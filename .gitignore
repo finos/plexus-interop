@@ -1,0 +1,63 @@
+### Gradle ###
+build
+node_modules
+.gradle/
+
+### Maven ###
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.idea
+*.iml
+**/src-gen/
+**/emf-gen
+**/xtend-gen
+**/xtext-gen
+/plexus-idl.parent/plexus-idl/model/
+/plexus-idl.parent/plexus-idl.vscode/out
+logs
+
+### Eclipse ###
+.classpath
+.project
+.settings/
+.metadata/
+bin/
+
+### JS ###
+
+npm-debug.log
+lerna-debug.log
+npm-debug.log.*
+yarn-error.log
+coverage
+**/dist
+**/target/
+
+### VS Code ###
+**/*/symbols.json
+**/.vscode/settings.json
+
+### Asciidoc ###
+
+**/.asciidoctor/*
+
+### NPM ###
+
+.npmrc
+
+### Xtext / Xtend
+generated/
+src-gen/
+xtend-gen/
+xtext-gen/
+
+### IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode
+out/
+
+### Local configuration file (sdk path, etc)
+local.properties
