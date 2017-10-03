@@ -1,0 +1,43 @@
+dependencies {
+    
+	testCompile "junit:junit:4.12"
+	testCompile project(':dsl:model')
+	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
+	testCompile "org.eclipse.xtext:org.eclipse.xtext.xbase.testing:${xtextVersion}"
+    	
+	compile project(':dsl:model')
+    	compile "org.eclipse.xtext:org.eclipse.xtext:${xtextVersion}"
+    	compile "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
+	compile "org.eclipse.xtext:org.eclipse.xtext.ecore:${xtextVersion}"    
+}
+configurations {
+    mwe2 {
+        extendsFrom compile
+    }
+}
+
+dependencies {
+    mwe2 "org.eclipse.emf:org.eclipse.emf.mwe2.launch:2.9.0.201605261059"
+    mwe2 "org.eclipse.xtext:org.eclipse.xtext.common.types:${xtextVersion}"
+    mwe2 "org.eclipse.xtext:org.eclipse.xtext.xtext.generator:${xtextVersion}"
+    mwe2 "org.eclipse.xtext:xtext-antlr-generator:[2.1.1, 3)"
+
+	// added for Xcore support
+	mwe2 'org.eclipse.emf:org.eclipse.emf.ecore.xcore:+'
+	mwe2 'org.eclipse.emf:org.eclipse.emf.codegen.ecore.xtext:+'
+}
+
+task generateXtextLanguage(type: JavaExec) {
+    main = 'org.eclipse.emf.mwe2.launch.runtime.Mwe2Launcher'
+    classpath = configurations.mwe2
+    inputs.file "src/main/java/com/db/plexus/interop/dsl/protobuf/GenerateProtoLang.mwe2"
+    inputs.file "src/main/java/com/db/plexus/interop/dsl/protobuf/ProtoLang.xtext"
+    outputs.dir "src/main/xtext-gen"
+    args += "src/main/java/com/db/plexus/interop/dsl/protobuf/GenerateProtoLang.mwe2"
+    args += "-p"
+    args += "rootPath=/${projectDir}/.."
+}
+
+generateXtext.dependsOn(generateXtextLanguage)
+clean.dependsOn(cleanGenerateXtextLanguage)
+eclipse.classpath.plusConfigurations += [configurations.mwe2]

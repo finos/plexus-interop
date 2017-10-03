@@ -1,0 +1,36 @@
+dependencies {
+	compile "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
+	compile 'org.eclipse.emf:org.eclipse.emf.ecore.xcore.lib:+'
+	
+	xtextLanguages 'org.eclipse.emf:org.eclipse.emf.ecore.xcore:+'
+	xtextLanguages 'org.eclipse.emf:org.eclipse.emf.ecore.xcore.lib:+'
+	xtextLanguages "org.eclipse.emf:org.eclipse.emf.codegen:+"
+	xtextLanguages 'org.eclipse.emf:org.eclipse.emf.codegen.ecore:+'
+	xtextLanguages 'org.eclipse.emf:org.eclipse.emf.codegen.ecore.xtext:+'
+	xtextLanguages "org.eclipse.xtext:org.eclipse.xtext.ecore:${xtextVersion}"
+	xtextLanguages "org.eclipse.emf:org.eclipse.emf.mwe2.lib:2.9.1.201705291010"
+}
+
+sourceSets {
+	main {
+		resources {
+			exclude '**/*.xcore'
+		}
+	}
+}
+
+xtext {
+	version = "${xtextVersion}"
+	languages {
+		ecore {
+			setup = 'org.eclipse.xtext.ecore.EcoreSupport'
+		}
+		codegen {
+			setup = 'org.eclipse.emf.codegen.ecore.xtext.GenModelSupport'
+		}
+		xcore {
+			setup = 'org.eclipse.emf.ecore.xcore.XcoreStandaloneSetup'
+			generator.outlet.producesJava = true
+		}
+	}
+}

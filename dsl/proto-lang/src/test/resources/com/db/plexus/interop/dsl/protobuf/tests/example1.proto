@@ -1,0 +1,77 @@
+//
+// Copyright 2017 Plexus Interop Deutsche Bank AG
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+syntax = "proto3";
+
+package plexus.interop;
+
+import "example2.proto";
+
+option csharp_namespace="Plexus.Interop.Generated";
+option int_option=1;
+
+message Message1 {
+	string string_field_1 = 1;
+	sint32 sint32_field_1 = 2;
+
+	map<sint32, .plexus.interop.Message2> map_field_1 = 99;
+
+	.plexus.interop.Enum1 enum_field_1 = 3;
+	Message2 message_field_1 = 10;
+	Message2.SubEnum1 external_sun_enum_1 = 11;
+	Message3 external_file_message = 13;
+
+	reserved 'reserve3', 'reserve4';
+
+	oneof oneOfField {
+		interop.Message2 oneof_case_1 = 16;
+		Message3 oneof_case_2 = 17;
+	}
+
+	reserved 'reserve1', 'reserve2';
+
+	reserved 100 to 999, 10000;
+
+	Message4 msg4_field = 5;
+}
+
+enum Enum1 {
+}
+
+message Message2 {
+	enum SubEnum1 {
+	}
+
+	message SubMessage1 {
+		message SubMessage1 {
+		}
+	}
+
+	message SubMessage2 {
+		SubMessage1.SubMessage1 sub_sub_field_1 = 1 [string_option="aaa", int_option=12];
+		SubMessage1 sub_field_1 = 2;
+	}
+
+	option message_opt = "aaa";
+
+	SubMessage1 sub_message_field_1 = 1;
+}
+
+service Service1 {
+	rpc ServerStream (Message1) returns (stream Message2);
+	rpc DuplexStream (stream Message2) returns (stream interop.Message2) { option service_id="xxx"; }
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin
+      name="%pluginName"
+      id="com.db.plexus.interop.dsl.model"
+      version="1.0.0"
+      provider-name="%providerName">
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.emf.ecore" export="true"/>
+      <import plugin="org.eclipse.xtext.xbase.lib" export="true"/>
+      <import plugin="org.eclipse.emf.ecore.xcore.lib" export="true"/>
+   </requires>
+
+   <runtime>
+      <library name=".">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated proto -->
+      <package
+            uri="http://www.db.com/plexus/interop/dsl/protobuf"
+            class="com.db.plexus.interop.dsl.protobuf.ProtobufPackage"
+            genModel="src/main/java/proto.xcore"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated interop -->
+      <package
+            uri="http://www.db.com/plexus/interop/dsl"
+            class="com.db.plexus.interop.dsl.DslPackage"
+            genModel="src/main/java/interop.xcore"/>
+   </extension>
+
+</plugin>
