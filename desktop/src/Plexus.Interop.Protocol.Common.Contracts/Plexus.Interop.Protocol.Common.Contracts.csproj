@@ -5,6 +5,7 @@
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
     <AssemblyName>Plexus.Interop.Protocol.Common.Contracts</AssemblyName>
     <RootNamespace>Plexus.Interop.Protocol.Common</RootNamespace>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

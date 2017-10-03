@@ -88,9 +88,8 @@ export class ElectronAppLauncher {
                 this.connected = true;
                 log.info("Launcher client connected to Broker");
                 this.launchOnStartup.forEach(launchPath => {
-                    
                     this.launchApp(launchPath)
-                        .then(() => log.info(`App Launcher for ${launchPath} path`))
+                        .then(() => log.info(`App Launched for ${launchPath} path`))
                         .catch(() => log.error(`Could not launch app for ${launchPath} path`));
                 });
             })

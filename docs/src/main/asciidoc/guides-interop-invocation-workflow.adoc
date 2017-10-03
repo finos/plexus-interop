@@ -1,0 +1,62 @@
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+participant "Service Consumer Application" as ConsumerComponent
+participant "Interop Broker" as InteropBroker
+participant "Interop Registry" as InteropRegistry
+participant "App Registry" as AppRegistry
+participant "App Lifecycle Manager" as AppLifecycleManager
+participant "Some App Launcher" as AppLauncher
+participant "Service Provider Application" as ProviderApplication
+
+ConsumerComponent -> InteropBroker : send request message to invoke service method
+InteropBroker -> InteropRegistry : find service provider application
+InteropBroker -> InteropBroker: check if provider application is connected
+InteropBroker -> AppLifecycleManager: request launch of provider application
+AppLifecycleManager -> AppRegistry: get app launcher id and launch params
+AppLifecycleManager -> AppLauncher: request launch by providing launch params
+AppLauncher -> ProviderApplication: launch app and provide instance id and broker connectivity details
+AppLifecycleManager <-- AppLauncher: launched app instance id
+InteropBroker <-- AppLifecycleManager: launched app instance id
+InteropBroker -> InteropBroker: wait for launched app with the specified id connected
+ProviderApplication --> InteropBroker: connect to broker
+InteropBroker -> ProviderApplication: send request message to invoke service method
+ProviderApplication --> InteropBroker: response
+InteropBroker --> ConsumerComponent: response
+@enduml
+....
+
+Let us review the most interesting scenario, which includes app launch:
+
+* When Desktop Plexus is started it creates transport endpoints and start listen for incoming connections.
+* Plexus Interop launches app A and provides it with the configuration on how to connect to transport servers.
+* App A initializes Client APIs and connects to Broker. Client and Broker performs handshake after which Broker registers the connected instance start tracking it.
+
+Now user wants to send some information from app A into another app B available in Plexus. Here is what happens in app A:
+
+* App A creates an input message instance using builder provided by Client API library
+* App A calls service method in Client API and passes created message instance
+* Client API performs several steps:
+** Creates header which contains information about the invocation: sender, receiver, service name, method name etc.
+** Serializes the created header via Protobuf and submits into Interop Transport for sending
+** Serializes the created input message into binary stream using Protobuf and submits into Interop Transport for sending
+** Transport splits the incoming message stream into one or more frames and send them to the pipe
+
+Plexus Host process is doing the following:
+
+* Interop Transport reads binary stream from transport and re-constructs headers and messages from received frames.
+* When new *header* arrives Transport starts to build new message blob from frames related to the message
+* Once header and message blobs are constructed, Transport passes them into Interop Broker
+* Interop Broker deserializes header blob and checks information about message receiver
+* If target app is not running then Interop Broker sends "launch app" event to App Launcher with the ID of app B and waits
+* App Launcher starts target app B. After launch app B will:
+** Register callback for process API calls
+** Register its instance in Interop Broker (same as app A)
+* Interop Broker detects that app B is live and sends message into it using Transport
+
+Now that message is send to app B via transport remaining part is easy:
+
+* Interop Transport within app B restores message blob and passes it into Client API
+* Client API deserializes blob into strongly typed message and invokes callback registered by app B code
+* App B processes the message and sends reply using same approach as original request, but in reverse direction

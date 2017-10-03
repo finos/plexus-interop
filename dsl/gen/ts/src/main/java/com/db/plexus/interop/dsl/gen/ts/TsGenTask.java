@@ -64,13 +64,17 @@ public class TsGenTask extends BaseGenTask {
         }
 
         final List<String> protoFilePaths = resources.stream()
-                .map(resource -> resource.getURI().toFileString())
+                .map(resource -> new File(resource.getURI().toFileString()).getAbsolutePath())
                 .filter(resourcePath -> resourcePath.endsWith(".proto"))
                 .collect(Collectors.toList());
 
-        final String outDirPath = this.getOutDirUri().toFileString();
+        final String outDirPath = this.getAbsolutePath(config.getOutDir());
 
-        if (pbJsPath != null) {
+        if (protoFilePaths.isEmpty()) {
+            this.logger.warning("No proto resources detected");
+        }
+
+        if (!protoFilePaths.isEmpty() && pbJsPath != null) {
             this.logger.info("Using " + pbJsPath + " to generate JS messages");
             final List<String> pbJsArgs = new ArrayList<>(Arrays.asList(pbJsPath));
             pbJsArgs.addAll(jsProtoArgs(config, outDirPath));

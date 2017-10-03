@@ -7,6 +7,7 @@
     <PackageId>Plexus.Utils</PackageId>
     <RootNamespace>Plexus</RootNamespace>
     <LangVersion>latest</LangVersion>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
 

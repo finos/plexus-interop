@@ -4,7 +4,8 @@
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.5;net452</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.5</TargetFrameworks>
     <RootNamespace>Plexus.Interop.Apps</RootNamespace>
-
+    <Version>0.1.0</Version>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

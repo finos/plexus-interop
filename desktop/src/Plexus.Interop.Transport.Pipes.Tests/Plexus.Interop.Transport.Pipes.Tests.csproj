@@ -8,6 +8,8 @@
     <PlatformTarget Condition=" '$(OS)' != 'Windows_NT'">x64</PlatformTarget>
 
     <RootNamespace>Plexus.Interop.Transport.Pipes</RootNamespace>
+    <Version>0.1.0</Version>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

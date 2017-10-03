@@ -1,4 +1,4 @@
-# Contributing to PLexus Interop
+# Contributing to Plexus Interop
 Thanks for your interest in the project! Here is some basic information about how to contribute.
  
 # Contributor License Agreement (CLA)

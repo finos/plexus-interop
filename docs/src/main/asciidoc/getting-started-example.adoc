@@ -1,179 +1,375 @@
-To quickly introduce Plexus let us show one of the simplest scenarios. There might be a lot of other scenarios of interoperability between desktop apps. You can find more code samples in a dedicated section <<samples, Samples>>.
+For quick introduction let us show how to implement two apps using different technologies which communicates with each other through Interop Broker:
 
-In this example we will build two apps using different technologies and let those apps communicate with each other:
+- `vendorA.fx.CcyPairRateProvider` - .NET app developed by Vendor A in C#. The app provides FX pair exchange rates to other apps.
+- `vendorB.fx.CcyPairRateViewer` - Web app running in Electron developed by Vendor B in TypeScript. The app allows user to request FX pair exchange rate from other apps.
 
-- FxPriceViewer - web app which allows user to request price for some FX currency pair.
-- FxPriceProvider - .NET app which provides price for first app.
+==== Define Service
 
-// TODO - @Andrey, @Anton, need to insert screenshots into section
+First of all, both vendors need to agree and define common contract for FX rate providing service if it's not yet standardized and published.
 
-==== How to build and run example
+Out of the box Plexus Interop uses https://developers.google.com/protocol-buffers/docs/reference/proto3-spec[Google Protocol Buffers Version 3] language to define messages and services.
 
-// TODO implement and deploy example code somewhere and update link below
-. Clone (or download and extract) source code of the example from https://github.com/plexus/quick-start-example.
-. Open console in the root directory of the downloaded repository.
-. Run `build` command. Wait until the build script is finished: it should download all the required dependencies and build both example apps.
-. Launch the first app using command `plexus-host launch FxPriceViewer`. This command will start invisible `Plexus.Host.exe` process, which in its turn will launch FxPriceViewer app.
-. In the opened app window type in "EURUSD" and click "Request Quote" button.
-. Plexus will automatically launch FxPriceProvider .NET console app which provides quoting service.
-. In the opened console app you will see the incoming quote request.
-. Enter any quote value, e.g. "1.07" and press Enter.
-. Check the FxPriceViewer app screen. You should see the quote for the requested pair.
+Create folder "metadata" and put the following file with service and messages definitions into the folder:
 
-// TODO Screenshots
-
-==== Walk through example code
-
-Now that we can build and run the example, let's walk through source code.
-
-The repository consist of 3 folders:
-
-* `metadata` - definition of interop API for example apps.
-* `fx-price-viewer` - source code of the FxPriceViewer web app.
-* `fx-price-provider` - source code of the FxPriceProvider .NET app.
-
-===== Metadata
-
-`metadata` directory contains interop API definitions. Plexus uses https://developers.google.com/protocol-buffers/docs/proto3[Google Protobuf's proto3] syntax to define services plus additional language to define apps and links between them.
-Check <<reference-metadata-definition-language, Metadata definition language>> section for the full specification of Plexus language. Plexus also has https://marketplace.visualstudio.com/items?itemName=Plexus.VSCodePlugin[plugin for Visual Studio Code]
-which provides syntax highlighting, code completion and validation when editing metadata files.
-
-// TODO need to add app registry to the example
-
-Metadata for our example has two files:
-
-* Definition of public interfaces in proto3 syntax:
-+
 [source, php]
-.fx-quote.proto
+./metadata/fx/CcyPairRateService.proto
 ----
-package Plexus.Samples;
+syntax = "proto3";
 
-message FxCurrencyPair {
+package fx;
+
+message CcyPair {
     string ccyPairName = 1;
 }
 
-message FxCurrencyPairPrice {
+message CcyPairRate {
     string ccyPairName = 1;
-    double price = 2;
+    double rate = 2;
 }
 
-service FxQuoteService {
-    rpc GetQuote(FxCurrencyPair) returns (FxCurrencyPairPrice);
+service CcyPairRateService {
+    rpc GetRate(CcyPair) returns (CcyPairRate);
 }
 ----
 
-* Definition of interop API between example apps. For each app it specifies which methods are provided to others, and which methods are consumed from others.
-+
+==== Implement C# App
+
+Each app integrated to Plexus Interop must define and publish interop manifest where it declares which services it consumes and which services it provides.
+Published manifests then downloaded and used by Interop Brokers running on user machines.
+
+Application can produce and consume many services simultaneously, but our example manifest is pretty straightforward as the app just implements one method.
+
+Put the following interop manifest to "/metadata/vendorA/fx/CcyPairRateProvider.interop":
+
 [source, php]
-.fx-quote.plexus
+./metadata/vendorA/fx/CcyPairRateProvider.interop
 ----
-import "fx-quote.proto";
+package vendorA.fx;
 
-package Plexus.Samples;
+import "fx/CcyPairRateService.proto";
 
-application FxPriceProvider {
-    provides FxQuoteService.GetQuote;
-}
-
-application FxPriceViewer {
-    consumes FxQuoteService.GetQuote;
+application CcyPairRateProvider {
+    provides fx.CcyPairRateService { GetRate; }
 }
 ----
 
-===== FxPriceViewer code
+Let's create a simple app to demonstrate using of Plexus Interop API from C# app.
+To do this, enter the following "dotnet" toolset command:
 
-TODO @Anton - explain FxPriceViewer code
+`dotnet new console -o VendorA.FX.CcyPairRateProvider`
 
-===== FxPriceProvider code
+The command will create folder "VendorA.FX.CcyPairRateProvider" with console C# application inside.
+Navigate to the folder and invoke the following command to add Plexus.Interop.Client package:
 
-TODO @Anton - explain FxPriceProvider code
+`dotnet add VendorA.FX.CcyPairRateProvider\VendorA.FX.CcyPairRateProvider.csproj package Plexus.Interop.Client`
 
-===== Build scripts
+Ok, now we have application. Let's generate the code required for it according to interop manifest.
+To do this we need java-based tool "plexusgen" and https://github.com/google/protobuf/releases[Protobuf compiler "protoc"]:
 
-TODO @Anton - explain how build scripts work
+`java -jar plexusgen.jar --type=csharp --baseDir=metadata --input=metadata/vendorA/fx/CcyPairRateProvider.interop --namespace=VendorA.FX --output=VendorA.FX.CcyPairRateProvider --protoc=protoc.exe`
 
-==== How to make a change in example
+This command generates C# classes for all the messages referenced by the given interop manifest into the specified output folder, with the specified C# namespace.
+In our case "VendorA.FX.CcyPair" and "VendorB.FX.CcyPairRate" classes are generated in file CcyPairRateService.cs. Note that you need to specify path to Protobuf compiler
+using argument "--protoc" or place protoc compiler into the current folder.
 
-Let us improve our apps so that FxQuoteViewer shows all quote changes sent from FxQuoteProvider.
+Now we're ready to write the code. Add the following code to Program.cs:
+[source, java]
+./VendorA.FX.CcyPairRateProvider/Program.cs
+----
+using System;
+using System.Threading.Tasks;
+using Plexus.Interop;
 
-. First, we need to add new method into API definition to send quote updates:
- +
-Open file "/metadata/fx-quote.proto" and add new method GetQuoteStream to service FxQuoteService:
-+
+namespace VendorA.FX.CcyPairRateProvider
+{
+    public sealed class Program
+    {
+        public static void Main(string[] args)
+        {
+            new Program().MainAsync(args).GetAwaiter().GetResult();
+        }
+
+        public async Task MainAsync(string[] args)
+        {
+            // Broker location to connect is specified
+            // either in the first command line argument or in environment variable
+            var brokerLocation = args.Length > 0
+                ? args[0]
+                : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR");
+
+            // Defining client options
+            var clientOptions = new ClientOptionsBuilder()
+                .WithDefaultConfiguration(brokerLocation)
+                .WithApplicationId("vendorA.fx.CcyPairRateProvider")
+                .WithProvidedService("fx.CcyPairRateService", b =>
+                    b.WithUnaryMethod<CcyPair, CcyPairRate>("GetRate", GetRateAsync))
+                .Build();
+
+            // Connecting
+            var client = ClientFactory.Instance.Create(clientOptions);
+            await client.ConnectAsync();
+            Console.WriteLine("Connected. Waiting for requests. Press CTRL+C to disconnect.");
+            Console.CancelKeyPress += (sender, eventArgs) => client.Dispose();
+
+            // Awaiting completion
+            await client.Completion;
+            Console.WriteLine("Disconnected.");
+        }
+
+        private async Task<CcyPairRate> GetRateAsync(CcyPair request, MethodCallContext context)
+        {
+            Console.WriteLine("Received request: {0}", request);
+            CcyPairRate response;
+            switch (request.CcyPairName)
+            {
+                case "EURUSD":
+                    response = new CcyPairRate
+                    {
+                        CcyPairName = "EURUSD",
+                        Rate = 1.17
+                    };
+                    break;
+                case "EURGBP":
+                    response = new CcyPairRate
+                    {
+                        CcyPairName = "EURGBP",
+                        Rate = 0.88
+                    };
+                    break;
+                default:
+                    response = new CcyPairRate
+                    {
+                        CcyPairName = "Unknown Pair"
+                    };
+                    break;
+            }
+            Console.WriteLine("Sending response: {0}", response);
+            return response;
+        }
+    }
+}
+----
+
+And finally, build the code:
+
+`dotnet build -c release -r win-x86 -o ../CcyPairRateProvider VendorA.FX.CcyPairRateProvider`
+
+This command will build our app to folder "CcyPairRateProvider".
+
+==== Implement TypeScript App
+
+Consumer manifest in our example is also very simple.
+
+Put the following content to "metadata/vendorB/fx/CcyPairRateViewer.interop":
+
 [source, php]
-.fx-quote.proto
+.metadata/vendorB/fx/CcyPairRateViewer.interop
 ----
-package Plexus.Samples;
+package vendorB.fx;
 
-message FxCurrencyPair {
-    string ccyPairName = 1;
-}
+import "fx/CcyPairRateService.proto";
 
-message FxCurrencyPairPrice {
-    string ccyPairName = 1;
-    double price = 2;
-}
-
-service FxQuoteService {
-    rpc GetQuote(FxCurrencyPair) returns (FxCurrencyPairPrice);
-    rpc GetQuoteStream(FxCurrencyPair) returns (stream FxCurrencyPairPrice); // New method!
+application CcyPairRateViewer {
+    consumes fx.CcyPairRateService { GetRate; }
 }
 ----
 
-. Open file "/metadata/fx-quote.plexus" and add method GetQuoteStream to the list of provided methods of FxPriceProvider and to the list of consumed methods of FxPriceViewer:
-+
-[source, php]
-.fx-quote.plexus
+Let's create Web App's folder and move to it
+```
+mkdir ccy-pair-rate-viewer
+cd ccy-pair-rate-viewer
+```
+Now we can initialize our App's `npm` module running:
+```
+npm init
+```
+and passing default answers to all prompt questions. Then we need to install few compile:
+```
+npm i @plexus-interop/client @plexus-interop/websocket-transport --save
+```
+and dev dependencies:
+```
+npm i typescript browserify copyfiles electron trash-cli --save-dev
+```
+Let's also create basic tsconfig.json (Typescript Config) file and put it to the root:
+
+[source, json]
+./ccy-pair-rate-viewer/tsconfig.json
 ----
-import "fx-quote.proto";
-
-package Plexus.Samples;
-
-application FxPriceProvider {
-    // provides FxQuoteService.{GetQuote}; was
-    provides FxQuoteService.{GetQuote, GetQuoteStream}; // now FxPriceProvider app implements additional method
+{
+  "compilerOptions": {
+    "target": "es6",
+    "outDir": "dist/main",
+    "rootDir": ".",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "declaration": true,
+    "pretty": true,
+    "lib": ["es6", "dom"],
+    "types": ["long"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/**"
+  ]
 }
-
-application FxPriceViewer {
-    // consumes FxQuoteService.{GetQuote}; was
-    consumes FxQuoteService.{GetQuote, GetQuoteStream}; // now FxPriceViewer app implements additional method
-}
 ----
 
-. Run in repository root: `plexus gen --app=Plexus.Samples.FxPriceProvider --lang=csharp --metadata_dir="metadata" --output_dir="FxPriceProvider/Generated"`. It will update C# API code.
+Then let's use code generation tool to generate Client's code for our application:
+```
+java -jar plexusgen.jar --type=ts --baseDir=../metadata --input=CcyPairRateViewer.interop --out=src/gen --protoc=./node_modules/.bin/pbts.cmd
+```
+Client's generated code will be saved to:
+```
+src/gen/CcyPairRateViewerGeneratedClient.ts
+```
+Let's create our main application's code, it will connect to broker, send request for Rate and print response:
 
-. Next open .NET app and implement new `GetQuoteStream` service:
-+
-[source, cs]
-.QuoteProvider.cs
+[source, typescript]
+./ccy-pair-rate-viewer/src/index.ts
 ----
-include::quick-start/QuoteProvider.cs[]
+import { CcyPairRateViewerClientBuilder, CcyPairRateViewerClient } from "./gen/CcyPairRateViewerGeneratedClient";
+import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
+
+// Read launch arguments, provided by Electron Launcher
+declare var window: any;
+const electron = window.require("electron")
+const remote = electron.remote;
+const webSocketUrl = remote.getCurrentWindow().plexusBrokerWsUrl;
+const instanceId = remote.getCurrentWindow().plexusAppInstanceId;
+
+new CcyPairRateViewerClientBuilder()
+    // App's ID and Instance ID received from Launcher
+    .withClientDetails({
+        applicationId: "vendorB.fx.CcyPairRateViewer",
+        applicationInstanceId: instanceId
+    })
+    // Pass Transport to be used for connecting to Broker
+    .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
+    .connect()
+    .then((rateViewerClient: CcyPairRateViewerClient) => {
+        // Client connected, we can use generated Proxy Service to perform invocation
+        rateViewerClient.getCcyPairRateServiceProxy()
+            .getRate({ccyPairName: "EURUSD"})
+            .then(rateResponse => {
+                document.body.innerText = `Received rate ${rateResponse.ccyPairName}-${rateResponse.rate}`;
+            })
+            .catch(e => console.log("Failed to receive rate", e))
+    });
 ----
-TODO @Anton insert modified C# code
 
-. Run in repository root: `plexus gen --app=Plexus.Samples.FxPriceViewer --lang=js --metadata_dir="metadata" --output_dir="FxPriceViewer/generated"`. It will update JavaScript API code.
-
-. Finally we need to update HTML app to show price updates:
-+
+Let's also create simple HTML file to load result Javascript bundle from:
 [source, html]
-.greeting.html
+./ccy-pair-rate-viewer/index.html
 ----
-include::quick-start/app.html[]
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CCY Rate Viewer</title>
+    <script src="dist/rateViewer.bundle.js"></script>
+</head>
+<body>
+</body>
+</html>
 ----
-// TODO insert modified HTML/JS code
-TODO @Andrey - update HTML
 
-. Run `build` in repository root to re-build all apps
+Let's add simple build scripts to our `package.json` to compile the code and package everything to one bundle:
+[source, json]
+./ccy-pair-rate-viewer/package.json -> scripts
+----
+"scripts": {
+    "prebuild": "trash dist",
+    "compile": "tsc -p tsconfig.json", <1>
+    "copy-gen-folders": "copyfiles src/gen/* dist/main", <2>
+    "package": "browserify ./dist/main/src/index.js --outfile ./dist/rateViewer.bundle.js", <3>
+    "build": "npm run compile && npm run copy-gen-folders && npm run package" <4>
+  }
+----
+<1> Compile Typescript Code to JS
+<2> Copy Generated messages to dist folder
+<3> Package everything into one bundle
+<4> Run all build steps together
 
-. Launch FxPriceViewer: `plexus-host launch FxPriceViewer`
+Great! We are ready to build our application! Just call `build` command using `npm`:
+```
+npm run build
+```
 
-. In the opened screen type currency pair name "EURUSD" and press "Subscribe" button. Plexus should start the FxPriceProvider app.
+==== Register apps in App Registry
 
-. In FxPriceProvider console type any price, e.g. "1.07" and press Enter.
+Dotnet app can be launched using built-in "interop.NativeAppLauncher". For web app we need to use ElectronAppLauncher.
+Just copy folder "bin/win-x86/samples/apps/ElectronAppLauncher" into the current working folder.
+Also we need Plexus Interop Broker. Copy folder "bin/win-x86/broker" into the current working folder.
 
-. FxPriceViewer screen should show "1.07".
+Now we're ready to register both apps in app registry. To do this, create the app registry file "metadata/apps.json"
+with the following content:
 
-. In FxPriceProvider console type another price, e.g. "1.08" and press Enter.
+./metadata/apps.json
+[source, js]
+----
+{
+    "apps": [
+        {
+            "id": "interop.ElectronAppLauncher",
+            "displayName": "Electron App Launcher",
+            "launcherId": "interop.NativeAppLauncher",
+            "launcherParams": {
+                "cmd": "../ElectronAppLauncher/ElectronAppLauncher.exe",
+                "args": ""
+            }
+        },
+        {
+            "id": "vendorA.fx.CcyPairRateProvider",
+            "displayName": "Currency Pair Rate Provider",
+            "launcherId": "interop.NativeAppLauncher",
+            "launcherParams": {
+                "cmd": "../CcyPairRateProvider/CcyPairRateProvider.exe",
+                "args": ""
+            }
+        },
+        {
+            "id": "vendorB.fx.CcyPairRateViewer",
+            "displayName": "Currency Pair Rate Viewer",
+            "launcherId": "interop.ElectronAppLauncher",
+            "launcherParams": {
+                "path": "../ccy-pair-rate-viewer/dist/index.html"
+            }
+        }
+    ]
+}
+----
 
-. FxPriceViewer screen now should show "1.08".
+==== Run the Example
+
+Now we're ready to run the broker. The only required step is to generate interop.json file from our metadata.
+This file is used by broker to verify interop invocations and perform service discovery.
+
+To do this we need "plexusgen" tool again:
+
+`java -jar plexusgen.jar --type=json_meta --baseDir=metadata --out=metadata`
+
+Ok, now we're ready to launch our example. First start the broker and provide path to metadata folder:
+
+`broker\plexus.exe broker .\metadata`
+
+Then use electron launcher to start web app:
+
+`ElectronAppLauncher\ElectronAppLauncher.exe -apps ../ccy-pair-rate-viewer/dist/index.html`
+
+What should happen:
+* CcyPairRateViewer invoke fx.CcyPairRateService.GetRate.
+* Broker check that this service is implemented in CcyPairRateProvider and launch it.
+* CcyPairRateProvider connect to broker and receive the invocation.
+* CcyPairRateViewer receive the response.
+
+
+
+
+
+
+
+
+

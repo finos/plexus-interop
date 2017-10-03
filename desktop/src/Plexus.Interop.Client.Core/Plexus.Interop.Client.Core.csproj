@@ -5,6 +5,7 @@
     <RootNamespace>Plexus.Interop</RootNamespace>
     <LangVersion>latest</LangVersion>
     <AssemblyName>Plexus.Interop.Client.Core</AssemblyName>
+    <Version>0.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Internal\Client.cs" />

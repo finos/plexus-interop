@@ -1,63 +1,49 @@
-= Plexus
+= Plexus Interop
 :toc2:
 :toclevels: 2
 
 [[getting-started]]
 == Getting Started
 
-=== What is Plexus?
+=== What is Plexus Interop?
 
 include::getting-started-overview.adoc[]
 
-=== Example
+=== Code Examples
 
 include::getting-started-example.adoc[]
 
 [[guides]]
 == Guides
 
-=== Interoperability concepts
+=== Concepts
 
 include::guides-interop-concepts.adoc[]
+
+=== Invocation workflow
+
+include::guides-interop-invocation-workflow.adoc[]
+
+=== Plexus Interop integration workflow
+
+include::guides-interop-integration-workflow.adoc[]
+
+=== How to write custom App Launcher
+
+include::guides-how-to-write-custom-app-launcher.adoc[]
 
 [[guides-system-requirements]]
 === System requirements
 
 include::guides-system-requirements.adoc[]
 
-=== RPC architecture
-
-include::guides-rpc-architecture.adoc[]
-
-[[tutorials]]
-== Tutorials
-
-=== Integration with Plexus App Registry
-
-include::tutorials-app-registry-integration.adoc[]
-
-=== Integration with Plexus Interop
-
-include::tutorials-interop-integration.adoc[]
-
 [[reference]]
 == Reference
 
+=== App Registry
 include::spec-app-registry.adoc[]
 
-include::spec-metadata-definition-language.adoc[]
+[[reference-metadata-definition-language]]
+=== Interop Registry
 
 include::spec-interop-registry.adoc[]
-
-include::spec-named-pipes-transport.adoc[]
-
-[[samples]]
-== Samples
-
-=== Interop metadata examples
-
-include::samples-interop-metadata.adoc[]
-
-== FAQ
-
-include::faq.adoc[]

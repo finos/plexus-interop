@@ -1,0 +1,28 @@
+{
+  "name": "ccy-pair-rate-viewer",
+  "version": "1.0.0",
+  "description": "Quick start example",
+  "main": "index.js",
+  "private": true,
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@plexus-interop/client": "0.0.1",
+    "@plexus-interop/websocket-transport": "0.0.1"
+  },
+  "scripts": {
+    "prebuild": "trash dist",
+    "compile": "tsc -p tsconfig.json",
+    "copy-gen-folders": "copyfiles src/gen/* dist/main",
+    "package": "browserify ./dist/main/src/index.js --outfile ./dist/rateViewer.bundle.js",
+    "build": "npm run compile && npm run copy-gen-folders && npm run package"
+  },
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "copyfiles": "^1.2.0",
+    "electron": "^1.7.8",
+    "trash": "^4.1.0",
+    "trash-cli": "^1.4.0",
+    "typescript": "^2.5.3"
+  }
+}

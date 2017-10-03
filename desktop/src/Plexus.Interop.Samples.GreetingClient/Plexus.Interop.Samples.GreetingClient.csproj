@@ -17,7 +17,10 @@
 
     <LangVersion>latest</LangVersion>
 
-    <AssemblyName>GreetingClient</AssemblyName>    
+    <AssemblyName>GreetingClient</AssemblyName>
+
+    <Version>0.1.0</Version>
+    <IsPackable>false</IsPackable>
     
   </PropertyGroup>
 

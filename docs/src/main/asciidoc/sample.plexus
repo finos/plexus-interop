@@ -1,9 +1,0 @@
-import "./services/search.service"; // <1>
-
-package DB.GlobalMarkets; // <2>
-
-component UserAdmin { // <3>
-    provides CreateUserService.{CreateUser} to DB.GlobalMarkets.*; // <4>
-    provides UserInfoService.{GetUserInfo}; // <5>
-    consumes SearchService.{GetPersonInfo} from DB.GlobalMarkets.SearchEngine, DB.AWM.SearchEngine; // <6>
-}

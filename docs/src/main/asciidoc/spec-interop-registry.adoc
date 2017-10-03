@@ -1,3 +1,66 @@
-=== Interop Registry specification
+==== Messages and Services
 
-TODO - JSON schema or link to JSON schema with comments, Mikhail
+For messages and services definition Plexus uses Google Protobuf v3 format. For example:
+
+....
+package fx;
+
+message CcyPair {
+  string ccyPairName = 1;
+}
+
+message CcyPairRate {
+  string ccyPairName = 1;
+  double rate = 2;
+}
+
+service CcyPairRateService {
+  rpc GetRate (CcyPair) returns (CcyPairRate);
+}
+....
+
+You can find Protobuf specification here - https://developers.google.com/protocol-buffers/docs/proto3
+
+==== Interop Manifests
+
+Application interop manifests are defined using special `.interop` format. Here is an example:
+
+[source, php]
+----
+package vendorA.fx; // <1>
+
+import "fx/CcyPairRateService.proto"; // <2>
+
+application CcyPairRateProvider { // <3>
+    provides fx.CcyPairRateService to vendorA.* { GetRate; } // <4>
+    consumes interop.samples.GreetingService from interop.samples.GreetingServer { ShowGreeting; } <5>
+    consumes interop.samples.EchoService from interop.* { Echo; } <6>
+}
+----
+<1> Define namespace for application
+<2> Import services definition that application provides or consumes
+<3> Application name
+<4> Provided service definition. In this case app only allows using this implementation for other apps in package "vendorA".
+<5> Consumed service definition
+<6> One more consumed service definition.
+
+===== Consumes
+
+Consumes notation defines to which Service methods this component can execute. This Methods can be provided by several components
+ and they will be accessible by discovery for component client code. We explicitly ask to specify exact methods
+to support schema evolution and corner cases where one component produce not the full set of service methods
+
+Imagine the following scenario:
+
+* There is "ServiceA" fully implemented and produced by two components "ComponentA" and "ComponentB"
+* We add new additional method to "ServiceA"
+* "ComponentA" implements this method, where "ComponentB" is still in progress
+
+Thus exact method import will allow plexus to check if some methods used anywhere, it will allow to check if method is produced by
+both components and give error if not.
+
+===== Provides
+
+We ask to provide explicit list of methods for consume and provide notations to support service evolutions and changes.
+Plexus will be able to check if what set of methods of specific Service implemented in concrete Component and validate if
+all mapping are correct and consistent.

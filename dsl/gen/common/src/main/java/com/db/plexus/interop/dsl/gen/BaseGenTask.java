@@ -75,6 +75,10 @@ public abstract class BaseGenTask implements GenTask {
         return outDirUri;
     }
 
+    protected String getAbsolutePath(String relativePath) {
+        return Paths.get(".").resolve(relativePath).toAbsolutePath().toString();
+    }
+
     protected void validateResources() {
 
         final List<Issue> allIssues = new ArrayList<>();
@@ -142,6 +146,7 @@ public abstract class BaseGenTask implements GenTask {
     }
 
     protected int generateMessages(List<String> args) throws IOException {
+        this.logger.info(String.format("Running compiler with args [%s]", String.join(" ", args)));
         try {
             final int resultCode = new ProcessBuilder(args)
                     .inheritIO()

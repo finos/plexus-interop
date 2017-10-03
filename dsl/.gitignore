@@ -1,0 +1,26 @@
+# Xtext / Xtend
+generated/
+src-gen/
+xtend-gen/
+xtext-gen/
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+bin/
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# Gradle
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties

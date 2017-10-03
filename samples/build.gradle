@@ -1,0 +1,37 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+plugins {
+    id "com.github.hierynomus.license" version"0.14.0"
+}
+
+license {
+    header file("${rootDir}/LICENSE_HEADER")
+    mapping {
+        cs='JAVADOC_STYLE'
+        proto='DOUBLESLASH_STYLE'
+        interop='DOUBLESLASH_STYLE'
+    }
+    strictCheck true
+}
+
+task licenseFormatProto(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
+    source = fileTree(dir: 'metadata')
+            .exclude("**/google/protobuf/*.proto")
+            .include("**/*.proto").include("**/*.interop")
+}
+
+tasks["license"].dependsOn licenseFormatProto
+licenseFormat.dependsOn licenseFormatProto
+
+task build(type: Copy) {
+  def outputDir = "${rootDir}/bin/win-x86/samples/metadata"
+  if (Os.isFamily(Os.FAMILY_MAC)) {
+      outputDir="${rootDir}/bin/osx-x64/samples/metadata"
+  }
+  outputs.dir outputDir
+  inputs.dir 'metadata'
+  from 'metadata'
+  into outputDir
+}
+
+build.dependsOn('license')

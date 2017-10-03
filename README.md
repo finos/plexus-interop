@@ -1,5 +1,18 @@
 # Plexus Interop
 
+## Overview
+
+**Plexus Interop** is metadata-centric language-agnostic desktop app-to-app interoperability framework with extensible model for launching new instances of desktop Apps on demand.
+ 
+The main goal of the framework is to enable development of extensible workflows connecting independent Apps developed in different technologies (.NET, Web, Java, Python etc) and passing context (structured data objects) between them.
+
+Framework architecture is based around central broker providing hub-and-spoke connectivity between Apps and brokering strongly typed RPC-style calls between them. Broker has a connection to Application Lifecycle Manager which is capable of creating new instances of the Apps based on the their runtime-metadata (e.g. container type, launch command, params etc) defined in a registry.
+
+Plexus Interop separates interoperability from the container, which provides notable advantages: different containers can be leveraged in the same workflow, launched applications residing outside of containers can participate in interop activities.
+
+![Key components and high level architecture](./docs/src/main/asciidoc/images/architecture.png "Key components and high level architecture")
+ 
+
 ## Build/Install
 
 All Plexus components can be build using [Gradle](https://gradle.org/) tool using following command:
@@ -16,7 +29,7 @@ Invoke the following command to run the documentation build:
 
 After successful build documentation is available via:
 
-`docs/build/html5/index.html`
+`bin/docs/html5/index.html`
 
 ## Contributing
 

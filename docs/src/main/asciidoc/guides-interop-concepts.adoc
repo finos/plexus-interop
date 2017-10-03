@@ -10,9 +10,33 @@ There are 4 possible types of RPC methods in Plexus, just like in http://www.grp
 However Plexus is more than just an RPC framework:
 
 * Plexus is designed to provide interoperability within the same client desktop and it tracks lifecycle of desktop apps, i.e. knows if app is running or not and can initiate app launch on demand.
-* All interop calls in Plexus are going via central Interop Broker component which works as a mediator decoupling apps from each other and allowing dynamic service discovery.
 * Definitions of public APIs in proto3 format are stored in central interop registry thus defining standards of communication between apps.
 * In addition to API definitions in proto3 format, Plexus metadata also includes app manifests where each app declares which APIs it implements and which APIs it uses. This enables granular control for API usage and evolution.
+* All interop calls in Plexus are going via central Interop Broker component which works as a mediator decoupling apps from each other and allowing dynamic service discovery:
++
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+[App A] -> [Interop Broker] : 1) discover API implementations
+[Interop Broker] ..> [App A] : 2) apps B, C implement the API
+[Interop Broker] .. [App B]
+[Interop Broker] .. [App C]
+[Interop Broker] .. [App D]
+@enduml
+....
++
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+[App A] -> [Interop Broker] : 1) call API provided by app B
+[Interop Broker] --> [App B] : 2) launch app B
+[Interop Broker] --> [App B] : 3) call API
+[Interop Broker] .. [App C]
+[Interop Broker] .. [App D]
+@enduml
+....
 
 ==== High-level architecture
 
@@ -27,10 +51,10 @@ node "User Machine" {
         [Client Service API]
     }
     component "Plexus Host" {
-        [App Lifecycle Manager]
         [Interop Broker]
         [Interop Transport]
         [App Launcher]
+        [App Lifecycle Manager]
     }
 }
 cloud "Central Registries" {
@@ -43,13 +67,14 @@ cloud "Central Registries" {
 [Interop Registry] -> [Interop Broker] : load JSON
 [App Registry] -> [App Lifecycle Manager] : load JSON
 [Interop Broker] -> [App Lifecycle Manager] : request app launch
-[App Lifecycle Manager] -> [App Launcher] : request app launch
-[App Launcher] -> appInstance : start app
-[App Launcher] -> [App Lifecycle Manager] : report app status
 [Interop Broker] <-> [Interop Transport] : send/receive messages
 [Interop Transport] <-> transportApp : send/receive messages
 [Client Service API] <-> transportApp : send/receive  messages
 [Client Service API] <-> [App Functionality] : send/receive messages
+[App Lifecycle Manager] -> [App Launcher] : request app launch
+[App Launcher] -> appInstance : start app
+[App Launcher] -> [App Lifecycle Manager] : report app status
+
 @enduml
 ....
 
@@ -63,17 +88,14 @@ cloud "Central Registries" {
 ** *Service* - set of related methods that can be provided by one or many applications. Plexus uses Protobuf v3 definition language syntax for defining services.
 ** *Application* - corresponds to a desktop application. Each application can provide services to other applications and consume services provided by other applications.
 * *Interop Broker* - responsible for managing interop sessions, routing messages between apps and discovery mechanisms. If message was sent to component that is not running yet then Broker asks App Launcher to start the app using mapping between components and apps.
-* *Interop Registry* - provides Interop Broker with all information about components, services and messages in run-time. Interop Registry is populated from *approved* Interop API Definitions.
+* *Interop Registry* - provides Interop Broker with all information about services, messages and connections between apps in run-time. Interop Registry is populated from *approved* Interop API Definitions.
+* *App Registry* - provides App Lifecycle Manager with all information about how to launch apps.
 * *Interop Transport* - responsible for delivering serialized messages between Interop Broker and client interop APIs
 * *Client Service API* - client library that app uses to provide some interop service or to consume another interop API. API is always generated from interop API definitions. Depending on app technology API can be generated either in run-time (e.g. JavaScript) or in compile time (e.g. DLLs for .NET). Compile-time generation uses Plexus SDK tools.
 
-==== Interop Registry
-
-Interop Registry provides Interop Broker with full information about messages, services, components and their mapping to apps.
-
-TODO @Mikhail - bring interop registry example here, explain in more details what was in "getting started" section.
-
 ==== Interop Broker
+
+Interop broker is the central component. It allows decoupling of apps from each other and provides powerful features like discovery.
 
 [plantuml]
 ....
@@ -93,81 +115,3 @@ Interop Broker has several responsibilities:
 * It tracks which interop API implementations are alive. If some app calls API which is not alive yet then Broker asks App Lifecycle Manager to start the app hosting this API.
 
 Interop Broker is not talking with apps directly - it relies on Interop Transport, which can deliver serialized messages across app boundaries.
-
-==== Point-to-point interop call when service provider is running
-
-TODO @Mikhail
-
-==== Point-to-point interop call when service provider is not running
-
-[plantuml]
-....
-@startuml
-skinparam monochrome true
-participant "Service Consumer Application" as ConsumerComponent
-participant "Interop Broker" as InteropBroker
-participant "App Registry" as AppRegistry
-participant "App Lifecycle Manager" as AppLifecycleManager
-participant "Some App Launcher" as AppLauncher
-participant "Service Provider Application" as ProviderApplication
-
-ConsumerComponent -> InteropBroker : invoke(\nProviderComponent.\nInteropService.\nInteropMethod\n)
-InteropBroker -> AppRegistry : findApplicationHosting(ProviderComponent)
-AppRegistry --> InteropBroker : providerApplication
-InteropBroker -> AppRegistry : findLauncherFor(ProviderApplication)
-AppRegistry --> InteropBroker : appLauncher
-InteropBroker -> AppLauncher : launch(providerApplication)
-AppLauncher -> AppLifecycleManager : onApplicationStarted(providerApplication)
-AppLauncher --> InteropBroker : application launched
-InteropBroker -> ProviderApplication :  invoke(ProviderComponent.InteropService.InteropMethod)
-ProviderApplication --> InteropBroker : response
-InteropBroker --> ConsumerComponent : response
-@enduml
-....
-
-TODO @Mikhail - clean up diagram, link descriptions below to it
-
-Let us review the most interesting scenario, which includes app launch:
-
-* When Desktop Plexus is started it creates transport endpoint and start listen for incoming connections. By default the transport is implemented as named pipe. The name of created pipe includes random GUID - this way multiple Plexus instances avoid clashes.
-* Plexus launches app A and provides it with the name of Broker's named pipe through command-line arguments, stdin, or in other way, depending on type of the app.
-* App A initializes Client APIs and connects to Broker. Client and Broker performs handshake after which Broker registers the connected instance.
-
-Now user wants to send some information from app A into another app B available in Plexus. Here is what happens in app A:
-
-* App A creates an input message instance using builder provided by Client API library
-* App A calls service method in Client API and passes created message instance
-* Client API performs several steps:
-** Creates header which contains information about the invocation: sender, receiver, service name, method name etc. 
-** Serializes the created header via Protobuf and submits into Interop Transport for sending
-** Serializes the created input message into binary stream using Protobuf and submits into Interop Transport for sending
-** Transport splits the incoming message stream into one or more frames and send them to the pipe
-
-Plexus Host process is doing the following:
-
-* Interop Transport reads binary stream from named pipe and re-constructs headers and messages from received frames.
-* When new *header* arrives Transport starts to build new message blob from frames related to the message
-* Once header and message blobs are constructed, Transport passes them into Interop Broker
-* Interop Broker deserializes header blob and checks information about message receiver
-* If target app is not running then Interop Broker sends "launch app" event to App Launcher with the ID of app B and waits
-* App Launcher starts target app B. After launch app B will:
-** Register callback for process API calls
-** Register its instance in Interop Broker (same as app A)
-* Interop Broker detects that app B is live and sends message into it using Transport and named pipes
-
-Now that message is send to app B via named pipes remaining part is easy:
-
-* Interop Transport within app B restores message blob and passes it into Client API
-* Client API deserializes blob into strongly typed message and invokes callback registered by app B code
-* App B processes the message and sends reply using same approach as original request, but in reverse direction
-
-==== Sandbox Interop Registry
-
-TODO @Mikhail - to explain sandbox mode
-
-==== Interop registry format
-
-[source]
-----
-include::sample-interop-registry.json[]
-----

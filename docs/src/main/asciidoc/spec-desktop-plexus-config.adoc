@@ -1,6 +1,0 @@
-=== Desktop Plexus config
-
-[source]
-----
-include::sample-desktop-plexus-config.json[]
-----

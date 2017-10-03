@@ -3,9 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.3;net452;net46</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
-
-    <IsPackable>false</IsPackable>
+    
     <RootNamespace>Plexus.Interop.Transport.Transmission</RootNamespace>
+    <Version>0.1.0</Version>
+    <IsPackable>false</IsPackable>
+
   </PropertyGroup>
 
   <ItemGroup>
