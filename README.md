@@ -46,6 +46,8 @@ Run .Net to Web interop example:
 
 ## Documentation
 
+To check out docs, visit [https://symphonyoss.github.io/plexus-interop/](https://symphonyoss.github.io/plexus-interop/).
+
 Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/). 
 
 Invoke the following command to run the documentation build:
