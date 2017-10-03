@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>
+
+    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'win-x86'">x86</PlatformTarget>
+    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'osx-x64'">x64</PlatformTarget>
+
+    <PublishDir>../../../bin/$(RuntimeIdentifier)/broker</PublishDir>
+
+    <LangVersion>latest</LangVersion>
+
+    <AssemblyName>plexus</AssemblyName>
+  </PropertyGroup>
+  
+  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish" />
+  
+  <ItemGroup>
+    <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Host.Contracts\Plexus.Host.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Logging.NLog\Plexus.Logging.NLog.csproj" />
+    <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />    
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

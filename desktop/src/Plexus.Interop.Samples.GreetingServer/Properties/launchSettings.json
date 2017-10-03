@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Plexus.Interop.Samples.GreetingServer": {
+      "commandName": "Executable",
+      "executablePath": ".\\LaunchGreetingServer.cmd",
+      "workingDirectory": "$(SamplesDir)"
+    }
+  }
+}

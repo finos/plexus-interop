@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>
+
+    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'win-x86'">x86</PlatformTarget>
+    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'osx-x64'">x64</PlatformTarget>
+
+    <RepoRootDir>../../../</RepoRootDir>
+    <ArtifactsDir>$(RepoRootDir)bin/$(RuntimeIdentifier)/</ArtifactsDir>
+    <PublishDir>$(ArtifactsDir)broker/</PublishDir>
+    <ArtifactsSamplesDir>$(ArtifactsDir)samples/</ArtifactsSamplesDir>
+    
+    <LangVersion>latest</LangVersion>
+  
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="LaunchBroker.cmd" />
+    <None Remove="LaunchBroker.sh" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="LaunchBroker.cmd" />
+    <Content Include="LaunchBroker.sh" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Host.Contracts\Plexus.Host.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />
+    <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
+  </ItemGroup>
+
+  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish">
+    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />       
+  </Target>
+
+</Project>

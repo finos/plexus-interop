@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <PlatformTarget Condition=" '$(OS)' == 'Windows_NT'">x86</PlatformTarget>
+    <PlatformTarget Condition=" '$(OS)' != 'Windows_NT'">x64</PlatformTarget>
+
+    <RootNamespace>Plexus.Interop.Broker</RootNamespace>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="TestBroker\**" />
+    <EmbeddedResource Remove="TestBroker\**" />
+    <None Remove="TestBroker\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="Shouldly" Version="3.0.0-beta0003" />
+    <PackageReference Include="xunit" Version="2.3.0-beta5-build3769" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta4-build3742" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Testing\Plexus.Interop.Testing.csproj" />
+    <ProjectReference Include="..\Plexus.Utils.Testing\Plexus.Utils.Testing.csproj" />
+  </ItemGroup>
+
+</Project>

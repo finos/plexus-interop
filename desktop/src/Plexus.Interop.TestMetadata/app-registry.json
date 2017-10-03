@@ -1,0 +1,38 @@
+﻿[
+  {
+    "id": "Plexus.Launcher.Binary",
+    "displayName": "Exe launcher",
+    "type": "applicationLauncher",
+    "launcherId": "Plexus.Launcher.Binary",
+    "launcherParams": {}
+  },
+  {
+    "id": "notepad",
+    "displayName": "Text editor",
+    "launcherId": "Plexus.Launcher.Binary",
+    "launcherParams": {
+      "fileName": "notepad",
+      "arguments": ""
+    },
+    "type": "application"
+  },
+  {
+    "id": "System.SystemCalculator",
+    "displayName": "System Calculator",
+    "launcherId": "Plexus.Launcher.Binary",
+    "launcherParams": {
+      "fileName": "calc",
+      "arguments": ""
+    },
+    "type": "application"
+  },
+  {
+    "id": "google",
+    "displayName": "Search",
+    "launcherId": "Plexus.Launcher.Binary",
+    "launcherParams": {
+      "arguments": "http://google.com"
+    },
+    "type": "application"
+  }
+]

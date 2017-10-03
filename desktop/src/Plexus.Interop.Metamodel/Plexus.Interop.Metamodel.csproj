@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.3;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
+    <RootNamespace>Plexus.Interop.Metamodel</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Common.Contracts\Plexus.Common.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Metamodel.Contracts\Plexus.Interop.Metamodel.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

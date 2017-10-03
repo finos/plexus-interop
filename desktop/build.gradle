@@ -1,0 +1,83 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+plugins {
+    id "com.github.hierynomus.license" version"0.14.0"
+    id "de.undercouch.download" version "3.2.0"
+}
+
+license {
+    header file("${rootDir}/LICENSE_HEADER")
+    mapping {
+        cs='JAVADOC_STYLE'
+        proto='DOUBLESLASH_STYLE'
+        interop='DOUBLESLASH_STYLE'
+    }
+    strictCheck true
+}
+
+task licenseFormatCS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
+    source = fileTree(dir: 'src').exclude("**/bin/*").exclude("**/obj/*")
+            .exclude("**/google/protobuf/*.proto")
+            .include("**/*.cs").include("**/*.proto").include("**/*.interop")
+}
+
+tasks["license"].dependsOn licenseFormatCS
+licenseFormat.dependsOn licenseFormatCS
+
+task downloadDotnet << {
+    download {
+        onlyIfNewer true
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            src 'https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-win-x86.zip'
+            dest "$buildDir/win32/sdk/dotnet.zip"
+        } else if (Os.isFamily(Os.FAMILY_MAC)){
+            src 'https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-osx-x64.tar.gz'
+            dest "$buildDir/unix/sdk/dotnet.tar.gz"
+        } else {
+            src 'https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-linux-x64.tar.gz'
+            dest "$buildDir/unix/sdk/dotnet.tar.gz"
+        }
+    }
+}
+
+task downloadAndUnzipDotnet << {
+
+    copy {
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            from zipTree("$buildDir/win32/sdk/dotnet.zip")
+            into "$buildDir/win32/sdk/dotnet"
+        } else {
+            from tarTree(resources.gzip("$buildDir/unix/sdk/dotnet.tar.gz"))
+            into "$buildDir/unix/sdk/dotnet"
+        }
+    }
+}
+downloadAndUnzipDotnet.dependsOn(downloadDotnet)
+
+task build(type:Exec) {	
+    workingDir projectDir    
+    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        environment "PATH", "$buildDir/win32/sdk/dotnet/"
+        commandLine 'cmd', '/c', 'build-netcore-only.cmd'
+    } else {
+        environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
+        commandLine "$projectDir/build-netcore-only.sh"
+    }
+}
+build.dependsOn(downloadAndUnzipDotnet)
+build.dependsOn('license')
+
+task test(dependsOn: build, type:Exec) {
+    workingDir projectDir    
+    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        environment "PATH", "$buildDir/win32/sdk/dotnet/"
+        commandLine 'cmd', '/c', 'tests.cmd'
+    } else {
+        environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"  
+        commandLine './tests.sh'
+    }
+}
+
+task clean {
+    delete fileTree(dir: 'src').include("**/bin/*").include("**/obj/*")
+}

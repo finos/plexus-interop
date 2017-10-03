@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">netstandard1.3;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+    <NUGET_PACKAGES Condition=" '$(NUGET_PACKAGES)' == '' ">$(USERPROFILE)\.nuget\packages</NUGET_PACKAGES>
+    <ProtoCompilerPath>$(NUGET_PACKAGES)\google.protobuf.tools\3.4.0\tools\windows_x86\protoc</ProtoCompilerPath>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
+    <NUGET_PACKAGES Condition=" '$(NUGET_PACKAGES)' == '' ">~/.nuget/packages</NUGET_PACKAGES>
+    <ProtoCompilerPath>$(NUGET_PACKAGES)/google.protobuf.tools/3.4.0/tools/macosx_x64/protoc</ProtoCompilerPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.4.1" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Protocol.Common.Contracts\Plexus.Interop.Protocol.Common.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <ProtoRoot>../../../protocol/</ProtoRoot>
+    <ProtoOutDir>./</ProtoOutDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvailableItemName Include="Protobuf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="$(ProtoRoot)plexus.proto" />
+  </ItemGroup>
+
+  <Target Name="ProtoCompile" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <ProtoCCommand>$(ProtoCompilerPath) --csharp_out=$(ProtoOutDir) --csharp_opt=file_extension=.proto.cs -I $(ProtoRoot) @(Protobuf -> '%(Identity)', ' ')</ProtoCCommand>
+    </PropertyGroup>
+    <Message Importance="high" Text="$(ProtoCCommand)" />
+    <Delete Files="$(ProtoOutDir)*.proto.cs" />
+    <Exec Command="$(ProtoCCommand)" WorkingDirectory="$(ProjectDir)" />
+    <ItemGroup>
+      <Compile Include="$(ProtoOutDir)/*.proto.cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>

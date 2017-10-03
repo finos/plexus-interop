@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.3;net452;net46</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
+
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Plexus.Interop.Transport.Transmission</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.3.0-beta5-build3769" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Contracts\Plexus.Interop.Transport.Transmission.Contracts.csproj" />    
+    <ProjectReference Include="..\Plexus.Utils.Testing\Plexus.Utils.Testing.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems" Label="Shared" />
+
+</Project>

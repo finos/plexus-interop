@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    
+    <PlatformTarget Condition=" '$(OS)' == 'Windows_NT'">x86</PlatformTarget>
+    <PlatformTarget Condition=" '$(OS)' != 'Windows_NT'">x64</PlatformTarget>
+
+    <IsPackable>false</IsPackable>
+
+    <RootNamespace>Plexus.Interop.Transport.Transmission.WebSockets</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="xunit" Version="2.3.0-beta5-build3769" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta4-build3742" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Testing\Plexus.Interop.Transport.Transmission.Testing.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Client\Plexus.Interop.Transport.Transmission.WebSockets.Client.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server\Plexus.Interop.Transport.Transmission.WebSockets.Server.csproj" />
+    <ProjectReference Include="..\Plexus.Utils.Testing\Plexus.Utils.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="WorkaroundAppConfigPathTooLong" BeforeTargets="GenerateBindingRedirects">
+    <PropertyGroup>
+      <_GenerateBindingRedirectsIntermediateAppConfig>$(IntermediateOutputPath)$(TargetFileName).config</_GenerateBindingRedirectsIntermediateAppConfig>
+    </PropertyGroup>
+  </Target>
+
+  <Import Project="..\Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems" Label="Shared" />
+
+</Project>

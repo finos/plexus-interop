@@ -1,0 +1,66 @@
+/**
+ * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+﻿namespace Plexus.Interop.Protocol.Internal.Discovery
+{
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Plexus.Interop.Protocol.Discovery;
+
+    internal sealed class DiscoveredServiceCollection : IReadOnlyCollection<IDiscoveredService>
+    {
+        private readonly IReadOnlyCollection<IDiscoveredService> _collection;
+
+        public DiscoveredServiceCollection(IReadOnlyCollection<IDiscoveredService> collection)
+        {
+            _collection = collection;
+        }
+
+        public int Count => _collection.Count;
+
+        public override string ToString()
+        {
+            return $"[{string.Join(", ", _collection)}]";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is DiscoveredServiceCollection other &&
+                _collection.SequenceEqual(other._collection);
+        }
+
+        public IEnumerator<IDiscoveredService> GetEnumerator()
+        {
+            return _collection.GetEnumerator();
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -989839414;
+            foreach (var item in _collection)
+            {
+                hashCode = hashCode * -1521134295 + EqualityComparer<IDiscoveredService>.Default.GetHashCode(item);
+            }
+            return hashCode;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _collection.GetEnumerator();
+        }
+    }
+}

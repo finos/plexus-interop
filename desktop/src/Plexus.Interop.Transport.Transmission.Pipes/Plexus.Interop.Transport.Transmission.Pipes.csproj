@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.3;net452;net46</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Common.Contracts\Plexus.Common.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Contracts\Plexus.Interop.Transport.Transmission.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Streams\Plexus.Interop.Transport.Transmission.Streams.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Utils\Plexus.Interop.Transport.Utils.csproj" />
+    <ProjectReference Include="..\Plexus.Logging\Plexus.Logging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="System.IO.Pipes">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

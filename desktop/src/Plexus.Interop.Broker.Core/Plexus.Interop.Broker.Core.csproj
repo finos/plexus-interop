@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.5;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.5</TargetFrameworks>
+
+    <RootNamespace>Plexus.Interop.Broker</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Apps.Manager.Contracts\Plexus.Interop.Apps.Manager.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Metamodel.Contracts\Plexus.Interop.Metamodel.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Protocol\Plexus.Interop.Protocol.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Contracts\Plexus.Interop.Transport.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appRegistry.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

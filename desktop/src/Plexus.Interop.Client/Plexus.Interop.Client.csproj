@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.3;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
+
+    <RootNamespace>Plexus.Interop</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Client.Core\Plexus.Interop.Client.Core.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Client.Marshalling.Protobuf\Plexus.Interop.Client.Marshalling.Protobuf.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Protocol.Protobuf\Plexus.Interop.Protocol.Protobuf.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Protocol\Plexus.Interop.Protocol.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Pipes\Plexus.Interop.Transport.Transmission.Pipes.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport\Plexus.Interop.Transport.csproj" />
+  </ItemGroup>
+
+</Project>

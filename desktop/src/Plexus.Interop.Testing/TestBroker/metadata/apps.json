@@ -1,0 +1,8 @@
+﻿{
+  "apps": [
+    {
+      "id": "interop.NativeAppLauncher", 
+      "displayName": "Built-in Native App Launcher"
+    }
+  ]
+}

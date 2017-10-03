@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.0;net452;net46</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.0</TargetFrameworks>
+
+    <PlatformTarget Condition=" '$(OS)' == 'Windows_NT'">x86</PlatformTarget>
+    <PlatformTarget Condition=" '$(OS)' != 'Windows_NT'">x64</PlatformTarget>
+
+    <RootNamespace>Plexus.Interop.Transport.Pipes</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Transport.Protocol.Protobuf\Plexus.Interop.Transport.Protocol.Protobuf.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Testing\Plexus.Interop.Transport.Testing.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Pipes\Plexus.Interop.Transport.Transmission.Pipes.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems" Label="Shared" />
+
+
+</Project>
