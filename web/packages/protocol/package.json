@@ -1,0 +1,40 @@
+{
+  "name": "@plexus-interop/protocol",
+  "version": "0.0.1",
+  "types": "dist/main/src/index.d.ts",
+  "main": "dist/main/src/index.js",
+  "description": "Plexus Internal Protocol",
+  "license": "Apache-2.0",
+  "scripts": {
+    "prebuild": "trash dist",
+    "build": "yarn build:main",
+    "copy-gen-folder": "copyfiles src/gen/* dist/main",
+    "build:main": "tsc -p tsconfig.json && npm run copy-gen-folder",
+    "gen-client-js": "pbjs --force-long -t static-module -r plexusClient -w commonjs -o src/gen/internal-client-protocol.js ../../../protocol/Plexus.Interop.proto",
+    "gen-client-ts": "pbts --force-long -o src/gen/internal-client-protocol.d.ts src/gen/internal-client-protocol.js",
+    "gen-transport-js": "pbjs --force-long -t static-module -r plexusTransport -w commonjs -o src/gen/internal-transport-protocol.js ../../../protocol/Plexus.Interop.Transport.proto",
+    "gen-transport-ts": "pbts --force-long -o src/gen/internal-transport-protocol.d.ts src/gen/internal-transport-protocol.js",
+    "gen-client-protocol": "npm run gen-client-js && npm run gen-client-ts",
+    "gen-transport-protocol": "npm run gen-transport-js && npm run gen-transport-ts",
+    "unpublish": "npm unpublish @plexus-interop/protocol@0.0.1",
+    "postunpublish": "echo 'Unpublished'",
+    "prerepublish": "echo 'Republishing started...'",
+    "publish-package": "npm run build && npm publish",
+    "republish": "npm run unpublish && npm i && npm run publish-package",
+    "postrepublish": "echo 'Package republished successfully!'"
+  },
+  "dependencies": {
+    "@types/long": "^3.0.31",
+    "long": "^3.2.0",
+    "protobufjs": "6.8.0"
+  },
+  "peerDependencies": {
+    "protobufjs": "6.8.0"
+  },
+  "devDependencies": {
+    "trash-cli": "^1.4.0",
+    "typescript": "~2.3.4",
+    "yarn": "^1.1.0",
+    "copyfiles": "^1.2.0"
+  }
+}

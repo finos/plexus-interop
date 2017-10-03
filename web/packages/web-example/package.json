@@ -1,0 +1,37 @@
+{
+  "name": "@plexus-interop/web-app-example",
+  "version": "0.0.1",
+  "description": "Simple Web App examples",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "prebuild": "trash dist",
+    "compile": "tsc -p tsconfig.json",
+    "package": "browserify ./dist/main/src/greeting/server/Main.js --outfile ./dist/greetingServer.bundle.js",
+    "copy-assets": "copyfiles -f src/greeting/views/* ./dist && copyfiles -f ./dist/greetingServer* ../../../bin/win-x86/samples/apps/WebGreetingServer",
+    "copy-gen-folders": "copyfiles src/greeting/server/gen/* dist/main",
+    "build": "npm run compile && npm run copy-gen-folders && npm run package && npm run copy-assets",
+    "gen-server-js": "pbjs --force-long -t static-module -r launcher -w commonjs -o src/greeting/server/gen/plexus-messages.js ../../../plexus-desktop/src/Plexus.Interop.Samples.Configuration/metadata/interop/samples.proto ../../../plexus-desktop/src/Plexus.Interop.Samples.Configuration/metadata/interop/common.proto",
+    "gen-server-ts": "pbts --force-long -o src/greeting/server/gen/plexus-messages.d.ts src/greeting/server/gen/plexus-messages.js",
+    "gen-server-protocol": "npm run gen-server-js && npm run gen-server-ts",
+    "prestart": "npm run build",
+    "start": "http-server ./dist -p 8001"
+  },
+  "keywords": [
+    "plexus",
+    "example"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@plexus-interop/client": "0.0.1",
+    "@plexus-interop/websocket-transport": "0.0.1"
+  },
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "copyfiles": "^1.2.0",
+    "electron": "1.7.5",
+    "http-server": "^0.10.0",
+    "trash-cli": "^1.4.0",
+    "typescript": "2.3.4"
+  }
+}

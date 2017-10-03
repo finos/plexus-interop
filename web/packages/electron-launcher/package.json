@@ -1,0 +1,68 @@
+{
+  "name": "@plexus-interop/electron-app-launcher",
+  "version": "0.0.1",
+  "description": "Plexus Electron App Launcher Example",
+  "productName": "Plexus Electron App Launcher",
+  "license": "Apache-2.0",
+  "main": "./dist/electronLauncher.bundle.js",
+  "scripts": {
+    "prebuild": "trash dist",
+    "build": "yarn build:main && npm run copy-gen-folders && npm run package && npm run build-binary",
+    "package": "browserify ./dist/main/src/launcher/Main.js -x electron --ignore-missing --node --outfile ./dist/electronLauncher.bundle.js",
+    "copy-gen-folders": "copyfiles src/launcher/gen/* dist/main",
+    "build:main": "tsc -p tsconfig.json",
+    "pretest": "yarn lint",
+    "test": "yarn unit",
+    "unit": "yarn build && jest --coverage",
+    "gen-launcher-js": "pbjs --force-long -t static-module -r launcher -w commonjs -o src/launcher/gen/plexus-messages.js ../../../plexus-desktop/src/Plexus.Interop.Samples.Configuration/metadata/interop/appLauncher.proto ../../../plexus-desktop/src/Plexus.Interop.Samples.Configuration/metadata/interop/common.proto",
+    "gen-launcher-ts": "pbts --force-long -o src/launcher/gen/plexus-messages.d.ts src/launcher/gen/plexus-messages.js",
+    "gen-launcher-protocol": "npm run gen-launcher-js && npm run gen-launcher-ts",
+    "build-binary": "electron-packager . ElectronAppLauncher --overwrite --platform=win32 --arch=ia32 --prune=true --out=../../../bin/win-x86/samples/apps && npm run rename-packages && copyfiles ElectronAppLauncher.cmd ../../../bin/win-x86/samples", 
+    "prestart": "npm run build",
+    "start": "node_modules/.bin/electron .",
+    "rename-packages": "trash ../../../bin/win-x86/samples/apps/ElectronAppLauncher && renamer --find ElectronAppLauncher-win32-ia32 --replace ElectronAppLauncher ../../../bin/win-x86/samples/apps/*"
+  },
+  "keywords": [
+    "plexus",
+    "electron",
+    "launcher"
+  ],
+  "dependencies": {
+    "@plexus-interop/client": "0.0.1",
+    "@plexus-interop/websocket-transport": "0.0.1",
+    "strip-bom": "^3.0.0",
+    "ws": "^3.2.0"
+  },
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "copyfiles": "^1.2.0",
+    "electron": "1.7.5",
+    "electron-log": "^2.2.9",
+    "electron-packager": "9.1.0",
+    "jest": "^21.1.0",
+    "renamer": "^0.6.1",
+    "trash": "^4.1.0",
+    "trash-cli": "^1.4.0",
+    "typescript": "2.3.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine.js",
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/preprocessor.js"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".+/dist/main/tests/.+spec.js$",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "dist/main/src/**/*.js",
+      "!dist/main/src/gen/**/*.js",
+      "!src/*.d.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.spec.ts"
+    ]
+  }
+}

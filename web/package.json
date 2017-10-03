@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "name": "@plexus-interop/web",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "description": "Plexus Web Interop root module",
+  "scripts": {
+    "build-client": "cd ./packages/client && yarn build",
+    "build-common": "cd ./packages/common && yarn build ",
+    "build-e2e": "cd ./packages/e2e && yarn build",
+    "build-web-example": "cd ./packages/web-example && yarn build",
+    "build-electron-launcher": "cd ./packages/electron-launcher && yarn build",
+    "build-protocol": "cd ./packages/protocol && yarn build",
+    "build-transport-common": "cd ./packages/transport-common && yarn build",
+    "build-websocket-transport": "cd ./packages/websocket-transport && yarn build",
+    "build-all": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client build-electron-launcher build-e2e build-web-example",
+    "prebuild-all": "yarn install"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "npm-run-all": "^4.1.1",
+    "yarn": "^1.1.0"
+  }
+}

@@ -1,0 +1,44 @@
+plugins {
+    id "com.moowork.node" version "1.2.0"
+    id "com.github.hierynomus.license" version"0.14.0"
+}
+
+node {
+    version = '8.5.0'
+    npmVersion = '5.4.2'
+    nodeModulesDir = projectDir
+    download = true
+}
+
+license {
+    header file("${rootDir}/LICENSE_HEADER")
+    mapping {
+        ts='JAVADOC_STYLE'
+        proto='DOUBLESLASH_STYLE'
+        interop='DOUBLESLASH_STYLE'
+    }
+    strictCheck true
+}
+
+task licenseFormatTS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
+    source = fileTree(dir: ".").exclude("**/node_modules/*")
+            .include("**/*.ts").include("**/*.proto").include("**/*.interop")
+}
+
+tasks["license"].dependsOn licenseFormatTS
+licenseFormat.dependsOn licenseFormatTS
+
+task yarnBuild(type: YarnTask, dependsOn: ['yarn_install']) {
+    args = ['build-all']
+    doLast{
+        println()
+    }
+}
+
+task buildTransport(dependsOn: yarnBuild) {
+    outputs.dir('.')
+}
+
+task build(dependsOn: buildTransport) {
+}
+build.dependsOn('license')
