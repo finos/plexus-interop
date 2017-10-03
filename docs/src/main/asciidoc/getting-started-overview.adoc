@@ -1,0 +1,15 @@
+Plexus Interop is an RPC framework for enterprise desktops with additional powerful features. It focuses on interoperability between heterogeneous applications and shared desktop services like notifications, user preferences, intents etc.
+
+==== Features
+
+* *Communicate across desktop applications*. Allows communication between applications running in different processes, developed by different teams, and in different programming languages.
+* *Decouple desktop apps from each other and discover services dynamically*. All interop calls are going through the central broker which works as a mediator decoupling apps from each other. Apps can discover each other in run time using different criteria.
+* *Launch apps on demand*. Interop broker tracks lifecycle of desktop applications, i.e. it knows whether app is running or not and can launch app when required.
+* *Define strongly-typed interop APIs*. Reference implementation uses popular https://developers.google.com/protocol-buffers/[Google Protobuf] format for defining APIs and serializing messages. Strong-typing and using of industry-wide standard allows easy integration between different apps.
+* *Store APIs in central repository, control their usage and evolution*. All API definitions, as well as explicit per-app declaration of provided and consumed services, are supposed to be stored in the central interop repository. Central repository allows defining standards for communicating apps and common services on user desktop, granular control on usage and evolution of APIs.
+* *Use different messaging patterns*. Supports request-response RPC pattern for common cases, as well as broadcast and bi-directional streaming patterns for more complex scenarios.
+* *Easy deploy and distribute into enterprise environments*. Deployment is very simple, does not require administrative permissions, supports <<guides-system-requirements, all major enterprise OSes>> and terminal services.
+* *Communicate securely using different transports*. Uses local-only communication channels. 2 transports are supported currently: "websockets" best suited for web apps and "named pipes" best suited for desktop apps.
+* *Extend where required*. Can be adjusted to your needs via extension points. It's possible to introduce new interop transport and serialization protocols, support custom authentication and authorization, different app startup flows and new programming languages.
+
+See <<guides, Guides>> section for the more detailed description of what is Plexus Interop and how it works.

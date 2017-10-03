@@ -1,0 +1,150 @@
+=== Plexus and Apps
+
+Plexus is designed to support multiple app types and extension points for supporting different app distribution and startup flows. App distribution can be done in any way including traditional application install, enterprise application distribution platforms, etc. The only requirement is that every app that wants integrate with Plexus must be registered in App Registry and be mapped to some App Launcher.
+
+==== App Registry
+
+When Plexus Host starts it downloads JSON file with information about all apps available for current user from App Registry. Path to JSON file can be specified in Plexus Host configuration file - see <<integration-app-registry.adoc>> section for that.
+
+Let us look at information provided by App Registry:
+
+[source,js]
+----
+[
+include::sample-app-registry.json[tag=desktop-app-entry-2]
+    ,
+include::sample-app-registry.json[tag=web-app-entry-1]
+    ,
+include::sample-app-registry.json[tag=electron-app-launcher]
+    ,
+include::sample-app-registry.json[tag=desktop-app-launcher]
+]
+----
+<1> Unique identifier of the app (string, mandatory)
+<2> App display name to be used in messages, logging, etc. (string, mandatory)
+<3> List of interop components hosted within the app. Plexus will use this mapping to start specific app when interop action is invoked.
+<4> Reference to the App launcher which will be used for launching given application
+<5> App parameters for "Plexus.Launcher.Binary" launcher
+<6> App parameters for "Plexus.Launcher.Electron" launcher
+<7> List of profiles where application is available. See more information on profiles below.
+<8> Type of the application; default value is `app`
+<9> Path to the launcher binary
+
+TODO - AL: Why not put path to Launcher into "launcherParam"? Also - why not create super-launcher app and let launchers reference it?
+
+==== App Launcher
+
+App Launcher is a .NET executable responsible for:
+
+* Creating new instances of specific app - e.g. open HTML app in Electron container or spawn new .NET process.
+* Tracking app lifecycle and notifying other components about app state - e.g. notifications to Interop Broker when some app has crashed
+* Controlling app lifecycle - e.g. gracefully shut down the app when Plexus Host itself is shutting down
+
+App Launchers are started by Plexus Host as separate processes. Launchers communicate with App Lifecycle Manager via interop API.
+
+TODO @Dmitry - when Launcher exists - never, after all its apps are closed, after all apps are closed + delay?
+
+==== App profiles
+
+TODO @Dmitry - more info on how profiles work
+
+==== App launch flow
+
+You can start an application using command line - e.g. `plexus-host run Windows.Calculator`
+
+Sequence diagram below describes the use case when interop component `ConsumerComponent` invokes interop action `InteropService.InteropMethod()` provided by `ProviderComponent`.
+`ProviderComponent` component is hosted by an application `ProviderApplication` which is currently not running.
+
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+participant "Service Consumer Application" as ConsumerComponent
+participant "Interop Broker" as InteropBroker
+participant "App Registry" as AppRegistry
+participant "App Lifecycle Manager" as AppLifecycleManager
+participant "Some App Launcher" as AppLauncher
+participant "Service Provider Application" as ProviderApplication
+
+
+ConsumerComponent -> InteropBroker : invoke(\nProviderComponent.\nInteropService.\nInteropMethod\n)
+InteropBroker -> AppRegistry : findApplicationHosting(ProviderComponent)
+AppRegistry --> InteropBroker : providerApplication
+InteropBroker -> AppRegistry : findLauncherFor(ProviderApplication)
+AppRegistry --> InteropBroker : appLauncher
+InteropBroker -> AppLauncher : launch(providerApplication)
+AppLauncher -> AppLifecycleManager : onApplicationStarted(providerApplication)
+AppLauncher --> InteropBroker : application launched
+InteropBroker -> ProviderApplication :  invoke(ProviderComponent.InteropService.InteropMethod)
+ProviderApplication --> InteropBroker : response
+InteropBroker --> ConsumerComponent : response
+@enduml
+....
+
+TODO @Dmitry - as discussed update App Registry and App Lifecycle Manager flow. Registry is passive provide of the information, Lifecycle Manager starts Launchers
+
+* Launch Desktop Plexus app and specify app ID to launch: `plexus-host run <App ID>`
+* Plexus checks whether another instance of Plexus is running. If yes - it forwards  app launch request into existing instance and exits. TODO - how request will be passed? Cannot use Synapse because no one provide Plexus with interop endpoint name.
+* App Lifecycle Manager within Plexus Host identifies which launcher should be used for the app
+* App Lifecycle Manager initializes the launcher and passes information about the app to launch: app ID and app's launcher-specific parameters. TODO - who will generate app instance ID
+* Launcher starts an app - e.g. opens app URL in new tab or starts new OS process
+* Launcher reports app status back into App Lifecycle Manager, including app exit
+
+==== App shutdown/crash flow
+
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+participant "Interop Broker" as InteropBroker
+participant "App Lifecycle Manager" as AppLifecycleManager
+participant "App Launcher" as AppLauncher
+participant "App X" as Application
+
+AppLauncher -> Application : monitor app status
+... App is working ...
+Application -> Application : graceful exit or crash
+destroy Application
+Application --> AppLauncher : app X is dead
+AppLauncher --> AppLifecycleManager : app X has stopped
+AppLifecycleManager --> InteropBroker : components within \n app X are now offline
+@enduml
+....
+
+==== Plexus shutdown flow
+
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+participant "Plexus Host" as PlexusHost
+participant "Interop Broker" as InteropBroker
+participant "App Lifecycle Manager" as AppLifecycleManager
+participant "App Launcher" as AppLauncher
+participant "App" as Application
+PlexusHost -> InteropBroker : shutdown
+InteropBroker -> AppLifecycleManager : shutdown all apps
+loop for all app launchers
+    loop for all apps
+        AppLifecycleManager -> AppLauncher : shutdown (via interop)
+        AppLauncher -> Application : request shutdown
+        alt graceful exit
+            Application -> Application : exit
+            destroy Application
+        end
+        alt exit timeout
+            AppLauncher -> Application : force kill
+            destroy Application
+        end
+        Application --> AppLauncher : app is dead
+        AppLauncher --> AppLifecycleManager : app is dead (via interop)
+    end
+    AppLauncher --> AppLifecycleManager : app launcher shuts down
+    destroy AppLauncher
+end
+AppLifecycleManager --> InteropBroker : all launchers/apps are closed
+InteropBroker --> PlexusHost : all launchers/apps are closed
+PlexusHost --> PlexusHost : exit process
+destroy PlexusHost
+@enduml
+....

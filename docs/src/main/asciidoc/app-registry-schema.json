@@ -1,0 +1,25 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "required": true
+            },
+            "displayName": {
+                "type": "string",
+                "required": false
+            },
+            "launcherId": {
+                "type": "string",
+                "required": false
+            },
+            "launcherParams": {
+                "type": "object",
+                "required": false,
+                "additionalProperties": true
+            }
+        }
+    }
+}

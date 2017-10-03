@@ -1,0 +1,13 @@
+==== Supported Windows versions
+
+* Windows 7 SP1
+* Windows 8.1
+* Windows 10
+* Windows Server 2008 R2 SP1
+* Windows Server 2012 SP1
+* Windows Server 2012 R2 SP1
+* Windows Server 2016
+
+==== Supported Mac OS X versions
+
+Not supported for now. Will be added soon.

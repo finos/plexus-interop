@@ -1,0 +1,57 @@
+Typical development cycle for integration with Plexus Interop:
+
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+skinparam componentStyle uml2
+
+frame "Interop Governance Server" {
+    [Metadata Registry]
+}
+
+frame "Dev Machine" {
+    [Local Metadata]
+    [Plexus Studio]
+    frame "App In Development" as appDev {
+        [Client API]
+        [App Logic] as App
+    }
+}
+
+frame "Interop Production Server" {
+    [Interop Registry Service]
+}
+
+frame "User Machine" {
+    [Plexus Interop]
+    [Deployed App]
+}
+
+[Metadata Registry] -> [Local Metadata] : 1) Clone existing metadata
+[Local Metadata] -> [Local Metadata] : 2) Define metadata
+[Local Metadata] -down-> [Client API] : 3) Generate API
+[Client API] -> [App] : 4) Integrate API into app
+[Client API] <-down-> [Plexus Studio] : 5) Test app via Plexus Studio
+[Local Metadata] -up-> [Metadata Registry] : 6) Raise change request
+[Approver] -> [Metadata Registry] : 7) Review/approve
+[Metadata Registry] ..> [Interop Registry Service] : 8) Promote
+appDev ..> [Deployed App] : 9) Deploy app
+[Interop Registry Service] -> [Plexus Interop] : 10) Download metadata
+[Plexus Interop] .. [Deployed App]
+@enduml
+....
+
+. Clone existing interop API definitions (metadata) from remote central registry
+. Define new interop metadata locally
+. Generate client interop APIs from local metadata
+. Integrate generated interop APIs into the app
+. Publish new metadata into local "sandbox" registry
+. Test interop flow via Plexus Studio:
+.. If app provides service then you can call it from Plexus Studio.
+.. If app consumes some service then you can check that app sends correct interop messages into Plexus Studio.
+.. Repeat steps 2-5 until you are fully happy with API and its implementation.
+. Deploy new version of the app with new interop flow
+. Publish interop metadata into central registry for approval
+. Once new metadata is approved it should get into central Interop Registry and become available to all users
+. Test flow between apps end-to-end in real environment

@@ -1,0 +1,33 @@
+plugins {
+    id 'org.asciidoctor.convert' version '1.5.6'
+}
+
+dependencies {
+    asciidoctor 'org.asciidoctor:asciidoctorj-diagram:1.5.4.1'
+}
+
+asciidoctor {
+    sourceDir = file('src/main/asciidoc')
+    outputDir = file("${rootDir}/bin/docs")    
+    sources {
+        include 'index.adoc'
+    }
+    requires 'asciidoctor-diagram'
+    extensions {
+       println delegate.class.classLoader
+    }
+    // List notation
+    attributes toc: 'left',
+            'icons': 'font',
+            'setanchors': '',
+            'idprefix': '',
+            'idseparator': '-',
+            'docinfo1': '',
+            'imagesDir': 'images',
+            'source-highlighter': 'coderay',
+	    encoding : ' utf-8 ' 
+}
+
+defaultTasks 'asciidoctor'
+
+build.dependsOn asciidoctor

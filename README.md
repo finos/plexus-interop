@@ -1,35 +1,36 @@
-# Plexus
+# Plexus Interop
 
-## Documentation
+## Overview
 
-Documentation project is located in folder 'plexus-docs'. We build documentation using [AsciiDoc](http://asciidoc.org/). 
+**Plexus Interop** is metadata-centric language-agnostic desktop app-to-app interoperability framework with extensible model for launching new instances of desktop Apps on demand.
+ 
+The main goal of the framework is to enable development of extensible workflows connecting independent Apps developed in different technologies (.NET, Web, Java, Python etc) and passing context (structured data objects) between them.
 
-Invoke the following command to run the documentation build:
+Framework architecture is based around central broker providing hub-and-spoke connectivity between Apps and brokering strongly typed RPC-style calls between them. Broker has a connection to Application Lifecycle Manager which is capable of creating new instances of the Apps based on the their runtime-metadata (e.g. container type, launch command, params etc) defined in a registry.
 
-`./gradlew -p plexus-docs`
+Plexus Interop separates interoperability from the container, which provides notable advantages: different containers can be leveraged in the same workflow, launched applications residing outside of containers can participate in interop activities.
 
-After successful build documentation is available via:
-
-`plexus-docs/build/html5/index.html`
+![Key components and high level architecture](./docs/src/main/asciidoc/images/architecture.png "Key components and high level architecture")
+ 
 
 ## Build/Install
-
-### Prerequisites
-
-#### Plexus Interop Desktop Components
-
-- .NET Core 2.0 SDK x86 https://www.microsoft.com/net/download/core must be installed and added to PATH
-- Windows-only: .NET Framework 4.5.2 https://www.microsoft.com/net/download/framework
-- Windows-only: .NET Framework 4.6.2 https://www.microsoft.com/net/download/framework
-
-#### Plexus Interop DSL
-
-- Download [Antlr Generator](http://download.itemis.com/antlr-generator-3.2.0-patch.jar) component and place it to
- 
-`plexus-interop-dsl/dsl/.antlr-generator-3.2.0-patch.jar`
-
-### Build
 
 All Plexus components can be build using [Gradle](https://gradle.org/) tool using following command:
 
 `./gradlew build`
+
+## Documentation
+
+Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/). 
+
+Invoke the following command to run the documentation build:
+
+`./gradlew -p docs`
+
+After successful build documentation is available via:
+
+`bin/docs/html5/index.html`
+
+## Contributing
+
+Please refer to [Contribution guidelines for this project](CONTRIBUTING.md).

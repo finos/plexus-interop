@@ -1,0 +1,36 @@
+Application registry is a JSON array where each item has following properties:
+
+.Application properties
+|===
+| *Name* | *Type* | *Description* | *Example*
+
+|*id*
+|string
+|Unique key representing the application
+|`"interop.samples.GreetingServer"`
+
+|*displayName*
+|string
+|Human readable display name of the application
+|`"App which provides greetings to other apps"`
+
+|*launcherId*
+|string
+|A reference to another application in the registry which starts this app
+|`"interop.NativeAppLauncher"`
+
+|*launcherParams*
+|object
+|Application launcher specific object which contains data required by launcher to launch the specific application
+|`{
+              "cmd": "../apps/GreetingServer/GreetingServer.exe",
+              "args": "" }`
+
+|===
+
+Find below a JSON schema for the application registry
+
+[source,json]
+----
+include::app-registry-schema.json[]
+----

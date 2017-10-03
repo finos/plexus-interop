@@ -1,0 +1,66 @@
+App Launchers are just applications which implements the special contract called `interop.AppLauncherService`.
+
+To implement custom app launcher need to do the following:
+
+. Define new application in interop registry that provides service `interop.AppLauncherService` service to `interop.AppLifecycleManager`. See example below.
+. Generate client API for the application.
+. Implement methods defined by `interop.AppLauncherService`.
+. Register the new app in App Registry. Use built-in `interop.NativeAppLauncher` as a launcher for it. See example below.
+. Use environment variables to get broker location and instance id for connection.
+
+How does this work?
+If app launcher is not started yet, Interop Broker will start it and pass environment variables "PLEXUS_APP_INSTANCE_ID" and "PLEXUS_BROKER_WORKING_DIR".
+First variable should be used in connection message 'AppInstanceId' property to let broker know the connecting instance is the one it is waiting for.
+The second variable defines broker location. Transports should check the directory "%PLEXUS_BROKER_WORKING_DIR%\servers\<servername>" to get connectivity details.
+For example, websocket server connection URL is specified in "%PLEXUS_BROKER_WORKING_DIR%\servers\ws-v1\address".
+
+==== Example definition of ElectronAppLauncher
+[source,php]
+.AppLauncherService.proto
+----
+syntax = "proto3";
+
+package interop;
+
+import "interop/UniqueId.proto";
+
+service AppLauncherService {
+	rpc Launch(AppLaunchRequest) returns (AppLaunchResponse);
+}
+
+message AppLaunchRequest {
+	string app_id = 1;
+	string launch_params_json = 2;
+}
+
+message AppLaunchResponse {
+	UniqueId app_instance_id = 1;
+}
+----
+
+.ElectronAppLauncher.interop
+[source,php]
+----
+import "interop/AppLauncherService.proto";
+
+package interop;
+
+application ElectronAppLauncher {
+
+	provides AppLauncherService to interop.AppLifecycleManager { Launch; }
+}
+----
+
+.apps.json
+[source,js]
+----
+{
+      "id": "interop.ElectronAppLauncher",
+      "displayName": "Electron App Launcher",
+      "launcherId": "interop.NativeAppLauncher",
+      "launcherParams": {
+        "cmd": "../ElectronAppLauncher.cmd",
+        "args": ""
+      }
+}
+----
