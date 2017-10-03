@@ -17,15 +17,42 @@ Plexus Interop separates interoperability from the container, which provides not
 
 All Plexus components can be build using [Gradle](https://gradle.org/) tool using following command:
 
-`./gradlew build`
+`gradlew build --console plain`
+
+## Running Samples
+
+After successfull build samples binaries will be located in `bin` directory.
+
+Run .Net to Web interop example on Windows:
+
+- Go to `bin/win-x86/samples`
+- Launch Broker – LaunchBroker.cmd
+- Launch Greeting Client – LaunchGreetingClient.cmd
+    - Choose “Discovery” option (5) and “Greeting from Electron Web app” from discovery response
+
+    ![Sample-1](./docs/src/main/asciidoc/images/sample-1.png "Sample-1")
+    - Enter name, e.g. “John” and hit enter – Web Greeting Server app will be launched by Broker, print Greeting Request:
+
+    ![Sample-2](./docs/src/main/asciidoc/images/sample-2.png "Sample-2")
+    - And send response back to .Net Greeting Client
+
+    ![Sample-3](./docs/src/main/asciidoc/images/sample-3.png "Sample-3")
+
+    - Then choose Discovery (5) and “Greeting from .Net app” from discovery response
+    - Enter another name, e.g. “Mike” and hit enter - .Net Greeting Server app will be launched and print greeting request:
+
+    ![Sample-4](./docs/src/main/asciidoc/images/sample-3.png "Sample-4")
+
 
 ## Documentation
 
-Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/). 
+To check out docs, visit [https://symphonyoss.github.io/plexus-interop/](https://symphonyoss.github.io/plexus-interop/).
+
+Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/).
 
 Invoke the following command to run the documentation build:
 
-`./gradlew -p docs`
+`gradlew -p docs --console plain`
 
 After successful build documentation is available via:
 
