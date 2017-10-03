@@ -17,7 +17,7 @@
     "gen-launcher-js": "pbjs --force-long -t static-module -r launcher -w commonjs -o src/launcher/gen/plexus-messages.js ../../../plexus-desktop/src/Plexus.Interop.Samples.Configuration/metadata/interop/appLauncher.proto ../../../plexus-desktop/src/Plexus.Interop.Samples.Configuration/metadata/interop/common.proto",
     "gen-launcher-ts": "pbts --force-long -o src/launcher/gen/plexus-messages.d.ts src/launcher/gen/plexus-messages.js",
     "gen-launcher-protocol": "npm run gen-launcher-js && npm run gen-launcher-ts",
-    "build-binary": "electron-packager . ElectronAppLauncher --overwrite --platform=win32 --arch=ia32 --prune=true --out=../../../bin/win-x86/samples/apps && npm run rename-packages && copyfiles ElectronAppLauncher.cmd ../../../bin/win-x86/samples", 
+    "build-binary": "electron-packager . ElectronAppLauncher --overwrite --prune=true --out=../../../bin/win-x86/samples/apps && npm run rename-packages && copyfiles ElectronAppLauncher.cmd ../../../bin/win-x86/samples", 
     "prestart": "npm run build",
     "start": "node_modules/.bin/electron .",
     "rename-packages": "trash ../../../bin/win-x86/samples/apps/ElectronAppLauncher && renamer --find ElectronAppLauncher-win32-ia32 --replace ElectronAppLauncher ../../../bin/win-x86/samples/apps/*"
