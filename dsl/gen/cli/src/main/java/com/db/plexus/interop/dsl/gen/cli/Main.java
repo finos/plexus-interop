@@ -1,0 +1,81 @@
+/**
+ * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.db.plexus.interop.dsl.gen.cli;
+
+import com.db.plexus.interop.dsl.InteropLangStandaloneSetup;
+import com.db.plexus.interop.dsl.gen.ApplicationCodeGenerator;
+import com.db.plexus.interop.dsl.gen.CodeOutputGenerator;
+import com.db.plexus.interop.dsl.gen.GenTask;
+import com.db.plexus.interop.dsl.gen.PlexusGenConfig;
+import com.db.plexus.interop.dsl.gen.js.JsGenTask;
+import com.db.plexus.interop.dsl.gen.csharp.CsharpGenTask;
+import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenTask;
+import com.db.plexus.interop.dsl.gen.ts.TsGenTask;
+import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask;
+import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig;
+import com.google.inject.Injector;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.logging.Logger;
+
+import org.eclipse.emf.common.util.URI;
+
+public class Main {
+
+    private static Logger log = Logger.getLogger("Generator");
+
+    public static void main(String[] args) throws IOException {
+        System.setProperty("java.util.logging.SimpleFormatter.format",
+                "[%1$tF %1$tT] [%4$-7s] %5$s %n");
+        final PlexusGenConfig genConfig = new ParametersParser().parse(args);
+        log.info("Running generator with parameters: " + genConfig.toString());
+        Path workDirPath= Paths.get(".").toAbsolutePath();
+        URI workDir = URI.createURI(workDirPath.toAbsolutePath().toUri().toString());
+        URI baseDir = URI.createFileURI(genConfig.getBaseDir() + "/").resolve(workDir);
+        ProtoLangConfig config = new ProtoLangConfig();
+        config.getBaseURIs().add(baseDir);
+        final Injector injector = new InteropLangStandaloneSetup(config).createInjectorAndDoEMFRegistration();
+        final String type = genConfig.getType();
+        switch (type) {
+            case ApplicationCodeGenerator.TS:
+                GenTask tsGenTask = injector.getInstance(TsGenTask.class);
+                tsGenTask.doGen(genConfig);
+                break;
+            case ApplicationCodeGenerator.JS:
+                GenTask jsGenTask = injector.getInstance(JsGenTask.class);
+                jsGenTask.doGen(genConfig);
+                break;
+            case CodeOutputGenerator.JSON_META:
+                GenTask metaJsonGenTask = injector.getInstance(MetaJsonGenTask.class);
+                metaJsonGenTask.doGen(genConfig);
+                break;
+            case CodeOutputGenerator.PROTO:
+                GenTask protoGenTask = injector.getInstance(ProtoGenTask.class);
+                protoGenTask.doGen(genConfig);
+                break;
+            case CodeOutputGenerator.CSHARP:
+                GenTask cSharpGenTask = injector.getInstance(CsharpGenTask.class);
+                cSharpGenTask.doGen(genConfig);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown type " + type);
+        }
+    }
+
+}

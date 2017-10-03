@@ -1,0 +1,56 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile project(':dsl:gen:common')
+    testCompile project(':dsl:gen:meta')
+    testCompile project(':dsl:gen:proto')
+    testCompile project(':dsl:gen:csharp')
+    testCompile project(':dsl:interop-lang')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile project(':dsl:gen:common')
+    compile project(':dsl:gen:meta')
+    compile project(':dsl:gen:ts')
+    compile project(':dsl:gen:js')
+    compile project(':dsl:gen:proto')
+    compile project(':dsl:gen:csharp')
+    compile project(':dsl:interop-lang')
+    compile group: 'com.beust', name: 'jcommander', version: '1.71'
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
+}
+
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+mainClassName = 'com.db.plexus.interop.dsl.gen.cli.Main'
+
+task copyJarToRootBin(type: Copy) {
+  def outputDir = '../../../bin/win-x86/sdk'
+  if (Os.isFamily(Os.FAMILY_MAC)) {
+      outputDir='../../../bin/osx-x64/sdk'
+  }
+  outputs.dir outputDir
+  inputs.dir 'build/libs'
+  from 'build/libs'
+  into outputDir
+  include "*-all.jar"
+  rename { String fileName ->
+    "plexusgen.jar"
+  }
+}
+
+build.dependsOn(copyJarToRootBin)
+
+defaultTasks 'build'

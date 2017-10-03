@@ -1,0 +1,55 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+           url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath 'org.xtext:xtext-gradle-plugin:1.0.18'    
+        classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"   
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.xtext.xtend'
+    apply from: "${rootDir}/gradle/source-layout.gradle"
+    apply from: "${rootDir}/gradle/maven-deployment.gradle"
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: "com.github.hierynomus.license"
+
+    license {
+        header file("${rootDir}/LICENSE_HEADER")
+        mapping {
+            xtend='JAVADOC_STYLE'
+            mwe2='JAVADOC_STYLE'
+            gradle='JAVADOC_STYLE'
+            xtext='JAVADOC_STYLE'
+            xcore='JAVADOC_STYLE'
+            proto='DOUBLESLASH_STYLE'
+            interop='DOUBLESLASH_STYLE'
+        }
+        exclude "**/build/*"
+        exclude "**/*.g"
+        exclude "**/*.xtextbin"
+        exclude "**/*.tokens"
+        exclude "**/*/*._trace"
+	exclude "**/google/protobuf/*.proto"
+        strictCheck true
+    }
+
+    processResources.dependsOn licenseFormat
+
+    group = 'com.db.plexus.interop.dsl'
+    version = '1.0.0-SNAPSHOT'
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+
+    configurations.all {
+        exclude group: 'asm'
+    }
+}

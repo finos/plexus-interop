@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':dsl:gen:common')
+    compile project(':dsl:gen:proto')
+}
+

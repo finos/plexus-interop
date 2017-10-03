@@ -1,0 +1,3 @@
+dependencies {
+    compile group: 'com.beust', name: 'jcommander', version: '1.71'
+}
