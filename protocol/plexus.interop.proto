@@ -1,0 +1,255 @@
+// Copyright 2017 Plexus Interop Deutsche Bank AG
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+syntax = "proto3";
+
+import "plexus.proto";
+
+package plexus.interop.protocol;
+
+option csharp_namespace = "Plexus.Interop.Protocol.Protobuf.Internal";
+
+// ---------------------- General -----------------------------------
+// For any invocation a dedicated transport channel is created (see Plexus.Interop.Transport.proto).
+// Termination of the underlying channel must be treated as termination of the invocation itself.
+// ------------------------------------------------------------------
+
+// ---------------------- Common messages ---------------------------
+
+message ConsumedServiceReference {
+
+	// Protobuf service id
+	string service_id = 1;
+
+	// Service alias used in case there are many imports of the same service in the calling app. Can be null.
+	string service_alias = 2;
+}
+
+message ConsumedMethodReference {
+
+	ConsumedServiceReference consumed_service = 1;
+	
+	// Protobuf method id
+	string method_id = 2;
+}
+
+message ProvidedServiceReference {	
+
+	string service_id = 1;
+
+	string service_alias = 2;
+
+	string application_id = 3;
+
+	.plexus.UniqueId connection_id = 4;
+}
+
+message ProvidedMethodReference {
+
+	ProvidedServiceReference provided_service = 1;
+
+	string method_id = 2;
+}
+
+// ---------------------- Connect Invocation ------------------------
+
+// client -> broker
+message ConnectRequest {
+	// Host application id from app registry
+	string application_id = 1;
+
+	// Unique id of host application instance which created this connection
+	.plexus.UniqueId application_instance_id = 2;
+}
+
+// broker -> client
+message ConnectResponse {
+	// This message is sent as response to ConnectRequest to confirm connect completed
+	.plexus.UniqueId connection_id = 1;
+}
+
+
+// ---------------------- Request Envelopes ---------------------
+
+// Envelope wraps all the possible messages which can initiate new channel from client to broker
+message ClientToBrokerRequestEnvelope {
+	oneof payload {
+		InvocationStartRequest invocation_start_request = 1;
+		ServiceDiscoveryRequest service_discovery_request = 2;
+		MethodDiscoveryRequest method_discovery_request = 3;
+	}
+}
+
+// Envelope wraps all the possible messages which can initiate new channel from broker to client
+message BrokerToClientRequestEnvelope {
+	oneof payload {
+		InvocationStartRequested invocation_start_requested = 1;
+	}
+}
+
+// ---------------------- Service Method Invocation -----------------
+
+// source -> broker;
+// Sent by the source client to start invocation with the specified parameters
+message InvocationStartRequest {
+
+	oneof target {
+	    
+		// Invocation to any implementation of method
+		ConsumedMethodReference consumed_method = 1;
+
+		// Invocation to the specific implementation of method
+		ProvidedMethodReference provided_method = 2;
+	}
+}
+
+// broker -> source
+// Sent back to the source client to let him know invocation is starting, e.g. broker is performing it
+message InvocationStarting {
+}
+
+// broker -> target;
+// Sent by the source client to start invocation with the specified parameters
+message InvocationStartRequested {
+	
+	// Target protobuf service id
+	string service_id = 1;
+
+	// Target service alias id. Can be null if service has no alias.
+	string service_alias = 2;
+		
+	// Target protobuf method id
+	string method_id = 3;
+
+	// Source application id
+	string consumer_application_id = 4;
+
+	// Source connection id
+	.plexus.UniqueId consumer_connection_id = 5;
+}
+
+// target -> broker -> source
+// Sent back to the source client to let him know invocation is started (e.g. the target client launched and invocation routed to it)
+message InvocationStarted {
+}
+
+// target -> broker -> source | source -> broker -> target
+// Message header. Must be followed by transport message which represents message body.
+message InvocationMessageHeader {
+}
+
+// target -> broker -> source | source -> broker -> target
+// Sent as response to InvocationMessageHeader to confirm the message received by the target client.
+message InvocationMessageReceived {
+}
+
+// target -> broker -> source & source -> broker -> target
+// Must be sent by both clients before closing transport channel. Indicates that the clients won't send any more messages.
+message InvocationSendCompletion {
+}
+
+// Envelope wraps messages which can be sent during the established invocation
+message InvocationMessageEnvelope {
+	oneof payload {
+		InvocationMessageHeader message = 1;
+		InvocationMessageReceived confirmation = 2;
+		InvocationSendCompletion send_completion = 3;
+	}
+}
+
+// ---------------------- Discovery Invocation ---------------------
+
+enum DiscoveryMode {
+	Offline = 0;
+	Online = 1;
+}
+
+enum MethodType {
+	Unary = 0;
+	ServerStreaming = 1;
+	ClientStreaming = 2;
+	DuplexStreaming = 3;
+}
+
+// client -> broker
+// Sent by client to initiate discovery of services
+message ServiceDiscoveryRequest {
+
+	ConsumedServiceReference consumed_service = 1;
+
+	DiscoveryMode discovery_mode = 2;
+}
+
+// broker -> client
+// Sent by broker when discovery is completed
+message ServiceDiscoveryResponse {
+
+	// Discovered service instances
+	repeated DiscoveredService services = 1;
+}
+
+message DiscoveredService {
+
+	ConsumedServiceReference consumed_service = 1;
+
+	ProvidedServiceReference provided_service = 2;
+
+	string service_title = 3;
+
+	repeated DiscoveredServiceMethod methods = 4;
+}
+
+message DiscoveredServiceMethod {
+
+	string method_id = 1;
+		
+	string method_title = 2;
+
+	string input_message_id = 3;
+
+	string output_message_id = 4;
+
+	MethodType method_type = 5;
+}
+
+// client -> broker
+// Sent by client to initiate discovery of services
+message MethodDiscoveryRequest {
+
+	string input_message_id = 1;
+
+	string output_message_id = 2;	
+
+	ConsumedMethodReference consumed_method = 3;
+
+	DiscoveryMode discovery_mode = 4;
+}
+
+message MethodDiscoveryResponse {
+
+	repeated DiscoveredMethod methods = 1;
+}
+
+message DiscoveredMethod {
+	
+	ProvidedMethodReference provided_method = 1;
+
+	string method_title = 2;
+
+	string input_message_id = 3;
+
+	string output_message_id = 4;
+
+	MethodType method_type = 5;
+}
