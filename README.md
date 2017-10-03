@@ -23,13 +23,13 @@ All Plexus components can be build using [Gradle](https://gradle.org/) tool usin
 
 After successfull build samples binaries will be located in `bin` directory.
 
-Run .Net to Web interop example:
- 
+Run .Net to Web interop example on Windows:
+
 - Go to `bin/win-x86/samples`
 - Launch Broker – LaunchBroker.cmd
 - Launch Greeting Client – LaunchGreetingClient.cmd
     - Choose “Discovery” option (5) and “Greeting from Electron Web app” from discovery response
-    
+
     ![Sample-1](./docs/src/main/asciidoc/images/sample-1.png "Sample-1")
     - Enter name, e.g. “John” and hit enter – Web Greeting Server app will be launched by Broker, print Greeting Request:
 
@@ -48,7 +48,7 @@ Run .Net to Web interop example:
 
 To check out docs, visit [https://symphonyoss.github.io/plexus-interop/](https://symphonyoss.github.io/plexus-interop/).
 
-Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/). 
+Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/).
 
 Invoke the following command to run the documentation build:
 
