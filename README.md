@@ -17,7 +17,7 @@ Plexus Interop separates interoperability from the container, which provides not
 
 All Plexus components can be build using [Gradle](https://gradle.org/) tool using following command:
 
-`./gradlew build --console plain`
+`gradlew build --console plain`
 
 ## Running Samples
 
@@ -50,7 +50,7 @@ Documentation project is located in folder 'docs'. We build documentation using 
 
 Invoke the following command to run the documentation build:
 
-`./gradlew -p docs --console plain`
+`gradlew -p docs --console plain`
 
 After successful build documentation is available via:
 
