@@ -12,8 +12,6 @@ target/
 **/emf-gen
 **/xtend-gen
 **/xtext-gen
-/plexus-idl.parent/plexus-idl/model/
-/plexus-idl.parent/plexus-idl.vscode/out
 logs
 
 ### Eclipse ###
@@ -44,12 +42,6 @@ coverage
 ### NPM ###
 
 .npmrc
-
-### Xtext / Xtend
-generated/
-src-gen/
-xtend-gen/
-xtext-gen/
 
 ### IntelliJ
 *.iml
