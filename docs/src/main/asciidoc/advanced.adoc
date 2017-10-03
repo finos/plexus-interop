@@ -1,0 +1,46 @@
+== Advanced topics
+
+=== How to write custom App Launcher
+
+. Define new interop component that implements `AppLaunchService` interop service. See more details below.
+. Generate .NET client API for this component
+. Write .NET app, which implements methods defined by `AppLaunchService`. App should parse command-line parameters provided by Plexus (see below).
+. Add new launcher into Plexus package
+. Register new launcher in App Registry
+. Test
+
+If app launcher is not started yet, Plexus will start it and pass the plexus endpoint and application instance id as command line parameters:
+`./launchers/PlexusElectronLauncher.exe plexus.endpoint="Plexus-c2502e58-77f4-4e22-953c-d191eb6cf642" plexus.appInstanceId="43a7a031-1cec-4216-9142-3de02f411c55"`
+
+TODO @Dmitry - sounds exactly like standard app launch. Should we put reference to integration section here instead? I'd also explain that app instance id is instance id for launcher itself.
+
+All application launchers implement `AppLaunchService` interface with following contract:
+
+[source,php]
+----
+include::app-launch/app-launch.proto[]
+----
+
+TODO @Dmitry - If I send two app request for launching two instance of the same app - how I will distinguish between them. I'd make app instance ID an incoming parameter from App Lifecycle Manager.
+
+TODO @Dmitry - How to package custom launcher, how to bring in additional binaries (e.g. Electron or JRE)
+
+TODO @Dmitry - How to register custom launcher in Plexus?
+
+TODO @Dmitry - How to specify envs supported by custom launcher (e.g. Windows-only launcher)
+
+Application launcher should connect to the InteropBroker and await for command for applications launch.
+Each application launcher must be registered in App Registry as shown below:
+
+[source,js]
+----
+[
+include::sample-app-registry.json[tag=electron-app-launcher]
+    ,
+    // leave existing objects as is
+]
+----
+
+=== Custom interop client API generator
+
+TODO @Mikhail - placeholder, low priority

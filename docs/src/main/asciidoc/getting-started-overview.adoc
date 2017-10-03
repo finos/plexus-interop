@@ -1,0 +1,42 @@
+Plexus is an RPC framework for enterprise desktops. It focuses on interoperability between heterogeneous applications and shared desktop services like notifications, user preferences, etc.
+
+// TODO @Anton would be cool to add nice small picture for every feature like on the main page of GRPC: http://www.grpc.io/
+
+==== Plexus Features
+
+* *Communicate across desktop applications*. Applications running in different processes and developed by different teams using different programming languages can communicate with each other.
+* *Launch apps on demand*. Plexus tracks lifecycle of desktop applications, i.e. it knows whether app is running or not and can launch app when required.
+* *Decouple desktop apps from each other and discover services dynamically*. All interop calls in Plexus are going through the central broker which works as a mediator decoupling apps from each other. Apps can discover each other in run time using different criteria.
+* *Define strongly-typed interop APIs based on industry-wide standards*. Reference implementation uses popular https://developers.google.com/protocol-buffers/[Google Protobuf] format for defining APIs and serializing messages. It is possible to switch to another serialization protocol in future.
+* *Store APIs in central repository, control their usage and evolution*. All API definitions, as well as explicit per-app declaration of provided and consumed services, are stored in the central interop repository which allows granular control on usage and evolution of APIs. Central repository allows defining standards for communicating apps and common services on user desktop.
+* *Use different messaging patterns*. Plexus Interop allows to do request-response RPC, broadcasts and bi-directional streaming.
+* *Enterprise-friendly deployment*. Plexus does not require administrative permissions, supports <<guides-system-requirements, all major desktop operation systems>> and terminal services.
+* *Secure communication between apps*. Each app process gets public key on start and this key is used to encrypt all communication with Plexus Interop.
+* *Extend Plexus when required*. Plexus can be adjusted to your organization needs via extension points. You can introduce new interop transport and serialization protocols, support custom authentication and authorization, different app startup flows and new programming languages.
+
+See <<guides, Guides>> section for the more detailed description of what is Plexus and how it works.
+
+Example:
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+[App A] -> [Plexus] : 1) discover API implementations
+[Plexus] ..> [App A] : 2) apps B, C implement the API
+[Plexus] .. [App B]
+[Plexus] .. [App C]
+[Plexus] .. [App D]
+@enduml
+....
+
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+[App A] -> [Plexus] : 1) call API provided by app B
+[Plexus] --> [App B] : 2) launch app B
+[Plexus] --> [App B] : 3) call API
+[Plexus] .. [App C]
+[Plexus] .. [App D]
+@enduml
+....

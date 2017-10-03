@@ -1,0 +1,11 @@
+import "fx-quote.proto";
+
+package Plexus.Samples;
+
+app FxPriceProvider {
+    provides FxQuoteService.{GetQuote, GetQuoteStream};
+}
+
+app FxPriceViewer {
+    consumes FxQuoteService.{GetQuote, GetQuoteStream};
+}

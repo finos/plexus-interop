@@ -1,0 +1,44 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "required": true
+            },
+            "displayName": {
+                "type": "string",
+                "required": true
+            },
+            "type": {
+                "type": "string",
+                "required": false,
+                "default" : "app"
+            },
+            "hostedComponents": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "required": false
+            },
+            "launcherId": {
+                "type": "string",
+                "required": false
+            },
+            "launcherParams": {
+                "type": "object",
+                "required": false,
+                "additionalProperties": true
+            },
+            "profiles": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "required": false
+            }
+        }
+    }
+}

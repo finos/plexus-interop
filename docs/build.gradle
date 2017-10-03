@@ -1,0 +1,49 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.6'
+        classpath 'com.github.jruby-gradle:jruby-gradle-plugin:1.5.0'
+    }
+}
+
+apply plugin: "com.github.jruby-gradle.base"
+apply plugin: 'org.asciidoctor.convert'
+
+jruby.defaultRepositories false
+
+dependencies {
+    gems 'rubygems:asciidoctor-diagram:1.5.4.1'
+    gems 'rubygems:coderay:1.1.2'
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        rubygems('https://rubygems.org')
+    }
+}
+
+asciidoctor {
+    dependsOn jrubyPrepare
+    sourceDir = file('src/main/asciidoc')
+    requires = ['asciidoctor-diagram', 'coderay', 'digest/md5']
+    gemPath = jrubyPrepare.outputDir
+    sources {
+        include 'index.adoc', 'index-browser-plexus.adoc'
+    }
+    // List notation
+    attributes toc: 'left',
+            'icons': 'font',
+            'setanchors': '',
+            'idprefix': '',
+            'idseparator': '-',
+            'docinfo1': '',
+            'source-highlighter': 'coderay'
+}
+
+defaultTasks 'asciidoctor'
+
+build.dependsOn asciidoctor

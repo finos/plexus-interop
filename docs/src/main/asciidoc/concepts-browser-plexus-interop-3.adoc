@@ -1,0 +1,40 @@
+=== HTML5 Local Storage Transport flow
+
+
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+autonumber "<b>(#)"
+box "Browser tab A"
+    participant "Interop Broker" as brokerA
+    participant "Local Storage\nInterop Transport" as transportA
+    participant "Cross-Domain Relay\n(symphony.com iframe)" as relayA
+end box
+participant "HTML5 local storage\n(symphony.com)" as storage
+box "Browser tab A"
+    participant "Cross-Domain Relay\n(symphony.com iframe)" as relayB
+    participant "Local Storage\nInterop Transport" as transportB
+    participant "Interop Broker" as brokerB
+end box
+
+== Initialization ==
+create transportA
+brokerA -> transportA : create & init
+create relayA
+transportA -> relayA : open URL in invisible <iframe>
+relayA -> storage : subscribe for changes
+relayA -> transportA : postMessage("ready")
+relayB -> storage : subscribe for changes
+== Interop call ==
+brokerA -> transportA : send message
+transportA -> relayA : postMessage()
+relayA ->  storage : setItem(message)
+relayA -> storage : clean-up stale messages
+storage -> relayB : "storage updated" event
+relayB -> transportB : postMessage()
+transportB -> brokerB: send message
+
+== Shutdown ==
+@enduml
+....

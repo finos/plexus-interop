@@ -1,0 +1,3 @@
+=== Interop Registry specification
+
+TODO - JSON schema or link to JSON schema with comments, Mikhail

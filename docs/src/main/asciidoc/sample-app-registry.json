@@ -1,0 +1,82 @@
+[
+    // tag::web-app-entry-1[]
+    {
+        "id": "Web.Google.Search", // <1>
+        "displayName": "Google Search", // <2>
+        "launcherId": "Plexus.Launcher.Electron", // <4>
+        "launcherParams": { // <6>
+            "url": "http://www.google.com",
+            "width": 800,
+            "height": 600
+        },
+        "profiles": [ // <7>
+            "web",
+            "desktop"
+        ]
+    }
+    // end::web-app-entry-1[]
+    ,
+    // tag::desktop-app-entry-1[]
+    {
+        "id": "Windows.Notepad", // <1>
+        "displayName": "Notepad", // <2>
+        "launcherId": "Plexus.Launcher.Binary", // <4>
+        "launcherParams": { // <5>
+            "path": "${WINDIR}\\system32\\notepad.exe"
+        },
+        "profiles": [ // <7>
+            "windows"
+        ]
+    }
+    // end::desktop-app-entry-1[]
+    ,
+    // tag::desktop-app-entry-2[]
+    {
+        "id": "Calculator", // <1>
+        "displayName": "Calculator", // <2>
+        "hostedComponents": [ // <3>
+            "CalculatorUI"
+        ],
+        "launcherId": "Plexus.Launcher.Binary", // <4>
+        "launcherParams": { // <5>
+            "path": ".\\apps\\calc.exe"
+        },
+        "profiles": [ // <7>
+            "desktop"
+        ]
+    }
+    // end::desktop-app-entry-2[]
+    ,
+    // tag::desktop-app-entry-3[]
+    {
+        "id": "GreetingGenerator",
+        "displayName": "Greeting Generator",
+        "hostedComponents": [ //
+            "GreetingGenerator"
+        ],
+        "launcherId": "Plexus.Launcher.Binary",
+        "launcherParams": {
+            "path": ".\\bin\\debug\\GreetingGenerator.exe"
+        },
+        "profiles": [
+            "desktop"
+        ]
+    }
+    // end::desktop-app-entry-3[]
+    ,
+    // tag::electron-app-launcher[]
+    {
+        "id": "Plexus.Launcher.Electron", // <1>
+        "type": "ApplicationLauncher", // <8>
+        "path": ".\\launchers\\PlexusElectronLauncher.exe" // <9>
+    }
+    // end::electron-app-launcher[]
+    ,
+    // tag::desktop-app-launcher[]
+    {
+        "id": "Plexus.Launcher.Binary",
+        "type": "ApplicationLauncher",
+        "path": ".\\launchers\\PlexusBinaryLauncher.exe"
+    }
+    // end::desktop-app-launcher[]
+]

@@ -1,0 +1,65 @@
+==== How to configure App Registry URL
+
+TODO @Dmitry
+
+==== How to register app in App Registry
+
+From Plexus point of view App Registry is just a JSON file, which contains a list of apps.
+Each app is identified by unique string id and specifies *launcher* that can run it. Example:
+
+[source,js]
+----
+include::sample-app-registry.json[]
+----
+
+TODO @Dmitry
+
+==== How to select App Launcher
+
+Every app defined in app registry specifies which launcher should run it and provides launcher-specific parameters - e.g. URL for web app and path to EXE for .NET app.
+Each launcher has a unique string id and referenced by app using `launcherId` property.
+
+Out of the box Desktop Plexus provides two minimalistic launchers:
+
+* Electron Web Launcher - opens specified URL as new tab in Desktop Shell
+* Native Launcher - opens specified native app via OS shell
+
+It is possible to implement additional launchers with more complex functionality - e.g. launcher that starts Java processes.
+
+===== How to configure app for Electron Web Launcher
+
+Simple Web Launcher takes following parameters: 
+
+* `url` - start URL of the web application
+* `width` - default width of the Electron browser in pixels
+* `height` - default height of the Electron browser in pixels
+
+===== How to configure app for Native Launcher
+
+Simple Native Launcher takes following parameters:
+
+* `path` - Path to app entry point (e.g. EXE file)
+
+TODO @Dmitry - I'd add custom command-line parameters
+
+==== Plexus profiles
+
+Different plexus run-times have different "profiles" which describe the capabilities of the platform.
+Application registry is filtered by profile provided by the Plexus runtime.
+
+Following profiles are available in plexus:
+* `web` - Plexus Web
+* `desktop` - Plexus Desktop
+* `windows` - Plexus Desktop running on Windows
+* `macos` - Plexus Desktop running on MacOS
+* `linux` - Plexus Desktop running on Linux
+
+==== How to launch app
+
+Desktop Plexus allows you to launch any app from app registry. To launch an app run:
+
+`plexus-host run <App ID>`
+
+==== App command-line parameters
+
+ TODO @Dmitry - let us specify parameters that Plexus always sends to apps, like Interop endpoint name

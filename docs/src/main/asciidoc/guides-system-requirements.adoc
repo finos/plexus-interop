@@ -1,0 +1,21 @@
+* Desktop Plexus and built-in app launchers runs on Windows, maxOS/OS X and Linux
+* .NET integration libraries provided by Plexus can be used by .NET Core 1.0+ and .NET Framework 4.5+ apps
+
+==== Supported Windows versions
+
+* Windows 7 SP1
+* Windows 8.1
+* Windows 10
+* Windows Server 2008 R2 SP1
+* Windows Server 2012 SP1
+* Windows Server 2012 R2 SP1
+* Windows Server 2016
+
+==== Supported Mac OS X versions
+
+* El Capitan (version 10.11)
+* Sierra (version 10.12)
+
+==== Supported Linux versions
+
+TODO - discuss to define our commitment. See https://github.com/dotnet/core/blob/master/roadmap.md

@@ -1,0 +1,9 @@
+=== Installation
+
+To install Plexus Host download and unpack TODO http://TODO.plexus.zip
+
+To install Plexus SDK download and unpack TODO http://TODO.plexus-sdk.zip. Add TODO folder into PATH.
+
+=== Desktop Plexus folders structure
+
+TODO - Alexey

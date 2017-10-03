@@ -1,0 +1,179 @@
+To quickly introduce Plexus let us show one of the simplest scenarios. There might be a lot of other scenarios of interoperability between desktop apps. You can find more code samples in a dedicated section <<samples, Samples>>.
+
+In this example we will build two apps using different technologies and let those apps communicate with each other:
+
+- FxPriceViewer - web app which allows user to request price for some FX currency pair.
+- FxPriceProvider - .NET app which provides price for first app.
+
+// TODO - @Andrey, @Anton, need to insert screenshots into section
+
+==== How to build and run example
+
+// TODO implement and deploy example code somewhere and update link below
+. Clone (or download and extract) source code of the example from https://github.com/plexus/quick-start-example.
+. Open console in the root directory of the downloaded repository.
+. Run `build` command. Wait until the build script is finished: it should download all the required dependencies and build both example apps.
+. Launch the first app using command `plexus-host launch FxPriceViewer`. This command will start invisible `Plexus.Host.exe` process, which in its turn will launch FxPriceViewer app.
+. In the opened app window type in "EURUSD" and click "Request Quote" button.
+. Plexus will automatically launch FxPriceProvider .NET console app which provides quoting service.
+. In the opened console app you will see the incoming quote request.
+. Enter any quote value, e.g. "1.07" and press Enter.
+. Check the FxPriceViewer app screen. You should see the quote for the requested pair.
+
+// TODO Screenshots
+
+==== Walk through example code
+
+Now that we can build and run the example, let's walk through source code.
+
+The repository consist of 3 folders:
+
+* `metadata` - definition of interop API for example apps.
+* `fx-price-viewer` - source code of the FxPriceViewer web app.
+* `fx-price-provider` - source code of the FxPriceProvider .NET app.
+
+===== Metadata
+
+`metadata` directory contains interop API definitions. Plexus uses https://developers.google.com/protocol-buffers/docs/proto3[Google Protobuf's proto3] syntax to define services plus additional language to define apps and links between them.
+Check <<reference-metadata-definition-language, Metadata definition language>> section for the full specification of Plexus language. Plexus also has https://marketplace.visualstudio.com/items?itemName=Plexus.VSCodePlugin[plugin for Visual Studio Code]
+which provides syntax highlighting, code completion and validation when editing metadata files.
+
+// TODO need to add app registry to the example
+
+Metadata for our example has two files:
+
+* Definition of public interfaces in proto3 syntax:
++
+[source, php]
+.fx-quote.proto
+----
+package Plexus.Samples;
+
+message FxCurrencyPair {
+    string ccyPairName = 1;
+}
+
+message FxCurrencyPairPrice {
+    string ccyPairName = 1;
+    double price = 2;
+}
+
+service FxQuoteService {
+    rpc GetQuote(FxCurrencyPair) returns (FxCurrencyPairPrice);
+}
+----
+
+* Definition of interop API between example apps. For each app it specifies which methods are provided to others, and which methods are consumed from others.
++
+[source, php]
+.fx-quote.plexus
+----
+import "fx-quote.proto";
+
+package Plexus.Samples;
+
+application FxPriceProvider {
+    provides FxQuoteService.GetQuote;
+}
+
+application FxPriceViewer {
+    consumes FxQuoteService.GetQuote;
+}
+----
+
+===== FxPriceViewer code
+
+TODO @Anton - explain FxPriceViewer code
+
+===== FxPriceProvider code
+
+TODO @Anton - explain FxPriceProvider code
+
+===== Build scripts
+
+TODO @Anton - explain how build scripts work
+
+==== How to make a change in example
+
+Let us improve our apps so that FxQuoteViewer shows all quote changes sent from FxQuoteProvider.
+
+. First, we need to add new method into API definition to send quote updates:
+ +
+Open file "/metadata/fx-quote.proto" and add new method GetQuoteStream to service FxQuoteService:
++
+[source, php]
+.fx-quote.proto
+----
+package Plexus.Samples;
+
+message FxCurrencyPair {
+    string ccyPairName = 1;
+}
+
+message FxCurrencyPairPrice {
+    string ccyPairName = 1;
+    double price = 2;
+}
+
+service FxQuoteService {
+    rpc GetQuote(FxCurrencyPair) returns (FxCurrencyPairPrice);
+    rpc GetQuoteStream(FxCurrencyPair) returns (stream FxCurrencyPairPrice); // New method!
+}
+----
+
+. Open file "/metadata/fx-quote.plexus" and add method GetQuoteStream to the list of provided methods of FxPriceProvider and to the list of consumed methods of FxPriceViewer:
++
+[source, php]
+.fx-quote.plexus
+----
+import "fx-quote.proto";
+
+package Plexus.Samples;
+
+application FxPriceProvider {
+    // provides FxQuoteService.{GetQuote}; was
+    provides FxQuoteService.{GetQuote, GetQuoteStream}; // now FxPriceProvider app implements additional method
+}
+
+application FxPriceViewer {
+    // consumes FxQuoteService.{GetQuote}; was
+    consumes FxQuoteService.{GetQuote, GetQuoteStream}; // now FxPriceViewer app implements additional method
+}
+----
+
+. Run in repository root: `plexus gen --app=Plexus.Samples.FxPriceProvider --lang=csharp --metadata_dir="metadata" --output_dir="FxPriceProvider/Generated"`. It will update C# API code.
+
+. Next open .NET app and implement new `GetQuoteStream` service:
++
+[source, cs]
+.QuoteProvider.cs
+----
+include::quick-start/QuoteProvider.cs[]
+----
+TODO @Anton insert modified C# code
+
+. Run in repository root: `plexus gen --app=Plexus.Samples.FxPriceViewer --lang=js --metadata_dir="metadata" --output_dir="FxPriceViewer/generated"`. It will update JavaScript API code.
+
+. Finally we need to update HTML app to show price updates:
++
+[source, html]
+.greeting.html
+----
+include::quick-start/app.html[]
+----
+// TODO insert modified HTML/JS code
+TODO @Andrey - update HTML
+
+. Run `build` in repository root to re-build all apps
+
+. Launch FxPriceViewer: `plexus-host launch FxPriceViewer`
+
+. In the opened screen type currency pair name "EURUSD" and press "Subscribe" button. Plexus should start the FxPriceProvider app.
+
+. In FxPriceProvider console type any price, e.g. "1.07" and press Enter.
+
+. FxPriceViewer screen should show "1.07".
+
+. In FxPriceProvider console type another price, e.g. "1.08" and press Enter.
+
+. FxPriceViewer screen now should show "1.08".

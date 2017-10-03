@@ -1,0 +1,77 @@
+[[reference-metadata-definition-language]]
+=== Metadata definition language
+
+==== Fields and messages
+
+For messages definition Plexus uses Google Protobuf v3 format. For example:
+
+....
+package DB.GlobalMarkets;
+
+message Person {
+  string name = 1; // comment
+  int32 id = 2;
+  string email = 3;
+}
+....
+
+You can find Protobuf specification here - https://developers.google.com/protocol-buffers/docs/proto3
+
+==== Services
+
+Services are also defined in .proto files using gRPC syntax. For example:
+
+....
+import "./messages/Person.proto"
+
+package DB.GlobalMarkets;
+
+service SearchService {
+  rpc GetPersonInfo (PersonReference) returns (Person);
+}
+....
+
+==== Components
+
+Components are defined using special `.plexus` format. Here is an example:
+
+[source]
+.user-admin.plexus
+----
+include::sample.plexus[]
+----
+<1> Import services definition that component implements or consumes
+<2> Multiple imports are allowed
+<3> Define namespace for component
+<4> Define component name
+<5> Component implements `CreateUser` method from `CreateUserService` interface and makes it to any other component (i.e. public)
+<6> Component implements `CreateUser` method from `CreateUserService` interface and makes it available only to two specific components(?) 
+
+
+===== Namespace
+
+This notation will map component to it`s scope, defining which services it could consume
+and with which service it can communicate. In above example "UserAdmin" component is in DB.GlobalMarkets namespace and
+will be able to consume all public services and services which provided to DB.GlobalMarkets namespace.
+
+===== Consumes
+
+Consumes notation defines to which Service methods this component can execute. This Methods can be provided by several components
+ and they will be accessible by discovery for component client code. We explicitly ask to specify exact methods
+to support schema evolution and corner cases where one component produce not the full set of service methods
+
+Imagine the following scenario:
+
+* There is "ServiceA" fully implemented and produced by two components "ComponentA" and "ComponentB"
+* We add new additional method to "ServiceA"
+* "ComponentA" implements this method, where "ComponentB" is still in progress
+
+Thus exact method import will allow plexus to check if some methods used anywhere, it will allow to check if method is produced by
+both components and give error if not.
+
+
+===== Provides
+
+We ask to provide explicit list of methods for consume and provide notations to support service evolutions and changes.
+Plexus will be able to check if what set of methods of specific Service implemented in concrete Component and validate if
+all mapping are correct and consistent.

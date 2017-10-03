@@ -1,0 +1,4 @@
+{
+    "appRegistryUrl": "file://app-registry.json",
+    "interopRegistryUrl": "file://interop-registry.json"
+}

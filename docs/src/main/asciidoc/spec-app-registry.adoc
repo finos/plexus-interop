@@ -1,0 +1,56 @@
+=== App Registry
+
+Application registry is a JSON array where each item has following properties:
+
+.Application properties
+|===
+| *Name* | *Type* | *Description* | *Example*
+
+|*id*
+|string
+|Unique key representing the application
+|`"Windows.Notepad"`
+
+|*displayName*
+|string
+|Human readable display name of the application
+|`"Notepad"`
+
+|*hostedComponents*
+|string[]
+|Array of Interop component ids hosted within the given application
+|`["CalculatorUI"]`
+
+|*type*
+|string
+|A type of the application; can be either `"Application"` or `"ApplicationLauncher"`
+|`"ApplicationLauncher"`
+
+|*launcherId*
+|string
+|A reference to another application in the registry with type of `ApplicationLauncher`
+|`"Plexus.Launcher.Binary"`
+
+|*launcherParams*
+|object
+|Application launcher specific object which contains data required by launcher to launch the specific application
+|`{
+              "url": "http://www.google.com",
+              "width": 800,
+              "height": 600
+          }`
+
+|*profiles*
+|string[]
+|Array of profiles where application is available
+|`["desktop","web"]`
+
+|
+|===
+
+Find below a JSON schema for the application registry
+
+[source,json]
+----
+include::app-launch/app-registry-schema.json[]
+----

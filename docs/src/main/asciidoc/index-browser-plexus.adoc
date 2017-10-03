@@ -1,0 +1,49 @@
+== Browser Plexus
+
+Browser Plexus can be used when all your apps are web you do not need to integrate with desktop apps.  
+
+=== High level architecture
+
+Imagine that you have two web apps A and B and you want app A to call service provided by app B.
+
+//image::images/browser-high-level-architecture.png[]
+
+Key components:
+
+* Interop Registry - same as in Desktop Plexus
+* App Registry - same as in Desktop Plexus
+* Web App Launcher - responsible for creating new app instances
+...
+
+=== Interoperability flow
+
+include::concepts-browser-plexus-interop-1.adoc[]
+
+include::concepts-browser-plexus-interop-2.adoc[]
+
+include::concepts-browser-plexus-interop-3.adoc[]
+
+=== Integration with Browser Plexus
+
+TODO - register app, same as for Desktop Plexus
+
+TODO - edit and publish metadata, same as for Desktop Plexus
+
+TODO - generate TypeScript API definitions, same as for Desktop Plexus
+
+TODO - integration with plexus.js
+
+TODO - integration with 
+
+TODO - browser sandboxes
+
+=== Desktop and Browser Plexus - containers comparison
+
+[options="header", cols=">s,,"]
+|=====
+| | Browser Container | Desktop Container
+| Supported app types | HTML | HTML, .NET
+| Plexus Run-time Hosting | Web Browser | Plexus Host app (Electron-based)
+| Plexus Run-time Installation Required? | No |  Yes, no admin permissions needed
+| Transport between "sandboxes" | PostMessage (IE 11) or JStorage (IE 10) | Named Pipes
+|=====

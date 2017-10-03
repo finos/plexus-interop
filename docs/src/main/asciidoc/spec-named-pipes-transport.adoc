@@ -1,0 +1,40 @@
+=== Named Pipe Transport protocol
+
+Named Pipe Transport sends binary content between processes over named pipes.
+Plexus includes reference implementation for Names Pipes Transport, which uses .NET,
+but it is also possible to write custom implementations - e.g. for C++. Java or Python.
+
+==== Binary stream structure
+
+image::images/pipe-transport-stream-structure.png[]
+
+The first byte of each message determines its type: 0 - Heartbeat, 1 - Frame, 2 - Disconnect.
+
+"Heartbeat" and "Disconnect" are technical messages. They only consist of 1 byte, so the reader must consider such message consumed right after the first byte received.
+
+* When "Heartbeat" received, the reader must ignore it.
+* When "Disconnect" received, the reader must cancel further reading and terminate the pipe connection.
+* When "Frame" received, the reader must read its header and body.
+
+===== Frame structure
+
+"Frame" message consist of fixed-size header (29 bytes) and variable-size body (from 0 to 2^32 bytes).
+
+All integers and GUIDs are written to binary stream in big-endian order, which is default for inter-process communications.
+
+Frame header structure:
+
+image::images/pipe-transport-frame-header-structure.png[]
+
+* 16 bytes = channel GUID (see RFC 4122 for the specification)
+* 4 bytes = integer representing sequential index of the message within the channel.
+* 4 bytes = integer representing sequential index of the frame within the message.
+* 1 byte = byte representing frame position flags. Several flags can be set simultaneously using logical "OR". Binary values for each flag are: 
+** 0000 - none, 
+** 0001 - first frame in channel, 
+** 0010 - first frame in message, 
+** 0100 - last frame in message, 
+** 1000 - last frame in channel.
+* 4 bytes = integer representing frame body length
+
+Frame header is followed by body - sequence of bytes of the specified length.
