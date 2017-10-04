@@ -13,7 +13,19 @@ include::getting-started-overview.adoc[]
 
 include::getting-started-features.adoc[]
 
-=== Code Examples
+=== Components
+
+include::getting-started-components.adoc[]
+
+=== How to build
+
+include::getting-started-how-to-build.adoc[]
+
+=== How to run samples
+
+include::getting-started-how-to-run-samples.adoc[]
+
+=== Usage Example
 
 include::getting-started-example.adoc[]
 

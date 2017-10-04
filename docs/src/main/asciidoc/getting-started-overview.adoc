@@ -6,4 +6,4 @@ Framework architecture is based around central broker providing hub-and-spoke co
 
 Plexus Interop separates interoperability from the container, which provides notable advantages: different containers can be leveraged in the same workflow, launched applications residing outside of containers can participate in interop activities.
 
-image::./images/architecture.png[Key components and high level architecture]
+image::images/architecture.png[Key components and high level architecture]
