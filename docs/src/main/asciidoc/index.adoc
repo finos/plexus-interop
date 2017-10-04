@@ -5,9 +5,13 @@
 [[getting-started]]
 == Getting Started
 
-=== What is Plexus Interop?
+=== Overview
 
 include::getting-started-overview.adoc[]
+
+=== Features
+
+include::getting-started-features.adoc[]
 
 === Code Examples
 
