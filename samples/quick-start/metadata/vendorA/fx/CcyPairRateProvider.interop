@@ -14,19 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-syntax = "proto3";
+package vendorA.fx;
 
-package fx;
+import "fx/CcyPairRateService.proto";
 
-message CcyPair {
-    string ccyPairName = 1;
-}
+application CcyPairRateProvider {
 
-message CcyPairRate {
-    string ccyPairName = 1;
-    double rate = 2;
-}
+    provides fx.CcyPairRateService {
+        GetRate [method_title = "Web Provider - Get Rate"];
+    }
 
-service CcyPairRateService {
-    rpc GetRate(CcyPair) returns (CcyPairRate);
 }
