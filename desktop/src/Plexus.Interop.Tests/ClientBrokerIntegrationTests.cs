@@ -578,6 +578,38 @@ namespace Plexus.Interop
             });
         }
 
+        [Fact]
+        public void AppLauncherStartAppWhenRequired()
+        {
+            EchoRequest receivedRequest = null;
+
+            Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
+            {
+                receivedRequest = request;
+                return Task.FromResult(request);
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var serverOptionsBuilder = new ClientOptionsBuilder()
+                        .WithDefaultConfiguration("TestBroker")
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
+                        .WithApplicationId("plexus.interop.testing.EchoServer");
+                    var appLauncher = RegisterDisposable(new TestAppLauncher(new [] { serverOptionsBuilder }));
+                    await appLauncher.StartAsync();
+                    var client = ConnectEchoClient();
+                    var request = CreateTestRequest();
+                    var response = await client.Call(EchoUnaryMethod, request);
+                    response.ShouldBe(request);
+                    receivedRequest.ShouldBe(request);
+                }
+            });
+        }
+
         private IClient ConnectEchoClient()
         {
             var clientOptions = new ClientOptionsBuilder()

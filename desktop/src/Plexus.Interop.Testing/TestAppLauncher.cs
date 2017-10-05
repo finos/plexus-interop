@@ -21,7 +21,7 @@
         {
             var options = new ClientOptionsBuilder()
                 .WithDefaultConfiguration("TestBroker")
-                .WithApplicationId("interop.testing.TestAppLauncher")
+                .WithApplicationId("plexus.interop.testing.TestAppLauncher")
                 .WithProvidedService(
                     "interop.AppLauncherService", 
                     s => s.WithUnaryMethod<AppLaunchRequest, AppLaunchResponse>("Launch", LaunchAppAsync))
@@ -38,15 +38,8 @@
                 throw new InvalidOperationException($"Unknown application launch requested: {request.AppId}");
             }
             var instanceId = UniqueId.Generate();
-            switch (request.AppId)
-            {
-                case "interop.testing.EchoServer":
-                    var echoServer = ClientFactory.Instance.Create(clientOptions.WithAppInstanceId(instanceId).Build());
-                    await echoServer.ConnectAsync().ConfigureAwait(false);
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unknown application launch requested: {request.AppId}");
-            }
+            var client = ClientFactory.Instance.Create(clientOptions.WithAppInstanceId(instanceId).Build());
+            await client.ConnectAsync().ConfigureAwait(false);
             return new AppLaunchResponse
             {
                 AppInstanceId = new Generated.UniqueId
