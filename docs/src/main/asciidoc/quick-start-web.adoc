@@ -1,0 +1,32 @@
+
+= Quick Start - Web
+
+This quick start guide will get you started with Plexus Interop Web client with a simple working example. Both applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
+
+== Before you start
+
+You need Interop Broker binaries and local copy of all examples to go through the quick start guide. You can download examples and build everything with few simple steps:
+
+include::clone-and-build.adoc[]
+
+== Run example
+
+include::quick-start-run-broker.adoc[]
+
+Great, we can start CCY Pair Rate Provider:
+
+[source, bash]
+-----
+cd samples/quick-start/ccy-pair-rate-provider
+npm run start
+-----
+and CCY Pair Rate Viewer:
+-----
+cd ../ccy-pair-rate-viewer
+npm run start
+-----
+
+Great, Rate Viewer app will request Currency Pair's rate and print the result.
+
+
+

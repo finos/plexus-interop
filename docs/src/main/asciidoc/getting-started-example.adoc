@@ -1,9 +1,16 @@
+ifdef::env-github,env-browser[:outFileSuffix: .adoc]
+
 This introduction guide gets you started with Plexus Interop with a simple example of two apps which communicates with each other through Interop Broker:
 
 - `vendorA.fx.CcyPairRateProvider` - app developed by Vendor A. The app provides FX pair exchange rates to other apps.
 - `vendorB.fx.CcyPairRateViewer` - app developed by Vendor B in TypeScript. The app allows user to request FX pair exchange rate from other apps.
 
-==== Define Service
+There is a quick start guide for all currently supported Plexus Interop Client's technologies:
+
+- link:quick-start-web{outFileSuffix}[Quick Start - Web]
+- link:quick-start-net{outFileSuffix}[Quick Start - .Net]
+
+==== CCY Pair Rate Provider
 
 First of all, both vendors need to agree and define common contract for FX rate providing service if it's not yet standardized and published.
 
