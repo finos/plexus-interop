@@ -14,6 +14,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Transport", "Plexus.Interop.Transport\Plexus.Interop.Transport.csproj", "{6958A076-8D0A-433B-BBF1-6AF782E8FFD0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Broker.Host", "Plexus.Interop.Broker.Host\Plexus.Interop.Broker.Host.csproj", "{113039D9-C878-4404-97FE-6E371BC6C79B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F2B5D2A5-AF4D-4356-A023-FA8B589DEE13} = {F2B5D2A5-AF4D-4356-A023-FA8B589DEE13}
+		{62F457D0-223A-4694-AC35-A855C43AEBDC} = {62F457D0-223A-4694-AC35-A855C43AEBDC}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Utils.Testing", "Plexus.Utils.Testing\Plexus.Utils.Testing.csproj", "{B089A539-9AA0-4156-B8E7-CB44564EBFD1}"
 EndProject
@@ -95,6 +99,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Client", "Plexus.Interop.Client\Plexus.Interop.Client.csproj", "{86FA0447-5E15-4758-8D1C-8AB413CF0097}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Testing", "Plexus.Interop.Testing\Plexus.Interop.Testing.csproj", "{78B22006-0BC7-4F30-990D-2F1B06FC23B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{113039D9-C878-4404-97FE-6E371BC6C79B} = {113039D9-C878-4404-97FE-6E371BC6C79B}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Transport.Utils", "Plexus.Interop.Transport.Utils\Plexus.Interop.Transport.Utils.csproj", "{66D22EE5-D153-4248-87B5-F3D4D86DC1F8}"
 EndProject

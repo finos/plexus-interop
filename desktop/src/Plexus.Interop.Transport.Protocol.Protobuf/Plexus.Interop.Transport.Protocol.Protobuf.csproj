@@ -50,7 +50,10 @@
     <Delete Files="$(ProtoOutDir)*.proto.cs" />
     <Exec Command="$(ProtoCCommand)" WorkingDirectory="$(ProjectDir)" />
     <ItemGroup>
-      <Compile Include="$(ProtoOutDir)/*.proto.cs" />
+      <Generated Include="$(ProtoOutDir)/*.proto.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="@(Generated)" Condition="'@(Compile-&gt;Contains(%(Generated.Identity)))' == 'True' " />
     </ItemGroup>
   </Target>
 
