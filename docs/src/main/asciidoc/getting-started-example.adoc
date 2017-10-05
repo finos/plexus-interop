@@ -1,7 +1,7 @@
-For quick introduction let us show how to implement two apps using different technologies which communicates with each other through Interop Broker:
+This introduction guide gets you started with Plexus Interop with a simple example of two apps which communicates with each other through Interop Broker:
 
-- `vendorA.fx.CcyPairRateProvider` - .NET app developed by Vendor A in C#. The app provides FX pair exchange rates to other apps.
-- `vendorB.fx.CcyPairRateViewer` - Web app running in Electron developed by Vendor B in TypeScript. The app allows user to request FX pair exchange rate from other apps.
+- `vendorA.fx.CcyPairRateProvider` - app developed by Vendor A. The app provides FX pair exchange rates to other apps.
+- `vendorB.fx.CcyPairRateViewer` - app developed by Vendor B in TypeScript. The app allows user to request FX pair exchange rate from other apps.
 
 ==== Define Service
 
