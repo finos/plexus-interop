@@ -61,7 +61,9 @@
         protected void RunWith10SecTimeout(Func<Task> func) => RunWithTimeout(Timeout10Sec, func);
         protected void RunWith10SecTimeout(Action action) => RunWithTimeout(Timeout10Sec, action);
         protected void RunWith5SecTimeout(Func<Task> func) => RunWithTimeout(Timeout5Sec, func);
+        protected void RunWith5SecTimeout(Action action) => RunWithTimeout(Timeout5Sec, action);
         protected void RunWith1SecTimeout(Func<Task> func) => RunWithTimeout(Timeout1Sec, func);
+        protected void RunWith1SecTimeout(Action action) => RunWithTimeout(Timeout1Sec, action);
 
         protected void RunWithTimeout(TimeSpan timeout, Func<Task> func) =>
             Should.CompleteIn(() => TaskRunner.RunInBackground(func), timeout);
@@ -71,7 +73,7 @@
 
         public virtual void Dispose()
         {
-            RunWith10SecTimeout(
+            RunWith5SecTimeout(
                 () =>
                 {
                     Log.Info("Disposing test resources");

@@ -21,9 +21,10 @@ namespace Plexus.Logging.NLog
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
+    using global::NLog.Extensions.Logging;
     using NLogManager = global::NLog.LogManager;
 
-    public sealed class LoggerFactory : ILoggerFactory
+    internal sealed class LoggerFactory : ILoggerFactory
     {
         public LoggerFactory()
         {
@@ -49,6 +50,11 @@ namespace Plexus.Logging.NLog
         public ILogger Create(string name)
         {
             return new Logger(NLogManager.GetLogger(name));
+        }
+
+        public void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
+        {
+            loggerFactory.ConfigureNLog(NLogManager.Configuration);
         }
 
         public Task FlushAsync(TimeSpan timeout)

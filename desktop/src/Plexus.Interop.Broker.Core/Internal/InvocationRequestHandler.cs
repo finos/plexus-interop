@@ -102,9 +102,9 @@
                 {
                     await Task
                         .WhenAll(
-                            targetChannel?.In.ConsumeAsync((Action<TransportMessageFrame>)DisposeFrame).IgnoreExceptions(),
+                            targetChannel?.In.ConsumeAsync((Action<TransportMessageFrame>)DisposeFrame).IgnoreExceptions() ?? TaskConstants.Completed,
                             sourceChannel.In.ConsumeAsync((Action<TransportMessageFrame>)DisposeFrame).IgnoreExceptions(),
-                            targetChannel?.Completion,
+                            targetChannel?.Completion ?? TaskConstants.Completed,
                             sourceChannel.Completion)
                         .ConfigureAwait(false);
                     Log.Info("Completed invocation {0} from {{{1}}} to {{{2}}}: {{{3}}}", sourceChannel.Id, sourceConnection, targetConnection, request);

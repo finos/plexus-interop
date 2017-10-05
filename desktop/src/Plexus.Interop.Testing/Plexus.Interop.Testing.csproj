@@ -37,10 +37,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="NLog.config">
+    <None Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TestBroker\NLog.config">
+    <None Update="TestBroker\nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

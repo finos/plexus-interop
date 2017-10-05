@@ -27,6 +27,8 @@
     {
         private static readonly ILogger Log = LogManager.GetLogger<TestBroker>();
 
+        private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(3);
+
         private static readonly string RuntimeIdentifier =
 #if NET452
             "win-x86";
@@ -111,12 +113,11 @@
                 shutdownEventName);
             shutdownEvent.Set();
             _completion.Task.ContinueWithSynchronously(_ => shutdownEvent.Dispose());
-            var timeout = TimeSpan.FromSeconds(5);
-            Task.Delay(timeout).ContinueWithSynchronously(t =>
+            Task.Delay(StopTimeout).ContinueWithSynchronously(t =>
             {
                 if (!_process.HasExited)
                 {
-                    Log.Warn("Killing broker forcibly after {0}sec shutdown awaiting", timeout.TotalSeconds);
+                    Log.Warn("Killing broker forcibly after {0}sec shutdown awaiting", StopTimeout.TotalSeconds);
                     _process.Kill();
                 }
             });

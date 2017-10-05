@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using Google.Protobuf;
     using Plexus.Channels;
@@ -22,6 +22,7 @@
     using Plexus.Interop.Testing.Generated;
     using Shouldly;
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -30,6 +31,8 @@
 
     public sealed class ClientBrokerIntegrationTests : TestsSuite
     {
+        private ConcurrentBag<TestBroker> _startedTestBrokers = new ConcurrentBag<TestBroker>();
+
         private static readonly UnaryMethod<EchoRequest, EchoRequest> EchoUnaryMethod =
             Method.Unary<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "Unary");
         
@@ -55,6 +58,15 @@
                 Log.Error(t.Exception.ExtractInner(), "Test broker exited with exception");
             }).IgnoreAwait(Log);
             return broker;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            foreach (var testBroker in _startedTestBrokers)
+            {
+                testBroker.Completion.ShouldCompleteIn(Timeout1Sec);
+            }
         }
 
         [Fact]
@@ -553,15 +565,14 @@
         }
 
         [Fact]
-        public void AppLauncher()
+        public void ExceptionWhenTargetAppIsNotRunningAndCannotBeStarted()
         {
             RunWith10SecTimeout(async () =>
             {
                 using (await StartTestBrokerAsync())
                 {
                     var client = ConnectEchoClient();
-                    await client.Call(EchoUnaryMethod, new EchoRequest());
-                    Should.Throw<Exception>(async () => await client.Call(EchoUnaryMethod, new EchoRequest()));
+                    Should.Throw<Exception>(async () => await client.Call(EchoUnaryMethod, new EchoRequest()), Timeout5Sec);
                 }
             });
         }

@@ -45,7 +45,7 @@ namespace Plexus.Interop.Broker.Internal
 
         private async Task ProcessAsync()
         {
-            _log.Debug("Listening for connection requests: {0}", _connection);
+            _log.Debug("Listening for incoming channels: {0}", _connection);
             var listenChannelTask = _connection.IncomingChannels.ConsumeAsync((Action<ITransportChannel>)HandleChannel).IgnoreExceptions();
             lock (_runnningTasks)
             {
@@ -58,7 +58,7 @@ namespace Plexus.Interop.Broker.Internal
                 completion = Task.WhenAll(_runnningTasks);
             }
             await completion.ConfigureAwait(false);
-            _log.Debug("Connection listening completed: {0}", _connection);
+            _log.Debug("Listening for incoming channels completed: {0}", _connection);
         }
 
         private void HandleChannel(ITransportChannel channel)
