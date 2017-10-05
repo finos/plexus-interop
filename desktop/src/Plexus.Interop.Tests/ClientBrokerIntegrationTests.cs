@@ -31,7 +31,7 @@ namespace Plexus.Interop
 
     public sealed class ClientBrokerIntegrationTests : TestsSuite
     {
-        private ConcurrentBag<TestBroker> _startedTestBrokers = new ConcurrentBag<TestBroker>();
+        private readonly ConcurrentBag<TestBroker> _startedTestBrokers = new ConcurrentBag<TestBroker>();
 
         private static readonly UnaryMethod<EchoRequest, EchoRequest> EchoUnaryMethod =
             Method.Unary<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "Unary");
@@ -52,6 +52,7 @@ namespace Plexus.Interop
         private async Task<TestBroker> StartTestBrokerAsync()
         {            
             var broker = RegisterDisposable(new TestBroker());
+            _startedTestBrokers.Add(broker);
             await broker.StartAsync();
             broker.Completion.ContinueWithOnErrorSynchronously(t =>
             {
