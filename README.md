@@ -12,12 +12,23 @@ Plexus Interop separates interoperability from the container, which provides not
 
 ![Key components and high level architecture](./docs/src/main/asciidoc/images/architecture.png "Key components and high level architecture")
  
+## Repository Overview
+
+Plexus Interop repository consist of the following main sections:
+* *desktop* - Interop Broker, .NET Interop Client and sample apps implemented in C# using [.NET Core 2.0](https://www.microsoft.com/net/download/core).
+* *web* - Web Interop Client and sample apps implemented in [TypeScript](https://www.typescriptlang.org/).
+* *dsl* - [Protobuf](https://developers.google.com/protocol-buffers/) and Plexus Interop grammar parsers, validators and code-generators implemented using [Xtext framework](https://eclipse.org/Xtext/).
+* *docs* - documentation implemented in [AsciiDoc](http://asciidoc.org/) format using [Asciidoctor](http://asciidoctor.org/) processor.
+* *protocol* - definitions of Plexus Interop protocol messages in [Protobuf](https://developers.google.com/protocol-buffers/) format.
+* *samples* - sample interop metadata. 
 
 ## Build/Install
 
-All Plexus components can be build using [Gradle](https://gradle.org/) tool using following command:
+All Plexus Interop components can be build using [Gradle](https://gradle.org/) tool using the following single command:
 
 `gradlew build --console plain`
+
+Build produces artifacts into folder "bin".
 
 ## Running Samples
 
@@ -49,6 +60,8 @@ Run .Net to Web interop example on Windows:
 To check out docs, visit [https://symphonyoss.github.io/plexus-interop/](https://symphonyoss.github.io/plexus-interop/).
 
 Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/).
+
+To render diagrams during the build you need to have [graphviz](http://www.graphviz.org) installed on the machine.
 
 Invoke the following command to run the documentation build:
 
