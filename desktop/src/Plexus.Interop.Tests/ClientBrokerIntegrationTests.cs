@@ -550,7 +550,21 @@
                     serverStreaming.Type.ShouldBe(MethodType.ServerStreaming);
                 }
             });
-        }        
+        }
+
+        [Fact]
+        public void AppLauncher()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var client = ConnectEchoClient();
+                    await client.Call(EchoUnaryMethod, new EchoRequest());
+                    Should.Throw<Exception>(async () => await client.Call(EchoUnaryMethod, new EchoRequest()));
+                }
+            });
+        }
 
         private IClient ConnectEchoClient()
         {

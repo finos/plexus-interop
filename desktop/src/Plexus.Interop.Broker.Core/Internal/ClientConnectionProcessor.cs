@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Transport;
@@ -74,15 +74,16 @@
 
         private async Task HandleChannelAsync(object state)
         {
+            ITransportChannel channel = null;
             try
             {
-                var channel = (ITransportChannel)state;
+                channel = (ITransportChannel)state;
                 await _clientRequestHandler.HandleChannelAsync(_connection, channel).ConfigureAwait(false);
-                _log.Info("Channel {0} completed", channel.Id);
+                _log.Debug("Channel {0} completed", channel.Id);
             }
             catch (Exception ex)
             {
-                _log.Warn(ex, "Exception on handling channel");
+                _log.Warn(ex, "Exception on handling channel {0}", channel?.Id);
             }
         }
 
