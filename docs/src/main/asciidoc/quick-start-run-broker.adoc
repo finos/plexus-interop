@@ -1,5 +1,5 @@
-First of all we need to run Interop Broker, which is responsible for communication between clients. You can start it with CMD file on Windows:
+First of all we need to run Interop Broker, which is responsible for communication between clients. You can start it with following command on Windows:
 [source, bash]
 ----
-bin/win-x86/samples/LaunchBroker.cmd
+bin/win-x86/broker/plexus.exe broker ./quick-start/metadata
 ----

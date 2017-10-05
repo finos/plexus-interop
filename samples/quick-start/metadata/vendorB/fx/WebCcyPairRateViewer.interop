@@ -1,0 +1,9 @@
+package vendorB.fx;
+
+import "fx/CcyPairRateService.proto";
+
+application WebCcyPairRateViewer {
+
+    consumes fx.CcyPairRateService { GetRate; }
+
+}

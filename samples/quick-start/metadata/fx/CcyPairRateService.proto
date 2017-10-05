@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package fx;
+
+message CcyPair {
+    string ccyPairName = 1;
+}
+
+message CcyPairRate {
+    string ccyPairName = 1;
+    double rate = 2;
+}
+
+service CcyPairRateService {
+    rpc GetRate(CcyPair) returns (CcyPairRate);
+}

@@ -1,0 +1,11 @@
+package vendorA.fx;
+
+import "fx/CcyPairRateService.proto";
+
+application WebCcyPairRateProvider {
+
+    provides fx.CcyPairRateService {
+        GetRate [method_title = "Web Provider - Get Rate"];
+    }
+
+}
