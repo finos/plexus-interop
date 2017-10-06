@@ -25,5 +25,7 @@
         IReadOnlyDictionary<string, IMessage> Messages { get; }
 
         IReadOnlyDictionary<string, IService> Services { get; }
+
+        IRegistry MergeWith(IRegistry registry);
     }
 }

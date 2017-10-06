@@ -23,6 +23,6 @@ package interop;
 // To convert to bytes on little-endian systems (most common case): concat (toBytes(hi), toBytes(lo))
 // To convert to bytes on big-endian systems need to additionally reverse "hi" and "lo" parts: concat( reverse(toBytes(hi)), reverse(toBytes(lo)) )
 message UniqueId {
-	fixed64 lo = 1;
-	fixed64 hi = 2;
+    fixed64 lo = 1;
+    fixed64 hi = 2;
 }

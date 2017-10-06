@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker
+namespace Plexus.Interop.Broker
 {
     using Plexus.Interop.Apps;
     using Plexus.Interop.Metamodel;
@@ -31,13 +31,13 @@
     using LogManager = Plexus.LogManager;
 
     public sealed class BrokerRunner : StartableBase
-    {        
+    {
         private static readonly ILogger Log = LogManager.GetLogger<BrokerRunner>();
         private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider = new ProtobufTransportProtocolSerializationProvider();
         private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider = new ProtobufProtocolSerializerFactory();
 
         private readonly string _workingDir;
-        private readonly Semaphore _instanceSemaphore;        
+        private readonly Semaphore _instanceSemaphore;
         private readonly CompositeTransportServer _transportServer;
         private readonly IRegistryProvider _registryProvider;
         private readonly IAppLifecycleManager _appLifecycleManager;
@@ -46,8 +46,7 @@
         {
             _workingDir = Path.GetFullPath(Directory.GetCurrentDirectory());
             metadataDir = metadataDir ?? _workingDir;
-            _registryProvider = registryProvider ??
-                                JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
+            _registryProvider = registryProvider ?? (IRegistryProvider)JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
             _instanceSemaphore = new Semaphore(1, 1, $"Global{Path.DirectorySeparatorChar}plexus-interop-broker-semaphore-{_workingDir.Replace(Path.DirectorySeparatorChar, ':')}");
             _transportServer = new CompositeTransportServer(new[] { CreateNamedPipeServer(), CreateWebSocketServer() });
             _appLifecycleManager = new AppLifecycleManager(metadataDir, _workingDir);
@@ -59,14 +58,14 @@
             if (!_instanceSemaphore.WaitOne(0))
             {
                 throw new BrokerIsAlreadyRunningException(_workingDir);
-            }            
+            }
             try
             {
                 stopCancellationToken.ThrowIfCancellationRequested();
                 Log.Info("Starting broker in directory {0}", _workingDir);
                 BrokerProcessor brokerProcess;
                 using (stopCancellationToken.Register(OnStop))
-                {                    
+                {
                     await _transportServer.StartAsync().ConfigureAwait(false);
                     brokerProcess = new BrokerProcessor(
                         _transportServer,

@@ -57,6 +57,20 @@ class InteropLangParsingTest {
 		Assert.assertEquals(3, allResources.length)	
 	}
 	
+	@Test
+	def void ParseFilesWithPredefinedResources() {
+		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource("com/db/plexus/interop/dsl/tests/example3.interop").toURI().toString())
+		System.out.println("Parsing " + uri)
+		Assert.assertEquals(0, rs.resources.length)
+		rs.getResource(uri, true)
+		EcoreUtil2.resolveAll(rs);
+		val allResources = rs.resources		
+		for (r : allResources) {
+			validateResource(r)
+		}								
+		Assert.assertEquals(3, allResources.length)	
+	}
+	
 	def validateResource(Resource r) {		
 		System.out.println("Validating " + r.URI)
 		val issues = validator.validate(r, CheckMode.ALL, CancelIndicator.NullImpl)		

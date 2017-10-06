@@ -15,11 +15,10 @@
 // limitations under the License.
 //
 
+package plexus.interop.tests;
+
 import "interop/AppLauncherService.proto";
 
-package interop;
-
-application NativeAppLauncher {
-
-	provides AppLauncherService to interop.AppLifecycleManager { Launch; }
+application ElectronAppLauncher {
+	provides interop.AppLauncherService { Launch; }
 }

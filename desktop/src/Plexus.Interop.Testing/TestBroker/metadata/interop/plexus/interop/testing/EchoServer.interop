@@ -15,22 +15,17 @@
 // limitations under the License.
 //
 
-syntax = "proto3";
+import "plexus/interop/testing/EchoService.proto";
 
-package interop;
+package plexus.interop.testing;
 
-import "google/protobuf/descriptor.proto";
+application EchoServer {
 
-extend google.protobuf.MessageOptions {
-	string message_id = 9650;
-	string message_title = 9651;
-}
-extend google.protobuf.ServiceOptions {
-	string service_id = 9651;
-	string service_title = 9652;
-}
-
-extend google.protobuf.MethodOptions {
-	string method_id = 9650;
-	string method_title = 9651;
+	provides plexus.interop.testing.EchoService to plexus.interop.testing.* {
+		option service_title = "Sample Echo Service";
+		Unary [method_title = "Sample Unary Method"]; 
+		ServerStreaming [method_title = "Sample Server Streaming Method"]; 
+		ClientStreaming [method_title = "Sample Client Streaming Method"]; 
+		DuplexStreaming [method_title = "Sample Duplex Streaming Method"]; 
+	}
 }

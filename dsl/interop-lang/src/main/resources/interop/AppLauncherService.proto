@@ -15,17 +15,21 @@
 // limitations under the License.
 //
 
-import "interop/EchoService.proto";
+syntax = "proto3";
 
-package plexus.interop.testing;
+package interop;
 
-application EchoServer {
+import "interop/UniqueId.proto";
 
-	provides plexus.interop.testing.EchoService to plexus.interop.testing.* {
-		option service_title = "Sample Echo Service";
-		Unary [method_title = "Sample Unary Method"]; 
-		ServerStreaming [method_title = "Sample Server Streaming Method"]; 
-		ClientStreaming [method_title = "Sample Client Streaming Method"]; 
-		DuplexStreaming [method_title = "Sample Duplex Streaming Method"]; 
-	}
+service AppLauncherService {
+	rpc Launch(AppLaunchRequest) returns (AppLaunchResponse);
+}
+
+message AppLaunchRequest {
+	string app_id = 1;
+	string launch_params_json = 2;
+}
+
+message AppLaunchResponse {
+	UniqueId app_instance_id = 1;
 }

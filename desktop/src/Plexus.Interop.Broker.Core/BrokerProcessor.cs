@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker
+namespace Plexus.Interop.Broker
 {
     using Plexus.Channels;
     using Plexus.Interop.Apps;

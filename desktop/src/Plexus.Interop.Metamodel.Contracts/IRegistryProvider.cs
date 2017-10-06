@@ -22,6 +22,6 @@
     {
         IRegistry Current { get; }
 
-        event Action<IRegistry> Updated;
+        event Action<IRegistry> Updated;        
     }
 }
