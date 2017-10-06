@@ -15,13 +15,19 @@
 // limitations under the License.
 //
 
-import "interop/GreetingService.proto";
+import "interop/samples/GreetingService.proto";
 
 package interop.samples;
 
-application WebGreetingServer {
+application GreetingServer {
 
-	provides GreetingService to interop.samples.GreetingClient { 
-		Unary [method_title="Greeting from Electron Web app"];
+	provides GreetingService to interop.samples.GreetingClient {
+
+		option service_title = "Greeting service implemented by .NET app";
+
+		Unary [method_title="Greeting from .NET app"];
+		ServerStreaming [method_title="Greetings from .NET app"];
+		ClientStreaming;
+		DuplexStreaming;
 	}
 }

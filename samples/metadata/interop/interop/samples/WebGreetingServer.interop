@@ -15,21 +15,13 @@
 // limitations under the License.
 //
 
-syntax = "proto3";
+import "interop/samples/GreetingService.proto";
 
-package interop;
+package interop.samples;
 
-import "interop/UniqueId.proto";
+application WebGreetingServer {
 
-service AppLauncherService {
-	rpc Launch(AppLaunchRequest) returns (AppLaunchResponse);
-}
-
-message AppLaunchRequest {
-	string app_id = 1;
-	string launch_params_json = 2;
-}
-
-message AppLaunchResponse {
-	UniqueId app_instance_id = 1;
+	provides GreetingService to interop.samples.GreetingClient { 
+		Unary [method_title="Greeting from Electron Web app"];
+	}
 }

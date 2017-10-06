@@ -1,10 +1,6 @@
 ﻿{
   "apps": [
     {
-      "id": "interop.NativeAppLauncher", 
-      "displayName": "Built-in Native App Launcher"
-    },
-    {
       "id": "interop.samples.GreetingClient",
       "displayName": "Sample Greeting Client",
       "launcherId": "interop.NativeAppLauncher",
