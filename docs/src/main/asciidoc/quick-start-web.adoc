@@ -1,15 +1,15 @@
 
-=== Quick Start - Web
+==== Quick Start - Web
 
 This quick start guide will get you started with Plexus Interop Web client with a simple working example. Both applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
 
-==== Before you start
+===== Before you start
 
 You need Interop Broker binaries and local copy of all examples to go through the quick start guide. You can download examples and build everything with few simple steps:
 
 include::clone-and-build.adoc[]
 
-==== Run example
+===== Run example
 
 include::quick-start-run-broker.adoc[]
 
@@ -28,11 +28,11 @@ npm run start
 
 Great, we have running example, Rate Viewer app will request Currency Pair's rate and print the result.
 
-==== Update Interop Flow
+===== Update Interop Flow
 
 Let's take a look closer to example and extend provided rate with additional details - `dueDate`, to be set by provider and passed to viewer. We going to change contract between two components, pass this information to broker and run clients again.
 
-===== Update Service
+====== Update Service
 
 Let's open `quick-start/metadata/fx/CcyPairRateService.proto` file, create new `CcyPairExpiringRate` structure with additional field:
 
@@ -59,7 +59,7 @@ service CcyPairRateService {
     rpc GetExpiringRate(CcyPair) returns (CcyPairExpiringRate);
 }
 -----
-===== Update CCY Rate Provider
+====== Update CCY Rate Provider
 
 All provided application's actions are specified in Plexus `*.interop` files. We created new service method, so now we need to update provider's metadata and change provided method to new one. Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto` and change `GetRate` method name to `GetExpiringRate`
 
@@ -71,7 +71,7 @@ provides fx.CcyPairRateService {
 }
 -----
 
-===== Update CCY Rate Viewer
+====== Update CCY Rate Viewer
 
 On the other side we need to update consumer application and specify new service method as consumed. Consumed services are also described in applications's `*.interop` files. Let's open `quick-start/metadata/fx/vendorB/WebCcyPairRateViewer.interop` and change `GetRate` method name to `GetExpiringRate`
 
@@ -83,12 +83,27 @@ application WebCcyPairRateViewer {
 }
 -----
 
-===== Update Clients
+====== Update Clients
 
 We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool.
 
+// TODO command to generate the files
 
+Then we need to adjust implementation of invocation handler and specify `dueDate` field.
 
+// TODO code snippet of handler
+
+OK, provider is ready. Now let's re-generate consumer's client code:
+
+// TODO command to generate the files
+
+and adjust invocation code to print the `dueDate` field also.
+
+// TODO code snippet
+
+====== Run updated example
+
+Please stop currently running Broker and Example apps and run them again, using instructions above.
 
 
 

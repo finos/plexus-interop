@@ -1,4 +1,4 @@
-==== Implement C# App
+==== Quick Start - .Net
 
 
 Let's create a simple app to demonstrate using of Plexus Interop API from C# app.
