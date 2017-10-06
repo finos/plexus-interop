@@ -1,23 +1,23 @@
 
-= Quick Start - Web
+=== Quick Start - Web
 
 This quick start guide will get you started with Plexus Interop Web client with a simple working example. Both applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
 
-== Before you start
+==== Before you start
 
 You need Interop Broker binaries and local copy of all examples to go through the quick start guide. You can download examples and build everything with few simple steps:
 
 include::clone-and-build.adoc[]
 
-== Run example
+==== Run example
 
 include::quick-start-run-broker.adoc[]
 
-Great, we can start CCY Pair Rate Provider:
+Now can start CCY Pair Rate Provider:
 
 [source, bash]
 -----
-cd samples/quick-start/ccy-pair-rate-provider
+cd quick-start/web/ccy-pair-rate-provider
 npm run start
 -----
 and CCY Pair Rate Viewer:
@@ -26,7 +26,70 @@ cd ../ccy-pair-rate-viewer
 npm run start
 -----
 
-Great, Rate Viewer app will request Currency Pair's rate and print the result.
+Great, we have running example, Rate Viewer app will request Currency Pair's rate and print the result.
+
+==== Update Interop Flow
+
+Let's take a look closer to example and extend provided rate with additional details - `dueDate`, to be set by provider and passed to viewer. We going to change contract between two components, pass this information to broker and run clients again.
+
+===== Update Service
+
+Let's open `quick-start/metadata/fx/CcyPairRateService.proto` file, create new `CcyPairExpiringRate` structure with additional field:
+
+[source, proto]
+./quick-start/metadata/fx/CcyPairRateService.proto
+-----
+message CcyPairExpiringRate {
+    // same fields we have in CcyPairRate
+    string ccyPairName = 1;
+    double rate = 2;
+    // additional field
+    // represents dueDate in milliseconds (elapsed since 1 January 1970 00:00:00 UTC)
+    uint64 dueDate = 3;
+}
+-----
+
+and create new `rpc` call to return new structure:
+[source, proto]
+./quick-start/metadata/fx/CcyPairRateService.proto
+-----
+service CcyPairRateService {
+    rpc GetRate(CcyPair) returns (CcyPairRate);
+    // new rpc call, returning pair with expiration date
+    rpc GetExpiringRate(CcyPair) returns (CcyPairExpiringRate);
+}
+-----
+===== Update CCY Rate Provider
+
+All provided application's actions are specified in Plexus `*.interop` files. We created new service method, so now we need to update provider's metadata and change provided method to new one. Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto` and change `GetRate` method name to `GetExpiringRate`
+
+[source, proto]
+./quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto
+-----
+provides fx.CcyPairRateService {
+    GetExpiringRate [method_title = "Web Provider - Get Rate"];
+}
+-----
+
+===== Update CCY Rate Viewer
+
+On the other side we need to update consumer application and specify new service method as consumed. Consumed services are also described in applications's `*.interop` files. Let's open `quick-start/metadata/fx/vendorB/WebCcyPairRateViewer.interop` and change `GetRate` method name to `GetExpiringRate`
+
+[source, proto]
+./quick-start/metadata/fx/vendorB/WebCcyPairRateViewer.proto
+-----
+application WebCcyPairRateViewer {
+    consumes fx.CcyPairRateService { GetExpiringRate; }
+}
+-----
+
+===== Update Clients
+
+We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool.
+
+
+
+
 
 
 
