@@ -24,9 +24,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="Shouldly" Version="3.0.0-beta0003" />
-    <PackageReference Include="xunit" Version="2.3.0-beta5-build3769" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta4-build3742" />
+    <PackageReference Include="xunit" Version="2.3.0-rc3-build3818" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-rc3-build3818" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-rc3-build3818" />
   </ItemGroup>
 
   <ItemGroup>

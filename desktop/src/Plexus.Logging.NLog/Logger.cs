@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using INLogLogger = NLog.ILogger;
-using NLogLevel = NLog.LogLevel;
-
 namespace Plexus.Logging.NLog
 {
     using System;
     using System.Runtime.CompilerServices;
+    using INLogLogger = global::NLog.ILogger;
+    using NLogLevel = global::NLog.LogLevel;
 
     internal sealed class Logger : ILogger
     {

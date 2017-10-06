@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using Google.Protobuf;
     using Plexus.Channels;
@@ -22,6 +22,7 @@
     using Plexus.Interop.Testing.Generated;
     using Shouldly;
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -30,6 +31,8 @@
 
     public sealed class ClientBrokerIntegrationTests : TestsSuite
     {
+        private readonly ConcurrentBag<TestBroker> _startedTestBrokers = new ConcurrentBag<TestBroker>();
+
         private static readonly UnaryMethod<EchoRequest, EchoRequest> EchoUnaryMethod =
             Method.Unary<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "Unary");
         
@@ -49,12 +52,22 @@
         private async Task<TestBroker> StartTestBrokerAsync()
         {            
             var broker = RegisterDisposable(new TestBroker());
+            _startedTestBrokers.Add(broker);
             await broker.StartAsync();
             broker.Completion.ContinueWithOnErrorSynchronously(t =>
             {
                 Log.Error(t.Exception.ExtractInner(), "Test broker exited with exception");
             }).IgnoreAwait(Log);
             return broker;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            foreach (var testBroker in _startedTestBrokers)
+            {
+                testBroker.Completion.ShouldCompleteIn(Timeout1Sec);
+            }
         }
 
         [Fact]
@@ -550,7 +563,52 @@
                     serverStreaming.Type.ShouldBe(MethodType.ServerStreaming);
                 }
             });
-        }        
+        }
+
+        [Fact]
+        public void ExceptionWhenTargetAppIsNotRunningAndCannotBeStarted()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var client = ConnectEchoClient();
+                    Should.Throw<Exception>(async () => await client.Call(EchoUnaryMethod, new EchoRequest()), Timeout5Sec);
+                }
+            });
+        }
+
+        [Fact]
+        public void AppLauncherStartAppWhenRequired()
+        {
+            EchoRequest receivedRequest = null;
+
+            Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
+            {
+                receivedRequest = request;
+                return Task.FromResult(request);
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var serverOptionsBuilder = new ClientOptionsBuilder()
+                        .WithDefaultConfiguration("TestBroker")
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
+                        .WithApplicationId("plexus.interop.testing.EchoServer");
+                    var appLauncher = RegisterDisposable(new TestAppLauncher(new [] { serverOptionsBuilder }));
+                    await appLauncher.StartAsync();
+                    var client = ConnectEchoClient();
+                    var request = CreateTestRequest();
+                    var response = await client.Call(EchoUnaryMethod, request);
+                    response.ShouldBe(request);
+                    receivedRequest.ShouldBe(request);
+                }
+            });
+        }
 
         private IClient ConnectEchoClient()
         {

@@ -5,6 +5,7 @@
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <Version>0.1.0</Version>
+    <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,7 +33,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Client\Plexus.Interop.Client.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
   </ItemGroup>
- 
+
+  <ItemGroup>
+    <None Update="nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestBroker\nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

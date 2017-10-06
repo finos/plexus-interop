@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
+namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
-    using NLog.Extensions.Logging;
     using System;
     using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
@@ -48,7 +47,7 @@
         {
             Log.Debug("Configure");
 
-            loggerFactory.AddNLog();
+            LogManager.ConfigureLogging(loggerFactory);
 
             lifetime.ApplicationStarted.Register(_handler.OnListeningStarted);
 

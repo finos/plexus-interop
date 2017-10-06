@@ -18,6 +18,8 @@
     <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
 
+    <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
+
   </PropertyGroup>
 
   <ItemGroup>
