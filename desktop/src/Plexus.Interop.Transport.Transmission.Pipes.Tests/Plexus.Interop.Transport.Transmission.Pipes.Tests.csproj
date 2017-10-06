@@ -27,6 +27,12 @@
     <ProjectReference Include="..\Plexus.Utils.Testing\Plexus.Utils.Testing.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Import Project="..\Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems" Label="Shared" />
 
 </Project>
