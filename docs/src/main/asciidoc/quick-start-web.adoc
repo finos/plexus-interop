@@ -85,13 +85,30 @@ application WebCcyPairRateViewer {
 
 ====== Update Clients
 
-We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool.
-
-// TODO command to generate the files
+We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool. Let's start with updating of Provider's code:
+----
+java -jar plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./quick-start/web/ccy-pair-rate-provider --protoc=./quick-start/web/ccy-pair-rate-provider/node_modules/.bin/pbts.cmd
+----
 
 Then we need to adjust implementation of invocation handler and specify `dueDate` field.
 
-// TODO code snippet of handler
+[source, typescript]
+./quick-start/web/ccy-pair-rate-provider/src/index.ts
+----
+    .withCcyPairRateServiceInvocationsHandler({
+        // all provided methods must be implemented
+        // so we need to change implemented method to 'onGetExpiringRate'
+        onGetExpiringRate: async (ccyPair: plexus.fx.ICcyPair) => {
+            log.info(`Received request for ${ccyPair.ccyPairName} CCY Pair Rate`);
+            return {
+                ccyPairName: ccyPair.ccyPairName,
+                rate: Math.floor(Math.random() * 10) + 1,
+                // add new additional field
+                dueDate: new Date().getTime()
+            };
+        }
+    })
+----
 
 OK, provider is ready. Now let's re-generate consumer's client code:
 
