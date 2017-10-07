@@ -1,4 +1,4 @@
-
+[[quick-start-web]]
 ==== Quick Start - Web
 
 This quick start guide will get you started with Plexus Interop Web client with a simple working example. Both applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
@@ -13,7 +13,7 @@ include::clone-and-build.adoc[]
 
 include::quick-start-run-broker.adoc[]
 
-Now can start CCY Pair Rate Provider:
+Now you can start CCY Pair Rate Provider:
 
 [source, bash]
 -----
