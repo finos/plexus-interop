@@ -1,7 +1,7 @@
 [[quick-start-web]]
 ==== Quick Start - Web
 
-This quick start guide will get you started with Plexus Interop Web client, using a simple working example. Both client and server applications  applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
+This quick start guide will get you started with Plexus Interop Web client, using a simple working example. Both client and server applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
 
 ===== Before you start
 
