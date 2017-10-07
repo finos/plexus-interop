@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CcyPairRateViewerClientBuilder, CcyPairRateViewerClient } from "./gen/CcyPairRateViewerGeneratedClient";
+import { WebCcyPairRateViewerClientBuilder, WebCcyPairRateViewerClient } from "./gen/WebCcyPairRateViewerGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 
 // Read launch arguments, provided by Electron Launcher
@@ -24,21 +24,17 @@ const remote = electron.remote;
 const webSocketUrl = remote.getCurrentWindow().plexusBrokerWsUrl;
 const instanceId = remote.getCurrentWindow().plexusAppInstanceId;
 
-new CcyPairRateViewerClientBuilder()
+new WebCcyPairRateViewerClientBuilder()
     // App's ID and Instance ID received from Launcher
     .withClientDetails({
-        applicationId: "CcyPairRateViewer",
+        applicationId: "fx.vendorB.WebCcyPairRateViewer",
         applicationInstanceId: instanceId
     })
     // Pass Transport to be used for connecting to Broker
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
     .connect()
-    .then((rateViewerClient: CcyPairRateViewerClient) => {
+    .then(async (rateViewerClient: WebCcyPairRateViewerClient) => {
         // Client connected, we can use generated Proxy Service to perform invocation
-        rateViewerClient.getCcyPairRateServiceProxy()
-            .getRate({ccyPairName: "EURUSD"})
-            .then(rateResponse => {
-                document.body.innerText = `Received rate ${rateResponse.ccyPairName}-${rateResponse.rate}`;
-            })
-            .catch(e => console.log("Failed to receive rate", e))
+        const ccyPairRate = await rateViewerClient.getCcyPairRateServiceProxy().getRate({ccyPairName: "EURUSD"});
+        document.body.innerText = `Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}`;
     });

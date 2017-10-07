@@ -1,7 +1,7 @@
 [[quick-start-web]]
 ==== Quick Start - Web
 
-This quick start guide will get you started with Plexus Interop Web client with a simple working example. Both applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
+This quick start guide will get you started with Plexus Interop Web client, using a simple working example. Both client and server applications  applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
 
 ===== Before you start
 
@@ -86,11 +86,12 @@ application WebCcyPairRateViewer {
 ====== Update Clients
 
 We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool. Let's start with updating of Provider's code:
+
 ----
-java -jar plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./quick-start/web/ccy-pair-rate-provider --protoc=./quick-start/web/ccy-pair-rate-provider/node_modules/.bin/pbts.cmd
+java -jar plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateProvider.interop --out=./quick-start/web/ccy-pair-rate-provider/src/gen --protoc=./quick-start/web/ccy-pair-rate-provider/node_modules/.bin/pbts.cmd
 ----
 
-Then we need to adjust implementation of invocation handler and specify `dueDate` field.
+Then we need to adjust implementation of invocation handler and add `dueDate` field to result.
 
 [source, typescript]
 ./quick-start/web/ccy-pair-rate-provider/src/index.ts
@@ -99,7 +100,7 @@ Then we need to adjust implementation of invocation handler and specify `dueDate
         // all provided methods must be implemented
         // so we need to change implemented method to 'onGetExpiringRate'
         onGetExpiringRate: async (ccyPair: plexus.fx.ICcyPair) => {
-            log.info(`Received request for ${ccyPair.ccyPairName} CCY Pair Rate`);
+            log.info(`Received request for ${ccyPair.ccyPairName}'s Rate`);
             return {
                 ccyPairName: ccyPair.ccyPairName,
                 rate: Math.floor(Math.random() * 10) + 1,
@@ -112,15 +113,26 @@ Then we need to adjust implementation of invocation handler and specify `dueDate
 
 OK, provider is ready. Now let's re-generate consumer's client code:
 
-// TODO command to generate the files
+----
+java -jar plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./quick-start/web/ccy-pair-rate-viewer/src/gen --protoc=./quick-start/web/ccy-pair-rate-viewer/node_modules/.bin/pbts.cmd
+----
 
 and adjust invocation code to print the `dueDate` field also.
 
-// TODO code snippet
+./quick-start/web/ccy-pair-rate-viewer/src/index.ts
+[source, typescript]
+----
+const ccyPairRate = await rateViewerClient
+    .getCcyPairRateServiceProxy()
+    // we started to consume new method
+    .getExpiringRate({ccyPairName: "EURUSD"});
+// and receive new 'duteDate' attribute
+document.body.innerText = `Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}-${ccyPairRate.dueDate}`;
+----
 
 ====== Run updated example
 
-Please stop currently running Broker and Example apps and run them again, using instructions above.
+We are done with all required changes, please stop currently running Broker and Example apps and run them again using instructions above.
 
 
 
