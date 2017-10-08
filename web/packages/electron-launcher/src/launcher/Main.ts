@@ -17,6 +17,7 @@
 
 // We pack launcher using browserify due to yarn worspaces usage
 // this is a hack to inject LongJs to ProtobuffJs library
+// tslint:disable-next-line:variable-name
 const Long = require("long");
 declare var global: any;
 if (global && global.dcodeIO) {
@@ -26,10 +27,13 @@ if (global && global.dcodeIO) {
         Long
     };
 }
+// tslint:disable-next-line:no-unused-variable
+const WebSocket = require("ws");
+const argv = require("minimist")(process.argv.slice(1));
 
-import { app, BrowserWindow } from "electron";
+import { app } from "electron";
 import { FileLogger } from "./logger/FileLogger";
-import { Logger, LoggerFactory, PrefixedLogger, LogLevel } from "@plexus-interop/common";
+import { LoggerFactory, PrefixedLogger, LogLevel } from "@plexus-interop/common";
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 let log = new FileLogger(LoggerFactory.getLogger("ElectronLauncherMain"));
 
@@ -40,12 +44,12 @@ import { ElectronAppLauncher } from "./ElectronAppLauncher";
 
 log.info("Started");
 
-const appsIndex = process.argv.findIndex(v => v === "--apps");
-const appsToLaunch = appsIndex > 0 && appsIndex <= process.argv.length - 2 ? process.argv[appsIndex + 1].split(";") : [];
+const appsToLaunch = argv.apps ? argv.apps.split(";") : [];
+const brokerDefaultDir = argv.brokerDir ||  "../..";
 
-app.on('ready', () => {
+app.on("ready", () => {
     log.info("Connecting to Broker");
-    const electronAppLauncher = new ElectronAppLauncher(log, appsToLaunch);
+    const electronAppLauncher = new ElectronAppLauncher(log, appsToLaunch, brokerDefaultDir);
     electronAppLauncher.start()
         .then(() => {
             log.info("Connected to Broker");

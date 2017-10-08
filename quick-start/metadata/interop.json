@@ -40,6 +40,26 @@
 		     ]
 		  },
 		{
+			"id": "interop.ElectronAppLauncher",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.AppLauncherService",
+		     		"title": "AppLauncherService",
+		     		"to": [
+		     			"interop.AppLifecycleManager"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Launch",
+		     				"title": "Launch"
+		     			}
+		     		]
+		     	}
+		     ]
+		  },
+		{
 			"id": "interop.NativeAppLauncher",
 			"consumes": [
 		     ],

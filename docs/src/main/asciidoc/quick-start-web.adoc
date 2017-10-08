@@ -13,18 +13,13 @@ include::clone-and-build.adoc[]
 
 include::quick-start-run-broker.adoc[]
 
-Now you can start CCY Pair Rate Provider:
+Now you can start CCY Pair Rate Provider and Viewer apps using pre-built Electron App Launcher:
 
 [source, bash]
 -----
-cd web/packages/ccy-pair-rate-provider
-npm run start
+bin/win-x86/samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe aa --brokerDir . --apps "./web/packages/ccy-pair-rate-provider/dist/index.html;./web/packages/ccy-pair-rate-viewer/dist/index.html"
 -----
-and CCY Pair Rate Viewer:
------
-cd ../ccy-pair-rate-viewer
-npm run start
------
+Where `brokerDir` argument points to currently launched Broker's working directory and `apps` argument lists path to home pages of applications to launch in Electron Browser.
 
 Great, we have running example of two apps communicating with each other, Rate Viewer app will request Currency Pair's rate and print the result.
 
