@@ -20,6 +20,18 @@ import * as plexus from "./gen/plexus-messages";
 
 // Read launch arguments, provided by Electron Launcher
 declare var window: any;
+
+// enable dev tools
+document.addEventListener("keydown", function (e) {
+    if (e.which === 123) {
+        // F12
+        window.toggleDevTools();
+    } else if (e.which === 116) {
+        // F5
+        location.reload();
+    }
+});
+
 const electron = window.require("electron")
 const remote = electron.remote;
 const webSocketUrl = remote.getCurrentWindow().plexusBrokerWsUrl;

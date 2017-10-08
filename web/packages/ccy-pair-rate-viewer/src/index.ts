@@ -17,6 +17,17 @@
 import { WebCcyPairRateViewerClientBuilder, WebCcyPairRateViewerClient } from "./gen/WebCcyPairRateViewerGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 
+// enable dev tools
+document.addEventListener("keydown", function (e) {
+    if (e.which === 123) {
+        // F12
+        (<any>window).toggleDevTools();
+    } else if (e.which === 116) {
+        // F5
+        location.reload();
+    }
+});
+
 // Read launch arguments, provided by Electron Launcher
 declare var window: any;
 const electron = window.require("electron")
