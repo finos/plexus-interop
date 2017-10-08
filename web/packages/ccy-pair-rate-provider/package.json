@@ -1,5 +1,5 @@
 {
-  "name": "ccy-pair-rate-provider",
+  "name": "@plexus-interop/ccy-pair-rate-provider",
   "version": "0.0.1",
   "description": "Quick start Rate Provider App",
   "main": "index.js",
@@ -12,7 +12,7 @@
   "scripts": {
     "prebuild": "trash dist",
     "compile": "tsc -p tsconfig.json",
-    "copy-assets": "copyfiles src/gen/* dist/main && copyfiles src/views/* dist",
+    "copy-assets": "copyfiles src/gen/* dist/main && copyfiles -f src/views/* dist",
     "package": "browserify ./dist/main/src/index.js --outfile ./dist/app.bundle.js",
     "build": "npm run compile && npm run copy-assets && npm run package"
   },

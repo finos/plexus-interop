@@ -1,5 +1,5 @@
 {
-  "name": "ccy-pair-rate-viewer",
+  "name": "@plexus-interop/ccy-pair-rate-viewer",
   "version": "0.0.1",
   "description": "Quick start Rate Viewer App",
   "main": "index.js",

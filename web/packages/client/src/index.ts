@@ -15,3 +15,4 @@
  * limitations under the License.
  */
 export * from "./client";
+export {UniqueId as UniqueId} from "@plexus-interop/transport-common";
