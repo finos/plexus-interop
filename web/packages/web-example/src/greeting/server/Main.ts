@@ -17,7 +17,7 @@
 const Long = require("long");
 (<any>window).dcodeIO = { Long: Long };
 
-import { LoggerFactory, Logger, LogLevel } from "@plexus-interop/common";
+import { LoggerFactory, LogLevel } from "@plexus-interop/common";
 
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 
@@ -26,7 +26,6 @@ import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport"
 
 import * as plexus from "./gen/plexus-messages";
 import { DomLogger } from "../../common/DomLogger";
-import { UniqueId } from "@plexus-interop/transport-common";
 
 declare var window: any;
 
@@ -40,7 +39,7 @@ const instanceId = windowAny.plexusAppInstanceId;
 log.info(`Received Web Socket URL - ${wsUrl}`);
 log.info(`Received App Instance ID - ${instanceId.toString()}`);
 
-// Reload and Dev tools hotkeys
+// Reload and Dev tools hot keys
 document.addEventListener("keydown", function (e) {
     if (e.which === 123) {
         // F12
@@ -69,7 +68,7 @@ new WebGreetingServerClientBuilder()
     .then(() => log.info("Connected to Broker"))
     .catch(e => {
         log.error("Failed to connect");
-        console.error("Falied to connect", e);
+        console.error("Failed to connect", e);
     });
 
 
