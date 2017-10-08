@@ -1,7 +1,7 @@
 {
-  "name": "ccy-pair-rate-viewer",
+  "name": "ccy-pair-rate-provider",
   "version": "0.0.1",
-  "description": "Quick start Rate Viewer App",
+  "description": "Quick start Rate Provider App",
   "main": "index.js",
   "private": true,
   "license": "Apache-2.0",

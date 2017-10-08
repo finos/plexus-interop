@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "outDir": "dist/main",
+    "rootDir": ".",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "declaration": true,
+    "pretty": true,
+    "lib": [
+      "es6",
+      "dom"
+    ],
+    "types": [
+      "long"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/**"
+  ]
+}

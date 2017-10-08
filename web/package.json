@@ -13,7 +13,9 @@
     "build-protocol": "cd ./packages/protocol && yarn build",
     "build-transport-common": "cd ./packages/transport-common && yarn build",
     "build-websocket-transport": "cd ./packages/websocket-transport && yarn build",
-    "build-all": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client build-electron-launcher build-e2e build-web-example",
+    "build-quickstart-viewer": "cd ./packages/ccy-pair-rate-viewer && yarn build",
+    "build-quickstart-provider": "cd ./packages/ccy-pair-rate-provider && yarn build",
+    "build-all": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
     "prebuild-all": "yarn install"
   },
   "workspaces": [
