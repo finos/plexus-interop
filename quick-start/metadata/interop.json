@@ -1,6 +1,17 @@
 {
 	"services": [
 		{
+			"id": "interop.AppLauncherService",
+			"methods": [
+				{
+					"name": "Launch",
+					"input": "interop.AppLaunchRequest",
+					"output": "interop.AppLaunchResponse",
+					"type": "Unary"
+				}
+			]
+		},
+		{
 			"id": "fx.CcyPairRateService",
 			"methods": [
 				{
@@ -13,6 +24,41 @@
 		}
 	],
 	"applications": [
+		{
+			"id": "interop.AppLifecycleManager",
+			"consumes": [
+				{
+					"service": "interop.AppLauncherService",
+					"from": [
+					],
+					"methods": [
+						"Launch"
+					]
+				}
+		     ],
+		     "provides": [
+		     ]
+		  },
+		{
+			"id": "interop.NativeAppLauncher",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.AppLauncherService",
+		     		"title": "AppLauncherService",
+		     		"to": [
+		     			"interop.AppLifecycleManager"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Launch",
+		     				"title": "Launch"
+		     			}
+		     		]
+		     	}
+		     ]
+		  },
 		{
 			"id": "vendorA.fx.CcyPairRateProvider",
 			"consumes": [

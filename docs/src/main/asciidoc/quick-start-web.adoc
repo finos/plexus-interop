@@ -91,6 +91,8 @@ We updated client's metadata, so now we need to re-generate client's code to han
 java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateProvider.interop --out=./web/packages/ccy-pair-rate-provider/src/gen --protoc=./web/node_modules/.bin/pbts.cmd
 ----
 
+This command generates Typescript interfaces and classes required for connection to Broker, registering of handlers to provided actions and invocation of consumed methods. It also generated messages using https://github.com/dcodeIO/protobuf.js/tree/master/cli[ProtobufJS CLI tool]. The main generated class is `WebCcyPairRateProviderClientBuilder`, it provides intuitive interface to build and receive connected client.
+
 Then we need to adjust implementation of invocation handler and add `dueDate` field to result.
 
 [source, typescript]
@@ -111,13 +113,13 @@ Then we need to adjust implementation of invocation handler and add `dueDate` fi
     })
 ----
 
-OK, provider is ready. Now let's re-generate consumer's client code:
+OK, provider is ready. Now let's re-generate consumer's client code in the same was as for provider component:
 
 ----
 java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/packages/ccy-pair-rate-viewer/node_modules/.bin/pbts.cmd
 ----
 
-and adjust invocation code to print the `dueDate` field also.
+and adjust invocation code to print the `dueDate` field:
 
 ./web/packages/ccy-pair-rate-viewer/src/index.ts
 [source, typescript]
