@@ -17,28 +17,29 @@
 import { WebCcyPairRateViewerClientBuilder, WebCcyPairRateViewerClient } from "./gen/WebCcyPairRateViewerGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 
+// Read launch arguments, provided by Electron Launcher
+declare var window: any;
+const electron = window.require("electron");
+const remote = electron.remote;
+const electronWindow: any = remote.getCurrentWindow();
+
+const webSocketUrl = remote.getCurrentWindow().plexusBrokerWsUrl;
+const instanceId = remote.getCurrentWindow().plexusAppInstanceId;
 // enable dev tools
 document.addEventListener("keydown", function (e) {
     if (e.which === 123) {
         // F12
-        (<any>window).toggleDevTools();
+        electronWindow.toggleDevTools();
     } else if (e.which === 116) {
         // F5
         location.reload();
     }
 });
 
-// Read launch arguments, provided by Electron Launcher
-declare var window: any;
-const electron = window.require("electron")
-const remote = electron.remote;
-const webSocketUrl = remote.getCurrentWindow().plexusBrokerWsUrl;
-const instanceId = remote.getCurrentWindow().plexusAppInstanceId;
-
 new WebCcyPairRateViewerClientBuilder()
     // App's ID and Instance ID received from Launcher
     .withClientDetails({
-        applicationId: "fx.vendorB.WebCcyPairRateViewer",
+        applicationId: "vendorB.fx.WebCcyPairRateViewer",
         applicationInstanceId: instanceId
     })
     // Pass Transport to be used for connecting to Broker
