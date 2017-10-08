@@ -17,7 +17,7 @@ Now you can start CCY Pair Rate Provider:
 
 [source, bash]
 -----
-cd quick-start/web/ccy-pair-rate-provider
+cd web/packages/ccy-pair-rate-provider
 npm run start
 -----
 and CCY Pair Rate Viewer:
@@ -88,13 +88,13 @@ application WebCcyPairRateViewer {
 We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool. Let's start with updating of Provider's code:
 
 ----
-java -jar plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateProvider.interop --out=./quick-start/web/ccy-pair-rate-provider/src/gen --protoc=./quick-start/web/ccy-pair-rate-provider/node_modules/.bin/pbts.cmd
+java -jar plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateProvider.interop --out=./web/packages/ccy-pair-rate-provider/src/gen --protoc=./web/packages/ccy-pair-rate-provider/node_modules/.bin/pbts.cmd
 ----
 
 Then we need to adjust implementation of invocation handler and add `dueDate` field to result.
 
 [source, typescript]
-./quick-start/web/ccy-pair-rate-provider/src/index.ts
+./web/packages/ccy-pair-rate-provider/src/index.ts
 ----
     .withCcyPairRateServiceInvocationsHandler({
         // all provided methods must be implemented
@@ -114,12 +114,12 @@ Then we need to adjust implementation of invocation handler and add `dueDate` fi
 OK, provider is ready. Now let's re-generate consumer's client code:
 
 ----
-java -jar plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./quick-start/web/ccy-pair-rate-viewer/src/gen --protoc=./quick-start/web/ccy-pair-rate-viewer/node_modules/.bin/pbts.cmd
+java -jar plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/packages/ccy-pair-rate-viewer/node_modules/.bin/pbts.cmd
 ----
 
 and adjust invocation code to print the `dueDate` field also.
 
-./quick-start/web/ccy-pair-rate-viewer/src/index.ts
+./web/packages/ccy-pair-rate-viewer/src/index.ts
 [source, typescript]
 ----
 const ccyPairRate = await rateViewerClient
