@@ -26,11 +26,11 @@ cd ../ccy-pair-rate-viewer
 npm run start
 -----
 
-Great, we have running example, Rate Viewer app will request Currency Pair's rate and print the result.
+Great, we have running example of two apps communicating with each other, Rate Viewer app will request Currency Pair's rate and print the result.
 
 ===== Update Interop Flow
 
-Let's take a look closer to example and extend provided rate with additional details - `dueDate`, to be set by provider and passed to viewer. We going to change contract between two components, pass this information to broker and run clients again.
+Let's take a look closer to example and extend provided rate with additional details - `dueDate`, to be set by provider and passed to viewer. We're going to change contract between two components, pass this information to broker and run clients again.
 
 ====== Update Service
 
@@ -132,7 +132,7 @@ document.body.innerText = `Received rate ${ccyPairRate.ccyPairName}-${ccyPairRat
 
 ====== Run updated example
 
-We are done with all required changes, please stop currently running Broker and Example apps and run them again using instructions above.
+We are done with all required changes, please stop currently running Broker and Example apps and run them again using instructions above. You will see that consumer Application receives updated result now.
 
 
 
