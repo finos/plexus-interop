@@ -17,7 +17,7 @@ Now you can start CCY Pair Rate Provider and Viewer apps using pre-built Electro
 
 [source, bash]
 -----
-bin/win-x86/samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe aa --brokerDir . --apps "./web/packages/ccy-pair-rate-provider/dist/index.html;./web/packages/ccy-pair-rate-viewer/dist/index.html"
+bin/win-x86/samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe --brokerDir . --apps "./web/packages/ccy-pair-rate-provider/dist/index.html;./web/packages/ccy-pair-rate-viewer/dist/index.html"
 -----
 Where `brokerDir` argument points to currently launched Broker's working directory and `apps` argument lists path to home pages of applications to launch in Electron Browser.
 

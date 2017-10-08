@@ -16,7 +16,7 @@
  */
 
 // We pack launcher using browserify due to yarn worspaces usage
-// this is a hack to inject LongJs to ProtobuffJs library
+// this is a hack to inject LongJs to ProtobufJs library
 // tslint:disable-next-line:variable-name
 const Long = require("long");
 declare var global: any;
@@ -28,7 +28,7 @@ if (global && global.dcodeIO) {
     };
 }
 // tslint:disable-next-line:no-unused-variable
-const WebSocket = require("ws");
+global.WebSocket = global.WebSocket || require("ws");
 const argv = require("minimist")(process.argv.slice(1));
 
 import { app } from "electron";
@@ -37,7 +37,7 @@ import { LoggerFactory, PrefixedLogger, LogLevel } from "@plexus-interop/common"
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 let log = new FileLogger(LoggerFactory.getLogger("ElectronLauncherMain"));
 
-// substitute logger implementatiuon with simple file logger 
+// substitute logger implementation with simple file logger
 LoggerFactory.getLogger = (name: string) => new PrefixedLogger(log, name);
 
 import { ElectronAppLauncher } from "./ElectronAppLauncher";
