@@ -14,7 +14,8 @@
     "compile": "tsc -p tsconfig.json",
     "copy-assets": "copyfiles src/gen/* dist/main && copyfiles -f src/views/* dist",
     "package": "browserify ./dist/main/src/index.js --outfile ./dist/app.bundle.js",
-    "build": "npm run compile && npm run copy-assets && npm run package"
+    "build": "npm run compile && npm run copy-assets && npm run package",
+    "start": "../../../bin/win-x86/samples/ElectronAppLauncher.cmd --apps \"../../../web/packages/ccy-pare-rate-provider/dist/index.html\""
   },
   "devDependencies": {
     "browserify": "^14.4.0",
