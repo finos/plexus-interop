@@ -78,6 +78,14 @@ application WebCcyPairRateViewer {
 }
 -----
 
+====== Update Broker Metadata
+
+Broker component must be aware about all possible invocations to validate them and perform discovery, this information is stored in `interop.json`. To provide latest changes we simply need to generate this file from latest metadata:
+
+----
+java -jar bin/win-x86/sdk/plexusgen.jar --type=json_meta --baseDir=quick-start/metadata --out=quick-start/metadata
+----
+
 ====== Update Clients
 
 We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool. Let's start with updating of Provider's code:
@@ -108,13 +116,20 @@ Then we need to adjust implementation of invocation handler and add `dueDate` fi
     })
 ----
 
+All code changes completed, now we need to rebuild Provider component:
+
+----
+cd web/packages/ccy-pair-rate-provider
+npm run build
+----
+
 OK, provider is ready. Now let's re-generate consumer's client code in the same was as for provider component:
 
 ----
 java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/packages/ccy-pair-rate-viewer/node_modules/.bin/pbts.cmd
 ----
 
-and adjust invocation code to print the `dueDate` field:
+adjust invocation code to print the `dueDate` field:
 
 ./web/packages/ccy-pair-rate-viewer/src/index.ts
 [source, typescript]
@@ -125,6 +140,11 @@ const ccyPairRate = await rateViewerClient
     .getExpiringRate({ccyPairName: "EURUSD"});
 // and receive new 'duteDate' attribute
 document.body.innerText = `Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}-${ccyPairRate.dueDate}`;
+----
+and rebuild Consumer component:
+----
+cd web/packages/ccy-pair-rate-viewer
+npm run build
 ----
 
 ====== Run updated example
