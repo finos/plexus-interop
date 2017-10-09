@@ -38,6 +38,12 @@ document.addEventListener("keydown", function (e) {
     }
 });
 
+const outEl = document.getElementById("out");
+const log = (msg: string) => {
+    console.log(msg);
+    outEl.innerText = outEl.innerText + '\n' + msg;
+};
+
 new WebCcyPairRateProviderClientBuilder()
     .withClientDetails({
         applicationId: "vendorA.fx.WebCcyPairRateProvider",
@@ -46,7 +52,7 @@ new WebCcyPairRateProviderClientBuilder()
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
     .withCcyPairRateServiceInvocationsHandler({
         onGetRate: async (ccyPair: plexus.fx.ICcyPair) => {
-            console.log(`Received request for ${ccyPair.ccyPairName}'s Rate`);
+            log(`Received request for ${ccyPair.ccyPairName}'s Rate`);
             return {
                 ccyPairName: ccyPair.ccyPairName,
                 rate: Math.floor(Math.random() * 10) + 1
@@ -54,5 +60,5 @@ new WebCcyPairRateProviderClientBuilder()
         }
     })
     .connect()
-    .then(() => console.log("Connected to Broker"))
+    .then(() => log("Connected to Broker"))
     .catch(e => console.error("Connection failure", e)); 
