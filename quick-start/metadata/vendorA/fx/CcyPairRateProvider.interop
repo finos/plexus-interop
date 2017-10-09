@@ -21,7 +21,7 @@ import "fx/CcyPairRateService.proto";
 application CcyPairRateProvider {
 
     provides fx.CcyPairRateService {
-        GetRate [method_title = "Web Provider - Get Rate"];
+        GetRate [method_title = ".NET Provider - Get Rate"];
     }
 
 }
