@@ -54,6 +54,10 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     public disconnect(): Promise<void> {
+        if (this.socketOpenToken.isCancelled()) {
+            this.log.warn("Already disconnected");
+            return Promise.resolve();
+        }
         this.throwIfNotConnectedOrDisconnectRequested();
         return this.closeConnectionInternal();
     }
@@ -95,13 +99,19 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private createConnectionReadyPromise(): Promise<void> {
+        let opened = false;
         return new Promise<void>((resolve, reject) => {
             this.socket.onopen = () => {
+                opened = true;
                 this.handleOpen();
                 resolve();
             };
-            this.socket.addEventListener("error", () => {
-                reject("Connection error");
+            this.socket.addEventListener("error", (e) => {
+                if (!opened) {
+                    reject("Connection error");
+                } else {
+                    this.log.warn("Connection error", e);
+                }
             });
         });
     }
@@ -207,8 +217,8 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private handleError(socket: WebSocket, ev: Event): void {
-        this.log.error("Connection error", ev);
-        this.closeLogicalConnection("Connection error");
+        this.log.error("Connection error received", ev);
+        this.closeLogicalConnection("Connection error received");
     }
 
     private handleOpen(): void {
