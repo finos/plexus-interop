@@ -1,5 +1,5 @@
 [[quick-start-net]]
-==== Quick Start - .Net
+==== Quick Start - .NET
 
 
 Let's create a simple app to demonstrate using of Plexus Interop API from C# app.

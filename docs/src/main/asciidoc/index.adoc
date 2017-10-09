@@ -17,20 +17,22 @@ include::getting-started-features.adoc[]
 
 include::getting-started-components.adoc[]
 
+[[how-to-build]]
 === How to build
 
 include::getting-started-how-to-build.adoc[]
 
-=== How to run samples
+[[sample-apps]]
+=== Sample apps
 
 include::getting-started-how-to-run-samples.adoc[]
 
-=== Usage Example
-
-include::getting-started-example.adoc[]
-
 [[guides]]
 == Guides
+
+=== Quick start
+
+include::guides-quick-start.adoc[]
 
 === Concepts
 

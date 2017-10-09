@@ -1,0 +1,46 @@
+ifdef::env-github,env-browser[:outFileSuffix: .adoc]
+
+===== Prerequisites
+
+For this quick start guide the following software is required:
+
+- Windows 7 or later
+- http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[JDK 8+]
+- https://nodejs.org/en/download/[Node.js with NPM] for Web apps development
+- https://www.microsoft.com/net/download/core[.NET Core 2.0 SDK x86] for .NET apps development
+
+You also need clone and build https://github.com/symphonyoss/plexus-interop[Plexus Interop] repository if you not did it yet.
+To do this, run the following commands:
+[source, bash]
+----
+git clone https://github.com/symphonyoss/plexus-interop.git
+cd plexus-interop
+gradlew build --info
+----
+
+===== Before you start
+
+This introduction guide shows a simple case of two apps communicating with each other using Plexus Interop:
+
+- `CcyPairRateProvider` - app developed by Vendor A providing FX pair exchange rates to other apps.
+- `CcyPairRateViewer` - app developed by Vendor B allowing user to request FX pair exchange rates from other apps.
+
+There are 2 currently supported technologies, so the guide is split into 2 sections:
+
+- <<quick-start-web, Web (TypeScript)>>
+- <<quick-start-net, .NET (C#)>>.
+
+Note that you can combine the samples, e.g. take web implementation of `CcyPairRateViewer` from the first guide and
+.NET implementation of `CcyPairRateProvider` from the second guide and run them together.
+
+include::guides-quick-start-web.adoc[]
+
+include::guides-quick-start-net.adoc[]
+
+
+
+
+
+
+
+

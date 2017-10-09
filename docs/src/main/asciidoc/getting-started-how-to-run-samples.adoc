@@ -1,8 +1,10 @@
+==== How to run samples
+
 :imagesdir: ./images
 
-Successful build on Windows machine produces sample apps into directory `bin/win-x86/samples`.
+Successful build (see <<how-to-build, How to build>>) on Windows machine produces sample apps into directory `bin/win-x86/samples`.
 
-To run example which shows .Net and Web apps interoperability as well as discovery feature:
+Let's go through the most extensive example showing .NET and Web apps interoperability as well as service discovery feature:
 
 * Go to `bin/win-x86/samples`
 
@@ -10,20 +12,33 @@ To run example which shows .Net and Web apps interoperability as well as discove
 
 * Launch Greeting Client – `LaunchGreetingClient.cmd`
 
-* Choose “Discovery” option (5) and then “Greeting from Electron Web app” from discovery response
+* Choose “Discovery” option (5) and then “Greeting from Electron Web app” option from discovery response:
 +
 image::sample-1.png[Sample-1]
 
-* Enter name, e.g. “John” and hit enter – Web Greeting Server app will be launched by Broker and print Greeting Request:
+* Enter name, e.g. “John” and hit enter. `WebGreetingServer` app will be launched by `Broker` request using `ElectronAppLauncher`.
+The app will print the received name and send back greeting response:
 +
 image::sample-2.png[Sample-2]
 
-* And send response back to .Net Greeting Client
+* Greeting client app should receive the greeting and print it:
 +
 image::sample-3.png[Sample-3]
 
-* Then choose Discovery (5) again and this time select “Greeting from .Net app” from discovery response
+* Choose Discovery (5) again and this time select “Greeting from .Net app” option from discovery results.
 
-* Enter another name, e.g. “Mike” and hit enter - .Net Greeting Server app will be launched and print greeting request:
+* Enter another name, e.g. “Mike” and hit enter - .NET `GreetingServer` app will be launched, print the received name and send back greeting:
 +
 image::sample-4.png[Sample-4]
+
+* You can explore other examples by choosing other options in `GreetingClient` app.
+
+==== How to find sample code
+
+You can find sample apps code by links below:
+
+* Sample Metadata - https://github.com/symphonyoss/plexus-interop/tree/master/samples/samples/metadata/
+* GreetingClient .NET - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingClient/
+* GreetingServer .NET - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingServer/
+* GreetingServer Web - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/web-example/src/greeting/server/
+* ElectronAppLauncher - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/electron-launcher/src/launcher/

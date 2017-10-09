@@ -1,25 +1,27 @@
 [[quick-start-web]]
 ==== Quick Start - Web
 
-This quick start guide will get you started with Plexus Interop Web client, using a simple working example. Both client and server applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
-
-===== Before you start
-
-You need Interop Broker binaries and local copy of all examples to go through the quick start guide. You can download examples and build everything with few simple steps:
-
-include::clone-and-build.adoc[]
+In this guide both consumer and provider are Web applications written in Typescript language and run in https://electron.atom.io/[Electron].
 
 ===== Run example
 
-include::quick-start-run-broker.adoc[]
+Switch to directory `bin\win-x86\quick-start` and start a broker instance there:
+[source, bash]
+----
+cd bin\win-x86\quick-start
+start ..\broker\plexus.exe broker .\metadata
+----
 
-Now you can start CCY Pair Rate Provider and Viewer apps using pre-built Electron App Launcher:
+Second argument (".\metadata") specifies the directory where broker should seek for metadata: interop registry `interop.json` and app registry `apps.json`.
+
+Now let's launch our first app - `ccy-pair-rate-viewer` and connect it to the running broker instance. Note that our app is designed to run in Electron,
+so we're using `ElectronAppLauncher` which can open a given html file as Electron window:
 
 [source, bash]
 -----
-bin/win-x86/samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe --brokerDir . --apps "./web/packages/ccy-pair-rate-provider/dist/index.html;./web/packages/ccy-pair-rate-viewer/dist/index.html"
+..\samples\apps\ElectronAppLauncher\ElectronAppLauncher.exe --brokerDir . --apps "./web/packages/ccy-pair-rate-viewer/dist/index.html"
 -----
-Where `brokerDir` argument points to currently launched Broker's working directory and `apps` argument lists path to home pages of applications to launch in Electron Browser.
+Where `brokerDir` argument points to the currently running broker's working directory and `apps` argument lists path to pages to launch in Electron.
 
 Great, we have running example of two apps communicating with each other, Rate Viewer app will request Currency Pair's rate and print the result.
 
@@ -29,7 +31,7 @@ Let's take a look closer to example and extend provided rate with additional det
 
 ====== Update Service
 
-Let's open `quick-start/metadata/fx/CcyPairRateService.proto` file, create new `CcyPairExpiringRate` structure with additional field:
+Open `quick-start/metadata/fx/CcyPairRateService.proto` file, create new `CcyPairExpiringRate` structure with additional field:
 
 [source, proto]
 ./quick-start/metadata/fx/CcyPairRateService.proto
@@ -44,7 +46,7 @@ message CcyPairExpiringRate {
 }
 -----
 
-and create new `rpc` call to return new structure:
+and create new rpc method which provides fx rate with additional due date info:
 [source, proto]
 ./quick-start/metadata/fx/CcyPairRateService.proto
 -----
@@ -56,13 +58,14 @@ service CcyPairRateService {
 -----
 ====== Update CCY Rate Provider
 
-All provided application's actions are specified in Plexus `*.interop` files. We created new service method, so now we need to update provider's metadata and change provided method to new one. Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto` and change `GetRate` method name to `GetExpiringRate`
+We added new method to the service. To indicate our app is going to provide the new method to others we need update its interop manifest WebCcyPairRateProvider.interop. All services and methods provided by app must be specified in its interop manifest (*.interop file).
+Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto` and change `GetRate` method name to `GetExpiringRate`
 
 [source, proto]
-./quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto
+./quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.interop
 -----
 provides fx.CcyPairRateService {
-    GetExpiringRate [method_title = "Web Provider - Get Rate"];
+    GetExpiringRate [method_title = "Web Provider - Get rate with expiration date"];
 }
 -----
 
