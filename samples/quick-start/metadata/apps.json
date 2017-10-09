@@ -10,15 +10,6 @@
       }
     },
     {
-      "id": "vendorA.fx.CcyPairRateProvider",
-      "displayName": "Currency Pair Rate Provider",
-      "launcherId": "interop.NativeAppLauncher",
-      "launcherParams": {
-        "cmd": "../apps/CcyPairRateProvider/CcyPairRateProvider.exe",
-        "args": ""
-      }
-    },
-    {
       "id": "vendorB.fx.CcyPairRateViewer",
       "displayName": "Currency Pair Rate Viewer",
       "launcherId": "interop.NativeAppLauncher",
@@ -28,11 +19,20 @@
       }
     },
     {
+      "id": "vendorA.fx.CcyPairRateProvider",
+      "displayName": "Currency Pair Rate Provider",
+      "launcherId": "interop.NativeAppLauncher",
+      "launcherParams": {
+        "cmd": "../apps/CcyPairRateProvider/CcyPairRateProvider.exe",
+        "args": ""
+      }
+    },
+    {
       "id": "vendorA.fx.WebCcyPairRateProvider",
       "displayName": "Web Currency Pair Rate Provider",
       "launcherId": "interop.ElectronAppLauncher",
       "launcherParams": {
-        "path": "../apps/ccy-pare-rate-provider/dist/index.html"
+        "path": "../apps/WebCcyPairRateProvider/index.html"
       }
     },
     {
@@ -40,7 +40,7 @@
       "displayName": "Web Currency Pair Rate Viewer",
       "launcherId": "interop.ElectronAppLauncher",
       "launcherParams": {
-        "path": "../apps/ccy-pare-rate-viewer/dist/index.html"
+        "path": "../apps/WebCcyPairRateViewer/index.html"
       }
     }
   ]

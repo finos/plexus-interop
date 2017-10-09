@@ -37,10 +37,13 @@ document.addEventListener("keydown", function (e) {
 });
 
 const outEl = document.getElementById("out");
+
 const log = (msg: string) => {
     console.log(msg);
     outEl.innerText = outEl.innerText + '\n' + msg;
 };
+
+window.getRate = () => log("Not connected to Broker");
 
 new WebCcyPairRateViewerClientBuilder()
     // App's ID and Instance ID received from Launcher
@@ -52,8 +55,11 @@ new WebCcyPairRateViewerClientBuilder()
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
     .connect()
     .then(async (rateViewerClient: WebCcyPairRateViewerClient) => {
-        log("Connected to Broker, sending Invocation Request");
-        // Client connected, we can use generated Proxy Service to perform invocation
-        const ccyPairRate = await rateViewerClient.getCcyPairRateServiceProxy().getRate({ccyPairName: "EURUSD"});
-        log(`Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}`);
+        log("Connected to Broker");
+        window.getRate = async () => {
+            const ccyPair = document.getElementById("ccyPair").innerText;
+            log(`Sending request for ${ccyPair}`);
+            const ccyPairRate = await rateViewerClient.getCcyPairRateServiceProxy().getRate({ccyPairName: "EURUSD"});
+            log(`Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}`);
+        };
     });
