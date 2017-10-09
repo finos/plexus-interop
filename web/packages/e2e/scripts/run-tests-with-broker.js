@@ -18,15 +18,27 @@ function main() {
 
     const config = {
         brokerBaseDir: `${__dirname}/../../../../bin/win-x86/samples`,
-        wsAddressDir: "Servers/ws-v1",
+        wsAddressDir: "servers/ws-v1",
         wsAddressFile: "address",
-        startScript: "LaunchBroker.cmd"
+        brokerCmd: "../broker/plexus.exe",
+        brokerArgs: " broker metadata"
     };
 
-    const startScript = path.join(config.brokerBaseDir, config.startScript);
+    const fullBrokerCmd = path.join(config.brokerBaseDir, config.brokerCmd);
     const wsAddressDir = path.join(config.brokerBaseDir, config.wsAddressDir);
+    const addressFile = path.join(wsAddressDir, config.wsAddressFile);
 
-    log("Broker start script", startScript);
+    try {
+        fs.accessSync(addressFile);
+        log(`Deleting WS address file ${addressFile}`);
+        fs.unlinkSync(addressFile);
+        log(`Deleted ${addressFile}`); 
+    } catch (error) {
+        log(`${addressFile} does not exist`);
+    }
+
+    log("Broker start cmd", fullBrokerCmd);
+    log("Broker working dir", config.brokerBaseDir);
     log("WS address dir", wsAddressDir);
 
     log("Watching for Web Socket Server address file update");
@@ -44,13 +56,13 @@ function main() {
     setTimeout(() => {
         if (!launched) {
             launched = true;
-            const fullPath = `${config.brokerBaseDir}/address`;
-            readAddressAndRunTests(receivedPath);
+            log(`No file notification received, trying to read from default location ${addressFile}`);
+            readAddressAndRunTests(addressFile);
         }
     }, 5000);
 
     log("Starting Broker ...");
-    brokerProcess = exec(startScript, {
+    brokerProcess = exec(fullBrokerCmd + config.brokerArgs, {
         cwd: config.brokerBaseDir
     }, (error, stdout, stderr) => {
         log("Broker stopped");
