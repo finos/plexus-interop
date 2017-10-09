@@ -43,6 +43,10 @@ describe("Client: Web Socket Streaming invocation", () => {
         return serverStreamingTests.testServerSendsStreamWithErrorToClient();
     });
 
+    it("Sends stream of messages and cancel operation to client", function () {
+        return serverStreamingTests.testServerSendsStreamWithCancelToClient();
+    });
+
     it("Sends streaming messages in two directions", function () {
         this.timeout(5000);
         return bidiStreamingTests.testClientAndServerCanSendMessages();

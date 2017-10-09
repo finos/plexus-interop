@@ -102,4 +102,40 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
         });
     }
 
+    public testServerSendsStreamWithCancelToClient(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        return new Promise<void>(async (resolve, reject) => {
+            const handler = new ServerStreamingHandler(async (request, hostClient) => {
+                try {
+                    await this.assertEqual(request, echoRequest);
+                    await hostClient.next(echoRequest);
+                    await hostClient.cancel();
+                    console.log("Operation cancelled");
+                } catch (error) {
+                    console.error("Failed", error);
+                    reject(error);
+                }
+            });
+            const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
+            const responses: plexus.plexus.interop.testing.IEchoRequest[] = [];
+            
+            client.getEchoServiceProxy().serverStreaming(echoRequest, {
+                next: (response) => {
+                    console.log("Received");
+                    responses.push(response);
+                },
+                complete: async () => {
+                    reject("Not expected to be completed");
+                },
+                error: async (e) => {
+                    console.log("Error", JSON.stringify(e));
+                    expect(responses.length).is.eq(1);
+                    responses.forEach(r => this.assertEqual(r, echoRequest));
+                    await this.clientsSetup.disconnect(client, server);
+                    resolve();
+                }
+            });
+        });
+    }
+
 }
