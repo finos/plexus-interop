@@ -5,7 +5,7 @@ In this guide both consumer and provider are Web applications written in Typescr
 
 ===== Run example
 
-Switch to directory `bin\win-x86\quick-start` and start a broker instance there:
+To run example we first need to switch to directory `bin\win-x86\quick-start` and start a new broker instance there:
 [source, bash]
 ----
 cd bin\win-x86\quick-start
@@ -14,14 +14,13 @@ start ..\broker\plexus.exe broker .\metadata
 
 Second argument (".\metadata") specifies the directory where broker should seek for metadata: interop registry `interop.json` and app registry `apps.json`.
 
-Now let's launch our first app - `ccy-pair-rate-viewer` and connect it to the running broker instance. Note that our app is designed to run in Electron,
-so we're using `ElectronAppLauncher` which can open a given html file as Electron window:
+Now let's launch our first app - `ccy-pair-rate-viewer` and connect it to the running broker instance. Our app is designed to run in Electron, so we're using `ElectronAppLauncher` which can open a given html file as Electron window:
 
 [source, bash]
 -----
-..\samples\apps\ElectronAppLauncher\ElectronAppLauncher.exe --brokerDir . --apps "./web/packages/ccy-pair-rate-viewer/dist/index.html"
+start ..\samples\apps\ElectronAppLauncher\ElectronAppLauncher.exe --brokerDir . --apps "apps\ccy-pair-rate-viewer\index.html"
 -----
-Where `brokerDir` argument points to the currently running broker's working directory and `apps` argument lists path to pages to launch in Electron.
+Where `brokerDir` argument points to the currently running broker's working directory and `apps` argument lists paths to pages which should be opened as Electron windows.
 
 Great, we have running example of two apps communicating with each other, Rate Viewer app will request Currency Pair's rate and print the result.
 
@@ -85,6 +84,7 @@ application WebCcyPairRateViewer {
 
 Broker component must be aware about all possible invocations to validate them and perform discovery, this information is stored in `interop.json`. To provide latest changes we simply need to generate this file from latest metadata:
 
+[source, bash]
 ----
 java -jar bin/win-x86/sdk/plexusgen.jar --type=json_meta --baseDir=quick-start/metadata --out=quick-start/metadata
 ----
@@ -93,6 +93,7 @@ java -jar bin/win-x86/sdk/plexusgen.jar --type=json_meta --baseDir=quick-start/m
 
 We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool. Let's start with updating of Provider's code:
 
+[source, bash]
 ----
 java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateProvider.interop --out=./web/packages/ccy-pair-rate-provider/src/gen --protoc=./web/node_modules/.bin/pbts.cmd
 ----
@@ -121,6 +122,7 @@ Then we need to adjust implementation of invocation handler and add `dueDate` fi
 
 All code changes completed, now we need to rebuild Provider component:
 
+[source, bash]
 ----
 cd web/packages/ccy-pair-rate-provider
 npm run build
@@ -128,6 +130,7 @@ npm run build
 
 OK, provider is ready. Now let's re-generate consumer's client code in the same was as for provider component:
 
+[source, bash]
 ----
 java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/packages/ccy-pair-rate-viewer/node_modules/.bin/pbts.cmd
 ----
@@ -145,6 +148,7 @@ const ccyPairRate = await rateViewerClient
 document.body.innerText = `Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}-${ccyPairRate.dueDate}`;
 ----
 and rebuild Consumer component:
+[source, bash]
 ----
 cd web/packages/ccy-pair-rate-viewer
 npm run build
