@@ -9,16 +9,7 @@
       "displayName": "Electron App Launcher",
       "launcherId": "interop.NativeAppLauncher",
       "launcherParams": {
-        "cmd": "../../bin/win-x86/samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe",
-        "args": ""
-      }
-    },
-    {
-      "id": "vendorA.fx.CcyPairRateProvider",
-      "displayName": "Currency Pair Rate Provider",
-      "launcherId": "interop.NativeAppLauncher",
-      "launcherParams": {
-        "cmd": "../CcyPairRateProvider/CcyPairRateProvider.exe",
+        "cmd": "bin/win-x86/samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe",
         "args": ""
       }
     },
@@ -27,7 +18,16 @@
       "displayName": "Currency Pair Rate Viewer",
       "launcherId": "interop.NativeAppLauncher",
       "launcherParams": {
-        "cmd": "../CcyPairRateViewer/CcyPairRateViewer.exe",
+        "cmd": "bin/win-x86/samples/apps/CcyPairRateViewer/CcyPairRateViewer.exe",
+        "args": ""
+      }
+    },
+    {
+      "id": "vendorA.fx.CcyPairRateProvider",
+      "displayName": "Currency Pair Rate Provider",
+      "launcherId": "interop.NativeAppLauncher",
+      "launcherParams": {
+        "cmd": "bin/win-x86/samples/apps/CcyPairRateProvider/CcyPairRateProvider.exe",
         "args": ""
       }
     },
@@ -36,7 +36,7 @@
       "displayName": "Web Currency Pair Rate Provider",
       "launcherId": "interop.ElectronAppLauncher",
       "launcherParams": {
-        "path": "../../../web/packages/ccy-pare-rate-provider/dist/index.html"
+        "path": "web/packages/ccy-pair-rate-provider/dist/index.html"
       }
     },
     {
@@ -44,7 +44,7 @@
       "displayName": "Web Currency Pair Rate Viewer",
       "launcherId": "interop.ElectronAppLauncher",
       "launcherParams": {
-        "path": "../../../web/packages/ccy-pare-rate-viewer/dist/index.html"
+        "path": "web/packages/ccy-pair-rate-viewer/dist/index.html"
       }
     }
   ]
