@@ -34,7 +34,6 @@ export class DomLogger implements Logger {
 
     public error(msg: string, ...args: any[]): void {
         this.baseLogger.error(msg, args);
-
     }
 
     public warn(msg: string, ...args: any[]): void {

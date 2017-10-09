@@ -1,0 +1,156 @@
+[[quick-start-web]]
+==== Quick Start - Web
+
+This quick start guide will get you started with Plexus Interop Web client, using a simple working example. Both client and server applications written in Typescript language and can run inside https://electron.atom.io/[Electron] container.
+
+===== Before you start
+
+You need Interop Broker binaries and local copy of all examples to go through the quick start guide. You can download examples and build everything with few simple steps:
+
+include::clone-and-build.adoc[]
+
+===== Run example
+
+include::quick-start-run-broker.adoc[]
+
+Now you can start CCY Pair Rate Provider and Viewer apps using pre-built Electron App Launcher:
+
+[source, bash]
+-----
+bin/win-x86/samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe --brokerDir . --apps "./web/packages/ccy-pair-rate-provider/dist/index.html;./web/packages/ccy-pair-rate-viewer/dist/index.html"
+-----
+Where `brokerDir` argument points to currently launched Broker's working directory and `apps` argument lists path to home pages of applications to launch in Electron Browser.
+
+Great, we have running example of two apps communicating with each other, Rate Viewer app will request Currency Pair's rate and print the result.
+
+===== Update Interop Flow
+
+Let's take a look closer to example and extend provided rate with additional details - `dueDate`, to be set by provider and passed to viewer. We're going to change contract between two components, pass this information to broker and run clients again.
+
+====== Update Service
+
+Let's open `quick-start/metadata/fx/CcyPairRateService.proto` file, create new `CcyPairExpiringRate` structure with additional field:
+
+[source, proto]
+./quick-start/metadata/fx/CcyPairRateService.proto
+-----
+message CcyPairExpiringRate {
+    // same fields we have in CcyPairRate
+    string ccyPairName = 1;
+    double rate = 2;
+    // additional field
+    // represents dueDate in milliseconds (elapsed since 1 January 1970 00:00:00 UTC)
+    uint64 dueDate = 3;
+}
+-----
+
+and create new `rpc` call to return new structure:
+[source, proto]
+./quick-start/metadata/fx/CcyPairRateService.proto
+-----
+service CcyPairRateService {
+    rpc GetRate(CcyPair) returns (CcyPairRate);
+    // new rpc call, returning pair with expiration date
+    rpc GetExpiringRate(CcyPair) returns (CcyPairExpiringRate);
+}
+-----
+====== Update CCY Rate Provider
+
+All provided application's actions are specified in Plexus `*.interop` files. We created new service method, so now we need to update provider's metadata and change provided method to new one. Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto` and change `GetRate` method name to `GetExpiringRate`
+
+[source, proto]
+./quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto
+-----
+provides fx.CcyPairRateService {
+    GetExpiringRate [method_title = "Web Provider - Get Rate"];
+}
+-----
+
+====== Update CCY Rate Viewer
+
+On the other side we need to update consumer application and specify new service method as consumed. Consumed services are also described in applications's `*.interop` files. Let's open `quick-start/metadata/fx/vendorB/WebCcyPairRateViewer.interop` and change `GetRate` method name to `GetExpiringRate`
+
+[source, proto]
+./quick-start/metadata/fx/vendorB/WebCcyPairRateViewer.proto
+-----
+application WebCcyPairRateViewer {
+    consumes fx.CcyPairRateService { GetExpiringRate; }
+}
+-----
+
+====== Update Broker Metadata
+
+Broker component must be aware about all possible invocations to validate them and perform discovery, this information is stored in `interop.json`. To provide latest changes we simply need to generate this file from latest metadata:
+
+----
+java -jar bin/win-x86/sdk/plexusgen.jar --type=json_meta --baseDir=quick-start/metadata --out=quick-start/metadata
+----
+
+====== Update Clients
+
+We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool. Let's start with updating of Provider's code:
+
+----
+java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateProvider.interop --out=./web/packages/ccy-pair-rate-provider/src/gen --protoc=./web/node_modules/.bin/pbts.cmd
+----
+
+This command generates Typescript interfaces and classes required for connection to Broker, registering of handlers to provided actions and invocation of consumed methods. It also generated messages using https://github.com/dcodeIO/protobuf.js/tree/master/cli[ProtobufJS CLI tool]. The main generated class is `WebCcyPairRateProviderClientBuilder`, it provides interface to build and receive connected client.
+
+Then we need to adjust implementation of invocation handler and add `dueDate` field to result:
+
+[source, typescript]
+./web/packages/ccy-pair-rate-provider/src/index.ts
+----
+    .withCcyPairRateServiceInvocationsHandler({
+        // all provided methods must be implemented
+        // so we need to change implemented method to 'onGetExpiringRate'
+        onGetExpiringRate: async (ccyPair: plexus.fx.ICcyPair) => {
+            log.info(`Received request for ${ccyPair.ccyPairName}'s Rate`);
+            return {
+                ccyPairName: ccyPair.ccyPairName,
+                rate: Math.floor(Math.random() * 10) + 1,
+                // add new additional field
+                dueDate: new Date().getTime()
+            };
+        }
+    })
+----
+
+All code changes completed, now we need to rebuild Provider component:
+
+----
+cd web/packages/ccy-pair-rate-provider
+npm run build
+----
+
+OK, provider is ready. Now let's re-generate consumer's client code in the same was as for provider component:
+
+----
+java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/packages/ccy-pair-rate-viewer/node_modules/.bin/pbts.cmd
+----
+
+adjust invocation code to print the `dueDate` field:
+
+./web/packages/ccy-pair-rate-viewer/src/index.ts
+[source, typescript]
+----
+const ccyPairRate = await rateViewerClient
+    .getCcyPairRateServiceProxy()
+    // we started to consume new method
+    .getExpiringRate({ccyPairName: "EURUSD"});
+// and receive new 'duteDate' attribute
+document.body.innerText = `Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}-${ccyPairRate.dueDate}`;
+----
+and rebuild Consumer component:
+----
+cd web/packages/ccy-pair-rate-viewer
+npm run build
+----
+
+====== Run updated example
+
+We are done with all required changes, please stop currently running Broker and Example apps and run them again using instructions above. You will see that consumer Application receives updated result now.
+
+
+
+

@@ -1,0 +1,51 @@
+{
+  "apps": [
+    {
+      "id": "interop.NativeAppLauncher",
+      "displayName": "Built-in Native App Launcher"
+    },
+    {
+      "id": "interop.ElectronAppLauncher",
+      "displayName": "Electron App Launcher",
+      "launcherId": "interop.NativeAppLauncher",
+      "launcherParams": {
+        "cmd": "../../bin/win-x86/samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe",
+        "args": ""
+      }
+    },
+    {
+      "id": "vendorA.fx.CcyPairRateProvider",
+      "displayName": "Currency Pair Rate Provider",
+      "launcherId": "interop.NativeAppLauncher",
+      "launcherParams": {
+        "cmd": "../CcyPairRateProvider/CcyPairRateProvider.exe",
+        "args": ""
+      }
+    },
+    {
+      "id": "vendorB.fx.CcyPairRateViewer",
+      "displayName": "Currency Pair Rate Viewer",
+      "launcherId": "interop.NativeAppLauncher",
+      "launcherParams": {
+        "cmd": "../CcyPairRateViewer/CcyPairRateViewer.exe",
+        "args": ""
+      }
+    },
+    {
+      "id": "vendorA.fx.WebCcyPairRateProvider",
+      "displayName": "Web Currency Pair Rate Provider",
+      "launcherId": "interop.ElectronAppLauncher",
+      "launcherParams": {
+        "path": "../../../web/packages/ccy-pare-rate-provider/dist/index.html"
+      }
+    },
+    {
+      "id": "vendorB.fx.WebCcyPairRateViewer",
+      "displayName": "Web Currency Pair Rate Viewer",
+      "launcherId": "interop.ElectronAppLauncher",
+      "launcherParams": {
+        "path": "../../../web/packages/ccy-pare-rate-viewer/dist/index.html"
+      }
+    }
+  ]
+}

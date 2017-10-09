@@ -65,7 +65,7 @@ export class CcyPairRateServiceProxyImpl implements CcyPairRateServiceProxy {
  * Main client API
  *
  */
-export abstract class CcyPairRateViewerClient {
+export abstract class WebCcyPairRateViewerClient {
 
     public abstract getCcyPairRateServiceProxy(): CcyPairRateServiceProxy;
 
@@ -94,7 +94,7 @@ export abstract class CcyPairRateViewerClient {
  * Client's API internal implementation
  *
  */
-class CcyPairRateViewerClientImpl implements CcyPairRateViewerClient {
+class WebCcyPairRateViewerClientImpl implements WebCcyPairRateViewerClient {
 
     public constructor(
         private readonly genericClient: GenericClientApi,
@@ -148,33 +148,33 @@ class CcyPairRateViewerClientImpl implements CcyPairRateViewerClient {
  * Client API builder
  *
  */
-export class CcyPairRateViewerClientBuilder {
+export class WebCcyPairRateViewerClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "CcyPairRateViewer",
+        applicationId: "fx.vendorB.WebCcyPairRateViewer",
         applicationInstanceId: UniqueId.generateNew()
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
 
-    public withClientDetails(clientId: ClientConnectRequest): CcyPairRateViewerClientBuilder {
+    public withClientDetails(clientId: ClientConnectRequest): WebCcyPairRateViewerClientBuilder {
         this.clientDetails = clientId;
         return this;
     }
 
 
-    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): CcyPairRateViewerClientBuilder {
+    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): WebCcyPairRateViewerClientBuilder {
         this.transportConnectionProvider = provider;
         return this;
     }
 
-    public connect(): Promise<CcyPairRateViewerClient> {
+    public connect(): Promise<WebCcyPairRateViewerClient> {
         return new GenericClientApiBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
             .connect()
-            .then(genericClient => new CcyPairRateViewerClientImpl(
+            .then(genericClient => new WebCcyPairRateViewerClientImpl(
                 genericClient,
                 new CcyPairRateServiceProxyImpl(genericClient)
                 ));

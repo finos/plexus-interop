@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WebCcyPairRateViewerClientBuilder, WebCcyPairRateViewerClient } from "./gen/WebCcyPairRateViewerGeneratedClient";
+import { WebCcyPairRateProviderClientBuilder, WebCcyPairRateProviderClient } from "./gen/WebCcyPairRateProviderGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
+import * as plexus from "./gen/plexus-messages";
 
 // Read launch arguments, provided by Electron Launcher
 declare var window: any;
+
 const electron = window.require("electron");
 const remote = electron.remote;
 const electronWindow: any = remote.getCurrentWindow();
@@ -42,18 +44,21 @@ const log = (msg: string) => {
     outEl.innerText = outEl.innerText + '\n' + msg;
 };
 
-new WebCcyPairRateViewerClientBuilder()
-    // App's ID and Instance ID received from Launcher
+new WebCcyPairRateProviderClientBuilder()
     .withClientDetails({
-        applicationId: "vendorB.fx.WebCcyPairRateViewer",
+        applicationId: "vendorA.fx.WebCcyPairRateProvider",
         applicationInstanceId: instanceId
     })
-    // Pass Transport to be used for connecting to Broker
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
+    .withCcyPairRateServiceInvocationsHandler({
+        onGetRate: async (ccyPair: plexus.fx.ICcyPair) => {
+            log(`Received request for ${ccyPair.ccyPairName}'s Rate`);
+            return {
+                ccyPairName: ccyPair.ccyPairName,
+                rate: Math.floor(Math.random() * 10) + 1
+            };
+        }
+    })
     .connect()
-    .then(async (rateViewerClient: WebCcyPairRateViewerClient) => {
-        log("Connected to Broker, sending Invocation Request");
-        // Client connected, we can use generated Proxy Service to perform invocation
-        const ccyPairRate = await rateViewerClient.getCcyPairRateServiceProxy().getRate({ccyPairName: "EURUSD"});
-        log(`Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}`);
-    });
+    .then(() => log("Connected to Broker"))
+    .catch(e => console.error("Connection failure", e)); 

@@ -29,17 +29,25 @@ function main() {
     log("Broker start script", startScript);
     log("WS address dir", wsAddressDir);
 
-    log("Watching for Web Socket Server address file update")
-    onFileAdded(wsAddressDir, (path) => {
-        log(`WS Server file ${path} has been added, reading server URL`);
-        setTimeout(() => {
-            readline(path, (line) => {
-                log('WS Server URL received', line);
-                line = stripBom(line);
-                runElectronTest(line);
-            });
-        }, 1000);
+    log("Watching for Web Socket Server address file update");
+
+    let launched = false;
+    onFileAdded(wsAddressDir, (receivedPath) => {
+        if (!launched) {
+            launched = true;
+            readAddressAndRunTests(receivedPath);
+        }
     });
+
+    // if file addition was not handled due to race condition, 
+    // then try to read port from hardcoded path
+    setTimeout(() => {
+        if (!launched) {
+            launched = true;
+            const fullPath = `${config.brokerBaseDir}/address`;
+            readAddressAndRunTests(receivedPath);
+        }
+    }, 5000);
 
     log("Starting Broker ...");
     brokerProcess = exec(startScript, {
@@ -52,6 +60,15 @@ function main() {
         }
         log('StdOut:', stdout);
         process.exit();
+    });
+}
+
+function readAddressAndRunTests(path) {
+    log(`WS Server file ${path} has been added, reading server URL`);
+    readline(path, (line) => {
+        log('WS Server URL received', line);
+        line = stripBom(line);
+        runElectronTest(line);
     });
 }
 

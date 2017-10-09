@@ -14,20 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Logger, LoggerFactory, LogLevel } from "@plexus-interop/common";
+import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { BrowserWindow } from "electron";
-import { ElectronAppLauncherClientBuilder, AppLauncherServiceInvocationHandler, ElectronAppLauncherClient } from "./client/ElectronAppLauncherGeneratedClient";
+import { ElectronAppLauncherClientBuilder, ElectronAppLauncherClient } from "./client/ElectronAppLauncherGeneratedClient";
 import * as plexus from "./gen/plexus-messages";
 import { UniqueId } from "@plexus-interop/transport-common";
-import { GUID } from "@plexus-interop/common";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 import * as fs from "fs";
-import { FileLogger } from "./logger/FileLogger";
 import * as log from "loglevel";
-const WebSocket = require("ws");
 const stripBom = require("strip-bom");
 const path = require("path");
-const Long = require("Long");
 
 /**
  * Simple launcher, open apps with provided URL and pass App Instance ID and Broker Web Socket URL to them.
@@ -51,7 +47,8 @@ export class ElectronAppLauncher {
     
     public constructor(
         private log: Logger = LoggerFactory.getLogger("ElectronAppLauncher"),
-        private launchOnStartup: string[] = []) {}
+        private launchOnStartup: string[],
+        private defaultBrokerWorkingDir: string) {}
 
     public async start(): Promise<void> {
 
@@ -93,7 +90,10 @@ export class ElectronAppLauncher {
                         .catch(() => log.error(`Could not launch app for ${launchPath} path`));
                 });
             })
-            .catch(e => log.error("Error connecting to broker" + e));
+            .catch(e => {
+                log.error("Error connecting to broker" + e);
+                throw e;
+            });
 
     }
 
@@ -112,13 +112,13 @@ export class ElectronAppLauncher {
             const windowAny: any = window;
             windowAny.plexusBrokerWsUrl = this.webSocketAddress;
             windowAny.plexusAppInstanceId = appInstanceId;
-            window.webContents.on('did-finish-load', () => {
+            window.webContents.on("did-finish-load", () => {
                 this.log.debug("Window loaded");
                 resolve({
                     appInstanceId
                 });
             });
-            window.once('ready-to-show', () => {
+            window.once("ready-to-show", () => {
                 this.log.debug("Window ready to show");
                 window.show();
             });
@@ -127,11 +127,13 @@ export class ElectronAppLauncher {
     }
 
     private toFileUri(filePath: string): string {
-        filePath = path.resolve(filePath).replace(/\\/g, '/');
+        filePath = path.resolve(filePath).replace(/\\/g, "/");
+        // tslint:disable-next-line:quotemark
         if (filePath[0] !== '/') {
+            // tslint:disable-next-line:quotemark
             filePath = '/' + filePath;
         }
-        return encodeURI('file://' + filePath);
+        return encodeURI("file://" + filePath);
     }
 
     private readPath(request: plexus.interop.IAppLaunchRequest): string {
@@ -162,8 +164,8 @@ export class ElectronAppLauncher {
         let brokerDir = process.env[this.brokerDirEnvProperty];
         this.log.debug(`Received broker ID ${brokerDir}`);
         if (!brokerDir) {
-            this.log.debug(`${this.brokerDirEnvProperty} env property is empty, resolving to parent`);
-            brokerDir = path.resolve("../..");
+            this.log.debug(`${this.brokerDirEnvProperty} env property is empty, resolving to default ${this.defaultBrokerWorkingDir}`);
+            brokerDir = path.resolve(this.defaultBrokerWorkingDir);
         }
         return brokerDir;
     }
@@ -182,7 +184,7 @@ export class ElectronAppLauncher {
         const path = `${workingDir}/servers/ws-v1/address`;
         this.log.info(`Reading WS URL from ${path}`);
         return new Promise((resolve, reject) => {
-            fs.readFile(path, 'utf8', (err, data) => {
+            fs.readFile(path, "utf8", (err, data) => {
                 if (err) {
                     this.log.error("Unable to read file", err);
                     reject(err);
