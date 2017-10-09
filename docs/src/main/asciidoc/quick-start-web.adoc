@@ -56,10 +56,10 @@ service CcyPairRateService {
 -----
 ====== Update CCY Rate Provider
 
-All provided application's actions are specified in Plexus `*.interop` files. We created new service method, so now we need to update provider's metadata and change provided method to new one. Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto` and change `GetRate` method name to `GetExpiringRate`
+All provided application's actions are specified in Plexus `*.interop` files. We created new service method, so now we need to update provider's metadata and change provided method to new one. Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.interop` and change `GetRate` method name to `GetExpiringRate`
 
 [source, proto]
-./quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto
+./quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.interop
 -----
 provides fx.CcyPairRateService {
     GetExpiringRate [method_title = "Web Provider - Get Rate"];
