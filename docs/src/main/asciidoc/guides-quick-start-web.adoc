@@ -57,12 +57,8 @@ service CcyPairRateService {
 -----
 ====== Update CCY Rate Provider
 
-<<<<<<< HEAD:docs/src/main/asciidoc/guides-quick-start-web.adoc
 We added new method to the service. To indicate our app is going to provide the new method to others we need update its interop manifest WebCcyPairRateProvider.interop. All services and methods provided by app must be specified in its interop manifest (*.interop file).
-Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.proto` and change `GetRate` method name to `GetExpiringRate`
-=======
-All provided application's actions are specified in Plexus `*.interop` files. We created new service method, so now we need to update provider's metadata and change provided method to new one. Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.interop` and change `GetRate` method name to `GetExpiringRate`
->>>>>>> feature/quick-start-update:docs/src/main/asciidoc/quick-start-web.adoc
+Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.interop` and change `GetRate` method name to `GetExpiringRate`
 
 [source, proto]
 ./quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.interop
