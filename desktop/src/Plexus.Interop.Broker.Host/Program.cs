@@ -16,8 +16,8 @@
  */
 namespace Plexus.Interop.Broker.Host
 {
-    using System;
     using Plexus.Host;
+    using System;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
