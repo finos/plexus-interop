@@ -39,6 +39,10 @@ describe("Client: Web Socket Streaming invocation", () => {
         return serverStreamingTests.testServerSendsStreamToClient();
     });
 
+    it("Sends few streams in parrallel to client using serverStreaming invocation", function () {
+        return serverStreamingTests.testServerSendsFewStreamsInParrallelToClient();
+    });
+
     it("Sends stream of messages and error to client", function () {
         return serverStreamingTests.testServerSendsStreamWithErrorToClient();
     });

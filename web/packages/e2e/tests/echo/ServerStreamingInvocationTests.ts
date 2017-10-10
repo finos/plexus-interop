@@ -102,6 +102,61 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
         });
     }
 
+    public testServerSendsFewStreamsInParrallelToClient(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        return new Promise<void>(async (resolve, reject) => {
+            const handler = new ServerStreamingHandler(async (request, hostClient) => {
+                try {
+                    await this.assertEqual(request, echoRequest);
+                    hostClient.next(echoRequest);
+                    hostClient.next(echoRequest);
+                    hostClient.next(echoRequest);
+                    hostClient.complete();
+                } catch (error) {
+                    console.error("Failed", error);
+                    reject(error);
+                }
+            });
+            
+            const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
+            
+            let firstCompleted = false;
+            let secondCompleted = false;
+
+            // first
+            const firstResponses: plexus.plexus.interop.testing.IEchoRequest[] = [];
+            client.getEchoServiceProxy().serverStreaming(echoRequest, {
+                next: (response) => firstResponses.push(response),
+                complete: async () => {
+                    firstCompleted = true;
+                    expect(firstResponses.length).is.eq(3);
+                    firstResponses.forEach(r => this.assertEqual(r, echoRequest));
+                    if (secondCompleted) { 
+                        await this.clientsSetup.disconnect(client, server);
+                        resolve(); 
+                    }
+                },
+                error: (e) => reject(e)
+            });
+
+            // second
+            const secondResponses: plexus.plexus.interop.testing.IEchoRequest[] = [];            
+            client.getEchoServiceProxy().serverStreaming(echoRequest, {
+                next: (response) => secondResponses.push(response),
+                complete: async () => {
+                    secondCompleted = true;
+                    expect(secondResponses.length).is.eq(3);
+                    secondResponses.forEach(r => this.assertEqual(r, echoRequest));
+                    if (firstCompleted) { 
+                        await this.clientsSetup.disconnect(client, server);
+                        resolve(); 
+                    }
+                },
+                error: (e) => reject(e)
+            });
+        });
+    }
+
     public testServerSendsStreamWithCancelToClient(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>(async (resolve, reject) => {
