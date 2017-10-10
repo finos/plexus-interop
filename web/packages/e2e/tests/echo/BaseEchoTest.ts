@@ -18,7 +18,7 @@ import * as plexus from "../../src/echo/gen/plexus-messages";
 import { expect } from "chai";
 import { MarshallerProvider, ProtoMarshallerProvider } from "@plexus-interop/client";
 import { Arrays } from "@plexus-interop/common";
-
+import { ClientsSetup } from "../common/ClientsSetup";
 
 export class BaseEchoTest {
 
@@ -55,6 +55,14 @@ export class BaseEchoTest {
 
     public decodeRequestDto(payload: ArrayBuffer): plexus.plexus.interop.testing.IEchoRequest {
         return this.marshallerProvider.getMarshaller(plexus.plexus.interop.testing.EchoRequest).decode(new Uint8Array(payload));
+    }
+
+    public verifyClientChannelsCleared(clientsSetup: ClientsSetup): void {
+        expect(clientsSetup.getClientConnection().getManagedChannels().length).to.eq(0);
+    }
+
+    public verifyServerChannelsCleared(clientsSetup: ClientsSetup): void {
+        expect(clientsSetup.getServerConnection().getManagedChannels().length).to.eq(0);
     }
 
 }

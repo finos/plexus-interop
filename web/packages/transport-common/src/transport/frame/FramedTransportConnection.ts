@@ -125,6 +125,14 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         return this.channelsHolder.waitForIncomingChannel(cancellationToken);
     }
 
+    public getManagedChannels(): TransportChannel[] {
+        const result: TransportChannel[] = [];
+        this.channelsHolder.getChannels().forEach(value => {
+            result.push(value.channel);         
+        });
+        return result;
+    }
+
     public async createChannel(): Promise<TransportChannel> {
         this.stateMachine.throwIfNot(ConnectionState.OPEN);
         const uuid = UniqueId.generateNew();

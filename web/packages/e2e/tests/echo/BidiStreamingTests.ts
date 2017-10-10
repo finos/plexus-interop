@@ -41,24 +41,29 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                     complete: () => reject("Complete not expected"),
                     error: async (e) => {
                         console.log("Error received by server", e);
+                        this.verifyServerChannelsCleared(this.clientsSetup);
                         await this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
                         resolve(e);
                     }
                 }
             });
-            (async () => {
-                [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
-                const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
-                    next: (serverResponse) => {
-                        reject("Not expected");
-                    },
-                    error: (e) => reject("Not expected to fail by client"),
-                    complete: () => console.log("Remote completed")
-                });
-                await streamingClient.cancel();
-                console.log("Client cancelled");
-            })();
-
+            try {
+                (async () => {
+                    [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+                    const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
+                        next: (serverResponse) => {
+                            reject("Not expected");
+                        },
+                        error: (e) => reject("Not expected to fail by client"),
+                        complete: () => console.log("Remote completed")
+                    });
+                    await streamingClient.cancel();
+                    console.log("Client cancelled");
+                    this.verifyClientChannelsCleared(this.clientsSetup);
+                })();
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 
