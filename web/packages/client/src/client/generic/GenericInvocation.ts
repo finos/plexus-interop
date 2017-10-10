@@ -69,7 +69,7 @@ export class GenericInvocation {
             // active states
             {
                 from: InvocationState.OPEN, to: InvocationState.COMPLETION_RECEIVED, preHandler: async () => {
-                    this.readCancellationToken.cancel("Invocation close received");
+                    await this.readCancellationToken.cancel("Invocation close received");
                 }
             }, {
                 from: InvocationState.COMPLETION_RECEIVED, to: InvocationState.COMPLETED
@@ -142,7 +142,7 @@ export class GenericInvocation {
         }
         this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
         this.stateMachine.go(InvocationState.COMPLETED);
-        this.log.trace("Sending send completion message");
+        this.log.trace("Sending completion message");
         await this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
         if (ClientProtocolHelper.isSuccessCompletion(completion)) {
             // wait for remote side for success case only
@@ -269,6 +269,10 @@ export class GenericInvocation {
 
     private handleIncomingMessage(data: ArrayBuffer, invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.trace(`Received message of ${data.byteLength} bytes`);
+        if (this.readCancellationToken.isCancelled()) {
+            this.log.warn(`Read cancelled with '${this.readCancellationToken.getReason()}', drop message`);
+            return;
+        }
         if (this.pendingHeader) {
             this.log.trace(`Received message payload of ${data.byteLength} length`);
             this.pendingHeader = null;
