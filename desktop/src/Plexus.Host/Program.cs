@@ -40,10 +40,11 @@ namespace Plexus.Host
 
         public async Task<int> RunAsync(string[] args)
         {
-            var command = PlexusCommand.None;
+            var command = CliCommand.None;
             var console = TargetConsole.Current;
             var workingDir = Directory.GetCurrentDirectory();
             var metadataDir = "metadata";
+            string pluginPath = null;
             IReadOnlyList<string> pluginArgs = null;
             string appId = null;
             string pid = null;
@@ -55,7 +56,7 @@ namespace Plexus.Host
                 syntax.HandleErrors = true;
                 syntax.HandleResponseFiles = true;
 
-                syntax.DefineCommand("broker", ref command, PlexusCommand.Broker, "Start interop broker");
+                syntax.DefineCommand("broker", ref command, CliCommand.Broker, "Start interop broker");
                 syntax.DefineOption(
                     "c|console",
                     ref console,
@@ -73,24 +74,29 @@ namespace Plexus.Host
                     false,
                     "Directory to seek for metadata files: apps.json and interop.json");
 
-                syntax.DefineCommand("launch", ref command, PlexusCommand.Launch, "Send command to launch app");
+                syntax.DefineCommand("launch", ref command, CliCommand.Launch, "Send command to launch app");
                 syntax.DefineOption(
                     "d|directory",
                     ref workingDir,
                     false,
-                    "Working directory of the target interop broker");
+                    "Broker working directory");
                 syntax.DefineParameter("applicationId", ref appId, "ID of application to launch. ID must present in apps.json.");
 
-                var loadCommand = syntax.DefineCommand("load", ref command, PlexusCommand.Load, "Load plugin dll");
+                var loadCommand = syntax.DefineCommand("load", ref command, CliCommand.Load, "Load plugin dll");
                 loadCommand.IsHidden = true;
+                syntax.DefineOption(
+                    "p|plugin",
+                    ref pluginPath,
+                    true,
+                    "Path to plugin");
                 syntax.DefineOption(
                     "d|directory",
                     ref workingDir,
                     false,
                     "Working directory for plugin process");
-                syntax.DefineParameterList("pluginCmd", ref pluginArgs, "Plugin command");
+                syntax.DefineParameterList("pluginCmd", ref pluginArgs, "Plugin arguments");
 
-                var stopCommand = syntax.DefineCommand("stop", ref command, PlexusCommand.Stop, "Stop currently running plexus process(es)");
+                var stopCommand = syntax.DefineCommand("stop", ref command, CliCommand.Stop, "Stop currently running plexus process(es)");
                 stopCommand.IsHidden = true;
                 syntax.DefineParameter("pid", ref pid, "Process ID to stop");
             });
@@ -99,23 +105,27 @@ namespace Plexus.Host
             {                
                 switch (command)
                 {
-                    case PlexusCommand.None:
+                    case CliCommand.None:
                         result.ReportError("Command expected");
                         return 1;
-                    case PlexusCommand.Broker:
+                    case CliCommand.Broker:
                         return await StartBrokerAsync(workingDir, metadataDir, console).ConfigureAwait(false);
-                    case PlexusCommand.Stop:
+                    case CliCommand.Stop:
                         return await StopProcess(pid).ConfigureAwait(false);
-                    case PlexusCommand.Launch:
+                    case CliCommand.Launch:
                         if (string.IsNullOrEmpty(appId))
                         {
-                            result.ReportError("<applicationID> must be specified");
+                            result.ReportError("<applicationID> parameter required");
                             return 1;
                         }
                         break;
-                    case PlexusCommand.Load:
-                        var loader = new ModuleLoader(pluginArgs);
-                        return await loader.LoadAndRunAsync().ConfigureAwait(false);                        
+                    case CliCommand.Load:
+                        if (string.IsNullOrEmpty(pluginPath))
+                        {
+                            result.ReportError("<plugin> option required");
+                            return 1;
+                        }
+                        return await LoadAndRunPluginAsync(pluginPath, pluginArgs, workingDir, false);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -129,34 +139,50 @@ namespace Plexus.Host
             return 0;
         }
 
+        private static async Task<int> LoadAndRunPluginAsync(
+            string pluginPath, 
+            IEnumerable<string> pluginArgs, 
+            string workingDir,
+            bool singleInstance)
+        {
+            var curDir = Directory.GetCurrentDirectory();
+            try
+            {
+                var fullPluginPath = Path.GetFullPath(pluginPath);
+                var loader = new ModuleLoader(fullPluginPath, pluginArgs, workingDir, singleInstance);
+                return await loader.LoadAndRunAsync().ConfigureAwait(false);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(curDir);
+            }
+        }
+
         private async Task<int> StartBrokerAsync(string workingDir, string metadataDir, TargetConsole targetConsole)
         {
             var fullMetadataDir = Path.GetFullPath(metadataDir);
-            var args = new[] { "broker", fullMetadataDir };
-            var fullWorkingDir = Path.GetFullPath(workingDir);
             switch (targetConsole)
             {                    
-                case TargetConsole.Current:
-                    Directory.SetCurrentDirectory(fullWorkingDir);
-                    var loader = new ModuleLoader(args);
-                    return await loader.LoadAndRunAsync().ConfigureAwait(false);
-                case TargetConsole.New:                    
-                    StartPlexusProcess(args, fullWorkingDir, true);
+                case TargetConsole.Current:                    
+                    return await LoadAndRunPluginAsync("broker", new[] { "start", "-m", fullMetadataDir }, workingDir, true).ConfigureAwait(false);
+                case TargetConsole.New:
+                    StartPlexusProcess(new[] { "broker", "-m", fullMetadataDir }, workingDir, true);
                     return 0;
                 case TargetConsole.Hidden:
-                    StartPlexusProcess(args, fullWorkingDir);
+                    StartPlexusProcess(new[] { "broker", "-m", fullMetadataDir }, workingDir);
                     return 0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(targetConsole), targetConsole, null);
             }            
         }
         
-        private static void StartPlexusProcess(string[] otherArgs, string workingDirectory = null, bool newConsoleWindow = false)
+        private static void StartPlexusProcess(string[] otherArgs, string workingDirectory = null, bool openWithConsole = false)
         {
+            workingDirectory = Path.GetFullPath(workingDirectory ?? Directory.GetCurrentDirectory());
             var binDir = Path.GetDirectoryName(typeof(Program).Assembly.Location);
             var command = Path.Combine(binDir, "plexus.exe");
             var args = string.Join(" ", otherArgs);
-            if (newConsoleWindow)
+            if (openWithConsole)
             {
                 args = $"/c start \"\" \"{command}\" " + args;
                 command = "cmd";
@@ -165,7 +191,7 @@ namespace Plexus.Host
             {
                 FileName = command,
                 Arguments = args,
-                WorkingDirectory = workingDirectory ?? Directory.GetCurrentDirectory(),
+                WorkingDirectory = workingDirectory,
                 RedirectStandardOutput = false,
                 RedirectStandardInput = false,
                 RedirectStandardError = false,
@@ -176,7 +202,7 @@ namespace Plexus.Host
             Console.WriteLine($"Started new plexus.exe process {p.Id}");
         }
 
-        private async Task<int> StopProcess(string pidArg)
+        private static async Task<int> StopProcess(string pidArg)
         {
             var processes = Process.GetProcesses().Where(x =>
                 string.Equals(x.ProcessName, "plexus") || string.Equals(x.ProcessName, "plexus.exe"));

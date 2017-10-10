@@ -1,6 +1,6 @@
 ﻿namespace Plexus.Host
 {
-    internal enum PlexusCommand
+    internal enum CliCommand
     {
         None,
         Broker,
