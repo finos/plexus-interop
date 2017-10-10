@@ -22,11 +22,19 @@ import { UniqueId } from "../../transport/UniqueId";
 import { Observer } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
 import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, AsyncHelper, StateMaschine } from "@plexus-interop/common";
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ErrorCompletion } from "@plexus-interop/protocol";
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";
 
-export enum ChannelState { CREATED, OPEN, CLOSED, CLOSE_RECEIVED, CLOSE_REQUESTED }
+export type ChannelState = "CREATED" | "OPEN" | "CLOSED" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED";
+
+export const ChannelState = {
+    CREATED: "CREATED" as ChannelState,
+    OPEN: "OPEN" as ChannelState,
+    CLOSED: "CLOSED" as ChannelState,
+    CLOSE_RECEIVED: "CLOSE_RECEIVED" as ChannelState,
+    CLOSE_REQUESTED: "CLOSE_REQUESTED" as ChannelState
+};
 
 export class FramedTransportChannel implements TransportChannel {
 
@@ -56,22 +64,32 @@ export class FramedTransportChannel implements TransportChannel {
         this.readCancellationToken = new CancellationToken(baseReadToken);
         this.log.debug("Created");
         this.stateMachine = new StateMaschineBase<ChannelState>(ChannelState.CREATED, [
-            { from: ChannelState.CREATED, to: ChannelState.OPEN },
+            { 
+                from: ChannelState.CREATED, to: ChannelState.OPEN 
+            },
+            // client requested to complete channel, waiting for response
             {
                 from: ChannelState.OPEN, to: ChannelState.CLOSE_REQUESTED
             },
+            // remote side requested to complete channel
             {
                 from: ChannelState.OPEN, to: ChannelState.CLOSE_RECEIVED, preHandler: async () => {
                     this.readCancellationToken.cancel("Channel close received");
                 }
             },
+            // client reported error
+            {
+                from: ChannelState.OPEN, to: ChannelState.CLOSED, preHandler: async () => {
+                    this.readCancellationToken.cancel("Channel closed by client");
+                }
+            },
+            // client confirmed channel closure
             {
                 from: ChannelState.CLOSE_RECEIVED, to: ChannelState.CLOSED
             },
+            // remote confirmed channel closure
             {
-                from: ChannelState.CLOSE_REQUESTED, to: ChannelState.CLOSED, preHandler: async () => {
-                    await this.closeInternal();
-                }
+                from: ChannelState.CLOSE_REQUESTED, to: ChannelState.CLOSED
             }
         ]);
     }
@@ -162,31 +180,41 @@ export class FramedTransportChannel implements TransportChannel {
 
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
         this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
-        return new Promise<plexus.ICompletion>((resolve, reject) => {
-            this.onCloseHandler = (summarizedCompletion?: plexus.ICompletion) => {
-                resolve(summarizedCompletion);
-            };
-            if (this.stateMachine.is(ChannelState.OPEN)) {
-                this.stateMachine.go(ChannelState.CLOSE_REQUESTED, {
-                    preHandler: async () => {
-                        await this.sendChannelClosedRequest(completion);
-                    }
-                }).catch((e) => {
-                    this.log.error("Unable to request channel close", e);
-                    reject(e);
-                });
-            } else {
-                this.stateMachine.go(ChannelState.CLOSED, {
-                    preHandler: async () => {
-                        await this.sendChannelClosedRequest(completion);
-                        await this.closeInternal();
-                    }
-                }).catch((e) => {
-                    this.log.error("Unable to close channel", e);
-                    reject(e);
-                });
-            }
-        });
+        if (!this.isSuccessCompletion(completion)) {
+            // something wrong with client, doesn't care on response, report and close the channel
+            return this.sendClosedAndCleanUp(completion);
+        } else {
+            // wait for remote side if required and report result
+            return new Promise<plexus.ICompletion>((resolve, reject) => {
+                this.onCloseHandler = (summarizedCompletion?: plexus.ICompletion) => {
+                    resolve(summarizedCompletion);
+                };
+                if (this.stateMachine.is(ChannelState.OPEN)) {
+                    // wait for remote side response
+                    this.sendChannelClosedRequest(completion);
+                    this.stateMachine.go(ChannelState.CLOSE_REQUESTED);
+                } else {
+                    // remote is completed already
+                    this.sendChannelClosedRequest(completion);
+                    this.stateMachine.go(ChannelState.CLOSED);
+                    this.closeInternal();
+                }
+            });
+        }
+        
+    }
+
+    private async sendClosedAndCleanUp(completion: plexus.ICompletion): Promise<plexus.ICompletion> {
+        this.sendChannelClosedRequest(completion);
+        this.stateMachine.go(ChannelState.CLOSED);
+        try {
+            await this.closeInternal();                
+            return new SuccessCompletion();
+        } catch (e) {
+            const errorText = "Error on closing of channel";
+            this.log.error(errorText, e);
+            return new ErrorCompletion({message: errorText});   
+        }
     }
 
     public async onChannelClose(channelCloseFrame: ChannelCloseFrame): Promise<void> {
@@ -198,6 +226,7 @@ export class FramedTransportChannel implements TransportChannel {
                 await this.stateMachine.go(ChannelState.CLOSE_RECEIVED);
                 break;
             case ChannelState.CLOSE_REQUESTED:
+                await this.closeInternal();
                 await this.stateMachine.go(ChannelState.CLOSED);
                 break;
             default:

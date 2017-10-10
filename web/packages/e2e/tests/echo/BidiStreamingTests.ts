@@ -20,6 +20,8 @@ import { BaseEchoTest } from "./BaseEchoTest";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientStreamingHandler } from "./ClientStreamingHandler";
 import { StreamingInvocationClient } from "@plexus-interop/client";
+import { EchoClientClient } from "../../src/echo/client/EchoClientGeneratedClient";
+import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
 
 export class BidiStreamingInvocationTests extends BaseEchoTest {
 
@@ -27,6 +29,37 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
         private connectionProvider: ConnectionProvider,
         private clientsSetup: ClientsSetup = new ClientsSetup()) {
         super();
+    }
+
+    public testClientCanCancelInvocation(): Promise<void> {
+        let client: EchoClientClient | null = null;
+        let server: EchoServerClient | null = null;
+        return new Promise<void>((resolve, reject) => {
+            const serverHandler = new ClientStreamingHandler((hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
+                return {
+                    next: (clientRequest) => reject("Not expected"),
+                    complete: () => reject("Complete not expected"),
+                    error: async (e) => {
+                        console.log("Error received by server", e);
+                        await this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
+                        resolve(e);
+                    }
+                }
+            });
+            (async () => {
+                [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+                const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
+                    next: (serverResponse) => {
+                        reject("Not expected");
+                    },
+                    error: (e) => reject("Not expected to fail by client"),
+                    complete: () => console.log("Remote completed")
+                });
+                await streamingClient.cancel();
+                console.log("Client cancelled");
+            })();
+
+        });
     }
 
     public testClientAndServerCanSendMessages(): Promise<void> {

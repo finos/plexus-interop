@@ -52,4 +52,8 @@ describe("Client: Web Socket Streaming invocation", () => {
         return bidiStreamingTests.testClientAndServerCanSendMessages();
     });
 
+    it("Client can cancel invocation", function() {
+        return bidiStreamingTests.testClientCanCancelInvocation();
+    });
+
 });
