@@ -125,7 +125,7 @@
             };
 
             var shutdownEventName = "plexus-host-shutdown-" + Process.GetCurrentProcess().Id;
-            _log.Info("Registering shutdown event: {0}", shutdownEventName);
+            _log.Debug("Registering shutdown event: {0}", shutdownEventName);
             var shutdownEvent = new EventWaitHandle(false, EventResetMode.AutoReset, shutdownEventName);
             ThreadPool.RegisterWaitForSingleObject(
                 shutdownEvent,

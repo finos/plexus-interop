@@ -14,13 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Runtime.CompilerServices;
-
 namespace Plexus
 {
+    using System;
+    using System.Runtime.CompilerServices;
+    using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
+
     public static class LogManager
     {
+        public static void ConfigureLogging(IMsLoggerFactory loggerFactory)
+        {
+            LogConfig.LoggerFactory.Configure(loggerFactory);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ILogger GetLogger(string name)
         {

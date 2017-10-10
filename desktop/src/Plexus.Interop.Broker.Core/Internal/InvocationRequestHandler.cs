@@ -50,12 +50,14 @@
         
         public async Task HandleAsync(IInvocationStart request, IClientConnection sourceConnection, ITransportChannel sourceChannel)
         {
-            Log.Info("Handling invocation request {0} from {1}: {2}", sourceChannel.Id, sourceConnection.Id, request);
-            var targetConnection = await request.Target.Handle(_resolveTargetConnectionHandler, sourceConnection).ConfigureAwait(false);
-            var targetChannel = await targetConnection.CreateChannelAsync().ConfigureAwait(false);
-            Log.Debug("Created target channel {0} for invocation {1} to {2}", targetChannel.Id, sourceChannel.Id, targetConnection);
+            IClientConnection targetConnection = null;
+            ITransportChannel targetChannel = null;            
             try
             {
+                Log.Info("Handling invocation {0} from {{{1}}}: {{{2}}}", sourceChannel.Id, sourceConnection, request);
+                targetConnection = await request.Target.Handle(_resolveTargetConnectionHandler, sourceConnection).ConfigureAwait(false);
+                targetChannel = await targetConnection.CreateChannelAsync().ConfigureAwait(false);
+                Log.Debug("Created channel {0} for invocation {1} from {{{2}}} to {{{3}}}: {{{4}}}", targetChannel.Id, sourceChannel.Id, sourceConnection, targetConnection, request);
                 using (var invocationStarting = _protocolMessageFactory.CreateInvocationStarting())
                 {
                     var serialized = _protocolSerializer.Serialize(invocationStarting);
@@ -91,7 +93,7 @@
             catch (Exception ex)
             {
                 sourceChannel.Out.TryTerminate(ex);
-                targetChannel.Out.TryTerminate(ex);
+                targetChannel?.Out.TryTerminate(ex);
                 throw;
             }
             finally
@@ -100,9 +102,9 @@
                 {
                     await Task
                         .WhenAll(
-                            targetChannel.In.ConsumeAsync((Action<TransportMessageFrame>)DisposeFrame).IgnoreExceptions(),
+                            targetChannel?.In.ConsumeAsync((Action<TransportMessageFrame>)DisposeFrame).IgnoreExceptions() ?? TaskConstants.Completed,
                             sourceChannel.In.ConsumeAsync((Action<TransportMessageFrame>)DisposeFrame).IgnoreExceptions(),
-                            targetChannel.Completion,
+                            targetChannel?.Completion ?? TaskConstants.Completed,
                             sourceChannel.Completion)
                         .ConfigureAwait(false);
                     Log.Info("Completed invocation {0} from {{{1}}} to {{{2}}}: {{{3}}}", sourceChannel.Id, sourceConnection, targetConnection, request);

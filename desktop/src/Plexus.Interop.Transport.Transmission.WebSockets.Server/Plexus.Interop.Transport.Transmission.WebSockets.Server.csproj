@@ -9,8 +9,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.0.0" />
-    <PackageReference Include="NLog" Version="5.0.0-beta11" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.0.0-rtm-beta6" />
   </ItemGroup>
 
   <ItemGroup>

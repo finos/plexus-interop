@@ -1,0 +1,29 @@
+:imagesdir: ./images
+
+Successful build on Windows machine produces sample apps into directory `bin/win-x86/samples`.
+
+To run example which shows .Net and Web apps interoperability as well as discovery feature:
+
+* Go to `bin/win-x86/samples`
+
+* Launch Broker – `LaunchBroker.cmd`
+
+* Launch Greeting Client – `LaunchGreetingClient.cmd`
+
+* Choose “Discovery” option (5) and then “Greeting from Electron Web app” from discovery response
++
+image::sample-1.png[Sample-1]
+
+* Enter name, e.g. “John” and hit enter – Web Greeting Server app will be launched by Broker and print Greeting Request:
++
+image::sample-2.png[Sample-2]
+
+* And send response back to .Net Greeting Client
++
+image::sample-3.png[Sample-3]
+
+* Then choose Discovery (5) again and this time select “Greeting from .Net app” from discovery response
+
+* Enter another name, e.g. “Mike” and hit enter - .Net Greeting Server app will be launched and print greeting request:
++
+image::sample-4.png[Sample-4]

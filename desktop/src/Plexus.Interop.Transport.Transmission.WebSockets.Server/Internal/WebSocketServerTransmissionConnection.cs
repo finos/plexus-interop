@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Plexus.Pools;
-using System.Net.WebSockets;
-using System;
-using Plexus.Channels;
-using System.Text;
-
 namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
+    using Plexus.Channels;
+    using Plexus.Pools;
+    using System;
+    using System.Net.WebSockets;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     internal sealed class WebSocketServerTransmissionConnection : ITransmissionConnection
     {
         private static readonly byte[] EndMessage = Encoding.UTF8.GetBytes("<END>");
