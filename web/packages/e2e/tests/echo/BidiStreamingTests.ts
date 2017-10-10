@@ -68,15 +68,18 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
     }
 
     public testClientAndServerCanSendMessages(): Promise<void> {
+        let client: EchoClientClient | null = null;
+        let server: EchoServerClient | null = null;
         return new Promise<void>((resolve, reject) => {
             const serverHandler = new ClientStreamingHandler((hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
-                    next: (clientRequest) => {
+                    next: async (clientRequest) => {
                         if (clientRequest.stringField === "Hey") {
                             hostClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
                         } else if (clientRequest.stringField === "Ping") {
                             hostClient.next(this.clientsSetup.createSimpleRequestDto("Pong"));
-                            hostClient.complete();
+                            await hostClient.complete();
+                            this.verifyServerChannelsCleared(this.clientsSetup);
                         }
                     },
                     complete: () => { },
@@ -87,14 +90,15 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                 }
             });
             (async () => {
-                const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+                [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
                 const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
                     next: (serverResponse) => {
                         if (serverResponse.stringField === "Hey") {
                             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Ping"));
                         } else if (serverResponse.stringField === "Pong") {
                             streamingClient.complete().then(() => {
-                                return this.clientsSetup.disconnect(client, server);
+                                this.verifyClientChannelsCleared(this.clientsSetup);
+                                return this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
                             })
                             .then(() => resolve())
                             .catch(e => reject(e));
