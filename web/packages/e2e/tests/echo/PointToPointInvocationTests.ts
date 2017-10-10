@@ -19,6 +19,8 @@ import { ConnectionProvider } from "../common/ConnectionProvider";
 import { UnaryServiceHandler } from "./UnaryServiceHandler";
 import { BaseEchoTest } from "./BaseEchoTest";
 import * as plexus from "../../src/echo/gen/plexus-messages";
+import { ClientError } from "@plexus-interop/protocol";
+import { expect } from "chai";
 
 export class PointToPointInvocationTests extends BaseEchoTest {
 
@@ -64,27 +66,41 @@ export class PointToPointInvocationTests extends BaseEchoTest {
         return this.testMessageSentInternal(echoRequest);
     }
 
+    public testHostsExecutionClientErrorReceived(): Promise<void> {
+        const errorText = "Host error";
+        return this.testHostsExecutionErrorReceivedInternal(new ClientError(errorText), errorText);
+    }
+
     public testHostsExecutionErrorReceived(): Promise<void> {
+        const errorText = "Host error";
+        return this.testHostsExecutionErrorReceivedInternal(new Error(errorText), errorText);
+    }
+
+    public testHostsExecutionStringErrorReceived(): Promise<void> {
+        const errorText = "Host error";
+        return this.testHostsExecutionErrorReceivedInternal(errorText, errorText);
+    }
+
+    private testHostsExecutionErrorReceivedInternal(errorObj: any, errorText: string): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>((resolve, reject) => {
-            const handler = new UnaryServiceHandler((request) => Promise.reject("Host error"));
+            const handler = new UnaryServiceHandler((request) => Promise.reject(errorObj));
             this.clientsSetup.createEchoClients(this.connectionProvider, handler)
                 .then(clients => {
                     return clients[0].getEchoServiceProxy()
                         .unary(echoRequest)
                         .then(echoResponse => {
                             reject("Should not happen");
-                            this.assertEqual(echoRequest, echoResponse);
                         })
                         .catch(error => {
-                            console.log("Error received", error);
+                            console.log("Error received", JSON.stringify(error));
+                            expect(error.message).to.eq(errorText);
                             return this.clientsSetup.disconnect(clients[0], clients[1]);
                         });
                 })
                 .then(() => resolve())
                 .catch(error => reject(error));
         });
-
     }
 
     public testFewMessagesSent(): Promise<void> {

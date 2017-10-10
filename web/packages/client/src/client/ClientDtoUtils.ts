@@ -56,7 +56,7 @@ export class ClientDtoUtils {
             return new ClientError(error);
         }
         const message = error.message && isString(error.message) ? error.message : "Unknown";
-        const details = error.stack && isString(error.stack) ? error.stack : "Unknown";
+        const details = error.stack && isString(error.stack) ? error.stack : (error.details && isString(error.details) ? error.details : "Unknown");
         return new ClientError(message, details);
     }
 
