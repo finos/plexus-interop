@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Host
+namespace Plexus.Host
 {
-    using Plexus.Logging.NLog;
     using System;
     using System.Collections.Generic;
+    using System.CommandLine;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -27,144 +27,145 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class Program : IProgram
+    public sealed class Program
     {
         private static readonly TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(5);
 
-        private static readonly IReadOnlyDictionary<string, string> ProgramAliases = new Dictionary<string, string>
+        public static int Main(string[] args)
         {
-            { "broker", "Plexus.Interop.Broker.Host.dll"}
-        };
-
-        private static LoggingInitializer _loggingInitializer;
-        private static ILogger _log;
-        private IProgram _program;
-        private int _isShuttingDown;
-
-        public static async Task<int> Main(string[] args)
-        {
-            using (_loggingInitializer = new LoggingInitializer())
-            {
-                try
-                {
-                    InitializeProcess();
-                    _log = LogManager.GetLogger<Program>();
-                    AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
-                    return await new Program().RunAsync(args).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    _log.Error(ex, "Unhandled exception");
-                    return 1;
-                }
-            }
+            InitializeProcess();
+            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+            return new Program().RunAsync(args).GetResult();
         }
 
         public async Task<int> RunAsync(string[] args)
         {
-            _log.Info("Executing {0}", Environment.CommandLine);
-
-            var firstArg = args.First();
-            var otherArgs = args.Skip(1).ToArray();
-
-            if (string.Equals(firstArg, "start"))
+            var command = PlexusCommand.None;
+            var console = TargetConsole.Current;
+            var workingDir = Directory.GetCurrentDirectory();
+            var metadataDir = "metadata";
+            IReadOnlyList<string> pluginArgs = null;
+            string appId = null;
+            string pid = null;
+            var result = ArgumentSyntax.Parse(args, syntax =>
             {
-                return StartProcess(otherArgs);
-            }
+                syntax.ApplicationName = "plexus";
+                syntax.ErrorOnUnexpectedArguments = false;
+                syntax.HandleHelp = true;
+                syntax.HandleErrors = true;
+                syntax.HandleResponseFiles = true;
 
-            if (string.Equals(firstArg, "stop"))
-            {
-                return await StopProcess(otherArgs).ConfigureAwait(false);
-            }
+                syntax.DefineCommand("broker", ref command, PlexusCommand.Broker, "Start interop broker");
+                syntax.DefineOption(
+                    "c|console",
+                    ref console,
+                    x => Enum.Parse<TargetConsole>(x, ignoreCase: true),
+                    false,
+                    "Broker console mode. Possible values: \"current\" to start in the current console, \"new\" to start in new console, \"hidden\" to start as background process without visible console.");
+                syntax.DefineOption(
+                    "d|directory",
+                    ref workingDir,
+                    false,
+                    "Working directory for interop broker");
+                syntax.DefineOption(
+                    "m|metadata",
+                    ref metadataDir,
+                    false,
+                    "Directory to seek for metadata files: apps.json and interop.json");
 
-            var parentProcessVar = Environment.GetEnvironmentVariable("PLEXUS_PARENT_PROCESS");
-            if (!string.IsNullOrWhiteSpace(parentProcessVar) && int.TryParse(parentProcessVar, out var parentPid))
-            {
-                var parentProcess = Process.GetProcessById(parentPid);
-                if (parentProcess != null)
-                {
-                    AttachToParent(parentProcess);
-                }
-            }
+                syntax.DefineCommand("launch", ref command, PlexusCommand.Launch, "Send command to launch app");
+                syntax.DefineOption(
+                    "d|directory",
+                    ref workingDir,
+                    false,
+                    "Working directory of the target interop broker");
+                syntax.DefineParameter("applicationId", ref appId, "ID of application to launch. ID must present in apps.json.");
 
-            RegisterShutdownEvent();
+                var loadCommand = syntax.DefineCommand("load", ref command, PlexusCommand.Load, "Load plugin dll");
+                loadCommand.IsHidden = true;
+                syntax.DefineOption(
+                    "d|directory",
+                    ref workingDir,
+                    false,
+                    "Working directory for plugin process");
+                syntax.DefineParameterList("pluginCmd", ref pluginArgs, "Plugin command");
 
-            var programToLoad = firstArg;
-            if (ProgramAliases.TryGetValue(programToLoad, out var alias))
-            {
-                programToLoad = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), alias);
-            }
-            var assembly = Assembly.LoadFrom(programToLoad);
-            var attribute =
-                (EntryPointAttribute)assembly.GetCustomAttributes(typeof(EntryPointAttribute)).SingleOrDefault();
-            var programType = attribute != null
-                ? attribute.Type
-                : assembly.GetExportedTypes()
-                    .SingleOrDefault(x => typeof(IProgram).IsAssignableFrom(x) && x.IsClass);
-            _log.Info("Starting {0} with args: {1}", programType, string.Join(" ", otherArgs));
+                var stopCommand = syntax.DefineCommand("stop", ref command, PlexusCommand.Stop, "Stop currently running plexus process(es)");
+                stopCommand.IsHidden = true;
+                syntax.DefineParameter("pid", ref pid, "Process ID to stop");
+            });
+
             try
-            {
-                _program = (IProgram)Activator.CreateInstance(programType);
-                var exitCode = await _program.RunAsync(otherArgs).ConfigureAwait(false);
-                _log.Info("Program {0} exited with code {1}", programType, exitCode);
-                return exitCode;
+            {                
+                switch (command)
+                {
+                    case PlexusCommand.None:
+                        result.ReportError("Command expected");
+                        return 1;
+                    case PlexusCommand.Broker:
+                        return await StartBrokerAsync(workingDir, metadataDir, console).ConfigureAwait(false);
+                    case PlexusCommand.Stop:
+                        return await StopProcess(pid).ConfigureAwait(false);
+                    case PlexusCommand.Launch:
+                        if (string.IsNullOrEmpty(appId))
+                        {
+                            result.ReportError("<applicationID> must be specified");
+                            return 1;
+                        }
+                        break;
+                    case PlexusCommand.Load:
+                        var loader = new ModuleLoader(pluginArgs);
+                        return await loader.LoadAndRunAsync().ConfigureAwait(false);                        
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
             catch (Exception ex)
             {
-                _log.Error(ex, "Unhandled exception in program {0}", programType);
+                Console.WriteLine("Unhandled exception: " + ex);
                 return 1;
             }
+
+            return 0;
         }
 
-        private void RegisterShutdownEvent()
+        private async Task<int> StartBrokerAsync(string workingDir, string metadataDir, TargetConsole targetConsole)
         {
-            Console.CancelKeyPress += (x, y) =>
-            {
-                ShutdownAsync().IgnoreAwait(_log);
-                y.Cancel = true;
-            };
-
-            var shutdownEventName = "plexus-host-shutdown-" + Process.GetCurrentProcess().Id;
-            _log.Debug("Registering shutdown event: {0}", shutdownEventName);
-            var shutdownEvent = new EventWaitHandle(false, EventResetMode.AutoReset, shutdownEventName);
-            ThreadPool.RegisterWaitForSingleObject(
-                shutdownEvent,
-                (state, timedOut) => ShutdownAsync().IgnoreAwait(_log),
-                null,
-                Timeout.Infinite,
-                true);
+            var fullMetadataDir = Path.GetFullPath(metadataDir);
+            var args = new[] { "broker", fullMetadataDir };
+            var fullWorkingDir = Path.GetFullPath(workingDir);
+            switch (targetConsole)
+            {                    
+                case TargetConsole.Current:
+                    Directory.SetCurrentDirectory(fullWorkingDir);
+                    var loader = new ModuleLoader(args);
+                    return await loader.LoadAndRunAsync().ConfigureAwait(false);
+                case TargetConsole.New:                    
+                    StartPlexusProcess(args, fullWorkingDir, true);
+                    return 0;
+                case TargetConsole.Hidden:
+                    StartPlexusProcess(args, fullWorkingDir);
+                    return 0;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(targetConsole), targetConsole, null);
+            }            
         }
-
-        private static void AttachToParent(Process parentProcess)
+        
+        private static void StartPlexusProcess(string[] otherArgs, string workingDirectory = null, bool newConsoleWindow = false)
         {
-            _log.Info("Attaching the current process to the parent process \"{0}\" ({1})", parentProcess.ProcessName, parentProcess.Id);
-
-            void OnParentProcessExited()
+            var binDir = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+            var command = Path.Combine(binDir, "plexus.exe");
+            var args = string.Join(" ", otherArgs);
+            if (newConsoleWindow)
             {
-                _log.Warn("Exiting because the attached parent process \"{0}\" ({1}) exited with code {2}", parentProcess.ProcessName, parentProcess.Id, parentProcess.ExitCode);
-                _loggingInitializer?.Dispose();
-                Environment.Exit(1);
-                
+                args = $"/c start \"\" \"{command}\" " + args;
+                command = "cmd";
             }
-            parentProcess.EnableRaisingEvents = true;
-            parentProcess.Exited += (sender, args) =>
-            {
-                OnParentProcessExited();
-            };
-            if (parentProcess.HasExited)
-            {
-                OnParentProcessExited();
-            }
-        }
-
-        private static int StartProcess(string[] otherArgs)
-        {
-            var argsJoined = string.Join(" ", otherArgs);
             var si = new ProcessStartInfo
             {
-                FileName = "plexus",
-                Arguments = argsJoined,
-                WorkingDirectory = Directory.GetCurrentDirectory(),
+                FileName = command,
+                Arguments = args,
+                WorkingDirectory = workingDirectory ?? Directory.GetCurrentDirectory(),
                 RedirectStandardOutput = false,
                 RedirectStandardInput = false,
                 RedirectStandardError = false,
@@ -172,17 +173,14 @@
                 UseShellExecute = false,
             };
             var p = Process.Start(si);
-            _log.Info("Started process {0}: plexus {1}", p.Id, argsJoined);
-
-            return 0;
+            Console.WriteLine($"Started new plexus.exe process {p.Id}");
         }
 
-        private static async Task<int> StopProcess(string[] otherArgs)
+        private async Task<int> StopProcess(string pidArg)
         {
             var processes = Process.GetProcesses().Where(x =>
                 string.Equals(x.ProcessName, "plexus") || string.Equals(x.ProcessName, "plexus.exe"));
             processes = processes.Where(x => x.Id != Process.GetCurrentProcess().Id);
-            var pidArg = otherArgs.FirstOrDefault();
             if (!string.IsNullOrEmpty(pidArg) && int.TryParse(pidArg, out var pid))
             {
                 processes = processes.Where(x => x.Id == pid);
@@ -190,7 +188,7 @@
 
             async Task ShutdownProcessAsync(Process process)
             {
-                _log.Info("Shutting down plexus process {0}", process.Id);
+                Console.WriteLine($"Shutting down plexus process {process.Id}");
                 process.EnableRaisingEvents = true;
                 var exitPromise = new Promise<int>();
                 process.Exited += (sender, eventArgs) => exitPromise.TryComplete(((Process) sender).ExitCode);
@@ -207,13 +205,12 @@
                         Task.Delay(ShutdownTimeout));
                     if (completed != exitPromise.Task)
                     {
-                        _log.Warn("Process {0} failed to shutdown gracefully in the given timeout {1}", process.Id,
-                            ShutdownTimeout);
+                        Console.WriteLine($"Killing plexus process {process.Id} which failed to shutdown gracefully in the given timeout {ShutdownTimeout.TotalSeconds} sec");
                         process.Kill();
                     }
                 }
                 var exitCode = await exitPromise.Task.ConfigureAwait(false);
-                _log.Info("Plexus process {0} exited with code {1}", process.Id, exitCode);
+                Console.WriteLine($"Plexus process {process.Id} exited with code {exitCode}");
             }
 
             var tasks = processes.Select(x => TaskRunner.RunInBackground(() => ShutdownProcessAsync(x)));
@@ -221,39 +218,6 @@
             await Task.WhenAll(tasks).IgnoreExceptions().ConfigureAwait(false);
 
             return 0;
-        }
-
-        public async Task ShutdownAsync()
-        {
-            if (Interlocked.Exchange(ref _isShuttingDown, 1) == 1)
-            {
-                return;
-            }
-            if (_program == null)
-            {
-                _loggingInitializer?.Dispose();
-                Environment.Exit(0);
-            }
-            else
-            {
-                _log.Info("Shutting down");                
-
-                var task = TaskRunner.RunInBackground(_program.ShutdownAsync);
-
-                var completed = await Task.WhenAny(task, Task.Delay(ShutdownTimeout)).ConfigureAwait(false);
-                if (completed != task)
-                {
-                    _log.Error("Program {0} failed to shutdown gracefully withing the given timeout {1} sec", _program.GetType(), ShutdownTimeout.TotalSeconds);
-                    _loggingInitializer?.Dispose();
-                    Environment.Exit(1);
-                }
-                if (task.IsFaulted)
-                {
-                    _log.Error(task.Exception.ExtractInner(), "Exception while shutting down program {0}", _program.GetType());
-                    _loggingInitializer?.Dispose();
-                    Environment.Exit(1);
-                }
-            }
         }
 
         private static Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
