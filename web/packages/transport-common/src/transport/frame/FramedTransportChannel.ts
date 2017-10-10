@@ -22,7 +22,7 @@ import { UniqueId } from "../../transport/UniqueId";
 import { Observer } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
 import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, AsyncHelper, StateMaschine } from "@plexus-interop/common";
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ErrorCompletion } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ErrorCompletion, ClientError } from "@plexus-interop/protocol";
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";
 
@@ -75,12 +75,6 @@ export class FramedTransportChannel implements TransportChannel {
             {
                 from: ChannelState.OPEN, to: ChannelState.CLOSE_RECEIVED, preHandler: async () => {
                     this.readCancellationToken.cancel("Channel close received");
-                }
-            },
-            // client reported error
-            {
-                from: ChannelState.OPEN, to: ChannelState.CLOSED, preHandler: async () => {
-                    this.readCancellationToken.cancel("Channel closed by client");
                 }
             },
             // client confirmed channel closure
@@ -166,7 +160,7 @@ export class FramedTransportChannel implements TransportChannel {
         if (this.isSuccessCompletion(this.remoteCompletion)) {
             channelObserver.complete();
         } else {
-            channelObserver.error(this.remoteCompletion.error);
+            channelObserver.error(this.remoteCompletion.error || new ClientError(`Remote completed with status ${this.remoteCompletion.status}`));
         }
     }
 
@@ -180,41 +174,29 @@ export class FramedTransportChannel implements TransportChannel {
 
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
         this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
-        if (!this.isSuccessCompletion(completion)) {
-            // something wrong with client, doesn't care on response, report and close the channel
-            return this.sendClosedAndCleanUp(completion);
-        } else {
-            // wait for remote side if required and report result
-            return new Promise<plexus.ICompletion>((resolve, reject) => {
+        // wait for remote side if required and report result
+        return new Promise<plexus.ICompletion>((resolve, reject) => {
+            (async () => {
+                // handler called when remote side also sent its completion
                 this.onCloseHandler = (summarizedCompletion?: plexus.ICompletion) => {
                     resolve(summarizedCompletion);
                 };
                 if (this.stateMachine.is(ChannelState.OPEN)) {
                     // wait for remote side response
-                    this.sendChannelClosedRequest(completion);
-                    this.stateMachine.go(ChannelState.CLOSE_REQUESTED);
+                    await this.sendChannelClosedRequest(completion);
+                    await this.stateMachine.go(ChannelState.CLOSE_REQUESTED);
                 } else {
-                    // remote is completed already
-                    this.sendChannelClosedRequest(completion);
-                    this.stateMachine.go(ChannelState.CLOSED);
-                    this.closeInternal();
+                    // remote is completed already, send message and clean up
+                    await this.sendChannelClosedRequest(completion);
+                    await this.stateMachine.go(ChannelState.CLOSED);
+                    await this.closeInternal();
                 }
+            })()
+            .catch(e => {
+                this.log.error("Error during sending close channel request", e);
+                reject(e);
             });
-        }
-        
-    }
-
-    private async sendClosedAndCleanUp(completion: plexus.ICompletion): Promise<plexus.ICompletion> {
-        this.sendChannelClosedRequest(completion);
-        this.stateMachine.go(ChannelState.CLOSED);
-        try {
-            await this.closeInternal();                
-            return new SuccessCompletion();
-        } catch (e) {
-            const errorText = "Error on closing of channel";
-            this.log.error(errorText, e);
-            return new ErrorCompletion({message: errorText});   
-        }
+        });        
     }
 
     public async onChannelClose(channelCloseFrame: ChannelCloseFrame): Promise<void> {

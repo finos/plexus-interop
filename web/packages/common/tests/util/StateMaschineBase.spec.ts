@@ -76,7 +76,6 @@ describe("StateMaschineBase", () => {
         const sut = new StateMaschineBase<State>(State.OPEN, [
             {
                 from: State.OPEN, to: State.CLOSED, postHandler: async () => {
-                    debugger;
                     expect(sut.getCurrent()).toBe(State.CLOSED);
                     called++;
                 }

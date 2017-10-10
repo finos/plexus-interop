@@ -33,12 +33,7 @@ export abstract class BaseInvocationClientImpl implements InvocationClient {
         await this.close(new CancelledCompletion());
     }
 
-    protected close(completion: plexus.ICompletion = new SuccessCompletion()): void {
-        this.invocation.close(completion)
-            .then(() => {
-                this.log.debug("Closed");
-            }, (closeError) => {
-                this.log.error("Closed with errors", closeError);
-            });
+    protected async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<void> {
+        await this.invocation.close(completion);
     }
 }

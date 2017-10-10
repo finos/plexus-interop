@@ -48,7 +48,7 @@ export class ClientDtoUtils {
         }
     }
 
-    public static toError(error: any): plexus.IError {
+    public static toError(error: any): ClientError {
         if (!error) {
             return new ClientError();
         }

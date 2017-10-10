@@ -57,11 +57,11 @@ export class BaseEchoTest {
         return this.marshallerProvider.getMarshaller(plexus.plexus.interop.testing.EchoRequest).decode(new Uint8Array(payload));
     }
 
-    public verifyClientChannelsCleared(clientsSetup: ClientsSetup): void {
+    public async verifyClientChannelsCleared(clientsSetup: ClientsSetup): Promise<void> {
         expect(clientsSetup.getClientConnection().getManagedChannels().length).to.eq(0);
     }
 
-    public verifyServerChannelsCleared(clientsSetup: ClientsSetup): void {
+    public async verifyServerChannelsCleared(clientsSetup: ClientsSetup): Promise<void> {
         expect(clientsSetup.getServerConnection().getManagedChannels().length).to.eq(0);
     }
 

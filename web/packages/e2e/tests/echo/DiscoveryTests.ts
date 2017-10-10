@@ -71,7 +71,6 @@ export class DiscoveryTests extends BaseEchoTest {
                         }
                     })
                     .then(discoveryResponse => {
-                        debugger;
                         if (discoveryResponse.methods) {
                             expect(discoveryResponse.methods.length).to.be.eq(1);
                             const method = discoveryResponse.methods[0];
