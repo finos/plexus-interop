@@ -127,6 +127,26 @@
 		     		]
 		     	}
 		     ]
+		  },
+		{
+			"id": "plexus.interop.testing.TestAppLauncher",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.AppLauncherService",
+		     		"title": "AppLauncherService",
+		     		"to": [
+		     			"interop.AppLifecycleManager"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Launch",
+		     				"title": "Launch"
+		     			}
+		     		]
+		     	}
+		     ]
 		  }
 	]
 }

@@ -38,7 +38,7 @@
 
         public async Task<bool> WaitInitializationAsync(TimeSpan timeout, CancellationToken cancellationToken)
         {
-            Log.Info("Waiting initialization {0}", _eventName);
+            Log.Debug("Waiting initialization {0}", _eventName);
             using (var waitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, _eventName))
             {
                 return await FromWaitHandle(waitHandle, timeout, cancellationToken).ConfigureAwait(false);

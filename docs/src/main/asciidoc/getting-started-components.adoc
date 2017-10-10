@@ -1,0 +1,8 @@
+Plexus Interop repository consist of the following main sections:
+
+* *desktop* - Interop Broker, .NET Interop Client and sample apps implemented in C# using https://www.microsoft.com/net/download/core[.NET Core 2.0].
+* *web* - Web Interop Client and sample apps implemented in https://www.typescriptlang.org/[TypeScript].
+* *dsl* - https://developers.google.com/protocol-buffers/[Protobuf] and Plexus Interop grammar parsers, validators and code-generators implemented using https://eclipse.org/Xtext/[Xtext framework].
+* *docs* - documentation implemented in http://asciidoc.org/[AsciiDoc] format using http://asciidoctor.org/[Asciidoctor] processor.
+* *protocol* - definitions of Plexus Interop internal protocol messages in https://developers.google.com/protocol-buffers/[Protobuf] format.
+* *samples* - sample interop metadata.

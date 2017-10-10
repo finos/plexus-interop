@@ -16,8 +16,12 @@
  */
 ﻿namespace Plexus
 {
+    using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
+
     public interface ILoggerFactory
     {
         ILogger Create(string name);
+
+        void Configure(IMsLoggerFactory loggerFactory);
     }
 }

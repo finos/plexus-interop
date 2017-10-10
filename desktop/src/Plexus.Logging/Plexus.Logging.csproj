@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="AsyncFriendlyStackTrace" Version="1.5.0" />
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
   
 </Project>

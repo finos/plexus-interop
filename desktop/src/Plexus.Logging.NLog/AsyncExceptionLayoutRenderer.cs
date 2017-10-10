@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Logging.NLog
+namespace Plexus.Logging.NLog
 {
-    using System;
-    using System.Text;
     using AsyncFriendlyStackTrace;
     using global::NLog.Config;
     using global::NLog.LayoutRenderers;
+    using System;
+    using System.Text;
 
     [LayoutRenderer("exception")]
     [ThreadAgnostic]

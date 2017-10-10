@@ -35,7 +35,9 @@
 
   <PropertyGroup>
     <ProtoRoot>$(ProjectDir)../../../protocol/</ProtoRoot>
-    <ProtoOutDir>./Internal/</ProtoOutDir>
+    <ProtoOutDir>Internal\</ProtoOutDir>
+    <ProtoOutDirParam>$(ProtoOutDir)</ProtoOutDirParam>
+    <ProtoOutDirParam Condition=" '$(ProtoOutDirParam)' == '' ">.</ProtoOutDirParam>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,13 +46,19 @@
 
   <Target Name="ProtoCompile" BeforeTargets="CoreCompile">
     <PropertyGroup>
-      <ProtoCCommand>$(ProtoCompilerPath) --csharp_out=internal_access:$(ProtoOutDir) --csharp_opt=file_extension=.proto.cs -I $(ProtoRoot) @(Protobuf -> '%(Identity)', ' ')</ProtoCCommand>
+      <ProtoCCommand>$(ProtoCompilerPath) --csharp_out=internal_access:$(ProtoOutDirParam) --csharp_opt=file_extension=.proto.cs -I $(ProtoRoot) @(Protobuf -> '%(Identity)', ' ')</ProtoCCommand>
     </PropertyGroup>
     <Message Importance="high" Text="$(ProtoCCommand)" />
     <Delete Files="$(ProtoOutDir)*.proto.cs" />
     <Exec Command="$(ProtoCCommand)" WorkingDirectory="$(ProjectDir)" />
     <ItemGroup>
-      <Compile Include="$(ProtoOutDir)/*.proto.cs" />
+      <Generated Include="$(ProtoOutDir)*.proto.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="@(Generated)" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="@(Generated)" />
     </ItemGroup>
   </Target>
 
