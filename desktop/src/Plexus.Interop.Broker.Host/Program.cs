@@ -29,7 +29,7 @@ namespace Plexus.Interop.Broker.Host
         private int _stoped;
         private BrokerRunner _brokerRunner;
 
-        public async Task<int> RunAsync(string[] args)
+        public async Task<Task> StartAsync(string[] args)
         {
             var command = BrokerCliCommand.Start;
             var metadataDir = "metadata";            
@@ -49,18 +49,22 @@ namespace Plexus.Interop.Broker.Host
                 _brokerRunner = new BrokerRunner(metadataDir);
                 if (_stoped == 1)
                 {
-                    return 0;
+                    return Task.FromResult(0);
                 }
                 await _brokerRunner.StartAsync().ConfigureAwait(false);
-                await _brokerRunner.Completion.ConfigureAwait(false);
-                Log.Debug("Broker process completed");
-                return 0;
+                Log.Debug("Broker process started");
+                return _brokerRunner.Completion;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Terminated with exception");
-                return 1;
+                return Task.FromResult(1);
             }
+        }
+
+        public async Task HandleOtherInstanceRequestAsync(string[] args)
+        {
+            Log.Info("Another instance started: {0}", string.Join(" ", args));
         }
 
         public async Task ShutdownAsync()

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Host
+ namespace Plexus.Host
 {
     using System.Threading.Tasks;
 
     public interface IProgram
     {
-        Task<int> RunAsync(string[] args);
+        Task<Task> StartAsync(string[] args);
+
+        Task HandleOtherInstanceRequestAsync(string[] args);
 
         Task ShutdownAsync();
     }

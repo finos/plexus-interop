@@ -110,7 +110,7 @@ namespace Plexus.Host
                 switch (command)
                 {
                     case CliCommand.None:
-                        result.ReportError("Command expected");
+                        result.ReportError("<command> required");
                         return 1;
                     case CliCommand.Broker:
                         return await StartBrokerAsync(workingDir, metadataDir, console).ConfigureAwait(false);
@@ -119,7 +119,7 @@ namespace Plexus.Host
                     case CliCommand.Launch:
                         if (string.IsNullOrEmpty(appId))
                         {
-                            result.ReportError("<application> parameter required");
+                            result.ReportError("<application> option required");
                             return 1;
                         }
                         break;
@@ -129,7 +129,7 @@ namespace Plexus.Host
                             result.ReportError("<plugin> option required");
                             return 1;
                         }
-                        return await LoadAndRunPluginAsync(pluginPath, pluginArgs, workingDir, false);
+                        return await LoadAndRunProgramAsync(pluginPath, pluginArgs, workingDir);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -143,22 +143,14 @@ namespace Plexus.Host
             return 0;
         }
 
-        private static async Task<int> LoadAndRunPluginAsync(
-            string pluginPath, 
-            IEnumerable<string> pluginArgs, 
-            string workingDir,
-            bool singleInstance)
+        private static async Task<int> LoadAndRunProgramAsync(
+            string programPath,
+            IEnumerable<string> programArgs,
+            string workingDir)
         {
-            var curDir = Directory.GetCurrentDirectory();
-            try
+            using (var loader = new ProgramLoader(programPath, programArgs, workingDir))
             {
-                var fullPluginPath = Path.GetFullPath(pluginPath);
-                var loader = new ModuleLoader(fullPluginPath, pluginArgs, workingDir, singleInstance);
                 return await loader.LoadAndRunAsync().ConfigureAwait(false);
-            }
-            finally
-            {
-                Directory.SetCurrentDirectory(curDir);
             }
         }
 
@@ -171,7 +163,7 @@ namespace Plexus.Host
                     var brokerPluginPath = Path.Combine(
                         Path.GetDirectoryName(typeof(Program).Assembly.Location),
                         "Plexus.Interop.Broker.Host.dll");
-                    return await LoadAndRunPluginAsync(brokerPluginPath, new[] { "start", "-m", fullMetadataDir }, workingDir, true).ConfigureAwait(false);
+                    return await LoadAndRunProgramAsync(brokerPluginPath, new[] { "start", "-m", fullMetadataDir }, workingDir).ConfigureAwait(false);
                 case TargetConsole.New:
                     StartPlexusProcess(new[] { "broker", "-m", fullMetadataDir }, workingDir, true);
                     return 0;
