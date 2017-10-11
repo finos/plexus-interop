@@ -80,7 +80,11 @@ namespace Plexus.Host
                     ref workingDir,
                     false,
                     "Broker working directory");
-                syntax.DefineParameter("applicationId", ref appId, "ID of application to launch. ID must present in apps.json.");
+                syntax.DefineOption(
+                    "a|application",
+                    ref appId,
+                    true,
+                    "ID of application to launch. ID must present in apps.json.");
 
                 var loadCommand = syntax.DefineCommand("load", ref command, CliCommand.Load, "Load plugin dll");
                 loadCommand.IsHidden = true;
@@ -115,7 +119,7 @@ namespace Plexus.Host
                     case CliCommand.Launch:
                         if (string.IsNullOrEmpty(appId))
                         {
-                            result.ReportError("<applicationID> parameter required");
+                            result.ReportError("<application> parameter required");
                             return 1;
                         }
                         break;
@@ -163,8 +167,11 @@ namespace Plexus.Host
             var fullMetadataDir = Path.GetFullPath(metadataDir);
             switch (targetConsole)
             {                    
-                case TargetConsole.Current:                    
-                    return await LoadAndRunPluginAsync("broker", new[] { "start", "-m", fullMetadataDir }, workingDir, true).ConfigureAwait(false);
+                case TargetConsole.Current:
+                    var brokerPluginPath = Path.Combine(
+                        Path.GetDirectoryName(typeof(Program).Assembly.Location),
+                        "Plexus.Interop.Broker.Host.dll");
+                    return await LoadAndRunPluginAsync(brokerPluginPath, new[] { "start", "-m", fullMetadataDir }, workingDir, true).ConfigureAwait(false);
                 case TargetConsole.New:
                     StartPlexusProcess(new[] { "broker", "-m", fullMetadataDir }, workingDir, true);
                     return 0;

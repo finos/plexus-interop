@@ -5,35 +5,33 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.IO.Pipes;
     using System.Linq;
     using System.Reflection;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Xml.Serialization;
 
-    internal sealed class ModuleLoader
+    internal sealed class ModuleLoader : IDisposable
     {
         private static readonly TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(5);
-        private static readonly SHA1 _hasher = SHA1.Create();
-
-        private static readonly IReadOnlyDictionary<string, string> ModuleAliases = new Dictionary<string, string>
-        {
-            { "broker", "Plexus.Interop.Broker.Host.dll"}
-        };
-
+        private static readonly HashAlgorithm Hasher = MD5.Create();
         private readonly string[] _args;
         private readonly LoggingInitializer _loggingInitializer;
         private readonly ILogger _log;
         private readonly string _path;
         private readonly string _workingDir;
         private readonly bool _singleInstance;
+        private readonly string _instanceKey;
+        private Mutex _mutex;
         private IProgram _program;
         private int _isShuttingDown;
 
-        public ModuleLoader(string path, IEnumerable<string> args, string workingDir, bool singleInstance)
+        public ModuleLoader(
+            string path, 
+            IEnumerable<string> args, 
+            string workingDir, 
+            bool singleInstance)
         {
             _path = path;
             _workingDir = Path.GetFullPath(workingDir ?? Directory.GetCurrentDirectory());
@@ -41,37 +39,13 @@
             _args = args.ToArray();
             _loggingInitializer = new LoggingInitializer();
             _log = LogManager.GetLogger<ModuleLoader>();
+            _instanceKey = "plexus-host-" + BitConverter.ToString(Hasher.ComputeHash(Encoding.UTF8.GetBytes(_workingDir + "-" + _path)));            
         }
 
         public async Task<int> LoadAndRunAsync()
-        {            
-            var singleInstanceKey = "plexus-host-" + Convert.ToBase64String(
-                _hasher.ComputeHash(Encoding.UTF8.GetBytes(_workingDir + "-" + _path)));
-
-            using (var mutex = new Mutex(false, @"Global\" + singleInstanceKey))
-            {
-                if (!mutex.WaitOne(1000))
-                {
-                    throw new InvalidOperationException("Cannot acquire initialization mutex");
-                }
-                try
-                {
-                    using (var pipeClient = new NamedPipeClientStream(singleInstanceKey, ".", PipeDirection.InOut, PipeOptions.Asynchronous))
-                    {
-                        await pipeClient.ConnectAsync(1000).ConfigureAwait(false);
-                    }
-
-                    var pipeServer = new NamedPipeServerStream(
-                        singleInstanceKey, PipeDirection.InOut, -1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-
-                    await pipeServer.WaitForConnectionAsync().ConfigureAwait(false);
-                }
-                finally
-                {
-                    mutex.ReleaseMutex();
-                }
-            }
-
+        {
+            _mutex = new Mutex(true, @"Global\" + _instanceKey, out var isFirstInstance);
+            Console.WriteLine("Is first instance: " + isFirstInstance);
             var curDir = Directory.GetCurrentDirectory();           
             Directory.SetCurrentDirectory(_workingDir);           
             try
@@ -88,14 +62,7 @@
 
                 RegisterShutdownEvent();
 
-                var programToLoad = _path;
-                if (ModuleAliases.TryGetValue(programToLoad, out var alias))
-                {
-                    programToLoad = Path.Combine(
-                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                        alias);
-                }
-                var assembly = Assembly.LoadFrom(programToLoad);
+                var assembly = Assembly.LoadFrom(_path);
                 var attribute =
                     (EntryPointAttribute) assembly.GetCustomAttributes(typeof(EntryPointAttribute)).SingleOrDefault();
                 var programType = attribute != null
@@ -196,5 +163,10 @@
             }
         }
 
+        public void Dispose()
+        {
+            _loggingInitializer?.Dispose();
+            _mutex?.Dispose();
+        }
     }
 }

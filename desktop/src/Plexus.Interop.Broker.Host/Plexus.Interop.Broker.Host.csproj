@@ -33,6 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="0.1.0-e171010-1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Plexus.Host.Contracts\Plexus.Host.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />

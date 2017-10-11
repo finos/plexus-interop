@@ -18,7 +18,7 @@ namespace Plexus.Interop.Broker.Host
 {
     using Plexus.Host;
     using System;
-    using System.IO;
+    using System.CommandLine;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -31,9 +31,21 @@ namespace Plexus.Interop.Broker.Host
 
         public async Task<int> RunAsync(string[] args)
         {
+            var command = BrokerCliCommand.Start;
+            var metadataDir = "metadata";            
+            ArgumentSyntax.Parse(args, syntax =>
+            {
+                syntax.ApplicationName = "plexus";
+                syntax.ErrorOnUnexpectedArguments = true;
+                syntax.HandleHelp = false;
+                syntax.HandleErrors = false;
+                syntax.HandleResponseFiles = false;
+
+                syntax.DefineCommand("start", ref command, BrokerCliCommand.Start, "Start broker");
+                syntax.DefineOption("m|metadata", ref metadataDir, false, "Metadata directory");
+            });
             try
             {
-                var metadataDir = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
                 _brokerRunner = new BrokerRunner(metadataDir);
                 if (_stoped == 1)
                 {
