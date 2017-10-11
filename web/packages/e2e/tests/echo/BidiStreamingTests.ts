@@ -19,7 +19,7 @@ import { ClientsSetup } from "../common/ClientsSetup";
 import { BaseEchoTest } from "./BaseEchoTest";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientStreamingHandler } from "./ClientStreamingHandler";
-import { StreamingInvocationClient } from "@plexus-interop/client";
+import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
 import { EchoClientClient } from "../../src/echo/client/EchoClientGeneratedClient";
 import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
 
@@ -37,7 +37,7 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
         let serverReceivedError = false;
         let clientReceivedError = false;
         return new Promise<void>((resolve, reject) => {
-            const serverHandler = new ClientStreamingHandler((hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
+            const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
                     next: (clientRequest) => reject("Not expected"),
                     complete: () => reject("Complete not expected"),
@@ -83,7 +83,7 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
         let client: EchoClientClient | null = null;
         let server: EchoServerClient | null = null;
         return new Promise<void>((resolve, reject) => {
-            const serverHandler = new ClientStreamingHandler((hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
+            const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
                     next: async (clientRequest) => {
                         if (clientRequest.stringField === "Hey") {

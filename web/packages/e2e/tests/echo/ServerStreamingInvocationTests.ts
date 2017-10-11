@@ -33,8 +33,9 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
     public testServerSendsStreamToClient(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>(async (resolve, reject) => {
-            const handler = new ServerStreamingHandler(async (request, hostClient) => {
+            const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
                 try {
+                    this.verifyInvocationContext(context);
                     await this.assertEqual(request, echoRequest);
                     hostClient.next(echoRequest);
                     hostClient.next(echoRequest);
@@ -69,7 +70,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
     public testServerSendsStreamWithErrorToClient(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>(async (resolve, reject) => {
-            const handler = new ServerStreamingHandler(async (request, hostClient) => {
+            const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
                 try {
                     await this.assertEqual(request, echoRequest);
                     hostClient.next(echoRequest);
@@ -105,7 +106,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
     public testServerSendsFewStreamsInParrallelToClient(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>(async (resolve, reject) => {
-            const handler = new ServerStreamingHandler(async (request, hostClient) => {
+            const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
                 try {
                     await this.assertEqual(request, echoRequest);
                     hostClient.next(echoRequest);
@@ -160,7 +161,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
     public testServerSendsStreamWithCancelToClient(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>(async (resolve, reject) => {
-            const handler = new ServerStreamingHandler(async (request, hostClient) => {
+            const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
                 try {
                     await this.assertEqual(request, echoRequest);
                     await hostClient.next(echoRequest);

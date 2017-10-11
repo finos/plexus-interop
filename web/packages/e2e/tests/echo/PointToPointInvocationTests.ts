@@ -21,6 +21,7 @@ import { BaseEchoTest } from "./BaseEchoTest";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientError } from "@plexus-interop/protocol";
 import { expect } from "chai";
+import { MethodInvocationContext } from "@plexus-interop/client";
 
 export class PointToPointInvocationTests extends BaseEchoTest {
 
@@ -37,8 +38,9 @@ export class PointToPointInvocationTests extends BaseEchoTest {
 
     private testMessageSentInternal(echoRequest: plexus.plexus.interop.testing.IEchoRequest): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            const handler = new UnaryServiceHandler(async (request) => {
+            const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => {
                 try {
+                    this.verifyInvocationContext(context);
                     this.assertEqual(request, echoRequest);
                 } catch (error) {
                     console.error("Failed", error);
@@ -84,7 +86,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
     private testHostsExecutionErrorReceivedInternal(errorObj: any, errorText: string): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>((resolve, reject) => {
-            const handler = new UnaryServiceHandler((request) => Promise.reject(errorObj));
+            const handler = new UnaryServiceHandler((context: MethodInvocationContext, request) => Promise.reject(errorObj));
             this.clientsSetup.createEchoClients(this.connectionProvider, handler)
                 .then(clients => {
                     return clients[0].getEchoServiceProxy()
@@ -106,7 +108,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
     public testFewMessagesSent(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>((resolve, reject) => {
-            const handler = new UnaryServiceHandler(async (request) => request);
+            const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => request);
             return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
                 .then(clients => {
                     console.log("Clients connected, sending multiple messages");

@@ -34,7 +34,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
     public testAllInvocationClientsReceiveErrorOnClientDisconnect(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>(async (resolve, reject) => {
-            const handler = new ServerStreamingHandler(async (request, hostClient) => {
+            const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
                 try {
                     await this.assertEqual(request, echoRequest);
                     hostClient.next(echoRequest);

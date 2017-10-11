@@ -25,7 +25,6 @@ import { UnaryServiceHandler } from "./UnaryServiceHandler";
 
 export class DiscoveryTests extends BaseEchoTest {
 
-
     public constructor(
         private connectionProvider: ConnectionProvider,
         private clientsSetup: ClientsSetup = new ClientsSetup()) {
@@ -58,7 +57,7 @@ export class DiscoveryTests extends BaseEchoTest {
     public testClientCanInvokeDiscoveredMethod(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const echoRequest = this.clientsSetup.createRequestDto();
-            const handler = new UnaryServiceHandler(async (request) => request);
+            const handler = new UnaryServiceHandler(async (context, request) => request);
             return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
                 .then(clients => {
                     const client = clients[0];
