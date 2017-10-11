@@ -1,3 +1,4 @@
+import { ReadOnlyCancellationToken } from "./ReadOnlyCancellationToken";
 /**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -14,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export class CancellationToken {
+export class CancellationToken implements ReadOnlyCancellationToken {
 
     private cancelled: boolean = false;
     private reason: string = "Not defined";

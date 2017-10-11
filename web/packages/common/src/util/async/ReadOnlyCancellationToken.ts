@@ -1,5 +1,4 @@
-/**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+/* Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./CancellationToken";
-export * from "./ReadOnlyCancellationToken";
-export * from "./AsyncHelper";
+export abstract class ReadOnlyCancellationToken {
+
+    public abstract isCancelled(): boolean;
+
+}

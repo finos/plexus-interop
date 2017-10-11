@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { RemoteInvocationInfo } from "./api/dto/RemoteInvocationInfo";
-import { clientProtocol as plexus, ClientError } from "@plexus-interop/protocol";
+import { ClientError } from "@plexus-interop/protocol";
 import { InvocationRequestInfo } from "./generic/InvocationMetaInfo";
 import { isString } from "@plexus-interop/common";
 import { ProvidedMethodReference } from "./api/dto/ProvidedMethodReference";

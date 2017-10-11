@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 import { StreamingInvocationClient } from "./StreamingInvocationClient";
+import { MethodInvocationContext } from "../MethodInvocationContext";
 
 export interface ServerStreamingInvocationHandler<Req, Res> {
 
     methodId: string;
 
-    handle(requestPayload: Req, invocationHostClient: StreamingInvocationClient<Res>): void;
+    handle(invocationContext: MethodInvocationContext, requestPayload: Req, invocationHostClient: StreamingInvocationClient<Res>): void;
 
 }

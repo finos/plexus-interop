@@ -16,3 +16,4 @@
  */
 export * from "./client";
 export {UniqueId as UniqueId} from "@plexus-interop/transport-common";
+export {ReadOnlyCancellationToken as ReadOnlyCancellationToken} from "@plexus-interop/common";

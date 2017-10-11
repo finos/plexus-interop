@@ -20,6 +20,7 @@ import { BidiStreamingInvocationHandler } from "./BidiStreamingInvocationHandler
 import { StreamingInvocationClient } from "./StreamingInvocationClient";
 import { ClientDtoUtils } from "../../ClientDtoUtils";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { MethodInvocationContext } from "../MethodInvocationContext";
 
 export class ServerStreamingConverter implements InvocationHandlerConverter<ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>> {
 
@@ -28,11 +29,11 @@ export class ServerStreamingConverter implements InvocationHandlerConverter<Serv
     public convert(baseHandler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
         return {
             methodId: baseHandler.methodId,
-            handle: (invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
+            handle: (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                 return {
                     next: (request) => {
                         try {
-                            baseHandler.handle(request, invocationHostClient);
+                            baseHandler.handle(invocationContext, request, invocationHostClient);
                         } catch (executionError) {
                             this.log.error("Execution error", executionError);
                             invocationHostClient.error(ClientDtoUtils.toError(executionError));
