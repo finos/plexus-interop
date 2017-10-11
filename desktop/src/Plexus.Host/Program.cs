@@ -56,7 +56,7 @@ namespace Plexus.Host
                     syntax.ApplicationName = "plexus";
                     syntax.ErrorOnUnexpectedArguments = false;
                     syntax.HandleHelp = true;
-                    syntax.HandleErrors = false;
+                    syntax.HandleErrors = true;
                     syntax.HandleResponseFiles = true;
 
                     syntax.DefineCommand("start", ref command, CliCommand.Start, "Start interop broker and/or application(s)");
