@@ -46,6 +46,7 @@
             _log.Debug("Starting");
             _settingsWriter.Write("address", _pipeName);
             _settingsWriter.SignalInitialized();
+            _log.Info("Pipe server started: {0}", _pipeName);
             return TaskConstants.Completed;
         }
 

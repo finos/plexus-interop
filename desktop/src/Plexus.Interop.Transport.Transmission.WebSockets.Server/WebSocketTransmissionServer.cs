@@ -154,7 +154,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
                 var feature = _host.ServerFeatures.Get<IServerAddressesFeature>();
                 var url = feature.Addresses.First();                
                 _stateWriter.Write("address", url.Replace("http://", "ws://"));
-                Log.Info("Listening started on url {0}", url);
+                Log.Info("Websocket server started: {0}", url);
                 _stateWriter.SignalInitialized();                
                 _startCompletion.TryComplete();
             }
@@ -182,7 +182,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
                         s.AddSingleton<IWebSocketHandler>(this);
                     })
                     .Build();
-                Log.Info("Starting server host on url {0}", url);
+                Log.Debug("Starting server host: {0}", url);
                 await _host.RunAsync(_cancellation.Token).ConfigureAwait(false);
                 Log.Info("Web server host stopped");
             }
