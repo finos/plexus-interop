@@ -160,6 +160,10 @@ export class FramedTransportChannel implements TransportChannel {
         if (this.isSuccessCompletion(this.remoteCompletion)) {
             channelObserver.complete();
         } else {
+            // remote error received, close with error if not yet and report to observer
+            if (this.stateMachine.isOneOf(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED)) {
+                await this.close(new ErrorCompletion(new ClientError(`Remote completed with status ${this.remoteCompletion.status}`)));
+            }
             channelObserver.error(this.remoteCompletion.error || new ClientError(`Remote completed with status ${this.remoteCompletion.status}`));
         }
     }

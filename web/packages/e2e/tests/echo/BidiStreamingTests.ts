@@ -34,16 +34,22 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
     public testClientCanCancelInvocation(): Promise<void> {
         let client: EchoClientClient | null = null;
         let server: EchoServerClient | null = null;
+        let serverReceivedError = false;
+        let clientReceivedError = false;
         return new Promise<void>((resolve, reject) => {
             const serverHandler = new ClientStreamingHandler((hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
                     next: (clientRequest) => reject("Not expected"),
                     complete: () => reject("Complete not expected"),
                     error: async (e) => {
+                        debugger;
                         console.log("Error received by server", e);
-                        this.verifyServerChannelsCleared(this.clientsSetup);
-                        await this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
-                        resolve(e);
+                        this.verifyServerChannelsCleared(this.clientsSetup).catch(e => reject(e));
+                        serverReceivedError = true;
+                        if (clientReceivedError) {
+                            this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient)
+                                .then(() => resolve());
+                        }
                     }
                 }
             });
@@ -52,14 +58,22 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                     [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
                     const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
                         next: (serverResponse) => {
-                            reject("Not expected");
+                            reject("Not expected to receive message");
                         },
-                        error: (e) => reject("Not expected to fail by client"),
-                        complete: () => console.log("Remote completed")
+                        error: (e) => {
+                            debugger;
+                            console.log(JSON.stringify(e));
+                            this.verifyClientChannelsCleared(this.clientsSetup).catch(e => reject(e));
+                            clientReceivedError = true;                            
+                            if (serverReceivedError) {
+                                this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient)
+                                    .then(() => resolve());
+                            }
+                        },
+                        complete: () =>  reject("Not expected to complete successfuly")
                     });
                     await streamingClient.cancel();
                     console.log("Client cancelled");
-                    this.verifyClientChannelsCleared(this.clientsSetup);
                 })();
             } catch (error) {
                 reject(error);
@@ -79,7 +93,8 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                         } else if (clientRequest.stringField === "Ping") {
                             hostClient.next(this.clientsSetup.createSimpleRequestDto("Pong"));
                             await hostClient.complete();
-                            this.verifyServerChannelsCleared(this.clientsSetup);
+                            this.verifyServerChannelsCleared(this.clientsSetup)
+                                .catch(e => reject(e));
                         }
                     },
                     complete: () => { },
@@ -97,7 +112,8 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Ping"));
                         } else if (serverResponse.stringField === "Pong") {
                             streamingClient.complete().then(() => {
-                                this.verifyClientChannelsCleared(this.clientsSetup);
+                                this.verifyClientChannelsCleared(this.clientsSetup)
+                                    .catch(e => reject(e));
                                 return this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
                             })
                             .then(() => resolve())
