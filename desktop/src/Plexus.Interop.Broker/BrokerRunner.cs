@@ -37,65 +37,46 @@ namespace Plexus.Interop.Broker
         private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider = new ProtobufProtocolSerializerFactory();
 
         private readonly string _workingDir;
-        private readonly Semaphore _instanceSemaphore;
         private readonly CompositeTransportServer _transportServer;
-        private readonly IRegistryProvider _registryProvider;
-        private readonly IAppLifecycleManager _appLifecycleManager;
+        private readonly BrokerProcessor _brokerProcessor;
 
         public BrokerRunner(string metadataDir = null, IRegistryProvider registryProvider = null)
         {
             _workingDir = Path.GetFullPath(Directory.GetCurrentDirectory());
             metadataDir = metadataDir ?? _workingDir;
-            _registryProvider = registryProvider ?? (IRegistryProvider)JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
-            _instanceSemaphore = new Semaphore(1, 1, $"Global{Path.DirectorySeparatorChar}plexus-interop-broker-semaphore-{_workingDir.Replace(Path.DirectorySeparatorChar, ':')}");
+            registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
             _transportServer = new CompositeTransportServer(new[] { CreateNamedPipeServer(), CreateWebSocketServer() });
-            _appLifecycleManager = new AppLifecycleManager(metadataDir, _workingDir);
+            _brokerProcessor = new BrokerProcessor(
+                _transportServer,
+                registryProvider,
+                DefaultProtocolSerializationProvider,
+                new AppLifecycleManager(metadataDir, _workingDir));
+        }
+
+        public async Task LaunchAppAsync(string appId)
+        {
+            await _brokerProcessor.LaunchAppAsync(appId).ConfigureAwait(false);
         }
 
         protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
         {
-            Log.Debug("Trying to accure instance semaphore");
-            if (!_instanceSemaphore.WaitOne(0))
+            stopCancellationToken.ThrowIfCancellationRequested();
+            Log.Info("Starting broker in directory {0}", _workingDir);
+            using (stopCancellationToken.Register(OnStop))
             {
-                throw new BrokerIsAlreadyRunningException(_workingDir);
+                await _transportServer.StartAsync().ConfigureAwait(false);
+                await _brokerProcessor.StartAsync().ConfigureAwait(false);
+                Log.Info("Broker started in directory {0}", _workingDir);
             }
-            try
-            {
-                stopCancellationToken.ThrowIfCancellationRequested();
-                Log.Info("Starting broker in directory {0}", _workingDir);
-                BrokerProcessor brokerProcess;
-                using (stopCancellationToken.Register(OnStop))
+            return TaskRunner.RunInBackground(
+                async () =>
                 {
-                    await _transportServer.StartAsync().ConfigureAwait(false);
-                    brokerProcess = new BrokerProcessor(
-                        _transportServer,
-                        _registryProvider,
-                        DefaultProtocolSerializationProvider,
-                        _appLifecycleManager);
-                    Log.Info("Broker started in directory {0}", _workingDir);
-                }
-                return TaskRunner.RunInBackground(
-                    async () =>
+                    using (stopCancellationToken.Register(OnStop))
                     {
-                        try
-                        {
-                            using (stopCancellationToken.Register(OnStop))
-                            {
-                                await brokerProcess.Completion.ConfigureAwait(false);
-                            }
-                        }
-                        finally
-                        {
-                            _instanceSemaphore.Release();
-                        }
-                    },
-                    stopCancellationToken);
-            }
-            catch
-            {
-                _instanceSemaphore.Release();
-                throw;
-            }
+                        await _brokerProcessor.Completion.ConfigureAwait(false);
+                    }
+                },
+                stopCancellationToken);
         }
 
         private void OnStop()

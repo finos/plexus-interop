@@ -2,7 +2,6 @@
 {
     internal enum BrokerCliCommand
     {
-        Start,
-        Launch
+        Start
     }
 }

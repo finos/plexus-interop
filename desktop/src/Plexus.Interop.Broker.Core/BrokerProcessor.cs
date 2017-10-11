@@ -25,9 +25,10 @@ namespace Plexus.Interop.Broker
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class BrokerProcessor
+    public sealed class BrokerProcessor : StartableBase
     {
         private static readonly ILogger Log = LogManager.GetLogger<BrokerProcessor>();
 
@@ -40,6 +41,7 @@ namespace Plexus.Interop.Broker
         private readonly IAuthenticationHandler _authenticationHandler;
         private readonly IClientRequestHandler _clientRequestHandler;
         private readonly IAppLifecycleManager _appLifecycleManager;
+        private readonly IClientConnectionTracker _connectionTracker;
 
         public BrokerProcessor(
             IReadableChannel<ITransportConnection> incomingConnections,
@@ -51,19 +53,27 @@ namespace Plexus.Interop.Broker
             var registryService = new RegistryService(registryProvider);
             var protocol = new ProtocolImplementation(DefaultProtocolMessageFactory, serializerFactory);
             _appLifecycleManager =  appLifecycleManager ?? new NoopAppLifecycleManager();
-            var connectionTracker = new ClientConnectionTracker(_appLifecycleManager);
-            _authenticationHandler = new AuthenticationHandler(connectionTracker, protocol, registryService);
-            _clientRequestHandler = new ClientRequestHandler(connectionTracker, protocol, registryService);
-            Completion = TaskRunner.RunInBackground(ProcessAsync);
+            _connectionTracker = new ClientConnectionTracker(_appLifecycleManager);
+            _authenticationHandler = new AuthenticationHandler(_connectionTracker, protocol, registryService);
+            _clientRequestHandler = new ClientRequestHandler(_connectionTracker, protocol, registryService);
         }
 
-        public Task Completion { get; }
+        protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
+        {
+            var processTask = ProcessAsync();
+            await _appLifecycleManager.StartAsync().ConfigureAwait(false);
+            return processTask;
+        }
+
+        public async Task LaunchAppAsync(string appId)
+        {            
+            await _connectionTracker.SpawnConnectionAsync(appId).ConfigureAwait(false);
+        }
 
         private async Task ProcessAsync()
         {
             try
             {
-                TaskRunner.RunInBackground(() => _appLifecycleManager.StartAsync()).IgnoreAwait(Log, "Exception on app lifecycle manager initialization");
                 while (true)
                 {
                     var transportConnectionResult = await _incomingConnections.TryReadAsync().ConfigureAwait(false);

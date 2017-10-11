@@ -22,7 +22,7 @@
     {
         Task<Task> StartAsync(string[] args);
 
-        Task HandleOtherInstanceRequestAsync(string[] args);
+        Task HandleCommandAsync(string[] args);
 
         Task ShutdownAsync();
     }

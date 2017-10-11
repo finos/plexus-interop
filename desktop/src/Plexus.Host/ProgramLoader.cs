@@ -45,6 +45,7 @@
 
         public async Task<int> LoadAndRunAsync()
         {
+            _log.Info("Loading {0} {1}", _path, string.Join(" ", _args));
             var cancellation = new CancellationTokenSource();
             InstancePerDirectoryLock instancePerDirectoryLock = null;
             var curDir = Directory.GetCurrentDirectory();
@@ -91,7 +92,7 @@
                             await namedPipeClient.WriteAsync(bytes, 0, bytes.Length, cancellation.Token).ConfigureAwait(false);
                             await namedPipeClient.FlushAsync(cancellation.Token).ConfigureAwait(false);
                             namedPipeClient.Close();
-                            _log.Info("Forwared args to the already running instance: {0}", string.Join(", ", _args));
+                            _log.Info("Forwarding args to the already running instance: {0}", string.Join(" ", _args));
                         }
                         return 0;
                     }
@@ -158,7 +159,7 @@
                     {
                         if (!cancellationToken.IsCancellationRequested)
                         {
-                            await program.HandleOtherInstanceRequestAsync(args).ConfigureAwait(false);
+                            await program.HandleCommandAsync(args).ConfigureAwait(false);
                         }
                     }
                     catch (Exception ex)

@@ -82,7 +82,7 @@
             }
         }
 
-        private async Task<IClientConnection> SpawnConnectionAsync(string appId)
+        public async Task<IClientConnection> SpawnConnectionAsync(string appId)
         {
             var appInstanceId = await _appLauncher.LaunchAsync(appId).ConfigureAwait(false);
             Promise<IClientConnection> connectionPromise;

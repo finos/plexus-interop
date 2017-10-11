@@ -45,8 +45,8 @@ namespace Plexus.Host
             var workingDir = Directory.GetCurrentDirectory();
             var metadataDir = "metadata";
             string pluginPath = null;
-            IReadOnlyList<string> pluginArgs = null;
-            string appId = null;
+            IReadOnlyList<string> pluginArgs = new string[0];
+            IReadOnlyList<string> appIds = new string[0];
             string pid = null;
             var result = ArgumentSyntax.Parse(args, syntax =>
             {
@@ -56,7 +56,7 @@ namespace Plexus.Host
                 syntax.HandleErrors = true;
                 syntax.HandleResponseFiles = true;
 
-                syntax.DefineCommand("broker", ref command, CliCommand.Broker, "Start interop broker");
+                syntax.DefineCommand("start", ref command, CliCommand.Start, "Start interop broker and/or application(s)");
                 syntax.DefineOption(
                     "c|console",
                     ref console,
@@ -73,18 +73,10 @@ namespace Plexus.Host
                     ref metadataDir,
                     false,
                     "Directory to seek for metadata files: apps.json and interop.json");
-
-                syntax.DefineCommand("launch", ref command, CliCommand.Launch, "Send command to launch app");
-                syntax.DefineOption(
-                    "d|directory",
-                    ref workingDir,
-                    false,
-                    "Broker working directory");
-                syntax.DefineOption(
+                syntax.DefineOptionList(
                     "a|application",
-                    ref appId,
-                    true,
-                    "ID of application to launch. ID must present in apps.json.");
+                    ref appIds, 
+                    "Optional list of applications to start");
 
                 var loadCommand = syntax.DefineCommand("load", ref command, CliCommand.Load, "Load plugin dll");
                 loadCommand.IsHidden = true;
@@ -112,17 +104,10 @@ namespace Plexus.Host
                     case CliCommand.None:
                         result.ReportError("<command> required");
                         return 1;
-                    case CliCommand.Broker:
-                        return await StartBrokerAsync(workingDir, metadataDir, console).ConfigureAwait(false);
+                    case CliCommand.Start:
+                        return await StartBrokerAsync(workingDir, metadataDir, console, appIds).ConfigureAwait(false);
                     case CliCommand.Stop:
                         return await StopProcess(pid).ConfigureAwait(false);
-                    case CliCommand.Launch:
-                        if (string.IsNullOrEmpty(appId))
-                        {
-                            result.ReportError("<application> option required");
-                            return 1;
-                        }
-                        break;
                     case CliCommand.Load:
                         if (string.IsNullOrEmpty(pluginPath))
                         {
@@ -139,8 +124,6 @@ namespace Plexus.Host
                 Console.WriteLine("Unhandled exception: " + ex);
                 return 1;
             }
-
-            return 0;
         }
 
         private static async Task<int> LoadAndRunProgramAsync(
@@ -154,7 +137,7 @@ namespace Plexus.Host
             }
         }
 
-        private async Task<int> StartBrokerAsync(string workingDir, string metadataDir, TargetConsole targetConsole)
+        private async Task<int> StartBrokerAsync(string workingDir, string metadataDir, TargetConsole targetConsole, IEnumerable<string> appIds)
         {
             var fullMetadataDir = Path.GetFullPath(metadataDir);
             switch (targetConsole)
@@ -163,7 +146,13 @@ namespace Plexus.Host
                     var brokerPluginPath = Path.Combine(
                         Path.GetDirectoryName(typeof(Program).Assembly.Location),
                         "Plexus.Interop.Broker.Host.dll");
-                    return await LoadAndRunProgramAsync(brokerPluginPath, new[] { "start", "-m", fullMetadataDir }, workingDir).ConfigureAwait(false);
+                    var brokerArgs = new List<string> {"start", "-m", fullMetadataDir};
+                    foreach (var appId in appIds)
+                    {
+                        brokerArgs.Add("-a");
+                        brokerArgs.Add(appId);
+                    }
+                    return await LoadAndRunProgramAsync(brokerPluginPath, brokerArgs, workingDir).ConfigureAwait(false);
                 case TargetConsole.New:
                     StartPlexusProcess(new[] { "broker", "-m", fullMetadataDir }, workingDir, true);
                     return 0;

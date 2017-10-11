@@ -18,7 +18,6 @@ namespace Plexus.Interop.Broker.Host
 {
     using Plexus.Host;
     using System;
-    using System.CommandLine;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -31,28 +30,17 @@ namespace Plexus.Interop.Broker.Host
 
         public async Task<Task> StartAsync(string[] args)
         {
-            var command = BrokerCliCommand.Start;
-            var metadataDir = "metadata";            
-            ArgumentSyntax.Parse(args, syntax =>
-            {
-                syntax.ApplicationName = "plexus";
-                syntax.ErrorOnUnexpectedArguments = true;
-                syntax.HandleHelp = false;
-                syntax.HandleErrors = false;
-                syntax.HandleResponseFiles = false;
-
-                syntax.DefineCommand("start", ref command, BrokerCliCommand.Start, "Start broker");
-                syntax.DefineOption("m|metadata", ref metadataDir, false, "Metadata directory");
-            });
+            var brokerArgs = BrokerArguments.Parse(args);
             try
             {
-                _brokerRunner = new BrokerRunner(metadataDir);
+                _brokerRunner = new BrokerRunner(brokerArgs.MetadataDir);
                 if (_stoped == 1)
                 {
                     return Task.FromResult(0);
                 }
                 await _brokerRunner.StartAsync().ConfigureAwait(false);
                 Log.Debug("Broker process started");
+                HandleCommand(brokerArgs);
                 return _brokerRunner.Completion;
             }
             catch (Exception ex)
@@ -62,9 +50,10 @@ namespace Plexus.Interop.Broker.Host
             }
         }
 
-        public async Task HandleOtherInstanceRequestAsync(string[] args)
+        public Task HandleCommandAsync(string[] args)
         {
-            Log.Info("Another instance started: {0}", string.Join(" ", args));
+            HandleCommand(BrokerArguments.Parse(args));
+            return TaskConstants.Completed;
         }
 
         public async Task ShutdownAsync()
@@ -74,6 +63,18 @@ namespace Plexus.Interop.Broker.Host
             {
                 await _brokerRunner.StopAsync().ConfigureAwait(false);
             }
+        }
+
+        private void HandleCommand(BrokerArguments brokerArgs)
+        {
+            TaskRunner.RunInBackground(() =>
+            {
+                foreach (var appId in brokerArgs.ApplicationIds)
+                {
+                    Log.Info("Launching app {0}", appId);
+                    _brokerRunner.LaunchAppAsync(appId).IgnoreAwait(Log, "Exception while launching app {0}", appId);
+                }
+            }).IgnoreAwait(Log, "Exception while handling command");
         }
     }
 }
