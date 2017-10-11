@@ -23,23 +23,23 @@ export class LoggerBase implements Logger {
     constructor(public name: string = "Anonymous") { }
 
     public debug(msg: string, ...args: any[]): void {
-        log.debug(`${this.name}: ${msg}`, args);
+        log.debug(`${this.name} ${msg}`, args);
     }
 
     public info(msg: string, ...args: any[]): void {
-        log.info(`${this.name}: ${msg}`, args);
+        log.info(`${this.name} ${msg}`, args);
     }
 
     public error(msg: string, ...args: any[]): void {
-        log.error(`${this.name}: ${msg}`, args);
+        log.error(`${this.name} ${msg}`, args);
     }
 
     public warn(msg: string, ...args: any[]): void {
-        log.warn(`${this.name}: ${msg}`, args);
+        log.warn(`${this.name} ${msg}`, args);
     }
 
     public trace(msg: string, ...args: any[]): void {
         // TODO switch to other Logger implementation and switch to trace
-        log.debug(`[TRACE] ${this.name}: ${msg}`, args);
+        log.debug(`${this.name} ${msg}`, args);
     }
 }

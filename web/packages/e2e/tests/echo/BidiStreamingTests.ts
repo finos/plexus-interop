@@ -42,7 +42,6 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                     next: (clientRequest) => reject("Not expected"),
                     complete: () => reject("Complete not expected"),
                     error: async (e) => {
-                        debugger;
                         console.log("Error received by server", e);
                         this.verifyServerChannelsCleared(this.clientsSetup).catch(e => reject(e));
                         serverReceivedError = true;
@@ -61,7 +60,6 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                             reject("Not expected to receive message");
                         },
                         error: (e) => {
-                            debugger;
                             console.log(JSON.stringify(e));
                             this.verifyClientChannelsCleared(this.clientsSetup).catch(e => reject(e));
                             clientReceivedError = true;                            

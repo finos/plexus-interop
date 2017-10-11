@@ -17,6 +17,7 @@
 import * as log from "loglevel";
 import {Logger} from "./Logger";
 import {LoggerBase} from "./LoggerBase";
+const logPrefixer: any = require("loglevel-plugin-prefix");
 
 export enum LogLevel {
   TRACE,
@@ -37,10 +38,13 @@ export class LoggerFactory {
       log.setLevel(level as any);
     }
 
-    public static getLogLevel(): string {
-      return log.getLevel().toString();
-    }
-
 }
+
+logPrefixer.apply(log, {
+  template: "%t | [%l] ",
+  timestampFormatter: function (date: Date) {
+    return `${date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, '$1')}.${('000' + date.getMilliseconds()).slice(-3)}`;
+  }
+});
 
 LoggerFactory.setLogLevel(LogLevel.INFO);

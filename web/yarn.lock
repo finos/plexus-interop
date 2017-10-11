@@ -3598,6 +3598,10 @@ log4js@^0.6.31:
     readable-stream "~1.0.2"
     semver "~4.3.3"
 
+loglevel-plugin-prefix@^0.5.3:
+  version "0.5.3"
+  resolved "http://coaapp01.uk.db.com:4873/loglevel-plugin-prefix/-/loglevel-plugin-prefix-0.5.3.tgz#8e9131b96e4697a0dba517996f76b9e6c3f43210"
+
 loglevel@^1.4.1:
   version "1.5.0"
   resolved "http://coaapp01.uk.db.com:4873/loglevel/-/loglevel-1.5.0.tgz#3863984a2c326b986fbb965f378758a6dc8a4324"

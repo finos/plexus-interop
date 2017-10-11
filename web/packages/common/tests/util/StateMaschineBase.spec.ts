@@ -83,7 +83,6 @@ describe("StateMaschineBase", () => {
         ]);
         sut.go(State.CLOSED, {
             postHandler: async () => {
-                debugger;
                 expect(sut.getCurrent()).toBe(State.CLOSED);
                 called++;
             }
