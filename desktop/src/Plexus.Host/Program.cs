@@ -48,57 +48,58 @@ namespace Plexus.Host
             IReadOnlyList<string> pluginArgs = new string[0];
             IReadOnlyList<string> appIds = new string[0];
             string pid = null;
-            var result = ArgumentSyntax.Parse(args, syntax =>
-            {
-                syntax.ApplicationName = "plexus";
-                syntax.ErrorOnUnexpectedArguments = false;
-                syntax.HandleHelp = true;
-                syntax.HandleErrors = true;
-                syntax.HandleResponseFiles = true;
-
-                syntax.DefineCommand("start", ref command, CliCommand.Start, "Start interop broker and/or application(s)");
-                syntax.DefineOption(
-                    "c|console",
-                    ref console,
-                    x => Enum.Parse<TargetConsole>(x, ignoreCase: true),
-                    false,
-                    "Broker console mode. Possible values: \"current\" to start in the current console, \"new\" to start in new console, \"hidden\" to start as background process without visible console.");
-                syntax.DefineOption(
-                    "d|directory",
-                    ref workingDir,
-                    false,
-                    "Working directory for interop broker");
-                syntax.DefineOption(
-                    "m|metadata",
-                    ref metadataDir,
-                    false,
-                    "Directory to seek for metadata files: apps.json and interop.json");
-                syntax.DefineOptionList(
-                    "a|application",
-                    ref appIds, 
-                    "Optional list of applications to start");
-
-                var loadCommand = syntax.DefineCommand("load", ref command, CliCommand.Load, "Load plugin dll");
-                loadCommand.IsHidden = true;
-                syntax.DefineOption(
-                    "p|plugin",
-                    ref pluginPath,
-                    true,
-                    "Path to plugin");
-                syntax.DefineOption(
-                    "d|directory",
-                    ref workingDir,
-                    false,
-                    "Working directory for plugin process");
-                syntax.DefineParameterList("pluginCmd", ref pluginArgs, "Plugin arguments");
-
-                var stopCommand = syntax.DefineCommand("stop", ref command, CliCommand.Stop, "Stop currently running plexus process(es)");
-                stopCommand.IsHidden = true;
-                syntax.DefineParameter("pid", ref pid, "Process ID to stop");
-            });
 
             try
             {                
+                var result = ArgumentSyntax.Parse(args, syntax =>
+                {
+                    syntax.ApplicationName = "plexus";
+                    syntax.ErrorOnUnexpectedArguments = false;
+                    syntax.HandleHelp = true;
+                    syntax.HandleErrors = false;
+                    syntax.HandleResponseFiles = true;
+
+                    syntax.DefineCommand("start", ref command, CliCommand.Start, "Start interop broker and/or application(s)");
+                    syntax.DefineOption(
+                        "c|console",
+                        ref console,
+                        x => Enum.Parse<TargetConsole>(x, ignoreCase: true),
+                        false,
+                        "Broker console mode. Possible values: \"current\" to start in the current console, \"new\" to start in new console, \"hidden\" to start as background process without visible console.");
+                    syntax.DefineOption(
+                        "d|directory",
+                        ref workingDir,
+                        false,
+                        "Working directory for interop broker");
+                    syntax.DefineOption(
+                        "m|metadata",
+                        ref metadataDir,
+                        false,
+                        "Directory to seek for metadata files: apps.json and interop.json");
+                    syntax.DefineOptionList(
+                        "a|application",
+                        ref appIds,
+                        "Optional list of applications to start");
+
+                    var loadCommand = syntax.DefineCommand("load", ref command, CliCommand.Load, "Load plugin dll");
+                    loadCommand.IsHidden = true;
+                    syntax.DefineOption(
+                        "p|plugin",
+                        ref pluginPath,
+                        true,
+                        "Path to plugin");
+                    syntax.DefineOption(
+                        "d|directory",
+                        ref workingDir,
+                        false,
+                        "Working directory for plugin process");
+                    syntax.DefineParameterList("pluginCmd", ref pluginArgs, "Plugin arguments");
+
+                    var stopCommand = syntax.DefineCommand("stop", ref command, CliCommand.Stop, "Stop currently running plexus process(es)");
+                    stopCommand.IsHidden = true;
+                    syntax.DefineParameter("pid", ref pid, "Process ID to stop");
+                });
+
                 switch (command)
                 {
                     case CliCommand.None:
@@ -140,31 +141,31 @@ namespace Plexus.Host
         private async Task<int> StartBrokerAsync(string workingDir, string metadataDir, TargetConsole targetConsole, IEnumerable<string> appIds)
         {
             var fullMetadataDir = Path.GetFullPath(metadataDir);
+            var args = new List<string> { "start", "-m", fullMetadataDir };
+            foreach (var appId in appIds)
+            {
+                args.Add("-a");
+                args.Add(appId);
+            }
             switch (targetConsole)
             {                    
                 case TargetConsole.Current:
                     var brokerPluginPath = Path.Combine(
                         Path.GetDirectoryName(typeof(Program).Assembly.Location),
                         "Plexus.Interop.Broker.Host.dll");
-                    var brokerArgs = new List<string> {"start", "-m", fullMetadataDir};
-                    foreach (var appId in appIds)
-                    {
-                        brokerArgs.Add("-a");
-                        brokerArgs.Add(appId);
-                    }
-                    return await LoadAndRunProgramAsync(brokerPluginPath, brokerArgs, workingDir).ConfigureAwait(false);
+                    return await LoadAndRunProgramAsync(brokerPluginPath, args, workingDir).ConfigureAwait(false);
                 case TargetConsole.New:
-                    StartPlexusProcess(new[] { "broker", "-m", fullMetadataDir }, workingDir, true);
+                    StartPlexusProcess(args, workingDir, true);
                     return 0;
                 case TargetConsole.Hidden:
-                    StartPlexusProcess(new[] { "broker", "-m", fullMetadataDir }, workingDir);
+                    StartPlexusProcess(args, workingDir);
                     return 0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(targetConsole), targetConsole, null);
             }            
         }
         
-        private static void StartPlexusProcess(string[] otherArgs, string workingDirectory = null, bool openWithConsole = false)
+        private static void StartPlexusProcess(IEnumerable<string> otherArgs, string workingDirectory = null, bool openWithConsole = false)
         {
             workingDirectory = Path.GetFullPath(workingDirectory ?? Directory.GetCurrentDirectory());
             var binDir = Path.GetDirectoryName(typeof(Program).Assembly.Location);
