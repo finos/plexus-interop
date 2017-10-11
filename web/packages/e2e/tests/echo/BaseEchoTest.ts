@@ -68,7 +68,7 @@ export class BaseEchoTest {
         expect(invocationContext).to.not.be.undefined;
         expect(invocationContext.cancellationToken).to.not.be.undefined;
         expect(invocationContext.consumerConnectionId).to.not.be.undefined;
-        expect(invocationContext.consumerApplicationId).to.not.be.undefined;
+        expect(invocationContext.consumerApplicationId).to.be.eq("plexus.interop.testing.EchoClient");
     }
 
 }
