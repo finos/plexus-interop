@@ -18,12 +18,17 @@ import { expect } from "chai";
 import { ClientsSetup } from "../common/ClientsSetup";
 import { TransportsSetup } from "../common/TransportsSetup";
 import { readWsUrl } from "../common/utils";
+import { ClientConnectivityTests } from "../echo/ClientConnectivityTests";
 
 describe("Web Socket Client connectivity", () => {
 
     const clientsSetup = new ClientsSetup();
     const transportsSetup = new TransportsSetup();
     const wsUrl = readWsUrl();
+
+    const connectivityTests = new ClientConnectivityTests(
+        transportsSetup.createWebSocketTransportProvider(wsUrl), 
+        clientsSetup);
     
     it("Can receive WS URL from Broker", () => {
         expect(wsUrl).is.not.empty;
@@ -42,6 +47,10 @@ describe("Web Socket Client connectivity", () => {
                     done();
                 });
             });
+    });
+
+    it("Notifies all invocation client with error if client disconnected", function() {
+        return connectivityTests.testAllInvocationClientsReceiveErrorOnClientDisconnect();
     });
 
 });

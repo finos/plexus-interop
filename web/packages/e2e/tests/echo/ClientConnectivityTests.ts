@@ -25,6 +25,7 @@ import { ServerStreamingHandler } from "./ServerStreamingHandler";
 import { MethodInvocationContext } from "@plexus-interop/client";
 import { EchoClientClient } from "../../src/echo/client/EchoClientGeneratedClient";
 import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
+import { AsyncHelper } from "@plexus-interop/common";
 
 export class ClientConnectivityTests extends BaseEchoTest {
 
@@ -40,42 +41,47 @@ export class ClientConnectivityTests extends BaseEchoTest {
         let serverStreamingContext: MethodInvocationContext | null = null;
         let client: EchoClientClient | null = null;
         let server: EchoServerClient | null = null;
+
         return new Promise<void>(async (testResolve, testError) => {
             
             let handler: ServerStreamingHandler | null = null;
-            
+            let clientInvocationErrorReceived: Promise<void> | null = null;
+
             const serverRequestReceived = new Promise(async (serverRequestResolve) => {
                 handler = new ServerStreamingHandler(async (context, request, hostClient) => {
                     serverStreamingContext = context;
                     serverRequestResolve();
                 });
                 [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler as ServerStreamingHandler);
-                console.log("Clients created");
-            });
-
-            const serverStreamingInvocationErrorReceived = new Promise((clientErrorResolve, clientErrorReject) => {
-                (client as EchoClientClient).getEchoServiceProxy().serverStreaming(echoRequest, {
-                    next: (r) => clientErrorReject("Not expected to receive update"),
-                    complete: () => clientErrorReject("Not expected to complete"),
-                    error: (e) => {
-                        clientErrorResolve();
-                    }
+                clientInvocationErrorReceived = new Promise<void>((clientErrorResolve, clientErrorReject) => {
+                    (client as EchoClientClient).getEchoServiceProxy().serverStreaming(echoRequest, {
+                        next: (r) => {
+                            clientErrorReject("Not expected to receive update");
+                        },
+                        complete: () => {
+                            clientErrorReject("Not expected to receive complete");
+                        },
+                        error: (e) => {
+                            clientErrorResolve();
+                        }
+                    });
                 });
+                console.log("Clients created");
             });
 
             await serverRequestReceived
             console.log("Request received");
             await (client as EchoClientClient).disconnect();
             console.log("Client disconnected");            
-            await serverStreamingInvocationErrorReceived;       
-            console.log("Server error received");
-            if (!(serverStreamingContext as MethodInvocationContext)
-                    .cancellationToken
-                    .isCancelled()) {
-                testError("Server must be cancelled");
-            }
+            await clientInvocationErrorReceived;       
+            console.log("Client invocation error received");
+            
+            await AsyncHelper.waitFor(() => (serverStreamingContext as MethodInvocationContext).cancellationToken.isCancelled());
+            console.log("Server streaming cancelled");
+
             await (server as EchoServerClient).disconnect();
             console.log("Server disconnected");
+
             testResolve();
             
         });

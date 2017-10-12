@@ -17,7 +17,7 @@
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { expect } from "chai";
 import { MarshallerProvider, ProtoMarshallerProvider, MethodInvocationContext } from "@plexus-interop/client";
-import { Arrays } from "@plexus-interop/common";
+import { Arrays, LoggerFactory, LogLevel, AsyncHelper } from "@plexus-interop/common";
 import { ClientsSetup } from "../common/ClientsSetup";
 
 export class BaseEchoTest {
@@ -69,6 +69,14 @@ export class BaseEchoTest {
         expect(invocationContext.cancellationToken).to.not.be.undefined;
         expect(invocationContext.consumerConnectionId).to.not.be.undefined;
         expect(invocationContext.consumerApplicationId).to.be.eq("plexus.interop.testing.EchoClient");
+    }
+
+    public waitForClientConnectionCleared(clientsSetup: ClientsSetup): Promise<void> {
+        return AsyncHelper.waitFor(() => clientsSetup.getClientConnection().getManagedChannels().length === 0);
+    }
+
+    public waitForServerConnectionCleared(clientsSetup: ClientsSetup): Promise<void> {
+        return AsyncHelper.waitFor(() => clientsSetup.getServerConnection().getManagedChannels().length === 0);
     }
 
 }

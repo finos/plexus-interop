@@ -22,6 +22,7 @@ import { ClientStreamingHandler } from "./ClientStreamingHandler";
 import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
 import { EchoClientClient } from "../../src/echo/client/EchoClientGeneratedClient";
 import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
+import { AsyncHelper } from "@plexus-interop/common";
 
 export class BidiStreamingInvocationTests extends BaseEchoTest {
 
@@ -32,46 +33,34 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
     }
 
     public testClientCanCancelInvocation(): Promise<void> {
-        let client: EchoClientClient | null = null;
-        let server: EchoServerClient | null = null;
+       
         let serverReceivedError = false;
         let clientReceivedError = false;
+
         return new Promise<void>((resolve, reject) => {
             const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
                     next: (clientRequest) => reject("Not expected"),
                     complete: () => reject("Complete not expected"),
-                    error: async (e) => {
-                        console.log("Error received by server", e);
-                        this.verifyServerChannelsCleared(this.clientsSetup).catch(e => reject(e));
-                        serverReceivedError = true;
-                        if (clientReceivedError) {
-                            this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient)
-                                .then(() => resolve());
-                        }
-                    }
+                    error: async (e) => serverReceivedError = true
                 }
             });
             try {
                 (async () => {
-                    [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+                    const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
                     const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
-                        next: (serverResponse) => {
-                            reject("Not expected to receive message");
-                        },
-                        error: (e) => {
-                            console.log(JSON.stringify(e));
-                            this.verifyClientChannelsCleared(this.clientsSetup).catch(e => reject(e));
-                            clientReceivedError = true;                            
-                            if (serverReceivedError) {
-                                this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient)
-                                    .then(() => resolve());
-                            }
-                        },
+                        next: (serverResponse) => reject("Not expected to receive message"),
+                        error: (e) => clientReceivedError = true,
                         complete: () =>  reject("Not expected to complete successfuly")
                     });
-                    await streamingClient.cancel();
-                    console.log("Client cancelled");
+                    streamingClient.cancel();
+                    await AsyncHelper.waitFor(() => serverReceivedError === true);
+                    await AsyncHelper.waitFor(() => clientReceivedError === true);
+                    await this.waitForClientConnectionCleared(this.clientsSetup);
+                    await this.waitForServerConnectionCleared(this.clientsSetup);
+                    await this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
+                    resolve();
+
                 })();
             } catch (error) {
                 reject(error);
