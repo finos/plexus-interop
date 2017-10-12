@@ -27,7 +27,7 @@
     public abstract class TransmissionTestsSuite : TestsSuite
     {
         protected abstract ITransmissionServer CreateServer();
-        protected abstract ITransmissionConnectionFactory CreateClient();
+        protected abstract ITransmissionClient CreateClient();
 
         public static readonly IEnumerable<object[]> SendAndReceiveTestData = new object[][]
         {
@@ -84,7 +84,7 @@
             {
                 var server = RegisterDisposable(CreateServer());
                 await server.StartAsync().ConfigureAwaitWithTimeout(Timeout5Sec);
-                using (var serverConnection = RegisterDisposable(await server.CreateAsync().ConfigureAwait(false)))
+                using (var serverConnection = RegisterDisposable(await server.AcceptAsync().ConfigureAwait(false)))
                 {
                     var receiveTask = TaskRunner.RunInBackground(async () =>
                     {
@@ -125,7 +125,7 @@
             {
                 var clientFactory = CreateClient();
                 Log.Trace("Connecting client");
-                using (var client = RegisterDisposable(await clientFactory.CreateAsync().ConfigureAwait(false)))
+                using (var client = RegisterDisposable(await clientFactory.ConnectAsync().ConfigureAwait(false)))
                 {
                     var receiveTask = TaskRunner.RunInBackground(async () =>
                     {

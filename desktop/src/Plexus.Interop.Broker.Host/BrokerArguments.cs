@@ -12,7 +12,7 @@
             IReadOnlyList<string> appIds = new string[0];
             ArgumentSyntax.Parse(args, syntax =>
             {
-                syntax.ApplicationName = "plexus";
+                syntax.ApplicationName = "Plexus.Interop.Broker.Host";
                 syntax.ErrorOnUnexpectedArguments = true;
                 syntax.HandleHelp = false;
                 syntax.HandleErrors = false;

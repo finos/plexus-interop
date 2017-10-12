@@ -20,11 +20,12 @@
     using Plexus.Pools;
     using SuperSocket.ClientEngine;
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using WebSocket4Net;
 
     internal sealed class WebSocketTransmissionClientConnection : ITransmissionConnection
-    {
+    {        
         private static readonly TimeSpan CloseTimeout = TimeSpan.FromSeconds(3);
 
         private readonly ILogger _log;
@@ -32,12 +33,12 @@
         private readonly IChannel<IPooledBuffer> _sendQueue = new BufferedChannel<IPooledBuffer>(1);
         private readonly Promise _connectCompletion = new Promise();
         private readonly Promise _disconnectCompletion = new Promise();
-
         private readonly WebSocket _socket;
+        private readonly CancellationTokenRegistration _cancellationRegistration;
 
-        public WebSocketTransmissionClientConnection(string url)
+        public WebSocketTransmissionClientConnection(string url, CancellationToken cancellationToken)
         {
-            _log = LogManager.GetLogger<WebSocketTransmissionClientConnection>(Id.ToString());
+            _log = LogManager.GetLogger<WebSocketTransmissionClientConnection>(Id.ToString());            
             _socket = new WebSocket(url.Replace("http://", "ws://"));
             _socket.DataReceived += OnDataReceived;
             _socket.MessageReceived += OnMessageReceived;
@@ -45,6 +46,7 @@
             _socket.Error += OnError;
             _socket.Opened += OnOpened;
             _log.Trace("Created");
+            _cancellationRegistration = cancellationToken.Register(() => _socket.Dispose());
             Completion = TaskRunner.RunInBackground(ProcessAsync);
             Completion.PropagateCompletionToPromise(_connectCompletion);
         }
@@ -62,6 +64,7 @@
         public void Dispose()
         {
             _log.Trace("Disposing");
+            _cancellationRegistration.Dispose();
             _socket.Dispose();
         }
 
@@ -78,7 +81,7 @@
                         _receiveQueue.In.Completion)
                     .ConfigureAwait(false);
                 _log.Trace("Waiting for socket close from server");
-                var completedTask = await Task.WhenAny(Task.Delay(CloseTimeout), _disconnectCompletion.Task).ConfigureAwait(false);
+                var completedTask = await Task.WhenAny(Task.Delay(CloseTimeout, CancellationToken.None), _disconnectCompletion.Task).ConfigureAwait(false);
                 if (completedTask != _disconnectCompletion.Task)
                 {
                     _log.Trace("Closing socket forcibly after {0} sec timeout", CloseTimeout.TotalSeconds);

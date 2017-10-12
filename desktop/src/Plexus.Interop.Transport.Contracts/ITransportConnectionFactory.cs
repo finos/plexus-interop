@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading;
-using System.Threading.Tasks;
-
 namespace Plexus.Interop.Transport
 {
+    using System.Threading.Tasks;
+
     public interface ITransportConnectionFactory
     {
-        ValueTask<ITransportConnection> CreateAsync(CancellationToken cancellationToken = default(CancellationToken));
+        ValueTask<Maybe<ITransportConnection>> TryCreateAsync();
     }
 }

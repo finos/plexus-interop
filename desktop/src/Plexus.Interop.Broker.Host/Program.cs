@@ -40,7 +40,6 @@ namespace Plexus.Interop.Broker.Host
                 }
                 await _brokerRunner.StartAsync().ConfigureAwait(false);
                 Log.Debug("Broker process started");
-                HandleCommand(brokerArgs);
                 return _brokerRunner.Completion;
             }
             catch (Exception ex)
@@ -50,12 +49,6 @@ namespace Plexus.Interop.Broker.Host
             }
         }
 
-        public Task HandleCommandAsync(string[] args)
-        {
-            HandleCommand(BrokerArguments.Parse(args));
-            return TaskConstants.Completed;
-        }
-
         public async Task ShutdownAsync()
         {
             Log.Debug("Shutting down");
@@ -63,18 +56,6 @@ namespace Plexus.Interop.Broker.Host
             {
                 await _brokerRunner.StopAsync().ConfigureAwait(false);
             }
-        }
-
-        private void HandleCommand(BrokerArguments brokerArgs)
-        {
-            TaskRunner.RunInBackground(() =>
-            {
-                foreach (var appId in brokerArgs.ApplicationIds)
-                {
-                    Log.Info("Launching app {0}", appId);
-                    _brokerRunner.LaunchAppAsync(appId).IgnoreAwait(Log, "Exception while launching app {0}", appId);
-                }
-            }).IgnoreAwait(Log, "Exception while handling command");
         }
     }
 }

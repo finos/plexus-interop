@@ -21,39 +21,59 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class WebSocketTransmissionClient : ITransmissionConnectionFactory
+    public sealed class WebSocketTransmissionClient : ITransmissionClient
     {
         private const string ServerName = "ws-v1";
         private static readonly TimeSpan MaxServerInitializationTime = TimeSpan.FromSeconds(20);
 
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
 
+        private readonly CancellationTokenSource _cancellation;
         private readonly IServerStateReader _serverStateReader;
 
-        public WebSocketTransmissionClient(string brokerWorkingDir)
+        public WebSocketTransmissionClient(
+            string brokerWorkingDir, 
+            CancellationToken cancellationToken = default(CancellationToken))
         {
+            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
         }
 
-        public async ValueTask<ITransmissionConnection> CreateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async ValueTask<Maybe<ITransmissionConnection>> TryConnectAsync()
         {
-            if (!await _serverStateReader.WaitInitializationAsync(MaxServerInitializationTime, cancellationToken).ConfigureAwait(false))
+            try
             {
-                throw new TimeoutException($"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
-            }
-            var url = _serverStateReader.ReadSetting("address");
-            if (string.IsNullOrEmpty(url))
-            {
-                throw new InvalidOperationException("Cannot find url to connect");
-            }
-            Log.Trace("Creating new connection to url {0}", url);
-            var connection = new WebSocketTransmissionClientConnection(url);
-            using (cancellationToken.Register(() => connection.Dispose()))
-            {
+                if (!await _serverStateReader.WaitInitializationAsync(MaxServerInitializationTime, _cancellation.Token)
+                    .ConfigureAwait(false))
+                {
+                    throw new TimeoutException(
+                        $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+                }
+                var url = _serverStateReader.ReadSetting("address");
+                if (string.IsNullOrEmpty(url))
+                {
+                    throw new InvalidOperationException("Cannot find url to connect");
+                }
+                Log.Trace("Creating new connection to url {0}", url);
+                var connection = new WebSocketTransmissionClientConnection(url, _cancellation.Token);
                 await connection.ConnectCompletion.ConfigureAwait(false);
+                Log.Trace("Created new connection {0} to url {1}", connection.Id, url);
+                return connection;
             }
-            Log.Trace("Created new connection {0} to url {1}", connection.Id, url);
-            return connection;
+            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+            {
+                return Maybe<ITransmissionConnection>.Nothing;
+            }
+        }
+
+        public async ValueTask<ITransmissionConnection> ConnectAsync()
+        {
+            return (await TryConnectAsync()).GetValueOrThrowException<OperationCanceledException>();
+        }
+
+        public void Dispose()
+        {
+            _cancellation.Cancel();
         }
     }
 }

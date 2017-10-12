@@ -22,8 +22,6 @@
     {
         Task<Task> StartAsync(string[] args);
 
-        Task HandleCommandAsync(string[] args);
-
         Task ShutdownAsync();
     }
 }

@@ -61,13 +61,12 @@ namespace Plexus.Interop.Broker
         protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
         {
             var processTask = ProcessAsync();
-            await _appLifecycleManager.StartAsync().ConfigureAwait(false);
+            TaskRunner.RunInBackground(() => _appLifecycleManager.StartAsync(), stopCancellationToken).IgnoreAwait(Log, "Exception");
+            //using (stopCancellationToken.Register(() => _appLifecycleManager.StopAsync().IgnoreExceptions()))
+            //{
+            //    await _appLifecycleManager.StartAsync().ConfigureAwait(false);
+            //}
             return processTask;
-        }
-
-        public async Task LaunchAppAsync(string appId)
-        {            
-            await _connectionTracker.SpawnConnectionAsync(appId).ConfigureAwait(false);
         }
 
         private async Task ProcessAsync()

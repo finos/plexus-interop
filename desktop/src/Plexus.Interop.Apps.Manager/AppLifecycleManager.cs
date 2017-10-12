@@ -25,9 +25,10 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Processes;
     using UniqueId = Plexus.UniqueId;
 
-    public sealed class AppLifecycleManager : StartableBase, IAppLifecycleManager
+    public sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager
     {        
         private static readonly ILogger Log = LogManager.GetLogger<AppLifecycleManager>();
 
@@ -38,12 +39,14 @@
         private readonly string _metadataDir;
         private readonly SubProcessLauncher _subProcessLauncher;
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.CreateDefault();
+        private readonly CancellationToken _cancellationToken;
         private AppsDto _appsDto;
 
-        public AppLifecycleManager(string metadataDir, string brokerWorkingDir = null)
+        public AppLifecycleManager(string metadataDir, CancellationToken cancellationToken)
         {
             _metadataDir = metadataDir;
-            _brokerWorkingDir = Path.GetFullPath(brokerWorkingDir ?? Directory.GetCurrentDirectory());
+            _cancellationToken = cancellationToken;
+            _brokerWorkingDir = Directory.GetCurrentDirectory();
             _subProcessLauncher = new SubProcessLauncher();
             _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(StartNativeAppLauncher, LazyThreadSafetyMode.ExecutionAndPublication);
         }
@@ -94,15 +97,16 @@
             return appIds;
         }
 
-        protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
+        protected override async Task<Task> StartCoreAsync()
         {
-            stopCancellationToken.ThrowIfCancellationRequested();
+            _cancellationToken.ThrowIfCancellationRequested();
             _appsDto = AppsDto.Load(Path.Combine(_metadataDir, "apps.json"));
             _client = ClientFactory.Instance.Create(
                 new ClientOptionsBuilder()
                     .WithDefaultConfiguration(_brokerWorkingDir)
                     .WithApplicationId("interop.AppLifecycleManager")
-                    .Build());            
+                    .WithCancellationToken(_cancellationToken)
+                    .Build());
             var startNativeAppLauncherTask = _startNativeAppLauncherTask.Value;
             await Task.WhenAll(_client.ConnectAsync(), startNativeAppLauncherTask).ConfigureAwait(false);
             var nativeAppLauncher = startNativeAppLauncherTask.GetResult();
@@ -111,12 +115,14 @@
 
         private async Task<NativeAppLauncher> StartNativeAppLauncher()
         {
-            var nativeAppLauncher = new NativeAppLauncher(_brokerWorkingDir, _metadataDir, _subProcessLauncher, _jsonSerializer);
-            var task = TaskRunner.RunInBackground(nativeAppLauncher.StartAsync);
-            task.ContinueWithSynchronously(x =>
-                    _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(
-                        StartNativeAppLauncher,
-                        LazyThreadSafetyMode.ExecutionAndPublication))
+            var nativeAppLauncher = new NativeAppLauncher(_metadataDir, _subProcessLauncher, _jsonSerializer, _cancellationToken);
+            var task = TaskRunner.RunInBackground(nativeAppLauncher.StartAsync, _cancellationToken);
+            task.ContinueWithSynchronously(
+                    x =>
+                        _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(
+                            StartNativeAppLauncher,
+                            LazyThreadSafetyMode.ExecutionAndPublication),
+                    CancellationToken.None)
                 .IgnoreAwait(Log);
             await task.ConfigureAwait(false);
             return nativeAppLauncher;

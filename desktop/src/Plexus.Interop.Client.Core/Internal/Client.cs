@@ -29,12 +29,14 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Processes;
 
-    internal sealed class Client : StartableBase, IClient
+    internal sealed class Client : ProcessBase, IClient
     {        
         private readonly ClientOptions _options;
         private readonly BrokerToClientRequestHandler<Task, ITransportChannel> _incomingRequestHandler;
         private readonly ConcurrentDictionary<Task, Nothing> _runningTasks = new ConcurrentDictionary<Task, Nothing>();
+        private readonly CancellationTokenSource _cancellation; 
 
         private ILogger _log = LogManager.GetLogger<Client>();
         private IOutcomingInvocationFactory _outcomingInvocationFactory;
@@ -45,7 +47,8 @@
         public Client(ClientOptions options)
         {
             _options = options;
-            _incomingRequestHandler = new BrokerToClientRequestHandler<Task, ITransportChannel>(HandleInvocationStartRequestAsync);
+            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(_options.CancellationToken);
+            _incomingRequestHandler = new BrokerToClientRequestHandler<Task, ITransportChannel>(HandleInvocationStartRequestAsync);            
         }
 
         public string ApplicationId => _options.ApplicationId;
@@ -54,26 +57,21 @@
 
         public UniqueId ConnectionId { get; private set; }
 
-        protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
+        protected override async Task<Task> StartCoreAsync()
         {
-            _log.Debug("Connecting");
-            _connection = await ClientConnectionFactory.Instance.ConnectAsync(_options, stopCancellationToken).ConfigureAwait(false);
+            _log.Debug("Connecting {0}", _options);
+            _connection = await ClientConnectionFactory.Instance.ConnectAsync(_options, _cancellation.Token).ConfigureAwait(false);
             ConnectionId = _connection.Id;
             _log = LogManager.GetLogger<Client>(_connection.Id.ToString());            
             _outcomingInvocationFactory = new OutcomingInvocationFactory(_connection, _options.Protocol, _options.Marshaller);
             _discoveryService = new DiscoveryService(ConnectionId, _connection, _options.Protocol);
-            return ProcessAsync(stopCancellationToken);
+            return ProcessAsync();
         }
 
         public Task ConnectAsync()
         {
-            return StartAsync();
-        }
-
-        public Task DisconnectAsync()
-        {
-            _log.Debug("Disconnecting");
-            return StopAsync().IgnoreExceptions();
+            Start();
+            return StartCompletion;
         }
 
         public IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request)
@@ -181,9 +179,9 @@
             return discoveryResults.Select(x => new DiscoveredOnlineService(x)).ToList();
         }
 
-        private async Task ProcessAsync(CancellationToken cancellationToken)
+        private async Task ProcessAsync()
         {
-            using (cancellationToken.Register(() => _connection.TryTerminate()))
+            using (_cancellation.Token.Register(() => _connection.TryTerminate()))
             {
                 try
                 {
@@ -319,6 +317,11 @@
             _runningTasks[task] = Nothing.Instance;
             ((Task)task).ContinueWithSynchronously((Action<Task>)OnTaskCompleted);
             return task;
+        }
+
+        public void Dispose()
+        {
+            _cancellation.Cancel();
         }
     }
 }

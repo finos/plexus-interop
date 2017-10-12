@@ -24,13 +24,14 @@ namespace Plexus.Interop.Broker
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
+    using Plexus.Processes;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
 
-    public sealed class BrokerRunner : StartableBase
+    public sealed class BrokerRunner : ProcessBase
     {
         private static readonly ILogger Log = LogManager.GetLogger<BrokerRunner>();
         private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider = new ProtobufTransportProtocolSerializationProvider();
@@ -39,61 +40,44 @@ namespace Plexus.Interop.Broker
         private readonly string _workingDir;
         private readonly CompositeTransportServer _transportServer;
         private readonly BrokerProcessor _brokerProcessor;
+        private readonly CancellationToken _cancellationToken;
 
-        public BrokerRunner(string metadataDir = null, IRegistryProvider registryProvider = null)
+        public BrokerRunner(
+            string metadataDir = null, 
+            IRegistryProvider registryProvider = null,
+            CancellationToken cancellationToken = default)
         {
-            _workingDir = Path.GetFullPath(Directory.GetCurrentDirectory());
-            metadataDir = metadataDir ?? _workingDir;
+            _cancellationToken = cancellationToken;
+            _workingDir = Directory.GetCurrentDirectory();
+            metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
             registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
             _transportServer = new CompositeTransportServer(new[] { CreateNamedPipeServer(), CreateWebSocketServer() });
             _brokerProcessor = new BrokerProcessor(
                 _transportServer,
                 registryProvider,
                 DefaultProtocolSerializationProvider,
-                new AppLifecycleManager(metadataDir, _workingDir));
+                new AppLifecycleManager(metadataDir, _cancellationToken));
         }
 
-        public async Task LaunchAppAsync(string appId)
+        protected override async Task<Task> StartCoreAsync()
         {
-            await _brokerProcessor.LaunchAppAsync(appId).ConfigureAwait(false);
-        }
-
-        protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
-        {
-            stopCancellationToken.ThrowIfCancellationRequested();
+            _cancellationToken.ThrowIfCancellationRequested();
             Log.Info("Starting broker in directory {0}", _workingDir);
-            using (stopCancellationToken.Register(OnStop))
-            {
-                await _transportServer.StartAsync().ConfigureAwait(false);
-                await _brokerProcessor.StartAsync().ConfigureAwait(false);
-                Log.Info("Broker started in directory {0}", _workingDir);
-            }
-            return TaskRunner.RunInBackground(
-                async () =>
-                {
-                    using (stopCancellationToken.Register(OnStop))
-                    {
-                        await _brokerProcessor.Completion.ConfigureAwait(false);
-                    }
-                },
-                stopCancellationToken);
-        }
-
-        private void OnStop()
-        {
-            Log.Debug("Stopping transport servers");
-            _transportServer.StopAsync().IgnoreAwait(Log);
+            await _transportServer.StartAsync().ConfigureAwait(false);
+            await _brokerProcessor.StartAsync().ConfigureAwait(false);
+            Log.Info("Broker started in directory {0}", _workingDir);
+            return _brokerProcessor.Completion;
         }
 
         private ITransportServer CreateNamedPipeServer()
         {
-            var pipeServer = new PipeTransmissionServer(_workingDir);
+            var pipeServer = new PipeTransmissionServer(_workingDir, _cancellationToken);
             return new TransportServer(pipeServer, DefaultTransportSerializationProvider);
         }
 
         private ITransportServer CreateWebSocketServer()
         {
-            var webSocketServer = new WebSocketTransmissionServer(_workingDir);
+            var webSocketServer = new WebSocketTransmissionServer(_workingDir, _cancellationToken);
             return new TransportServer(webSocketServer, DefaultTransportSerializationProvider);
         }
     }

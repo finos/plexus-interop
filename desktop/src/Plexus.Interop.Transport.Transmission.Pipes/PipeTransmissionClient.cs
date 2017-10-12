@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.Pipes
+namespace Plexus.Interop.Transport.Transmission.Pipes
 {
     using Plexus.Interop.Transport.Transmission.Streams;
     using System;
@@ -23,36 +23,68 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class PipeTransmissionClient : StreamTransmissionConnectionFactoryBase
-    {
+    public sealed class PipeTransmissionClient : ITransmissionClient
+    {        
         private const string ServerName = "np-v1";
         private static readonly TimeSpan MaxServerInitializationTime = TimeSpan.FromSeconds(10);
 
+        private readonly CancellationTokenSource _cancellation;
         private readonly ILogger _log;
         private readonly IServerStateReader _serverStateReader;
 
-        public PipeTransmissionClient(string brokerWorkingDir)
+        public PipeTransmissionClient(string brokerWorkingDir, CancellationToken cancellationToken = default)
         {
+            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _log = LogManager.GetLogger<PipeTransmissionClient>();
             _serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
         }
 
-        protected override async ValueTask<Stream> ConnectAsync(CancellationToken cancellationToken)
+        public async ValueTask<ITransmissionConnection> ConnectAsync()
         {
-            if (!await _serverStateReader.WaitInitializationAsync(MaxServerInitializationTime, cancellationToken).ConfigureAwait(false))
+            var result = await TryConnectAsync().ConfigureAwait(false);
+            if (!result.HasValue)
             {
-                throw new TimeoutException($"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+                throw new OperationCanceledException();
             }
-            var pipeName = _serverStateReader.ReadSetting("address");
-            if (string.IsNullOrEmpty(pipeName))
+            return result.Value;
+        }
+
+        public void Dispose()
+        {
+            _cancellation.Cancel();
+        }
+
+        public ValueTask<Maybe<ITransmissionConnection>> TryConnectAsync()
+        {
+            return StreamTransmissionConnection.TryCreateAsync(UniqueId.Generate(), TryConnectStreamAsync);
+        }
+
+        private async ValueTask<Maybe<Stream>> TryConnectStreamAsync()
+        {
+            try
             {
-                throw new InvalidOperationException("Cannot find pipe name to connect");
-            }            
-            _log.Trace("Connecting to pipe {0}", pipeName);
-            var pipeClientStream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
-            await ConnectAsync(pipeClientStream, cancellationToken).ConfigureAwait(false);
-            _log.Trace("Connected to pipe {0}", pipeName);
-            return pipeClientStream;
+                if (!await _serverStateReader.WaitInitializationAsync(MaxServerInitializationTime, _cancellation.Token)
+                    .ConfigureAwait(false))
+                {
+                    throw new TimeoutException(
+                        $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+                }
+                var pipeName = _serverStateReader.ReadSetting("address");
+                if (string.IsNullOrEmpty(pipeName))
+                {
+                    throw new InvalidOperationException("Cannot find pipe name to connect");
+                }
+                _log.Trace("Connecting to pipe {0}", pipeName);
+                var pipeClientStream =
+                    new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+                await ConnectAsync(pipeClientStream, _cancellation.Token).ConfigureAwait(false);
+                _log.Trace("Connected to pipe {0}", pipeName);
+                return pipeClientStream;
+            }
+            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+            {
+                return Maybe<Stream>.Nothing;
+            }
         }
 
 #if NET452
@@ -90,6 +122,6 @@
                 throw;
             }
         }
-#endif
+#endif        
     }
 }

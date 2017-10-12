@@ -16,11 +16,13 @@
  */
 ﻿namespace Plexus.Interop.Transport.Transmission
 {
-    using System.Threading;
+    using System;
     using System.Threading.Tasks;
 
-    public interface ITransmissionConnectionFactory
+    public interface ITransmissionClient : IDisposable
     {
-        ValueTask<ITransmissionConnection> CreateAsync(CancellationToken cancellationToken = new CancellationToken());
+        ValueTask<Maybe<ITransmissionConnection>> TryConnectAsync();
+
+        ValueTask<ITransmissionConnection> ConnectAsync();
     }
 }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using Plexus.Interop.Transport.Internal;
+ using Plexus.Interop.Transport.Internal;
 using Plexus.Interop.Transport.Transmission;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,22 +28,27 @@ namespace Plexus.Interop.Transport
     {
         private static readonly ILogger Log = LogManager.GetLogger<TransportConnectionFactory>();
 
-        private readonly ITransmissionConnectionFactory _transmissionConnectionFactory;
+        private readonly ITransmissionClient _transmissionClient;
         private readonly ITransportProtocolSerializer _serializer;
         private readonly ITransportProtocolDeserializer _deserializer;
 
         public TransportConnectionFactory(
-            ITransmissionConnectionFactory transmissionConnectionFactory,
+            ITransmissionClient transmissionClient,
             ITransportProtocolSerializationProvider serializationProvider)
         {
-            _transmissionConnectionFactory = transmissionConnectionFactory;
+            _transmissionClient = transmissionClient;
             _serializer = serializationProvider.GetSerializer();
             _deserializer = serializationProvider.GetDeserializer(TransportHeaderPool.Instance);
         }
 
-        public async ValueTask<ITransportConnection> CreateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async ValueTask<Maybe<ITransportConnection>> TryCreateAsync()
         {
-            var transmissionConnection = await _transmissionConnectionFactory.CreateAsync(cancellationToken).ConfigureAwait(false);
+            var result = await _transmissionClient.TryCreateAsync().ConfigureAwait(false);
+            if (!result.HasValue)
+            {
+                return Maybe<ITransportConnection>.Nothing;
+            }
+            var transmissionConnection = result.Value;
             try
             {
                 var sender = new TransportSendProcessor(transmissionConnection, TransportHeaderPool.Instance, _serializer);
@@ -62,7 +67,7 @@ namespace Plexus.Interop.Transport
 
         public override string ToString()
         {
-            return $"{{Transmission transport: {_transmissionConnectionFactory.GetType().Name}}}";
+            return $"{{Transmission transport: {_transmissionClient.GetType().Name}}}";
         }
     }
 }

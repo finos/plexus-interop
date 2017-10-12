@@ -1,28 +1,19 @@
 ﻿namespace Plexus.Host
 {
-    using Plexus.Channels;
     using Plexus.Logging.NLog;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.IO.Pipes;
     using System.Linq;
     using System.Reflection;
-    using System.Security.Cryptography;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Xml.Serialization;
 
     internal sealed class ProgramLoader : IDisposable
     {
         private static readonly TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(5);
-        private static readonly XmlSerializer XmlSerializer = new XmlSerializer(typeof(string[]));
-        private static readonly HashAlgorithm Hasher = MD5.Create();
 
-        private readonly byte[] _readBuffer = new byte[64 * 1024];
-        private readonly IChannel<string[]> _incomingRequestBuffer = new BufferedChannel<string[]>(3);
         private readonly string[] _args;
         private readonly LoggingInitializer _loggingInitializer;
         private readonly ILogger _log;
@@ -46,12 +37,9 @@
         public async Task<int> LoadAndRunAsync()
         {
             _log.Info("Loading {0} {1}", _path, string.Join(" ", _args));
-            var cancellation = new CancellationTokenSource();
             InstancePerDirectoryLock instancePerDirectoryLock = null;
             var curDir = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(_workingDir);
-            var listenRequestsTask = TaskConstants.Completed;
-            var handleRequestsTask = TaskConstants.Completed;
             try
             {
                 var assembly = Assembly.LoadFrom(_path);
@@ -66,35 +54,13 @@
 
                 if (attribute.InstanceAwareness == InstanceAwareness.SingleInstancePerDirectory)
                 {
-                    _log.Debug("Checking if another instance is running");
-                    var pipe = attribute.InstanceKey + "-" +
-                               BitConverter.ToString(Hasher.ComputeHash(Encoding.UTF8.GetBytes(_workingDir)));
+                    _log.Debug("Checking if another instance of {0} is already running in directory {1}", attribute.InstanceKey, _workingDir);
                     instancePerDirectoryLock = new InstancePerDirectoryLock(attribute.InstanceKey ?? string.Empty);
                     var isFirstInstance = instancePerDirectoryLock.TryEnter(500);
-                    if (isFirstInstance)
+                    if (!isFirstInstance)
                     {
-                        listenRequestsTask = ListenOtherInstanceRequestsAsync(pipe, cancellation.Token);
-                    }
-                    else
-                    {
-                        _log.Info("Another instance of {0} is already running in directory {1}. Connecting to the running instance...", attribute.InstanceKey, _workingDir);
-                        using (var namedPipeClient =
-                            new NamedPipeClientStream(".", pipe, PipeDirection.InOut, PipeOptions.Asynchronous))
-                        {
-                            await namedPipeClient.ConnectAsync(3000, cancellation.Token).ConfigureAwait(false);
-                            string serializeArgs;
-                            using (var writer = new StringWriter(new StringBuilder()))
-                            {
-                                XmlSerializer.Serialize(writer, _args);
-                                serializeArgs = writer.ToString();
-                            }
-                            var bytes = Encoding.UTF8.GetBytes(serializeArgs);
-                            await namedPipeClient.WriteAsync(bytes, 0, bytes.Length, cancellation.Token).ConfigureAwait(false);
-                            await namedPipeClient.FlushAsync(cancellation.Token).ConfigureAwait(false);
-                            namedPipeClient.Close();
-                            _log.Info("Forwarding args to the already running instance: {0}", string.Join(" ", _args));
-                        }
-                        return 0;
+                        _log.Info("Another instance of {0} is already running in directory {1}. Exiting.", attribute.InstanceKey, _workingDir);
+                        return 1;
                     }
                 }
 
@@ -117,11 +83,8 @@
                     _program = (IProgram) Activator.CreateInstance(programType);
                     var task = await _program.StartAsync(_args).ConfigureAwait(false);
                     _log.Info("Program {0} started", programType);
-                    if (attribute.InstanceAwareness != InstanceAwareness.MultiInstance)
-                    {
-                        handleRequestsTask = HandleOtherInstanceRequestsAsync(_program, cancellation.Token);
-                    }
                     await task.ConfigureAwait(false);
+                    _log.Info("Program {0} completed", programType);
                 }
                 catch (Exception ex)
                 {
@@ -136,8 +99,6 @@
             }
             finally
             {                   
-                cancellation.Cancel();
-                await Task.WhenAll(listenRequestsTask, handleRequestsTask).IgnoreExceptions().ConfigureAwait(false);
                 if (instancePerDirectoryLock != null)
                 {
                     _log.Debug("Releasing lock");
@@ -149,78 +110,6 @@
             return 0;
         }
 
-        private async Task HandleOtherInstanceRequestsAsync(IProgram program, CancellationToken cancellationToken)
-        {
-            while (await _incomingRequestBuffer.In.WaitForNextSafeAsync().ConfigureAwait(false))
-            {
-                while (_incomingRequestBuffer.In.TryReadSafe(out var args))
-                {
-                    try
-                    {
-                        if (!cancellationToken.IsCancellationRequested)
-                        {
-                            await program.HandleCommandAsync(args).ConfigureAwait(false);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.Error(ex, "Exception while handling other instance request");
-                    }
-                }
-            }
-        }
-
-        private async Task ListenOtherInstanceRequestsAsync(string pipe, CancellationToken cancellationToken)
-        {
-            try
-            {
-                while (true)
-                {
-                    using (var pipeServer =
-                        new NamedPipeServerStream(
-                            pipe, 
-                            PipeDirection.InOut, 
-                            -1, 
-                            PipeTransmissionMode.Byte,
-                            PipeOptions.Asynchronous))
-                    {
-                        await pipeServer
-                            .WaitForConnectionAsync(cancellationToken)
-                            .ConfigureAwait(false);
-                        if (!pipeServer.IsConnected)
-                        {
-                            return;
-                        }
-                        var count = await pipeServer
-                            .ReadAsync(_readBuffer, 0, _readBuffer.Length, cancellationToken)
-                            .ConfigureAwait(false);
-                        pipeServer.Close();
-                        try
-                        {
-                            var xml = Encoding.UTF8.GetString(_readBuffer, 0, count);
-                            var args = (string[]) XmlSerializer.Deserialize(new StringReader(xml));
-                            _log.Debug("Received new incoming request: {0}", string.Join(" ", args));
-                            await _incomingRequestBuffer.Out
-                                .WriteAsync(args)
-                                .ConfigureAwait(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            _log.Error(ex, "Unhandled exception while parsing received request");
-                        }
-                    }
-                }
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-            }
-            finally
-            {
-                _incomingRequestBuffer.Out.TryComplete();
-            }
-            _log.Info("Completed listening for incoming requests");
-        }
-
         private void RegisterShutdownEvent()
         {
             Console.CancelKeyPress += (x, y) =>
@@ -230,7 +119,7 @@
             };
 
             var shutdownEventName = "plexus-host-shutdown-" + Process.GetCurrentProcess().Id;
-            _log.Debug("Registering shutdown event: {0}", shutdownEventName);
+            _log.Info("Registering shutdown event: {0}", shutdownEventName);
             var shutdownEvent = new EventWaitHandle(false, EventResetMode.AutoReset, shutdownEventName);
             ThreadPool.RegisterWaitForSingleObject(
                 shutdownEvent,

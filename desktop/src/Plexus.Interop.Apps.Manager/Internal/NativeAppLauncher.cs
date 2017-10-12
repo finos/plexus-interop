@@ -22,37 +22,43 @@ namespace Plexus.Interop.Apps.Internal
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Processes;
 
-    internal sealed class NativeAppLauncher : StartableBase
+    internal sealed class NativeAppLauncher : ProcessBase
     {
         private static readonly ILogger Log = LogManager.GetLogger<NativeAppLauncher>();
 
         private readonly SubProcessLauncher _subProcessLauncher;
-        private readonly string _brokerWorkingDir;
         private readonly string _cmdBasePath;
         private readonly JsonSerializer _jsonSerializer;
+        private readonly CancellationToken _cancellationToken;
         private IClient _client;
 
         public Plexus.UniqueId Id { get; }
 
-        public NativeAppLauncher(string brokerWorkingDir, string cmdBasePath, SubProcessLauncher subProcessLauncher, JsonSerializer jsonSerializer)
+        public NativeAppLauncher(
+            string cmdBasePath, 
+            SubProcessLauncher subProcessLauncher, 
+            JsonSerializer jsonSerializer,
+            CancellationToken cancellationToken)
         {
             Id = Plexus.UniqueId.Generate();
-            _brokerWorkingDir = brokerWorkingDir;
             _cmdBasePath = cmdBasePath;
             _subProcessLauncher = subProcessLauncher;
             _jsonSerializer = jsonSerializer;
+            _cancellationToken = cancellationToken;
         }
 
-        protected override async Task<Task> StartProcessAsync(CancellationToken cancellationToken)
+        protected override async Task<Task> StartCoreAsync()
         {
             var options = new ClientOptionsBuilder()
-                .WithDefaultConfiguration(_brokerWorkingDir)
+                .WithDefaultConfiguration(Directory.GetCurrentDirectory())
                 .WithApplicationId("interop.NativeAppLauncher")
                 .WithAppInstanceId(Id)
                 .WithProvidedService(
                     "interop.AppLauncherService",
                     s => s.WithUnaryMethod<AppLaunchRequest, AppLaunchResponse>("Launch", LaunchAsync))
+                .WithCancellationToken(_cancellationToken)
                 .Build();
             _client = ClientFactory.Instance.Create(options);
             await _client.ConnectAsync().ConfigureAwait(false);

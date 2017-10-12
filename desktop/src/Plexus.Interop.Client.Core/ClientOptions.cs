@@ -20,6 +20,7 @@
     using Plexus.Interop.Transport;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
 
     public sealed class ClientOptions
     {
@@ -29,7 +30,8 @@
             ITransportConnectionFactory transport,
             IProtocolImplementation protocol,
             IMarshallerProvider marshaller,
-            IEnumerable<ProvidedServiceDefinition> services)
+            IEnumerable<ProvidedServiceDefinition> services,
+            CancellationToken cancellationToken)
         {
             ApplicationId = applicationId;
             ApplicationInstanceId = applicationInstanceId;
@@ -38,6 +40,7 @@
             Protocol = protocol;
             Services = new List<ProvidedServiceDefinition>(services);
             ServicesDictionary = Services.ToDictionary(x => (x.Id, x.Alias), x => x);
+            CancellationToken = cancellationToken;
         }
 
         public string ApplicationId { get; }
@@ -51,6 +54,8 @@
         public IMarshallerProvider Marshaller { get; }
 
         public IReadOnlyCollection<ProvidedServiceDefinition> Services { get; }
+
+        public CancellationToken CancellationToken { get; }
 
         internal IReadOnlyDictionary<(string Id, Maybe<string> Alias), ProvidedServiceDefinition> ServicesDictionary { get; }
 

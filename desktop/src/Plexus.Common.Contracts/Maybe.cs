@@ -65,6 +65,24 @@ namespace Plexus
             return HasValue ? Value : defaultValue;
         }
 
+        public T GetValueOrThrowException<TException>(TException exception) where TException : Exception
+        {
+            if (!HasValue)
+            {
+                throw exception;
+            }
+            return Value;
+        }
+
+        public T GetValueOrThrowException<TException>() where TException : Exception, new()
+        {
+            if (!HasValue)
+            {
+                throw new TException();
+            }
+            return Value;
+        }
+
         public override string ToString()
         {
             return HasValue ? Value.ToString() : Plexus.Nothing.Instance.ToString();

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.Streams.Internal
+﻿namespace Plexus.Interop.Transport.Transmission.Streams
 {
     using System;
     using System.IO;
@@ -23,7 +23,7 @@
     using Plexus.Channels;
     using Plexus.Pools;
 
-    internal sealed class StreamTransmissionConnection : ITransmissionConnection
+    public sealed class StreamTransmissionConnection : ITransmissionConnection
     {
         private const int EndMessage = 65535;
         private readonly ILogger _log;
@@ -64,13 +64,13 @@
             }
         }
 
-        internal static async Task<StreamTransmissionConnection> CreateAsync(
-            UniqueId id,
-            Func<CancellationToken, ValueTask<Stream>> streamFactory,
-            CancellationToken cancellationToken)
+        public static async ValueTask<Maybe<ITransmissionConnection>> TryCreateAsync(
+            UniqueId id, Func<ValueTask<Maybe<Stream>>> streamFactory)
         {
-            var stream = await streamFactory(cancellationToken).ConfigureAwait(false);
-            return new StreamTransmissionConnection(id, stream);
+            var result = await streamFactory().ConfigureAwait(false);
+            return result.HasValue 
+                ? new StreamTransmissionConnection(id, result.Value) 
+                : Maybe<ITransmissionConnection>.Nothing;
         }
 
         private async Task ProcessAsync()

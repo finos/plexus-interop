@@ -27,7 +27,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
             return new WebSocketTransmissionServer(Directory.GetCurrentDirectory());
         }
 
-        protected override ITransmissionConnectionFactory CreateClient()
+        protected override ITransmissionClient CreateClient()
         {
             return new WebSocketTransmissionClient(Directory.GetCurrentDirectory());
         }

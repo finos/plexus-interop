@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Transport
 {
-    using System.Threading;
-    using System.Threading.Tasks;
     using Plexus.Interop.Transport.Protocol.Serialization;
     using Plexus.Interop.Transport.Transmission;
+    using System.Threading.Tasks;
 
     public sealed class TransportServer : ITransportServer
     {
@@ -41,14 +40,9 @@
             await _transmissionServer.StartAsync().ConfigureAwait(false);
         }
 
-        public async Task StopAsync()
+        public ValueTask<Maybe<ITransportConnection>> TryCreateAsync()
         {
-            await _transmissionServer.StopAsync().ConfigureAwait(false);
-        }
-
-        public ValueTask<ITransportConnection> CreateAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return _connectionFactory.CreateAsync(cancellationToken);
+            return _connectionFactory.TryCreateAsync();
         }
 
         public void Dispose()

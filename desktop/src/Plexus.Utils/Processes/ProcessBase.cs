@@ -37,8 +37,19 @@
             var startTask = TaskRunner.RunInBackground(StartCoreAsync);
             startTask.PropagateCompletionToPromise(_startCompletion);
             startTask.Unwrap().PropagateCompletionToPromise(_completion);
-        }        
+        }
+
+        public Task StartAsync()
+        {
+            Start();
+            return StartCompletion;
+        }
 
         protected abstract Task<Task> StartCoreAsync();
+
+        protected void SetStartCompleted()
+        {
+            _startCompletion.TryComplete();
+        }
     }
 }

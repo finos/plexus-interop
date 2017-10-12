@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,107 +14,145 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.Pipes
+namespace Plexus.Interop.Transport.Transmission.Pipes
 {
-    using Plexus.Interop.Transport.Transmission.Streams;
+    using Plexus.Processes;
     using System;
     using System.IO;
     using System.IO.Pipes;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Channels;
+    using Plexus.Interop.Transport.Transmission.Streams;
 
-    public sealed class PipeTransmissionServer : StreamTransmissionConnectionFactoryBase, ITransmissionServer
+    public sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
     {
         private const string ServerName = "np-v1";
 
         private readonly ILogger _log;
-        private readonly Promise _completion = new Promise();
         private readonly IServerStateWriter _settingsWriter;
         private readonly string _pipeName = "plexus-interop-broker-" + Guid.NewGuid();
+        private readonly CancellationTokenSource _cancellation;
+        private readonly BufferedChannel<ITransmissionConnection> _incomingConnections 
+            = new BufferedChannel<ITransmissionConnection>(1);
 
-        public PipeTransmissionServer(string brokerWorkingDir = null)
-        {            
+        public PipeTransmissionServer(string brokerWorkingDir, CancellationToken cancellationToken = default)
+        {
+            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _log = LogManager.GetLogger<PipeTransmissionServer>();
             brokerWorkingDir = brokerWorkingDir ?? Directory.GetCurrentDirectory();
             _settingsWriter = new ServerStateWriter(ServerName, brokerWorkingDir);
         }
 
-        public Task Completion => _completion.Task;
+        public ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync()
+        {
+            return _incomingConnections.TryReadAsync();
+        }
 
-        public Task StartAsync()
+        public async ValueTask<ITransmissionConnection> AcceptAsync()
+        {
+            return (await TryAcceptAsync()).GetValueOrThrowException<OperationCanceledException>();
+        }
+
+        protected override Task<Task> StartCoreAsync()
         {
             _log.Debug("Starting");
             _settingsWriter.Write("address", _pipeName);
             _settingsWriter.SignalInitialized();
             _log.Info("Pipe server started: {0}", _pipeName);
-            return TaskConstants.Completed;
+            return Task.FromResult(ProcessAsync());
         }
 
-        public Task StopAsync()
+        private async Task ProcessAsync()
         {
-            _log.Debug("Stopping");
-
-            // TODO: dispose all the active streams
-            _completion.TryComplete();
-            _settingsWriter.Dispose();
-            return Completion.IgnoreExceptions();
+            try
+            {
+                while (true)
+                {
+                    var result = await StreamTransmissionConnection
+                        .TryCreateAsync(UniqueId.Generate(), TryAcceptStreamAsync)
+                        .ConfigureAwait(false);
+                    if (!result.HasValue)
+                    {
+                        break;
+                    }
+                    await _incomingConnections.Out.WriteAsync(result.Value).ConfigureAwait(false);
+                }
+                _incomingConnections.Out.TryComplete();
+            }
+            catch (Exception ex)
+            {
+                _incomingConnections.Out.TryTerminate(ex);
+            }
+            finally
+            {
+                _settingsWriter.Dispose();
+            }
         }
 
         public void Dispose()
         {
             _log.Trace("Disposing");
-            StopAsync().GetResult();
+            _cancellation.Cancel();
+            Completion.IgnoreExceptions().GetResult();
         }
 
-        protected override async ValueTask<Stream> ConnectAsync(CancellationToken cancellationToken)
-        {            
-            _log.Trace("Waiting for connection to pipe {0}", _pipeName);
+        private async ValueTask<Maybe<Stream>> TryAcceptStreamAsync()
+        {
+            _log.Trace("Waiting for connection");
             var pipeServerStream = new NamedPipeServerStream(
                 _pipeName,
                 PipeDirection.InOut,
                 -1,
                 PipeTransmissionMode.Byte,
                 PipeOptions.Asynchronous);
-            await WaitForConnectionAsync(pipeServerStream, cancellationToken).ConfigureAwait(false);
-            _log.Trace("Received new connection to pipe {0}", _pipeName);
-
-            // TODO: keep connected stream to dispose it on Stop
+            if (!await WaitForConnectionAsync(pipeServerStream).ConfigureAwait(false))
+            {
+                return Maybe<Stream>.Nothing;
+            }
+            _log.Trace("Received new connection");
+            // TODO: keep connected stream to dispose it on Stop?
             return pipeServerStream;
         }
 
 #if NET452
-        private static async Task WaitForConnectionAsync(
-            NamedPipeServerStream pipeServerStream,
-            CancellationToken cancellationToken)
+        private async Task<bool> WaitForConnectionAsync(NamedPipeServerStream pipeServerStream)
         {
             try
             {
-                using (cancellationToken.Register(pipeServerStream.Dispose))
+                using (_cancellation.Token.Register(pipeServerStream.Dispose))
                 {
                     await Task.Factory.FromAsync(pipeServerStream.BeginWaitForConnection, pipeServerStream.EndWaitForConnection, null);
                 }
+                return true;
             }
             catch
             {
                 pipeServerStream.Dispose();
-                cancellationToken.ThrowIfCancellationRequested();
+                if (_cancellation.IsCancellationRequested)
+                {
+                    return false;
+                }
                 throw;
             }
         }
 #else
-        private static async Task WaitForConnectionAsync(
-            NamedPipeServerStream pipeServerStream,
-            CancellationToken cancellationToken)
+        private async Task<bool> WaitForConnectionAsync(NamedPipeServerStream pipeServerStream)
         {
             try
             {
-                await pipeServerStream.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
+                await pipeServerStream.WaitForConnectionAsync(_cancellation.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+            {
+                return false;
             }
             catch
             {
                 pipeServerStream.Dispose();
                 throw;
             }
+            return true;
         }
 #endif
     }

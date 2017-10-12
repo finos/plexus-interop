@@ -19,18 +19,28 @@ using System.Threading.Tasks;
 
 namespace Plexus
 {
+    using System.Threading;
+
     public static class TaskHelper
     {
         public static Task<T> FromException<T>(Exception exception)
         {
-            var aggrEx = exception as AggregateException;
-            if (aggrEx != null)
+            if (exception is AggregateException aggrEx)
             {
                 exception = aggrEx.ExtractInner();
             }
             var tcs = new TaskCompletionSource<T>();
             tcs.SetException(exception);
             return tcs.Task;
+        }
+
+        public static async Task AsTask(this CancellationToken cancellationToken)
+        {
+            var promise = new Promise();
+            using (cancellationToken.Register(() => promise.TryComplete()))
+            {
+                await promise.Task.ConfigureAwait(false);
+            }
         }
     }
 }

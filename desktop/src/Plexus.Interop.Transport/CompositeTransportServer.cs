@@ -20,15 +20,14 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Processes;
 
-    public sealed class CompositeTransportServer : StartableBase, IReadableChannel<ITransportConnection>
-    {
+    public sealed class CompositeTransportServer : ProcessBase, IReadableChannel<ITransportConnection>
+    {        
         private static readonly ILogger Log = LogManager.GetLogger<CompositeTransportServer>();
 
         private readonly IReadOnlyCollection<ITransportServer> _servers;
-
         private readonly IChannel<ITransportConnection> _buffer = new BufferedChannel<ITransportConnection>(3);
 
         public CompositeTransportServer(IEnumerable<ITransportServer> servers)
@@ -36,42 +35,32 @@
             _servers = servers.ToList();
         }
 
-        protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
+        protected override async Task<Task> StartCoreAsync()
         {
             Log.Debug("Starting");
-            using (stopCancellationToken.Register(OnStop))
-            {
-                var startTasks = _servers.Select(x => TaskRunner.RunInBackground(x.StartAsync, stopCancellationToken)).ToArray();
-                await Task.WhenAll(startTasks).IgnoreExceptions().ConfigureAwait(false);
-            }
-            return ProcessAsync(stopCancellationToken);
+            var startTasks = _servers.Select(x => TaskRunner.RunInBackground(x.StartAsync)).ToArray();
+            await Task.WhenAll(startTasks).IgnoreExceptions().ConfigureAwait(false);
+            return ProcessAsync();
         }
 
-        private async Task ProcessAsync(CancellationToken cancellationToken)
+        private async Task ProcessAsync()
         {
-            using (cancellationToken.Register(OnStop))
-            {
-                await Task.WhenAll(_servers.Select(x => ProcessAsync(x, cancellationToken))).IgnoreExceptions();
-            }
+            await Task.WhenAll(_servers.Select(ProcessAsync)).IgnoreExceptions();
             _buffer.Out.TryComplete();
         }
 
-        private void OnStop()
-        {
-            Log.Debug("Stopping");
-            foreach (var server in _servers)
-            {
-                server.StopAsync().IgnoreAwait(Log, "Exception on stopping server {0}", server);
-            }
-        }
-
-        private async Task ProcessAsync(ITransportServer server, CancellationToken cancellationToken)
+        private async Task ProcessAsync(ITransportServer server)
         {
             try
             {
                 while (true)
                 {
-                    var connection = await server.CreateAsync(cancellationToken).ConfigureAwait(false);
+                    var result = await server.TryCreateAsync().ConfigureAwait(false);
+                    if (!result.HasValue)
+                    {
+                        break;
+                    }
+                    var connection = result.Value;
                     try
                     {
                         if (!await _buffer.Out.TryWriteAsync(connection).ConfigureAwait(false))
@@ -86,9 +75,6 @@
                         throw;
                     }
                 }
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
             }
             catch (Exception ex)
             {

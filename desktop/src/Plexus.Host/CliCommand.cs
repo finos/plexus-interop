@@ -3,7 +3,7 @@
     internal enum CliCommand
     {
         None,
-        Start,
+        Broker,
         Stop,
         Load,
     }

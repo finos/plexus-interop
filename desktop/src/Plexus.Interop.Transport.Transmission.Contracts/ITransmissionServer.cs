@@ -19,12 +19,14 @@
     using System;
     using System.Threading.Tasks;
 
-    public interface ITransmissionServer : ITransmissionConnectionFactory, IDisposable
-    {
+    public interface ITransmissionServer : IDisposable
+    {        
         Task Completion { get; }
 
         Task StartAsync();
 
-        Task StopAsync();
+        ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync();
+
+        ValueTask<ITransmissionConnection> AcceptAsync();
     }
 }

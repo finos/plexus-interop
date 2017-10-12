@@ -21,6 +21,7 @@
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
+    using System.Threading;
 
     public class ClientOptionsBuilder
     {
@@ -36,6 +37,8 @@
         public IProtocolImplementation Protocol { get; private set; }
 
         public IMarshallerProvider Marshaller { get; private set; }
+
+        public CancellationToken CancellationToken { get; private set; }
 
         public ClientOptionsBuilder WithApplicationId(string applicationId)
         {
@@ -79,6 +82,12 @@
             return this;
         }
 
+        public ClientOptionsBuilder WithCancellationToken(CancellationToken cancellationToken)
+        {
+            CancellationToken = cancellationToken;
+            return this;
+        }
+
         public ClientOptions Build()
         {
             if (string.IsNullOrEmpty(ApplicationId))
@@ -118,7 +127,8 @@
                 Transport,
                 Protocol,
                 Marshaller,
-                GetServiceDefinitions());
+                GetServiceDefinitions(),
+                CancellationToken);
             IEnumerable<ProvidedServiceDefinition> GetServiceDefinitions()
             {
                 foreach (var serviceFactory in _serviceFactories)

@@ -41,12 +41,10 @@ namespace Plexus.Host
         public async Task<int> RunAsync(string[] args)
         {
             var command = CliCommand.None;
-            var console = TargetConsole.Current;
             var workingDir = Directory.GetCurrentDirectory();
             var metadataDir = "metadata";
             string pluginPath = null;
             IReadOnlyList<string> pluginArgs = new string[0];
-            IReadOnlyList<string> appIds = new string[0];
             string pid = null;
 
             try
@@ -59,13 +57,7 @@ namespace Plexus.Host
                     syntax.HandleErrors = true;
                     syntax.HandleResponseFiles = true;
 
-                    syntax.DefineCommand("start", ref command, CliCommand.Start, "Start interop broker and/or application(s)");
-                    syntax.DefineOption(
-                        "c|console",
-                        ref console,
-                        x => Enum.Parse<TargetConsole>(x, ignoreCase: true),
-                        false,
-                        "Broker console mode. Possible values: \"current\" to start in the current console, \"new\" to start in new console, \"hidden\" to start as background process without visible console.");
+                    syntax.DefineCommand("broker", ref command, CliCommand.Broker, "Start interop broker");
                     syntax.DefineOption(
                         "d|directory",
                         ref workingDir,
@@ -76,10 +68,6 @@ namespace Plexus.Host
                         ref metadataDir,
                         false,
                         "Directory to seek for metadata files: apps.json and interop.json");
-                    syntax.DefineOptionList(
-                        "a|application",
-                        ref appIds,
-                        "Optional list of applications to start");
 
                     var loadCommand = syntax.DefineCommand("load", ref command, CliCommand.Load, "Load plugin dll");
                     loadCommand.IsHidden = true;
@@ -105,8 +93,8 @@ namespace Plexus.Host
                     case CliCommand.None:
                         result.ReportError("<command> required");
                         return 1;
-                    case CliCommand.Start:
-                        return await StartBrokerAsync(workingDir, metadataDir, console, appIds).ConfigureAwait(false);
+                    case CliCommand.Broker:
+                        return await StartBrokerAsync(workingDir, metadataDir).ConfigureAwait(false);
                     case CliCommand.Stop:
                         return await StopProcess(pid).ConfigureAwait(false);
                     case CliCommand.Load:
@@ -138,59 +126,16 @@ namespace Plexus.Host
             }
         }
 
-        private async Task<int> StartBrokerAsync(string workingDir, string metadataDir, TargetConsole targetConsole, IEnumerable<string> appIds)
+        private static async Task<int> StartBrokerAsync(string workingDir, string metadataDir)
         {
             var fullMetadataDir = Path.GetFullPath(metadataDir);
+            var brokerPluginPath = Path.Combine(
+                Path.GetDirectoryName(typeof(Program).Assembly.Location),
+                "Plexus.Interop.Broker.Host.dll");
             var args = new List<string> { "start", "-m", fullMetadataDir };
-            foreach (var appId in appIds)
-            {
-                args.Add("-a");
-                args.Add(appId);
-            }
-            switch (targetConsole)
-            {                    
-                case TargetConsole.Current:
-                    var brokerPluginPath = Path.Combine(
-                        Path.GetDirectoryName(typeof(Program).Assembly.Location),
-                        "Plexus.Interop.Broker.Host.dll");
-                    return await LoadAndRunProgramAsync(brokerPluginPath, args, workingDir).ConfigureAwait(false);
-                case TargetConsole.New:
-                    StartPlexusProcess(args, workingDir, true);
-                    return 0;
-                case TargetConsole.Hidden:
-                    StartPlexusProcess(args, workingDir);
-                    return 0;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(targetConsole), targetConsole, null);
-            }            
+            return await LoadAndRunProgramAsync(brokerPluginPath, args, workingDir).ConfigureAwait(false);
         }
         
-        private static void StartPlexusProcess(IEnumerable<string> otherArgs, string workingDirectory = null, bool openWithConsole = false)
-        {
-            workingDirectory = Path.GetFullPath(workingDirectory ?? Directory.GetCurrentDirectory());
-            var binDir = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-            var command = Path.Combine(binDir, "plexus.exe");
-            var args = string.Join(" ", otherArgs);
-            if (openWithConsole)
-            {
-                args = $"/c start \"\" \"{command}\" " + args;
-                command = "cmd";
-            }
-            var si = new ProcessStartInfo
-            {
-                FileName = command,
-                Arguments = args,
-                WorkingDirectory = workingDirectory,
-                RedirectStandardOutput = false,
-                RedirectStandardInput = false,
-                RedirectStandardError = false,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-            };
-            var p = Process.Start(si);
-            Console.WriteLine($"Started new plexus.exe process {p.Id}");
-        }
-
         private static async Task<int> StopProcess(string pidArg)
         {
             var processes = Process.GetProcesses().Where(x =>

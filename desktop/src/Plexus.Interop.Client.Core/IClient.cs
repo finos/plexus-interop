@@ -30,7 +30,5 @@
         Task Completion { get; }
 
         Task ConnectAsync();
-
-        Task DisconnectAsync();        
     }
 }

@@ -37,7 +37,7 @@ namespace Plexus.Interop.Transport.Protocol
             = new ProtobufTransportProtocolSerializationProvider();
 
         private readonly ITransmissionServer _server;
-        private readonly ITransmissionConnectionFactory _clientFactory;
+        private readonly ITransmissionClient _clientFactory;
 
         public MessagingTests()
         {
@@ -160,7 +160,7 @@ namespace Plexus.Interop.Transport.Protocol
             Log.Trace(senderTask.Exception.ExtractInner(), "Received exception on sending");
         }
 
-        private Task RunReceiverTaskAsync(ITransmissionConnectionFactory streamFactory, Func<IMessagingReceiveProcessor, Task> action)
+        private Task RunReceiverTaskAsync(ITransmissionClient streamFactory, Func<IMessagingReceiveProcessor, Task> action)
         {
             return TaskRunner.RunInBackground(async () =>
             {
@@ -176,7 +176,7 @@ namespace Plexus.Interop.Transport.Protocol
             });
         }
 
-        private Task RunSenderTaskAsync(ITransmissionConnectionFactory streamFactory, Func<IMessagingSendProcessor, Task> action)
+        private Task RunSenderTaskAsync(ITransmissionClient streamFactory, Func<IMessagingSendProcessor, Task> action)
         {
             return TaskRunner.RunInBackground(async () =>
             {

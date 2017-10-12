@@ -21,8 +21,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
     using Microsoft.Extensions.DependencyInjection;
     using Plexus.Channels;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
+    using Plexus.Processes;
     using System;
-    using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -31,141 +31,86 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class WebSocketTransmissionServer : ITransmissionServer, IWebSocketHandler
-    {
+    public sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer, IWebSocketHandler
+    {        
         private const string ServerName = "ws-v1";
 
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionServer>();
 
-        private readonly ConcurrentDictionary<ITransmissionConnection, Nothing> _currentConnections
-            = new ConcurrentDictionary<ITransmissionConnection, Nothing>();
-
         private IWebHost _host;
+        private readonly CancellationTokenSource _cancellation;
         private readonly IChannel<ITransmissionConnection> _incomingConnections = new BufferedChannel<ITransmissionConnection>(0);
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
-        private readonly Promise _completion = new Promise();
-        private readonly Promise _startCompletion = new Promise();
-        private readonly Latch _started = new Latch();
         private readonly IServerStateWriter _stateWriter;
 
-        public WebSocketTransmissionServer(string workingDir = null)
+        public WebSocketTransmissionServer(
+            string workingDir, CancellationToken cancellationToken = default)
         {
-            _stateWriter = new ServerStateWriter(ServerName, workingDir ?? Directory.GetCurrentDirectory());
+            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _stateWriter = new ServerStateWriter(ServerName, workingDir);
         }
-
-        public Task Completion => _completion.Task;
 
         public async Task HandleAsync(WebSocket websocket)
         {
             try
             {
                 var connection = new WebSocketServerTransmissionConnection(websocket);
-                _currentConnections.TryAdd(connection, Nothing.Instance);
-                connection.Completion
-                    .ContinueWithSynchronously(t => _currentConnections.TryRemove(connection, out _), CancellationToken.None)
-                    .IgnoreAwait(Log);
                 await _incomingConnections.Out.WriteAsync(connection).ConfigureAwait(false);
-                Log.Info("Websocket connection accepted: {0}", websocket);
+                Log.Debug("Websocket connection accepted");
                 await connection.Completion.ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                Log.Info("Websocket connection failed: {0}", ex.FormatTypeAndMessage());
+                Log.Debug("Websocket connection failed: {0}", ex.FormatTypeAndMessage());
                 throw;
             }
         }
 
-        public async ValueTask<ITransmissionConnection> CreateAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync()
         {
-            Log.Debug("Waiting for incoming connection");
-            var result = await _incomingConnections.In.TryReadAsync().ConfigureAwait(false);
+            return _incomingConnections.In.TryReadAsync();
+        }
+
+        public async ValueTask<ITransmissionConnection> AcceptAsync()
+        {
+            var result = await TryAcceptAsync().ConfigureAwait(false);
             if (!result.HasValue)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                throw new InvalidOperationException("Web socket server closed");
+                throw new OperationCanceledException();
             }
             return result.Value;
         }
 
-        public async Task StartAsync()
+        protected override async Task<Task> StartCoreAsync()
         {
-            if (!_started.TryEnter())
+            Log.Debug("Starting");
+            using (_stateWriter)
             {
-                throw new InvalidOperationException("Server was already started");
+                await Task.Factory
+                    .StartNew(MainThreadAsync, TaskCreationOptions.LongRunning)
+                    .Unwrap()
+                    .ConfigureAwait(false);
             }
-
-            try
-            {
-                Log.Debug("Starting");
-
-                Task.Factory.StartNew(MainThreadAsync, TaskCreationOptions.LongRunning).Unwrap().PropagateCompletionToPromise(_completion);
-                _incomingConnections.Out.PropagateCompletionFrom(_completion.Task);
-                _completion.Task.PropagateCompletionToPromise(_startCompletion);
-
-                await _startCompletion.Task.ConfigureAwait(false);                
-
-                Log.Debug("Started");
-            }
-            catch (Exception ex)
-            {
-                _completion.TryFail(ex);
-                throw;
-            }
-        }
-
-        public async Task StopAsync()
-        {
-            try
-            {
-                if (_started.TryEnter())
-                {
-                    _completion.TryComplete();
-                }
-                Log.Debug("Stopping");
-                _cancellation.Cancel();
-                foreach (var con in _currentConnections.Keys)
-                {                    
-                    con.Out.TryTerminate();
-                }
-                await _completion.Task.ConfigureAwait(false);
-                Log.Debug("Stopped");
-            }
-            catch
-            {
-                // ignore
-            }
-            finally
-            {
-                _stateWriter?.Dispose();
-                _host?.Dispose();
-                _host = null;
-            }
+            return Task.CompletedTask;
         }
 
         public void Dispose()
         {
-            StopAsync().GetResult();
+            _cancellation.Cancel();
+            Completion.IgnoreExceptions().GetResult();            
         }
 
         public void OnListeningStarted()
         {
-            try
-            {
-                var feature = _host.ServerFeatures.Get<IServerAddressesFeature>();
-                var url = feature.Addresses.First();                
-                _stateWriter.Write("address", url.Replace("http://", "ws://"));
-                Log.Info("Websocket server started: {0}", url);
-                _stateWriter.SignalInitialized();                
-                _startCompletion.TryComplete();
-            }
-            catch (Exception ex)
-            {
-                _startCompletion.TryFail(ex);
-            }
+            var feature = _host.ServerFeatures.Get<IServerAddressesFeature>();
+            var url = feature.Addresses.First();
+            _stateWriter.Write("address", url.Replace("http://", "ws://"));
+            Log.Info("Websocket server started: {0}", url);
+            _stateWriter.SignalInitialized();
+            SetStartCompleted();
         }
 
         private async Task MainThreadAsync()
-        {            
+        {
             try
             {
                 Log.Debug("Resolving localhost url");
@@ -188,8 +133,14 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
             }
             catch (Exception ex)
             {
+                _incomingConnections.Out.TryTerminate(ex);
                 Log.Error(ex, "Web server host terminated with exception");
                 throw;
+            }
+            finally
+            {
+                _incomingConnections.Out.TryComplete();
+                await _incomingConnections.In.Completion.ConfigureAwait(false);
             }
         }
     }

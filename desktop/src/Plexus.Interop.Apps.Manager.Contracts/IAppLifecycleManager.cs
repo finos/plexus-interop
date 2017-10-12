@@ -23,7 +23,5 @@
         Task Completion { get; }
 
         Task StartAsync();
-
-        Task StopAsync();
     }
 }
