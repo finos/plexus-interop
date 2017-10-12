@@ -36,6 +36,14 @@ export class ClientConnectivityTests extends BaseEchoTest {
     }
 
     public testAllInvocationClientsReceiveErrorOnClientDisconnect(): Promise<void> {
+        return this.testAllInvocationClientsReceiveErrorOnDisconnect(true, false);
+    }
+
+    public testAllInvocationClientsReceiveErrorOnServerDisconnect(): Promise<void> {
+        return this.testAllInvocationClientsReceiveErrorOnDisconnect(false, true);
+    }
+
+    private testAllInvocationClientsReceiveErrorOnDisconnect(isForcedByClient: boolean, isForcedByServer: boolean): Promise<void> {
 
         const echoRequest = this.clientsSetup.createRequestDto();
         let serverStreamingContext: MethodInvocationContext | null = null;
@@ -71,16 +79,30 @@ export class ClientConnectivityTests extends BaseEchoTest {
 
             await serverRequestReceived
             console.log("Request received");
-            await (client as EchoClientClient).disconnect();
-            console.log("Client disconnected");            
+
+            if (isForcedByClient) {
+                (client as EchoClientClient).disconnect();
+            }
+
+            if (isForcedByServer) {
+                (server as EchoServerClient).disconnect();
+            }
+
             await clientInvocationErrorReceived;       
             console.log("Client invocation error received");
             
             await AsyncHelper.waitFor(() => (serverStreamingContext as MethodInvocationContext).cancellationToken.isCancelled());
             console.log("Server streaming cancelled");
 
-            await (server as EchoServerClient).disconnect();
-            console.log("Server disconnected");
+            if (!isForcedByServer) {
+                await (server as EchoServerClient).disconnect();
+                console.log("Server disconnected");
+            }
+
+            if (!isForcedByClient) {
+                await (client as EchoClientClient).disconnect();
+                console.log("Client disconnected");
+            }
 
             testResolve();
             

@@ -49,8 +49,12 @@ describe("Web Socket Client connectivity", () => {
             });
     });
 
-    it("Notifies all invocation client with error if client disconnected", function() {
+    it("Notifies all invocation clients with error if client disconnected", function() {
         return connectivityTests.testAllInvocationClientsReceiveErrorOnClientDisconnect();
+    });
+
+    it("Notifies all invocation clients with error if server disconnected", function() {
+        return connectivityTests.testAllInvocationClientsReceiveErrorOnServerDisconnect();
     });
 
 });
