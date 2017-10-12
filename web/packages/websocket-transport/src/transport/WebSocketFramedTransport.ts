@@ -58,12 +58,21 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             this.log.warn("Already disconnected");
             return Promise.resolve();
         }
+        if (!this.isSocketClosed()) {
+            this.log.warn("Socket is CLOSED, cancelling connection");
+            this.cancelConnectionAndCleanUp();
+        }
         this.throwIfNotConnectedOrDisconnectRequested();
         return this.closeConnectionInternal();
     }
 
     public connected(): boolean {
         return this.socket.readyState === WebSocketFramedTransport.OPEN;
+    }
+
+    private isSocketClosed(): boolean {
+        return this.socket.readyState === WebSocketFramedTransport.CLOSED 
+            || this.socket.readyState === WebSocketFramedTransport.CLOSING;
     }
 
     public async readFrame(): Promise<Frame> {
@@ -124,7 +133,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     private async closeConnectionInternal(): Promise<void> {
         this.log.debug("Closing connection");
-        this.closeLogicalConnection();
+        this.cancelConnectionAndCleanUp();
         if (this.terminateSent && this.terminateReceived) {
             this.scheduleSocketDisconnect();
         } else if (this.terminateSent) {
@@ -153,13 +162,14 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         }, WebSocketFramedTransport.SOCKET_CLOSE_TIMEOUT);
     }
 
-    private closeLogicalConnection(reason: string = "Connection closed"): void {
+    private cancelConnectionAndCleanUp(reason: string = "Connection closed"): void {
+        this.log.debug(`Cancelling connection with reason: ${reason}`);        
         this.socketOpenToken.cancel(reason);
         this.inMessagesBuffer.clear();
     }
 
     private handleCloseEvent(socket: WebSocket, ev: CloseEvent): void {
-        this.log.debug("Connection closed", ev);
+        this.log.debug("Connection closed event received", ev);
     }
 
     private handleMessageEvent(ev: MessageEvent): void {
@@ -218,7 +228,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     private handleError(socket: WebSocket, ev: Event): void {
         this.log.error("Connection error received", ev);
-        this.closeLogicalConnection("Connection error received");
+        this.cancelConnectionAndCleanUp("Connection error received");
     }
 
     private handleOpen(): void {
