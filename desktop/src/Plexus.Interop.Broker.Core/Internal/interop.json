@@ -10,6 +10,17 @@
 					"type": "Unary"
 				}
 			]
+		},
+		{
+			"id": "interop.AppLifecycleService",
+			"methods": [
+				{
+					"name": "Activate",
+					"input": "interop.ActivateAppRequest",
+					"output": "interop.ActivateAppResponse",
+					"type": "Unary"
+				}
+			]
 		}
 	],
 	"applications": [
@@ -22,6 +33,34 @@
 					],
 					"methods": [
 						"Launch"
+					]
+				}
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.AppLifecycleService",
+		     		"title": "AppLifecycleService",
+		     		"to": [
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Activate",
+		     				"title": "Activate"
+		     			}
+		     		]
+		     	}
+		     ]
+		  },
+		{
+			"id": "interop.CommandLineTool",
+			"consumes": [
+				{
+					"service": "interop.AppLifecycleService",
+					"from": [
+						"interop.AppLifecycleManager"
+					],
+					"methods": [
+						"Activate"
 					]
 				}
 		     ],

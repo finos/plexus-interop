@@ -15,14 +15,21 @@
 // limitations under the License.
 //
 
-import "interop/AppLauncherService.proto";
-import "interop/AppLifecycleService.proto";
+syntax = "proto3";
 
 package interop;
 
-application AppLifecycleManager {
+import "interop/UniqueId.proto";
 
-	consumes AppLauncherService { Launch; }
+service AppLifecycleService {
+	rpc Activate (ActivateAppRequest) returns (ActivateAppResponse);
+}
 
-	provides AppLifecycleService { Activate; }
+message ActivateAppRequest {
+	string app_id = 1;
+}
+
+message ActivateAppResponse {
+	UniqueId app_instance_id = 1;
+	UniqueId app_connection_id = 1;
 }

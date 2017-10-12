@@ -15,14 +15,10 @@
 // limitations under the License.
 //
 
-import "interop/AppLauncherService.proto";
 import "interop/AppLifecycleService.proto";
 
 package interop;
 
-application AppLifecycleManager {
-
-	consumes AppLauncherService { Launch; }
-
-	provides AppLifecycleService { Activate; }
+application CommandLineTool {
+	consumes AppLifecycleService from interop.AppLifecycleManager { Activate; }
 }
