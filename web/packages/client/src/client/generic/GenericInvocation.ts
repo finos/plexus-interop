@@ -234,16 +234,19 @@ export class GenericInvocation {
         this.log.trace(`Starting listening of incoming messages`);
         return new Promise<AnonymousSubscription>((resolve, reject) => {
             this.sourceChannel.open({
+
                 started: (sourceSubscription) => {
                     this.log.debug("Source channel subscription started");
                     this.sourceChannelSubscription = sourceSubscription;
                     resolve(sourceSubscription);
                 },
+
                 startFailed: (error) => {
                     this.log.error("Unable to open source channel", error);
                     invocationObserver.startFailed(error);
                     reject(error);
                 },
+
                 next: (message) => {
                     try {
                         this.handleIncomingMessage(message, invocationObserver);
@@ -254,10 +257,12 @@ export class GenericInvocation {
                         invocationObserver.error(e);
                     }
                 },
+
                 complete: () => {
                     this.log.debug("Remote channel closed");
                     invocationObserver.complete();
                 },
+                
                 error: (e) => {
                     this.log.error("Error from source channel received", e);
                     this.closeInternal();

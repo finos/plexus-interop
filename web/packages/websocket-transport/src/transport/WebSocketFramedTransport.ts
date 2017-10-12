@@ -174,7 +174,6 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     private handleMessageEvent(ev: MessageEvent): void {
         this.log.debug("Message event received");
-        this.throwIfNotConnected();
         if (this.isTerminateMessage(ev)) {
             this.log.debug("Terminate message received");
             this.terminateReceived = true;
