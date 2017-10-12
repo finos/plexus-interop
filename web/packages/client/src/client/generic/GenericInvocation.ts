@@ -248,8 +248,9 @@ export class GenericInvocation {
                     try {
                         this.handleIncomingMessage(message, invocationObserver);
                     } catch (e) {
-                        this.log.error(`Unknown error`, e);
-                        this.terminate("Unknown error");
+                        const errorText = "Error while processing of incoming message";
+                        this.log.error(errorText, e);
+                        this.terminate(errorText);
                         invocationObserver.error(e);
                     }
                 },
@@ -259,7 +260,7 @@ export class GenericInvocation {
                 },
                 error: (e) => {
                     this.log.error("Error from source channel received", e);
-                    this.terminate("Error from source channel received");
+                    this.closeInternal();
                     invocationObserver.error(e);
                 }
             });
