@@ -26,4 +26,8 @@ export * from "./MethodDiscoveryRequest";
 export * from "./MethodDiscoveryResponse";
 export * from "./ProvidedMethodReference";
 export * from "./DiscoveredMethod";
+export * from "./DiscoveredServiceMethod";
+export * from "./ConsumedService";
+export * from "./ProvidedServiceReference";
+export * from "./DiscoveredService";
 export * from "./MethodType";

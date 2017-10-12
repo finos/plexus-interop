@@ -14,9 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus } from "@plexus-interop/protocol";
-import { DiscoveredService } from "./DiscoveredService";
+import { ConsumedService } from "./ConsumedService";
+import { ProvidedServiceReference } from "./ProvidedServiceReference";
+import { DiscoveredServiceMethod } from "./DiscoveredServiceMethod";
 
-export interface ServiceDiscoveryResponse {
-    services?: DiscoveredService[];
+export interface DiscoveredService {
+
+    consumedService?: ConsumedService;
+
+    providedService?: ProvidedServiceReference;
+
+    serviceTitle?: string;
+
+    methods?: DiscoveredServiceMethod[];
 }

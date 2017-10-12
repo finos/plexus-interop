@@ -14,9 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus } from "@plexus-interop/protocol";
-import { DiscoveredService } from "./DiscoveredService";
+import { MethodType } from "./MethodType";
 
-export interface ServiceDiscoveryResponse {
-    services?: DiscoveredService[];
+export interface DiscoveredServiceMethod {
+    /** DiscoveredServiceMethod methodId */
+    methodId?: string;
+
+    /** DiscoveredServiceMethod methodTitle */
+    methodTitle?: string;
+
+    /** DiscoveredServiceMethod inputMessageId */
+    inputMessageId?: string;
+
+    /** DiscoveredServiceMethod outputMessageId */
+    outputMessageId?: string;
+
+    /** DiscoveredServiceMethod methodType */
+    methodType?: MethodType;
 }

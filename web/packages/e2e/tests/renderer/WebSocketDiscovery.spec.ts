@@ -42,6 +42,14 @@ describe("Client: Web Socket Discovery", () => {
         return pointToPointTests.testMethodDiscoveredByReference();
     });
 
+    it("Receives discovered service by service ID", function() {
+        return pointToPointTests.testServiceDiscoveredById();
+    });
+
+    it("Receives empty Service Discovery response if ID is wrong", function() {
+        return pointToPointTests.testServiceDiscoveryReceivesEmptyResponseForWrongId();
+    });
+
     it("Can invoke discovered method passing serialized data", function() {
         return pointToPointTests.testClientCanInvokeDiscoveredMethod();
     });

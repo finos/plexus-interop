@@ -14,9 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus } from "@plexus-interop/protocol";
-import { DiscoveredService } from "./DiscoveredService";
+import { UniqueId } from "@plexus-interop/transport-common";
 
-export interface ServiceDiscoveryResponse {
-    services?: DiscoveredService[];
+export interface ProvidedServiceReference {
+    /** ProvidedServiceReference serviceId */
+    serviceId?: string;
+
+    /** ProvidedServiceReference serviceAlias */
+    serviceAlias?: string;
+
+    /** ProvidedServiceReference applicationId */
+    applicationId?: string;
+
+    /** ProvidedServiceReference connectionId */
+    connectionId?: UniqueId;
 }
