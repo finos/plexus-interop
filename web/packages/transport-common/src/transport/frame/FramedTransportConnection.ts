@@ -28,7 +28,16 @@ import { ChannelsHolder } from "../../common/ChannelsHolder";
 import { BufferedChannelsHolder } from "../../common/BufferedChannelsHolder";
 import { StateMaschineBase, StateMaschine, CancellationToken, LoggerFactory, Logger, BlockingQueue, BlockingQueueBase } from "@plexus-interop/common";
 
-export enum ConnectionState { CREATED, ACCEPT, OPEN, CLOSE_RECEIVED, CLOSE_REQUESTED, CLOSED }
+export type ConnectionState = "CREATED" | "ACCEPT" | "OPEN" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED" | "CLOSED";
+
+export const ConnectionState = {
+    CREATED: "CREATED" as ConnectionState, 
+    ACCEPT: "ACCEPT" as ConnectionState, 
+    OPEN: "OPEN" as ConnectionState, 
+    CLOSE_RECEIVED: "CLOSE_RECEIVED" as ConnectionState, 
+    CLOSE_REQUESTED: "CLOSE_REQUESTED" as ConnectionState, 
+    CLOSED: "CLOSED" as ConnectionState
+}
 
 type ChannelDescriptor = {
     channel: FramedTransportChannel,
