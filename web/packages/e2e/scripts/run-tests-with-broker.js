@@ -21,7 +21,7 @@ function main() {
         wsAddressDir: "servers/ws-v1",
         wsAddressFile: "address",
         brokerCmd: "../broker/plexus.exe",
-        brokerArgs: " broker metadata"
+        brokerArgs: ` broker ${__dirname}/../metadata`
     };
 
     const fullBrokerCmd = path.join(config.brokerBaseDir, config.brokerCmd);
@@ -69,6 +69,9 @@ function main() {
         if (error) {
             console.error('Std Error:', stderr);
             console.error('Error:', error);
+        }
+        if (stderr) {
+            log('StdErr:', stderr);
         }
         log('StdOut:', stdout);
         process.exit();

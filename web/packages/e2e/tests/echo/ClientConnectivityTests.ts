@@ -22,6 +22,9 @@ import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientError } from "@plexus-interop/protocol";
 import { expect } from "chai";
 import { ServerStreamingHandler } from "./ServerStreamingHandler";
+import { MethodInvocationContext } from "@plexus-interop/client";
+import { EchoClientClient } from "../../src/echo/client/EchoClientGeneratedClient";
+import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
 
 export class ClientConnectivityTests extends BaseEchoTest {
 
@@ -32,38 +35,49 @@ export class ClientConnectivityTests extends BaseEchoTest {
     }
 
     public testAllInvocationClientsReceiveErrorOnClientDisconnect(): Promise<void> {
+
         const echoRequest = this.clientsSetup.createRequestDto();
-        return new Promise<void>(async (resolve, reject) => {
-            const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
-                try {
-                    await this.assertEqual(request, echoRequest);
-                    hostClient.next(echoRequest);
-                    hostClient.next(echoRequest);
-                    hostClient.next(echoRequest);
-                    hostClient.complete();
-                } catch (error) {
-                    console.error("Failed", error);
-                    reject(error);
-                }
-            });
-            const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
-            const responses: plexus.plexus.interop.testing.IEchoRequest[] = [];
+        let serverStreamingContext: MethodInvocationContext | null = null;
+        let client: EchoClientClient | null = null;
+        let server: EchoServerClient | null = null;
+        return new Promise<void>(async (testResolve, testError) => {
             
-            client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: (response) => {
-                    console.log("Received");
-                    responses.push(response);
-                },
-                complete: async () => {
-                    expect(responses.length).is.eq(3);
-                    responses.forEach(r => this.assertEqual(r, echoRequest));
-                    await this.clientsSetup.disconnect(client, server);
-                    resolve();
-                },
-                error: (e) => {
-                    reject(e);
-                }
+            let handler: ServerStreamingHandler | null = null;
+            
+            const serverRequestReceived = new Promise(async (serverRequestResolve) => {
+                handler = new ServerStreamingHandler(async (context, request, hostClient) => {
+                    serverStreamingContext = context;
+                    serverRequestResolve();
+                });
+                [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler as ServerStreamingHandler);
+                console.log("Clients created");
             });
+
+            const serverStreamingInvocationErrorReceived = new Promise((clientErrorResolve, clientErrorReject) => {
+                (client as EchoClientClient).getEchoServiceProxy().serverStreaming(echoRequest, {
+                    next: (r) => clientErrorReject("Not expected to receive update"),
+                    complete: () => clientErrorReject("Not expected to complete"),
+                    error: (e) => {
+                        clientErrorResolve();
+                    }
+                });
+            });
+
+            await serverRequestReceived
+            console.log("Request received");
+            await (client as EchoClientClient).disconnect();
+            console.log("Client disconnected");            
+            await serverStreamingInvocationErrorReceived;       
+            console.log("Server error received");
+            if (!(serverStreamingContext as MethodInvocationContext)
+                    .cancellationToken
+                    .isCancelled()) {
+                testError("Server must be cancelled");
+            }
+            await (server as EchoServerClient).disconnect();
+            console.log("Server disconnected");
+            testResolve();
+            
         });
     }
 }

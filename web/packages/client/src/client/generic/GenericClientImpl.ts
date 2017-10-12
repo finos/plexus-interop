@@ -124,7 +124,7 @@ export class GenericClientImpl implements GenericClient {
                 observer.next(channel);
             } catch (error) {
                 this.log.error("Error while reading frame", error);
-                this.state.go(ClientState.CLOSED);
+                await this.state.go(ClientState.CLOSED);
             }
         }
         this.log.debug("Finished to listen for Channels");
