@@ -12,10 +12,10 @@
 			]
 		},
 		{
-			"id": "interop.AppLifecycleService",
+			"id": "interop.InteropService",
 			"methods": [
 				{
-					"name": "Activate",
+					"name": "ActivateApp",
 					"input": "interop.ActivateAppRequest",
 					"output": "interop.ActivateAppResponse",
 					"type": "Unary"
@@ -37,34 +37,41 @@
 				}
 		     ],
 		     "provides": [
-		     	{
-		     		"service": "interop.AppLifecycleService",
-		     		"title": "AppLifecycleService",
-		     		"to": [
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Activate",
-		     				"title": "Activate"
-		     			}
-		     		]
-		     	}
 		     ]
 		  },
 		{
 			"id": "interop.CommandLineTool",
 			"consumes": [
 				{
-					"service": "interop.AppLifecycleService",
+					"service": "interop.InteropService",
 					"from": [
-						"interop.AppLifecycleManager"
+						"interop.InteropManager"
 					],
 					"methods": [
-						"Activate"
+						"ActivateApp"
 					]
 				}
 		     ],
 		     "provides": [
+		     ]
+		  },
+		{
+			"id": "interop.InteropManager",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.InteropService",
+		     		"title": "InteropService",
+		     		"to": [
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "ActivateApp",
+		     				"title": "ActivateApp"
+		     			}
+		     		]
+		     	}
 		     ]
 		  },
 		{
