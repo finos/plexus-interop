@@ -51,7 +51,6 @@ export class DiscoveryTests extends BaseEchoTest {
     }
 
     public async testServiceDiscoveredById(): Promise<void> {
-        debugger;
         const serviceId = "plexus.interop.testing.EchoService";
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
         const serviceDiscoveryResponse = await client.discoverService({
@@ -83,11 +82,10 @@ export class DiscoveryTests extends BaseEchoTest {
         } else {
             throw "Empty Response";
         }
-        await this.clientsSetup.disconnect(client, server);        
+        await this.clientsSetup.disconnect(client, server);
     }
 
     public async testServiceDiscoveryReceivesEmptyResponseForWrongId(): Promise<void> {
-        debugger;
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
         const serviceDiscoveryResponse = await client.discoverService({
             consumedService: {
@@ -100,50 +98,39 @@ export class DiscoveryTests extends BaseEchoTest {
         await this.clientsSetup.disconnect(client, server);
     }
 
-    public testClientCanInvokeDiscoveredMethod(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            const echoRequest = this.clientsSetup.createRequestDto();
-            const handler = new UnaryServiceHandler(async (context, request) => request);
-            return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
-                .then(clients => {
-                    const client = clients[0];
-                    return client.discoverMethod({
-                        consumedMethod: {
-                            consumedService: {
-                                serviceId: "plexus.interop.testing.EchoService"
-                            },
-                            methodId: "Unary"
-                        }
-                    })
-                        .then(discoveryResponse => {
-                            if (discoveryResponse.methods) {
-                                expect(discoveryResponse.methods.length).to.be.eq(1);
-                                const method = discoveryResponse.methods[0];
-                                this.assertDiscoveredMethodValid(method);
-                                // invoke discovered
-                                return new Promise((invocationResolve, invocationReject) => {
-                                    client.sendDiscoveredUnaryRequest(
-                                        method.providedMethod as ProvidedMethodReference,
-                                        this.encodeRequestDto(echoRequest), {
-                                            value: (response: ArrayBuffer) => {
-                                                const echoResponse = this.decodeRequestDto(response);
-                                                this.assertEqual(echoRequest, echoResponse);
-                                                invocationResolve();
-                                            },
-                                            error: (e) => invocationReject(e)
-                                        });
-                                });
-                            } else {
-                                throw "Empty response";
-                            }
-                        })
-                        .then(() => {
-                            return this.clientsSetup.disconnect(clients[0], clients[1]);
-                        });
-                })
-                .then(() => resolve())
-                .catch(error => reject(error));
+    public async testClientCanInvokeDiscoveredMethod(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        const handler = new UnaryServiceHandler(async (context, request) => request);
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const discoveryResponse = await client.discoverMethod({
+            consumedMethod: {
+                consumedService: {
+                    serviceId: "plexus.interop.testing.EchoService"
+                },
+                methodId: "Unary"
+            }
         });
+        if (discoveryResponse.methods) {
+            expect(discoveryResponse.methods.length).to.be.eq(1);
+            const method = discoveryResponse.methods[0];
+            this.assertDiscoveredMethodValid(method);
+            // invoke discovered
+            await new Promise((invocationResolve, invocationReject) => {
+                client.sendDiscoveredUnaryRequest(
+                    method.providedMethod as ProvidedMethodReference,
+                    this.encodeRequestDto(echoRequest), {
+                        value: (response: ArrayBuffer) => {
+                            const echoResponse = this.decodeRequestDto(response);
+                            this.assertEqual(echoRequest, echoResponse);
+                            invocationResolve();
+                        },
+                        error: (e) => invocationReject(e)
+                    });
+            });
+        } else {
+            throw "Empty response";
+        }
+        await this.clientsSetup.disconnect(client, server);
     }
 
     private assertDiscoveredMethodValid(discoveredMethod: DiscoveredMethod) {
@@ -155,63 +142,41 @@ export class DiscoveryTests extends BaseEchoTest {
     private assertDiscoveredServiceMethodValid(discoveredMethod: DiscoveredServiceMethod) {
         expect(discoveredMethod.methodId).to.not.be.undefined;
         expect(discoveredMethod.methodTitle).to.not.be.undefined;
-        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");        
-        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");        
+        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
     }
 
-    public testMethodDiscoveredByOutputMessageId(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            return this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler())
-                .then(clients => {
-                    const client = clients[0];
-                    return client.discoverMethod({ outputMessageId: "plexus.interop.testing.EchoRequest" })
-                        .then(discoveryResponse => {
-                            if (discoveryResponse.methods) {
-                                expect(discoveryResponse.methods.length).to.be.eq(4);
-                                discoveryResponse.methods.forEach(
-                                    method => this.assertDiscoveredMethodValid(method));
-                            } else {
-                                throw "Empty response";
-                            }
-                        })
-                        .then(() => {
-                            return this.clientsSetup.disconnect(clients[0], clients[1]);
-                        });
-                })
-                .then(() => resolve())
-                .catch(error => reject(error));
-        });
+    public async testMethodDiscoveredByOutputMessageId(): Promise<void> {
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
+        const discoveryResponse = await client.discoverMethod({ outputMessageId: "plexus.interop.testing.EchoRequest" });
+        if (discoveryResponse.methods) {
+            expect(discoveryResponse.methods.length).to.be.eq(4);
+            discoveryResponse.methods.forEach(
+                method => this.assertDiscoveredMethodValid(method));
+        } else {
+            throw "Empty response";
+        }
+        await this.clientsSetup.disconnect(client, server);
     }
 
-    public testMethodDiscoveredByReference(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            return this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler())
-                .then(clients => {
-                    const client = clients[0];
-                    return client.discoverMethod({
-                        consumedMethod: {
-                            consumedService: {
-                                serviceId: "plexus.interop.testing.EchoService"
-                            },
-                            methodId: "Unary"
-                        }
-                    })
-                        .then(discoveryResponse => {
-                            if (discoveryResponse.methods) {
-                                expect(discoveryResponse.methods.length).to.be.eq(1);
-                                discoveryResponse.methods.forEach(
-                                    method => this.assertDiscoveredMethodValid(method));
-                            } else {
-                                throw "Empty response";
-                            }
-                        })
-                        .then(() => {
-                            return this.clientsSetup.disconnect(clients[0], clients[1]);
-                        });
-                })
-                .then(() => resolve())
-                .catch(error => reject(error));
+    public async testMethodDiscoveredByReference(): Promise<void> {
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
+        const discoveryResponse = await client.discoverMethod({
+            consumedMethod: {
+                consumedService: {
+                    serviceId: "plexus.interop.testing.EchoService"
+                },
+                methodId: "Unary"
+            }
         });
+        if (discoveryResponse.methods) {
+            expect(discoveryResponse.methods.length).to.be.eq(1);
+            discoveryResponse.methods.forEach(
+                method => this.assertDiscoveredMethodValid(method));
+        } else {
+            throw "Empty response";
+        }
+        await this.clientsSetup.disconnect(client, server);
     }
 
 }
