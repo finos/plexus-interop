@@ -16,21 +16,28 @@
  */
 namespace Plexus.Interop.Transport
 {
+    using System;
+    using Plexus.Interop.Transport.Internal;
     using Plexus.Interop.Transport.Protocol.Serialization;
     using Plexus.Interop.Transport.Transmission;
     using System.Threading.Tasks;
 
-    public sealed class TransportServer : ITransportServer
+    public sealed class TransportServer : ITransportServer, ITransportConnectionFactory
     {
         private readonly ITransmissionServer _transmissionServer;
-        private readonly ITransportConnectionFactory _connectionFactory;
+        private readonly TransportConnectionFactory _connectionFactory;
 
         public TransportServer(
             ITransmissionServer transmissionServer,
             ITransportProtocolSerializationProvider serializationProvider)
         {
-            _connectionFactory = new TransportConnectionFactory(transmissionServer, serializationProvider);
+            _connectionFactory = new TransportConnectionFactory(serializationProvider);
             _transmissionServer = transmissionServer;
+        }
+
+        public async ValueTask<ITransportConnection> AcceptAsync()
+        {
+            return (await TryAcceptAsync()).GetValueOrThrowException<OperationCanceledException>();
         }
 
         public Task Completion => _transmissionServer.Completion;
@@ -40,14 +47,27 @@ namespace Plexus.Interop.Transport
             await _transmissionServer.StartAsync().ConfigureAwait(false);
         }
 
-        public ValueTask<Maybe<ITransportConnection>> TryCreateAsync()
+        public async ValueTask<Maybe<ITransportConnection>> TryAcceptAsync()
         {
-            return _connectionFactory.TryCreateAsync();
+            var connection = await _transmissionServer.TryAcceptAsync();
+            return connection.HasValue
+                ? new Maybe<ITransportConnection>(_connectionFactory.Create(connection.Value))
+                : Maybe<ITransportConnection>.Nothing;
         }
 
         public void Dispose()
         {
             _transmissionServer.Dispose();
+        }
+
+        ValueTask<Maybe<ITransportConnection>> ITransportConnectionFactory.TryCreateAsync()
+        {
+            return TryAcceptAsync();
+        }
+
+        ValueTask<ITransportConnection> ITransportConnectionFactory.CreateAsync()
+        {
+            return AcceptAsync();
         }
     }
 }

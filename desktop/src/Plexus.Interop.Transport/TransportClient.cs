@@ -14,36 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- using Plexus.Interop.Transport.Internal;
-using Plexus.Interop.Transport.Transmission;
-using System.Threading;
-using System.Threading.Tasks;
-using Plexus.Interop.Transport.Protocol;
-using Plexus.Interop.Transport.Protocol.Serialization;
-using System;
-
 namespace Plexus.Interop.Transport
 {
-    public sealed class TransportConnectionFactory : ITransportConnectionFactory
+    using Plexus.Interop.Transport.Internal;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
+    using System;
+    using System.Threading.Tasks;
+
+    public sealed class TransportClient : ITransportClient, ITransportConnectionFactory
     {
-        private static readonly ILogger Log = LogManager.GetLogger<TransportConnectionFactory>();
+        private static readonly ILogger Log = LogManager.GetLogger<TransportClient>();
 
         private readonly ITransmissionClient _transmissionClient;
-        private readonly ITransportProtocolSerializer _serializer;
-        private readonly ITransportProtocolDeserializer _deserializer;
+        private readonly TransportConnectionFactory _connectionFactory;
 
-        public TransportConnectionFactory(
+        public TransportClient(
             ITransmissionClient transmissionClient,
             ITransportProtocolSerializationProvider serializationProvider)
         {
             _transmissionClient = transmissionClient;
-            _serializer = serializationProvider.GetSerializer();
-            _deserializer = serializationProvider.GetDeserializer(TransportHeaderPool.Instance);
+            _connectionFactory = new TransportConnectionFactory(serializationProvider);
         }
 
-        public async ValueTask<Maybe<ITransportConnection>> TryCreateAsync()
+        public async ValueTask<Maybe<ITransportConnection>> TryConnectAsync()
         {
-            var result = await _transmissionClient.TryCreateAsync().ConfigureAwait(false);
+            var result = await _transmissionClient.TryConnectAsync().ConfigureAwait(false);
             if (!result.HasValue)
             {
                 return Maybe<ITransportConnection>.Nothing;
@@ -51,11 +47,7 @@ namespace Plexus.Interop.Transport
             var transmissionConnection = result.Value;
             try
             {
-                var sender = new TransportSendProcessor(transmissionConnection, TransportHeaderPool.Instance, _serializer);
-                var receiver = new TransportReceiveProcessor(transmissionConnection, _deserializer);
-                var connection = new TransportConnection(sender, receiver, TransportHeaderPool.Instance);
-                Log.Trace("New connection created: {0}", connection.Id);
-                return connection;
+                return new Maybe<ITransportConnection>(_connectionFactory.Create(transmissionConnection));
             }
             catch (Exception ex)
             {
@@ -63,6 +55,21 @@ namespace Plexus.Interop.Transport
                 transmissionConnection.Dispose();
                 throw;
             }
+        }
+
+        public async ValueTask<ITransportConnection> ConnectAsync()
+        {
+            return (await TryConnectAsync()).GetValueOrThrowException<OperationCanceledException>();
+        }
+
+        ValueTask<Maybe<ITransportConnection>> ITransportConnectionFactory.TryCreateAsync()
+        {
+            return TryConnectAsync();
+        }
+
+        ValueTask<ITransportConnection> ITransportConnectionFactory.CreateAsync()
+        {
+            return ConnectAsync();
         }
 
         public override string ToString()

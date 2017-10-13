@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Pipes
+ namespace Plexus.Interop.Transport.Pipes
 {
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
@@ -27,13 +27,13 @@
             Server = RegisterDisposable(new TransportServer(
                 new PipeTransmissionServer(Directory.GetCurrentDirectory()),
                 new ProtobufTransportProtocolSerializationProvider()));
-            Client = new TransportConnectionFactory(
+            Client = new TransportClient(
                 new PipeTransmissionClient(Directory.GetCurrentDirectory()),
                 new ProtobufTransportProtocolSerializationProvider());
         }
 
         protected override ITransportServer Server { get; }
 
-        protected override ITransportConnectionFactory Client { get; }
+        protected override ITransportClient Client { get; }
     }
 }

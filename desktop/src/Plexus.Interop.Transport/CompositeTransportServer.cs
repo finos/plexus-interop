@@ -55,7 +55,7 @@
             {
                 while (true)
                 {
-                    var result = await server.TryCreateAsync().ConfigureAwait(false);
+                    var result = await server.TryAcceptAsync().ConfigureAwait(false);
                     if (!result.HasValue)
                     {
                         break;

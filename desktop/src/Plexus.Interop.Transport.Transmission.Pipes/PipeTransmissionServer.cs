@@ -16,16 +16,16 @@
  */
 namespace Plexus.Interop.Transport.Transmission.Pipes
 {
+    using Plexus.Channels;
+    using Plexus.Interop.Transport.Transmission.Streams;
     using Plexus.Processes;
     using System;
     using System.IO;
     using System.IO.Pipes;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Channels;
-    using Plexus.Interop.Transport.Transmission.Streams;
 
-    public sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
+    public sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer, ITransmissionConnectionFactory
     {
         private const string ServerName = "np-v1";
 
@@ -63,6 +63,16 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             return Task.FromResult(ProcessAsync());
         }
 
+        ValueTask<Maybe<ITransmissionConnection>> ITransmissionConnectionFactory.TryCreateAsync()
+        {
+            return TryAcceptAsync();
+        }
+
+        ValueTask<ITransmissionConnection> ITransmissionConnectionFactory.CreateAsync()
+        {
+            return AcceptAsync();
+        }
+
         private async Task ProcessAsync()
         {
             try
@@ -80,9 +90,14 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                 }
                 _incomingConnections.Out.TryComplete();
             }
+            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+            {
+                _incomingConnections.Out.TryComplete();
+            }
             catch (Exception ex)
             {
                 _incomingConnections.Out.TryTerminate(ex);
+                throw;
             }
             finally
             {
@@ -123,18 +138,17 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                 using (_cancellation.Token.Register(pipeServerStream.Dispose))
                 {
                     await Task.Factory.FromAsync(pipeServerStream.BeginWaitForConnection, pipeServerStream.EndWaitForConnection, null);
-                }
-                return true;
+                }                
             }
-            catch
+            catch when (_cancellation.IsCancellationRequested)
+            {
+                return false;
+            }
+            finally
             {
                 pipeServerStream.Dispose();
-                if (_cancellation.IsCancellationRequested)
-                {
-                    return false;
-                }
-                throw;
             }
+            return true;
         }
 #else
         private async Task<bool> WaitForConnectionAsync(NamedPipeServerStream pipeServerStream)
@@ -143,14 +157,13 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             {
                 await pipeServerStream.WaitForConnectionAsync(_cancellation.Token).ConfigureAwait(false);
             }
-            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+            catch when (_cancellation.IsCancellationRequested)
             {
                 return false;
             }
-            catch
+            finally
             {
                 pipeServerStream.Dispose();
-                throw;
             }
             return true;
         }

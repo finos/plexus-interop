@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+ namespace Plexus.Interop
 {
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Protocol.Protobuf;
@@ -34,7 +34,7 @@
                         ProtocolMessagePool.Instance,
                         new ProtobufProtocolSerializerFactory()))
                 .WithTransport(
-                    new TransportConnectionFactory(
+                    new TransportClient(
                         new PipeTransmissionClient(brokerWorkingDir),
                         new ProtobufTransportProtocolSerializationProvider()));
         }

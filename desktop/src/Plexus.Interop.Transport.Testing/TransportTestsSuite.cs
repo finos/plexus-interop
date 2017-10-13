@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
+ namespace Plexus.Interop.Transport
 {
     using Plexus.Channels;
     using Shouldly;
@@ -28,7 +28,7 @@
     {
         protected abstract ITransportServer Server { get; }
 
-        protected abstract ITransportConnectionFactory Client { get; }
+        protected abstract ITransportClient Client { get; }
 
         public sealed class ChannelExchange : IXunitSerializable
         {
@@ -117,8 +117,8 @@
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.CreateAsync();
-                    var clientConnection = RegisterDisposable(await Client.CreateAsync().ConfigureAwait(false));
+                    var serverConnectionTask = Server.AcceptAsync();
+                    var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                     var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
@@ -137,8 +137,8 @@
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.CreateAsync();
-                    var clientConnection = RegisterDisposable(await Client.CreateAsync().ConfigureAwait(false));
+                    var serverConnectionTask = Server.AcceptAsync();
+                    var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                     var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
@@ -155,8 +155,8 @@
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.CreateAsync();
-                    var clientConnection = RegisterDisposable(await Client.CreateAsync().ConfigureAwait(false));
+                    var serverConnectionTask = Server.AcceptAsync();
+                    var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     serverConnection.TryTerminate();
                     Should.Throw<OperationCanceledException>(() => clientConnection.Completion);
@@ -171,8 +171,8 @@
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.CreateAsync();
-                    var clientConnection = await Client.CreateAsync().ConfigureAwait(false);
+                    var serverConnectionTask = Server.AcceptAsync();
+                    var clientConnection = await Client.ConnectAsync().ConfigureAwait(false);
                     var serverConnection = await serverConnectionTask.ConfigureAwait(false);
                     clientConnection.TryTerminate();
                     Should.Throw<OperationCanceledException>(() => clientConnection.CreateChannelAsync().AsTask());
@@ -230,7 +230,7 @@
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    serverConnection = await Server.CreateAsync().ConfigureAwait(false);
+                    serverConnection = await Server.AcceptAsync().ConfigureAwait(false);
                     Log.Info("Server connection created");
                     var channelTasks = new List<Task>();
                     foreach (var channelExchange in cases)
@@ -250,7 +250,7 @@
             var clientTask = TaskRunner.RunInBackground(
                 async () =>
                 {
-                    clientConnection = await Client.CreateAsync().ConfigureAwait(false);
+                    clientConnection = await Client.ConnectAsync().ConfigureAwait(false);
                     Log.Info("Client connection created");
                     var channelTasks = new List<Task>();
                     foreach (var channelExchange in cases)

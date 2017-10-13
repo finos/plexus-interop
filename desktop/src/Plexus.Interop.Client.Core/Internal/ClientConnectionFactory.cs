@@ -19,7 +19,6 @@ namespace Plexus.Interop.Internal
     using Plexus.Channels;
     using Plexus.Interop.Transport;
     using System;
-    using System.Threading;
     using System.Threading.Tasks;
 
     internal sealed class ClientConnectionFactory
@@ -28,13 +27,13 @@ namespace Plexus.Interop.Internal
 
         private static readonly ILogger Log = LogManager.GetLogger<ClientConnectionFactory>();
 
-        public async Task<IClientConnection> ConnectAsync(ClientOptions options, CancellationToken cancellationToken = default)
+        public async Task<IClientConnection> ConnectAsync(ClientOptions options)
         {
             Log.Trace("Establishing new connection with broker");
             ITransportConnection transportConnection = null;
             try
             {
-                transportConnection = await options.Transport.CreateAsync(cancellationToken);
+                transportConnection = await options.Transport.ConnectAsync();
                 Log.Debug("Connection {0} established. Performing handshake: {1}", transportConnection.Id, options);
                 var channel = await transportConnection.CreateChannelAsync().ConfigureAwait(false);
                 var protocolSerializer = options.Protocol.Serializer;

@@ -23,7 +23,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class PipeTransmissionClient : ITransmissionClient
+    public sealed class PipeTransmissionClient : ITransmissionClient, ITransmissionConnectionFactory
     {        
         private const string ServerName = "np-v1";
         private static readonly TimeSpan MaxServerInitializationTime = TimeSpan.FromSeconds(10);
@@ -87,6 +87,16 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             }
         }
 
+        ValueTask<Maybe<ITransmissionConnection>> ITransmissionConnectionFactory.TryCreateAsync()
+        {
+            return TryConnectAsync();
+        }
+
+        ValueTask<ITransmissionConnection> ITransmissionConnectionFactory.CreateAsync()
+        {
+            return ConnectAsync();
+        }
+
 #if NET452
         private static async Task ConnectAsync(
             NamedPipeClientStream pipeClientStream,
@@ -122,6 +132,6 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                 throw;
             }
         }
-#endif        
+#endif
     }
 }

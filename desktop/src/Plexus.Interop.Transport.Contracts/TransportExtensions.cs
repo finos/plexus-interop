@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Threading.Tasks;
-
 namespace Plexus.Interop.Transport
 {
+    using System;
+    using System.Threading.Tasks;
+
     public static class TransportExtensions
     {
         public static async ValueTask<Maybe<ITransportChannel>> TryCreateChannelAsync(this ITransportConnection connection)

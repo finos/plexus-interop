@@ -36,14 +36,15 @@ namespace Plexus.Interop.Transport.Protocol
         private static readonly ITransportProtocolSerializationProvider SerializationProvider 
             = new ProtobufTransportProtocolSerializationProvider();
 
-        private readonly ITransmissionServer _server;
-        private readonly ITransmissionClient _clientFactory;
+        private readonly ITransmissionConnectionFactory _server;
+        private readonly ITransmissionConnectionFactory _client;
 
         public MessagingTests()
         {
-            _server = RegisterDisposable(new PipeTransmissionServer(Directory.GetCurrentDirectory()));
-            _server.StartAsync().GetResult();
-            _clientFactory = new PipeTransmissionClient(Directory.GetCurrentDirectory());
+            var server = RegisterDisposable(new PipeTransmissionServer(Directory.GetCurrentDirectory()));
+            server.StartAsync().GetResult();
+            _server = server;
+            _client = new PipeTransmissionClient(Directory.GetCurrentDirectory());
         }
 
         private static IEnumerable<TransportMessage> GenerateAllTransportMessages()
@@ -86,7 +87,7 @@ namespace Plexus.Interop.Transport.Protocol
 
             var testMessages = GenerateAllTransportMessages().ToArray();
 
-            var clientTask = RunSenderTaskAsync(_clientFactory, async sender =>
+            var clientTask = RunSenderTaskAsync(_client, async sender =>
             {
                 foreach (var transportMessage in testMessages)
                 {
@@ -100,21 +101,23 @@ namespace Plexus.Interop.Transport.Protocol
             Should.CompleteIn(Task.WhenAll(clientTask, serverTask), Timeout1Sec);
 
             received.Count.ShouldBe(5);
-            var enumerator = received.GetEnumerator();
-            foreach (var expected in testMessages)
+            using (var enumerator = received.GetEnumerator())
             {
-                using (expected)
+                foreach (var expected in testMessages)
                 {
-                    enumerator.MoveNext().ShouldBe(true);
-                    using (var actual = enumerator.Current)
+                    using (expected)
                     {
-                        actual.Header.ShouldBe(expected.Header);
-                        actual.Payload.HasValue.ShouldBe(expected.Payload.HasValue);
-                        if (expected.Payload.HasValue)
+                        enumerator.MoveNext().ShouldBe(true);
+                        using (var actual = enumerator.Current)
                         {
-                            var actualPayload = actual.Payload.Value.ToArray();
-                            var expectedPayload = expected.Payload.Value.ToArray();
-                            actualPayload.ShouldBe(expectedPayload);
+                            actual.Header.ShouldBe(expected.Header);
+                            actual.Payload.HasValue.ShouldBe(expected.Payload.HasValue);
+                            if (expected.Payload.HasValue)
+                            {
+                                var actualPayload = actual.Payload.Value.ToArray();
+                                var expectedPayload = expected.Payload.Value.ToArray();
+                                actualPayload.ShouldBe(expectedPayload);
+                            }
                         }
                     }
                 }
@@ -130,7 +133,7 @@ namespace Plexus.Interop.Transport.Protocol
                 using (var serverStream = await _server.CreateAsync().ConfigureAwait(false))
                 {
                     receiver = new MessagingReceiveProcessor(serverStream, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
-                    var maybeMessage = await receiver.In.TryReadSafeAsync().ConfigureAwait(false);
+                    await receiver.In.TryReadSafeAsync().ConfigureAwait(false);
                 }
                 await receiver.In.ConsumeAsync(x => x.Dispose()).ConfigureAwait(false);
             });
@@ -138,7 +141,7 @@ namespace Plexus.Interop.Transport.Protocol
             var senderTask = TaskRunner.RunInBackground(async () =>
             {
                 MessagingSendProcessor sender;
-                using (var clientStream = await _clientFactory.CreateAsync().ConfigureAwait(false))
+                using (var clientStream = await _client.CreateAsync().ConfigureAwait(false))
                 {
                     sender = new MessagingSendProcessor(clientStream, SerializationProvider.GetSerializer());
                     var result = true;
@@ -160,11 +163,11 @@ namespace Plexus.Interop.Transport.Protocol
             Log.Trace(senderTask.Exception.ExtractInner(), "Received exception on sending");
         }
 
-        private Task RunReceiverTaskAsync(ITransmissionClient streamFactory, Func<IMessagingReceiveProcessor, Task> action)
+        private Task RunReceiverTaskAsync(ITransmissionConnectionFactory connectionFactory, Func<IMessagingReceiveProcessor, Task> action)
         {
             return TaskRunner.RunInBackground(async () =>
             {
-                using (var serverStream = await streamFactory.CreateAsync().ConfigureAwait(false))
+                using (var serverStream = await connectionFactory.CreateAsync().ConfigureAwait(false))
                 {
                     var receiver = new MessagingReceiveProcessor(serverStream, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
                     await action(receiver).ConfigureAwait(false);
@@ -176,11 +179,11 @@ namespace Plexus.Interop.Transport.Protocol
             });
         }
 
-        private Task RunSenderTaskAsync(ITransmissionClient streamFactory, Func<IMessagingSendProcessor, Task> action)
+        private Task RunSenderTaskAsync(ITransmissionConnectionFactory connectionFactory, Func<IMessagingSendProcessor, Task> action)
         {
             return TaskRunner.RunInBackground(async () =>
             {
-                using (var serverStream = await streamFactory.CreateAsync().ConfigureAwait(false))
+                using (var serverStream = await connectionFactory.CreateAsync().ConfigureAwait(false))
                 {
                     var sender = new MessagingSendProcessor(serverStream, SerializationProvider.GetSerializer());
                     await action(sender).ConfigureAwait(false);
