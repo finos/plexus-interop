@@ -18,7 +18,7 @@ Now let's launch our first app - `ccy-pair-rate-viewer` and connect it to the ru
 
 [source, bash]
 -----
-start ..\samples\apps\ElectronAppLauncher\ElectronAppLauncher.exe --brokerDir . --apps "apps\ccy-pair-rate-viewer\index.html"
+start ..\samples\apps\ElectronAppLauncher\ElectronAppLauncher.exe --brokerDir . --apps "apps\WebCcyPairRateViewer\index.html"
 -----
 Where `brokerDir` argument points to the currently running broker's working directory and `apps` argument lists paths to pages which should be opened as Electron windows.
 

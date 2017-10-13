@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+declare var window: any;
+const Long = require("long");
+(<any>window).dcodeIO = { Long: Long };
 import { WebCcyPairRateViewerClientBuilder, WebCcyPairRateViewerClient } from "./gen/WebCcyPairRateViewerGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
+import { LoggerFactory, LogLevel } from "@plexus-interop/common";
 
 // Read launch arguments, provided by Electron Launcher
-declare var window: any;
+LoggerFactory.setLogLevel(LogLevel.TRACE);
 const electron = window.require("electron");
 const remote = electron.remote;
 const electronWindow: any = remote.getCurrentWindow();
@@ -57,9 +61,9 @@ new WebCcyPairRateViewerClientBuilder()
     .then(async (rateViewerClient: WebCcyPairRateViewerClient) => {
         log("Connected to Broker");
         window.getRate = async () => {
-            const ccyPair = document.getElementById("ccyPair").innerText;
+            const ccyPair = (document.getElementById("ccyPair") as HTMLInputElement).value;
             log(`Sending request for ${ccyPair}`);
-            const ccyPairRate = await rateViewerClient.getCcyPairRateServiceProxy().getRate({ccyPairName: "EURUSD"});
+            const ccyPairRate = await rateViewerClient.getCcyPairRateServiceProxy().getRate({ccyPairName: ccyPair});
             log(`Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}`);
         };
     });
