@@ -16,7 +16,6 @@
  */
 import { WebSocketFramedTransport } from "../../src/transport/WebSocketFramedTransport";
 import { ChannelOpenFrame, InternalMessagesConverter, MessageFrame, UniqueId } from "@plexus-interop/transport-common";
-import * as Long from "long";
 
 // tslint:disable-next-line:variable-name
 const MockSocket = require("mock-socket");
@@ -67,11 +66,15 @@ describe("WebSocketFramedTransport", () => {
             mockServer.send(new Uint8Array(messagesConverter.serialize(frame)));
             // tslint:disable-next-line:no-console
             console.log(transport.terminateReceived);
-            transport.readFrame().then((receivedFrame) => {
-                const channelFrame = receivedFrame as ChannelOpenFrame;
-                expect(receivedFrame).toBeDefined();
-                expect(channelFrame).toEqual(frame);
-                done();
+            transport.open({
+                next: (frame) => {
+                    const channelFrame = frame as ChannelOpenFrame;
+                    expect(frame).toBeDefined();
+                    expect(channelFrame).toEqual(frame);
+                    done();
+                },
+                complete: () => { },
+                error: () => { }
             });
         });
     });
@@ -81,20 +84,28 @@ describe("WebSocketFramedTransport", () => {
         transport.connectionEstablished().then(() => {
             const frame = ChannelOpenFrame.fromHeaderData({ channelId: UniqueId.generateNew() });
             mockServer.send(messagesConverter.serialize(frame));
-            transport.readFrame().then((receivedFrame) => {
-                const channelFrame = receivedFrame as ChannelOpenFrame;
-                expect(receivedFrame).toBeDefined();
-                expect(channelFrame).toEqual(frame);
-                done();
+            transport.open({
+                next: (receivedFrame) => {
+                    const channelFrame = receivedFrame as ChannelOpenFrame;
+                    expect(receivedFrame).toBeDefined();
+                    expect(channelFrame).toEqual(frame);
+                    done();
+                },
+                complete: () => { },
+                error: () => { }
             });
         });
     });
 
-    it("Fails on reading frame after disconnect", (done) => {
+    it("Fails on to open connection after disconnect", (done) => {
         const transport = newMockedTransport();
         transport.connectionEstablished().then(() => {
             transport.disconnect().then(() => {
-                transport.readFrame().catch(done);
+                transport.open({
+                    next: (n) => { },
+                    complete: () => { },
+                    error: (w) => { }
+                }).catch(done);
             });
         });
     });
@@ -130,12 +141,16 @@ describe("WebSocketFramedTransport", () => {
             const payload = new Uint8Array([1, 2, 3]);
             mockServer.send(messagesConverter.serialize(messageHeaderFrame));
             mockServer.send(payload);
-            transport.readFrame().then((receivedFrame) => {
-                expect(receivedFrame).toBeDefined();
-                const receivedMessageFrame: MessageFrame = receivedFrame as MessageFrame;
-                expect(receivedMessageFrame.getHeaderData()).toEqual(messageHeaderFrame.getHeaderData());
-                expect(receivedFrame.body).toBeDefined();
-                done();
+            transport.open({
+                next: (receivedFrame) => {
+                    expect(receivedFrame).toBeDefined();
+                    const receivedMessageFrame: MessageFrame = receivedFrame as MessageFrame;
+                    expect(receivedMessageFrame.getHeaderData()).toEqual(messageHeaderFrame.getHeaderData());
+                    expect(receivedFrame.body).toBeDefined();
+                    done();
+                },
+                complete: () => { },
+                error: () => { }
             });
         });
     });
@@ -159,12 +174,11 @@ describe("WebSocketFramedTransport", () => {
             mockServer.close();
             setTimeout(() => {
                 expect(transport.connected()).toEqual(false);
-                transport.readFrame()
-                    .then(() => {
-                        fail("Error is expected");
-                    }, (error) => {
-                        done();
-                    });
+                transport.open({
+                    next: (n) => { },
+                    complete: () => { },
+                    error: (w) => { }
+                }).catch(done);
             }, 0);
         });
     });

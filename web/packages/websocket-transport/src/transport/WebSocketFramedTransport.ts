@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter } from "@plexus-interop/transport-common";
-import { BlockingQueueBase, BlockingQueue, CancellationToken, Logger, LoggerFactory } from "@plexus-interop/common";
+import { CancellationToken, Logger, LoggerFactory, Observer } from "@plexus-interop/common";
+import { Queue } from "typescript-collections";
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
@@ -36,11 +37,12 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     public static OPEN: number = 1;
     public static CLOSING: number = 2;
     public static CLOSED: number = 3;
+    private connectionObserver: Observer<Frame> | null = null;
 
     constructor(
         private readonly socket: WebSocket,
         private readonly guid: UniqueId = UniqueId.generateNew(),
-        private inMessagesBuffer: BlockingQueue<Frame> = new BlockingQueueBase<Frame>(),
+        private inMessagesBuffer: Queue<Frame> = new Queue<Frame>(),
         private messagesConverter: InternalMessagesConverter = new InternalMessagesConverter()) {
         this.socket.binaryType = "arraybuffer";
         this.log = LoggerFactory.getLogger(`WebSocketFramedTransport [${this.uuid().toString()}]`);
@@ -75,9 +77,15 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             || this.socket.readyState === WebSocketFramedTransport.CLOSING;
     }
 
-    public async readFrame(): Promise<Frame> {
+    public async open(connectionObserver: Observer<Frame>): Promise<void> {
         this.throwIfNotConnectedOrDisconnectRequested();
-        return this.inMessagesBuffer.blockingDequeue(this.socketOpenToken);
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(`Received connection observer, ${this.inMessagesBuffer.size()} messages in buffer`);
+        }
+        this.connectionObserver = connectionObserver;
+        while (this.inMessagesBuffer.size() > 0) {
+            this.connectionObserver.next(this.inMessagesBuffer.dequeue());
+        }
     }
 
     public async writeFrame(frame: Frame): Promise<void> {
@@ -174,6 +182,9 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     private handleCloseEvent(socket: WebSocket, ev: CloseEvent): void {
         this.log.debug("Connection closed event received", ev);
+        if (this.connectionObserver) {
+            this.connectionObserver.complete();
+        }
     }
 
     private handleMessageEvent(ev: MessageEvent): void {
@@ -194,7 +205,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             }
             if (this.dataFrame) {
                 this.dataFrame.body = data.buffer;
-                this.inMessagesBuffer.enqueue(this.dataFrame);
+                this.addToInbox(this.dataFrame);
                 this.dataFrame = null;
             } else {
                 const frame = this.messagesConverter.deserialize(data);
@@ -204,9 +215,21 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
                     }
                     this.dataFrame = frame;
                 } else {
-                    this.inMessagesBuffer.enqueue(frame);
+                    this.addToInbox(frame);
                 }
             }
+        }
+    }
+
+    private addToInbox(frame: Frame): void {
+        if (this.connectionObserver) {
+            this.log.info(`Passing frame to observer`);
+            this.connectionObserver.next(frame);
+        } else {
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`No connection observer adding to buffer, buffer size ${this.inMessagesBuffer.size()}`);
+            }
+            this.inMessagesBuffer.enqueue(frame);
         }
     }
 
@@ -244,17 +267,13 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     private handleError(socket: WebSocket, ev: Event): void {
         this.log.error("Connection error received", ev);
         this.cancelConnectionAndCleanUp("Connection error received");
+        if (this.connectionObserver) {
+            this.connectionObserver.error("Web Socket Connection Error received");
+        }
     }
 
     private handleOpen(): void {
         this.log.debug("Connection opened");
-    }
-
-    private throwIfNotConnected(): void {
-        if (!this.connected()) {
-            this.log.error(`Web Socket is not connected`);
-            throw new Error(`Web Socket is not connected`);
-        }
     }
 
     private throwIfNotConnectedOrDisconnectRequested(): void {
