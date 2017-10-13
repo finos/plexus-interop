@@ -85,6 +85,15 @@ export class ClientsSetup {
         };
     }
 
+    public createRequestOfBytes(numberOfBytes: number): plexus.plexus.interop.testing.IEchoRequest {
+        const bytesField = Uint8Array.from(Array<number>(numberOfBytes).fill(1));
+        return {
+            subMessageField: {
+                bytesField
+            }
+        };
+    }
+
     public createHugeRequestDto(strLength: number): plexus.plexus.interop.testing.IEchoRequest {
         const text = (new Array(strLength)).join("x");
         return {

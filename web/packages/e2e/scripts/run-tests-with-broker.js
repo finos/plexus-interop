@@ -63,17 +63,20 @@ function main() {
 
     log("Starting Broker ...");
     brokerProcess = exec(fullBrokerCmd + config.brokerArgs, {
-        cwd: config.brokerBaseDir
+        cwd: config.brokerBaseDir,
+        maxBuffer: 1024 * 1024
     }, (error, stdout, stderr) => {
         log("Broker stopped");
         if (error) {
             console.error('Std Error:', stderr);
             console.error('Error:', error);
         }
-        if (stderr) {
-            log('StdErr:', stderr);
+        // if (stderr) {
+        //     log('StdErr:', stderr);
+        // }
+        if (argv.printBrokerStdout) {
+            log('StdOut', stdout);
         }
-        log('StdOut:', stdout);
         process.exit();
     });
 }
@@ -101,7 +104,7 @@ function runElectronTest(wsUrl) {
         cwd: process.cwd()
     }, (error, stdout, stderr) => {
         log("Electron tests stopped, killing Broker");
-        if (error) {
+        if (error || stderr) {
             console.error('Std Error:', stderr);
             console.error('Error: ', error);
         }
