@@ -97,9 +97,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             },
             // graceful connection closure
             {
-                from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED, preHandler: async () => {
-                    await this.closeInternal();
-                }
+                from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED, preHandler: async () => this.closeInternal()
             }
         ]);
         this.log.debug("Created");
@@ -195,8 +193,8 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
 
     private async forcedCloseConnection(completion?: plexus.ICompletion): Promise<void> {
         this.log.warn("Forced connection close requested");
-        await this.sendConnectionCloseMessage(completion);
-        await this.closeInternal();
+        this.sendConnectionCloseMessage(completion);
+        this.closeInternal();
     }
 
     private async disconnectFromSource(): Promise<void> {

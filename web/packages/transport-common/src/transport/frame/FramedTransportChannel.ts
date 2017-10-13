@@ -72,9 +72,7 @@ export class FramedTransportChannel implements TransportChannel {
             },
             // remote side requested to complete channel
             {
-                from: ChannelState.OPEN, to: ChannelState.CLOSE_RECEIVED, preHandler: async () => {
-                    this.channelCancellationToken.cancelRead("Channel close received");
-                }
+                from: ChannelState.OPEN, to: ChannelState.CLOSE_RECEIVED
             },
             // client confirmed channel closure
             {
@@ -240,6 +238,7 @@ export class FramedTransportChannel implements TransportChannel {
         this.remoteCompletion = channelCloseFrame.getHeaderData().completion || new SuccessCompletion();
         switch (this.stateMachine.getCurrent()) {
             case ChannelState.OPEN:
+                this.channelCancellationToken.cancelRead("Channel close received");
                 this.stateMachine.go(ChannelState.CLOSE_RECEIVED);
                 break;
             case ChannelState.CLOSE_REQUESTED:
@@ -286,7 +285,9 @@ export class FramedTransportChannel implements TransportChannel {
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
         this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
-        this.log.trace(`Scheduling sending of message with ${data.byteLength} bytes, sending in progress ${this.sendingInProgress}`);
+        if (this.log.isTraceEnabled()) {
+            this.log.trace(`Scheduling sending of message with ${data.byteLength} bytes, sending in progress ${this.sendingInProgress}`);
+        }
         if (this.sendingInProgress) {
             await AsyncHelper.waitFor(() => {
                 if (!this.sendingInProgress) {
@@ -295,7 +296,7 @@ export class FramedTransportChannel implements TransportChannel {
                 } else {
                     return false;
                 }
-            }, this.channelCancellationToken.getWriteToken(), 10, FramedTransportChannel.MESSAGE_SCHEDULING_WAITING_TIMEOUT);
+            }, this.channelCancellationToken.getWriteToken(), 0, FramedTransportChannel.MESSAGE_SCHEDULING_WAITING_TIMEOUT);
         }
         this.sendingInProgress = true;
         return this.sendMessageInternal(data)
