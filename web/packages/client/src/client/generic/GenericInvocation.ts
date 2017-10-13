@@ -135,7 +135,9 @@ export class GenericInvocation {
     }
 
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
-        this.log.debug("Close invocation requested", JSON.stringify(completion));
+        if (this.log.isDebugEnabled()) {
+            this.log.debug("Close invocation requested", JSON.stringify(completion));
+        }
         if (this.stateMachine.is(InvocationState.COMPLETED)) {
             this.log.warn("Already completed");
             return Promise.resolve(completion);
@@ -165,10 +167,14 @@ export class GenericInvocation {
             this.log.debug("Channel closed");
             this.closeInternal();
             const result = ClientProtocolUtils.createSummarizedCompletion(completion, channelCompletion, this.checkInternalStatus());
-            this.log.trace(`Completion result ${JSON.stringify(result)}`);
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Completion result ${JSON.stringify(result)}`);
+            }
             return result;
         }).catch((e) => {
-            this.log.debug("Error during channel closure", e);
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Error during channel closure", e);
+            }
             this.closeInternal();
             throw e;
         });

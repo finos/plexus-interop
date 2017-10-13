@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 import * as log from "loglevel";
-
 import { Logger } from "./Logger";
+import { LogLevel } from "./LoggerFactory";
 
 export class LoggerBase implements Logger {
 
@@ -41,5 +41,17 @@ export class LoggerBase implements Logger {
     public trace(msg: string, ...args: any[]): void {
         // TODO switch to other Logger implementation and switch to trace
         log.debug(`${this.name} ${msg}`, args);
+    }
+
+    public getLogLevel(): LogLevel {
+        return log.getLevel();
+    }
+
+    public isDebugEnabled(): boolean {
+        return this.getLogLevel() <= LogLevel.DEBUG;
+    }
+
+    public isTraceEnabled(): boolean {
+        return this.getLogLevel() <= LogLevel.TRACE;
     }
 }

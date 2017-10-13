@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import { Logger } from "./Logger";
+import { LogLevel } from "./LoggerFactory";
 
 export class PrefixedLogger implements Logger {
 
@@ -39,4 +40,17 @@ export class PrefixedLogger implements Logger {
     public debug(msg: string, ...args: any[]): void {
         this.base.debug(`${this.prefix} ${msg}`, args);
     }
+
+    public getLogLevel(): LogLevel {
+        return this.base.getLogLevel();
+    }
+
+    public isDebugEnabled(): boolean {
+        return this.base.getLogLevel() <= LogLevel.DEBUG;
+    }
+
+    public isTraceEnabled(): boolean {
+        return this.base.getLogLevel() <= LogLevel.TRACE;
+    }
+
 }

@@ -36,15 +36,14 @@ export class EchoClientBenchmark extends BaseEchoTest {
         const finish = Date.now() + periodInMillis;
         let sentMessagesCount = 0;
         while (finish > Date.now()) {
-            const start = Date.now();
-            const result = await client.getEchoServiceProxy().unary(echoRequest);
+            await client.getEchoServiceProxy().unary(echoRequest);
             sentMessagesCount++;
         }
         await this.clientsSetup.disconnect(client, server);
         return {
+            periodInMillis,
             methodType: MethodType.Unary,
             messagesSent: sentMessagesCount,
-            periodInMillis: periodInMillis,
             bytesSent: sentMessagesCount * bytesPerMessage
         }
     }

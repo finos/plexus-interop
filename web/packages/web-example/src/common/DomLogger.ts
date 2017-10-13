@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { Logger, LoggerFactory, LogLevel } from "@plexus-interop/common";
 
 export class DomLogger implements Logger {
 
     constructor(
-        private domElId: string, 
+        private domElId: string,
         private baseLogger: Logger = LoggerFactory.getLogger("DomLogger")) {
     }
 
@@ -49,6 +49,18 @@ export class DomLogger implements Logger {
         if (domEl) {
             domEl.innerText = domEl.innerText + '\n' + text;
         }
+    }
+
+    public getLogLevel(): LogLevel {
+        return this.baseLogger.getLogLevel();
+    }
+
+    public isDebugEnabled(): boolean {
+        return this.baseLogger.getLogLevel() <= LogLevel.DEBUG;
+    }
+
+    public isTraceEnabled(): boolean {
+        return this.baseLogger.getLogLevel() <= LogLevel.TRACE;
     }
 
 }

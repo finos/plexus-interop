@@ -24,7 +24,9 @@ export abstract class BaseInvocationClientImpl implements InvocationClient {
     constructor(protected invocation: Invocation, protected log: Logger) { }
 
     public async error(clientError: ClientError): Promise<void> {
-        this.log.debug(`Client reported error, closing invocation`, JSON.stringify(clientError));
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(`Client reported error, closing invocation`, JSON.stringify(clientError));
+        }
         await this.close(new ErrorCompletion(clientError));
     }
 

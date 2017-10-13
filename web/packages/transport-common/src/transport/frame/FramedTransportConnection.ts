@@ -237,7 +237,9 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
 
     public async handleConnectionCloseFrame(frame: ConnectionCloseFrame): Promise<void> {
         const completion = frame.getHeaderData().completion as plexus.ICompletion;
-        this.log.debug("Received connection close", JSON.stringify(completion));
+        if (this.log.isDebugEnabled()) {
+            this.log.debug("Received connection close", JSON.stringify(completion));
+        }
         switch (this.stateMachine.getCurrent()) {
             case ConnectionState.OPEN:
                 this.log.debug("Close received");

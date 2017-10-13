@@ -14,15 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Logger } from "@plexus-interop/common";
+import { Logger, LogLevel } from "@plexus-interop/common";
 import * as fs from "fs";
 import * as util from "util";
 
 export class FileLogger implements Logger {
 
     private logFile: any;
-    private logSout: any;
-    
+
     constructor(private baseLogger: Logger, fileName: string = "plexus-electron-launcher.log") {
         fileName = `${process.cwd()}/${fileName}`;
         this.logFile = fs.createWriteStream(fileName, { flags: "w" });
@@ -53,5 +52,17 @@ export class FileLogger implements Logger {
     public trace(msg: string, ...args: any[]): void {
         this.baseLogger.trace(msg, args);
         this.log(msg);
+    }
+    
+    public getLogLevel(): LogLevel {
+        return this.baseLogger.getLogLevel();
+    }
+
+    public isDebugEnabled(): boolean {
+        return this.getLogLevel() <= LogLevel.DEBUG;
+    }
+
+    public isTraceEnabled(): boolean {
+        return this.getLogLevel() <= LogLevel.TRACE;
     }
 }

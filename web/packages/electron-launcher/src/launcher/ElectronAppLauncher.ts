@@ -70,13 +70,11 @@ export class ElectronAppLauncher {
                 applicationInstanceId: launcherAppInstanceId
             })
             .withAppLauncherServiceInvocationsHandler({
-
                 onLaunch: async (request: plexus.interop.IAppLaunchRequest) => {
                     this.log.info("Received launch request: " + JSON.stringify(request));
                     let launchPath = this.readPath(request);
                     return this.launchApp(launchPath);
                 }
-
             })
             .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(this.webSocketAddress)).connect())
             .connect()
