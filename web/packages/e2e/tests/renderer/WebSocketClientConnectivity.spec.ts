@@ -49,6 +49,10 @@ describe("Web Socket Client connectivity", () => {
             });
     });
 
+    it("Receives error if provide wrong cliend id to Broker", function() {
+        return connectivityTests.testClientReceiveErrorIfProvideWrongId();
+    });
+
     it("Notifies all invocation clients with error if client disconnected", function() {
         return connectivityTests.testAllInvocationClientsReceiveErrorOnClientDisconnect();
     });

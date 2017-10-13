@@ -23,9 +23,10 @@ import { ClientError } from "@plexus-interop/protocol";
 import { expect } from "chai";
 import { ServerStreamingHandler } from "./ServerStreamingHandler";
 import { MethodInvocationContext } from "@plexus-interop/client";
-import { EchoClientClient } from "../../src/echo/client/EchoClientGeneratedClient";
+import { EchoClientClient, EchoClientClientBuilder } from "../../src/echo/client/EchoClientGeneratedClient";
 import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
 import { AsyncHelper } from "@plexus-interop/common";
+import { UniqueId } from "@plexus-interop/transport-common";
 
 export class ClientConnectivityTests extends BaseEchoTest {
 
@@ -41,6 +42,23 @@ export class ClientConnectivityTests extends BaseEchoTest {
 
     public testAllInvocationClientsReceiveErrorOnServerDisconnect(): Promise<void> {
         return this.testAllInvocationClientsReceiveErrorOnDisconnect(false, true);
+    }
+
+    public async testClientReceiveErrorIfProvideWrongId(): Promise<void> {
+        debugger;
+        const preparedBuilder = new EchoClientClientBuilder()
+            .withClientDetails({
+                applicationId: "plexus.interop.testing.DoNotExist",
+                applicationInstanceId: UniqueId.generateNew()
+            })
+            .withTransportConnectionProvider(this.connectionProvider);
+        try {
+            await preparedBuilder.connect();
+        } catch (error) {
+            console.log("Expected error", error);
+            return Promise.resolve();
+        }
+        throw new Error("Expect to fail to receive connection")
     }
 
     private testAllInvocationClientsReceiveErrorOnDisconnect(isForcedByClient: boolean, isForcedByServer: boolean): Promise<void> {

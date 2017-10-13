@@ -63,8 +63,8 @@ export class FramedTransportChannel implements TransportChannel {
         this.channelCancellationToken = new ReadWriteCancellationToken(new CancellationToken(baseReadToken));
         this.log.debug("Created");
         this.stateMachine = new StateMaschineBase<ChannelState>(ChannelState.CREATED, [
-            { 
-                from: ChannelState.CREATED, to: ChannelState.OPEN 
+            {
+                from: ChannelState.CREATED, to: ChannelState.OPEN
             },
             // client requested to complete channel, waiting for response
             {
@@ -90,7 +90,7 @@ export class FramedTransportChannel implements TransportChannel {
                     this.log.warn("Channel forced OPEN -> CLOSED");
                 }
             },
-            { 
+            {
                 from: ChannelState.CREATED, to: ChannelState.CLOSED, preHandler: async () => {
                     this.log.warn("Channel forced CREATED -> CLOSED");
                 }
@@ -133,7 +133,7 @@ export class FramedTransportChannel implements TransportChannel {
             if (this.stateMachine.isOneOf(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED)) {
                 this.log.debug("Closing channel due to error", cause);
                 await this.close(new ErrorCompletion(cause));
-                channelObserver.error(cause);            
+                channelObserver.error(cause);
             } else {
                 channelObserver.error(cause);
             }
@@ -147,8 +147,8 @@ export class FramedTransportChannel implements TransportChannel {
 
     private async receiveMessage(): Promise<ArrayBuffer> {
         let notReceived = false;
-        let resultBuffer = new ArrayBuffer(0);
         try {
+            let resultBuffer = new ArrayBuffer(0);
             do {
                 this.log.trace("Waiting for next frame");
                 const frame: Frame = await this.framedTransport.readFrame(this.channelCancellationToken.getReadToken());
@@ -163,6 +163,7 @@ export class FramedTransportChannel implements TransportChannel {
                 } else if (frame.internalHeaderProperties.channelClose) {
                     this.log.trace("Received close frame");
                     this.onChannelClose(frame as ChannelCloseFrame);
+                    return Promise.reject("Receive channel Closed frame");
                 }
             } while (notReceived);
             this.log.debug(`Received message with ${resultBuffer.byteLength} bytes`);
@@ -226,11 +227,11 @@ export class FramedTransportChannel implements TransportChannel {
                     await this.closeInternal("Remote completed, confirmation sent");
                 }
             })()
-            .catch(e => {
-                this.log.error("Error during sending close channel request", e);
-                reject(e);
-            });
-        });        
+                .catch(e => {
+                    this.log.error("Error during sending close channel request", e);
+                    reject(e);
+                });
+        });
     }
 
     public async onChannelClose(channelCloseFrame: ChannelCloseFrame): Promise<void> {
@@ -249,7 +250,11 @@ export class FramedTransportChannel implements TransportChannel {
         }
     }
 
-    public async closeInternal(reason : string = "Channel closed"): Promise<void> {
+    public async closeInternal(reason: string = "Channel closed"): Promise<void> {
+        if (this.stateMachine.is(ChannelState.CLOSED)) {
+            this.log.error("Channel already closed");
+            return Promise.reject("Channel already closed");
+        }
         this.log.debug(`Closing channel resources, reason - ${reason}`);
         this.channelCancellationToken.cancel(reason);
         await this.stateMachine.go(ChannelState.CLOSED);
@@ -259,7 +264,7 @@ export class FramedTransportChannel implements TransportChannel {
             this.onCloseHandler(ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion));
             this.onCloseHandler = null;
         }
-        
+
     }
 
     private async sendChannelClosedRequest(completion: plexus.ICompletion = new SuccessCompletion()): Promise<void> {
