@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -105,7 +105,7 @@ class WebCcyPairRateProviderClientImpl implements WebCcyPairRateProviderClient {
  */
 export abstract class CcyPairRateServiceInvocationHandler {
 
-    public abstract onGetRate(request: plexus.fx.ICcyPair): Promise<plexus.fx.ICcyPairRate>;
+    public abstract onGetRate(invocationContext: MethodInvocationContext, request: plexus.fx.ICcyPair): Promise<plexus.fx.ICcyPairRate>;
 
 }
 
@@ -117,14 +117,14 @@ class CcyPairRateServiceInvocationHandlerInternal {
 
     public constructor(private readonly clientHandler: CcyPairRateServiceInvocationHandler) {}
 
-    public onGetRate(request: ArrayBuffer): Promise<ArrayBuffer> {
+    public onGetRate(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
         const responseToBinaryConverter = (from: plexus.fx.ICcyPairRate) => Arrays.toArrayBuffer(plexus.fx.CcyPairRate.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.fx.CcyPair.decode(new Uint8Array(from));
             return plexus.fx.CcyPair.toObject(decoded);
         };
         return this.clientHandler
-            .onGetRate(requestFromBinaryConverter(request))
+            .onGetRate(invocationContext, requestFromBinaryConverter(request))
             .then(response => responseToBinaryConverter(response));
     }
 }
