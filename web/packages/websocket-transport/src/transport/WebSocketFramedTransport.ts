@@ -71,7 +71,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private isSocketClosed(): boolean {
-        return this.socket.readyState === WebSocketFramedTransport.CLOSED 
+        return this.socket.readyState === WebSocketFramedTransport.CLOSED
             || this.socket.readyState === WebSocketFramedTransport.CLOSING;
     }
 
@@ -83,10 +83,14 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     public async writeFrame(frame: Frame): Promise<void> {
         this.throwIfNotConnectedOrDisconnectRequested();
         const data: ArrayBuffer = this.messagesConverter.serialize(frame);
-        this.log.debug(`Sending header message of ${data.byteLength} bytes to server`);
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(`Sending header message of ${data.byteLength} bytes to server`);
+        }
         this.socket.send(data);
         if (frame.isDataFrame()) {
-            this.log.debug(`Sending data message of ${frame.body.byteLength} bytes to server`);
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Sending data message of ${frame.body.byteLength} bytes to server`);
+            }
             this.socket.send(frame.body);
         } else if (frame.internalHeaderProperties.close) {
             this.sendTerminateMessage();
@@ -163,7 +167,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private cancelConnectionAndCleanUp(reason: string = "Connection closed"): void {
-        this.log.debug(`Cancelling connection with reason: ${reason}`);        
+        this.log.debug(`Cancelling connection with reason: ${reason}`);
         this.socketOpenToken.cancel(reason);
         this.inMessagesBuffer.clear();
     }
@@ -173,15 +177,21 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private handleMessageEvent(ev: MessageEvent): void {
-        this.log.debug("Message event received");
+        if (this.log.isDebugEnabled()) {
+            this.log.debug("Message event received");
+        }
         if (this.isTerminateMessage(ev)) {
-            this.log.debug("Terminate message received");
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Terminate message received");
+            }
             this.terminateReceived = true;
         } else if (this.terminateReceived) {
             this.log.warn("Terminate message already received, dropping frame", ev.data);
         } else {
             const data: Uint8Array = this.readEventData(ev);
-            this.log.debug(`Received message with ${data.byteLength} bytes`);
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Received message with ${data.byteLength} bytes`);
+            }
             if (this.dataFrame) {
                 this.dataFrame.body = data.buffer;
                 this.inMessagesBuffer.enqueue(this.dataFrame);
@@ -189,7 +199,9 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             } else {
                 const frame = this.messagesConverter.deserialize(data);
                 if (frame.isDataFrame()) {
-                    this.log.debug("Message header frame, waiting for data frame");
+                    if (this.log.isDebugEnabled()) {
+                        this.log.debug("Message header frame, waiting for data frame");
+                    }
                     this.dataFrame = frame;
                 } else {
                     this.inMessagesBuffer.enqueue(frame);
@@ -206,10 +218,14 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         if (ev.data instanceof Array) {
             return new Uint8Array(ev.data);
         } else if (this.isArrayBuffer(ev.data)) {
-            this.log.debug("Array Buffer message");
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Array Buffer message");
+            }
             return new Uint8Array(ev.data);
         } else if (this.isArrayBufferView(ev.data)) {
-            this.log.debug("ArrayBufferView Buffer message");
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("ArrayBufferView Buffer message");
+            }
             return new Uint8Array(ev.data);
         } else {
             this.log.error("Unknown payload type", ev.data);

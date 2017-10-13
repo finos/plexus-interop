@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 import * as log from "loglevel";
-import {Logger} from "./Logger";
-import {LoggerBase} from "./LoggerBase";
+import { Logger } from "./Logger";
+import { LoggerBase } from "./LoggerBase";
 const logPrefixer: any = require("loglevel-plugin-prefix");
 
 export enum LogLevel {
@@ -30,21 +30,22 @@ export enum LogLevel {
 
 export class LoggerFactory {
 
-    public static getLogger(name: string = "Anonymous"): Logger {
-        return new LoggerBase(name);
-    }
+  public static getLogger(name: string = "Anonymous"): Logger {
+    return new LoggerBase(name);
+  }
 
-    public static setLogLevel(level: LogLevel): void {
-      log.setLevel(level as any);
+  public static setLogLevel(level: LogLevel): void {
+    if (level <= LogLevel.DEBUG) {
+      logPrefixer.apply(log, {
+        template: "%t | [%l] ",
+        timestampFormatter: (date: Date) => {
+          return `${date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.${("000" + date.getMilliseconds()).slice(-3)}`;
+        }
+      });
     }
+    log.setLevel(level as any);
+  }
 
 }
-
-logPrefixer.apply(log, {
-  template: "%t | [%l] ",
-  timestampFormatter: function (date: Date) {
-    return `${date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, '$1')}.${('000' + date.getMilliseconds()).slice(-3)}`;
-  }
-});
 
 LoggerFactory.setLogLevel(LogLevel.INFO);

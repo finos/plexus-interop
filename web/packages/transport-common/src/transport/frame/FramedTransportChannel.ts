@@ -220,11 +220,11 @@ export class FramedTransportChannel implements TransportChannel {
                 if (this.stateMachine.is(ChannelState.OPEN)) {
                     // wait for remote side response
                     this.sendChannelClosedRequest(completion);
-                    await this.stateMachine.go(ChannelState.CLOSE_REQUESTED);
+                    this.stateMachine.go(ChannelState.CLOSE_REQUESTED);
                 } else {
                     // remote is completed already, send message and clean up
                     this.sendChannelClosedRequest(completion);
-                    await this.closeInternal("Remote completed, confirmation sent");
+                    this.closeInternal("Remote completed, confirmation sent");
                 }
             })()
                 .catch(e => {
@@ -240,10 +240,10 @@ export class FramedTransportChannel implements TransportChannel {
         this.remoteCompletion = channelCloseFrame.getHeaderData().completion || new SuccessCompletion();
         switch (this.stateMachine.getCurrent()) {
             case ChannelState.OPEN:
-                await this.stateMachine.go(ChannelState.CLOSE_RECEIVED);
+                this.stateMachine.go(ChannelState.CLOSE_RECEIVED);
                 break;
             case ChannelState.CLOSE_REQUESTED:
-                await this.closeInternal("Remote channel close received");
+                this.closeInternal("Remote channel close received");
                 break;
             default:
                 throw new Error(`Can't handle close, invalid state ${this.stateMachine.getCurrent()}`);
@@ -257,7 +257,7 @@ export class FramedTransportChannel implements TransportChannel {
         }
         this.log.debug(`Closing channel resources, reason - ${reason}`);
         this.channelCancellationToken.cancel(reason);
-        await this.stateMachine.go(ChannelState.CLOSED);
+        this.stateMachine.go(ChannelState.CLOSED);
         await this.dispose();
         if (this.onCloseHandler) {
             this.log.debug("Reporting summarized completion");
@@ -295,7 +295,7 @@ export class FramedTransportChannel implements TransportChannel {
                 } else {
                     return false;
                 }
-            }, this.channelCancellationToken.getWriteToken(), 100, FramedTransportChannel.MESSAGE_SCHEDULING_WAITING_TIMEOUT);
+            }, this.channelCancellationToken.getWriteToken(), 10, FramedTransportChannel.MESSAGE_SCHEDULING_WAITING_TIMEOUT);
         }
         this.sendingInProgress = true;
         return this.sendMessageInternal(data)

@@ -23,7 +23,9 @@ export class LoggerBase implements Logger {
     constructor(public name: string = "Anonymous") { }
 
     public debug(msg: string, ...args: any[]): void {
-        log.debug(`${this.name} ${msg}`, args);
+        if (log.getLevel() <= LogLevel.DEBUG) {
+            log.debug(`${this.name} ${msg}`, args);
+        }
     }
 
     public info(msg: string, ...args: any[]): void {
@@ -39,8 +41,9 @@ export class LoggerBase implements Logger {
     }
 
     public trace(msg: string, ...args: any[]): void {
-        // TODO switch to other Logger implementation and switch to trace
-        log.debug(`${this.name} ${msg}`, args);
+        if (log.getLevel() <= LogLevel.TRACE) {
+            log.debug(`${this.name} ${msg}`, args);
+        }
     }
 
     public getLogLevel(): LogLevel {

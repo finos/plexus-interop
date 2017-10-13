@@ -21,4 +21,5 @@ export interface BenchmarkResult {
     messagesSent: number;
     periodInMillis: number;
     bytesSent: number;
+    millisPerMessage: number;
 }

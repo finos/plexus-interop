@@ -16,5 +16,5 @@
  */
 export abstract class Defaults {
     public static readonly OPERATION_TIMEOUT: number = 60000;
-    public static readonly STATUS_CHECK_INTERVAL: number = 50;
+    public static readonly STATUS_CHECK_INTERVAL: number = 0;
 }

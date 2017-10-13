@@ -31,11 +31,11 @@ import { StateMaschineBase, StateMaschine, CancellationToken, LoggerFactory, Log
 export type ConnectionState = "CREATED" | "ACCEPT" | "OPEN" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED" | "CLOSED";
 
 export const ConnectionState = {
-    CREATED: "CREATED" as ConnectionState, 
-    ACCEPT: "ACCEPT" as ConnectionState, 
-    OPEN: "OPEN" as ConnectionState, 
-    CLOSE_RECEIVED: "CLOSE_RECEIVED" as ConnectionState, 
-    CLOSE_REQUESTED: "CLOSE_REQUESTED" as ConnectionState, 
+    CREATED: "CREATED" as ConnectionState,
+    ACCEPT: "ACCEPT" as ConnectionState,
+    OPEN: "OPEN" as ConnectionState,
+    CLOSE_RECEIVED: "CLOSE_RECEIVED" as ConnectionState,
+    CLOSE_REQUESTED: "CLOSE_REQUESTED" as ConnectionState,
     CLOSED: "CLOSED" as ConnectionState
 }
 
@@ -137,7 +137,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     public getManagedChannels(): TransportChannel[] {
         const result: TransportChannel[] = [];
         this.channelsHolder.getChannels().forEach(value => {
-            result.push(value.channel);         
+            result.push(value.channel);
         });
         return result;
     }
@@ -187,7 +187,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         this.channelsHolder.getChannels().forEach((value, key: string) => {
             this.log.debug(`Cleaning channel ${key}`);
             value.channel.closeInternal();
-            value.inBuffer.clear();            
+            value.inBuffer.clear();
         });
         this.channelsHolder.clearAll();
         return this.disconnectFromSource();
@@ -215,8 +215,10 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         while (this.stateMachine.is(ConnectionState.CLOSE_REQUESTED)
             || this.stateMachine.is(ConnectionState.OPEN)
             || this.stateMachine.is(ConnectionState.ACCEPT)) {
-            this.log.debug("Awaiting for next frame");
-            try {             
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Awaiting for next frame");
+            }
+            try {
                 const baseFrame = await this.framedTransport.readFrame(this.readCancellationToken);
                 this.handleFrame(baseFrame, this.log);
             } catch (error) {
@@ -229,7 +231,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
                         this.log.error(`Error while closing connection: ${error}`);
                         this.stateMachine.go(ConnectionState.CLOSED);
                     });
-                    return Promise.reject(error);   
+                    return Promise.reject(error);
                 }
             }
         }
@@ -243,11 +245,11 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         switch (this.stateMachine.getCurrent()) {
             case ConnectionState.OPEN:
                 this.log.debug("Close received");
-                await this.stateMachine.go(ConnectionState.CLOSE_RECEIVED);
+                this.stateMachine.go(ConnectionState.CLOSE_RECEIVED);
                 break;
             case ConnectionState.CLOSE_REQUESTED:
-                this.log.debug("Closing connection");            
-                await this.stateMachine.go(ConnectionState.CLOSED);
+                this.log.debug("Closing connection");
+                this.stateMachine.go(ConnectionState.CLOSED);
                 break;
             default:
                 throw new Error(`Can't handle close, invalid state ${this.stateMachine.getCurrent()}`);
@@ -268,7 +270,9 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     public handleChannelCloseFrame(frame: ChannelCloseFrame): void {
         const channelId = UniqueId.fromProperties(frame.getHeaderData().channelId as plexus.IUniqueId);
         const strChannelId = channelId.toString();
-        this.log.trace(`Received channel close frame, channelId ${strChannelId}`);        
+        if (this.log.isTraceEnabled()) {
+            this.log.trace(`Received channel close frame, channelId ${strChannelId}`);
+        }
         if (this.channelsHolder.channelExists(strChannelId)) {
             const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
             this.log.debug("Pass close frame to channel", strChannelId);
@@ -296,19 +300,25 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         const channelIdProps = frame.getHeaderData().channelId as plexus.IUniqueId;
         const channelId = UniqueId.fromProperties(channelIdProps);
         const strChannelId = channelId.toString();
-        this.log.trace(`Received message frame, channelId ${strChannelId}`);        
+        if (this.log.isTraceEnabled()) {
+            this.log.trace(`Received message frame, channelId ${strChannelId}`);
+        }
         const channelExists = this.channelsHolder.channelExists(strChannelId);
         if (!channelExists) {
             // not first frame, however no buffer exist
             this.log.error(`Dropped frame, no incoming buffer exist for ${strChannelId}`);
         } else {
             // add frame to incoming buffer
-            this.log.debug(`Received data frame for channel ${strChannelId}`);
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Received data frame for channel ${strChannelId}`);
+            }
             const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
             channelDescriptor.inBuffer.enqueue(frame);
         }
         if (frame.isLast()) {
-            this.log.trace(`Received last frame for message of channel ${strChannelId}`);
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Received last frame for message of channel ${strChannelId}`);
+            }
         }
     }
 

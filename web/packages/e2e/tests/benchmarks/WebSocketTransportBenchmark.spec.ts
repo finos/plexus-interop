@@ -31,10 +31,10 @@ describe("Web Socket Client Benchmarks", () => {
         clientsSetup);
 
     it("Sends 200 of messages in one second", function() {
-        this.timeout(5000);
+        this.timeout(10000);
         return (async () => {
             console.log("Starting", new Date().toISOString());        
-            const result = await echoServiceBenchmark.testUnaryMessagesSentWithinPeriod(500, 1024, 1000);
+            const result = await echoServiceBenchmark.testUnaryMessagesSentWithinPeriod(500, 1024, 5000);
             console.log("End", new Date().toISOString());
             console.log("Benchmark result:", JSON.stringify(result));
             expect(result.messagesSent).to.be.greaterThan(500);

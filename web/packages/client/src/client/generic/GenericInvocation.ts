@@ -68,9 +68,7 @@ export class GenericInvocation {
             },
             // active states
             {
-                from: InvocationState.OPEN, to: InvocationState.COMPLETION_RECEIVED, preHandler: async () => {
-                    await this.readCancellationToken.cancel("Invocation close received");
-                }
+                from: InvocationState.OPEN, to: InvocationState.COMPLETION_RECEIVED
             }, {
                 from: InvocationState.COMPLETION_RECEIVED, to: InvocationState.COMPLETED
             }, {
@@ -187,7 +185,7 @@ export class GenericInvocation {
             length: data.byteLength
         });
         await this.sourceChannel.sendMessage(headerPayload);
-        await this.sourceChannel.sendMessage(data);
+        this.sourceChannel.sendMessage(data);
         this.sentMessagesCounter++;
     }
 
@@ -221,6 +219,7 @@ export class GenericInvocation {
         switch (this.stateMachine.getCurrent()) {
             case InvocationState.OPEN:
                 this.log.debug("Open state, switching to COMPLETION_RECEIVED");
+                this.readCancellationToken.cancel("Invocation close received")
                 this.stateMachine.go(InvocationState.COMPLETION_RECEIVED);
                 break;
             case InvocationState.COMPLETED:

@@ -33,10 +33,13 @@ export class EchoClientBenchmark extends BaseEchoTest {
         const echoRequest = this.clientsSetup.createRequestOfBytes(bytesPerMessage);
         const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => request);
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
-        const finish = Date.now() + periodInMillis;
+        const start = Date.now();
+        const finish = start + periodInMillis;
         let sentMessagesCount = 0;
-        while (finish > Date.now()) {
+        let lastReceived = 0;
+        while (finish > lastReceived) {
             await client.getEchoServiceProxy().unary(echoRequest);
+            lastReceived = Date.now();
             sentMessagesCount++;
         }
         await this.clientsSetup.disconnect(client, server);
@@ -44,7 +47,8 @@ export class EchoClientBenchmark extends BaseEchoTest {
             periodInMillis,
             methodType: MethodType.Unary,
             messagesSent: sentMessagesCount,
-            bytesSent: sentMessagesCount * bytesPerMessage
+            bytesSent: sentMessagesCount * bytesPerMessage,
+            millisPerMessage: (lastReceived - start) / sentMessagesCount
         }
     }
 
