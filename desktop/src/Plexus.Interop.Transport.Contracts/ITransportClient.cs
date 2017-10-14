@@ -16,12 +16,11 @@
  */
 namespace Plexus.Interop.Transport
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     public interface ITransportClient
     {
-        ValueTask<Maybe<ITransportConnection>> TryConnectAsync();
-
-        ValueTask<ITransportConnection> ConnectAsync();
+        ValueTask<ITransportConnection> ConnectAsync(CancellationToken cancellationToken);
     }
 }

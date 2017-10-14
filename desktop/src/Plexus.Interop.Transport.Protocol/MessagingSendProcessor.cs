@@ -22,30 +22,46 @@ using Plexus.Pools;
 
 namespace Plexus.Interop.Transport.Protocol
 {
+    using System.Threading;
+
     public sealed class MessagingSendProcessor : IMessagingSendProcessor
     {
         private readonly ILogger _log;
         private readonly ITransportProtocolSerializer _serializer;
+        private readonly IChannel<TransportMessage> _buffer = new BufferedChannel<TransportMessage>(3);
+        private readonly ITransmissionConnection _connection;
+        private readonly CancellationToken _cancellationToken;
 
         public MessagingSendProcessor(
             ITransmissionConnection connection,
-            ITransportProtocolSerializer serializer)
+            ITransportProtocolSerializer serializer,
+            CancellationToken cancellationToken = default)
         {
             Id = connection.Id;
+            _connection = connection;
+            _cancellationToken = cancellationToken;
             _log = LogManager.GetLogger<MessagingSendProcessor>(Id.ToString());
             _serializer = serializer;
-            Out = new PropagatingChannel<TransportMessage, IPooledBuffer>(3, connection.Out, SendAsync, Dispose);
-            Out.Completion.LogCompletion(_log);
+            Completion = TaskRunner.RunInBackground(ProcessAsync);
+            _buffer.Out.PropagateCompletionFrom(Completion);
+            Completion.LogCompletion(_log);            
         }
 
         public UniqueId Id { get; }
 
-        public IWritableChannel<TransportMessage> Out { get; }
+        public Task Completion { get; }
 
-        private void Dispose(TransportMessage message)
+        public IWritableChannel<TransportMessage> Out => _buffer.Out;
+        
+        private async Task ProcessAsync()
         {
-            _log.Trace("Disposing message of type {0}", message.Header.GetType().Name);
-            message.Dispose();
+            while (await _buffer.In.WaitReadAvailableAsync(_cancellationToken))
+            {
+                while (_buffer.In.TryRead(out var item))
+                {
+                    await SendAsync(item, _connection.Out).ConfigureAwait(false);
+                }
+            }
         }
 
         private async Task SendAsync(TransportMessage message, IWriteOnlyChannel<IPooledBuffer> output)
@@ -53,13 +69,13 @@ namespace Plexus.Interop.Transport.Protocol
             _log.Debug("Sending message: {0}", message);
             using (var header = message.Header)
             {
-                var serializedHeader = _serializer.Serialize(header);                
+                var serializedHeader = _serializer.Serialize(header);
                 await SendAsync(serializedHeader, output).ConfigureAwait(false);
                 if (message.Payload.HasValue)
                 {
-                    var payload = message.Payload.Value;                    
+                    var payload = message.Payload.Value;
                     await SendAsync(payload, output).ConfigureAwait(false);
-                }                
+                }
             }
         }
 
@@ -67,7 +83,7 @@ namespace Plexus.Interop.Transport.Protocol
         {
             try
             {
-                await output.WriteAsync(message).ConfigureAwait(false);
+                await output.WriteAsync(message, _cancellationToken).ConfigureAwait(false);
             }
             catch
             {

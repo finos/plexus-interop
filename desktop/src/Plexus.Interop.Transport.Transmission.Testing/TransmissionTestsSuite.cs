@@ -21,13 +21,14 @@
     using Shouldly;
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
     using Xunit;
 
     public abstract class TransmissionTestsSuite : TestsSuite
     {
-        protected abstract ITransmissionServer CreateServer();
-        protected abstract ITransmissionClient CreateClient();
+        protected abstract ITransmissionServer CreateServer(CancellationToken cancellationToken = default);
+        protected abstract ITransmissionClient CreateClient(CancellationToken cancellationToken = default);
 
         public static readonly IEnumerable<object[]> SendAndReceiveTestData = new object[][]
         {

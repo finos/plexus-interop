@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Channels
+namespace Plexus.Channels
 {
     using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
+    using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class BufferedChannel<T> : IChannel<T>, IReadableChannel<T>, IWritableChannel<T>
+    public sealed class BufferedChannel<T> : IChannel<T>, IReadOnlyChannel<T>, IWritableChannel<T>
     {
-        private readonly int _bufferSize;
-        private readonly Queue<T> _buffer;
-        private readonly Queue<QueuedWrite> _writeQueue = new Queue<QueuedWrite>(Environment.ProcessorCount);
         private readonly object _sync = new object();
+        private readonly Queue<T> _buffer = new Queue<T>();        
+        private readonly Promise _readCompletion = new Promise();
+        private readonly Promise _writeCompletion = new Promise();
+        private readonly int _bufferSize;
 
-        private Promise _readCompletion = new Promise();
-        private Promise _writeCompletion = new Promise();
         private Promise<bool> _readAvailable = new Promise<bool>();
-        private int _balance;
+        private Promise<bool> _writeAvailable = new Promise<bool>();        
 
         public BufferedChannel(int bufferSize)
         {
@@ -40,20 +40,7 @@
                 throw new ArgumentOutOfRangeException(nameof(bufferSize), bufferSize, "Buffer size must be non-negative");
             }
             _bufferSize = bufferSize;
-            _buffer = new Queue<T>(_bufferSize + 1);
-        }
-
-        internal void Reset()
-        {
-            lock (_sync)
-            {
-                TryTerminate();                
-                _buffer.Clear();
-                _balance = 0;
-                _readCompletion = new Promise();
-                _writeCompletion = new Promise();
-                _readAvailable = new Promise<bool>();
-            }
+            OnBalanceChanged();
         }
 
         public Task Completion => _readCompletion.Task;
@@ -62,95 +49,66 @@
 
         public IWritableChannel<T> Out => this;
 
-        public IReadableChannel<T> In => this;
+        public IReadOnlyChannel<T> In => this;        
 
-        public Task<bool> WaitForNextSafeAsync()
+        public bool TryRead(out T item)
         {
             lock (_sync)
             {
-                return _readAvailable.Task;
-            }
-        }
-
-        public bool TryReadSafe(out T item)
-        {
-            bool result;
-            lock (_sync)
-            {
-                if (_readCompletion.Task.IsCompleted)
+                if (_buffer.Count == 0)
                 {
                     item = default;
                     return false;
                 }
-
-                while (_balance > _bufferSize)
-                {
-                    var queuedWrite = _writeQueue.Dequeue();
-                    if (queuedWrite.TryComplete(true))
-                    {
-                        _buffer.Enqueue(queuedWrite.Item);
-                        break;
-                    }
-                    _balance--;
-                }
-
-                if (_balance > 0)
-                {
-                    item = _buffer.Dequeue();
-                    _balance--;                    
-                    result = true;
-                }
-                else
-                {
-                    item = default;
-                    result = false;
-                }
-                OnBalanceChanged();
-                TryCompleteRead();
-            }
-            return result;
-        }
-
-        public bool TryWriteSafe(T item)
-        {
-            lock (_sync)
-            {
-                if (_writeCompletion.Task.IsCompleted)
-                {
-                    return false;
-                }
-
-                if (_balance >= _bufferSize)
-                {
-                    return false;
-                }
-
-                _buffer.Enqueue(item);
-                _balance++;
+                item = _buffer.Dequeue();
                 OnBalanceChanged();
                 return true;
             }
         }
 
-        public Task<bool> TryWriteSafeAsync(T item)
+        public bool TryWrite(T item)
         {
             lock (_sync)
             {
-                if (TryWriteSafe(item))
+                if (_writeCompletion.Task.IsCompleted || _buffer.Count >= _bufferSize)
                 {
-                    return TaskConstants.True;
+                    return false;
                 }
+                _buffer.Enqueue(item);
+                OnBalanceChanged();
+                return true;
+            }
+        }
 
-                if (_writeCompletion.Task.IsCompleted)
+        public Task<bool> WaitReadAvailableAsync(CancellationToken cancellationToken = default)
+        {
+            lock (_sync)
+            {
+                if (_readCompletion.Task.IsFaulted || _readCompletion.Task.IsCanceled)
+                {
+                    _readCompletion.Task.GetResult();
+                }
+                else if (_readCompletion.Task.IsCompleted)
                 {
                     return TaskConstants.False;
                 }
+                return _readAvailable.Task.WithCancellation(cancellationToken);
+            }
+        }
 
-                var queuedWrite = new QueuedWrite(item);
-                _writeQueue.Enqueue(queuedWrite);
-                _balance++;
-                OnBalanceChanged();
-                return queuedWrite.Task;
+        public Task<bool> WaitWriteAvailableAsync(CancellationToken cancellationToken = default)
+        {
+            lock (_sync)
+            {
+                if (_writeCompletion.Task.IsFaulted || _writeCompletion.Task.IsCanceled)
+                {
+                    _writeCompletion.Task.GetResult();
+                }
+                else if (_writeCompletion.Task.IsCompleted)
+                {
+                    return TaskConstants.False;
+                }
+                return _writeAvailable.Task.WithCancellation(cancellationToken);
             }
         }
 
@@ -162,14 +120,7 @@
                 {
                     return false;
                 }
-                while (_balance > _bufferSize)
-                {
-                    var queuedWriter = _writeQueue.Dequeue();
-                    _balance--;
-                    queuedWriter.TryComplete(false);
-                }
                 OnBalanceChanged();
-                TryCompleteRead();
                 return true;
             }
         }
@@ -183,22 +134,34 @@
                     : _writeCompletion.TryFail(error);
                 if (result)
                 {
-                    while (_balance > _bufferSize)
-                    {
-                        var queuedWriter = _writeQueue.Dequeue();
-                        _balance--;
-                        queuedWriter.TryComplete(false);
-                    }
                     OnBalanceChanged();
-                    TryCompleteRead();
                 }
                 return result;
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void OnBalanceChanged()
         {
-            if (_balance > 0)
+            if (_writeCompletion.Task.IsCompleted)
+            {
+                _writeAvailable.TryComplete(false);
+            }
+            else if (_buffer.Count < _bufferSize)
+            {
+                _writeAvailable.TryComplete(true);
+            }
+            else if (_writeAvailable.Task.IsCompleted && _writeAvailable.Task.Result)
+            {
+                _writeAvailable = new Promise<bool>();
+            }
+
+            TryCompleteRead();
+            if (_readCompletion.Task.IsCompleted)
+            {
+                _readAvailable.TryComplete(false);
+            }
+            else if (_buffer.Count > 0)
             {
                 _readAvailable.TryComplete(true);
             }
@@ -211,7 +174,7 @@
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void TryCompleteRead()
         {
-            if (_balance != 0)
+            if (_buffer.Count != 0)
             {
                 return;
             }            
@@ -236,16 +199,6 @@
             {
                 _readCompletion.TryComplete();
             }            
-        }
-
-        private sealed class QueuedWrite : Promise<bool>
-        {
-            public QueuedWrite(T item)
-            {
-                Item = item;
-            }
-
-            public T Item { get; }
         }
     }
 }

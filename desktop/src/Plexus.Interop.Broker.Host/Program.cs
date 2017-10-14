@@ -24,9 +24,10 @@ namespace Plexus.Interop.Broker.Host
     public sealed class Program : IProgram
     {
         private static readonly ILogger Log = LogManager.GetLogger<Program>();
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private int _stoped;
-        private BrokerRunner _brokerRunner;
+        private BrokerRunner _brokerRunner;        
 
         public async Task<Task> StartAsync(string[] args)
         {
@@ -52,9 +53,10 @@ namespace Plexus.Interop.Broker.Host
         public async Task ShutdownAsync()
         {
             Log.Debug("Shutting down");
+            _cancellation.Cancel();
             if (Interlocked.Exchange(ref _stoped, 1) == 0 && _brokerRunner != null)
             {
-                await _brokerRunner.StopAsync().ConfigureAwait(false);
+                await _brokerRunner.Completion.IgnoreExceptions().ConfigureAwait(false);
             }
         }
     }

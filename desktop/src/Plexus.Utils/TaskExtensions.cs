@@ -369,9 +369,22 @@ namespace Plexus
             return task.WithTimeoutAsync(timeout).ConfigureAwait(false);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueTask<T> AsValueTask<T>(this Task<T> task)
         {
             return new ValueTask<T>(task);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> WithCancellation<T>(this Task<T> task, CancellationToken cancellationToken)
+        {            
+            if (!cancellationToken.CanBeCanceled || task.IsCompleted)
+            {
+                return task;
+            }
+            return cancellationToken.IsCancellationRequested 
+                ? TaskConstants<T>.Canceled 
+                : Task.WhenAny(task, cancellationToken.AsTask<T>()).Unwrap();
         }
     }
 }

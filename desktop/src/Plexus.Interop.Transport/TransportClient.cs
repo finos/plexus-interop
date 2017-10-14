@@ -20,9 +20,10 @@ namespace Plexus.Interop.Transport
     using Plexus.Interop.Transport.Protocol.Serialization;
     using Plexus.Interop.Transport.Transmission;
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class TransportClient : ITransportClient, ITransportConnectionFactory
+    public sealed class TransportClient : ITransportClient
     {
         private static readonly ILogger Log = LogManager.GetLogger<TransportClient>();
 
@@ -37,17 +38,18 @@ namespace Plexus.Interop.Transport
             _connectionFactory = new TransportConnectionFactory(serializationProvider);
         }
 
-        public async ValueTask<Maybe<ITransportConnection>> TryConnectAsync()
+        public async ValueTask<ITransportConnection> ConnectAsync(CancellationToken cancellationToken)
         {
-            var result = await _transmissionClient.TryConnectAsync().ConfigureAwait(false);
-            if (!result.HasValue)
-            {
-                return Maybe<ITransportConnection>.Nothing;
-            }
-            var transmissionConnection = result.Value;
+            var transmissionConnection = await _transmissionClient.ConnectAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                return new Maybe<ITransportConnection>(_connectionFactory.Create(transmissionConnection));
+                return _connectionFactory.Create(transmissionConnection);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                Log.Trace("Connection canceled");
+                transmissionConnection.Dispose();
+                throw;
             }
             catch (Exception ex)
             {
@@ -55,21 +57,6 @@ namespace Plexus.Interop.Transport
                 transmissionConnection.Dispose();
                 throw;
             }
-        }
-
-        public async ValueTask<ITransportConnection> ConnectAsync()
-        {
-            return (await TryConnectAsync()).GetValueOrThrowException<OperationCanceledException>();
-        }
-
-        ValueTask<Maybe<ITransportConnection>> ITransportConnectionFactory.TryCreateAsync()
-        {
-            return TryConnectAsync();
-        }
-
-        ValueTask<ITransportConnection> ITransportConnectionFactory.CreateAsync()
-        {
-            return ConnectAsync();
         }
 
         public override string ToString()

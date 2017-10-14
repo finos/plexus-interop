@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,16 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading.Tasks;
+ using System.Threading.Tasks;
 
 namespace Plexus.Channels
 {
-    public interface IReadableChannel<T>
+    using System.Threading;
+
+    public interface IReadOnlyChannel<T>
     {
-        Task Completion { get; }
+        Task Completion { get; }        
 
-        Task<bool> WaitForNextSafeAsync();
+        bool TryRead(out T item);
 
-        bool TryReadSafe(out T item);
+        Task<bool> WaitReadAvailableAsync(CancellationToken cancellationToken = default);
     }
 }

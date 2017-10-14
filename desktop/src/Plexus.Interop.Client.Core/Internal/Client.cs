@@ -60,7 +60,7 @@
         protected override async Task<Task> StartCoreAsync()
         {
             _log.Debug("Connecting {0}", _options);
-            _connection = await ClientConnectionFactory.Instance.ConnectAsync(_options, _cancellation.Token).ConfigureAwait(false);
+            _connection = await ClientConnectionFactory.Instance.ConnectAsync(_options).ConfigureAwait(false);
             ConnectionId = _connection.Id;
             _log = LogManager.GetLogger<Client>(_connection.Id.ToString());            
             _outcomingInvocationFactory = new OutcomingInvocationFactory(_connection, _options.Protocol, _options.Marshaller);

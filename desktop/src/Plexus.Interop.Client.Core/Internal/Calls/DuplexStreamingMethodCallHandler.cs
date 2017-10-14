@@ -49,9 +49,9 @@ namespace Plexus.Interop.Internal.Calls
             }
             finally
             {
-                while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
+                while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
                 {
-                    while (invocation.In.TryReadSafe(out _))
+                    while (invocation.In.TryRead(out _))
                     {
                     }
                 }

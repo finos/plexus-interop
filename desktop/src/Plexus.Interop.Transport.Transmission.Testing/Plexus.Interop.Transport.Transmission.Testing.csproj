@@ -5,6 +5,7 @@
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
     
     <RootNamespace>Plexus.Interop.Transport.Transmission</RootNamespace>
+    <LangVersion>latest</LangVersion>
     <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
 

@@ -14,17 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Protocol.Protobuf;
     using Plexus.Interop.Transport;
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
+    using System.Threading;
 
     public static class ClientOptionsBuilderExtensions
     {
-        public static ClientOptionsBuilder WithDefaultConfiguration(this ClientOptionsBuilder builder, string brokerWorkingDir)
+        public static ClientOptionsBuilder WithDefaultConfiguration(
+            this ClientOptionsBuilder builder, 
+            string brokerWorkingDir,
+            CancellationToken cancellationToken)
         {
             return builder
                 .WithMarshaller(
@@ -35,7 +39,7 @@
                         new ProtobufProtocolSerializerFactory()))
                 .WithTransport(
                     new TransportClient(
-                        new PipeTransmissionClient(brokerWorkingDir),
+                        new PipeTransmissionClient(brokerWorkingDir, cancellationToken),
                         new ProtobufTransportProtocolSerializationProvider()));
         }
     }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Samples.GreetingServer
+ namespace Plexus.Interop.Samples.GreetingServer
 {
     using Plexus.Channels;
     using Plexus.Interop.Samples.GreetingServer.Generated;
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
     using Plexus.Logging.NLog;
 
@@ -30,6 +31,7 @@
         {
             var logging = new LoggingInitializer();
             var log = LogManager.GetLogger<Program>();
+            var cancellation = new CancellationTokenSource();
             try
             {
                 var brokerPath = args.Length > 0 ? args[0] : Path.GetFullPath(@"../..");
@@ -38,6 +40,7 @@
                     new ClientOptionsBuilder()
                         .WithDefaultConfiguration(brokerPath)
                         .WithApplicationId("interop.samples.GreetingServer")
+                        .WithCancellationToken(cancellation.Token)
                         .WithProvidedService(
                             "interop.samples.GreetingService",
                             s => s
@@ -54,7 +57,7 @@
                 {
                     eventArgs.Cancel = true;
                     Console.WriteLine("Disconnecting");
-                    client.DisconnectAsync();
+                    cancellation.Cancel();
                 };
                 await client.ConnectAsync().ConfigureAwait(false);
                 Console.WriteLine("Connected");
@@ -63,9 +66,14 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Program terminated with exception. See log for details. {0}: {1}", ex.GetType(), ex.Message);
+                Console.WriteLine("Program terminated with exception. See log for details. {0}: {1}", ex.GetType(),
+                    ex.Message);
                 log.Error(ex, "Program terminated with exception");
                 logging.Dispose();
+            }
+            finally
+            {
+                cancellation.Dispose();
             }
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
@@ -83,7 +91,7 @@
         }
 
         private static async Task GreetingDuplexStreaming(
-            IReadableChannel<GreetingRequest> requestStream, 
+            IReadOnlyChannel<GreetingRequest> requestStream, 
             IWriteOnlyChannel<GreetingResponse> responseStream, 
             MethodCallContext context)
         {
@@ -91,9 +99,9 @@
             var greeting = "Hello!";            
             await responseStream.WriteAsync(new GreetingResponse {Greeting = greeting}).ConfigureAwait(false);
             Console.WriteLine("Sent: {0}", greeting);
-            while (await requestStream.WaitForNextSafeAsync().ConfigureAwait(false))
+            while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false))
             {                
-                while (requestStream.TryReadSafe(out var request))
+                while (requestStream.TryRead(out var request))
                 {
                     Console.WriteLine("Received: {0}", request.Name);
                     greeting = $"Hello, {request.Name}!";
@@ -118,14 +126,14 @@
         }
 
         private static async Task<GreetingResponse> GreetingClientStreaming(
-            IReadableChannel<GreetingRequest> requeststream, 
+            IReadOnlyChannel<GreetingRequest> requeststream, 
             MethodCallContext context)
         {
             Console.WriteLine("Received client streaming request from {{{0}}}", context);
             var names = new List<string>();
-            while (await requeststream.WaitForNextSafeAsync().ConfigureAwait(false))
+            while (await requeststream.WaitReadAvailableAsync().ConfigureAwait(false))
             {
-                while (requeststream.TryReadSafe(out var request))
+                while (requeststream.TryRead(out var request))
                 {
                     Console.WriteLine("Received: {0}", request.Name);
                     names.Add(request.Name);

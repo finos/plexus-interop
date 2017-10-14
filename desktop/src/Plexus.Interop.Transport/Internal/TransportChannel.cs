@@ -58,7 +58,7 @@
 
         public IWritableChannel<TransportMessageFrame> Out => _sendProcessor;
 
-        public IReadableChannel<TransportMessageFrame> In => _receiveBuffer.In;
+        public IReadOnlyChannel<TransportMessageFrame> In => _receiveBuffer.In;
 
         public async Task HandleIncomingAsync(ChannelMessage message)
         {

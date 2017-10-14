@@ -44,9 +44,9 @@ namespace Plexus.Interop.Transport
         public static async Task CompleteAsync(this ITransportConnection connection)
         {
             connection.TryComplete();
-            while (await connection.IncomingChannels.WaitForNextSafeAsync().ConfigureAwait(false))
+            while (await connection.IncomingChannels.WaitReadAvailableAsync().ConfigureAwait(false))
             {
-                while (connection.IncomingChannels.TryReadSafe(out _))
+                while (connection.IncomingChannels.TryRead(out _))
                 {
                 }
             }

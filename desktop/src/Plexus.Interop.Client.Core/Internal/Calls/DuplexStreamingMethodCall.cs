@@ -38,7 +38,7 @@ namespace Plexus.Interop.Internal.Calls
             Completion.LogCompletion(Log);
         }
 
-        public IReadableChannel<TResponse> ResponseStream => _responseStream.In;
+        public IReadOnlyChannel<TResponse> ResponseStream => _responseStream.In;
 
         public IWritableChannel<TRequest> RequestStream => _requestStream.Out;
 
@@ -70,9 +70,9 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Reading responses");
-                    while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (invocation.In.TryReadSafe(out var item))
+                        while (invocation.In.TryRead(out var item))
                         {
                             await _responseStream.Out.TryWriteSafeAsync(item).ConfigureAwait(false);
                         }
@@ -99,9 +99,9 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Writing requests");
-                    while (await _requestStream.In.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await _requestStream.In.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (_requestStream.In.TryReadSafe(out var item))
+                        while (_requestStream.In.TryRead(out var item))
                         {
                             await invocation.Out.TryWriteSafeAsync(item).ConfigureAwait(false);
                         }

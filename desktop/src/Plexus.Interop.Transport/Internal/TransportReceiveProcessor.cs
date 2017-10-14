@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading;
+ using System.Threading;
 using Plexus.Pools;
 using Plexus.Interop.Transport.Transmission;
 using System.Threading.Tasks;
@@ -47,7 +47,7 @@ namespace Plexus.Interop.Transport.Internal
 
         public UniqueId InstanceId { get; }
 
-        public IReadableChannel<ChannelMessage> In { get; }
+        public IReadOnlyChannel<ChannelMessage> In { get; }
 
         private void Dispose(TransportMessage message)
         {

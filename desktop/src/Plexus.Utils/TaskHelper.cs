@@ -19,10 +19,14 @@ using System.Threading.Tasks;
 
 namespace Plexus
 {
+    using System.Runtime.CompilerServices;
     using System.Threading;
 
     public static class TaskHelper
     {
+        private static readonly ILogger Log = LogManager.GetLogger(typeof(TaskHelper));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<T> FromException<T>(Exception exception)
         {
             if (exception is AggregateException aggrEx)
@@ -34,13 +38,20 @@ namespace Plexus
             return tcs.Task;
         }
 
-        public static async Task AsTask(this CancellationToken cancellationToken)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> AsTask<T>(this CancellationToken cancellationToken)
         {
-            var promise = new Promise();
-            using (cancellationToken.Register(() => promise.TryComplete()))
-            {
-                await promise.Task.ConfigureAwait(false);
-            }
+            var promise = new Promise<T>();
+            var registration = cancellationToken.Register(() => promise.TryCancel());
+            var task = promise.Task;
+            task.ContinueWithInBackground(t => registration.Dispose(), CancellationToken.None).IgnoreAwait(Log);
+            return task;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task AsTask(this CancellationToken cancellationToken)
+        {
+            return cancellationToken.AsTask<Nothing>();
         }
     }
 }

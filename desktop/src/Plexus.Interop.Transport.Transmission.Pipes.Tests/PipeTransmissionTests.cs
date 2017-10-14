@@ -17,17 +17,18 @@
  namespace Plexus.Interop.Transport.Transmission.Pipes
 {
     using System.IO;
+    using System.Threading;
 
     public sealed class PipeTransmissionTests : TransmissionTestsSuite
     {
-        protected override ITransmissionClient CreateClient()
+        protected override ITransmissionClient CreateClient(CancellationToken cancellationToken = default)
         {
-            return new PipeTransmissionClient(Directory.GetCurrentDirectory());
+            return new PipeTransmissionClient(Directory.GetCurrentDirectory(), cancellationToken);
         }
 
-        protected override ITransmissionServer CreateServer()
+        protected override ITransmissionServer CreateServer(CancellationToken cancellationToken = default)
         {
-            return new PipeTransmissionServer(Directory.GetCurrentDirectory());
+            return new PipeTransmissionServer(Directory.GetCurrentDirectory(), cancellationToken);
         }
     }
 }

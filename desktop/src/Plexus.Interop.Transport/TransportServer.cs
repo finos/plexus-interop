@@ -22,7 +22,7 @@ namespace Plexus.Interop.Transport
     using Plexus.Interop.Transport.Transmission;
     using System.Threading.Tasks;
 
-    public sealed class TransportServer : ITransportServer, ITransportConnectionFactory
+    public sealed class TransportServer : ITransportServer
     {
         private readonly ITransmissionServer _transmissionServer;
         private readonly TransportConnectionFactory _connectionFactory;
@@ -58,16 +58,7 @@ namespace Plexus.Interop.Transport
         public void Dispose()
         {
             _transmissionServer.Dispose();
-        }
-
-        ValueTask<Maybe<ITransportConnection>> ITransportConnectionFactory.TryCreateAsync()
-        {
-            return TryAcceptAsync();
-        }
-
-        ValueTask<ITransportConnection> ITransportConnectionFactory.CreateAsync()
-        {
-            return AcceptAsync();
+            Completion.IgnoreExceptions().GetResult();
         }
     }
 }

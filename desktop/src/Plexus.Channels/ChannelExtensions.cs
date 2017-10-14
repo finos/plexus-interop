@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Threading.Tasks;
-
 namespace Plexus.Channels
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public static class ChannelExtensions
     {
         public static async Task CompleteAsync<T>(this IWritableChannel<T> channel)
@@ -33,61 +34,49 @@ namespace Plexus.Channels
             await channel.Completion.ConfigureAwait(false);
         }
 
-        public static async Task WriteAsync<T>(this IWriteOnlyChannel<T> channel, T item)
+        public static async Task WriteAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
         {
-            var result = await channel.TryWriteAsync(item).ConfigureAwait(false);
+            var result = await channel.TryWriteAsync(item, cancellationToken).ConfigureAwait(false);
             if (!result)
             {
-                await channel.Completion.ConfigureAwait(false);
                 throw new OperationCanceledException();
             }
         }
 
-        public static async ValueTask<T> ReadAsync<T>(this IReadableChannel<T> channel)
+        public static async Task<bool> TryWriteAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
         {
-            var result = await channel.TryReadAsync().ConfigureAwait(false);
+            while (await channel.WaitWriteAvailableAsync(cancellationToken))
+            {
+                if (channel.TryWrite(item))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static async ValueTask<T> ReadAsync<T>(this IReadOnlyChannel<T> channel, CancellationToken cancellationToken = default)
+        {
+            var result = await channel.TryReadAsync(cancellationToken).ConfigureAwait(false);
             if (!result.HasValue)
             {
-                await channel.Completion.ConfigureAwait(false);
                 throw new OperationCanceledException();
             }
             return result.Value;
         }
-
-        public static async ValueTask<Maybe<T>> TryReadSafeAsync<T>(this IReadableChannel<T> channel)
+        
+        public static async ValueTask<Maybe<T>> TryReadAsync<T>(this IReadOnlyChannel<T> channel, CancellationToken cancellationToken = default)
         {
-            T result;
-            while (!channel.TryReadSafe(out result))
+            while (await channel.WaitReadAvailableAsync(cancellationToken).ConfigureAwait(false))
             {
-                if (!await channel.WaitForNextSafeAsync().ConfigureAwait(false))
+                if (channel.TryRead(out var item))
                 {
-                    return Maybe<T>.Nothing;
+                    return item;
                 }
             }
-            return new Maybe<T>(result);
+            return Maybe<T>.Nothing;
         }
-
-        public static async ValueTask<Maybe<T>> TryReadAsync<T>(this IReadableChannel<T> channel)
-        {
-            var result = await channel.TryReadSafeAsync().ConfigureAwait(false);
-            if (result.HasValue)
-            {
-                return result;
-            }
-            await channel.Completion.ConfigureAwait(false);
-            return result;
-        }
-
-        public static async Task<bool> TryWriteAsync<T>(this IWriteOnlyChannel<T> channel, T item)
-        {
-            var result = await channel.TryWriteSafeAsync(item).ConfigureAwait(false);
-            if (!result)
-            {
-                await channel.Completion.ConfigureAwait(false);
-            }
-            return result;
-        }
-
+        
         public static void Terminate<T>(
             this IWritableChannel<T> channel,
             Exception error = null)
@@ -106,7 +95,7 @@ namespace Plexus.Channels
             }
         }
 
-        public static bool IsCompleted<T>(this IReadableChannel<T> channel)
+        public static bool IsCompleted<T>(this IReadOnlyChannel<T> channel)
         {
             return channel.Completion.IsCompleted;
         }
@@ -116,37 +105,21 @@ namespace Plexus.Channels
             return channel.Completion.IsCompleted;
         }
 
-        public static Task ConsumeAsync<T>(
-            this IReadableChannel<T> channel,
-            Action<T> handle,
-            Func<Task> onCompletedAsync = null,
-            Func<Exception, Task> onTerminatedAsync = null)
-        {
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-            return channel.ConsumeAsync(async x => handle(x));
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-        }
-
         public static async Task ConsumeAsync<T>(
-            this IReadableChannel<T> channel,
+            this IReadOnlyChannel<T> channel,            
             Func<T, Task> handleAsync,
+            CancellationToken cancellationToken = default,
             Func<Task> onCompletedAsync = null,
             Func<Exception, Task> onTerminatedAsync = null)
         {
             try
             {
-                while (true)
+                while (await channel.WaitReadAvailableAsync(cancellationToken).ConfigureAwait(false))
                 {
-                    if (!channel.TryReadSafe(out T item))
+                    while (channel.TryRead(out var item))
                     {
-                        var result = await channel.TryReadAsync().ConfigureAwait(false);
-                        if (!result.HasValue)
-                        {
-                            break;
-                        }
-                        item = result.Value;
+                        await handleAsync(item).ConfigureAwait(false);
                     }
-                    await handleAsync(item).ConfigureAwait(false);
                 }
                 if (onCompletedAsync != null)
                 {
@@ -163,37 +136,6 @@ namespace Plexus.Channels
                 {
                     throw;
                 }
-            }
-        }
-
-        public static async Task ConsumeBufferAsync<T>(
-            this IChannel<T> channel,
-            Func<T, Task> handleAsync,
-            Action<T> disposeAfterTermination)
-        {
-            try
-            {
-                await channel.In.ConsumeAsync(handleAsync).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                channel.Out.TryTerminate(ex);
-                if (!channel.In.IsCompleted())
-                {
-                    try
-                    {
-                        await channel.In.ConsumeAsync(disposeAfterTermination).ConfigureAwait(false);
-                    }
-                    catch
-                    {
-                        // ignore
-                    }
-                }
-                throw;
-            }
-            finally
-            {
-                await channel.In.Completion.ConfigureAwait(false);
             }
         }
     }

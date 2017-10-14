@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,95 +14,93 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Plexus.Channels;
-using Plexus.Interop.Transport.Protocol.Internal;
-using Plexus.Interop.Transport.Protocol.Serialization;
-using Plexus.Interop.Transport.Transmission;
-using Plexus.Pools;
 
 namespace Plexus.Interop.Transport.Protocol
 {
+    using Plexus.Channels;
+    using Plexus.Interop.Transport.Protocol.Internal;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
+    using Plexus.Pools;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public sealed class MessagingReceiveProcessor : IMessagingReceiveProcessor
     {
         private readonly ILogger _log;
-        private readonly IReadableChannel<IPooledBuffer> _connection;
+        private readonly IReadOnlyChannel<IPooledBuffer> _connection;
         private readonly ITransportProtocolDeserializer _deserializer;
+        private readonly CancellationToken _cancellationToken;
+        private readonly IChannel<TransportMessage> _buffer = new BufferedChannel<TransportMessage>(3);
 
         public MessagingReceiveProcessor(
             ITransmissionConnection connection,
-            ITransportProtocolDeserializer deserializer)
+            ITransportProtocolDeserializer deserializer,
+            CancellationToken cancellationToken = default)
         {
             Id = connection.Id;
             _log = LogManager.GetLogger<MessagingReceiveProcessor>(Id.ToString());
             _connection = connection.In;
             _deserializer = deserializer;
-            In = new ProducingChannel<TransportMessage>(3, ReceiveLoopAsync);
+            _cancellationToken = cancellationToken;
+            In = _buffer.In;
             In.Completion.LogCompletion(_log);
+            _buffer.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
         }
 
         public UniqueId Id { get; }
 
-        public IReadableChannel<TransportMessage> In { get; }
+        public IReadOnlyChannel<TransportMessage> In { get; }
 
-        private async Task ReceiveLoopAsync(IWriteOnlyChannel<TransportMessage> output, CancellationToken cancellationToken)
+        private async Task ProcessAsync()
         {
-            while (true)
+            while (await _connection.WaitReadAvailableAsync(_cancellationToken).ConfigureAwait(false))
             {
-                var maybeData = await _connection.TryReadAsync().ConfigureAwait(false);
-                if (!maybeData.HasValue)
+                while (_connection.TryRead(out var item))
                 {
-                    break;
-                }
-                ITransportHeader header;
-                using (var serializedHeader = maybeData.Value)
-                {
-                    header = _deserializer.Deserialize(maybeData.Value);
-                }
-                try
-                {
-                    var body = Maybe<IPooledBuffer>.Nothing;
-                    var expectedBodyLength = GetBodyLengthHandler.Instance.Handle(header);
-                    if (expectedBodyLength.HasValue)
+                    ITransportHeader header;
+                    using (item)
                     {
-                        body = await _connection.TryReadAsync().ConfigureAwait(false);
-                        if (!body.HasValue)
-                        {
-                            break;
-                        }
-                        if (body.Value.Count != expectedBodyLength.Value)
-                        {
-                            try
-                            {
-                                throw new InvalidOperationException($"Received body length {body.Value.Count} does not equal to the specified in header: {header}");
-                            }
-                            finally
-                            {
-                                body.Value.Dispose();
-                            }
-                        }
+                        header = _deserializer.Deserialize(item);
                     }
                     try
                     {
-                        var transportMessage = new TransportMessage(header, body);
-                        _log.Debug("Message received: {0}", transportMessage);
-                        await output.WriteAsync(transportMessage).ConfigureAwait(false);                        
+                        IPooledBuffer body = null;
+                        var expectedBodyLength = GetBodyLengthHandler.Instance.Handle(header);
+                        if (expectedBodyLength.HasValue)
+                        {
+                            body = await _connection.ReadAsync(_cancellationToken).ConfigureAwait(false);
+                            if (body.Count != expectedBodyLength.Value)
+                            {
+                                try
+                                {
+                                    throw new InvalidOperationException(
+                                        $"Received body length {body.Count} does not equal to the specified in header: {header}");
+                                }
+                                finally
+                                {
+                                    body.Dispose();
+                                }
+                            }
+                        }
+                        try
+                        {
+                            var transportMessage = new TransportMessage(header, new Maybe<IPooledBuffer>(body));
+                            _log.Debug("Message received: {0}", transportMessage);
+                            await _buffer.Out.WriteAsync(transportMessage, _cancellationToken).ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            body?.Dispose();
+                            throw;
+                        }
                     }
                     catch
                     {
-                        if (body.HasValue)
-                        {
-                            body.Value.Dispose();
-                        }
+                        header.Dispose();
                         throw;
-                    }                    
-                }
-                catch
-                {
-                    header.Dispose();
-                    throw;
+                    }
                 }
             }
             _log.Debug("Incoming messages completed");

@@ -16,13 +16,10 @@
  */
 ﻿namespace Plexus.Interop.Transport.Transmission
 {
-    using System;
     using System.Threading.Tasks;
 
-    public interface ITransmissionClient : IDisposable
+    public interface ITransmissionClient
     {
-        ValueTask<Maybe<ITransmissionConnection>> TryConnectAsync();
-
         ValueTask<ITransmissionConnection> ConnectAsync();
     }
 }

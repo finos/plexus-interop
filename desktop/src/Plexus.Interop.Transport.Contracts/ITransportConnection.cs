@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
+ namespace Plexus.Interop.Transport
 {
     using Plexus.Channels;
     using System;
@@ -26,7 +26,7 @@
 
         Task Completion { get; }
 
-        IReadableChannel<ITransportChannel> IncomingChannels { get; }
+        IReadOnlyChannel<ITransportChannel> IncomingChannels { get; }
 
         bool TryComplete();
 

@@ -68,9 +68,9 @@ namespace Plexus.Interop.Internal.Calls
                 {
                     _response = default;
                     Log.Trace("Reading response");
-                    while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (invocation.In.TryReadSafe(out var response))
+                        while (invocation.In.TryRead(out var response))
                         {
                             _response = response;
                         }

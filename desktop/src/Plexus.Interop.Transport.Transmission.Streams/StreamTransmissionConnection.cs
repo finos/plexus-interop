@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.Streams
+namespace Plexus.Interop.Transport.Transmission.Streams
 {
+    using Plexus.Channels;
+    using Plexus.Pools;
     using System;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Channels;
-    using Plexus.Pools;
 
     public sealed class StreamTransmissionConnection : ITransmissionConnection
     {
@@ -31,19 +31,20 @@
         private readonly byte[] _writeLengthBuffer = new byte[2];
         private int _disposed;
         private readonly Stream _stream;
+        private readonly CancellationToken _cancellationToken;
         private readonly ProducingChannel<IPooledBuffer> _receiver;
         private long _receiveCount;
         private long _sendCount;
 
-        private StreamTransmissionConnection(UniqueId id, Stream stream)
+        private StreamTransmissionConnection(UniqueId id, Stream stream, CancellationToken cancellationToken)
         {
             Id = id;
             _log = LogManager.GetLogger<StreamTransmissionConnection>(id.ToString());
             _stream = stream;
+            _cancellationToken = cancellationToken;
             Out = new ConsumingChannel<IPooledBuffer>(3, SendAsync, CompleteSendingAsync, DisposeRejected);
             _receiver = new ProducingChannel<IPooledBuffer>(3, ReceiveLoopAsync);
             In = _receiver;
-            // producer.PropagateTerminationFrom(Out.Completion);
             Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
         }
 
@@ -53,7 +54,7 @@
 
         public IWritableChannel<IPooledBuffer> Out { get; }
 
-        public IReadableChannel<IPooledBuffer> In { get; }
+        public IReadOnlyChannel<IPooledBuffer> In { get; }
 
         public void Dispose()
         {
@@ -65,12 +66,23 @@
         }
 
         public static async ValueTask<Maybe<ITransmissionConnection>> TryCreateAsync(
-            UniqueId id, Func<ValueTask<Maybe<Stream>>> streamFactory)
+            UniqueId id, 
+            Func<ValueTask<Maybe<Stream>>> streamFactory,
+            CancellationToken cancellationToken)
         {
             var result = await streamFactory().ConfigureAwait(false);
             return result.HasValue 
-                ? new StreamTransmissionConnection(id, result.Value) 
+                ? new StreamTransmissionConnection(id, result.Value, cancellationToken) 
                 : Maybe<ITransmissionConnection>.Nothing;
+        }
+
+        public static async ValueTask<ITransmissionConnection> CreateAsync(
+            UniqueId id, 
+            Func<ValueTask<Stream>> streamFactory,
+            CancellationToken cancellationToken)
+        {
+            var result = await streamFactory().ConfigureAwait(false);
+            return new StreamTransmissionConnection(id, result, cancellationToken);
         }
 
         private async Task ProcessAsync()
@@ -87,12 +99,13 @@
 
         private async Task ReceiveLoopAsync(IWriteOnlyChannel<IPooledBuffer> received, CancellationToken cancellationToken)
         {
+            var cancellation = CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, cancellationToken);
             try
             {
                 while (true)
                 {
                     _log.Trace("Awaiting next message {0}", _receiveCount);
-                    var length = await ReadLengthAsync(cancellationToken).ConfigureAwait(false);
+                    var length = await ReadLengthAsync(cancellation.Token).ConfigureAwait(false);
                     if (length == EndMessage)
                     {
                         _log.Trace("Completing receiving datagrams because <END> message received");
@@ -100,11 +113,11 @@
                     }
                     _log.Trace("Reading message {0} of length {1}", _receiveCount, length);
                     var datagram = await PooledBuffer
-                        .Get(_stream, length, cancellationToken)
+                        .Get(_stream, length, cancellation.Token)
                         .ConfigureAwait(false);
                     try
                     {
-                        await received.WriteAsync(datagram).ConfigureAwait(false);
+                        await received.WriteAsync(datagram, cancellation.Token).ConfigureAwait(false);
                     }
                     catch
                     {
@@ -120,6 +133,10 @@
                 Out.TryTerminate();
                 throw;
             }
+            finally
+            {
+                cancellation.Dispose();
+            }
         }
 
         private void DisposeRejected(IPooledBuffer msg)
@@ -134,8 +151,8 @@
                 var length = datagram.Count;
                 _log.Trace("Sending message {0} of length: {1}", _sendCount, length);
                 await WriteLengthAsync(datagram.Count).ConfigureAwait(false);
-                await _stream.WriteAsync(datagram.Array, datagram.Offset, length).ConfigureAwait(false);
-                await _stream.FlushAsync().ConfigureAwait(false);
+                await _stream.WriteAsync(datagram.Array, datagram.Offset, length, _cancellationToken).ConfigureAwait(false);
+                await _stream.FlushAsync(_cancellationToken).ConfigureAwait(false);
                 _log.Trace("Sent message {0} of length {1}", _sendCount, length);
                 _sendCount++;
             }
@@ -156,7 +173,7 @@
             {
                 _log.Trace("Sending <END> message to complete sending");
                 await WriteLengthAsync(EndMessage).ConfigureAwait(false);
-                await _stream.FlushAsync().ConfigureAwait(false);
+                await _stream.FlushAsync(_cancellationToken).ConfigureAwait(false);
 
             }
             catch
@@ -170,7 +187,7 @@
         {
             _writeLengthBuffer[0] = (byte)(length >> 8);
             _writeLengthBuffer[1] = (byte)length;
-            await _stream.WriteAsync(_writeLengthBuffer, 0, 2).ConfigureAwait(false);
+            await _stream.WriteAsync(_writeLengthBuffer, 0, 2, _cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<int> ReadLengthAsync(CancellationToken cancellationToken)

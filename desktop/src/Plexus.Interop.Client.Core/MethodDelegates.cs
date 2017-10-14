@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+ namespace Plexus.Interop
 {
     using System.Threading.Tasks;
     using Plexus.Channels;
@@ -31,7 +31,7 @@
     /// </summary>
     /// <typeparam name="TRequest">Request message type for this method.</typeparam>
     /// <typeparam name="TResponse">Response message type for this method.</typeparam>
-    public delegate Task<TResponse> ClientStreamingMethodHandler<TRequest, TResponse>(IReadableChannel<TRequest> requestStream, MethodCallContext context);
+    public delegate Task<TResponse> ClientStreamingMethodHandler<TRequest, TResponse>(IReadOnlyChannel<TRequest> requestStream, MethodCallContext context);
 
     /// <summary>
     /// Server-side handler for server streaming call.
@@ -45,5 +45,5 @@
     /// </summary>
     /// <typeparam name="TRequest">Request message type for this method.</typeparam>
     /// <typeparam name="TResponse">Response message type for this method.</typeparam>
-    public delegate Task DuplexStreamingMethodHandler<TRequest, out TResponse>(IReadableChannel<TRequest> requestStream, IWriteOnlyChannel<TResponse> responseStream, MethodCallContext context);
+    public delegate Task DuplexStreamingMethodHandler<TRequest, out TResponse>(IReadOnlyChannel<TRequest> requestStream, IWriteOnlyChannel<TResponse> responseStream, MethodCallContext context);
 }

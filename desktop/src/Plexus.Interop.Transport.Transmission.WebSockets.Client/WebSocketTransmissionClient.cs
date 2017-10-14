@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
+namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
 {
     using Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal;
     using System;
@@ -28,52 +28,45 @@
 
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
 
-        private readonly CancellationTokenSource _cancellation;
+        private readonly CancellationToken _cancellationToken;
         private readonly IServerStateReader _serverStateReader;
 
         public WebSocketTransmissionClient(
             string brokerWorkingDir, 
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
-            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _cancellationToken = cancellationToken;
             _serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
         }
 
-        public async ValueTask<Maybe<ITransmissionConnection>> TryConnectAsync()
+        public async ValueTask<ITransmissionConnection> ConnectAsync(CancellationToken cancellationToken = default)
         {
-            try
+            using (var cancellation =
+                CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationToken))
             {
-                if (!await _serverStateReader.WaitInitializationAsync(MaxServerInitializationTime, _cancellation.Token)
-                    .ConfigureAwait(false))
-                {
-                    throw new TimeoutException(
-                        $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
-                }
-                var url = _serverStateReader.ReadSetting("address");
-                if (string.IsNullOrEmpty(url))
-                {
-                    throw new InvalidOperationException("Cannot find url to connect");
-                }
-                Log.Trace("Creating new connection to url {0}", url);
-                var connection = new WebSocketTransmissionClientConnection(url, _cancellation.Token);
-                await connection.ConnectCompletion.ConfigureAwait(false);
-                Log.Trace("Created new connection {0} to url {1}", connection.Id, url);
-                return connection;
-            }
-            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
-            {
-                return Maybe<ITransmissionConnection>.Nothing;
+                return await ConnectInternalAsync(cancellation.Token).ConfigureAwait(false);
             }
         }
 
-        public async ValueTask<ITransmissionConnection> ConnectAsync()
+        private async ValueTask<ITransmissionConnection> ConnectInternalAsync(CancellationToken cancellationToken = default)
         {
-            return (await TryConnectAsync()).GetValueOrThrowException<OperationCanceledException>();
-        }
-
-        public void Dispose()
-        {
-            _cancellation.Cancel();
+            if (!await _serverStateReader
+                .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
+                .ConfigureAwait(false))
+            {
+                throw new TimeoutException(
+                    $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+            }
+            var url = _serverStateReader.ReadSetting("address");
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new InvalidOperationException("Cannot find url to connect");
+            }
+            Log.Trace("Creating new connection to url {0}", url);
+            var connection = new WebSocketTransmissionClientConnection(url, _cancellationToken);
+            await connection.ConnectCompletion.ConfigureAwait(false);
+            Log.Trace("Created new connection {0} to url {1}", connection.Id, url);
+            return connection;
         }
     }
 }

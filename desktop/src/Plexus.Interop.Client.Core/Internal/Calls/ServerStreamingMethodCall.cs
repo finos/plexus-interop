@@ -38,7 +38,7 @@ namespace Plexus.Interop.Internal.Calls
             _responseStream.PropagateCompletionFrom(Completion);
         }
 
-        public IReadableChannel<TResponse> ResponseStream => _responseStream;
+        public IReadOnlyChannel<TResponse> ResponseStream => _responseStream;
 
         public Task CancelAsync()
         {
@@ -62,11 +62,11 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Reading responses");
-                    while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (invocation.In.TryReadSafe(out var response))
+                        while (invocation.In.TryRead(out var response))
                         {
-                            if (!_responseStream.Out.TryWriteSafe(response))
+                            if (!_responseStream.Out.TryWrite(response))
                             {
                                 await _responseStream.Out.TryWriteSafeAsync(response).ConfigureAwait(false);
                             }

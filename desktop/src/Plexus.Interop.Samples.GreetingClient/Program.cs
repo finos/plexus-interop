@@ -20,6 +20,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Plexus.Channels;
     using Plexus.Logging.NLog;
@@ -30,6 +31,7 @@
         {
             var logging = new LoggingInitializer();
             var log = LogManager.GetLogger<Program>();
+            var cancellation = new CancellationTokenSource();
             try
             {
                 var brokerPath = args.Length > 0 ? args[0] : Path.GetFullPath(@"../..");
@@ -37,6 +39,7 @@
                 var client = ClientFactory.Instance.Create(
                     new ClientOptionsBuilder()
                         .WithDefaultConfiguration(brokerPath)
+                        .WithCancellationToken(cancellation.Token)
                         .WithApplicationId("interop.samples.GreetingClient")
                         .Build());
 
@@ -80,7 +83,9 @@
                             break;
                     }
                 }
-                await client.DisconnectAsync();
+                Console.WriteLine("Disconnecting");
+                cancellation.Cancel();
+                await client.Completion;
                 Console.WriteLine("Disconnected");
             }
             catch (Exception ex)
@@ -90,7 +95,8 @@
             }
             finally
             {
-                logging.Dispose();
+                cancellation.Dispose();
+                logging.Dispose();                
             }
             Console.WriteLine("> Press any key to exit...");
             Console.ReadKey();
@@ -120,9 +126,9 @@
             var request = new GreetingRequest { Name = name };
             Console.WriteLine("Sending: {0}", name);
             var responseStream = client.Call(serverStreaming, request).ResponseStream;
-            while (await responseStream.WaitForNextSafeAsync())
+            while (await responseStream.WaitReadAvailableAsync())
             {
-                while (responseStream.TryReadSafe(out var response))
+                while (responseStream.TryRead(out var response))
                 {
                     Console.WriteLine("Received: {0}", response.Greeting);                    
                 }
@@ -179,9 +185,9 @@
             }
             Console.WriteLine("Completing request stream");
             requestStream.TryComplete();
-            while (await responseStream.WaitForNextSafeAsync())
+            while (await responseStream.WaitReadAvailableAsync())
             {
-                while (responseStream.TryReadSafe(out response))
+                while (responseStream.TryRead(out response))
                 {
                     Console.WriteLine("Received: {0}", response.Greeting);
                 }

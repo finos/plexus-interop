@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
+ namespace Plexus.Interop.Transport
 {
     using Plexus.Channels;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Plexus.Processes;
 
-    public sealed class CompositeTransportServer : ProcessBase, IReadableChannel<ITransportConnection>
+    public sealed class CompositeTransportServer : ProcessBase, IReadOnlyChannel<ITransportConnection>
     {        
         private static readonly ILogger Log = LogManager.GetLogger<CompositeTransportServer>();
 
@@ -83,14 +84,14 @@
             Log.Debug("Server listening stopped: {0}", server);
         }
 
-        public Task<bool> WaitForNextSafeAsync()
+        public Task<bool> WaitReadAvailableAsync(CancellationToken cancellationToken = default)
         {
-            return _buffer.In.WaitForNextSafeAsync();
+            return _buffer.In.WaitReadAvailableAsync(cancellationToken);
         }
 
-        public bool TryReadSafe(out ITransportConnection item)
+        public bool TryRead(out ITransportConnection item)
         {
-            return _buffer.In.TryReadSafe(out item);
+            return _buffer.In.TryRead(out item);
         }
     }
 }

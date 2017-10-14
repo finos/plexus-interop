@@ -71,9 +71,9 @@ namespace Plexus.Interop.Internal.Calls
                 {
                     TResponse response = default;
                     Log.Trace("Reading response");
-                    while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (invocation.In.TryReadSafe(out var item))
+                        while (invocation.In.TryRead(out var item))
                         {
                             response = item;
                         }
@@ -101,9 +101,9 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Writing requests");
-                    while (await _requestStream.In.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await _requestStream.In.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (_requestStream.In.TryReadSafe(out var item))
+                        while (_requestStream.In.TryRead(out var item))
                         {
                             await invocation.Out.TryWriteSafeAsync(item).ConfigureAwait(false);
                         }

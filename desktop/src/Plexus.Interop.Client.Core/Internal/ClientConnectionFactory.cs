@@ -19,6 +19,7 @@ namespace Plexus.Interop.Internal
     using Plexus.Channels;
     using Plexus.Interop.Transport;
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     internal sealed class ClientConnectionFactory
@@ -33,7 +34,7 @@ namespace Plexus.Interop.Internal
             ITransportConnection transportConnection = null;
             try
             {
-                transportConnection = await options.Transport.ConnectAsync();
+                transportConnection = await options.Transport.ConnectAsync(options.CancellationToken).ConfigureAwait(false);
                 Log.Debug("Connection {0} established. Performing handshake: {1}", transportConnection.Id, options);
                 var channel = await transportConnection.CreateChannelAsync().ConfigureAwait(false);
                 var protocolSerializer = options.Protocol.Serializer;

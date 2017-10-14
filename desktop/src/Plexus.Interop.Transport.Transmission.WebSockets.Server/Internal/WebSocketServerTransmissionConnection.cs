@@ -46,7 +46,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         public Task Completion { get; }
 
-        public IReadableChannel<IPooledBuffer> In => _receiveQueue.In;
+        public IReadOnlyChannel<IPooledBuffer> In => _receiveQueue.In;
 
         public IWritableChannel<IPooledBuffer> Out => _sendQueue.Out;
 

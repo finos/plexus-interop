@@ -72,7 +72,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             return _sendQueue.Out.TryTerminate(error);
         }
 
-        public IReadableChannel<TResponse> In => _inMessageBuffer.In;
+        public IReadOnlyChannel<TResponse> In => _inMessageBuffer.In;
 
         protected abstract Task InitializeSendingAsync();
 

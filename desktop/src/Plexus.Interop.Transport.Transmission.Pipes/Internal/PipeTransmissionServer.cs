@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.Pipes
+namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Transport.Transmission.Streams;
@@ -25,7 +25,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer, ITransmissionConnectionFactory
+    internal sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
     {
         private const string ServerName = "np-v1";
 
@@ -36,12 +36,11 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
         private readonly BufferedChannel<ITransmissionConnection> _incomingConnections 
             = new BufferedChannel<ITransmissionConnection>(1);
 
-        public PipeTransmissionServer(string brokerWorkingDir, CancellationToken cancellationToken = default)
+        public PipeTransmissionServer(TransmissionServerOptions options)
         {
-            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(options.CancellationToken);
             _log = LogManager.GetLogger<PipeTransmissionServer>();
-            brokerWorkingDir = brokerWorkingDir ?? Directory.GetCurrentDirectory();
-            _settingsWriter = new ServerStateWriter(ServerName, brokerWorkingDir);
+            _settingsWriter = new ServerStateWriter(ServerName, options.BrokerWorkingDir);
         }
 
         public ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync()
@@ -62,17 +61,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             _log.Info("Pipe server started: {0}", _pipeName);
             return Task.FromResult(ProcessAsync());
         }
-
-        ValueTask<Maybe<ITransmissionConnection>> ITransmissionConnectionFactory.TryCreateAsync()
-        {
-            return TryAcceptAsync();
-        }
-
-        ValueTask<ITransmissionConnection> ITransmissionConnectionFactory.CreateAsync()
-        {
-            return AcceptAsync();
-        }
-
+        
         private async Task ProcessAsync()
         {
             try
@@ -80,7 +69,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                 while (true)
                 {
                     var result = await StreamTransmissionConnection
-                        .TryCreateAsync(UniqueId.Generate(), TryAcceptStreamAsync)
+                        .TryCreateAsync(UniqueId.Generate(), TryAcceptStreamAsync, _cancellation.Token)
                         .ConfigureAwait(false);
                     if (!result.HasValue)
                     {
