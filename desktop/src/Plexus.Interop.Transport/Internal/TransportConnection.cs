@@ -134,12 +134,12 @@ namespace Plexus.Interop.Transport.Internal
             try
             {
                 await _transportReceiveProcessor.In.ConsumeAsync(HandleReceivedMessageAsync).ConfigureAwait(false);
-                _incomingChannelQueue.Out.TryComplete();
+                _incomingChannelQueue.Out.TryCompleteWriting();
                 await CompleteReceivingAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _incomingChannelQueue.Out.TryTerminate(ex);
+                _incomingChannelQueue.Out.TryTerminateWriting(ex);
                 await CompleteReceivingAsync(ex).ConfigureAwait(false);
                 throw;
             }
@@ -169,12 +169,12 @@ namespace Plexus.Interop.Transport.Internal
                 _log.Trace("Completing sending for {0} channels", _channels.Count);
                 foreach (var channel in _channels.Values)
                 {
-                    channel.Out.TryComplete();
+                    channel.Out.TryCompleteWriting();
                 }
                 completion = Task.WhenAll(_channels.Values.Select(x => x.Out.Completion)).IgnoreExceptions();
             }
             await completion.ConfigureAwait(false);
-            _transportSendProcessor.Out.TryComplete();
+            _transportSendProcessor.Out.TryCompleteWriting();
         }
 
         private async Task TerminateSendingAsync(Exception error = null)
@@ -190,12 +190,12 @@ namespace Plexus.Interop.Transport.Internal
                 _log.Trace("Terminating sending for {0} channels: {1}", _channels.Count, error.FormatTypeAndMessage());
                 foreach (var channel in _channels.Values)
                 {
-                    channel.Out.TryTerminate(error);
+                    channel.Out.TryTerminateWriting(error);
                 }
                 completion = Task.WhenAll(_channels.Values.Select(x => x.Out.Completion)).IgnoreExceptions();
             }
             await completion.ConfigureAwait(false);
-            _transportSendProcessor.Out.TryTerminate(error);
+            _transportSendProcessor.Out.TryTerminateWriting(error);
         }
 
         private async Task HandleReceivedMessageAsync(ChannelMessage message)

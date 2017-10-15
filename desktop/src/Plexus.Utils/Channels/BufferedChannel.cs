@@ -112,7 +112,7 @@ namespace Plexus.Channels
             }
         }
 
-        public bool TryComplete()
+        public bool TryCompleteWriting()
         {
             lock (_sync)
             {
@@ -125,7 +125,7 @@ namespace Plexus.Channels
             }
         }
 
-        public bool TryTerminate(Exception error = null)
+        public bool TryTerminateWriting(Exception error = null)
         {
             lock (_sync)
             {

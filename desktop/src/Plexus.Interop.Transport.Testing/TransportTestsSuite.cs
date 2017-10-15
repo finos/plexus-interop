@@ -123,7 +123,7 @@
                     var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                     var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
                     Log.Info("Terminating channel");
-                    clientChannel.Out.TryTerminate();
+                    clientChannel.Out.TryTerminateWriting();
                     Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
                     Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
                     Log.Info("Both channels terminated");
@@ -142,7 +142,7 @@
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                     var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
-                    serverChannel.Out.TryTerminate();
+                    serverChannel.Out.TryTerminateWriting();
                     Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
                     Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
                 });
@@ -219,7 +219,7 @@
                         sent.Add(Md5.ComputeHash(msg));
                     }
                 }
-                c.Out.TryComplete();
+                c.Out.TryCompleteWriting();
                 await receiveTask.ConfigureAwait(false);
                 Log.Info("Channel handling completed {0}. Received {1} messages.", c.Id, received.Count);
             }

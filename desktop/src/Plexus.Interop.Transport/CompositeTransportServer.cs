@@ -47,7 +47,7 @@
         private async Task ProcessAsync()
         {
             await Task.WhenAll(_servers.Select(ProcessAsync)).IgnoreExceptions();
-            _buffer.Out.TryComplete();
+            _buffer.Out.TryCompleteWriting();
         }
 
         private async Task ProcessAsync(ITransportServer server)

@@ -386,5 +386,17 @@ namespace Plexus
                 ? TaskConstants<T>.Canceled 
                 : Task.WhenAny(task, cancellationToken.AsTask<T>()).Unwrap();
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task WithCancellation(this Task task, CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.CanBeCanceled || task.IsCompleted)
+            {
+                return task;
+            }
+            return cancellationToken.IsCancellationRequested
+                ? TaskConstants.Canceled
+                : Task.WhenAny(task, cancellationToken.AsTask()).Unwrap();
+        }
     }
 }

@@ -17,6 +17,7 @@
 namespace Plexus.Channels
 {
     using System;
+    using System.Runtime.CompilerServices;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -24,13 +25,13 @@ namespace Plexus.Channels
     {
         public static async Task CompleteAsync<T>(this IWritableChannel<T> channel)
         {
-            channel.TryComplete();
+            channel.TryCompleteWriting();
             await channel.Completion.ConfigureAwait(false);
         }
 
         public static async Task TerminateAsync<T>(this IWritableChannel<T> channel, Exception error = null)
         {
-            channel.TryTerminate(error);
+            channel.TryTerminateWriting(error);
             await channel.Completion.ConfigureAwait(false);
         }
 
@@ -81,7 +82,7 @@ namespace Plexus.Channels
             this IWritableChannel<T> channel,
             Exception error = null)
         {
-            if (!channel.TryTerminate(error))
+            if (!channel.TryTerminateWriting(error))
             {
                 throw new OperationCanceledException();
             }
@@ -89,7 +90,7 @@ namespace Plexus.Channels
 
         public static void Complete<T>(this IWritableChannel<T> channel)
         {
-            if (!channel.TryComplete())
+            if (!channel.TryCompleteWriting())
             {
                 throw new OperationCanceledException();
             }
@@ -103,6 +104,23 @@ namespace Plexus.Channels
         public static bool IsCompleted<T>(this IWritableChannel<T> channel)
         {
             return channel.Completion.IsCompleted;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DisposeBufferedItems<T>(
+            this IReadOnlyChannel<T> channel) where T : IDisposable
+        {
+            channel.ConsumeBufferedItems(x => x.Dispose());
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ConsumeBufferedItems<T>(
+            this IReadOnlyChannel<T> channel, Action<T> handle)
+        {
+            while (channel.TryRead(out var item))
+            {
+                handle(item);
+            }
         }
 
         public static async Task ConsumeAsync<T>(

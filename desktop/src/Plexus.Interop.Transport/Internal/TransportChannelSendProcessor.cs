@@ -52,14 +52,14 @@
 
         internal Task Initialized => _initialized.Task;
 
-        public bool TryComplete()
+        public bool TryCompleteWriting()
         {
-            return _buffer.Out.TryComplete();
+            return _buffer.Out.TryCompleteWriting();
         }
 
-        public bool TryTerminate(Exception error = null)
+        public bool TryTerminateWriting(Exception error = null)
         {
-            return _buffer.Out.TryTerminate(error);
+            return _buffer.Out.TryTerminateWriting(error);
         }
 
         public bool TryWrite(TransportMessageFrame item)

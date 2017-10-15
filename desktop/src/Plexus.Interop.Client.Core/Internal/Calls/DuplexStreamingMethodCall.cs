@@ -81,7 +81,7 @@ namespace Plexus.Interop.Internal.Calls
                 }
                 catch (Exception ex)
                 {
-                    invocation.Out.TryTerminate(ex);
+                    invocation.Out.TryTerminateWriting(ex);
                     throw;
                 }
                 finally
@@ -106,14 +106,14 @@ namespace Plexus.Interop.Internal.Calls
                             await invocation.Out.TryWriteSafeAsync(item).ConfigureAwait(false);
                         }
                     }
-                    invocation.Out.TryComplete();
+                    invocation.Out.TryCompleteWriting();
                     await _requestStream.Out.Completion.ConfigureAwait(false);
                     Log.Trace("Requests stream completed");
                 }
                 catch (Exception ex)
                 {
                     Log.Trace("Requests stream completed with exception: {0}", ex.FormatTypeAndMessage());
-                    invocation.Out.TryTerminate(ex);
+                    invocation.Out.TryTerminateWriting(ex);
                     throw;
                 }
                 finally

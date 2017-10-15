@@ -20,6 +20,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Security.Cryptography;
+    using System.Threading;
     using System.Threading.Tasks;
     using Xunit;
     using Xunit.Abstractions;
@@ -65,11 +66,26 @@
         protected void RunWith1SecTimeout(Func<Task> func) => RunWithTimeout(Timeout1Sec, func);
         protected void RunWith1SecTimeout(Action action) => RunWithTimeout(Timeout1Sec, action);
 
-        protected void RunWithTimeout(TimeSpan timeout, Func<Task> func) =>
-            Should.CompleteIn(() => TaskRunner.RunInBackground(func), timeout);
+        protected void RunWithTimeout(TimeSpan timeout, Func<Task> func)
+        {
+            using (var cancellation = new CancellationTokenSource(timeout))
+            {
+                try
+                {
+                    TaskRunner
+                        .RunInBackground(func, cancellation.Token)
+                        .WithCancellation(cancellation.Token)
+                        .GetResult();
+                }
+                catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+                {
+                    throw new TimeoutException($"Task not completed after {timeout.TotalMilliseconds} ms");
+                }
+            }
+        }
 
         protected void RunWithTimeout(TimeSpan timeout, Action action) =>
-            Should.CompleteIn(action, timeout);
+            Should.CompleteIn(async () => action(), timeout);
 
         public virtual void Dispose()
         {

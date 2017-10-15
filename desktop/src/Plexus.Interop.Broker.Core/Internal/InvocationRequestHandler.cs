@@ -92,8 +92,8 @@
             }
             catch (Exception ex)
             {
-                sourceChannel.Out.TryTerminate(ex);
-                targetChannel?.Out.TryTerminate(ex);
+                sourceChannel.Out.TryTerminateWriting(ex);
+                targetChannel?.Out.TryTerminateWriting(ex);
                 throw;
             }
             finally
@@ -185,11 +185,11 @@
                     }
                     await channel2.WriteAsync(result.Value).ConfigureAwait(false);
                 }
-                channel2.TryComplete();
+                channel2.TryCompleteWriting();
             }
             catch (Exception ex)
             {
-                channel2.TryTerminate(ex);
+                channel2.TryTerminateWriting(ex);
             }
         }
     }

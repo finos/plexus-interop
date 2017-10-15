@@ -94,7 +94,7 @@ namespace Plexus.Interop.Transport.Protocol
                     transportMessage.Retain();
                     await sender.Out.WriteAsync(transportMessage).ConfigureAwait(false);
                 }
-                sender.Out.TryComplete();
+                sender.Out.TryCompleteWriting();
                 await sender.Out.Completion.ConfigureAwait(false);
             });
 
@@ -187,7 +187,7 @@ namespace Plexus.Interop.Transport.Protocol
                 {
                     var sender = new MessagingSendProcessor(serverStream, SerializationProvider.GetSerializer());
                     await action(sender).ConfigureAwait(false);
-                    sender.Out.TryComplete();
+                    sender.Out.TryCompleteWriting();
                     await sender.Out.Completion.ConfigureAwait(false);
                     Log.Trace("Waiting for completion of connection {0}", serverStream.Id);
                     await serverStream.Completion.ConfigureAwait(false);

@@ -70,7 +70,7 @@
                 _log.Trace("New invocation received: {0}", channel.Id);
                 if (!await output.TryWriteAsync(channel).ConfigureAwait(false))
                 {
-                    channel.Out.TryTerminate();
+                    channel.Out.TryTerminateWriting();
                     break;
                 }
             }

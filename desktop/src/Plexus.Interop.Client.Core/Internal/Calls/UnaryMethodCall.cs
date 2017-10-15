@@ -78,7 +78,7 @@ namespace Plexus.Interop.Internal.Calls
                 }
                 catch (Exception ex)
                 {
-                    invocation.Out.TryTerminate(ex);
+                    invocation.Out.TryTerminateWriting(ex);
                     throw;
                 }
                 finally                

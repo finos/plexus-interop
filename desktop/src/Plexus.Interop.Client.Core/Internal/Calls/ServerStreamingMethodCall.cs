@@ -73,12 +73,12 @@ namespace Plexus.Interop.Internal.Calls
                         }
                     }
                     await invocation.In.Completion.ConfigureAwait(false);
-                    _responseStream.Out.TryComplete();
+                    _responseStream.Out.TryCompleteWriting();
                 }
                 catch (Exception ex)
                 {
-                    invocation.Out.TryTerminate(ex);
-                    _responseStream.Out.TryTerminate(ex);
+                    invocation.Out.TryTerminateWriting(ex);
+                    _responseStream.Out.TryTerminateWriting(ex);
                     throw;
                 }
                 finally

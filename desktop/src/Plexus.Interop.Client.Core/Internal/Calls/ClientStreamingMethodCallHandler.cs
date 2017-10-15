@@ -43,11 +43,11 @@ namespace Plexus.Interop.Internal.Calls
                 var context = new MethodCallContext(info.Source.ApplicationId, info.Source.ConnectionId);
                 var response = await _handler(invocation.In, context).ConfigureAwait(false);
                 await invocation.Out.TryWriteSafeAsync(response).ConfigureAwait(false);
-                invocation.Out.TryComplete();
+                invocation.Out.TryCompleteWriting();
             }
             catch (Exception ex)
             {
-                invocation.Out.TryTerminate(ex);
+                invocation.Out.TryTerminateWriting(ex);
                 throw;
             }
             finally

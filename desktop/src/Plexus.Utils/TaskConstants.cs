@@ -22,6 +22,8 @@ namespace Plexus
     {           
         public static readonly Task Completed = TaskConstants<Nothing>.Completed;
 
+        public static readonly Task Canceled = TaskConstants<Nothing>.Canceled;
+
         public static readonly Task<bool> True = Task.FromResult(true);
 
         public static readonly Task<bool> False = Task.FromResult(false);

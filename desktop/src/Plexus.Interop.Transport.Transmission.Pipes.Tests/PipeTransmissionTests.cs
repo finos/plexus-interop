@@ -21,14 +21,17 @@
 
     public sealed class PipeTransmissionTests : TransmissionTestsSuite
     {
+        private readonly PipeTransmissionClientFactory _clientFactory = new PipeTransmissionClientFactory();
+        private readonly PipeTransmissionServerFactory _serverFactory = new PipeTransmissionServerFactory();
+
         protected override ITransmissionClient CreateClient(CancellationToken cancellationToken = default)
         {
-            return new PipeTransmissionClient(Directory.GetCurrentDirectory(), cancellationToken);
+            return _clientFactory.Create(new TransmissionClientOptions(Directory.GetCurrentDirectory()));
         }
 
         protected override ITransmissionServer CreateServer(CancellationToken cancellationToken = default)
         {
-            return new PipeTransmissionServer(Directory.GetCurrentDirectory(), cancellationToken);
+            return _serverFactory.Create(new TransmissionServerOptions(Directory.GetCurrentDirectory()));
         }
     }
 }

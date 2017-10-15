@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+ namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol;
@@ -56,11 +56,11 @@
                 var frame = await channel.In.ReadAsync().ConfigureAwait(false);
                 var request = _protocolSerializer.DeserializeClientToBrokerRequest(frame.Payload);
                 await request.Handle(_clientToBrokerRequestHandler, (connection, channel)).ConfigureAwait(false);
-                channel.Out.TryComplete();
+                channel.Out.TryCompleteWriting();
             }
             catch (Exception ex)
             {
-                channel.Out.TryTerminate(ex);
+                channel.Out.TryTerminateWriting(ex);
             }
             finally
             {

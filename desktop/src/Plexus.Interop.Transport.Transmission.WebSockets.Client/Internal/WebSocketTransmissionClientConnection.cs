@@ -125,8 +125,8 @@
         {
             _log.Trace("OnError: {0}", e.Exception.FormatToString());
             _connectCompletion.TryFail(e.Exception);
-            _receiveQueue.Out.TryTerminate(e.Exception);
-            _sendQueue.Out.TryTerminate(e.Exception);
+            _receiveQueue.Out.TryTerminateWriting(e.Exception);
+            _sendQueue.Out.TryTerminateWriting(e.Exception);
             _disconnectCompletion.TryFail(e.Exception);
         }
 
@@ -134,8 +134,8 @@
         {
             _log.Trace("OnClosed");
             _connectCompletion.TryFail(new InvalidOperationException("Closed before connected"));
-            _receiveQueue.Out.TryTerminate();
-            _sendQueue.Out.TryTerminate();
+            _receiveQueue.Out.TryTerminateWriting();
+            _sendQueue.Out.TryTerminateWriting();
             _disconnectCompletion.TryComplete();
         }
 
@@ -144,7 +144,7 @@
             if (string.Equals(e.Message, "<END>"))
             {
                 _log.Trace("Received <END> message");
-                _receiveQueue.Out.TryComplete();
+                _receiveQueue.Out.TryCompleteWriting();
             }
             else
             {
@@ -172,7 +172,7 @@
             catch (Exception ex)
             {
                 _log.Trace(ex, "Exception in OnDataReceived callback");
-                _receiveQueue.Out.TryTerminate(ex);
+                _receiveQueue.Out.TryTerminateWriting(ex);
             }
         }
     }

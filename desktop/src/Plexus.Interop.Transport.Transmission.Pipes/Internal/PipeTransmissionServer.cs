@@ -48,9 +48,9 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
             return _incomingConnections.TryReadAsync();
         }
 
-        public async ValueTask<ITransmissionConnection> AcceptAsync()
+        public ValueTask<ITransmissionConnection> AcceptAsync()
         {
-            return (await TryAcceptAsync()).GetValueOrThrowException<OperationCanceledException>();
+            return _incomingConnections.ReadAsync();
         }
 
         protected override Task<Task> StartCoreAsync()
@@ -77,15 +77,15 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
                     }
                     await _incomingConnections.Out.WriteAsync(result.Value).ConfigureAwait(false);
                 }
-                _incomingConnections.Out.TryComplete();
+                _incomingConnections.Out.TryCompleteWriting();
             }
             catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
             {
-                _incomingConnections.Out.TryComplete();
+                _incomingConnections.Out.TryCompleteWriting();
             }
             catch (Exception ex)
             {
-                _incomingConnections.Out.TryTerminate(ex);
+                _incomingConnections.Out.TryTerminateWriting(ex);
                 throw;
             }
             finally
@@ -131,11 +131,13 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
             }
             catch when (_cancellation.IsCancellationRequested)
             {
+                pipeServerStream.Dispose();
                 return false;
             }
-            finally
+            catch
             {
                 pipeServerStream.Dispose();
+                throw;
             }
             return true;
         }
@@ -148,11 +150,13 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
             }
             catch when (_cancellation.IsCancellationRequested)
             {
+                pipeServerStream.Dispose();
                 return false;
             }
-            finally
+            catch
             {
                 pipeServerStream.Dispose();
+                throw;
             }
             return true;
         }
