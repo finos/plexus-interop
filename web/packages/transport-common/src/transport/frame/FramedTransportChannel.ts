@@ -43,8 +43,7 @@ export class FramedTransportChannel implements TransportChannel {
     private log: Logger;
     private messageId: number = 0;
     private sendingInProgress: boolean = false;
-    private transportConnectionPromise: Promise<void> | null = null;
-
+  
     private readonly stateMachine: StateMaschine<ChannelState>;
 
     private channelCancellationToken: ReadWriteCancellationToken;

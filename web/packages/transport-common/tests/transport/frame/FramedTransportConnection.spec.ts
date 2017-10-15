@@ -35,7 +35,7 @@ describe("FramedTransportConnection", () => {
                     const channel = await transportConnection.createChannel();
                     expect(channel).toBeDefined();
                     expect(transportConnection.getIncomingChannelsSize()).toBe(0);
-                    await transportConnection.closeInternal();
+                    await transportConnection.closeAndCleanUp();
                     done();
                 })();
             });
@@ -88,7 +88,7 @@ describe("FramedTransportConnection", () => {
                     expect(secondMessage).toBeDefined();
                     firstSubscription.unsubscribe();
                     secondSubscription.unsubscribe();
-                    await transportConnection.closeInternal();
+                    await transportConnection.closeAndCleanUp();
                     done();
                 })();
             });

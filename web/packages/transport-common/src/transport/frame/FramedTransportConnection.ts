@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Frame, MessageFrame, ConnectionOpenFrame, ConnectionCloseFrame } from "./model";
+import { MessageFrame, ConnectionOpenFrame, ConnectionCloseFrame } from "./model";
 import { ChannelOpenFrame, ChannelCloseFrame } from "./model";
 import { ConnectableFramedTransport } from "./ConnectableFramedTransport";
 import { TransportConnection } from "../TransportConnection";
-import { FramedTransportChannel } from "./FramedTransportChannel";
-import { BufferedReadFramedTransport } from "./BufferedReadFramedTransport";
+import { FramedTransportChannel, ChannelState } from "./FramedTransportChannel";
+import { ChannelTransportProxy } from "./ChannelTransportProxy";
 import { TransportChannel } from "../TransportChannel";
 import { UniqueId } from "../UniqueId";
 import { transportProtocol as plexus } from "@plexus-interop/protocol";
 import { TransportFrameHandler } from "./TransportFrameHandler";
 import { ChannelsHolder } from "../../common/ChannelsHolder";
 import { BufferedChannelsHolder } from "../../common/BufferedChannelsHolder";
-import { StateMaschineBase, StateMaschine, CancellationToken, LoggerFactory, Logger, BlockingQueue, BlockingQueueBase } from "@plexus-interop/common";
+import { StateMaschineBase, StateMaschine, CancellationToken, LoggerFactory, Logger } from "@plexus-interop/common";
 
 export type ConnectionState = "CREATED" | "ACCEPT" | "OPEN" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED" | "CLOSED";
 
@@ -37,11 +37,11 @@ export const ConnectionState = {
     CLOSE_RECEIVED: "CLOSE_RECEIVED" as ConnectionState,
     CLOSE_REQUESTED: "CLOSE_REQUESTED" as ConnectionState,
     CLOSED: "CLOSED" as ConnectionState
-}
+};
 
 type ChannelDescriptor = {
     channel: FramedTransportChannel,
-    inBuffer: BlockingQueue<Frame>
+    channelTransportProxy: ChannelTransportProxy
 };
 
 export class FramedTransportConnection extends TransportFrameHandler implements TransportConnection {
@@ -86,8 +86,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             },
             // forced connection closure
             {
-                from: ConnectionState.OPEN, to: ConnectionState.CLOSED,
-                postHandler: this.forcedCloseConnection.bind(this)
+                from: ConnectionState.OPEN, to: ConnectionState.CLOSED
             },
             // forced connection closure
             {
@@ -97,7 +96,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             },
             // graceful connection closure
             {
-                from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED, preHandler: async () => this.closeInternal()
+                from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED
             }
         ]);
         this.log.debug("Created");
@@ -115,12 +114,8 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
                 break;
             case ConnectionState.CLOSE_RECEIVED:
                 this.log.debug("Current state is CLOSE_RECEIVED, closing all");
-                await this.stateMachine.go(ConnectionState.CLOSED, {
-                    preHandler: async () => {
-                        await this.sendConnectionCloseMessage(completion);
-                        await this.closeInternal();
-                    }
-                });
+                await this.sendConnectionCloseMessage(completion);
+                this.closeAndCleanUp();               
                 break;
             default:
                 throw new Error(`Can't close, invalid state ${this.stateMachine.getCurrent()}`);
@@ -143,7 +138,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     public async createChannel(): Promise<TransportChannel> {
         this.stateMachine.throwIfNot(ConnectionState.OPEN);
         const uuid = UniqueId.generateNew();
-        const { channel, inBuffer } = this.createOutChannel(uuid);
+        const { channel } = this.createOutChannel(uuid);
         this.framedTransport.writeFrame(ChannelOpenFrame.fromHeaderData({
             channelId: uuid
         }));
@@ -178,23 +173,21 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             }));
     }
 
-    public async closeInternal(): Promise<void> {
-        this.log.debug("Closing internal");
+    public closeAndCleanUp(): void {
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(`Closing connection, current state is ${this.stateMachine.getCurrent()}`);
+        }
         this.writeCancellationToken.cancel("Connection is closed");
         this.readCancellationToken.cancel("Connection is closed");
+        this.stateMachine.go(ChannelState.CLOSED);
         this.channelsHolder.getChannels().forEach((value, key: string) => {
             this.log.debug(`Cleaning channel ${key}`);
             value.channel.closeInternal();
-            value.inBuffer.clear();
+            value.channelTransportProxy.clear();
         });
         this.channelsHolder.clearAll();
-        return this.disconnectFromSource();
-    }
-
-    private async forcedCloseConnection(completion?: plexus.ICompletion): Promise<void> {
-        this.log.warn("Forced connection close requested");
-        this.sendConnectionCloseMessage(completion);
-        this.closeInternal();
+        this.disconnectFromSource()
+            .catch(e => this.log.error("Failed to disconnect from source", e));
     }
 
     private async disconnectFromSource(): Promise<void> {
@@ -210,29 +203,29 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
 
     private async listenForIncomingFrames(): Promise<void> {
         this.log.debug("Start listening of incoming frames");
-        while (this.stateMachine.is(ConnectionState.CLOSE_REQUESTED)
-            || this.stateMachine.is(ConnectionState.OPEN)
-            || this.stateMachine.is(ConnectionState.ACCEPT)) {
-            if (this.log.isDebugEnabled()) {
-                this.log.debug("Awaiting for next frame");
-            }
-            try {
-                const baseFrame = await this.framedTransport.readFrame(this.readCancellationToken);
-                this.handleFrame(baseFrame, this.log);
-            } catch (error) {
-                if (this.readCancellationToken.isCancelled()) {
-                    this.log.debug("Error due to closed connection, stopped reading frames");
-                    break;
+        this.framedTransport.open({
+            next: (frame) => {
+                if (this.stateMachine.isOneOf(
+                    ConnectionState.CLOSE_REQUESTED, 
+                    ConnectionState.OPEN, 
+                    ConnectionState.ACCEPT)) {
+                    this.handleFrame(frame, this.log);
                 } else {
-                    this.log.error(`Error while reading the frame: ${error}`);
-                    this.disconnect().catch(error => {
-                        this.log.error(`Error while closing connection: ${error}`);
-                        this.stateMachine.go(ConnectionState.CLOSED);
-                    });
-                    return Promise.reject(error);
+                    this.log.warn("Not connected, dropping frame");
                 }
+            },
+            error: (transportError) => {
+                this.log.error("Error from source transport, closing connection", transportError);
+                this.channelsHolder.getChannels().forEach((value, key: string) => {
+                    value.channelTransportProxy.error(transportError);
+                });
+                this.closeAndCleanUp();
+            },
+            complete: () => {
+                this.log.debug("Source connection completed");
+                this.closeAndCleanUp();
             }
-        }
+        });
     }
 
     public async handleConnectionCloseFrame(frame: ConnectionCloseFrame): Promise<void> {
@@ -247,7 +240,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
                 break;
             case ConnectionState.CLOSE_REQUESTED:
                 this.log.debug("Closing connection");
-                this.stateMachine.go(ConnectionState.CLOSED);
+                this.closeAndCleanUp();
                 break;
             default:
                 throw new Error(`Can't handle close, invalid state ${this.stateMachine.getCurrent()}`);
@@ -274,7 +267,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         if (this.channelsHolder.channelExists(strChannelId)) {
             const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
             this.log.debug("Pass close frame to channel", strChannelId);
-            channelDescriptor.inBuffer.enqueue(frame);
+            channelDescriptor.channelTransportProxy.next(frame);
         } else {
             this.log.warn(`Received close channel frame for not existing uuid ${strChannelId}`);
         }
@@ -311,7 +304,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
                 this.log.debug(`Received data frame for channel ${strChannelId}`);
             }
             const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
-            channelDescriptor.inBuffer.enqueue(frame);
+            channelDescriptor.channelTransportProxy.next(frame);
         }
         if (frame.isLast()) {
             if (this.log.isTraceEnabled()) {
@@ -331,22 +324,22 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     private createChannelInternal(channelId: UniqueId, isIncomingChannel: boolean): ChannelDescriptor {
         const strChannelId = channelId.toString();
         this.log.debug(`Creating new channel ${strChannelId}`);
-        const inBuffer = new BlockingQueueBase<Frame>();
-        const channelTransport = new BufferedReadFramedTransport(this.framedTransport, this.writeCancellationToken, this.readCancellationToken, inBuffer);
+        const proxyLogger = LoggerFactory.getLogger(`ChannelTranportProxy ${strChannelId}`);
+        const channelTransportProxy = new ChannelTransportProxy(this.framedTransport, this.writeCancellationToken, proxyLogger);
         const dispose = async () => {
             this.log.debug(`Dispose called on ${strChannelId} channel`);
             if (this.channelsHolder.channelExists(strChannelId)) {
                 const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
-                channelDescriptor.inBuffer.clear();
+                channelDescriptor.channelTransportProxy.clear();
                 this.channelsHolder.clear(strChannelId);
             }
         };
-        const channel = new FramedTransportChannel(channelId, channelTransport, dispose, this.readCancellationToken);
-        this.channelsHolder.addChannelDescriptor(strChannelId, { channel, inBuffer });
+        const channel = new FramedTransportChannel(channelId, channelTransportProxy, dispose, this.readCancellationToken);
+        this.channelsHolder.addChannelDescriptor(strChannelId, { channel, channelTransportProxy });
         if (isIncomingChannel) {
             this.channelsHolder.enqueueIncomingChannel(channel);
         }
-        return { channel, inBuffer };
+        return { channel, channelTransportProxy };
     }
 
 }
