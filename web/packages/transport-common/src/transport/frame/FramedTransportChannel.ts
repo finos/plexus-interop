@@ -50,6 +50,7 @@ export class FramedTransportChannel implements TransportChannel {
 
     private clientCompletion: plexus.ICompletion;
     private remoteCompletion: plexus.ICompletion;
+    private channelObserver: Observer<ArrayBuffer>;
 
     private onCloseHandler: ((completion?: plexus.ICompletion) => void) | null;
 
@@ -119,14 +120,15 @@ export class FramedTransportChannel implements TransportChannel {
     public open(channelObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug("Opening channel");
         this.stateMachine.throwIfNot(ChannelState.CREATED);
+        this.channelObserver = channelObserver;
         const subscription = new Subscription(() => {
             this.log.debug("Closing on unsubscribe");
             this.close();
         });
         this.stateMachine.go(ChannelState.OPEN)
             .then(() => {
-                channelObserver.started(subscription);
                 this.subscribeToMessages(channelObserver);
+                channelObserver.started(subscription);
             });
     }
 
@@ -240,8 +242,10 @@ export class FramedTransportChannel implements TransportChannel {
             this.log.debug("Reporting summarized completion");
             this.onCloseHandler(ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion));
             this.onCloseHandler = null;
+        } else if (this.channelObserver) {
+            this.log.debug("Close not requested, reporting forced close");
+            this.channelObserver.error(new ClientError(reason));
         }
-
     }
 
     private async sendChannelClosedRequest(completion: plexus.ICompletion = new SuccessCompletion()): Promise<void> {
@@ -295,12 +299,10 @@ export class FramedTransportChannel implements TransportChannel {
         const messageIndex = this.messageId++;
         let framesCounter = 0;
         do {
-
             let frameLength = totalBytesCount - sentBytesCount;
             if (frameLength > this.framedTransport.getMaxFrameSize()) {
                 frameLength = this.framedTransport.getMaxFrameSize();
             }
-
             const frameBody = data.slice(sentBytesCount, sentBytesCount + frameLength);
             sentBytesCount += frameLength;
             hasMoreFrames = sentBytesCount < totalBytesCount;
@@ -309,12 +311,9 @@ export class FramedTransportChannel implements TransportChannel {
                 length: frameLength,
                 hasMore: hasMoreFrames
             };
-
             await this.framedTransport.writeFrame(MessageFrame.fromHeaderData(frameHeader, frameBody));
             framesCounter++;
-
         } while (hasMoreFrames && !this.channelCancellationToken.isWriteCancelled());
-
         this.log.trace(`Sent message [${messageIndex}], consist of ${framesCounter} frames, ${data.byteLength} bytes`);
     }
 

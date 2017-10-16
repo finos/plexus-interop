@@ -16,7 +16,11 @@
  */
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { Logger } from "@plexus-interop/common";
+import { ClientProtocolHelper } from "./ClientProtocolHelper";
 
+/**
+ * Represents Single Request to Broker
+ */
 export class SingleMessageRequest<R> {
 
     constructor(
@@ -32,7 +36,15 @@ export class SingleMessageRequest<R> {
                         startFailed: (e) => reject(e),
                         started: () => {
                             this.log.debug("Channel is open, sending connection request");
-                            channel.sendLastMessage(requestPayload);
+                            channel.sendLastMessage(requestPayload)
+                                .then(completion => {
+                                    if (!ClientProtocolHelper.isSuccessCompletion(completion)) {
+                                        if (this.log.isDebugEnabled()) {
+                                            this.log.debug("Received non successful completion", completion);
+                                            reject(completion.error);
+                                        }
+                                    }  
+                                });
                         },
                         next: (data) => {
                             try {

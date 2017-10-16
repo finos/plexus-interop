@@ -18,7 +18,7 @@ import { MessageFrame, ConnectionOpenFrame, ConnectionCloseFrame } from "./model
 import { ChannelOpenFrame, ChannelCloseFrame } from "./model";
 import { ConnectableFramedTransport } from "./ConnectableFramedTransport";
 import { TransportConnection } from "../TransportConnection";
-import { FramedTransportChannel, ChannelState } from "./FramedTransportChannel";
+import { FramedTransportChannel } from "./FramedTransportChannel";
 import { BufferedTransportProxy } from "./BufferedTransportProxy";
 import { TransportChannel } from "../TransportChannel";
 import { UniqueId } from "../UniqueId";
@@ -80,7 +80,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
                 from: ConnectionState.ACCEPT, to: ConnectionState.OPEN,
                 preHandler: this.openConnectionInternal.bind(this)
             },
-            // closing connection message recived
+            // closing connection message requested
             {
                 from: ConnectionState.OPEN, to: ConnectionState.CLOSE_REQUESTED
             },
@@ -179,7 +179,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         }
         this.writeCancellationToken.cancel("Connection is closed");
         this.readCancellationToken.cancel("Connection is closed");
-        this.stateMachine.go(ChannelState.CLOSED);
+        this.stateMachine.go(ConnectionState.CLOSED);
         this.channelsHolder.getChannels().forEach((value, key: string) => {
             this.log.debug(`Cleaning channel ${key}`);
             value.channel.closeInternal();
@@ -266,6 +266,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
             this.log.debug("Pass close frame to channel", strChannelId);
             channelDescriptor.channelTransportProxy.next(frame);
+            channelDescriptor.channelTransportProxy.complete();
         } else {
             this.log.warn(`Received close channel frame for not existing uuid ${strChannelId}`);
         }
@@ -328,7 +329,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     private createChannelInternal(channelId: UniqueId, isIncomingChannel: boolean): ChannelDescriptor {
         const strChannelId = channelId.toString();
         this.log.debug(`Creating new channel ${strChannelId}`);
-        const proxyLogger = LoggerFactory.getLogger(`ChannelTranportProxy ${strChannelId}`);
+        const proxyLogger = LoggerFactory.getLogger(`ChannelTranportProxy [${strChannelId}]`);
         const channelTransportProxy = new BufferedTransportProxy(this.framedTransport, this.writeCancellationToken, proxyLogger);
         const dispose = async () => {
             this.log.debug(`Dispose called on ${strChannelId} channel`);

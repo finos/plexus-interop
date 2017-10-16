@@ -45,7 +45,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
     }
 
     public async testClientReceiveErrorIfProvideWrongId(): Promise<void> {
-        debugger;
+
         const preparedBuilder = new EchoClientClientBuilder()
             .withClientDetails({
                 applicationId: "plexus.interop.testing.DoNotExist",
@@ -95,7 +95,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
                 console.log("Clients created");
             });
 
-            await serverRequestReceived
+            await serverRequestReceived;
             console.log("Request received");
 
             if (isForcedByClient) {

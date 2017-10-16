@@ -223,7 +223,9 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     private addToInbox(frame: Frame): void {
         if (this.connectionObserver) {
-            this.log.info(`Passing frame to observer`);
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Passing frame to observer`);
+            }
             this.connectionObserver.next(frame);
         } else {
             if (this.log.isDebugEnabled()) {
