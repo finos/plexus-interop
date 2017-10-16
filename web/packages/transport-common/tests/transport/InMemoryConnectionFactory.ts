@@ -17,25 +17,27 @@
 import { ClientConnectionFactory } from "../../src/transport/ClientConnectionFactory";
 import { ServerConnectionFactory } from "../../src/transport/ServerConnectionFactory";
 import { TransportConnection } from "../../src/transport/TransportConnection";
-import { BlockingQueue, BlockingQueueBase } from "@plexus-interop/common";
 import { Frame } from "../../src/transport/frame/model/Frame";
-import { InMemoryFramedTransport } from "./InMemoryFramedTransport";;
+import { TestBufferedInMemoryFramedTransport } from "./TestBufferedInMemoryFramedTransport";;
 import { UniqueId } from "../../src/transport/UniqueId";
 import { FramedTransportConnection } from "../../src/transport/frame/FramedTransportConnection";
+import { Queue } from "typescript-collections";
+import { LoggerFactory } from "@plexus-interop/common";
 
 export class InMemoryConnectionFactory implements ClientConnectionFactory, ServerConnectionFactory {
 
     constructor(
-        public readonly clientInBuffer: BlockingQueue<Frame> = new BlockingQueueBase<Frame>(),
-        public readonly serverInBuffer: BlockingQueue<Frame> = new BlockingQueueBase<Frame>()) { }
+        public readonly clientInBuffer: Queue<Frame> = new Queue<Frame>(),
+        public readonly serverInBuffer: Queue<Frame> = new Queue<Frame>()) { }
 
     public async connect(): Promise<TransportConnection> {
-        const connection = new FramedTransportConnection(new InMemoryFramedTransport(UniqueId.generateNew(), this.clientInBuffer, this.serverInBuffer));
+        const connection = new FramedTransportConnection(
+            new TestBufferedInMemoryFramedTransport(UniqueId.generateNew(), this.clientInBuffer, this.serverInBuffer, 8, LoggerFactory.getLogger("ClientTransport")));
         return connection.open().then(() => connection);
     }
 
     public async acceptConnection(): Promise<TransportConnection> {
-        const connection = new FramedTransportConnection(new InMemoryFramedTransport(UniqueId.generateNew(), this.serverInBuffer, this.clientInBuffer));
+        const connection = new FramedTransportConnection(new TestBufferedInMemoryFramedTransport(UniqueId.generateNew(), this.serverInBuffer, this.clientInBuffer, 8, LoggerFactory.getLogger("ServerTransport")));
         return connection.acceptingConnection().then(() => connection);
     }
 

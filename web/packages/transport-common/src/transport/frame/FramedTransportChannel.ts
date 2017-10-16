@@ -43,7 +43,7 @@ export class FramedTransportChannel implements TransportChannel {
     private log: Logger;
     private messageId: number = 0;
     private sendingInProgress: boolean = false;
-  
+
     private readonly stateMachine: StateMaschine<ChannelState>;
 
     private channelCancellationToken: ReadWriteCancellationToken;
@@ -91,11 +91,11 @@ export class FramedTransportChannel implements TransportChannel {
                 from: ChannelState.CREATED, to: ChannelState.CLOSED, preHandler: async () => {
                     this.log.warn("Channel forced CREATED -> CLOSED");
                 }
-            },
+            }
         ]);
     }
 
-    private async handleReadCompleted(channelObserver: Observer<ArrayBuffer>) {
+    private async handleReadCompleted(channelObserver: Observer<ArrayBuffer>): Promise<void> {
         if (this.isSuccessCompletion(this.remoteCompletion)) {
             channelObserver.complete();
         } else {
@@ -111,7 +111,7 @@ export class FramedTransportChannel implements TransportChannel {
         }
     }
 
-    private async handleConnectionError(channelObserver: Observer<ArrayBuffer>, error: any) {
+    private async handleConnectionError(channelObserver: Observer<ArrayBuffer>, error: any): Promise<void> {
         this.log.error("Transport connection error received", error);
         this.closeInternal("Transport connection rrror");
     }
@@ -157,12 +157,13 @@ export class FramedTransportChannel implements TransportChannel {
                 }
             },
             complete: () => {
-                this.handleReadCompleted(channelObserver);  
+                this.handleReadCompleted(channelObserver);
             },
             error: (transportError) => {
                 this.handleConnectionError(channelObserver, transportError);
             }
-        });
+        })
+        .catch(connectionError => channelObserver.error(connectionError));
     }
 
     private remoteCompletionToError(completion: plexus.ICompletion): plexus.IError {

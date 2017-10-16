@@ -17,27 +17,30 @@
 import { UniqueId } from "../UniqueId";
 import { Frame } from "./model";
 import { FramedTransport } from "./FramedTransport";
-import { Observer, Logger, CancellationToken } from "@plexus-interop/common";
+import { Observer, Logger } from "@plexus-interop/common";
 import { Queue } from "typescript-collections";
 
-export class ChannelTransportProxy implements FramedTransport, Observer<Frame> {
+/**
+ * Collects all read events until client opened connection
+ */
+export abstract class BufferedReadFramedTransport implements FramedTransport, Observer<Frame> {
 
-    private framesObserver: Observer<Frame> | null = null;
-
-    private completed: boolean = false;
-    private receivedError: any;
-    private inBuffer: Queue<Frame> = new Queue<Frame>();
+    protected framesObserver: Observer<Frame> | null = null;
+    protected completed: boolean = false;
+    protected receivedError: any;
+    protected inBuffer: Queue<Frame> = new Queue<Frame>();
 
     constructor(
-        private readonly innerTransport: FramedTransport,
-        private readonly writeCancellationToken: CancellationToken,
-        private readonly log: Logger) { }
+        protected readonly log: Logger) { }
 
-    public uuid(): UniqueId {
-        return this.innerTransport.uuid();
-    }
+    public abstract uuid(): UniqueId;
+
+    public abstract getMaxFrameSize(): number;
+
+    public abstract writeFrame(frame: Frame): Promise<void>;
 
     public async open(framesObserver: Observer<Frame>): Promise<void> {
+        this.log.trace("Opening transport");
         if (this.framesObserver) {
             throw new Error("Already opened");
         }
@@ -56,15 +59,6 @@ export class ChannelTransportProxy implements FramedTransport, Observer<Frame> {
         this.inBuffer.clear();
     }
 
-    public getMaxFrameSize(): number {
-        return this.innerTransport.getMaxFrameSize();
-    }
-
-    public async writeFrame(frame: Frame): Promise<void> {
-        this.writeCancellationToken.throwIfCanceled();
-        return this.innerTransport.writeFrame(frame);
-    }
-
     public next(frame: Frame): void {
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Received frame`);
@@ -74,10 +68,10 @@ export class ChannelTransportProxy implements FramedTransport, Observer<Frame> {
         } else {
             this.inBuffer.enqueue(frame);
         }
-    } 
+    }
 
     public error(transportError: any): void {
-        this.log.debug("Received error", transportError)
+        this.log.debug("Received error", transportError);
         if (this.framesObserver) {
             this.framesObserver.error(transportError);
         } else {
@@ -86,7 +80,7 @@ export class ChannelTransportProxy implements FramedTransport, Observer<Frame> {
     }
 
     public complete(): void {
-        this.log.debug("Receive complete message")
+        this.log.debug("Receive complete message");
         if (this.framesObserver) {
             this.framesObserver.complete();
         } else {

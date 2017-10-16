@@ -18,23 +18,23 @@ import { FramedTransport, FramedTransportChannel } from "../../../src/transport/
 import { UniqueId } from "../../../src/transport/UniqueId";
 import { TestUtils } from "./util";
 import { mock, instance, when, anything, capture } from "ts-mockito";
-import { CancellationToken } from "@plexus-interop/common";
+import { CancellationToken, AsyncHelper } from "@plexus-interop/common";
 import { Observer } from "@plexus-interop/common";
 import { LogObserver } from "../../LogObserver";
-import { InMemoryFramedTransport } from "../InMemoryFramedTransport";
-import { BlockingQueueBase } from "@plexus-interop/common";
+import { TestBufferedInMemoryFramedTransport } from "../TestBufferedInMemoryFramedTransport";
 import { Frame } from "../../../src/transport/frame/model/Frame";
 import { AnonymousSubscription } from "rxjs/Subscription";
 import { DelegateChannelObserver } from "../../../src/common/DelegateChannelObserver";
+import { Queue } from "typescript-collections";
 
 describe("FramedTransportChannel", () => {
 
     it("Concatenates message from frames", (done) => {
 
-        const mockFrameTransport = new InMemoryFramedTransport();
+        const mockFrameTransport = new TestBufferedInMemoryFramedTransport();
 
         TestUtils.framedMessage().forEach(frame => {
-            mockFrameTransport.inBuffer.enqueue(frame);
+            mockFrameTransport.next(frame);
         });
         const cancellationToken = new CancellationToken();
         const sut = new FramedTransportChannel(UniqueId.generateNew(), mockFrameTransport, async () => { }, cancellationToken);
@@ -54,10 +54,10 @@ describe("FramedTransportChannel", () => {
 
     it("Reports error to observable if can't read frame", (done) => {
 
-        const mockFrameTransport: FramedTransport = mock(InMemoryFramedTransport);
+        const mockFrameTransport: FramedTransport = mock(TestBufferedInMemoryFramedTransport);
 
         TestUtils.framedMessage().forEach(frame => {
-            when(mockFrameTransport.readFrame(anything())).thenReturn(Promise.reject(new Error("Transport error")));
+            when(mockFrameTransport.open(anything())).thenReturn(Promise.reject(new Error("Transport error")));
         });
 
         const sut = new FramedTransportChannel(UniqueId.generateNew(), instance(mockFrameTransport), async () => { }, new CancellationToken());
@@ -80,10 +80,10 @@ describe("FramedTransportChannel", () => {
 
     it("Rejects request if already opened", async (done) => {
 
-        const mockFrameTransport = new InMemoryFramedTransport();
+        const mockFrameTransport = new TestBufferedInMemoryFramedTransport();
 
         TestUtils.framedMessage().forEach(frame => {
-            mockFrameTransport.inBuffer.enqueue(frame);
+            mockFrameTransport.next(frame);
         });
         const cancellationToken = new CancellationToken();
 
@@ -108,7 +108,7 @@ describe("FramedTransportChannel", () => {
 
     it("Sends big message by frames", async (done) => {
 
-        const mockFrameTransport = new InMemoryFramedTransport(UniqueId.generateNew(), new BlockingQueueBase<Frame>(), new BlockingQueueBase<Frame>(), 3);
+        const mockFrameTransport = new TestBufferedInMemoryFramedTransport(UniqueId.generateNew(), new Queue<Frame>(), new Queue<Frame>(), 3);
         const dataArray = [1, 2, 3, 4, 5];
         const dataToSend = new Uint8Array(dataArray);
         const channelId = UniqueId.generateNew();
@@ -119,11 +119,13 @@ describe("FramedTransportChannel", () => {
             (resolve, reject) => sut.open(new DelegateChannelObserver(new LogObserver(), (s) => resolve(s))));
                    
         sut.sendMessage(dataToSend.buffer).then(async () => {
-            const firstFrame = await mockFrameTransport.outBuffer.blockingDequeue();
+            await AsyncHelper.waitFor(() => mockFrameTransport.outBuffer.size() > 0);
+            const firstFrame = mockFrameTransport.outBuffer.dequeue();
             expect(firstFrame.getHeaderData().channelId).toEqual(channelId);
             expect(firstFrame.getHeaderData().hasMore).toEqual(true);
             expect(new Uint8Array(firstFrame.body)).toEqual(new Uint8Array([1, 2, 3]));
-            const secondFrame = await mockFrameTransport.outBuffer.blockingDequeue();
+            await AsyncHelper.waitFor(() => mockFrameTransport.outBuffer.size() > 0);
+            const secondFrame = mockFrameTransport.outBuffer.dequeue();
             expect(secondFrame.getHeaderData().channelId).toEqual(channelId);
             expect(secondFrame.getHeaderData().hasMore).toEqual(false);
             expect(new Uint8Array(secondFrame.body)).toEqual(new Uint8Array([4, 5]));

@@ -19,7 +19,7 @@ import { ChannelOpenFrame, ChannelCloseFrame } from "./model";
 import { ConnectableFramedTransport } from "./ConnectableFramedTransport";
 import { TransportConnection } from "../TransportConnection";
 import { FramedTransportChannel, ChannelState } from "./FramedTransportChannel";
-import { ChannelTransportProxy } from "./ChannelTransportProxy";
+import { BufferedTransportProxy } from "./BufferedTransportProxy";
 import { TransportChannel } from "../TransportChannel";
 import { UniqueId } from "../UniqueId";
 import { transportProtocol as plexus } from "@plexus-interop/protocol";
@@ -41,7 +41,7 @@ export const ConnectionState = {
 
 type ChannelDescriptor = {
     channel: FramedTransportChannel,
-    channelTransportProxy: ChannelTransportProxy
+    channelTransportProxy: BufferedTransportProxy
 };
 
 export class FramedTransportConnection extends TransportFrameHandler implements TransportConnection {
@@ -329,7 +329,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         const strChannelId = channelId.toString();
         this.log.debug(`Creating new channel ${strChannelId}`);
         const proxyLogger = LoggerFactory.getLogger(`ChannelTranportProxy ${strChannelId}`);
-        const channelTransportProxy = new ChannelTransportProxy(this.framedTransport, this.writeCancellationToken, proxyLogger);
+        const channelTransportProxy = new BufferedTransportProxy(this.framedTransport, this.writeCancellationToken, proxyLogger);
         const dispose = async () => {
             this.log.debug(`Dispose called on ${strChannelId} channel`);
             if (this.channelsHolder.channelExists(strChannelId)) {
