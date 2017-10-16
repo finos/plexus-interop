@@ -54,13 +54,4 @@ describe("Web Socket Client connectivity", () => {
         return connectivityTests.testClientReceiveErrorIfProvideWrongId();
     });
 
-    // it("Notifies all invocation clients with error if client disconnected", function() {
-    //     this.timeout(5000);
-    //     return connectivityTests.testAllInvocationClientsReceiveErrorOnClientDisconnect();
-    // });
-
-    // it("Notifies all invocation clients with error if server disconnected", function() {
-    //     return connectivityTests.testAllInvocationClientsReceiveErrorOnServerDisconnect();
-    // });
-
 });

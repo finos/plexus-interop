@@ -75,6 +75,13 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         }
     }
 
+    public goSync(to: T): void {
+        if (!this.canGo(to)) {
+            throw new Error(`Transition ${this.getCurrent()} -> ${to} does not exist`);
+        }
+        this.current = to;
+    }
+
     public go(to: T, dynamicHandlers?: Handlers): Promise<void> {
         if (this.canGo(to)) {
             const descriptor = this.lookup(this.getCurrent());

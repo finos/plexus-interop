@@ -33,16 +33,21 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
     }
 
     public testClientCanCancelInvocation(): Promise<void> {
-       
+
         let serverReceivedError = false;
         let clientReceivedError = false;
+        let serverReceivedMessage = false;
 
         return new Promise<void>((resolve, reject) => {
             const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
-                    next: (clientRequest) => reject("Not expected"),
+                    next: (clientRequest) => {
+                        serverReceivedMessage = true;
+                    },
                     complete: () => reject("Complete not expected"),
-                    error: async (e) => serverReceivedError = true
+                    error: (e) => {
+                        serverReceivedError = true;
+                    }
                 }
             });
             try {
@@ -50,9 +55,14 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                     const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
                     const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
                         next: (serverResponse) => reject("Not expected to receive message"),
-                        error: (e) => clientReceivedError = true,
-                        complete: () =>  reject("Not expected to complete successfuly")
+                        error: (e) => {
+                            debugger;
+                            clientReceivedError = true;
+                        },
+                        complete: () => reject("Not expected to complete successfuly")
                     });
+                    streamingClient.next(this.clientsSetup.createRequestDto());
+                    await AsyncHelper.waitFor(() => serverReceivedMessage === true);
                     streamingClient.cancel();
                     await AsyncHelper.waitFor(() => serverReceivedError === true);
                     await AsyncHelper.waitFor(() => clientReceivedError === true);
@@ -103,8 +113,8 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                                     .catch(e => reject(e));
                                 return this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
                             })
-                            .then(() => resolve())
-                            .catch(e => reject(e));
+                                .then(() => resolve())
+                                .catch(e => reject(e));
                         }
                     },
                     error: (e) => {

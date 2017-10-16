@@ -35,6 +35,8 @@ export interface StateMaschine<T> {
 
     go(to: T, dynamicPreHandlers?: Handlers): Promise<void>;
 
+    goSync(to: T): void;
+
     throwIfNot(...states: T[]): void;
 }
 

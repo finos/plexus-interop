@@ -102,12 +102,10 @@ export class FramedTransportChannel implements TransportChannel {
         } else {
             const cause = this.remoteCompletionToError(this.remoteCompletion);
             // remote error received, close channel if required and report to observer
+            channelObserver.error(cause);
             if (this.stateMachine.isOneOf(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED)) {
                 this.log.debug("Closing channel due to error", cause);
-                await this.close(new ErrorCompletion(cause));
-                channelObserver.error(cause);
-            } else {
-                channelObserver.error(cause);
+                this.close(new ErrorCompletion(cause));
             }
         }
     }
@@ -219,7 +217,7 @@ export class FramedTransportChannel implements TransportChannel {
         switch (this.stateMachine.getCurrent()) {
             case ChannelState.OPEN:
                 this.channelCancellationToken.cancelRead("Channel close received");
-                this.stateMachine.go(ChannelState.CLOSE_RECEIVED);
+                this.stateMachine.goSync(ChannelState.CLOSE_RECEIVED);
                 break;
             case ChannelState.CLOSE_REQUESTED:
                 this.closeInternal("Remote channel close received");
