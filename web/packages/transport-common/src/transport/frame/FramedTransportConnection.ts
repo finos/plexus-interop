@@ -215,10 +215,8 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
                 }
             },
             error: (transportError) => {
-                this.log.error("Error from source transport, closing connection", transportError);
-                this.channelsHolder.getChannels().forEach((value, key: string) => {
-                    value.channelTransportProxy.error(transportError);
-                });
+                this.log.error("Error from source transport", transportError);
+                this.reportErrorToChannels(transportError);
                 this.closeAndCleanUp();
             },
             complete: () => {
@@ -235,11 +233,11 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         }
         switch (this.stateMachine.getCurrent()) {
             case ConnectionState.OPEN:
-                this.log.debug("Close received");
+                this.log.debug("Close received, waiting for client to close it");
                 this.stateMachine.go(ConnectionState.CLOSE_RECEIVED);
                 break;
             case ConnectionState.CLOSE_REQUESTED:
-                this.log.debug("Closing connection");
+                this.log.debug("Close already requested, closing connection");
                 this.closeAndCleanUp();
                 break;
             default:
@@ -311,6 +309,12 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
                 this.log.trace(`Received last frame for message of channel ${strChannelId}`);
             }
         }
+    }
+
+    private reportErrorToChannels(error: any): void {
+        this.channelsHolder.getChannels().forEach((value, key: string) => {
+            value.channelTransportProxy.error(error);
+        });
     }
 
     private createOutChannel(channelId: UniqueId): ChannelDescriptor {
