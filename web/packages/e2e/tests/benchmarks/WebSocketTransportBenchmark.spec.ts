@@ -30,14 +30,14 @@ describe("Web Socket Client Benchmarks", () => {
         transportsSetup.createWebSocketTransportProvider(wsUrl), 
         clientsSetup);
 
-    it("Sends 200 of messages in one second", function() {
-        this.timeout(10000);
+    it("Sends 60 of messages in 1 seconds", function() {
+        this.timeout(5000);
         return (async () => {
             console.log("Starting", new Date().toISOString());        
-            const result = await echoServiceBenchmark.testUnaryMessagesSentWithinPeriod(100, 1024, 5000);
+            const result = await echoServiceBenchmark.testUnaryMessagesSentWithinPeriod(100, 1024, 3000);
             console.log("End", new Date().toISOString());
             console.log("Benchmark result:", JSON.stringify(result));
-            expect(result.messagesSent).to.be.greaterThan(500);
+            expect(result.messagesSent).to.be.greaterThan(180);
             console.log("Passed");
         })();
     });
