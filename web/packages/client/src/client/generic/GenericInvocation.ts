@@ -219,7 +219,7 @@ export class GenericInvocation {
         switch (this.stateMachine.getCurrent()) {
             case InvocationState.OPEN:
                 this.log.debug("Open state, switching to COMPLETION_RECEIVED");
-                this.readCancellationToken.cancel("Invocation close received")
+                this.readCancellationToken.cancel("Invocation close received");
                 this.stateMachine.go(InvocationState.COMPLETION_RECEIVED);
                 break;
             case InvocationState.COMPLETED:

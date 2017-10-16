@@ -6,7 +6,7 @@
   "description": "Client for Plexus Interop",
   "license": "Apache-2.0",
   "scripts": {
-    "prebuild": "trash dist",
+    "prebuild": "trash dist && yarn lint",
     "build": "yarn build:main",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
