@@ -86,9 +86,6 @@ function main() {
             console.error('Std Error:', stderr);
             console.error('Error:', error);
         }
-        // if (stderr) {
-        //     log('StdErr:', stderr);
-        // }
         if (argv.printBrokerStdout) {
             log('StdOut', stdout);
         }
