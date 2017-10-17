@@ -56,7 +56,7 @@
             return _receiveBuffer.Out.TryTerminateWriting(error);
         }
 
-        public IWritableChannel<TransportMessageFrame> Out => _sendProcessor;
+        public IWritableChannel<TransportMessageFrame> Out => _sendProcessor.Out;
 
         public IReadOnlyChannel<TransportMessageFrame> In => _receiveBuffer.In;
 
@@ -71,16 +71,18 @@
 
         private async Task HandleIncomingAsync(ITransportFrameHeader header, ChannelMessage message)
         {
-            if (!await _receiveBuffer.Out
-                .TryWriteSafeAsync(new TransportMessageFrame(message.Payload.Value, header.HasMore))
-                .ConfigureAwait(false))
-            {                
-                _log.Trace("Skipping message because the channel is terminated: {0}", message);
+            try
+            {
+                await _receiveBuffer.Out.WriteAsync(new TransportMessageFrame(message.Payload.Value, header.HasMore));
+            }
+            catch
+            {
                 if (message.Payload.HasValue)
                 {
                     message.Payload.Value.Dispose();
                 }
-            }            
+                throw;
+            }
         }
 
         private Task HandleIncomingAsync(ITransportChannelCloseHeader header, ChannelMessage message)
@@ -91,12 +93,12 @@
                     _receiveBuffer.Out.TryCompleteWriting();
                     break;
                 case CompletionStatusHeader.Canceled:
-                    _sendProcessor.TryTerminateWriting();
+                    _sendProcessor.Out.TryTerminateWriting();
                     _receiveBuffer.Out.TryTerminateWriting();
                     break;
                 case CompletionStatusHeader.Failed:
                     var error = header.Completion.Error.Value;
-                    _sendProcessor.TryTerminateWriting();
+                    _sendProcessor.Out.TryTerminateWriting();
                     _receiveBuffer.Out.TryTerminateWriting(new RemoteErrorException(error));
                     break;
                 default:

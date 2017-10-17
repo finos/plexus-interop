@@ -26,7 +26,9 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
     using WebSocket4Net;
 
     internal sealed class WebSocketClientTransmissionConnection : ProcessBase, ITransmissionConnection
-    {        
+    {
+        private static readonly TimeSpan ConnectionTimeout = TimeSpan.FromSeconds(5);
+
         private readonly ILogger _log;
         private readonly WebSocket _webSocket;
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
@@ -85,8 +87,10 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 
         public async Task ConnectAsync(CancellationToken cancellationToken)
         {
-            using (cancellationToken.Register(() => _cancellation.Cancel()))
+            using (var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+            using (cancellation.Token.Register(() => _cancellation.Cancel()))
             {
+                cancellation.CancelAfter(ConnectionTimeout);
                 try
                 {
                     await StartAsync().ConfigureAwait(false);
@@ -108,13 +112,13 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 
         protected override async Task<Task> StartCoreAsync()
         {
-            if (_cancellation.IsCancellationRequested)
-            {
-                _webSocket.Dispose();
-                return TaskConstants.Completed;
-            }
             try
             {
+                if (_cancellation.IsCancellationRequested)
+                {
+                    _webSocket.Dispose();
+                    return TaskConstants.Completed;
+                }
                 _log.Trace("Opening socket");
                 _webSocket.Open();
                 await _connectCompletion.Task.WithCancellation(_cancellation.Token).ConfigureAwait(false);

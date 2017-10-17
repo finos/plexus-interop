@@ -21,6 +21,6 @@ namespace Plexus.Interop.Transport
 
     public interface ITransportClient
     {
-        ValueTask<ITransportConnection> ConnectAsync(CancellationToken cancellationToken);
+        ValueTask<ITransportConnection> ConnectAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- // ReSharper disable InconsistentlySynchronizedField
 
+// ReSharper disable InconsistentlySynchronizedField
 namespace Plexus.Interop.Transport.Internal
 {
     using Plexus.Channels;
@@ -115,7 +115,7 @@ namespace Plexus.Interop.Transport.Internal
             try
             {
                 receiveTask = ReceiveAsync();
-                await Task.WhenAny(receiveTask, _transportSendProcessor.Out.Completion).Unwrap().ConfigureAwait(false);
+                await Task.WhenAny(receiveTask, _transportSendProcessor.Completion).Unwrap().ConfigureAwait(false);
                 await CompleteSendingAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -125,7 +125,7 @@ namespace Plexus.Interop.Transport.Internal
             }
             finally
             {
-                await Task.WhenAll(receiveTask, _transportSendProcessor.Out.Completion).ConfigureAwait(false);
+                await Task.WhenAll(receiveTask, _transportSendProcessor.Completion).ConfigureAwait(false);
             }
         }
 
@@ -252,7 +252,7 @@ namespace Plexus.Interop.Transport.Internal
                     _channels[channel.Id] = channel;
                     channel.Completion.ContinueWithSynchronously((Action<Task, object>)OnChannelCompleted, channel).IgnoreAwait(_log);
                 }
-                await _incomingChannelQueue.Out.TryWriteSafeAsync(channel).ConfigureAwait(false);
+                await _incomingChannelQueue.Out.WriteAsync(channel).ConfigureAwait(false);
             }
         }
 

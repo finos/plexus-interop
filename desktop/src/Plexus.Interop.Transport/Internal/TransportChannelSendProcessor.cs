@@ -23,7 +23,7 @@
     using System;
     using System.Threading.Tasks;
 
-    internal sealed class TransportChannelSendProcessor : IWritableChannel<TransportMessageFrame>
+    internal sealed class TransportChannelSendProcessor
     {
         private readonly ILogger _log;
         private readonly IChannel<TransportMessageFrame> _buffer = new BufferedChannel<TransportMessageFrame>(3);
@@ -50,27 +50,9 @@
 
         public Task Completion { get; }
 
+        public IWritableChannel<TransportMessageFrame> Out => _buffer.Out;
+
         internal Task Initialized => _initialized.Task;
-
-        public bool TryCompleteWriting()
-        {
-            return _buffer.Out.TryCompleteWriting();
-        }
-
-        public bool TryTerminateWriting(Exception error = null)
-        {
-            return _buffer.Out.TryTerminateWriting(error);
-        }
-
-        public bool TryWrite(TransportMessageFrame item)
-        {
-            return _buffer.Out.TryWrite(item);
-        }
-
-        public Task<bool> TryWriteSafeAsync(TransportMessageFrame item)
-        {
-            return _buffer.Out.TryWriteSafeAsync(item);
-        }
 
         private async Task ProcessAsync()
         {
@@ -78,11 +60,13 @@
             {
                 await SendOpenMessageAsync().ConfigureAwait(false);
                 _initialized.TryComplete();
-                await _buffer.ConsumeBufferAsync(SendAsync, Dispose).ConfigureAwait(false);
+                await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);
                 await SendCloseMessageAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
-            {
+            {                
+                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.In.DisposeBufferedItems();
                 await SendCloseMessageAsync(ex).IgnoreExceptions().ConfigureAwait(false);
                 throw;
             }
@@ -136,12 +120,6 @@
         {
             var header = _headerFactory.CreateFrameHeader(ChannelId, frame.HasMore, frame.Payload.Count);
             await SendAsync(header, frame.Payload).ConfigureAwait(false);
-        }
-
-        private void Dispose(TransportMessageFrame frame)
-        {
-            _log.Trace("Disposing frame {0}", frame);
-            frame.Dispose();
         }
     }
 }

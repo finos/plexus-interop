@@ -116,6 +116,13 @@ namespace Plexus.Channels
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task DisposeRemainingItemsAsync<T>(
+            this IReadOnlyChannel<T> channel) where T : IDisposable
+        {
+            return channel.ConsumeAsync(x => x.Dispose());
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DisposeBufferedItems<T>(
             this IReadOnlyChannel<T> channel) where T : IDisposable
         {
@@ -156,11 +163,11 @@ namespace Plexus.Channels
             CancellationToken cancellationToken = default,
             Func<Task> onCompletedAsync = null,
             Func<Exception, Task> onTerminatedAsync = null)
-        {
+        {            
             try
             {
                 while (await channel.WaitReadAvailableAsync(cancellationToken).ConfigureAwait(false))
-                {
+                {                    
                     while (channel.TryRead(out var item))
                     {
                         await handleAsync(item).ConfigureAwait(false);
