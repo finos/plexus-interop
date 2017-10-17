@@ -71,13 +71,13 @@ namespace Plexus.Interop.Internal.Calls
                 {
                     TResponse response = default;
                     Log.Trace("Reading response");
-                    while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
+                    do
                     {
                         while (invocation.In.TryRead(out var item))
                         {
                             response = item;
                         }
-                    }
+                    } while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false));
                     Log.Trace("Response stream completed");
                     return response;
                 }

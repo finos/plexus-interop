@@ -28,7 +28,7 @@ namespace Plexus.Interop.Transport.Internal
         private readonly ILogger _log;
         private readonly IMessagingReceiveProcessor _receiveProcessor;
         private readonly TransportConnectionStateValidator _stateValidator = new TransportConnectionStateValidator();
-        private readonly TransportHeaderHandler<Task, (Maybe<IPooledBuffer>, IWriteOnlyChannel<ChannelMessage>)> _handler;
+        private readonly TransportHeaderHandler<Task, Maybe<IPooledBuffer>> _handler;
         private readonly BufferedChannel<ChannelMessage> _buffer = new BufferedChannel<ChannelMessage>(3);
 
         public TransportReceiveProcessor(
@@ -38,10 +38,10 @@ namespace Plexus.Interop.Transport.Internal
             InstanceId = connection.Id;
             _log = LogManager.GetLogger<TransportReceiveProcessor>(InstanceId.ToString());
             _receiveProcessor = new MessagingReceiveProcessor(connection, deserializer);
-            _handler = new TransportHeaderHandler<Task, (Maybe<IPooledBuffer>, IWriteOnlyChannel<ChannelMessage>)>(
+            _handler = new TransportHeaderHandler<Task, Maybe<IPooledBuffer>>(
                 HandleConnetionHeaderAsync,
                 HandleChannelHeaderAsync);
-            _buffer.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ReceveLoopAsync));
+            _buffer.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
             In.Completion.LogCompletion(_log);
         }
 
@@ -49,7 +49,7 @@ namespace Plexus.Interop.Transport.Internal
 
         public IReadOnlyChannel<ChannelMessage> In => _buffer.In;
 
-        private async Task ReceveLoopAsync()
+        private async Task ProcessAsync()
         {
             await _receiveProcessor.In.ConsumeAsync(HandleReceivedAsync).ConfigureAwait(false);
             _stateValidator.OnCompleted();
@@ -60,7 +60,7 @@ namespace Plexus.Interop.Transport.Internal
             try
             {
                 _stateValidator.OnMessage(message.Header);
-                await message.Header.Handle(_handler, (message.Payload, _buffer.Out)).ConfigureAwait(false);
+                await message.Header.Handle(_handler, message.Payload).ConfigureAwait(false);
             }
             catch
             {
@@ -69,14 +69,12 @@ namespace Plexus.Interop.Transport.Internal
             }
         }
 
-        private static async Task HandleChannelHeaderAsync(
-            ITransportChannelHeader header, 
-            (Maybe<IPooledBuffer> Payload, IWriteOnlyChannel<ChannelMessage> Output) args)
+        private async Task HandleChannelHeaderAsync(ITransportChannelHeader header, Maybe<IPooledBuffer> payload)
         {
-            var message = new ChannelMessage(header, args.Payload);
+            var message = new ChannelMessage(header, payload);
             try
             {
-                await args.Output.WriteAsync(message).ConfigureAwait(false);
+                await _buffer.Out.WriteAsync(message).ConfigureAwait(false);
             }
             catch
             {
@@ -85,9 +83,7 @@ namespace Plexus.Interop.Transport.Internal
             }
         }
 
-        private static Task HandleConnetionHeaderAsync(
-            ITransportConnectionHeader header, 
-            (Maybe<IPooledBuffer> Payload, IWriteOnlyChannel<ChannelMessage> Output) args)
+        private static Task HandleConnetionHeaderAsync(ITransportConnectionHeader header, Maybe<IPooledBuffer> payload)
         {
             return TaskConstants.Completed;
         }

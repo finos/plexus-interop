@@ -44,6 +44,7 @@ namespace Plexus.Channels
             await channel.Completion.ConfigureAwait(false);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async Task WriteAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
         {
             var result = await channel.TryWriteAsync(item, cancellationToken).ConfigureAwait(false);
@@ -53,18 +54,20 @@ namespace Plexus.Channels
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async Task<bool> TryWriteAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
         {
-            while (await channel.WaitWriteAvailableAsync(cancellationToken))
+            do
             {
                 if (channel.TryWrite(item))
                 {
                     return true;
                 }
-            }
+            } while (await channel.WaitWriteAvailableAsync(cancellationToken));
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async ValueTask<T> ReadAsync<T>(this IReadOnlyChannel<T> channel, CancellationToken cancellationToken = default)
         {
             var result = await channel.TryReadAsync(cancellationToken).ConfigureAwait(false);
@@ -74,16 +77,17 @@ namespace Plexus.Channels
             }
             return result.Value;
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async ValueTask<Maybe<T>> TryReadAsync<T>(this IReadOnlyChannel<T> channel, CancellationToken cancellationToken = default)
         {
-            while (await channel.WaitReadAvailableAsync(cancellationToken).ConfigureAwait(false))
+            do
             {
                 if (channel.TryRead(out var item))
                 {
                     return item;
                 }
-            }
+            } while (await channel.WaitReadAvailableAsync(cancellationToken).ConfigureAwait(false));
             return Maybe<T>.Nothing;
         }
         
@@ -139,6 +143,7 @@ namespace Plexus.Channels
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task ConsumeAsync<T>(
             this IReadOnlyChannel<T> channel,
             Action<T> handle,
@@ -157,6 +162,7 @@ namespace Plexus.Channels
                 onTerminatedAsync);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async Task ConsumeAsync<T>(
             this IReadOnlyChannel<T> channel,            
             Func<T, Task> handleAsync,
@@ -166,13 +172,14 @@ namespace Plexus.Channels
         {            
             try
             {
-                while (await channel.WaitReadAvailableAsync(cancellationToken).ConfigureAwait(false))
-                {                    
+                do
+                {
                     while (channel.TryRead(out var item))
                     {
                         await handleAsync(item).ConfigureAwait(false);
                     }
-                }
+                } while (await channel.WaitReadAvailableAsync(cancellationToken).ConfigureAwait(false));
+
                 if (onCompletedAsync != null)
                 {
                     await onCompletedAsync().ConfigureAwait(false);

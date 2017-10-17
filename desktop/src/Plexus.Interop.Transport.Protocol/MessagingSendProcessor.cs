@@ -14,15 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading.Tasks;
-using Plexus.Channels;
-using Plexus.Interop.Transport.Protocol.Serialization;
-using Plexus.Interop.Transport.Transmission;
-using Plexus.Pools;
-
 namespace Plexus.Interop.Transport.Protocol
 {
-    using System.Threading;
+    using Plexus.Channels;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
+    using Plexus.Pools;
+    using System;
+    using System.Threading.Tasks;
 
     public sealed class MessagingSendProcessor : IMessagingSendProcessor
     {
@@ -30,21 +29,17 @@ namespace Plexus.Interop.Transport.Protocol
         private readonly ITransportProtocolSerializer _serializer;
         private readonly IChannel<TransportMessage> _buffer = new BufferedChannel<TransportMessage>(3);
         private readonly ITransmissionConnection _connection;
-        private readonly CancellationToken _cancellationToken;
 
         public MessagingSendProcessor(
             ITransmissionConnection connection,
-            ITransportProtocolSerializer serializer,
-            CancellationToken cancellationToken = default)
+            ITransportProtocolSerializer serializer)
         {
             Id = connection.Id;
             _connection = connection;
-            _cancellationToken = cancellationToken;
             _log = LogManager.GetLogger<MessagingSendProcessor>(Id.ToString());
-            _serializer = serializer;
-            Completion = TaskRunner.RunInBackground(ProcessAsync);
-            _buffer.Out.PropagateCompletionFrom(Completion);
-            Completion.LogCompletion(_log);            
+            _serializer = serializer;            
+            _connection.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            Completion = _connection.Completion.LogCompletion(_log);
         }
 
         public UniqueId Id { get; }
@@ -55,35 +50,38 @@ namespace Plexus.Interop.Transport.Protocol
         
         private async Task ProcessAsync()
         {
-            while (await _buffer.In.WaitReadAvailableAsync(_cancellationToken))
+            try
             {
-                while (_buffer.In.TryRead(out var item))
-                {
-                    await SendAsync(item, _connection.Out).ConfigureAwait(false);
-                }
+                await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.In.DisposeBufferedItems();
+                throw;
             }
         }
 
-        private async Task SendAsync(TransportMessage message, IWriteOnlyChannel<IPooledBuffer> output)
+        private async Task SendAsync(TransportMessage message)
         {
             _log.Debug("Sending message: {0}", message);
             using (var header = message.Header)
             {
                 var serializedHeader = _serializer.Serialize(header);
-                await SendAsync(serializedHeader, output).ConfigureAwait(false);
+                await SendAsync(serializedHeader).ConfigureAwait(false);
                 if (message.Payload.HasValue)
                 {
                     var payload = message.Payload.Value;
-                    await SendAsync(payload, output).ConfigureAwait(false);
+                    await SendAsync(payload).ConfigureAwait(false);
                 }
             }
         }
 
-        private async Task SendAsync(IPooledBuffer message, IWriteOnlyChannel<IPooledBuffer> output)
+        private async Task SendAsync(IPooledBuffer message)
         {
             try
             {
-                await output.WriteAsync(message, _cancellationToken).ConfigureAwait(false);
+                await _connection.Out.WriteAsync(message).ConfigureAwait(false);
             }
             catch
             {

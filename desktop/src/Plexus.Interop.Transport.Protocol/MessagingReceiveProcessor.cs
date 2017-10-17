@@ -23,7 +23,6 @@ namespace Plexus.Interop.Transport.Protocol
     using Plexus.Interop.Transport.Transmission;
     using Plexus.Pools;
     using System;
-    using System.Threading;
     using System.Threading.Tasks;
 
     public sealed class MessagingReceiveProcessor : IMessagingReceiveProcessor
@@ -31,79 +30,69 @@ namespace Plexus.Interop.Transport.Protocol
         private readonly ILogger _log;
         private readonly IReadOnlyChannel<IPooledBuffer> _connection;
         private readonly ITransportProtocolDeserializer _deserializer;
-        private readonly CancellationToken _cancellationToken;
         private readonly IChannel<TransportMessage> _buffer = new BufferedChannel<TransportMessage>(3);
 
         public MessagingReceiveProcessor(
             ITransmissionConnection connection,
-            ITransportProtocolDeserializer deserializer,
-            CancellationToken cancellationToken = default)
+            ITransportProtocolDeserializer deserializer)
         {
             Id = connection.Id;
             _log = LogManager.GetLogger<MessagingReceiveProcessor>(Id.ToString());
             _connection = connection.In;
             _deserializer = deserializer;
-            _cancellationToken = cancellationToken;
-            In = _buffer.In;
             In.Completion.LogCompletion(_log);
             _buffer.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
         }
 
         public UniqueId Id { get; }
 
-        public IReadOnlyChannel<TransportMessage> In { get; }
+        public IReadOnlyChannel<TransportMessage> In => _buffer.In;
 
         private async Task ProcessAsync()
         {
-            while (await _connection.WaitReadAvailableAsync(_cancellationToken).ConfigureAwait(false))
+            await _connection.ConsumeAsync(HandleReceivedAsync).ConfigureAwait(false);
+            _log.Debug("Incoming messages completed");
+        }
+
+        private async Task HandleReceivedAsync(IPooledBuffer item)
+        {
+            ITransportHeader header;
+            using (item)
             {
-                while (_connection.TryRead(out var item))
+                header = _deserializer.Deserialize(item);
+            }
+            try
+            {
+                var payload = Maybe<IPooledBuffer>.Nothing;
+                var expectedBodyLength = GetBodyLengthHandler.Instance.Handle(header);
+                if (expectedBodyLength.HasValue)
                 {
-                    ITransportHeader header;
-                    using (item)
+                    var body = await _connection.ReadAsync().ConfigureAwait(false);
+                    if (body.Count != expectedBodyLength.Value)
                     {
-                        header = _deserializer.Deserialize(item);
+                        body.Dispose();
+                        throw new InvalidOperationException(
+                            $"Received body length {body.Count} does not equal to the specified in header: {header}");
                     }
-                    try
-                    {
-                        IPooledBuffer body = null;
-                        var expectedBodyLength = GetBodyLengthHandler.Instance.Handle(header);
-                        if (expectedBodyLength.HasValue)
-                        {
-                            body = await _connection.ReadAsync(_cancellationToken).ConfigureAwait(false);
-                            if (body.Count != expectedBodyLength.Value)
-                            {
-                                try
-                                {
-                                    throw new InvalidOperationException(
-                                        $"Received body length {body.Count} does not equal to the specified in header: {header}");
-                                }
-                                finally
-                                {
-                                    body.Dispose();
-                                }
-                            }
-                        }
-                        try
-                        {
-                            var transportMessage = new TransportMessage(header, new Maybe<IPooledBuffer>(body));
-                            _log.Debug("Message received: {0}", transportMessage);
-                            await _buffer.Out.WriteAsync(transportMessage, _cancellationToken).ConfigureAwait(false);
-                        }
-                        catch
-                        {
-                            body?.Dispose();
-                            throw;
-                        }
-                    }
-                    catch
-                    {
-                        header.Dispose();
-                        throw;
-                    }
+                    payload = new Maybe<IPooledBuffer>(body);
+                }
+                try
+                {
+                    var transportMessage = new TransportMessage(header, payload);
+                    _log.Debug("Message received: {0}", transportMessage);
+                    await _buffer.Out.WriteAsync(transportMessage).ConfigureAwait(false);
+                }
+                catch
+                {
+                    payload.GetValueOrDefault()?.Dispose();
+                    throw;
                 }
             }
-            _log.Debug("Incoming messages completed");
+            catch
+            {
+                header.Dispose();
+                throw;
+            }
         }
     }
 }

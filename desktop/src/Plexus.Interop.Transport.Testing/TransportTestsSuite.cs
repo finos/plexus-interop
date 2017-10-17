@@ -61,54 +61,66 @@ namespace Plexus.Interop.Transport
             {
                 return $"{{[{string.Join(", ", ServerMessageLengths)}], [{string.Join(",", ClientMessageLengths)}]}}";
             }
+        }        
+
+        [Fact]
+        public void DisposeFromServerSide()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                await Server.StartAsync();
+                using (var clientConnection = await Client.ConnectAsync())
+                using (var serverConnection = await Server.AcceptAsync())
+                {
+                }
+            });
         }
 
-        public static TheoryData<ChannelExchange[]> TestCases =
-            new TheoryData<ChannelExchange[]>
+        [Fact]
+        public void DisposeFromClientSide()
+        {
+            RunWith10SecTimeout(async () =>
             {
-                    new ChannelExchange[] { },
-                    new ChannelExchange[] {
-                        new ChannelExchange(new int[] { }, new int[] { }),
-                        new ChannelExchange(new int[] { }, new int[] { })
-                    },
-                    new ChannelExchange[] { new ChannelExchange(new[] { 3 }, new int[] { }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new [] { 3 }) },
-                    new ChannelExchange[] { new ChannelExchange(new [] { 3 }, new [] { 3 }) },
-                    new ChannelExchange[] { new ChannelExchange(new [] { 3, 5, 1 }, new int [] { }) },
-                    new ChannelExchange[] { new ChannelExchange(new int [] { }, new [] { 3, 5, 1 }) },
-                    new ChannelExchange[] { new ChannelExchange(new int [] { }, new int [] { }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { 0 }, new int [] { }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new int [] { 0 }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new int [] { 5, 0, 10 }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { 5, 0, 10 }, new int [] { }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { 65000 }, new int [] { }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new int [] { 65000 }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { 65000 }, new int [] { 65000 }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { 65001 }, new int [] { }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new int [] { 65001 }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { 65001 }, new int [] { 65001 }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { 1024*1024*5 }, new int [] { }) },
-                    new ChannelExchange[] { new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }) },
-                    new ChannelExchange[] {
-                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
-                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
-                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
-                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
-                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
-                    },
-                    new ChannelExchange[] {
-                        new ChannelExchange(new int[] { 1024*1024, 65001, 0, 65001 }, new int [] { 1024 * 1024, 0, 65001, 0, 1, 2, 3, 4, 5 }),
-                        new ChannelExchange(new int[] { }, new int [] { 1024 * 1024, 0, 65001, 0 }),
-                        new ChannelExchange(new int[] { 1024*1024, 0, 65001 }, new int [] { })
-                    },
-                    new ChannelExchange[] {
-                        new ChannelExchange(new int[] { 1, 2, 3}, new int [] { 1, 0, 1, 2, 3, 4, 5, 6, 7, 8 }),
-                        new ChannelExchange(new int[] { }, new int [] { 3, 0, 3, 0 }),
-                    },
-                    new ChannelExchange[] {
-                        new ChannelExchange(new int[] { 1024*1024, 65001, 0, 65001 }, new int [] { 1024 * 1024, 0, 65001, 0, 1, 2, 3, 4, 5 }),
-                    },
-            };
+                await Server.StartAsync();
+                using (var clientConnection = await Client.ConnectAsync())
+                using (var serverConnection = await Server.AcceptAsync())
+                {
+                    clientConnection.Dispose();
+                }
+            });
+        }
+
+        [Fact]
+        public void DisconnectFromClientSide()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                await Server.StartAsync();
+                using (var clientConnection = await Client.ConnectAsync())
+                using (var serverConnection = await Server.AcceptAsync())
+                {
+                    clientConnection.TryTerminate();
+                    Should.CompleteIn(serverConnection.Completion, Timeout1Sec);
+                    Should.CompleteIn(clientConnection.Completion, Timeout1Sec);
+                }
+            });
+        }
+
+        [Fact]
+        public void DisconnectFromServerSide()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                await Server.StartAsync();
+                using (var clientConnection = await Client.ConnectAsync())
+                using (var serverConnection = await Server.AcceptAsync())
+                {
+                    serverConnection.TryTerminate();
+                    Should.CompleteIn(serverConnection.Completion, Timeout1Sec);
+                    Should.CompleteIn(clientConnection.Completion, Timeout1Sec);
+                }
+            });
+        }
 
         [Fact]
         public void TerminateChannelFromClientSide()
@@ -122,11 +134,12 @@ namespace Plexus.Interop.Transport
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                     var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
-                    Log.Info("Terminating channel");
+                    WriteLog("Terminating channel");
                     clientChannel.Out.TryTerminateWriting();
+                    await clientConnection.Completion;
                     Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
                     Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
-                    Log.Info("Both channels terminated");
+                    WriteLog("Both channels terminated");
                 });
         }
 
@@ -180,8 +193,55 @@ namespace Plexus.Interop.Transport
                 });
         }
 
+        public static TheoryData<ChannelExchange[]> SendMessagesInBothDirectionsTestCases =
+            new TheoryData<ChannelExchange[]>
+            {
+                    new ChannelExchange[] { },
+                    new ChannelExchange[] {
+                        new ChannelExchange(new int[] { }, new int[] { }),
+                        new ChannelExchange(new int[] { }, new int[] { })
+                    },
+                    new ChannelExchange[] { new ChannelExchange(new[] { 3 }, new int[] { }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new [] { 3 }) },
+                    new ChannelExchange[] { new ChannelExchange(new [] { 3 }, new [] { 3 }) },
+                    new ChannelExchange[] { new ChannelExchange(new [] { 3, 5, 1 }, new int [] { }) },
+                    new ChannelExchange[] { new ChannelExchange(new int [] { }, new [] { 3, 5, 1 }) },
+                    new ChannelExchange[] { new ChannelExchange(new int [] { }, new int [] { }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 0 }, new int [] { }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new int [] { 0 }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new int [] { 5, 0, 10 }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 5, 0, 10 }, new int [] { }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 65000 }, new int [] { }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new int [] { 65000 }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 65000 }, new int [] { 65000 }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 65001 }, new int [] { }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { }, new int [] { 65001 }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 65001 }, new int [] { 65001 }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 1024*1024*5 }, new int [] { }) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }) },
+                    new ChannelExchange[] {
+                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
+                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
+                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
+                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
+                        new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
+                    },
+                    new ChannelExchange[] {
+                        new ChannelExchange(new int[] { 1024*1024, 65001, 0, 65001 }, new int [] { 1024 * 1024, 0, 65001, 0, 1, 2, 3, 4, 5 }),
+                        new ChannelExchange(new int[] { }, new int [] { 1024 * 1024, 0, 65001, 0 }),
+                        new ChannelExchange(new int[] { 1024*1024, 0, 65001 }, new int [] { })
+                    },
+                    new ChannelExchange[] {
+                        new ChannelExchange(new int[] { 1, 2, 3}, new int [] { 1, 0, 1, 2, 3, 4, 5, 6, 7, 8 }),
+                        new ChannelExchange(new int[] { }, new int [] { 3, 0, 3, 0 }),
+                    },
+                    new ChannelExchange[] {
+                        new ChannelExchange(new int[] { 1024*1024, 65001, 0, 65001 }, new int [] { 1024 * 1024, 0, 65001, 0, 1, 2, 3, 4, 5 }),
+                    },
+            };
+
         [Theory]
-        [MemberData(nameof(TestCases))]
+        [MemberData(nameof(SendMessagesInBothDirectionsTestCases))]
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void SendMessagesInBothDirections(ChannelExchange[] cases)
 #pragma warning restore xUnit1026 // Theory methods should use all of their parameters

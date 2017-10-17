@@ -150,7 +150,7 @@ namespace Plexus.Interop.Transport.Internal
             Task completion;
             lock (_channels)
             {
-                _log.Trace("Terminating receiving for {0} channels: {1}", string.Join(", ", _channels.Keys), error.FormatTypeAndMessage());
+                _log.Trace("Terminating receiving for {0} channels ({1}): {2}", _channels.Count, string.Join(", ", _channels.Keys), error.FormatTypeAndMessage());
                 foreach (var channel in _channels.Values)
                 {
                     channel.TerminateReceiving(error);
