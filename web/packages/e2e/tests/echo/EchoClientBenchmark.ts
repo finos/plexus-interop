@@ -20,6 +20,8 @@ import { ClientsSetup } from "../common/ClientsSetup";
 import { BenchmarkResult } from "../common/BenchmarkResult";
 import { UnaryServiceHandler } from "./UnaryServiceHandler";
 import { MethodInvocationContext, MethodType } from "@plexus-interop/client";
+import { ServerStreamingHandler } from "./ServerStreamingHandler";
+import { CancellationToken } from "@plexus-interop/common";
 
 export class EchoClientBenchmark extends BaseEchoTest {
 
@@ -29,7 +31,7 @@ export class EchoClientBenchmark extends BaseEchoTest {
         super();
     }
 
-    public async testUnaryMessagesSentWithinPeriod(numberOfMessages: number, bytesPerMessage: number, periodInMillis: number): Promise<BenchmarkResult> {
+    public async testUnaryMessagesSentWithinPeriod(bytesPerMessage: number, periodInMillis: number): Promise<BenchmarkResult> {
         const echoRequest = this.clientsSetup.createRequestOfBytes(bytesPerMessage);
         const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => request);
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
@@ -49,7 +51,63 @@ export class EchoClientBenchmark extends BaseEchoTest {
             messagesSent: sentMessagesCount,
             bytesSent: sentMessagesCount * bytesPerMessage,
             millisPerMessage: (lastReceived - start) / sentMessagesCount
-        }
+        };
+    }
+
+    public async testStreamingEventsSentWithinPeriod(bytesPerMessage: number, periodInMillis: number): Promise<BenchmarkResult> {
+        const echoRequest = this.clientsSetup.createRequestOfBytes(bytesPerMessage);
+        const cancellationToken = new CancellationToken();
+        const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
+            console.log("Starting to send");
+            function sentMessages() {
+                if (!cancellationToken.isCancelled()) {
+                    hostClient.next(echoRequest);
+                    hostClient.next(echoRequest);
+                    hostClient.next(echoRequest);
+                    hostClient.next(echoRequest);
+                    hostClient.next(echoRequest);
+                    setTimeout(sentMessages, 0);
+                } else {
+                    console.log("Completed " + new Date().toISOString());      
+                    hostClient.complete();   
+                }
+            };
+            sentMessages();
+        });        
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
+        return new Promise<BenchmarkResult>(async (resolve, reject) => {
+            const start = Date.now();
+            const finish = start + periodInMillis;
+            let sentMessagesCount = 0;
+            let lastReceived = 0;      
+            client.getEchoServiceProxy().serverStreaming(echoRequest, {
+                next: (response) => {
+                    if (cancellationToken.isCancelled()) {
+                        return;
+                    }
+                    sentMessagesCount++;
+                    lastReceived = Date.now();
+                    if (finish < lastReceived) { 
+                        cancellationToken.cancel();
+                    }
+                },
+                complete: async () => {
+                    console.log("Client completed")
+                    await this.clientsSetup.disconnect(client, server);
+                    resolve({
+                        periodInMillis,
+                        methodType: MethodType.Unary,
+                        messagesSent: sentMessagesCount,
+                        bytesSent: sentMessagesCount * bytesPerMessage,
+                        millisPerMessage: (lastReceived - start) / sentMessagesCount
+                    });
+                },
+                error: (e) => {
+                    reject(e);
+                }
+            });
+        });
+        
     }
 
 }
