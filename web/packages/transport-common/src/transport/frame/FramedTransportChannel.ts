@@ -123,7 +123,7 @@ export class FramedTransportChannel implements TransportChannel {
             this.log.debug("Closing on unsubscribe");
             this.close();
         });
-        this.stateMachine.go(ChannelState.OPEN)
+        this.stateMachine.goAsync(ChannelState.OPEN)
             .then(() => {
                 this.subscribeToMessages(channelObserver);
                 channelObserver.started(subscription);
@@ -217,7 +217,7 @@ export class FramedTransportChannel implements TransportChannel {
         switch (this.stateMachine.getCurrent()) {
             case ChannelState.OPEN:
                 this.channelCancellationToken.cancelRead("Channel close received");
-                this.stateMachine.goSync(ChannelState.CLOSE_RECEIVED);
+                this.stateMachine.go(ChannelState.CLOSE_RECEIVED);
                 break;
             case ChannelState.CLOSE_REQUESTED:
                 this.closeInternal("Remote channel close received");

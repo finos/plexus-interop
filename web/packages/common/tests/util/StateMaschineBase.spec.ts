@@ -27,7 +27,7 @@ describe("StateMaschineBase", () => {
             }
         ]);
         expect(sut.canGo(State.CLOSED)).toBeTruthy();
-        sut.go(State.CLOSED).then(() => {
+        sut.goAsync(State.CLOSED).then(() => {
             expect(sut.is(State.CLOSED)).toBeTruthy();
             expect(sut.getCurrent()).toBe(State.CLOSED);
             done();
@@ -44,7 +44,7 @@ describe("StateMaschineBase", () => {
                 }
             }
         ]);
-        sut.go(State.CLOSED).then(() => {
+        sut.goAsync(State.CLOSED).then(() => {
             expect(called).toBeTruthy();
             done();
         });
@@ -60,7 +60,7 @@ describe("StateMaschineBase", () => {
                 }
             }
         ]);
-        sut.go(State.CLOSED, {
+        sut.goAsync(State.CLOSED, {
             preHandler: async () => {
                 expect(sut.getCurrent()).toBe(State.OPEN);
                 called++;
@@ -81,7 +81,7 @@ describe("StateMaschineBase", () => {
                 }
             }
         ]);
-        sut.go(State.CLOSED, {
+        sut.goAsync(State.CLOSED, {
             postHandler: async () => {
                 expect(sut.getCurrent()).toBe(State.CLOSED);
                 called++;
@@ -102,7 +102,7 @@ describe("StateMaschineBase", () => {
                 }
             }
         ]);
-        sut.go(State.CLOSED).then(() => {
+        sut.goAsync(State.CLOSED).then(() => {
             expect(called).toBeTruthy();
             done();
         });
@@ -133,7 +133,7 @@ describe("StateMaschineBase", () => {
             }
         ]);
         expect(sut.canGo(State.CLOSED)).toBeTruthy();
-        sut.go(State.CLOSED).then(() => {
+        sut.goAsync(State.CLOSED).then(() => {
             expect(sut.is(State.CLOSED)).toBeTruthy();
             expect(sut.isOneOf(State.CREATED, State.CLOSED, State.OPEN)).toBeTruthy();
             done();
@@ -147,10 +147,38 @@ describe("StateMaschineBase", () => {
             }
         ]);
         expect(sut.canGo(State.CLOSED)).toBeTruthy();
-        sut.go(State.CLOSED).then(() => {
+        sut.goAsync(State.CLOSED).then(() => {
             expect(sut.isOneOf(State.CREATED, State.OPEN)).toBeFalsy();
             done();
         });
+    });
+
+    it("Should switch state synchronously", () => {
+        const sut = new StateMaschineBase<State>(State.OPEN, [
+            {
+                from: State.OPEN, to: State.CLOSED
+            }
+        ]);
+        sut.go(State.CLOSED);
+        expect(sut.getCurrent()).toEqual(State.CLOSED);
+    });
+
+    it("Should execute pre handler for synchronous switch", (done) => {
+        const sut = new StateMaschineBase<State>(State.OPEN, [
+            {
+                from: State.OPEN, to: State.CLOSED, preHandler: async () => done()
+            }
+        ]);
+        sut.go(State.CLOSED);
+    });
+
+    it("Should execute pre handler for synchronous switch", (done) => {
+        const sut = new StateMaschineBase<State>(State.OPEN, [
+            {
+                from: State.OPEN, to: State.CLOSED, preHandler: async () => done()
+            }
+        ]);
+        sut.go(State.CLOSED);
     });
 
 });

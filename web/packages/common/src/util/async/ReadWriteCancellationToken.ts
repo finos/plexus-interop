@@ -23,19 +23,19 @@ export class ReadWriteCancellationToken {
         private readonly writeToken: CancellationToken = new CancellationToken()
     ) {}
 
-    public cancelRead(reason: string = "Read cancelled") {
+    public cancelRead(reason: string = "Read cancelled"): void {
         this.readToken.cancel(reason);
     }
 
-    public cancelWrite(reason: string = "Write cancelled") {
-        this.writeToken.cancel(reason)
+    public cancelWrite(reason: string = "Write cancelled"): void {
+        this.writeToken.cancel(reason);
     }
 
     public isCancelled(): boolean {
         return this.readToken.isCancelled() && this.writeToken.isCancelled();
     } 
 
-    public cancel(reason: string = "Cancelled") {
+    public cancel(reason: string = "Cancelled"): void {
         this.cancelRead(reason);
         this.cancelWrite(reason);
     }

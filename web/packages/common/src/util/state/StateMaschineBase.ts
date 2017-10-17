@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 import { Transition, Transitions, StateMaschine, Handlers } from "./StateMaschine";
-import { Logger } from "../../../src/logger/Logger";
+import { Logger } from "../../logger/Logger";
+import { LoggerFactory } from "../../logger/LoggerFactory";
 
 class StateDescriptor<T> {
 
@@ -37,7 +38,7 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
 
     private readonly stateDescriptorsMap: Map<T, StateDescriptor<T>> = new Map<T, StateDescriptor<T>>();
 
-    constructor(private current: T, private transitions: Transitions<T>, private logger?: Logger) {
+    constructor(private current: T, private transitions: Transitions<T>, private logger: Logger = LoggerFactory.getLogger("StateMaschine")) {
         transitions.forEach(transition => {
             this.putIfAbsent(transition.from);
             this.putIfAbsent(transition.to);
@@ -75,37 +76,51 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         }
     }
 
-    public goSync(to: T): void {
+    public go(to: T): void {
         if (!this.canGo(to)) {
             throw new Error(`Transition ${this.getCurrent()} -> ${to} does not exist`);
         }
+        const descriptor = this.lookup(this.getCurrent());        
+        const transition = descriptor.outTransitions.find(transition => transition.to === to) as Transition<T>;
+        if (transition.preHandler) {
+            transition.preHandler()
+                .then(() => {
+                    if (this.logger.isTraceEnabled()) {
+                        this.logger.trace(`Finished pre-handler for ${this.getCurrent()} -> ${to}`);
+                    }
+                })
+                .catch(e => this.logger.error(`Pre-handler for ${this.getCurrent()} -> ${to} failed`, e));
+        }
         this.current = to;
+        if (transition.postHandler) {
+            transition.postHandler()
+                .then(() => {
+                    if (this.logger.isTraceEnabled()) {
+                        this.logger.trace(`Finished post-handler for ${this.getCurrent()} -> ${to}`);
+                    }
+                })
+                .catch(e => this.logger.error(`Post-handler for ${this.getCurrent()} -> ${to} failed`, e));
+        }
     }
 
-    public go(to: T, dynamicHandlers?: Handlers): Promise<void> {
+    public goAsync(to: T, dynamicHandlers?: Handlers): Promise<void> {
         if (this.canGo(to)) {
-            const descriptor = this.lookup(this.getCurrent());
+            const descriptor = this.lookup(this.getCurrent());                    
             const transition = descriptor.outTransitions.find(transition => transition.to === to) as Transition<T>;
             return new Promise<void>((resolve, reject) => {
-
                 const preHandlePassed = () => {
                     this.current = transition.to;
-
                     const postHandlerPromises = [dynamicHandlers ? dynamicHandlers.postHandler : null, transition.postHandler]
                         .filter(handler => !!handler)
                         .map(handler => handler as () => Promise<void>)
                         .map(handler => handler());
-
                     Promise.all(postHandlerPromises)
                         .then(() => resolve(), reject);
-
                 };
-
                 const preHandlePromises = [dynamicHandlers ? dynamicHandlers.preHandler : null, transition.preHandler]
                     .filter(handler => !!handler)
                     .map(handler => handler as () => Promise<void>)
                     .map(handler => handler());
-
                 Promise.all(preHandlePromises)
                     .then(preHandlePassed.bind(this), reject);
             });

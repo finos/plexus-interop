@@ -80,9 +80,8 @@ export class GenericClientImpl implements GenericClient {
             error: (e) => observer.error(e),
             complete: () => observer.complete()
         };
-        this.state.go(ClientState.LISTEN, {
-            postHandler: () => this.startIncomingChannelsListener(channelsObserver)
-        });
+        this.state.go(ClientState.LISTEN);
+        this.startIncomingChannelsListener(channelsObserver);
         return new Subscription(() => {
             this.log.debug("Unsubscribe received");
             if (this.state.is(ClientState.LISTEN)) {
@@ -124,7 +123,7 @@ export class GenericClientImpl implements GenericClient {
                 observer.next(channel);
             } catch (error) {
                 this.log.error("Error while reading frame", error);
-                await this.state.go(ClientState.CLOSED);
+                this.state.go(ClientState.CLOSED);
             }
         }
         this.log.debug("Finished to listen for Channels");

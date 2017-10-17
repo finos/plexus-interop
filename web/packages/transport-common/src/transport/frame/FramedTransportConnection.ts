@@ -58,47 +58,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     constructor(private framedTransport: ConnectableFramedTransport) {
         super();
         this.log = LoggerFactory.getLogger(`FramedTransportConnection [${this.uuid().toString()}]`);
-
-        this.stateMachine = new StateMaschineBase<ConnectionState>(ConnectionState.CREATED, [
-            // initializing connection
-            {
-                from: ConnectionState.CREATED, to: ConnectionState.OPEN,
-                preHandler: this.openConnectionInternal.bind(this),
-                postHandler: async () => {
-                    this.listenForIncomingFrames();
-                }
-            },
-            // accepting connection
-            {
-                from: ConnectionState.CREATED, to: ConnectionState.ACCEPT,
-                postHandler: async () => {
-                    this.listenForIncomingFrames();
-                }
-            },
-            // connection accepted
-            {
-                from: ConnectionState.ACCEPT, to: ConnectionState.OPEN,
-                preHandler: this.openConnectionInternal.bind(this)
-            },
-            // closing connection message requested
-            {
-                from: ConnectionState.OPEN, to: ConnectionState.CLOSE_REQUESTED
-            },
-            // forced connection closure
-            {
-                from: ConnectionState.OPEN, to: ConnectionState.CLOSED
-            },
-            // forced connection closure
-            {
-                from: ConnectionState.OPEN, to: ConnectionState.CLOSE_RECEIVED, preHandler: async () => {
-                    this.readCancellationToken.cancel("Connection close received");
-                }
-            },
-            // graceful connection closure
-            {
-                from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED
-            }
-        ]);
+        this.stateMachine = this.createStateMaschine();
         this.log.debug("Created");
     }
 
@@ -106,7 +66,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         switch (this.stateMachine.getCurrent()) {
             case ConnectionState.OPEN:
                 this.log.debug("Current state is OPEN, requesting connection close");
-                await this.stateMachine.go(ConnectionState.CLOSE_REQUESTED, {
+                await this.stateMachine.goAsync(ConnectionState.CLOSE_REQUESTED, {
                     preHandler: async () => {
                         await this.sendConnectionCloseMessage(completion);
                     }
@@ -115,7 +75,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             case ConnectionState.CLOSE_RECEIVED:
                 this.log.debug("Current state is CLOSE_RECEIVED, closing all");
                 await this.sendConnectionCloseMessage(completion);
-                this.closeAndCleanUp();               
+                this.closeAndCleanUp();
                 break;
             default:
                 throw new Error(`Can't close, invalid state ${this.stateMachine.getCurrent()}`);
@@ -151,12 +111,57 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
 
     public async open(): Promise<void> {
         this.log.debug("Opening connection");
-        return this.stateMachine.go(ConnectionState.OPEN);
+        return this.stateMachine.goAsync(ConnectionState.OPEN);
     }
 
     public async acceptingConnection(): Promise<void> {
         this.log.debug("Accepting connection");
-        return this.stateMachine.go(ConnectionState.ACCEPT);
+        return this.stateMachine.goAsync(ConnectionState.ACCEPT);
+    }
+
+    private createStateMaschine(): StateMaschine<ConnectionState> {
+        return new StateMaschineBase<ConnectionState>(ConnectionState.CREATED, [
+            // initializing connection
+            {
+                from: ConnectionState.CREATED, to: ConnectionState.OPEN,
+                preHandler: this.openConnectionInternal.bind(this),
+                postHandler: async () => {
+                    this.listenForIncomingFrames();
+                }
+            },
+            // accepting connection
+            {
+                from: ConnectionState.CREATED, to: ConnectionState.ACCEPT,
+                postHandler: async () => {
+                    this.listenForIncomingFrames();
+                }
+            },
+            // connection accepted
+            {
+                from: ConnectionState.ACCEPT, to: ConnectionState.OPEN,
+                preHandler: this.openConnectionInternal.bind(this)
+            },
+            // closing connection message requested
+            {
+                from: ConnectionState.OPEN, to: ConnectionState.CLOSE_REQUESTED
+            },
+            // forced connection closure
+            {
+                from: ConnectionState.OPEN, to: ConnectionState.CLOSED
+            },
+            {
+                from: ConnectionState.CLOSE_RECEIVED, to: ConnectionState.CLOSED
+            },
+            {
+                from: ConnectionState.OPEN, to: ConnectionState.CLOSE_RECEIVED, preHandler: async () => {
+                    this.readCancellationToken.cancel("Connection close received");
+                }
+            },
+            // graceful connection closure
+            {
+                from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED
+            }
+        ]);
     }
 
     private async sendConnectionCloseMessage(completion?: plexus.ICompletion): Promise<void> {
@@ -174,6 +179,10 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     }
 
     public closeAndCleanUp(): void {
+        if (this.stateMachine.is(ConnectionState.CLOSED)) {
+            this.log.warn("Already closed");
+            return;
+        }
         if (this.log.isDebugEnabled()) {
             this.log.debug(`Closing connection, current state is ${this.stateMachine.getCurrent()}`);
         }
@@ -206,8 +215,8 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         this.framedTransport.open({
             next: (frame) => {
                 if (this.stateMachine.isOneOf(
-                    ConnectionState.CLOSE_REQUESTED, 
-                    ConnectionState.OPEN, 
+                    ConnectionState.CLOSE_REQUESTED,
+                    ConnectionState.OPEN,
                     ConnectionState.ACCEPT)) {
                     this.handleFrame(frame, this.log);
                 } else {

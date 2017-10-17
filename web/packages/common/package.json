@@ -6,7 +6,7 @@
   "description": "Common functionality for Plexus Interop Web",
   "license": "Apache-2.0",
   "scripts": {
-    "prebuild": "trash dist",
+    "prebuild": "trash dist && yarn lint",
     "build": "yarn build:main",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
@@ -35,7 +35,6 @@
     "@types/jest": "^18.1.1",
     "@types/mocha": "^2.2.41",
     "@types/node": "^7.0.5",
-    "browserify": "^14.4.0",
     "chai": "^4.1.0",
     "jest": "^21.0.1",
     "karma": "^1.7.0",

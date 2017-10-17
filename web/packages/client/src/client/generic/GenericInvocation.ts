@@ -96,13 +96,13 @@ export class GenericInvocation {
         this.stateMachine.throwIfNot(InvocationState.CREATED);
         this.setUuid(UniqueId.generateNew());
         const subscriptionStartedPromise = this.openSubscription(invocationObserver);
-        this.stateMachine.go(InvocationState.START_REQUESTED, {
+        this.stateMachine.goAsync(InvocationState.START_REQUESTED, {
             preHandler: async () => {
                 await subscriptionStartedPromise;
                 await sendRequest();
             }
         })
-            .catch(e => this.log.error("Invocation start failed", e));
+        .catch(e => this.log.error("Invocation start failed", e));
     }
 
     public acceptInvocation(invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
