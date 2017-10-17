@@ -39,7 +39,7 @@ namespace Plexus.Interop.Transport.Protocol
             _log = LogManager.GetLogger<MessagingSendProcessor>(Id.ToString());
             _serializer = serializer;            
             _connection.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
-            Completion = _connection.Completion.LogCompletion(_log);
+            Completion = _connection.Out.Completion.LogCompletion(_log);
         }
 
         public UniqueId Id { get; }
@@ -53,9 +53,11 @@ namespace Plexus.Interop.Transport.Protocol
             try
             {
                 await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);
+                _log.Trace("Sending completed");
             }
             catch (Exception ex)
             {
+                _log.Trace("Sending failed: {0}", ex.FormatTypeAndMessage());
                 _buffer.Out.TryTerminateWriting(ex);
                 _buffer.In.DisposeBufferedItems();
                 throw;

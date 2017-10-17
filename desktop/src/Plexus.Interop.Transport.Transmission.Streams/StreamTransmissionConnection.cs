@@ -26,14 +26,6 @@ namespace Plexus.Interop.Transport.Transmission.Streams
 
     public sealed class StreamTransmissionConnection : ITransmissionConnection
     {
-        public static async ValueTask<Maybe<ITransmissionConnection>> TryCreateAsync(UniqueId id, Func<ValueTask<Maybe<Stream>>> streamFactory)
-        {
-            var result = await streamFactory().ConfigureAwait(false);
-            return result.HasValue
-                ? new StreamTransmissionConnection(id, result.Value)
-                : Maybe<ITransmissionConnection>.Nothing;
-        }
-
         public static async ValueTask<ITransmissionConnection> CreateAsync(UniqueId id, Func<ValueTask<Stream>> streamFactory)
         {
             var result = await streamFactory().ConfigureAwait(false);

@@ -54,9 +54,11 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
 
         public async Task StopAsync()
         {
+            _log.Trace("Stopping");
             _cancellation.Cancel();
             Start();
             await Completion.IgnoreExceptions().ConfigureAwait(false);
+            _log.Trace("Stopped");
         }
 
         protected override Task<Task> StartCoreAsync()
@@ -70,22 +72,18 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
         
         private async Task ProcessAsync()
         {
-            var registration = _cancellation.Token.Register(() => _incomingConnections.TryTerminateWriting());
             try
             {
                 _cancellation.Token.ThrowIfCancellationRequested();
                 while (true)
                 {
-                    var result = await StreamTransmissionConnection
-                        .TryCreateAsync(UniqueId.Generate(), TryAcceptStreamAsync)
+                    var connection = await StreamTransmissionConnection
+                        .CreateAsync(UniqueId.Generate(), AcceptStreamAsync)
                         .ConfigureAwait(false);
-                    if (!result.HasValue)
-                    {
-                        break;
-                    }
-                    await _incomingConnections.Out.WriteAsync(result.Value).ConfigureAwait(false);
+                    await _incomingConnections.Out
+                        .WriteAsync(connection, _cancellation.Token)
+                        .ConfigureAwait(false);
                 }
-                _incomingConnections.Out.TryCompleteWriting();
             }
             catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
             {
@@ -99,18 +97,16 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             finally
             {
                 _settingsWriter.Dispose();
-                registration.Dispose();
             }
         }
 
         public void Dispose()
         {
             _log.Trace("Disposing");
-            _cancellation.Cancel();
-            Completion.IgnoreExceptions().GetResult();
+            StopAsync().GetResult();
         }
 
-        private async ValueTask<Maybe<Stream>> TryAcceptStreamAsync()
+        private async ValueTask<Stream> AcceptStreamAsync()
         {
             _log.Trace("Waiting for connection");
             var pipeServerStream = new NamedPipeServerStream(
@@ -122,11 +118,6 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             try
             {
                 await WaitForConnectionAsync(pipeServerStream, _cancellation.Token).ConfigureAwait(false);
-            }
-            catch when (_cancellation.IsCancellationRequested)
-            {
-                pipeServerStream.Dispose();
-                return Maybe<Stream>.Nothing;
             }
             catch
             {

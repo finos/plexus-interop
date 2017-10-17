@@ -37,10 +37,10 @@ namespace Plexus.Interop.Transport.Internal
             ITransportProtocolSerializer serializer)
         {
             _sendProcessor = new MessagingSendProcessor(connection, serializer);
-            _transportHeaderFactory = transportHeaderFactory;
             _log = LogManager.GetLogger<TransportSendProcessor>(_sendProcessor.Id.ToString());
-            Completion = TaskRunner.RunInBackground(ProcessAsync);
-            Completion.LogCompletion(_log);
+            _transportHeaderFactory = transportHeaderFactory;            
+            _sendProcessor.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            Completion = _sendProcessor.Completion.LogCompletion(_log);
         }
 
         public UniqueId InstanceId => _sendProcessor.Id;

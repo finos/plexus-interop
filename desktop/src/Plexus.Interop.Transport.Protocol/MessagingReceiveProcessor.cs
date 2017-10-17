@@ -50,8 +50,16 @@ namespace Plexus.Interop.Transport.Protocol
 
         private async Task ProcessAsync()
         {
-            await _connection.ConsumeAsync(HandleReceivedAsync).ConfigureAwait(false);
-            _log.Debug("Incoming messages completed");
+            try
+            {
+                await _connection.ConsumeAsync(HandleReceivedAsync).ConfigureAwait(false);
+                _log.Trace("Receiving completed");
+            }
+            catch (Exception ex)
+            {                
+                _log.Trace("Receiving failed: {0}", ex.FormatTypeAndMessage());
+                throw;
+            }
         }
 
         private async Task HandleReceivedAsync(IPooledBuffer item)

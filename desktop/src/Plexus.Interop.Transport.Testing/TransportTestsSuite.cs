@@ -30,6 +30,10 @@ namespace Plexus.Interop.Transport
 
         protected abstract ITransportClient Client { get; }
 
+        protected TransportTestsSuite(ITestOutputHelper output) : base(output)
+        {
+        }
+
         public sealed class ChannelExchange : IXunitSerializable
         {
             public ChannelExchange()
@@ -101,7 +105,9 @@ namespace Plexus.Interop.Transport
                 {
                     clientConnection.TryTerminate();
                     Should.CompleteIn(serverConnection.Completion, Timeout1Sec);
+                    WriteLog("Server completed");                    
                     Should.CompleteIn(clientConnection.Completion, Timeout1Sec);
+                    WriteLog("Client completed");
                 }
             });
         }

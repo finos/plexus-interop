@@ -174,6 +174,7 @@ namespace Plexus.Interop.Transport.Internal
                 completion = Task.WhenAll(_channels.Values.Select(x => x.Out.Completion)).IgnoreExceptions();
             }
             await completion.ConfigureAwait(false);
+            _log.Trace("Sending completed for all channels");
             _transportSendProcessor.Out.TryCompleteWriting();
         }
 

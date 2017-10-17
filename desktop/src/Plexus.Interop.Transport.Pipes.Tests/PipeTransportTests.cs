@@ -19,10 +19,11 @@
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
     using System.IO;
+    using Xunit.Abstractions;
 
     public sealed class PipeTransportTests : TransportTestsSuite
     {
-        public PipeTransportTests()
+        public PipeTransportTests(ITestOutputHelper output) : base(output)
         {
             Server = RegisterDisposable(new TransportServer(
                 new PipeTransmissionServer(Directory.GetCurrentDirectory()),
