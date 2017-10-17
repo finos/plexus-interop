@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission
+namespace Plexus.Interop.Transport.Transmission
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     public interface ITransmissionClient
     {
-        ValueTask<ITransmissionConnection> ConnectAsync();
+        ValueTask<ITransmissionConnection> ConnectAsync(CancellationToken cancellationToken = default);
     }
 }

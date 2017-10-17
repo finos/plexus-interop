@@ -23,6 +23,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     {
         void OnListeningStarted();
 
-        Task HandleAsync(WebSocket socket);        
+        Task<Task> StartConnectionAsync(WebSocket socket);        
     }
 }

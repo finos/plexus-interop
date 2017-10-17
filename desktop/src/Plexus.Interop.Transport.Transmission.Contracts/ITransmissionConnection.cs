@@ -26,5 +26,7 @@ namespace Plexus.Interop.Transport.Transmission
         UniqueId Id { get; }
 
         Task Completion { get; }
+
+        Task DisconnectAsync();
     }
 }

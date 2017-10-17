@@ -14,43 +14,80 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission
+namespace Plexus.Interop.Transport.Transmission
 {
     using Plexus.Channels;
     using Plexus.Pools;
     using Shouldly;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Xunit;
+    using Xunit.Abstractions;
 
     public abstract class TransmissionTestsSuite : TestsSuite
     {
-        protected abstract ITransmissionServer CreateServer(CancellationToken cancellationToken = default);
-        protected abstract ITransmissionClient CreateClient(CancellationToken cancellationToken = default);
+        protected abstract ITransmissionServer CreateServer();
+        protected abstract ITransmissionClient CreateClient();
+
+        protected TransmissionTestsSuite(ITestOutputHelper output) : base(output)
+        {
+        }
 
         [Fact]
         public void ConnectDisconnect()
         {
             RunWith5SecTimeout(async () =>
             {
-                Log.Info("Starting server");
+                WriteLog("Starting server");
                 using (var server = CreateServer())
                 {
                     await server.StartAsync();
                     var serverConnectionTask = server.AcceptAsync();
-                    Log.Info("Connecting client");
+                    WriteLog("Connecting client");
                     var client = CreateClient();
                     using (await client.ConnectAsync())
                     {
-                        Log.Info("Client connected");
+                        WriteLog("Client connected");
                         using (await serverConnectionTask)
-                        {                            
-                            Log.Info("Disposing connections");
+                        {
+                            WriteLog("Disposing server connection");
                         }
+                        WriteLog("Disposing client connection");
                     }
-                    Log.Info("Disposing server");
+                    WriteLog("Disposing server");
+                }
+            });
+        }
+
+        [Fact]
+        public void CancelConnect()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                using (var server = CreateServer())
+                {
+                    await server.StartAsync();
+                    WriteLog("Server connected");
+                    var client = CreateClient();
+                    var cancellation = new CancellationTokenSource();
+                    var connectionTask1 = client.ConnectAsync(cancellation.Token).AsTask();
+                    var connectionTask2 = client.ConnectAsync(cancellation.Token).AsTask();
+                    var connectionTask3 = client.ConnectAsync(cancellation.Token).AsTask();
+                    var connections = new[] { connectionTask1, connectionTask2, connectionTask3 };
+                    var first = await Task.WhenAny(connections);
+                    await first;
+                    WriteLog("First connected");
+                    var second = await Task.WhenAny(connections.Except(new [] { first }));
+                    await second;
+                    WriteLog("Second connected");
+                    cancellation.Cancel();
+                    var third = connections.Except(new[] {first, second}).Single();
+                    Should.Throw<TaskCanceledException>(third, Timeout1Sec);
+                    WriteLog("Third canceled");
+                    WriteLog("Disposing server");
                 }
             });
         }
@@ -62,24 +99,25 @@
             {
                 var testMsg = new byte[] {1, 2, 3, 4, 5};
                 IPooledBuffer receivedMsg;
-                Log.Info("Starting server");
+                WriteLog("Starting server");
                 using (var server = CreateServer())
                 {
                     await server.StartAsync();
                     var serverConnectionTask = server.AcceptAsync();
-                    Log.Info("Connecting client");
+                    WriteLog("Connecting client");
                     var client = CreateClient();
                     using (var clientConnection = await client.ConnectAsync())
                     {
-                        Log.Info("Client connected");                        
+                        WriteLog("Client connected");                        
                         await clientConnection.Out.WriteAsync(PooledBuffer.Get(testMsg));
                         using (var serverConection = await serverConnectionTask)
                         {
                             receivedMsg = await serverConection.In.ReadAsync();
-                            Log.Info("Disposing connections");
+                            WriteLog("Disposing server connection");
                         }
+                        WriteLog("Disposing client connection");
                     }
-                    Log.Info("Disposing server");
+                    WriteLog("Disposing server");
                 }
                 receivedMsg.ToArray().ShouldBe(testMsg);
             });
@@ -92,24 +130,24 @@
             {
                 var testMsg = new byte[] { 1, 2, 3, 4, 5 };
                 IPooledBuffer receivedMsg;
-                Log.Info("Starting server");
+                WriteLog("Starting server");
                 using (var server = CreateServer())
                 {
                     await server.StartAsync();
                     var serverConnectionTask = server.AcceptAsync();
-                    Log.Info("Connecting client");
+                    WriteLog("Connecting client");
                     var client = CreateClient();
                     using (var clientConnection = await client.ConnectAsync())
                     {
-                        Log.Info("Client connected");                        
+                        WriteLog("Client connected");                        
                         using (var serverConection = await serverConnectionTask)
                         {
                             await serverConection.Out.WriteAsync(PooledBuffer.Get(testMsg));
                             receivedMsg = await clientConnection.In.ReadAsync();
-                            Log.Info("Disposing connections");
+                            WriteLog("Disposing connections");
                         }
                     }
-                    Log.Info("Disposing server");
+                    WriteLog("Disposing server");
                 }
                 receivedMsg.ToArray().ShouldBe(testMsg);
             });
@@ -179,12 +217,12 @@
                             var msg = await serverConnection.In.TryReadAsync().ConfigureAwait(false);
                             if (msg.HasValue)
                             {
-                                Log.Trace("Server received message of length {0}", msg.Value.Count);
+                                WriteLog($"Server received message of length {msg.Value.Count}");
                                 serverRecevied.Add(msg.Value.ToArray());
                             }
                             else
                             {
-                                Log.Trace("Server receive completed");
+                                WriteLog("Server receive completed");
                                 break;
                             }
                         }
@@ -194,16 +232,16 @@
                     {
                         foreach (var msg in serverMessages)
                         {
-                            Log.Trace("Server sending message of length {0}", msg.Length);
+                            WriteLog($"Server sending message of length {msg.Length}");
                             await serverConnection.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
                         }
                         serverConnection.Out.TryCompleteWriting();
-                        Log.Trace("Server send completed");
+                        WriteLog("Server send completed");
                     });
 
                     await Task.WhenAll(sendTask, receiveTask, serverConnection.Completion).ConfigureAwait(false);
 
-                    Log.Trace("Server completed");
+                    WriteLog("Server completed");
                 }
             });
 

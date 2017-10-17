@@ -23,6 +23,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
     using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
     using Plexus.Processes;
     using System;
+    using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -38,31 +39,30 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionServer>();
 
         private IWebHost _host;
-        private readonly CancellationTokenSource _cancellation;
-        private readonly IChannel<ITransmissionConnection> _incomingConnections = new BufferedChannel<ITransmissionConnection>(0);
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
+        private readonly IChannel<ITransmissionConnection> _incomingConnections = new BufferedChannel<ITransmissionConnection>(1);
         private readonly IServerStateWriter _stateWriter;
 
-        public WebSocketTransmissionServer(
-            string workingDir, CancellationToken cancellationToken = default)
+        public WebSocketTransmissionServer(string workingDir)
         {
-            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _stateWriter = new ServerStateWriter(ServerName, workingDir);
         }
 
-        public async Task HandleAsync(WebSocket websocket)
+        public async Task<Task> StartConnectionAsync(WebSocket websocket)
         {
-            try
-            {
-                var connection = new WebSocketServerTransmissionConnection(websocket);
-                await _incomingConnections.Out.WriteAsync(connection).ConfigureAwait(false);
-                Log.Debug("Websocket connection accepted");
-                await connection.Completion.ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug("Websocket connection failed: {0}", ex.FormatTypeAndMessage());
-                throw;
-            }
+            var connection = new WebSocketServerTransmissionConnection(websocket, _cancellation.Token);
+            await _incomingConnections.Out.WriteAsync(connection, _cancellation.Token).ConfigureAwait(false);
+            Log.Trace("Websocket connection accepted");
+            return connection.Completion;
+        }
+
+        public async Task StopAsync()
+        {
+            Log.Trace("Stopping");
+            _cancellation.Cancel();
+            Start();
+            await Completion.IgnoreExceptions().ConfigureAwait(false);
+            Log.Trace("Stopped");
         }
 
         public ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync()
@@ -82,7 +82,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 
         protected override async Task<Task> StartCoreAsync()
         {
-            Log.Debug("Starting");
+            Log.Trace("Starting");
             using (_stateWriter)
             {
                 await Task.Factory
@@ -95,8 +95,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 
         public void Dispose()
         {
-            _cancellation.Cancel();
-            Completion.IgnoreExceptions().GetResult();            
+            Log.Trace("Disposing");
+            StopAsync().GetResult();
         }
 
         public void OnListeningStarted()
@@ -113,7 +113,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
         {
             try
             {
-                Log.Debug("Resolving localhost url");
+                Log.Trace("Resolving localhost url");
                 var hostEntry = Dns.GetHostEntryAsync("localhost").GetResult();
                 var localhostIp = hostEntry.AddressList.First(addr => addr.AddressFamily == AddressFamily.InterNetwork);
                 var url = $"http://{localhostIp}:0";
@@ -122,26 +122,29 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
                     .UseUrls(url)
                     .UseContentRoot(Directory.GetCurrentDirectory())
                     .UseStartup<WebSocketServer>()
-                    .ConfigureServices(s =>
-                    {
-                        s.AddSingleton<IWebSocketHandler>(this);
-                    })
+                    .ConfigureServices(Configure)
                     .Build();
-                Log.Debug("Starting server host: {0}", url);
-                await _host.RunAsync(_cancellation.Token).ConfigureAwait(false);
-                Log.Info("Web server host stopped");
+                Log.Trace("Starting server host: {0}", url);
+                await _host.RunAsync(_cancellation.Token).ConfigureAwait(false);                
+            }
+            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+            {
             }
             catch (Exception ex)
             {
-                _incomingConnections.Out.TryTerminate(ex);
+                _incomingConnections.Out.TryTerminateWriting(ex);
+                _incomingConnections.In.DisposeBufferedItems();
                 Log.Error(ex, "Web server host terminated with exception");
                 throw;
             }
-            finally
-            {
-                _incomingConnections.Out.TryComplete();
-                await _incomingConnections.In.Completion.ConfigureAwait(false);
-            }
+            Log.Trace("Web server host stopped");
+            _incomingConnections.Out.TryCompleteWriting();
+            _incomingConnections.In.DisposeBufferedItems();
+        }
+
+        public void Configure(IServiceCollection s)
+        {
+            s.AddSingleton<IWebSocketHandler>(this);
         }
     }
 }

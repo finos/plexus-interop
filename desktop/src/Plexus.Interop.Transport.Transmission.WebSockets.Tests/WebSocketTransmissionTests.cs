@@ -16,12 +16,17 @@
  */
 namespace Plexus.Interop.Transport.Transmission.WebSockets
 {
-    using System.IO;
     using Plexus.Interop.Transport.Transmission.WebSockets.Client;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
+    using System.IO;
+    using Xunit.Abstractions;
 
     public sealed class WebSocketTransmissionTests : TransmissionTestsSuite
     {
+        public WebSocketTransmissionTests(ITestOutputHelper output) : base(output)
+        {
+        }
+
         protected override ITransmissionServer CreateServer()
         {
             return new WebSocketTransmissionServer(Directory.GetCurrentDirectory());

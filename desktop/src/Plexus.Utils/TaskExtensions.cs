@@ -23,6 +23,8 @@ namespace Plexus
 {
     public static class TaskExtensions
     {
+        private static readonly ILogger Log = LogManager.GetLogger(typeof(TaskExtensions));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task ContinueWithInBackground(this Task task, Action<Task> func,
             CancellationToken cancellationToken = new CancellationToken())
@@ -376,27 +378,74 @@ namespace Plexus
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<T> WithCancellation<T>(this Task<T> task, CancellationToken cancellationToken)
-        {            
-            if (!cancellationToken.CanBeCanceled || task.IsCompleted)
-            {
-                return task;
-            }
-            return cancellationToken.IsCancellationRequested 
-                ? TaskConstants<T>.Canceled 
-                : Task.WhenAny(task, cancellationToken.AsTask<T>()).Unwrap();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task WithCancellation(this Task task, CancellationToken cancellationToken)
+        public static Task<T> WithCancellation<T>(
+            this Task<T> task, 
+            CancellationToken cancellationToken, 
+            Action<Task<T>> disposeAction = null)
         {
             if (!cancellationToken.CanBeCanceled || task.IsCompleted)
             {
                 return task;
             }
-            return cancellationToken.IsCancellationRequested
-                ? TaskConstants.Canceled
-                : Task.WhenAny(task, cancellationToken.AsTask()).Unwrap();
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return TaskConstants<T>.Canceled;
+            }
+
+            async Task<T> WithCancellationAsync()
+            {
+                var completedTask = await Task.WhenAny(task, cancellationToken.AsTask<T>()).ConfigureAwait(false);
+                if (completedTask == task)
+                {
+                    return completedTask.GetResult();
+                }
+                if (disposeAction != null)
+                {
+                    task.ContinueWithSynchronously(disposeAction, CancellationToken.None).IgnoreAwait(Log);
+                }
+                else
+                {
+                    task.IgnoreAwait(Log);
+                }
+                return await completedTask.ConfigureAwait(false);
+            }
+
+            return WithCancellationAsync();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task WithCancellation(
+            this Task task, 
+            CancellationToken cancellationToken, 
+            Action<Task> disposeAction = null)
+        {
+            if (!cancellationToken.CanBeCanceled || task.IsCompleted)
+            {
+                return task;
+            }
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return TaskConstants.Canceled;
+            }
+
+            async Task WithCancellationAsync()
+            {
+                var completedTask = await Task.WhenAny(task, cancellationToken.AsTask()).ConfigureAwait(false);
+                if (completedTask != task)
+                {
+                    if (disposeAction != null)
+                    {
+                        task.ContinueWithSynchronously(disposeAction, CancellationToken.None).IgnoreAwait(Log);
+                    }
+                    else
+                    {
+                        task.IgnoreAwait(Log);
+                    }
+                }
+                completedTask.GetResult();
+            }
+
+            return WithCancellationAsync();
         }
     }
 }

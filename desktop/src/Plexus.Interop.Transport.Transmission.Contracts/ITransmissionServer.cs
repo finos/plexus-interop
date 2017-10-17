@@ -25,8 +25,10 @@
 
         Task StartAsync();
 
+        Task StopAsync();
+
         ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync();
 
-        ValueTask<ITransmissionConnection> AcceptAsync();
+        ValueTask<ITransmissionConnection> AcceptAsync();        
     }
 }

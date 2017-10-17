@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
+namespace Plexus.Interop.Transport.Transmission.Pipes
 {
     using Plexus.Interop.Transport.Transmission.Streams;
     using System;
@@ -23,34 +23,34 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal sealed class PipeTransmissionClient : ITransmissionClient
-    {        
+    public sealed class PipeTransmissionClient : ITransmissionClient
+    {
+        private const int ConnectTimeoutMs = 10000;
         private const string ServerName = "np-v1";
         private static readonly TimeSpan MaxServerInitializationTime = TimeSpan.FromSeconds(10);
 
         private readonly ILogger _log;
         private readonly IServerStateReader _serverStateReader;
-        private readonly CancellationToken _cancellationToken;
 
-        public PipeTransmissionClient(TransmissionClientOptions options)
+        public PipeTransmissionClient(string brokerWorkingDir)
         {
             _log = LogManager.GetLogger<PipeTransmissionClient>();
-            _serverStateReader = new ServerStateReader(ServerName, options.BrokerWorkingDir);
-            _cancellationToken = options.CancellationToken;
+            _serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
         }
 
-        public async ValueTask<ITransmissionConnection> ConnectAsync()
+        public async ValueTask<ITransmissionConnection> ConnectAsync(CancellationToken cancellationToken)
         {
-            return await StreamTransmissionConnection.CreateAsync(
+            var connection = await StreamTransmissionConnection.CreateAsync(
                 UniqueId.Generate(),
-                ConnectStreamAsync,
-                _cancellationToken);
+                () => ConnectStreamAsync(cancellationToken));
+            _log.Trace("Created connection {0}", connection);
+            return connection;
         }
 
-        private async ValueTask<Stream> ConnectStreamAsync()
+        private async ValueTask<Stream> ConnectStreamAsync(CancellationToken cancellationToken)
         {
             if (!await _serverStateReader
-                .WaitInitializationAsync(MaxServerInitializationTime, _cancellationToken)
+                .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
                 .ConfigureAwait(false))
             {
                 throw new TimeoutException(
@@ -61,11 +61,20 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
             {
                 throw new InvalidOperationException("Cannot find pipe name to connect");
             }
-            _log.Trace("Connecting to pipe {0}", pipeName);
-            var pipeClientStream =
-                new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
-            await ConnectAsync(pipeClientStream, _cancellationToken).ConfigureAwait(false);
-            _log.Trace("Connected to pipe {0}", pipeName);
+            _log.Trace("Connecting to pipe");
+            var pipeClientStream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+            try
+            {
+                await ConnectAsync(pipeClientStream, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _log.Trace("Connection to pipe terminated: {0}", ex.FormatTypeAndMessage());
+                pipeClientStream.Dispose();
+                cancellationToken.ThrowIfCancellationRequested();
+                throw;
+            }
+            _log.Trace("Connected to pipe");
             return pipeClientStream;
         }
 
@@ -74,36 +83,20 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
             NamedPipeClientStream pipeClientStream,
             CancellationToken cancellationToken)
         {
-            try
-            {
-                using (cancellationToken.Register(pipeClientStream.Dispose))
-                {
-                    var client = pipeClientStream;
-                    await TaskRunner.RunInBackground(() => client.Connect(), cancellationToken).ConfigureAwait(false);
-                }
-            }
-            catch
-            {
-                pipeClientStream.Dispose();
-                cancellationToken.ThrowIfCancellationRequested();
-                throw;
-            }
+            await TaskRunner
+                .RunInBackground(() => pipeClientStream.Connect(ConnectTimeoutMs), cancellationToken)
+                .WithCancellation(cancellationToken, _ => pipeClientStream.Dispose())
+                .ConfigureAwait(false);
+            pipeClientStream.ReadMode = PipeTransmissionMode.Byte;
         }
 #else
         private static async Task ConnectAsync(
             NamedPipeClientStream pipeClientStream,
             CancellationToken cancellationToken)
         {
-            try
-            {
-                await pipeClientStream.ConnectAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch
-            {
-                pipeClientStream.Dispose();
-                cancellationToken.ThrowIfCancellationRequested();
-                throw;
-            }
+            await pipeClientStream
+                .ConnectAsync(ConnectTimeoutMs, cancellationToken)
+                .ConfigureAwait(false);
         }
 #endif
     }

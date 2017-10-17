@@ -31,7 +31,7 @@ namespace Plexus.Channels
         private readonly int _bufferSize;
 
         private Promise<bool> _readAvailable = new Promise<bool>();
-        private Promise<bool> _writeAvailable = new Promise<bool>();        
+        private Promise<bool> _writeAvailable = new Promise<bool>();
 
         public BufferedChannel(int bufferSize)
         {

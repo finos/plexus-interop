@@ -26,37 +26,30 @@ namespace Plexus.Interop.Transport.Transmission.Streams
 
     public sealed class StreamTransmissionConnection : ITransmissionConnection
     {
-        public static async ValueTask<Maybe<ITransmissionConnection>> TryCreateAsync(
-            UniqueId id,
-            Func<ValueTask<Maybe<Stream>>> streamFactory,
-            CancellationToken cancellationToken)
+        public static async ValueTask<Maybe<ITransmissionConnection>> TryCreateAsync(UniqueId id, Func<ValueTask<Maybe<Stream>>> streamFactory)
         {
             var result = await streamFactory().ConfigureAwait(false);
             return result.HasValue
-                ? new StreamTransmissionConnection(id, result.Value, cancellationToken)
+                ? new StreamTransmissionConnection(id, result.Value)
                 : Maybe<ITransmissionConnection>.Nothing;
         }
 
-        public static async ValueTask<ITransmissionConnection> CreateAsync(
-            UniqueId id,
-            Func<ValueTask<Stream>> streamFactory,
-            CancellationToken cancellationToken)
+        public static async ValueTask<ITransmissionConnection> CreateAsync(UniqueId id, Func<ValueTask<Stream>> streamFactory)
         {
             var result = await streamFactory().ConfigureAwait(false);
-            return new StreamTransmissionConnection(id, result, cancellationToken);
+            return new StreamTransmissionConnection(id, result);
         }
 
         private readonly ILogger _log;
         private readonly StreamTransmissionWriter _writer;
         private readonly StreamTransmissionReader _reader;
         private readonly Stream _stream;
-        private readonly CancellationTokenSource _cancellation;
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
-        private StreamTransmissionConnection(UniqueId id, Stream stream, CancellationToken cancellationToken)
+        private StreamTransmissionConnection(UniqueId id, Stream stream)
         {
             Id = id;
             _log = LogManager.GetLogger<StreamTransmissionConnection>(id.ToString());
-            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _writer = new StreamTransmissionWriter(id, stream, _cancellation.Token);
             _reader = new StreamTransmissionReader(id, stream, _cancellation.Token);            
             _stream = stream;
@@ -92,11 +85,21 @@ namespace Plexus.Interop.Transport.Transmission.Streams
             }
         }
 
+        public async Task DisconnectAsync()
+        {
+            _log.Trace("Disconnecting");
+            _cancellation.Cancel();
+            await Completion.IgnoreExceptions().ConfigureAwait(false);
+        }
+
         public void Dispose()
         {
-            _log.Trace("Disposing");
-            _cancellation.Cancel();
-            Completion.IgnoreExceptions().GetResult();
+            DisconnectAsync().GetResult();
+        }
+
+        public override string ToString()
+        {
+            return $"{{{nameof(Id)}: {Id}, Type: {GetType()}}}";
         }
     }
 }

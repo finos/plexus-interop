@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Internal
+namespace Plexus.Interop.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Internal.Calls;
@@ -23,20 +23,20 @@
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Protocol.Invocation;
     using Plexus.Interop.Transport;
+    using Plexus.Processes;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Processes;
 
     internal sealed class Client : ProcessBase, IClient
     {        
         private readonly ClientOptions _options;
         private readonly BrokerToClientRequestHandler<Task, ITransportChannel> _incomingRequestHandler;
         private readonly ConcurrentDictionary<Task, Nothing> _runningTasks = new ConcurrentDictionary<Task, Nothing>();
-        private readonly CancellationTokenSource _cancellation; 
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private ILogger _log = LogManager.GetLogger<Client>();
         private IOutcomingInvocationFactory _outcomingInvocationFactory;
@@ -47,7 +47,6 @@
         public Client(ClientOptions options)
         {
             _options = options;
-            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(_options.CancellationToken);
             _incomingRequestHandler = new BrokerToClientRequestHandler<Task, ITransportChannel>(HandleInvocationStartRequestAsync);            
         }
 
@@ -59,19 +58,40 @@
 
         protected override async Task<Task> StartCoreAsync()
         {
-            _log.Debug("Connecting {0}", _options);
-            _connection = await ClientConnectionFactory.Instance.ConnectAsync(_options).ConfigureAwait(false);
-            ConnectionId = _connection.Id;
-            _log = LogManager.GetLogger<Client>(_connection.Id.ToString());            
-            _outcomingInvocationFactory = new OutcomingInvocationFactory(_connection, _options.Protocol, _options.Marshaller);
-            _discoveryService = new DiscoveryService(ConnectionId, _connection, _options.Protocol);
-            return ProcessAsync();
+            if (_cancellation.IsCancellationRequested)
+            {
+                return TaskConstants.Completed;
+            }
+            try
+            {                
+                _log.Debug("Connecting {0}", _options);
+                _connection = await ClientConnectionFactory.Instance
+                    .ConnectAsync(_options, _cancellation.Token)
+                    .ConfigureAwait(false);
+                ConnectionId = _connection.Id;
+                _log = LogManager.GetLogger<Client>(_connection.Id.ToString());
+                _outcomingInvocationFactory =
+                    new OutcomingInvocationFactory(_connection, _options.Protocol, _options.Marshaller);
+                _discoveryService = new DiscoveryService(ConnectionId, _connection, _options.Protocol);
+                return ProcessAsync();
+            }
+            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+            {
+                return TaskConstants.Completed;
+            }
         }
 
-        public Task ConnectAsync()
+        public async Task ConnectAsync()
         {
             Start();
-            return StartCompletion;
+            await StartCompletion.ConfigureAwait(false);
+        }
+
+        public async Task DisconnectAsync()
+        {
+            _cancellation.Cancel();
+            Start();
+            await Completion.IgnoreExceptions().ConfigureAwait(false);
         }
 
         public IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request)
@@ -179,8 +199,18 @@
             return discoveryResults.Select(x => new DiscoveredOnlineService(x)).ToList();
         }
 
+        public void Dispose()
+        {
+            DisconnectAsync().GetResult();
+        }
+
         private async Task ProcessAsync()
         {
+            if (_cancellation.IsCancellationRequested)
+            {
+                return;
+            }
+            using (_cancellation)
             using (_cancellation.Token.Register(() => _connection.TryTerminate()))
             {
                 try
@@ -188,6 +218,9 @@
                     _log.Debug("Connected. Listening to incoming invocations.");
                     await ListenIncomingInvocationsAsync(_connection).ConfigureAwait(false);
                     await _connection.Completion.ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+                {
                 }
                 catch (Exception ex)
                 {
@@ -317,11 +350,6 @@
             _runningTasks[task] = Nothing.Instance;
             ((Task)task).ContinueWithSynchronously((Action<Task>)OnTaskCompleted);
             return task;
-        }
-
-        public void Dispose()
-        {
-            _cancellation.Cancel();
         }
     }
 }

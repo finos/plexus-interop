@@ -64,9 +64,9 @@
 
         private async Task CompleteSendingAsync()
         {
-                _log.Trace("Sending <END> message to complete sending");
-                await WriteLengthAsync(EndMessage).ConfigureAwait(false);
-                await _stream.FlushAsync(_cancellationToken).ConfigureAwait(false);
+            _log.Trace("Sending <END> message to complete sending");
+            await WriteLengthAsync(EndMessage).ConfigureAwait(false);
+            await _stream.FlushAsync(_cancellationToken).ConfigureAwait(false);
         }
 
         private async Task WriteLengthAsync(int length)

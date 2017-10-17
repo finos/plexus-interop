@@ -28,27 +28,14 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
 
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
 
-        private readonly CancellationToken _cancellationToken;
         private readonly IServerStateReader _serverStateReader;
 
-        public WebSocketTransmissionClient(
-            string brokerWorkingDir, 
-            CancellationToken cancellationToken = default)
+        public WebSocketTransmissionClient(string brokerWorkingDir)
         {
-            _cancellationToken = cancellationToken;
             _serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
         }
 
         public async ValueTask<ITransmissionConnection> ConnectAsync(CancellationToken cancellationToken = default)
-        {
-            using (var cancellation =
-                CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationToken))
-            {
-                return await ConnectInternalAsync(cancellation.Token).ConfigureAwait(false);
-            }
-        }
-
-        private async ValueTask<ITransmissionConnection> ConnectInternalAsync(CancellationToken cancellationToken = default)
         {
             if (!await _serverStateReader
                 .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
@@ -63,8 +50,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
                 throw new InvalidOperationException("Cannot find url to connect");
             }
             Log.Trace("Creating new connection to url {0}", url);
-            var connection = new WebSocketTransmissionClientConnection(url, _cancellationToken);
-            await connection.ConnectCompletion.ConfigureAwait(false);
+            var connection = new WebSocketClientTransmissionConnection(url);
+            await connection.ConnectAsync(cancellationToken).ConfigureAwait(false);
             Log.Trace("Created new connection {0} to url {1}", connection.Id, url);
             return connection;
         }

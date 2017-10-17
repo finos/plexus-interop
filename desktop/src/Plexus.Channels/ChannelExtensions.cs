@@ -23,6 +23,15 @@ namespace Plexus.Channels
 
     public static class ChannelExtensions
     {
+        private static readonly Task CompletedTask;
+
+        static ChannelExtensions()
+        {
+            var tcs = new TaskCompletionSource<Nothing>();
+            tcs.SetResult(Nothing.Instance);
+            CompletedTask = tcs.Task;
+        }
+
         public static async Task CompleteAsync<T>(this IWritableChannel<T> channel)
         {
             channel.TryCompleteWriting();
@@ -121,6 +130,24 @@ namespace Plexus.Channels
             {
                 handle(item);
             }
+        }
+
+        public static Task ConsumeAsync<T>(
+            this IReadOnlyChannel<T> channel,
+            Action<T> handle,
+            CancellationToken cancellationToken = default,
+            Func<Task> onCompletedAsync = null,
+            Func<Exception, Task> onTerminatedAsync = null)
+        {
+            return channel.ConsumeAsync(
+                x =>
+                {
+                    handle(x);
+                    return CompletedTask;
+                },
+                cancellationToken,
+                onCompletedAsync,
+                onTerminatedAsync);
         }
 
         public static async Task ConsumeAsync<T>(

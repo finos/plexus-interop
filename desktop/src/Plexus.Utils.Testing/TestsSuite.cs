@@ -51,6 +51,12 @@
             Log = LogManager.GetLogger(GetType());
         }
 
+        protected void WriteLog(string message)
+        {
+            Log.Info(message);
+            Console?.WriteLine(message);
+        }
+
         protected ILogger Log { get; }
 
         protected T RegisterDisposable<T>(T disposable) where T : IDisposable
@@ -85,14 +91,14 @@
         }
 
         protected void RunWithTimeout(TimeSpan timeout, Action action) =>
-            Should.CompleteIn(async () => action(), timeout);
+            Should.CompleteIn(action, timeout);
 
         public virtual void Dispose()
         {
             RunWith5SecTimeout(
                 () =>
                 {
-                    Log.Info("Disposing test resources");
+                    WriteLog("Disposing test resources");
                     while (_disposables.TryPop(out var disposable))
                     {
                         disposable.Dispose();

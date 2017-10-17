@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
+namespace Plexus.Interop.Transport.Transmission.Pipes
 {
     using Plexus.Channels;
     using Plexus.Interop.Transport.Transmission.Streams;
@@ -25,22 +25,21 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
+    public sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
     {
         private const string ServerName = "np-v1";
 
         private readonly ILogger _log;
         private readonly IServerStateWriter _settingsWriter;
         private readonly string _pipeName = "plexus-interop-broker-" + Guid.NewGuid();
-        private readonly CancellationTokenSource _cancellation;
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private readonly BufferedChannel<ITransmissionConnection> _incomingConnections 
             = new BufferedChannel<ITransmissionConnection>(1);
 
-        public PipeTransmissionServer(TransmissionServerOptions options)
+        public PipeTransmissionServer(string brokerWorkingDir)
         {
-            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(options.CancellationToken);
             _log = LogManager.GetLogger<PipeTransmissionServer>();
-            _settingsWriter = new ServerStateWriter(ServerName, options.BrokerWorkingDir);
+            _settingsWriter = new ServerStateWriter(ServerName, brokerWorkingDir);
         }
 
         public ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync()
@@ -51,6 +50,13 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
         public ValueTask<ITransmissionConnection> AcceptAsync()
         {
             return _incomingConnections.ReadAsync();
+        }
+
+        public async Task StopAsync()
+        {
+            _cancellation.Cancel();
+            Start();
+            await Completion.IgnoreExceptions().ConfigureAwait(false);
         }
 
         protected override Task<Task> StartCoreAsync()
@@ -64,12 +70,14 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
         
         private async Task ProcessAsync()
         {
+            var registration = _cancellation.Token.Register(() => _incomingConnections.TryTerminateWriting());
             try
             {
+                _cancellation.Token.ThrowIfCancellationRequested();
                 while (true)
                 {
                     var result = await StreamTransmissionConnection
-                        .TryCreateAsync(UniqueId.Generate(), TryAcceptStreamAsync, _cancellation.Token)
+                        .TryCreateAsync(UniqueId.Generate(), TryAcceptStreamAsync)
                         .ConfigureAwait(false);
                     if (!result.HasValue)
                     {
@@ -91,6 +99,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
             finally
             {
                 _settingsWriter.Dispose();
+                registration.Dispose();
             }
         }
 
@@ -110,55 +119,40 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
                 -1,
                 PipeTransmissionMode.Byte,
                 PipeOptions.Asynchronous);
-            if (!await WaitForConnectionAsync(pipeServerStream).ConfigureAwait(false))
+            try
             {
+                await WaitForConnectionAsync(pipeServerStream, _cancellation.Token).ConfigureAwait(false);
+            }
+            catch when (_cancellation.IsCancellationRequested)
+            {
+                pipeServerStream.Dispose();
                 return Maybe<Stream>.Nothing;
             }
+            catch
+            {
+                pipeServerStream.Dispose();
+                throw;
+            }
             _log.Trace("Received new connection");
-            // TODO: keep connected stream to dispose it on Stop?
             return pipeServerStream;
         }
 
 #if NET452
-        private async Task<bool> WaitForConnectionAsync(NamedPipeServerStream pipeServerStream)
+        private static async Task WaitForConnectionAsync(NamedPipeServerStream pipeServerStream,
+            CancellationToken cancellationToken)
         {
-            try
+            using (cancellationToken.Register(pipeServerStream.Dispose))
             {
-                using (_cancellation.Token.Register(pipeServerStream.Dispose))
-                {
-                    await Task.Factory.FromAsync(pipeServerStream.BeginWaitForConnection, pipeServerStream.EndWaitForConnection, null);
-                }                
+                await Task.Factory.FromAsync(
+                    pipeServerStream.BeginWaitForConnection,
+                    pipeServerStream.EndWaitForConnection, 
+                    null);
             }
-            catch when (_cancellation.IsCancellationRequested)
-            {
-                pipeServerStream.Dispose();
-                return false;
-            }
-            catch
-            {
-                pipeServerStream.Dispose();
-                throw;
-            }
-            return true;
         }
 #else
-        private async Task<bool> WaitForConnectionAsync(NamedPipeServerStream pipeServerStream)
+        private static async Task WaitForConnectionAsync(NamedPipeServerStream pipeServerStream, CancellationToken cancellationToken)
         {
-            try
-            {
-                await pipeServerStream.WaitForConnectionAsync(_cancellation.Token).ConfigureAwait(false);
-            }
-            catch when (_cancellation.IsCancellationRequested)
-            {
-                pipeServerStream.Dispose();
-                return false;
-            }
-            catch
-            {
-                pipeServerStream.Dispose();
-                throw;
-            }
-            return true;
+            await pipeServerStream.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
         }
 #endif
     }

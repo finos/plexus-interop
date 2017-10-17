@@ -17,21 +17,22 @@
  namespace Plexus.Interop.Transport.Transmission.Pipes
 {
     using System.IO;
-    using System.Threading;
+    using Xunit.Abstractions;
 
     public sealed class PipeTransmissionTests : TransmissionTestsSuite
     {
-        private readonly PipeTransmissionClientFactory _clientFactory = new PipeTransmissionClientFactory();
-        private readonly PipeTransmissionServerFactory _serverFactory = new PipeTransmissionServerFactory();
-
-        protected override ITransmissionClient CreateClient(CancellationToken cancellationToken = default)
+        public PipeTransmissionTests(ITestOutputHelper output) : base(output)
         {
-            return _clientFactory.Create(new TransmissionClientOptions(Directory.GetCurrentDirectory()));
         }
 
-        protected override ITransmissionServer CreateServer(CancellationToken cancellationToken = default)
+        protected override ITransmissionClient CreateClient()
         {
-            return _serverFactory.Create(new TransmissionServerOptions(Directory.GetCurrentDirectory()));
+            return new PipeTransmissionClient(Directory.GetCurrentDirectory());
+        }
+
+        protected override ITransmissionServer CreateServer()
+        {
+            return RegisterDisposable(new PipeTransmissionServer(Directory.GetCurrentDirectory()));
         }
     }
 }
