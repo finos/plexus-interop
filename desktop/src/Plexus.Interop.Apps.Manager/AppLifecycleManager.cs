@@ -105,6 +105,7 @@ namespace Plexus.Interop.Apps
                     .WithApplicationId("interop.AppLifecycleManager")
                     .Build());
             await _client.ConnectAsync().ConfigureAwait(false);
+            Log.Debug("Connected");
             return _client.Completion;
         }
     }
