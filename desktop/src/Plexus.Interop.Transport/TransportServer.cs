@@ -21,7 +21,6 @@ namespace Plexus.Interop.Transport
     using Plexus.Interop.Transport.Protocol.Serialization;
     using Plexus.Interop.Transport.Transmission;
     using Plexus.Processes;
-    using System;
     using System.Threading.Tasks;
 
     public sealed class TransportServer : ProcessBase, ITransportServer
@@ -36,6 +35,7 @@ namespace Plexus.Interop.Transport
         {
             _connectionFactory = new TransportConnectionFactory(serializationProvider);
             _transmissionServer = transmissionServer;
+            _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
         public IReadOnlyChannel<ITransportConnection> In => _buffer.In;
@@ -46,36 +46,14 @@ namespace Plexus.Interop.Transport
             return ProcessAsync();
         }
 
-        public async Task StopAsync()
-        {
-            _buffer.Out.TryCompleteWriting();            
-            await _transmissionServer.StopAsync().ConfigureAwait(false);
-            Start();
-            await Completion.IgnoreExceptions().ConfigureAwait(false);
-        }        
-
-        public void Dispose()
-        {
-            StopAsync().IgnoreExceptions().GetResult();
-        }
-
         private async Task ProcessAsync()
         {
-            try
-            {
-                await _transmissionServer.In.ConsumeAsync(AcceptAsync).ConfigureAwait(false);
-                _buffer.Out.TryCompleteWriting();
-            }
-            catch (Exception ex)
-            {
-                _buffer.Out.TryTerminateWriting(ex);
-                throw;
-            }
+            await _transmissionServer.In.ConsumeAsync(AcceptAsync, StopToken).ConfigureAwait(false);
         }
 
         private async Task AcceptAsync(ITransmissionConnection c)
         {
-            if (!await _buffer.TryWriteAsync(_connectionFactory.Create(c)))
+            if (!await _buffer.TryWriteAsync(_connectionFactory.Create(c), StopToken))
             {
                 await c.DisconnectAsync().ConfigureAwait(false);
             }

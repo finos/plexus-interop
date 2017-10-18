@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Samples.GreetingServer
+namespace Plexus.Interop.Samples.GreetingServer
 {
     using Plexus.Channels;
     using Plexus.Interop.Samples.GreetingServer.Generated;
+    using Plexus.Logging.NLog;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Logging.NLog;
 
     public class Program
     {
@@ -40,7 +40,6 @@
                     new ClientOptionsBuilder()
                         .WithDefaultConfiguration(brokerPath)
                         .WithApplicationId("interop.samples.GreetingServer")
-                        .WithCancellationToken(cancellation.Token)
                         .WithProvidedService(
                             "interop.samples.GreetingService",
                             s => s

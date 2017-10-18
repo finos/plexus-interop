@@ -16,17 +16,34 @@
  */
 ﻿namespace Plexus.Processes
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     public abstract class ProcessBase : IProcess
     {
         private readonly Latch _started = new Latch();
+        private readonly Latch _stopped = new Latch();
         private readonly Promise _completion = new Promise();
-        private readonly Promise _startCompletion = new Promise();
+        private readonly Promise _startCompletion = new Promise();        
+        private readonly CancellationTokenSource _stopCancellation = new CancellationTokenSource();
 
         public Task Completion => _completion.Task;
 
         public Task StartCompletion => _startCompletion.Task;
+
+        protected CancellationToken StopToken => _stopCancellation.Token;
+
+        protected virtual Task OnStopAsync()
+        {
+            return TaskConstants.Completed;
+        }
+
+        protected virtual Task OnCompletedAsync(Task completion)
+        {
+            return completion;
+        }
+
+        protected abstract Task<Task> StartCoreAsync();
 
         public void Start()
         {
@@ -34,9 +51,15 @@
             {
                 return;
             }
-            var startTask = TaskRunner.RunInBackground(StartCoreAsync);
-            startTask.PropagateCompletionToPromise(_startCompletion);
-            startTask.Unwrap().PropagateCompletionToPromise(_completion);
+            var startTask = TaskRunner.RunInBackground(StartCoreAsync, StopToken);
+            startTask
+                .IgnoreCancellation(StopToken)
+                .PropagateCompletionToPromise(_startCompletion);
+            startTask
+                .Unwrap()                
+                .ContinueWithSynchronously(OnCompletedAsync, CancellationToken.None)
+                .IgnoreCancellation(StopToken)
+                .PropagateCompletionToPromise(_completion);
         }
 
         public Task StartAsync()
@@ -45,7 +68,27 @@
             return StartCompletion;
         }
 
-        protected abstract Task<Task> StartCoreAsync();
+        public void Stop()
+        {
+            if (!_stopped.TryEnter())
+            {
+                return;
+            }
+            _stopCancellation.Cancel();
+            Start();
+        }
+
+        public async Task StopAsync()
+        {
+            Stop();
+            await Completion.IgnoreExceptions().ConfigureAwait(false);
+        }
+
+        public void Dispose()
+        {
+            StopAsync().GetResult();
+            _stopCancellation.Dispose();
+        }
 
         protected void SetStartCompleted()
         {

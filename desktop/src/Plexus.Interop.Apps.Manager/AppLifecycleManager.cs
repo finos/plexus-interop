@@ -39,13 +39,11 @@
         private readonly string _metadataDir;
         private readonly SubProcessLauncher _subProcessLauncher;
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.CreateDefault();
-        private readonly CancellationToken _cancellationToken;
         private AppsDto _appsDto;
 
-        public AppLifecycleManager(string metadataDir, CancellationToken cancellationToken)
+        public AppLifecycleManager(string metadataDir)
         {
             _metadataDir = metadataDir;
-            _cancellationToken = cancellationToken;
             _brokerWorkingDir = Directory.GetCurrentDirectory();
             _subProcessLauncher = new SubProcessLauncher();
             _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(StartNativeAppLauncher, LazyThreadSafetyMode.ExecutionAndPublication);
@@ -99,13 +97,11 @@
 
         protected override async Task<Task> StartCoreAsync()
         {
-            _cancellationToken.ThrowIfCancellationRequested();
             _appsDto = AppsDto.Load(Path.Combine(_metadataDir, "apps.json"));
             _client = ClientFactory.Instance.Create(
                 new ClientOptionsBuilder()
                     .WithDefaultConfiguration(_brokerWorkingDir)
                     .WithApplicationId("interop.AppLifecycleManager")
-                    .WithCancellationToken(_cancellationToken)
                     .Build());
             var startNativeAppLauncherTask = _startNativeAppLauncherTask.Value;
             await Task.WhenAll(_client.ConnectAsync(), startNativeAppLauncherTask).ConfigureAwait(false);
@@ -115,8 +111,8 @@
 
         private async Task<NativeAppLauncher> StartNativeAppLauncher()
         {
-            var nativeAppLauncher = new NativeAppLauncher(_metadataDir, _subProcessLauncher, _jsonSerializer, _cancellationToken);
-            var task = TaskRunner.RunInBackground(nativeAppLauncher.StartAsync, _cancellationToken);
+            var nativeAppLauncher = new NativeAppLauncher(_metadataDir, _subProcessLauncher, _jsonSerializer);
+            var task = TaskRunner.RunInBackground(nativeAppLauncher.StartAsync);
             task.ContinueWithSynchronously(
                     x =>
                         _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(

@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Samples.GreetingClient
+namespace Plexus.Interop.Samples.GreetingClient
 {
+    using Plexus.Channels;
     using Plexus.Interop.Samples.GreetingClient.Generated;
+    using Plexus.Logging.NLog;
     using System;
     using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Channels;
-    using Plexus.Logging.NLog;
 
     public sealed class Program
     {        
@@ -39,7 +39,6 @@
                 var client = ClientFactory.Instance.Create(
                     new ClientOptionsBuilder()
                         .WithDefaultConfiguration(brokerPath)
-                        .WithCancellationToken(cancellation.Token)
                         .WithApplicationId("interop.samples.GreetingClient")
                         .Build());
 

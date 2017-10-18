@@ -32,7 +32,6 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
         private readonly ILogger _log;
         private readonly IServerStateWriter _settingsWriter;
         private readonly string _pipeName = "plexus-interop-broker-" + Guid.NewGuid();
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private readonly BufferedChannel<ITransmissionConnection> _buffer 
             = new BufferedChannel<ITransmissionConnection>(1);
 
@@ -40,18 +39,10 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
         {
             _log = LogManager.GetLogger<PipeTransmissionServer>();
             _settingsWriter = new ServerStateWriter(ServerName, brokerWorkingDir);
+            _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
         public IReadOnlyChannel<ITransmissionConnection> In => _buffer.In;
-
-        public async Task StopAsync()
-        {
-            _log.Trace("Stopping");
-            _cancellation.Cancel();
-            Start();
-            await Completion.IgnoreExceptions().ConfigureAwait(false);
-            _log.Trace("Stopped");
-        }
 
         protected override Task<Task> StartCoreAsync()
         {
@@ -61,41 +52,21 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             _log.Info("Pipe server started: {0}", _pipeName);
             return Task.FromResult(ProcessAsync());
         }
-        
+
         private async Task ProcessAsync()
         {
-            try
+            using (_settingsWriter)
             {
-                _cancellation.Token.ThrowIfCancellationRequested();
                 while (true)
                 {
                     var connection = await StreamTransmissionConnection
                         .CreateAsync(UniqueId.Generate(), AcceptStreamAsync)
                         .ConfigureAwait(false);
                     await _buffer.Out
-                        .WriteAsync(connection, _cancellation.Token)
+                        .WriteAsync(connection, StopToken)
                         .ConfigureAwait(false);
                 }
             }
-            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
-            {
-                _buffer.Out.TryCompleteWriting();
-            }
-            catch (Exception ex)
-            {
-                _buffer.Out.TryTerminateWriting(ex);
-                throw;
-            }
-            finally
-            {
-                _settingsWriter.Dispose();
-            }
-        }
-
-        public void Dispose()
-        {
-            _log.Trace("Disposing");
-            StopAsync().GetResult();
         }
 
         private async ValueTask<Stream> AcceptStreamAsync()
@@ -109,7 +80,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                 PipeOptions.Asynchronous);
             try
             {
-                await WaitForConnectionAsync(pipeServerStream, _cancellation.Token).ConfigureAwait(false);
+                await WaitForConnectionAsync(pipeServerStream, StopToken).ConfigureAwait(false);
             }
             catch
             {

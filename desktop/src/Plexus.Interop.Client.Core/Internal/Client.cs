@@ -28,7 +28,6 @@ namespace Plexus.Interop.Internal
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
     internal sealed class Client : ProcessBase, IClient
@@ -36,7 +35,6 @@ namespace Plexus.Interop.Internal
         private readonly ClientOptions _options;
         private readonly BrokerToClientRequestHandler<Task, ITransportChannel> _incomingRequestHandler;
         private readonly ConcurrentDictionary<Task, Nothing> _runningTasks = new ConcurrentDictionary<Task, Nothing>();
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private ILogger _log = LogManager.GetLogger<Client>();
         private IOutcomingInvocationFactory _outcomingInvocationFactory;
@@ -58,41 +56,21 @@ namespace Plexus.Interop.Internal
 
         protected override async Task<Task> StartCoreAsync()
         {
-            if (_cancellation.IsCancellationRequested)
-            {
-                return TaskConstants.Completed;
-            }
-            try
-            {                
-                _log.Debug("Connecting {0}", _options);
-                _connection = await ClientConnectionFactory.Instance
-                    .ConnectAsync(_options, _cancellation.Token)
-                    .ConfigureAwait(false);
-                ConnectionId = _connection.Id;
-                _log = LogManager.GetLogger<Client>(_connection.Id.ToString());
-                _outcomingInvocationFactory =
-                    new OutcomingInvocationFactory(_connection, _options.Protocol, _options.Marshaller);
-                _discoveryService = new DiscoveryService(ConnectionId, _connection, _options.Protocol);
-                return ProcessAsync();
-            }
-            catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
-            {
-                return TaskConstants.Completed;
-            }
+            _log.Debug("Connecting {0}", _options);
+            _connection = await ClientConnectionFactory.Instance
+                .ConnectAsync(_options, StopToken)
+                .ConfigureAwait(false);
+            ConnectionId = _connection.Id;
+            _log = LogManager.GetLogger<Client>(_connection.Id.ToString());
+            _outcomingInvocationFactory =
+                new OutcomingInvocationFactory(_connection, _options.Protocol, _options.Marshaller);
+            _discoveryService = new DiscoveryService(ConnectionId, _connection, _options.Protocol);
+            return ProcessAsync();
         }
 
-        public async Task ConnectAsync()
-        {
-            Start();
-            await StartCompletion.ConfigureAwait(false);
-        }
+        public Task ConnectAsync() => StartAsync();
 
-        public async Task DisconnectAsync()
-        {
-            _cancellation.Cancel();
-            Start();
-            await Completion.IgnoreExceptions().ConfigureAwait(false);
-        }
+        public Task DisconnectAsync() => StopAsync();
 
         public IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request)
         {
@@ -199,19 +177,9 @@ namespace Plexus.Interop.Internal
             return discoveryResults.Select(x => new DiscoveredOnlineService(x)).ToList();
         }
 
-        public void Dispose()
-        {
-            DisconnectAsync().GetResult();
-        }
-
         private async Task ProcessAsync()
         {
-            if (_cancellation.IsCancellationRequested)
-            {
-                return;
-            }
-            using (_cancellation)
-            using (_cancellation.Token.Register(() => _connection.TryTerminate()))
+            using (StopToken.Register(() => _connection.TryTerminate()))
             {
                 try
                 {
@@ -219,7 +187,7 @@ namespace Plexus.Interop.Internal
                     await ListenIncomingInvocationsAsync(_connection).ConfigureAwait(false);
                     await _connection.Completion.ConfigureAwait(false);
                 }
-                catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
+                catch (OperationCanceledException) when (StopToken.IsCancellationRequested)
                 {
                 }
                 catch (Exception ex)

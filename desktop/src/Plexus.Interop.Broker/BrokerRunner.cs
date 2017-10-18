@@ -40,14 +40,12 @@ namespace Plexus.Interop.Broker
         private readonly string _workingDir;
         private readonly CompositeTransportServer _transportServer;
         private readonly BrokerProcessor _brokerProcessor;
-        private readonly CancellationToken _cancellationToken;
 
         public BrokerRunner(
             string metadataDir = null, 
             IRegistryProvider registryProvider = null,
             CancellationToken cancellationToken = default)
         {
-            _cancellationToken = cancellationToken;
             _workingDir = Directory.GetCurrentDirectory();
             metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
             registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
@@ -56,12 +54,11 @@ namespace Plexus.Interop.Broker
                 _transportServer,
                 registryProvider,
                 DefaultProtocolSerializationProvider,
-                new AppLifecycleManager(metadataDir, _cancellationToken));
+                new AppLifecycleManager(metadataDir));
         }
 
         protected override async Task<Task> StartCoreAsync()
         {
-            _cancellationToken.ThrowIfCancellationRequested();
             Log.Info("Starting broker in directory {0}", _workingDir);
             await _transportServer.StartAsync().ConfigureAwait(false);
             await _brokerProcessor.StartAsync().ConfigureAwait(false);

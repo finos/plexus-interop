@@ -19,10 +19,9 @@ namespace Plexus.Interop.Apps.Internal
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using Plexus.Interop.Apps.Internal.Generated;
-    using System.IO;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Plexus.Processes;
+    using System.IO;
+    using System.Threading.Tasks;
 
     internal sealed class NativeAppLauncher : ProcessBase
     {
@@ -31,7 +30,6 @@ namespace Plexus.Interop.Apps.Internal
         private readonly SubProcessLauncher _subProcessLauncher;
         private readonly string _cmdBasePath;
         private readonly JsonSerializer _jsonSerializer;
-        private readonly CancellationToken _cancellationToken;
         private IClient _client;
 
         public Plexus.UniqueId Id { get; }
@@ -39,14 +37,12 @@ namespace Plexus.Interop.Apps.Internal
         public NativeAppLauncher(
             string cmdBasePath, 
             SubProcessLauncher subProcessLauncher, 
-            JsonSerializer jsonSerializer,
-            CancellationToken cancellationToken)
+            JsonSerializer jsonSerializer)
         {
             Id = Plexus.UniqueId.Generate();
             _cmdBasePath = cmdBasePath;
             _subProcessLauncher = subProcessLauncher;
             _jsonSerializer = jsonSerializer;
-            _cancellationToken = cancellationToken;
         }
 
         protected override async Task<Task> StartCoreAsync()
@@ -58,7 +54,6 @@ namespace Plexus.Interop.Apps.Internal
                 .WithProvidedService(
                     "interop.AppLauncherService",
                     s => s.WithUnaryMethod<AppLaunchRequest, AppLaunchResponse>("Launch", LaunchAsync))
-                .WithCancellationToken(_cancellationToken)
                 .Build();
             _client = ClientFactory.Instance.Create(options);
             await _client.ConnectAsync().ConfigureAwait(false);

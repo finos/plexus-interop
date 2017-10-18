@@ -94,7 +94,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             {
                 Log.Trace("Accepting websocket connection");
                 var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);                
-                connectionTask = await _handler.StartConnectionAsync(webSocket).ConfigureAwait(false);
+                connectionTask = await _handler.AcceptConnectionAsync(webSocket).ConfigureAwait(false);
                 Log.Trace("Websocket connection accepted");
             }
             finally

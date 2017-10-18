@@ -133,7 +133,9 @@ namespace Plexus
         public static Task ContinueWithOnErrorSynchronously(this Task task, Action<Task> func,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            return task.ContinueWith(func, cancellationToken,
+            return task.ContinueWith(
+                func,
+                cancellationToken,
                 TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted,
                 TaskRunner.BackgroundScheduler);
         }
@@ -142,7 +144,10 @@ namespace Plexus
         public static Task<T2> ContinueWithSynchronously<T1, T2>(this Task<T1> task, Func<Task<T1>, T2> func,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            return task.ContinueWith(func, cancellationToken, TaskContinuationOptions.ExecuteSynchronously,
+            return task.ContinueWith(
+                func,
+                cancellationToken,
+                TaskContinuationOptions.ExecuteSynchronously,
                 TaskRunner.BackgroundScheduler);
         }
 
@@ -150,7 +155,10 @@ namespace Plexus
         public static Task<T> ContinueWithSynchronously<T>(this Task task, Func<Task, T> func,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            return task.ContinueWith(func, cancellationToken, TaskContinuationOptions.ExecuteSynchronously,
+            return task.ContinueWith(
+                func,
+                cancellationToken,
+                TaskContinuationOptions.ExecuteSynchronously,
                 TaskRunner.BackgroundScheduler);
         }
 
@@ -158,8 +166,12 @@ namespace Plexus
         public static Task ContinueWithSynchronously(this Task task, Func<Task, Task> func,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            return task.ContinueWith(func, cancellationToken, TaskContinuationOptions.ExecuteSynchronously,
-                TaskRunner.BackgroundScheduler).Unwrap();
+            return task.ContinueWith(
+                    func,
+                    cancellationToken,
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    TaskRunner.BackgroundScheduler)
+                .Unwrap();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -200,6 +212,11 @@ namespace Plexus
             return task.ContinueWithSynchronously((Action<Task>) IgnoreCancellationOnCompletedTask);
         }
 
+        public static Task IgnoreCancellation(this Task task, CancellationToken cancellationToken)
+        {
+            return task.ContinueWithSynchronously(t => t.IgnoreCancellationOnCompletedTask(cancellationToken), CancellationToken.None);
+        }
+
         private static void IgnoreExceptionsOnCompletedTask(this Task task)
         {
             bool HandleException(Exception e)
@@ -210,6 +227,14 @@ namespace Plexus
             if (task.IsFaulted)
             {
                 task.Exception.Handle(HandleException);
+            }
+        }
+
+        private static void IgnoreCancellationOnCompletedTask(this Task task, CancellationToken cancellationToken)
+        {
+            if (!task.IsCanceled || !cancellationToken.IsCancellationRequested)
+            {
+                task.GetResult();
             }
         }
 

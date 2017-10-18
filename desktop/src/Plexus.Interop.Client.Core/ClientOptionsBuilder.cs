@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
-    using System.Threading;
 
     public class ClientOptionsBuilder
     {
@@ -37,8 +36,6 @@
         public IProtocolImplementation Protocol { get; private set; }
 
         public IMarshallerProvider Marshaller { get; private set; }
-
-        public CancellationToken CancellationToken { get; private set; }
 
         public ClientOptionsBuilder WithApplicationId(string applicationId)
         {
@@ -79,12 +76,6 @@
         public ClientOptionsBuilder WithProvidedService(string name, string alias, Func<ProvidedServiceDefinition.Builder, ProvidedServiceDefinition.Builder> setup)
         {
             _serviceFactories.Add((name, alias, setup));
-            return this;
-        }
-
-        public ClientOptionsBuilder WithCancellationToken(CancellationToken cancellationToken)
-        {
-            CancellationToken = cancellationToken;
             return this;
         }
 

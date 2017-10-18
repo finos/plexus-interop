@@ -31,7 +31,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 
         private readonly ILogger _log;
         private readonly WebSocket _webSocket;
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private readonly WebSocketClientTransmissionReader _reader;
         private readonly WebSocketClientTransmissionWriter _writer;
         private readonly Promise _connectCompletion = new Promise();
@@ -46,8 +45,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
             _webSocket.Closed += OnClosed;
             _webSocket.Error += OnError;
 
-            _reader = new WebSocketClientTransmissionReader(Id, _webSocket, _cancellation.Token);
-            _writer = new WebSocketClientTransmissionWriter(Id, _webSocket, _cancellation.Token);
+            _reader = new WebSocketClientTransmissionReader(Id, _webSocket, StopToken);
+            _writer = new WebSocketClientTransmissionWriter(Id, _webSocket, StopToken);
 
             Completion.LogCompletion(_log);
 
@@ -57,14 +56,14 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
         private void OnError(object sender, ErrorEventArgs e)
         {
             _log.Trace("OnError: {0}", e.Exception.FormatTypeAndMessage());
-            _cancellation.Cancel();
+            Stop();
             _disconnectCompletion.TryFail(e.Exception);
         }
 
         private void OnClosed(object sender, EventArgs e)
         {
             _log.Trace("OnClosed");
-            _cancellation.Cancel();
+            Stop();
             _disconnectCompletion.TryComplete();
         }
 
@@ -80,15 +79,10 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 
         public IWritableChannel<IPooledBuffer> Out => _writer.Out;
 
-        public void Dispose()
-        {
-            DisconnectAsync().GetResult();            
-        }
-
         public async Task ConnectAsync(CancellationToken cancellationToken)
         {
             using (var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-            using (cancellation.Token.Register(() => _cancellation.Cancel()))
+            using (cancellation.Token.Register(Stop))
             {
                 cancellation.CancelAfter(ConnectionTimeout);
                 try
@@ -102,26 +96,20 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
             }
         }
 
-        public async Task DisconnectAsync()
-        {
-            _log.Trace("Disconnecting");
-            _cancellation.Cancel();
-            Start();
-            await Completion.IgnoreExceptions().ConfigureAwait(false);
-        }
+        public Task DisconnectAsync() => StopAsync();
 
         protected override async Task<Task> StartCoreAsync()
         {
             try
             {
-                if (_cancellation.IsCancellationRequested)
+                if (StopToken.IsCancellationRequested)
                 {
                     _webSocket.Dispose();
                     return TaskConstants.Completed;
                 }
                 _log.Trace("Opening socket");
                 _webSocket.Open();
-                await _connectCompletion.Task.WithCancellation(_cancellation.Token).ConfigureAwait(false);
+                await _connectCompletion.Task.WithCancellation(StopToken).ConfigureAwait(false);
                 _log.Trace("Connected");
                 _writer.Start();
                 return ProcessAsync();
@@ -143,7 +131,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
                 }
                 catch
                 {
-                    _cancellation.Cancel();
+                    Stop();
                 }
                 await Task.WhenAll(_writer.Completion, _reader.Completion).ConfigureAwait(false);
                 _webSocket.Close();
