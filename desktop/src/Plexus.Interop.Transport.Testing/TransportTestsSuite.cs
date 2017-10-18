@@ -76,6 +76,10 @@ namespace Plexus.Interop.Transport
                 using (var clientConnection = await Client.ConnectAsync())
                 using (var serverConnection = await Server.AcceptAsync())
                 {
+                    serverConnection.Dispose();
+
+                    Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
                 }
             });
         }
@@ -90,6 +94,9 @@ namespace Plexus.Interop.Transport
                 using (var serverConnection = await Server.AcceptAsync())
                 {
                     clientConnection.Dispose();
+                    
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
                 }
             });
         }
@@ -104,10 +111,10 @@ namespace Plexus.Interop.Transport
                 using (var serverConnection = await Server.AcceptAsync())
                 {
                     clientConnection.TryTerminate();
-                    Should.CompleteIn(serverConnection.Completion, Timeout1Sec);
-                    WriteLog("Server completed");                    
-                    Should.CompleteIn(clientConnection.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
                     WriteLog("Client completed");
+                    Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
+                    WriteLog("Server completed");                    
                 }
             });
         }
@@ -122,8 +129,10 @@ namespace Plexus.Interop.Transport
                 using (var serverConnection = await Server.AcceptAsync())
                 {
                     serverConnection.TryTerminate();
-                    Should.CompleteIn(serverConnection.Completion, Timeout1Sec);
-                    Should.CompleteIn(clientConnection.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
+                    WriteLog("Server completed");
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                    WriteLog("Client completed");
                 }
             });
         }
@@ -135,17 +144,19 @@ namespace Plexus.Interop.Transport
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.AcceptAsync();
-                    var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
-                    var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
-                    var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
-                    var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
-                    WriteLog("Terminating channel");
-                    clientChannel.Out.TryTerminateWriting();
-                    await clientConnection.Completion;
-                    Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
-                    Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
-                    WriteLog("Both channels terminated");
+                    using (var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false)))
+                    using (var serverConnection = RegisterDisposable(await Server.AcceptAsync().ConfigureAwait(false)))
+                    {
+                        var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
+                        var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
+                        WriteLog("Terminating client channel");
+                        clientChannel.Out.TryTerminateWriting();
+                        clientChannel.Out.Completion.IsCanceled.ShouldBe(true);
+                        Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
+                        WriteLog("Client channel terminated");
+                        Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
+                        WriteLog("Server channel terminated");
+                    }
                 });
         }
 
@@ -178,8 +189,8 @@ namespace Plexus.Interop.Transport
                     var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     serverConnection.TryTerminate();
-                    Should.Throw<OperationCanceledException>(() => clientConnection.Completion);
-                    Should.Throw<OperationCanceledException>(() => clientConnection.CreateChannelAsync().AsTask());
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(clientConnection.CreateChannelAsync().AsTask(), Timeout1Sec);
                 });
         }
 
@@ -194,8 +205,8 @@ namespace Plexus.Interop.Transport
                     var clientConnection = await Client.ConnectAsync().ConfigureAwait(false);
                     var serverConnection = await serverConnectionTask.ConfigureAwait(false);
                     clientConnection.TryTerminate();
-                    Should.Throw<OperationCanceledException>(() => clientConnection.CreateChannelAsync().AsTask());
-                    Should.Throw<OperationCanceledException>(() => clientConnection.Completion);
+                    Should.Throw<OperationCanceledException>(clientConnection.CreateChannelAsync().AsTask(), Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
                 });
         }
 

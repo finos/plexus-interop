@@ -16,6 +16,7 @@
  */
 namespace Plexus.Interop.Transport.Internal
 {
+    using System.Runtime.InteropServices;
     using Plexus.Channels;
     using Plexus.Interop.Transport.Protocol;
     using Plexus.Interop.Transport.Protocol.Serialization;
@@ -59,8 +60,10 @@ namespace Plexus.Interop.Transport.Internal
         {
             try
             {
+                _log.Trace("Received message: {0}", message);
                 _stateValidator.OnMessage(message.Header);
                 await message.Header.Handle(_handler, message.Payload).ConfigureAwait(false);
+                _log.Trace("Processed message: {0}", message);
             }
             catch
             {

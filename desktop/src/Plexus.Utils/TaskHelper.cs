@@ -41,6 +41,14 @@ namespace Plexus
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<T> AsTask<T>(this CancellationToken cancellationToken)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return TaskConstants<T>.Canceled;
+            }
+            if (!cancellationToken.CanBeCanceled)
+            {
+                return TaskConstants<T>.Infinite;
+            }
             var promise = new Promise<T>();
             var registration = cancellationToken.Register(() => promise.TryCancel());
             var task = promise.Task;

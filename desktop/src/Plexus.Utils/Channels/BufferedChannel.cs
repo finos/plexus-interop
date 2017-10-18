@@ -84,14 +84,6 @@ namespace Plexus.Channels
         {
             lock (_sync)
             {
-                if (_readCompletion.Task.IsFaulted || _readCompletion.Task.IsCanceled)
-                {
-                    _readCompletion.Task.GetResult();
-                }
-                else if (_readCompletion.Task.IsCompleted)
-                {
-                    return TaskConstants.False;
-                }
                 return _readAvailable.Task.WithCancellation(cancellationToken);
             }
         }
@@ -100,14 +92,6 @@ namespace Plexus.Channels
         {
             lock (_sync)
             {
-                if (_writeCompletion.Task.IsFaulted || _writeCompletion.Task.IsCanceled)
-                {
-                    _writeCompletion.Task.GetResult();
-                }
-                else if (_writeCompletion.Task.IsCompleted)
-                {
-                    return TaskConstants.False;
-                }
                 return _writeAvailable.Task.WithCancellation(cancellationToken);
             }
         }
@@ -145,7 +129,7 @@ namespace Plexus.Channels
         {
             if (_writeCompletion.Task.IsCompleted)
             {
-                _writeAvailable.TryComplete(false);
+                ComputeAvailabilityFromCompletion(_writeCompletion.Task, ref _writeAvailable);
             }
             else if (_buffer.Count < _bufferSize)
             {
@@ -157,9 +141,10 @@ namespace Plexus.Channels
             }
 
             TryCompleteRead();
+
             if (_readCompletion.Task.IsCompleted)
             {
-                _readAvailable.TryComplete(false);
+                ComputeAvailabilityFromCompletion(_readCompletion.Task, ref _readAvailable);
             }
             else if (_buffer.Count > 0)
             {
@@ -168,6 +153,34 @@ namespace Plexus.Channels
             else if (_readAvailable.Task.IsCompleted && _readAvailable.Task.Result)
             {
                 _readAvailable = new Promise<bool>();
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ComputeAvailabilityFromCompletion(Task completion, ref Promise<bool> availability)
+        {
+            if (availability.Task.IsCompleted)
+            {
+                availability = new Promise<bool>();
+            }
+            if (completion.IsCanceled)
+            {
+                availability.TryCancel();
+            }
+            else if (completion.IsFaulted)
+            {
+                if (completion.Exception != null)
+                {
+                    availability.TryFail(completion.Exception.InnerExceptions);
+                }
+                else
+                {
+                    availability.TryCancel();
+                }
+            }
+            else
+            {
+                availability.TryComplete(false);
             }
         }
 
@@ -186,7 +199,6 @@ namespace Plexus.Channels
             {
                 return;
             }
-            _readAvailable.TryComplete(false);
             if (_writeCompletion.Task.IsCanceled)
             {
                 _readCompletion.TryCancel();

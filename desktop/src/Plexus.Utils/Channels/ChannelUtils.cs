@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- using System;
-using System.Threading.Tasks;
-
 namespace Plexus.Channels
 {
+    using System;
+    using System.Threading.Tasks;
+
     public static class ChannelUtils
     {
         public static void PropagateTerminationFrom(this ITerminatableChannel channel, Task completion)
@@ -58,7 +58,7 @@ namespace Plexus.Channels
                 }
             }
 
-            Task.WhenAny(completion, channel.Completion).ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
+            Task.WhenAny(completion, channel.Completion).Unwrap().ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
         }
 
         public static void PropagateExceptionFrom<T>(this IWritableChannel<T> channel, Task completion)
@@ -76,7 +76,7 @@ namespace Plexus.Channels
                 }
             }
 
-            Task.WhenAny(channel.Completion, completion).ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
+            Task.WhenAny(channel.Completion, completion).Unwrap().ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
         }
     }
 }

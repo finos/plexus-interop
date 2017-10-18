@@ -40,7 +40,7 @@
             _log = LogManager.GetLogger<TransportChannel>($"{connectionId}.{channelId}");
             _incomingMessageHandler = new TransportChannelHeaderHandler<Task, ChannelMessage>(HandleIncomingAsync, HandleIncomingAsync, HandleIncomingAsync);
             _sendProcessor = new TransportChannelSendProcessor(connectionId, channelId, output, headerFactory);
-            Completion = Task.WhenAll(_sendProcessor.Completion, _receiveBuffer.In.Completion).LogCompletion(_log);
+            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
         }
 
         public UniqueId Id { get; }
@@ -67,6 +67,11 @@
             {
                 await message.Header.Handle(_incomingMessageHandler, message).ConfigureAwait(false);
             }
+        }
+
+        private Task ProcessAsync()
+        {
+            return Task.WhenAll(_sendProcessor.Completion, _receiveBuffer.In.Completion);
         }
 
         private async Task HandleIncomingAsync(ITransportFrameHeader header, ChannelMessage message)

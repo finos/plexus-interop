@@ -58,18 +58,21 @@
         {
             try
             {
+                _log.Trace("Starting sending");
                 await SendOpenMessageAsync().ConfigureAwait(false);
                 _initialized.TryComplete();
-                await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);
+                await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);                
                 await SendCloseMessageAsync().ConfigureAwait(false);
+                _log.Trace("Sending completed");
             }
             catch (Exception ex)
-            {                
+            {                              
                 _buffer.Out.TryTerminateWriting(ex);
                 _buffer.In.DisposeBufferedItems();
                 await SendCloseMessageAsync(ex).IgnoreExceptions().ConfigureAwait(false);
+                _log.Trace("Sending failed: {0}", ex.FormatTypeAndMessage());
                 throw;
-            }
+            }            
         }
 
         private async Task SendOpenMessageAsync()
@@ -84,7 +87,7 @@
         {
             try
             {
-                _log.Trace("Sending header {0} with body {1}", header, body);
+                _log.Trace("Sending: {0} with body {1}", header, body);
                 await _out.WriteAsync(new ChannelMessage(header, body)).ConfigureAwait(false);
             }
             catch

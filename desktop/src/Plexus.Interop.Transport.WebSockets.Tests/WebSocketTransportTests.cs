@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Transport.WebSockets
+namespace Plexus.Interop.Transport.WebSockets
 {
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.WebSockets.Client;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using System.IO;
+    using Xunit.Abstractions;
 
     public sealed class WebSocketTransportTests : TransportTestsSuite
     {
-        public WebSocketTransportTests()
+        public WebSocketTransportTests(ITestOutputHelper output) : base(output)
         {
             Server = RegisterDisposable(new TransportServer(
                 new WebSocketTransmissionServer(Directory.GetCurrentDirectory()),
