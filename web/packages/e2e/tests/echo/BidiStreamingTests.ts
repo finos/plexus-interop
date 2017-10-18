@@ -121,9 +121,7 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                         console.error("Error received by client", e);
                         reject(e);
                     },
-                    complete: () => {
-                        console.log("Remote completed");
-                    }
+                    complete: () => {}
                 });
                 streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
             })();

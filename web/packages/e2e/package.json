@@ -25,7 +25,7 @@
     "postrepublish": "echo 'Package republished successfully!'",
     "prepare-electron-renderer-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/renderer/*spec.js --outputFile dist/main/tests/renderer/RendererProcess.bundle.js",
     "prepare-electron-renderer-benchmarks": "node scripts/browserify-all.js --inputGlob dist/main/tests/benchmarks/*spec.js --outputFile dist/main/tests/benchmarks/RendererProcessBenchmarks.bundle.js",
-    "run-ws-broker-tests": "npm run prepare-electron-renderer-tests && node scripts/run-tests-with-broker.js --printBrokerStdout true --file ./dist/main/tests/renderer/RendererProcess.bundle.js",
+    "run-ws-broker-tests": "npm run prepare-electron-renderer-tests && node scripts/run-tests-with-broker.js --file ./dist/main/tests/renderer/RendererProcess.bundle.js",
     "run-ws-broker-benchmarks": "npm run prepare-electron-renderer-benchmarks && node scripts/run-tests-with-broker.js --file ./dist/main/tests/benchmarks/RendererProcessBenchmarks.bundle.js",
     "electron-e2e": "npm run build && npm run run-ws-broker-tests",
     "electron-e2e-benchmarks": "npm run build && npm run run-ws-broker-benchmarks",

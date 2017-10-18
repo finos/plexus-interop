@@ -42,7 +42,6 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                     hostClient.next(echoRequest);
                     hostClient.complete();
                 } catch (error) {
-                    console.error("Failed", error);
                     reject(error);
                 }
             });
@@ -51,7 +50,6 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => {
-                    console.log("Received");
                     responses.push(response);
                 },
                 complete: async () => {
@@ -75,9 +73,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                     await this.assertEqual(request, echoRequest);
                     hostClient.next(echoRequest);
                     hostClient.error(new ClientError("Host error", "Error Details"));
-                    console.log("All sent");
                 } catch (error) {
-                    console.error("Failed", error);
                     reject(error);
                 }
             });
@@ -86,14 +82,12 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => {
-                    console.log("Received");
                     responses.push(response);
                 },
                 complete: async () => {
                     reject("Not expected to be completed");
                 },
                 error: async (e) => {
-                    console.log("Error", JSON.stringify(e));
                     expect(responses.length).is.eq(1);
                     responses.forEach(r => this.assertEqual(r, echoRequest));
                     await this.clientsSetup.disconnect(client, server);
@@ -114,7 +108,6 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                     hostClient.next(echoRequest);
                     hostClient.complete();
                 } catch (error) {
-                    console.error("Failed", error);
                     reject(error);
                 }
             });
@@ -166,9 +159,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                     await this.assertEqual(request, echoRequest);
                     await hostClient.next(echoRequest);
                     await hostClient.cancel();
-                    console.log("Operation cancelled");
                 } catch (error) {
-                    console.error("Failed", error);
                     reject(error);
                 }
             });
@@ -177,14 +168,12 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => {
-                    console.log("Received");
                     responses.push(response);
                 },
                 complete: async () => {
                     reject("Not expected to be completed");
                 },
                 error: async (e) => {
-                    console.log("Error", JSON.stringify(e));
                     expect(responses.length).is.eq(1);
                     responses.forEach(r => this.assertEqual(r, echoRequest));
                     await this.clientsSetup.disconnect(client, server);

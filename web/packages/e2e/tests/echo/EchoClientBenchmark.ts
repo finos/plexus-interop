@@ -58,7 +58,6 @@ export class EchoClientBenchmark extends BaseEchoTest {
         const echoRequest = this.clientsSetup.createRequestOfBytes(bytesPerMessage);
         const cancellationToken = new CancellationToken();
         const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
-            console.log("Starting to send");
             function sentMessages() {
                 if (!cancellationToken.isCancelled()) {
                     hostClient.next(echoRequest);
@@ -68,7 +67,6 @@ export class EchoClientBenchmark extends BaseEchoTest {
                     hostClient.next(echoRequest);
                     setTimeout(sentMessages, 0);
                 } else {
-                    console.log("Completed " + new Date().toISOString());      
                     hostClient.complete();   
                 }
             };
@@ -92,7 +90,6 @@ export class EchoClientBenchmark extends BaseEchoTest {
                     }
                 },
                 complete: async () => {
-                    console.log("Client completed")
                     await this.clientsSetup.disconnect(client, server);
                     resolve({
                         periodInMillis,

@@ -37,14 +37,11 @@ describe("Web Socket Client connectivity", () => {
     it("Can connect/disconnect from running Broker instance", function (done) {
         this.timeout(3000);
         let wsUrl = readWsUrl();
-        console.log("Connecting to " + wsUrl);
         clientsSetup
             .createEchoClient(transportsSetup.createWebSocketTransportProvider(wsUrl))
             .then(client => {
-                console.log("Client connected");
                 expect(client).to.not.be.undefined;
                 client.disconnect().then(() => {
-                    console.log("Client disconnected");
                     done();
                 });
             });

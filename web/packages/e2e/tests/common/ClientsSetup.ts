@@ -109,9 +109,7 @@ export class ClientsSetup {
 
     public async disconnect(client: EchoClientClient, server: EchoServerClient): Promise<void> {
         await client.disconnect();
-        console.log("Client disconnected");
         await server.disconnect();
-        console.log("Server disconnected");
     }
 
 }

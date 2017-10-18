@@ -50,7 +50,6 @@ export class PointToPointInvocationTests extends BaseEchoTest {
             });
             return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
                 .then(clients => {
-                    console.log("Clients connected");
                     return clients[0].getEchoServiceProxy()
                         .unary(echoRequest)
                         .then(echoResponse => {
@@ -95,7 +94,6 @@ export class PointToPointInvocationTests extends BaseEchoTest {
                             reject("Should not happen");
                         })
                         .catch(error => {
-                            console.log("Error received", JSON.stringify(error));
                             expect(error.message).to.eq(errorText);
                             return this.clientsSetup.disconnect(clients[0], clients[1]);
                         });
@@ -111,7 +109,6 @@ export class PointToPointInvocationTests extends BaseEchoTest {
             const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => request);
             return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
                 .then(clients => {
-                    console.log("Clients connected, sending multiple messages");
                     return (async () => {
                         let echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
                         this.assertEqual(echoRequest, echoResponse);

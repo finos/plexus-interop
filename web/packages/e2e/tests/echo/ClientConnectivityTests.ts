@@ -55,7 +55,6 @@ export class ClientConnectivityTests extends BaseEchoTest {
         try {
             await preparedBuilder.connect();
         } catch (error) {
-            console.log("Expected error", error);
             return Promise.resolve();
         }
         throw new Error("Expect to fail to receive connection")
@@ -92,11 +91,9 @@ export class ClientConnectivityTests extends BaseEchoTest {
                         }
                     });
                 });
-                console.log("Clients created");
             });
 
             await serverRequestReceived;
-            console.log("Request received");
 
             if (isForcedByClient) {
                 (client as EchoClientClient).disconnect();
@@ -107,19 +104,15 @@ export class ClientConnectivityTests extends BaseEchoTest {
             }
 
             await clientInvocationErrorReceived;       
-            console.log("Client invocation error received");
             
             await AsyncHelper.waitFor(() => (serverStreamingContext as MethodInvocationContext).cancellationToken.isCancelled());
-            console.log("Server streaming cancelled");
 
             if (!isForcedByServer) {
                 await (server as EchoServerClient).disconnect();
-                console.log("Server disconnected");
             }
 
             if (!isForcedByClient) {
                 await (client as EchoClientClient).disconnect();
-                console.log("Client disconnected");
             }
 
             testResolve();
