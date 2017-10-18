@@ -21,14 +21,12 @@ namespace Plexus.Interop
     using Plexus.Interop.Transport;
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
-    using System.Threading;
 
     public static class ClientOptionsBuilderExtensions
     {
         public static ClientOptionsBuilder WithDefaultConfiguration(
             this ClientOptionsBuilder builder, 
-            string brokerWorkingDir,
-            CancellationToken cancellationToken)
+            string brokerWorkingDir)
         {
             return builder
                 .WithMarshaller(
@@ -39,7 +37,7 @@ namespace Plexus.Interop
                         new ProtobufProtocolSerializerFactory()))
                 .WithTransport(
                     new TransportClient(
-                        new PipeTransmissionClient(brokerWorkingDir, cancellationToken),
+                        new PipeTransmissionClient(brokerWorkingDir),
                         new ProtobufTransportProtocolSerializationProvider()));
         }
     }

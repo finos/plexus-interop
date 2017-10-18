@@ -127,8 +127,7 @@
                 Transport,
                 Protocol,
                 Marshaller,
-                GetServiceDefinitions(),
-                CancellationToken);
+                GetServiceDefinitions());
             IEnumerable<ProvidedServiceDefinition> GetServiceDefinitions()
             {
                 foreach (var serviceFactory in _serviceFactories)

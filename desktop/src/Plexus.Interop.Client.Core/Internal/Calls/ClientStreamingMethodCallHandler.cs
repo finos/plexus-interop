@@ -20,6 +20,7 @@ namespace Plexus.Interop.Internal.Calls
     using Plexus.Interop.Transport;
     using System;
     using System.Threading.Tasks;
+    using Plexus.Channels;
 
     internal sealed class ClientStreamingMethodCallHandler<TRequest, TResponse> : IMethodCallHandler
     {
@@ -42,7 +43,7 @@ namespace Plexus.Interop.Internal.Calls
                 await invocation.StartCompletion.ConfigureAwait(false);
                 var context = new MethodCallContext(info.Source.ApplicationId, info.Source.ConnectionId);
                 var response = await _handler(invocation.In, context).ConfigureAwait(false);
-                await invocation.Out.TryWriteSafeAsync(response).ConfigureAwait(false);
+                await invocation.Out.WriteAsync(response).ConfigureAwait(false);
                 invocation.Out.TryCompleteWriting();
             }
             catch (Exception ex)

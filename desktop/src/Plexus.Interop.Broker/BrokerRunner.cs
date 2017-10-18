@@ -71,13 +71,13 @@ namespace Plexus.Interop.Broker
 
         private ITransportServer CreateNamedPipeServer()
         {
-            var pipeServer = new PipeTransmissionServer(_workingDir, _cancellationToken);
+            var pipeServer = new PipeTransmissionServer(_workingDir);
             return new TransportServer(pipeServer, DefaultTransportSerializationProvider);
         }
 
         private ITransportServer CreateWebSocketServer()
         {
-            var webSocketServer = new WebSocketTransmissionServer(_workingDir, _cancellationToken);
+            var webSocketServer = new WebSocketTransmissionServer(_workingDir);
             return new TransportServer(webSocketServer, DefaultTransportSerializationProvider);
         }
     }

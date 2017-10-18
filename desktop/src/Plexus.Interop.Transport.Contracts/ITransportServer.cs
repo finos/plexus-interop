@@ -14,19 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Transport
 {
     using System;
     using System.Threading.Tasks;
+    using Plexus.Channels;
 
     public interface ITransportServer : IDisposable
     {
-        ValueTask<Maybe<ITransportConnection>> TryAcceptAsync();
-
-        ValueTask<ITransportConnection> AcceptAsync();
-
         Task Completion { get; }
 
+        IReadOnlyChannel<ITransportConnection> In { get; }
+
         Task StartAsync();
+
+        Task StopAsync();
     }
 }

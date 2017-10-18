@@ -22,7 +22,7 @@ namespace Plexus.Channels
 
     public interface IReadOnlyChannel<T>
     {
-        Task Completion { get; }        
+        Task Completion { get; }
 
         bool TryRead(out T item);
 

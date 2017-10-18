@@ -62,16 +62,9 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Reading responses");
-                    while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
-                    {
-                        while (invocation.In.TryRead(out var response))
-                        {
-                            if (!_responseStream.Out.TryWrite(response))
-                            {
-                                await _responseStream.Out.TryWriteSafeAsync(response).ConfigureAwait(false);
-                            }
-                        }
-                    }
+                    await invocation.In
+                        .ConsumeAsync(item => _responseStream.Out.WriteAsync(item))
+                        .ConfigureAwait(false);
                     await invocation.In.Completion.ConfigureAwait(false);
                     _responseStream.Out.TryCompleteWriting();
                 }

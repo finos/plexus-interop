@@ -23,7 +23,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
     using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
     using Plexus.Processes;
     using System;
-    using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -40,7 +39,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 
         private IWebHost _host;
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
-        private readonly IChannel<ITransmissionConnection> _incomingConnections = new BufferedChannel<ITransmissionConnection>(1);
+        private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(1);
         private readonly IServerStateWriter _stateWriter;
 
         public WebSocketTransmissionServer(string workingDir)
@@ -48,13 +47,15 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
             _stateWriter = new ServerStateWriter(ServerName, workingDir);
         }
 
+        public IReadOnlyChannel<ITransmissionConnection> In => _buffer.In;
+
         public async Task<Task> StartConnectionAsync(WebSocket websocket)
         {
             var connection = new WebSocketServerTransmissionConnection(websocket, _cancellation.Token);
-            await _incomingConnections.Out.WriteAsync(connection, _cancellation.Token).ConfigureAwait(false);
+            await _buffer.Out.WriteAsync(connection, _cancellation.Token).ConfigureAwait(false);
             Log.Trace("Websocket connection accepted");
             return connection.Completion;
-        }
+        }        
 
         public async Task StopAsync()
         {
@@ -63,21 +64,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
             Start();
             await Completion.IgnoreExceptions().ConfigureAwait(false);
             Log.Trace("Stopped");
-        }
-
-        public ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync()
-        {
-            return _incomingConnections.In.TryReadAsync();
-        }
-
-        public async ValueTask<ITransmissionConnection> AcceptAsync()
-        {
-            var result = await TryAcceptAsync().ConfigureAwait(false);
-            if (!result.HasValue)
-            {
-                throw new OperationCanceledException();
-            }
-            return result.Value;
         }
 
         protected override async Task<Task> StartCoreAsync()
@@ -132,14 +118,14 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
             }
             catch (Exception ex)
             {
-                _incomingConnections.Out.TryTerminateWriting(ex);
-                _incomingConnections.In.DisposeBufferedItems();
+                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.In.DisposeBufferedItems();
                 Log.Error(ex, "Web server host terminated with exception");
                 throw;
             }
             Log.Trace("Web server host stopped");
-            _incomingConnections.Out.TryCompleteWriting();
-            _incomingConnections.In.DisposeBufferedItems();
+            _buffer.Out.TryCompleteWriting();
+            _buffer.In.DisposeBufferedItems();
         }
 
         public void Configure(IServiceCollection s)

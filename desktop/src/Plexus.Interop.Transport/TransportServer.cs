@@ -16,16 +16,19 @@
  */
 namespace Plexus.Interop.Transport
 {
-    using System;
+    using Plexus.Channels;
     using Plexus.Interop.Transport.Internal;
     using Plexus.Interop.Transport.Protocol.Serialization;
     using Plexus.Interop.Transport.Transmission;
+    using Plexus.Processes;
+    using System;
     using System.Threading.Tasks;
 
-    public sealed class TransportServer : ITransportServer
+    public sealed class TransportServer : ProcessBase, ITransportServer
     {
         private readonly ITransmissionServer _transmissionServer;
         private readonly TransportConnectionFactory _connectionFactory;
+        private readonly BufferedChannel<ITransportConnection> _buffer = new BufferedChannel<ITransportConnection>(1);
 
         public TransportServer(
             ITransmissionServer transmissionServer,
@@ -35,30 +38,47 @@ namespace Plexus.Interop.Transport
             _transmissionServer = transmissionServer;
         }
 
-        public async ValueTask<ITransportConnection> AcceptAsync()
-        {
-            return (await TryAcceptAsync()).GetValueOrThrowException<OperationCanceledException>();
-        }
+        public IReadOnlyChannel<ITransportConnection> In => _buffer.In;
 
-        public Task Completion => _transmissionServer.Completion;
-
-        public async Task StartAsync()
+        protected override async Task<Task> StartCoreAsync()
         {
             await _transmissionServer.StartAsync().ConfigureAwait(false);
+            return ProcessAsync();
         }
 
-        public async ValueTask<Maybe<ITransportConnection>> TryAcceptAsync()
+        public async Task StopAsync()
         {
-            var connection = await _transmissionServer.TryAcceptAsync();
-            return connection.HasValue
-                ? new Maybe<ITransportConnection>(_connectionFactory.Create(connection.Value))
-                : Maybe<ITransportConnection>.Nothing;
-        }
+            _buffer.Out.TryCompleteWriting();            
+            await _transmissionServer.StopAsync().ConfigureAwait(false);
+            Start();
+            await Completion.IgnoreExceptions().ConfigureAwait(false);
+        }        
 
         public void Dispose()
         {
-            _transmissionServer.Dispose();
-            Completion.IgnoreExceptions().GetResult();
+            StopAsync().IgnoreExceptions().GetResult();
+        }
+
+        private async Task ProcessAsync()
+        {
+            try
+            {
+                await _transmissionServer.In.ConsumeAsync(AcceptAsync).ConfigureAwait(false);
+                _buffer.Out.TryCompleteWriting();
+            }
+            catch (Exception ex)
+            {
+                _buffer.Out.TryTerminateWriting(ex);
+                throw;
+            }
+        }
+
+        private async Task AcceptAsync(ITransmissionConnection c)
+        {
+            if (!await _buffer.TryWriteAsync(_connectionFactory.Create(c)))
+            {
+                await c.DisconnectAsync().ConfigureAwait(false);
+            }
         }
     }
 }

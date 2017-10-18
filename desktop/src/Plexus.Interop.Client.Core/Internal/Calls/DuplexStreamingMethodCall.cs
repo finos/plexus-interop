@@ -16,12 +16,12 @@
  */
 namespace Plexus.Interop.Internal.Calls
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Plexus.Channels;
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
     using Plexus.Processes;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     internal sealed class DuplexStreamingMethodCall<TRequest, TResponse> : 
         ProcessBase, IDuplexStreamingMethodCall<TRequest, TResponse>
@@ -70,13 +70,9 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Reading responses");
-                    while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
-                    {
-                        while (invocation.In.TryRead(out var item))
-                        {
-                            await _responseStream.Out.TryWriteSafeAsync(item).ConfigureAwait(false);
-                        }
-                    }
+                    await invocation.In
+                        .ConsumeAsync(item => _responseStream.Out.WriteAsync(item))
+                        .ConfigureAwait(false);
                     Log.Trace("Responses stream completed");
                 }
                 catch (Exception ex)
@@ -99,13 +95,9 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Writing requests");
-                    while (await _requestStream.In.WaitReadAvailableAsync().ConfigureAwait(false))
-                    {
-                        while (_requestStream.In.TryRead(out var item))
-                        {
-                            await invocation.Out.TryWriteSafeAsync(item).ConfigureAwait(false);
-                        }
-                    }
+                    await _requestStream.In
+                        .ConsumeAsync(item => invocation.Out.WriteAsync(item))
+                        .ConfigureAwait(false);
                     invocation.Out.TryCompleteWriting();
                     await _requestStream.Out.Completion.ConfigureAwait(false);
                     Log.Trace("Requests stream completed");

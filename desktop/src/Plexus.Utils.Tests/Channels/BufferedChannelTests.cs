@@ -197,8 +197,8 @@ namespace Plexus.Channels
             var task1 = sut.TryReadAsync();
             var task2 = sut.TryReadAsync();
             sut.Terminate();
-            task1.Result.HasValue.ShouldBeFalse();
-            task2.Result.HasValue.ShouldBeFalse();
+            Should.Throw<OperationCanceledException>(task1.AsTask(), Timeout1Sec);
+            Should.Throw<OperationCanceledException>(task2.AsTask(), Timeout1Sec);
         }
 
         [Fact]
@@ -208,8 +208,8 @@ namespace Plexus.Channels
             var task1 = sut.TryWriteAsync(1);
             var task2 = sut.TryWriteAsync(1);
             sut.Terminate();
-            task1.Result.ShouldBeFalse();
-            task2.Result.ShouldBeFalse();
+            Should.Throw<OperationCanceledException>(task1, Timeout1Sec);
+            Should.Throw<OperationCanceledException>(task2, Timeout1Sec);
         }
 
         [Fact]
@@ -219,8 +219,8 @@ namespace Plexus.Channels
             var task1 = sut.TryReadAsync();
             var task2 = sut.TryReadAsync();
             sut.Terminate(new InvalidOperationException());
-            task1.Result.HasValue.ShouldBeFalse();
-            task2.Result.HasValue.ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(task1.AsTask(), Timeout1Sec);
+            Should.Throw<InvalidOperationException>(task2.AsTask(), Timeout1Sec);
         }
 
         [Fact]
@@ -230,8 +230,8 @@ namespace Plexus.Channels
             var task1 = sut.TryWriteAsync(1);
             var task2 = sut.TryWriteAsync(1);
             sut.Terminate(new InvalidOperationException());
-            task1.Result.ShouldBeFalse();
-            task2.Result.ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(task1, Timeout1Sec);
+            Should.Throw<InvalidOperationException>(task2, Timeout1Sec);
         }
 
         [Fact]

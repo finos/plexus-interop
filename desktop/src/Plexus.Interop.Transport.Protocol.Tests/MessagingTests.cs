@@ -70,7 +70,7 @@ namespace Plexus.Interop.Transport.Protocol
             RunWith10SecTimeout(async () =>
             {
                 using (var clientConnection = await _client.ConnectAsync())
-                using (var serverConnection = await _server.AcceptAsync())
+                using (var serverConnection = await _server.In.ReadAsync())
                 {
                     var clientSender = new MessagingSendProcessor(clientConnection, SerializationProvider.GetSerializer());
                     var serverReceiver = new MessagingReceiveProcessor(serverConnection, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
@@ -94,7 +94,7 @@ namespace Plexus.Interop.Transport.Protocol
         public void CanSendMessagesOfAllTypes()
         {
             var received = new List<TransportMessage>();
-            var serverTask = RunReceiverTaskAsync(() => _server.AcceptAsync(), async receiver =>
+            var serverTask = RunReceiverTaskAsync(() => _server.In.ReadAsync(), async receiver =>
             {
                 while (true)
                 {
@@ -155,7 +155,7 @@ namespace Plexus.Interop.Transport.Protocol
             var receiverTask = TaskRunner.RunInBackground(async () =>
             {
                 MessagingReceiveProcessor receiver;
-                using (var connection = await _server.AcceptAsync().ConfigureAwait(false))
+                using (var connection = await _server.In.ReadAsync().ConfigureAwait(false))
                 {
                     receiver = new MessagingReceiveProcessor(connection, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
                     await receiver.In.TryReadAsync().ConfigureAwait(false);

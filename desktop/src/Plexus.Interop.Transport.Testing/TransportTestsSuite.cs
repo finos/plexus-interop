@@ -74,7 +74,7 @@ namespace Plexus.Interop.Transport
             {
                 await Server.StartAsync();
                 using (var clientConnection = await Client.ConnectAsync())
-                using (var serverConnection = await Server.AcceptAsync())
+                using (var serverConnection = await Server.In.ReadAsync())
                 {
                     serverConnection.Dispose();
 
@@ -91,7 +91,7 @@ namespace Plexus.Interop.Transport
             {
                 await Server.StartAsync();
                 using (var clientConnection = await Client.ConnectAsync())
-                using (var serverConnection = await Server.AcceptAsync())
+                using (var serverConnection = await Server.In.ReadAsync())
                 {
                     clientConnection.Dispose();
                     
@@ -108,7 +108,7 @@ namespace Plexus.Interop.Transport
             {
                 await Server.StartAsync();
                 using (var clientConnection = await Client.ConnectAsync())
-                using (var serverConnection = await Server.AcceptAsync())
+                using (var serverConnection = await Server.In.ReadAsync())
                 {
                     clientConnection.TryTerminate();
                     Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
@@ -126,7 +126,7 @@ namespace Plexus.Interop.Transport
             {
                 await Server.StartAsync();
                 using (var clientConnection = await Client.ConnectAsync())
-                using (var serverConnection = await Server.AcceptAsync())
+                using (var serverConnection = await Server.In.ReadAsync())
                 {
                     serverConnection.TryTerminate();
                     Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
@@ -145,7 +145,7 @@ namespace Plexus.Interop.Transport
                 {
                     await Server.StartAsync().ConfigureAwait(false);
                     using (var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false)))
-                    using (var serverConnection = RegisterDisposable(await Server.AcceptAsync().ConfigureAwait(false)))
+                    using (var serverConnection = RegisterDisposable(await Server.In.ReadAsync().ConfigureAwait(false)))
                     {
                         var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                         var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
@@ -167,7 +167,7 @@ namespace Plexus.Interop.Transport
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.AcceptAsync();
+                    var serverConnectionTask = Server.In.ReadAsync();
                     var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
@@ -184,8 +184,8 @@ namespace Plexus.Interop.Transport
             RunWith10SecTimeout(
                 async () =>
                 {
-                    await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.AcceptAsync();
+                    await Server.StartAsync();
+                    var serverConnectionTask = Server.In.ReadAsync();
                     var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     serverConnection.TryTerminate();
@@ -200,10 +200,9 @@ namespace Plexus.Interop.Transport
             RunWith10SecTimeout(
                 async () =>
                 {
-                    await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.AcceptAsync();
-                    var clientConnection = await Client.ConnectAsync().ConfigureAwait(false);
-                    var serverConnection = await serverConnectionTask.ConfigureAwait(false);
+                    await Server.StartAsync().ConfigureAwait(false);                    
+                    var clientConnection = await Client.ConnectAsync();
+                    var serverConnection = await Server.In.ReadAsync();
                     clientConnection.TryTerminate();
                     Should.Throw<OperationCanceledException>(clientConnection.CreateChannelAsync().AsTask(), Timeout1Sec);
                     Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
@@ -307,7 +306,7 @@ namespace Plexus.Interop.Transport
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    serverConnection = await Server.AcceptAsync().ConfigureAwait(false);
+                    serverConnection = await Server.In.ReadAsync().ConfigureAwait(false);
                     Log.Info("Server connection created");
                     var channelTasks = new List<Task>();
                     foreach (var channelExchange in cases)

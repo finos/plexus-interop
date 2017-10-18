@@ -33,7 +33,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
         private readonly IServerStateWriter _settingsWriter;
         private readonly string _pipeName = "plexus-interop-broker-" + Guid.NewGuid();
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
-        private readonly BufferedChannel<ITransmissionConnection> _incomingConnections 
+        private readonly BufferedChannel<ITransmissionConnection> _buffer 
             = new BufferedChannel<ITransmissionConnection>(1);
 
         public PipeTransmissionServer(string brokerWorkingDir)
@@ -42,15 +42,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             _settingsWriter = new ServerStateWriter(ServerName, brokerWorkingDir);
         }
 
-        public ValueTask<Maybe<ITransmissionConnection>> TryAcceptAsync()
-        {
-            return _incomingConnections.TryReadAsync();
-        }
-
-        public ValueTask<ITransmissionConnection> AcceptAsync()
-        {
-            return _incomingConnections.ReadAsync();
-        }
+        public IReadOnlyChannel<ITransmissionConnection> In => _buffer.In;
 
         public async Task StopAsync()
         {
@@ -80,18 +72,18 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                     var connection = await StreamTransmissionConnection
                         .CreateAsync(UniqueId.Generate(), AcceptStreamAsync)
                         .ConfigureAwait(false);
-                    await _incomingConnections.Out
+                    await _buffer.Out
                         .WriteAsync(connection, _cancellation.Token)
                         .ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) when (_cancellation.IsCancellationRequested)
             {
-                _incomingConnections.Out.TryCompleteWriting();
+                _buffer.Out.TryCompleteWriting();
             }
             catch (Exception ex)
             {
-                _incomingConnections.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminateWriting(ex);
                 throw;
             }
             finally

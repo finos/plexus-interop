@@ -45,7 +45,7 @@ namespace Plexus.Interop.Transport.Transmission
                 using (var server = CreateServer())
                 {
                     await server.StartAsync();
-                    var serverConnectionTask = server.AcceptAsync();
+                    var serverConnectionTask = server.In.ReadAsync();
                     WriteLog("Connecting client");
                     var client = CreateClient();
                     using (await client.ConnectAsync())
@@ -103,7 +103,7 @@ namespace Plexus.Interop.Transport.Transmission
                 using (var server = CreateServer())
                 {
                     await server.StartAsync();
-                    var serverConnectionTask = server.AcceptAsync();
+                    var serverConnectionTask = server.In.ReadAsync();
                     WriteLog("Connecting client");
                     var client = CreateClient();
                     using (var clientConnection = await client.ConnectAsync())
@@ -134,7 +134,7 @@ namespace Plexus.Interop.Transport.Transmission
                 using (var server = CreateServer())
                 {
                     await server.StartAsync();
-                    var serverConnectionTask = server.AcceptAsync();
+                    var serverConnectionTask = server.In.ReadAsync();
                     WriteLog("Connecting client");
                     var client = CreateClient();
                     using (var clientConnection = await client.ConnectAsync())
@@ -208,7 +208,7 @@ namespace Plexus.Interop.Transport.Transmission
             {
                 var server = RegisterDisposable(CreateServer());
                 await server.StartAsync().ConfigureAwaitWithTimeout(Timeout5Sec);
-                using (var serverConnection = RegisterDisposable(await server.AcceptAsync().ConfigureAwait(false)))
+                using (var serverConnection = RegisterDisposable(await server.In.ReadAsync().ConfigureAwait(false)))
                 {
                     var receiveTask = TaskRunner.RunInBackground(async () =>
                     {
