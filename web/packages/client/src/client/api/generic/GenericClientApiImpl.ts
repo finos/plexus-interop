@@ -27,7 +27,7 @@ import { InvocationClient } from "./../InvocationClient";
 import { ValueHandler } from "./../ValueHandler";
 import { ClientError } from "@plexus-interop/protocol";
 import { InvocationRequestInfo } from "../../generic/InvocationMetaInfo";
-import { Logger, LoggerFactory, Arrays, PrefixedLogger } from "@plexus-interop/common";
+import { Logger, LoggerFactory, Arrays } from "@plexus-interop/common";
 
 import { MarshallerProvider } from "../io/MarshallerProvider";
 import { Completion } from "../dto/Completion";
@@ -92,7 +92,7 @@ export class GenericClientApiImpl implements GenericClientApi {
     }
 
     public async sendBidirectionalStreamingRequestInternal(strInfo: string, requestInvocation: () => Promise<Invocation>, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
-        const logger = new PrefixedLogger(this.log, strInfo);
+        const logger = LoggerFactory.getLogger(`Invocation Request [${strInfo}]`);
         logger.debug(`Sending request for invocation`);
         const invocation = await requestInvocation();
         logger.debug(`Invocation created`);

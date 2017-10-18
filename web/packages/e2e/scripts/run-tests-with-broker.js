@@ -82,10 +82,6 @@ function main() {
         maxBuffer: 1024 * 1024
     }, (error, stdout, stderr) => {
         log("Broker stopped");
-        if (error) {
-            console.error('Std Error:', stderr);
-            console.error('Error:', error);
-        }
         if (argv.printBrokerStdout) {
             log('StdOut', stdout);
         }

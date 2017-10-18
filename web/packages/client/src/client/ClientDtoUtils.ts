@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RemoteInvocationInfo } from "./api/dto/RemoteInvocationInfo";
 import { ClientError } from "@plexus-interop/protocol";
 import { InvocationRequestInfo } from "./generic/InvocationMetaInfo";
 import { isString } from "@plexus-interop/common";
@@ -23,10 +22,6 @@ import { UniqueId } from "@plexus-interop/transport-common";
 import { InvocationMetaInfo } from "./generic/InvocationMetaInfo";
 
 export class ClientDtoUtils {
-
-    public static toString(dto: RemoteInvocationInfo): string {
-        return `${dto.applicationId}-${dto.serviceId}-${dto.methodId}`;
-    }
 
     public static targetInvocationHash(invocation: InvocationRequestInfo): string {
         return `${invocation.serviceId}.${invocation.methodId}`;
@@ -49,9 +44,6 @@ export class ClientDtoUtils {
     }
 
     public static toError(error: any): ClientError {
-        if (!error) {
-            return new ClientError();
-        }
         if (isString(error)) {
             return new ClientError(error);
         }

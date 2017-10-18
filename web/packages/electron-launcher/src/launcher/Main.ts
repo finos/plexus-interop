@@ -33,7 +33,9 @@ const argv = require("minimist")(process.argv.slice(1));
 
 import { app } from "electron";
 import { FileLogger } from "./logger/FileLogger";
-import { LoggerFactory, PrefixedLogger, LogLevel } from "@plexus-interop/common";
+import { PrefixedLogger } from "./logger/PrefixedLogger";
+import { LoggerFactory, LogLevel } from "@plexus-interop/common";
+
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 let log = new FileLogger(LoggerFactory.getLogger("ElectronLauncherMain"));
 

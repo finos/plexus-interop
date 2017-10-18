@@ -17,7 +17,7 @@
 import { BidiStreamingInvocationHandler } from "./BidiStreamingInvocationHandler";
 import { Invocation } from "../../../client/generic/Invocation";
 import { StreamingInvocationClientImpl } from "./StreamingInvocationClientImpl";
-import { Logger, Observer, LoggerFactory, PrefixedLogger, CancellationToken } from "@plexus-interop/common";
+import { Logger, Observer, LoggerFactory, CancellationToken } from "@plexus-interop/common";
 import { ClientDtoUtils } from "../../ClientDtoUtils";
 import { MethodInvocationContext } from "../MethodInvocationContext";
 import { UniqueId } from "@plexus-interop/transport-common";
@@ -41,7 +41,7 @@ export class StreamingInvocationHost<Req, Res> {
                 this.logger.trace("Invocation opened");
                 const metaInfo = this.invocation.getMetaInfo();
                 const hash = ClientDtoUtils.targetInvocationHash(metaInfo);
-                this.logger = new PrefixedLogger(this.logger, hash);
+                this.logger = LoggerFactory.getLogger(`Invocation Host [${hash}]`);
                 const invocationHandler = this.handlersRegistry.get(hash);
                 if (invocationHandler) {
                     const invocationContext = new MethodInvocationContext(metaInfo.consumerApplicationId as string, metaInfo.consumerConnectionId as UniqueId, invocationCancellationToken);
