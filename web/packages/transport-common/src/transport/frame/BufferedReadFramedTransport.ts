@@ -17,8 +17,9 @@
 import { UniqueId } from "../UniqueId";
 import { Frame } from "./model";
 import { FramedTransport } from "./FramedTransport";
-import { Observer, Logger } from "@plexus-interop/common";
+import { Observer, Logger, LimitedBufferQueue } from "@plexus-interop/common";
 import { Queue } from "typescript-collections";
+import { Defaults } from "../../common/Defaults";
 
 /**
  * Collects all read events until client opened connection
@@ -28,7 +29,7 @@ export abstract class BufferedReadFramedTransport implements FramedTransport, Ob
     protected framesObserver: Observer<Frame> | null = null;
     protected completed: boolean = false;
     protected receivedError: any;
-    protected inBuffer: Queue<Frame> = new Queue<Frame>();
+    protected inBuffer: Queue<Frame> = new LimitedBufferQueue<Frame>(Defaults.DEFAULT_BUFFER_SIZE);
 
     constructor(
         protected readonly log: Logger) { }

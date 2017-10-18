@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BlockingQueueBase } from "./BlockingQueue";
+import { Queue } from "typescript-collections";
 
-export class BlockingBufferedQueue<T> extends BlockingQueueBase<T> {
+export class LimitedBufferQueue<T> extends Queue<T> {
 
     constructor(
         private readonly maxBufferSize: number = 1024) {
         super();
     }
 
-    public async enqueue(elem: T): Promise<void> {
+    public enqueue(elem: T): boolean {
         if (this.size() >= this.maxBufferSize) {
-            return Promise.reject(`Reached max buffer size ${this.maxBufferSize}`);
+            throw new Error(`Buffer reached the limit ${this.maxBufferSize}`);
         } else {
-            super.enqueue(elem);
+            return super.enqueue(elem);
         }
     }
 

@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter } from "@plexus-interop/transport-common";
-import { CancellationToken, Logger, LoggerFactory, Observer } from "@plexus-interop/common";
+import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults } from "@plexus-interop/transport-common";
+import { CancellationToken, Logger, LoggerFactory, Observer, LimitedBufferQueue } from "@plexus-interop/common";
 import { Queue } from "typescript-collections";
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
@@ -42,7 +42,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     constructor(
         private readonly socket: WebSocket,
         private readonly guid: UniqueId = UniqueId.generateNew(),
-        private inMessagesBuffer: Queue<Frame> = new Queue<Frame>(),
+        private inMessagesBuffer: Queue<Frame> = new LimitedBufferQueue<Frame>(Defaults.DEFAULT_BUFFER_SIZE),
         private messagesConverter: InternalMessagesConverter = new InternalMessagesConverter()) {
         this.socket.binaryType = "arraybuffer";
         this.log = LoggerFactory.getLogger(`WebSocketFramedTransport [${this.uuid().toString()}]`);

@@ -14,24 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BlockingBufferedQueue } from "../../src/util/collections/BlockingBufferedQueue";
+import { LimitedBufferQueue } from "../../src/util/collections/LimitedBufferQueue";
 
-describe("BlockingBufferedQueue", () => {
+describe("LimitedBufferQueue", () => {
 
-    it("Should enqueue and dequeue element if buffer size is enough", (done) => {
-        const sut = new BlockingBufferedQueue(1);
+    it("Should enqueue and dequeue element if buffer size is enough", () => {
+        const sut = new LimitedBufferQueue(1);
         const el = "test";
-        sut.blockingDequeue().then(res => {
-            expect(res).toBe(el);
-            done();
-        });
-        setTimeout(() => sut.enqueue(el), 30);
+        sut.enqueue(el)
+        expect(sut.dequeue()).toEqual(el);
     });
 
     it("Should reject enqueue if buffer size is not enough", (done) => {
-        const sut = new BlockingBufferedQueue(0);
+        const sut = new LimitedBufferQueue(0);
         const el = "test";
-        sut.enqueue(el).catch(() => done());
+        try {
+            sut.enqueue(el);
+        } catch (error) {
+            done();
+        }
     });
 
 });

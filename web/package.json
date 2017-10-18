@@ -19,7 +19,9 @@
     "build-all": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
     "prebuild-all": "yarn install",
     "e2e": "cd ./packages/e2e && yarn electron-e2e",
-    "poste2e": "nyc report"
+    "poste2e": "yarn coverage",
+    "coverage": "nyc report --reporter=text --reporter=html",
+    "benchmarks": "cd ./packages/e2e && yarn electron-e2e-benchmarks"
   },
   "workspaces": [
     "packages/*"
