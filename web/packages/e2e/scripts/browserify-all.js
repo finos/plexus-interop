@@ -31,25 +31,26 @@ var testFiles = glob.sync(resultInputGlob);
 
 console.log('Processing files: ' + JSON.stringify(testFiles));
 
-browserify({entries: testFiles})
-    .transform(istanbul({
+let browserifyBundle = browserify({ entries: testFiles });
+
+if (!argv.debug) {
+    bundle = browserifyBundle.transform(istanbul({
         // ignore these glob paths (the ones shown are the defaults)
-    ignore: [
-        // skip all node modules, except our
-        '**/node_modules/!(@plexus-interop)/**', 
-        // skip all generated proto messages
-        '**/*-messages.js',
-        '**/*-protocol.js',
-        '**/index.js',
-        '**/bower_components/**', 
-        '**/test/**', 
-        '**/tests/**', 
-        '**/*.json',
-        '**/*.spec.js'],
-        // by default, any paths you include in the ignore option are ignored
-        // in addition to the defaults. set the defaultIgnore option to false
-        // to only ignore the paths you specify.
+        ignore: [
+            // skip all node modules, except our
+            '**/node_modules/!(@plexus-interop)/**',
+            // skip all generated proto messages
+            '**/*-messages.js',
+            '**/*-protocol.js',
+            '**/index.js',
+            '**/bower_components/**',
+            '**/test/**',
+            '**/tests/**',
+            '**/*.json',
+            '**/*.spec.js'],
         defaultIgnore: true
-    }), {global : true})
-    .bundle()
+    }), { global: true });
+}
+
+browserifyBundle.bundle()
     .pipe(fs.createWriteStream(argv.outputFile));

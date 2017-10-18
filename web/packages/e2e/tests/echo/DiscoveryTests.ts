@@ -149,7 +149,7 @@ export class DiscoveryTests extends BaseEchoTest {
                 return {
                     next: (clientRequest) => hostClient.complete(),
                     complete: () => {},
-                    error: (e) =>  console.error("Error received by server", e)
+                    error: (e) => console.error("Error received by server", e)
                 }
             });
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
@@ -167,20 +167,19 @@ export class DiscoveryTests extends BaseEchoTest {
             if (!method.providedMethod) {
                 throw new Error("Provided method is empty");
             }
-            return new Promise<void>((resolve, reject) => {
-                 (async () => {
-                    const streamingClient = await client.sendDiscoveredBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
-                        next: (serverResponse) => {},
-                        error: (e) => {
-                            reject(e);
-                        },
-                        complete: async () => {
-                            await this.clientsSetup.disconnect(client, server);
-                            resolve();                        
-                        }
-                    });
-                    streamingClient.next(this.encodeRequestDto(echoRequest));
-                })();
+            return new Promise<void>(async (resolve, reject) => {
+                const streamingClient = await client.sendDiscoveredBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
+                    next: (serverResponse) => {},
+                    error: (e) => {
+                        reject(e);
+                    },
+                    complete: async () => {
+                        await this.clientsSetup.disconnect(client, server);
+                        resolve();                        
+                    }
+                });
+                streamingClient.next(this.encodeRequestDto(echoRequest));
+                streamingClient.complete();
             });
         } else {
             throw "Empty response";
