@@ -58,20 +58,25 @@ class EchoServerClientImpl implements EchoServerClient {
         private readonly genericClient: GenericClientApi,
     ) { }
 
+    // Client methods ignored from coverage as all tests use EchoClient to invoke actions
 
     public discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse> {
+        /* istanbul ignore next */
         return this.genericClient.discoverService(discoveryRequest);
     }
 
     public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
+        /* istanbul ignore next */        
         return this.genericClient.discoverMethod(discoveryRequest);
     }
 
     public sendDiscoveredUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
+        /* istanbul ignore next */        
         return this.genericClient.sendDiscoveredUnaryRequest(methodReference, request, responseHandler);
     }
 
     public sendDiscoveredBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
+        /* istanbul ignore next */        
         return this.genericClient.sendDiscoveredBidirectionalStreamingRequest(methodReference, responseObserver);
     }
 
@@ -79,6 +84,7 @@ class EchoServerClientImpl implements EchoServerClient {
         methodReference: ProvidedMethodReference,
         request: ArrayBuffer,
         responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
+        /* istanbul ignore next */                    
         return this.genericClient.sendDiscoveredServerStreamingRequest(methodReference, request, responseObserver);
     }
 
@@ -87,10 +93,12 @@ class EchoServerClientImpl implements EchoServerClient {
     }
 
     public sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
+        /* istanbul ignore next */                        
         return this.genericClient.sendDynamicUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
     }
 
     public sendStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
+        /* istanbul ignore next */                        
         return this.genericClient.sendDynamicBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
     }
 

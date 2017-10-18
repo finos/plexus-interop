@@ -60,4 +60,8 @@ describe("Client: Web Socket Discovery", () => {
         return pointToPointTests.testClientCanInvokeDiscoveredServerStreamingRequest();
     });
 
+    it("Can invoke discovered bidi streaming method passing serialized data", function() {
+        return pointToPointTests.testClientCanInvokeDiscoveredBidiStreamingRequest();
+    });
+
 });

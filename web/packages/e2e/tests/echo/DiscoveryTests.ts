@@ -23,6 +23,7 @@ import { expect } from "chai";
 import { DiscoveredMethod, ProvidedMethodReference, DiscoveredServiceMethod } from "@plexus-interop/client";
 import { UnaryServiceHandler } from "./UnaryServiceHandler";
 import { ServerStreamingHandler } from "./ServerStreamingHandler";
+import { ClientStreamingHandler } from "./ClientStreamingHandler";
 
 export class DiscoveryTests extends BaseEchoTest {
 
@@ -137,6 +138,50 @@ export class DiscoveryTests extends BaseEchoTest {
                 });
             });
 
+        } else {
+            throw "Empty response";
+        }
+    }
+
+    public async testClientCanInvokeDiscoveredBidiStreamingRequest(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        const handler = new ClientStreamingHandler((context, hostClient) => {
+                return {
+                    next: (clientRequest) => hostClient.complete(),
+                    complete: () => {},
+                    error: (e) =>  console.error("Error received by server", e)
+                }
+            });
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const discoveryResponse = await client.discoverMethod({
+            consumedMethod: {
+                consumedService: {
+                    serviceId: "plexus.interop.testing.EchoService"
+                },
+                methodId: "DuplexStreaming"
+            }
+        });
+        if (discoveryResponse.methods) {
+            expect(discoveryResponse.methods.length).to.be.eq(1);
+            const method = discoveryResponse.methods[0];
+            if (!method.providedMethod) {
+                throw new Error("Provided method is empty");
+            }
+            return new Promise<void>((resolve, reject) => {
+                 (async () => {
+                    const streamingClient = await client.sendDiscoveredBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
+                        next: (serverResponse) => {},
+                        error: (e) => {
+                            reject(e);
+                        },
+                        complete: async () => {
+                            await this.clientsSetup.disconnect(client, server);
+                            resolve();                        
+                        }
+                    });
+                    streamingClient.next(this.encodeRequestDto(echoRequest));
+                })();
+            });
         } else {
             throw "Empty response";
         }
