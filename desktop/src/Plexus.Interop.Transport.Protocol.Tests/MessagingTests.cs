@@ -181,7 +181,7 @@ namespace Plexus.Interop.Transport.Protocol
                 Log.Trace("Awaiting completion of sender {0}", sender.Id);
                 await sender.Out.Completion.ConfigureAwait(false);
             });
-            Should.CompleteIn(receiverTask, Timeout1Sec);
+            Should.Throw<OperationCanceledException>(receiverTask, Timeout1Sec);
             Should.Throw<Exception>(senderTask, Timeout1Sec);
             Log.Trace(senderTask.Exception.ExtractInner(), "Received exception on sending");
         }
