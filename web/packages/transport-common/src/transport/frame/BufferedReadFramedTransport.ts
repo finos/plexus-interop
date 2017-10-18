@@ -61,6 +61,7 @@ export abstract class BufferedReadFramedTransport implements FramedTransport, Ob
     }
 
     public next(frame: Frame): void {
+        /* istanbul ignore if */ 
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Received frame`);
         }

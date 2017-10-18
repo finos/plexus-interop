@@ -142,6 +142,7 @@ export class FramedTransportChannel implements TransportChannel {
                 } else if (frame.internalHeaderProperties.messageFrame) {
                     const messageFrame = frame as MessageFrame;
                     const isLast = !messageFrame.getHeaderData().hasMore;
+                    /* istanbul ignore if */ 
                     if (this.log.isTraceEnabled()) {
                         this.log.trace(`Received ${isLast ? "last" : ""} message frame, ${messageFrame.body.byteLength} bytes`);
                     }
@@ -265,6 +266,7 @@ export class FramedTransportChannel implements TransportChannel {
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
         this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
+        /* istanbul ignore if */ 
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Scheduling sending of message with ${data.byteLength} bytes, sending in progress ${this.sendingInProgress}`);
         }

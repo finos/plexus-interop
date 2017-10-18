@@ -183,6 +183,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             this.log.warn("Already closed");
             return;
         }
+        /* istanbul ignore if */ 
         if (this.log.isDebugEnabled()) {
             this.log.debug(`Closing connection, current state is ${this.stateMachine.getCurrent()}`);
         }
@@ -237,6 +238,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
 
     public async handleConnectionCloseFrame(frame: ConnectionCloseFrame): Promise<void> {
         const completion = frame.getHeaderData().completion as plexus.ICompletion;
+        /* istanbul ignore if */ 
         if (this.log.isDebugEnabled()) {
             this.log.debug("Received connection close", JSON.stringify(completion));
         }
@@ -268,6 +270,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     public handleChannelCloseFrame(frame: ChannelCloseFrame): void {
         const channelId = UniqueId.fromProperties(frame.getHeaderData().channelId as plexus.IUniqueId);
         const strChannelId = channelId.toString();
+        /* istanbul ignore if */ 
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Received channel close frame, channelId ${strChannelId}`);
         }
@@ -299,6 +302,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         const channelIdProps = frame.getHeaderData().channelId as plexus.IUniqueId;
         const channelId = UniqueId.fromProperties(channelIdProps);
         const strChannelId = channelId.toString();
+        /* istanbul ignore if */ 
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Received message frame, channelId ${strChannelId}`);
         }
@@ -308,6 +312,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             this.log.error(`Dropped frame, no incoming buffer exist for ${strChannelId}`);
         } else {
             // add frame to incoming buffer
+            /* istanbul ignore if */ 
             if (this.log.isDebugEnabled()) {
                 this.log.debug(`Received data frame for channel ${strChannelId}`);
             }
@@ -315,6 +320,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             channelDescriptor.channelTransportProxy.next(frame);
         }
         if (frame.isLast()) {
+            /* istanbul ignore if */ 
             if (this.log.isTraceEnabled()) {
                 this.log.trace(`Received last frame for message of channel ${strChannelId}`);
             }
