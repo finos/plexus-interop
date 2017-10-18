@@ -16,11 +16,7 @@
  */
 import { ClientsSetup } from "../common/ClientsSetup";
 import { ConnectionProvider } from "../common/ConnectionProvider";
-import { UnaryServiceHandler } from "./UnaryServiceHandler";
 import { BaseEchoTest } from "./BaseEchoTest";
-import * as plexus from "../../src/echo/gen/plexus-messages";
-import { ClientError } from "@plexus-interop/protocol";
-import { expect } from "chai";
 import { ServerStreamingHandler } from "./ServerStreamingHandler";
 import { MethodInvocationContext } from "@plexus-interop/client";
 import { EchoClientClient, EchoClientClientBuilder } from "../../src/echo/client/EchoClientGeneratedClient";
