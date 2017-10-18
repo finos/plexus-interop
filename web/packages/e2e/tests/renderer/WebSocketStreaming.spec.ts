@@ -19,6 +19,7 @@ import { TransportsSetup } from "../common/TransportsSetup";
 import { readWsUrl } from "../common/utils";
 import { ServerStreamingInvocationTests } from "../echo/ServerStreamingInvocationTests";
 import { BidiStreamingInvocationTests } from "../echo/BidiStreamingTests";
+import { ClientInvocationTests } from "../echo/ClientStreamingTests";
 
 describe("Client: Web Socket Streaming invocation", () => {
 
@@ -33,6 +34,9 @@ describe("Client: Web Socket Streaming invocation", () => {
 
     const bidiStreamingTests = new BidiStreamingInvocationTests(
         transportsSetup.createWebSocketTransportProvider(wsUrl),
+        clientsSetup);
+
+    const clientStreamingTests = new ClientInvocationTests(transportsSetup.createWebSocketTransportProvider(wsUrl),
         clientsSetup);
 
     it("Sends streaming response from server using serverStreaming invocation", function () {
@@ -54,6 +58,10 @@ describe("Client: Web Socket Streaming invocation", () => {
     it("Sends streaming messages in two directions", function () {
         this.timeout(5000);
         return bidiStreamingTests.testClientAndServerCanSendMessages();
+    });
+
+    it("Sends client stream messages to server", function () {
+        return clientStreamingTests.testClientCanSendStreamToServer();
     });
 
     it("Client can cancel invocation", function() {

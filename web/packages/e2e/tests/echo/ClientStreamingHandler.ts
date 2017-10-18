@@ -29,4 +29,10 @@ export class ClientStreamingHandler extends NopServiceHandler {
         return this.handler(context, hostClient);
     }
 
+    public onClientStreaming(
+        context: MethodInvocationContext,
+        hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): Observer<plexus.plexus.interop.testing.IEchoRequest> {
+        return this.handler(context, hostClient);
+    }
+
 }

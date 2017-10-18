@@ -39,10 +39,11 @@ export class SingleMessageRequest<R> {
                             channel.sendLastMessage(requestPayload)
                                 .then(completion => {
                                     if (!ClientProtocolHelper.isSuccessCompletion(completion)) {
+                                        /* istanbul ignore if */
                                         if (this.log.isDebugEnabled()) {
                                             this.log.debug("Received non successful completion", completion);
-                                            reject(completion.error);
                                         }
+                                        reject(completion.error);
                                     }  
                                 });
                         },
