@@ -22,6 +22,7 @@ import { NopServiceHandler } from "./NopServiceHandler";
 import { expect } from "chai";
 import { DiscoveredMethod, ProvidedMethodReference, DiscoveredServiceMethod } from "@plexus-interop/client";
 import { UnaryServiceHandler } from "./UnaryServiceHandler";
+import { ServerStreamingHandler } from "./ServerStreamingHandler";
 
 export class DiscoveryTests extends BaseEchoTest {
 
@@ -96,6 +97,49 @@ export class DiscoveryTests extends BaseEchoTest {
             expect(serviceDiscoveryResponse.services.length).to.be.eq(0);
         }
         await this.clientsSetup.disconnect(client, server);
+    }
+
+    public async testClientCanInvokeDiscoveredServerStreamingRequest(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
+            hostClient.next(echoRequest);
+            hostClient.complete();
+        });
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const discoveryResponse = await client.discoverMethod({
+            consumedMethod: {
+                consumedService: {
+                    serviceId: "plexus.interop.testing.EchoService"
+                },
+                methodId: "ServerStreaming"
+            }
+        });
+        if (discoveryResponse.methods) {
+            expect(discoveryResponse.methods.length).to.be.eq(1);
+            const method = discoveryResponse.methods[0];
+            if (!method.providedMethod) {
+                throw new Error("Provided method is empty");
+            }
+            let receivedResponse: plexus.plexus.interop.testing.IEchoRequest | null = null;
+            return new Promise<void>((resolve, reject) => {
+                client.sendDiscoveredServerStreamingRequest(method.providedMethod as ProvidedMethodReference, this.encodeRequestDto(echoRequest), {
+                    next: (response) => {
+                        receivedResponse = this.decodeRequestDto(response);
+                    },
+                    complete: async () => {
+                        this.assertEqual(echoRequest, receivedResponse as plexus.plexus.interop.testing.IEchoRequest);
+                        await this.clientsSetup.disconnect(client, server);
+                        resolve();
+                    },
+                    error: (e) => {
+                        reject(e);
+                    }
+                });
+            });
+
+        } else {
+            throw "Empty response";
+        }
     }
 
     public async testClientCanInvokeDiscoveredMethod(): Promise<void> {

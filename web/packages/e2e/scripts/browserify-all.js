@@ -40,8 +40,6 @@ browserify({entries: testFiles})
         // skip all generated proto messages
         '**/*-messages.js',
         '**/*-protocol.js',
-        // generated Plexus Clients
-        '**/*Generated*.js',
         '**/index.js',
         '**/bower_components/**', 
         '**/test/**', 

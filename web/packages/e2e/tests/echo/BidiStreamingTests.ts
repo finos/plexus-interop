@@ -56,7 +56,6 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                     const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
                         next: (serverResponse) => reject("Not expected to receive message"),
                         error: (e) => {
-                            debugger;
                             clientReceivedError = true;
                         },
                         complete: () => reject("Not expected to complete successfuly")

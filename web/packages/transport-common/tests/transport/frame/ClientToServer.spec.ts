@@ -99,7 +99,6 @@ describe("Framed Transport Connection: Client to Server communication", () => {
         clientConnection: TransportConnection,
         serverConnection: TransportConnection,
         payload: ArrayBuffer): Promise<void> {
-        debugger;
         const clientChannel = await clientConnection.createChannel();
         new Promise<AnonymousSubscription>(
             (resolve, reject) => clientChannel.open(new DelegateChannelObserver(new LogObserver(undefined, clientChannel.uuid()), (s) => resolve(s))))

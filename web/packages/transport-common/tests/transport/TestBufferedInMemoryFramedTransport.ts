@@ -33,7 +33,6 @@ export class TestBufferedInMemoryFramedTransport extends BufferedReadFramedTrans
         public readonly bufferSize: number = 8,
         log: Logger = LoggerFactory.getLogger("BufferedInMemoryFramedTransport")) {
         super(log);
-        debugger;
         this.inBuffer = inBuffer;
     }
 
