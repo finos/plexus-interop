@@ -36,12 +36,11 @@ namespace Plexus.Interop.Apps.Internal
 
         public NativeAppLauncher(
             string cmdBasePath, 
-            SubProcessLauncher subProcessLauncher, 
             JsonSerializer jsonSerializer)
         {
             Id = Plexus.UniqueId.Generate();
             _cmdBasePath = cmdBasePath;
-            _subProcessLauncher = subProcessLauncher;
+            _subProcessLauncher = new SubProcessLauncher();
             _jsonSerializer = jsonSerializer;
         }
 

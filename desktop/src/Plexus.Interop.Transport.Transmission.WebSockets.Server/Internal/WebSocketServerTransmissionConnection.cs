@@ -75,7 +75,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 {
                     _cancellation.Cancel();
                 }
-                await Task.WhenAll(_writer.Completion, _reader.Completion).IgnoreCancellation().ConfigureAwait(false);
+                await Task.WhenAll(_writer.Completion, _reader.Completion).IgnoreAnyCancellation().ConfigureAwait(false);
                 _log.Trace("Closing websocket");
                 await _webSocket
                     .CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, _cancellation.Token)

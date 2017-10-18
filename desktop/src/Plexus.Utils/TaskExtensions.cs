@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
+ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -207,7 +207,7 @@ namespace Plexus
             return task.ContinueWithSynchronously((Action<Task>) IgnoreExceptionsOnCompletedTask);
         }
 
-        public static Task IgnoreCancellation(this Task task)
+        public static Task IgnoreAnyCancellation(this Task task)
         {
             return task.ContinueWithSynchronously((Action<Task>) IgnoreCancellationOnCompletedTask);
         }

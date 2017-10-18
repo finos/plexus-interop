@@ -26,7 +26,6 @@ namespace Plexus.Interop.Broker
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using Plexus.Processes;
     using System.IO;
-    using System.Threading;
     using System.Threading.Tasks;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
@@ -40,30 +39,45 @@ namespace Plexus.Interop.Broker
         private readonly string _workingDir;
         private readonly CompositeTransportServer _transportServer;
         private readonly BrokerProcessor _brokerProcessor;
+        private readonly AppLifecycleManager _appLifecycleManager;
 
-        public BrokerRunner(
-            string metadataDir = null, 
-            IRegistryProvider registryProvider = null,
-            CancellationToken cancellationToken = default)
+        public BrokerRunner(string metadataDir = null, IRegistryProvider registryProvider = null)
         {
             _workingDir = Directory.GetCurrentDirectory();
             metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
             registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
             _transportServer = new CompositeTransportServer(new[] { CreateNamedPipeServer(), CreateWebSocketServer() });
+            _appLifecycleManager = new AppLifecycleManager(metadataDir);
+            OnStop(_appLifecycleManager.Stop);
             _brokerProcessor = new BrokerProcessor(
                 _transportServer,
                 registryProvider,
                 DefaultProtocolSerializationProvider,
-                new AppLifecycleManager(metadataDir));
+                _appLifecycleManager);
         }
 
         protected override async Task<Task> StartCoreAsync()
         {
             Log.Info("Starting broker in directory {0}", _workingDir);
-            await _transportServer.StartAsync().ConfigureAwait(false);
-            await _brokerProcessor.StartAsync().ConfigureAwait(false);
+            await Task
+                .WhenAll(
+                    _transportServer.StartAsync(),
+                    _brokerProcessor.StartAsync())
+                .ConfigureAwait(false);
             Log.Info("Broker started in directory {0}", _workingDir);
-            return _brokerProcessor.Completion;
+            return ProcessAsync();
+        }
+
+        private async Task ProcessAsync()
+        {
+            try
+            {
+                await _brokerProcessor.Completion.ConfigureAwait(false);
+            }
+            finally
+            {
+                await _appLifecycleManager.StopAsync().IgnoreExceptions().ConfigureAwait(false);
+            }
         }
 
         private ITransportServer CreateNamedPipeServer()

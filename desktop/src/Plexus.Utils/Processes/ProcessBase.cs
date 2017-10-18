@@ -16,6 +16,8 @@
  */
 ﻿namespace Plexus.Processes
 {
+    using System;
+    using System.Collections.Concurrent;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -27,15 +29,18 @@
         private readonly Promise _startCompletion = new Promise();        
         private readonly CancellationTokenSource _stopCancellation = new CancellationTokenSource();
 
+        private readonly ConcurrentBag<CancellationTokenRegistration> _registrations 
+            = new ConcurrentBag<CancellationTokenRegistration>();
+
         public Task Completion => _completion.Task;
 
         public Task StartCompletion => _startCompletion.Task;
 
         protected CancellationToken StopToken => _stopCancellation.Token;
 
-        protected virtual Task OnStopAsync()
+        protected void OnStop(Action action)
         {
-            return TaskConstants.Completed;
+            _registrations.Add(StopToken.Register(action));
         }
 
         protected virtual Task OnCompletedAsync(Task completion)
@@ -87,6 +92,10 @@
         public void Dispose()
         {
             StopAsync().GetResult();
+            while (_registrations.TryPeek(out var registration))
+            {
+                registration.Dispose();
+            }
             _stopCancellation.Dispose();
         }
 

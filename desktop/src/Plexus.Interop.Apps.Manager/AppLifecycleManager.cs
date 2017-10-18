@@ -14,48 +14,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps
+namespace Plexus.Interop.Apps
 {
     using Newtonsoft.Json;
     using Plexus.Interop.Apps.Internal;
     using Plexus.Interop.Apps.Internal.Generated;
+    using Plexus.Processes;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Processes;
     using UniqueId = Plexus.UniqueId;
 
     public sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager
     {        
         private static readonly ILogger Log = LogManager.GetLogger<AppLifecycleManager>();
 
-        private Lazy<Task<NativeAppLauncher>> _startNativeAppLauncherTask;
-
         private IClient _client;
-        private readonly string _brokerWorkingDir;
         private readonly string _metadataDir;
-        private readonly SubProcessLauncher _subProcessLauncher;
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.CreateDefault();
+        private readonly NativeAppLauncher _nativeAppLauncher;
         private AppsDto _appsDto;
 
         public AppLifecycleManager(string metadataDir)
         {
             _metadataDir = metadataDir;
-            _brokerWorkingDir = Directory.GetCurrentDirectory();
-            _subProcessLauncher = new SubProcessLauncher();
-            _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(StartNativeAppLauncher, LazyThreadSafetyMode.ExecutionAndPublication);
+            _nativeAppLauncher = new NativeAppLauncher(_metadataDir, _jsonSerializer);
         }
 
         public async ValueTask<UniqueId> LaunchAsync(string appId)
         {
             Log.Info("Launching {0}", appId);
 
-            if (string.Equals(appId, "interop.NativeAppLauncher"))
+            if (string.Equals(appId, "interop.AppLifecycleManager"))
             {
-                return (await _startNativeAppLauncherTask.Value.ConfigureAwait(false)).Id;
+                await StartAsync().ConfigureAwait(false);
+                return _client.ConnectionId;
+            }
+
+            if (string.Equals(appId, "interop.NativeAppLauncher"))
+            {                
+                await _nativeAppLauncher.StartAsync().ConfigureAwait(false);
+                return _nativeAppLauncher.Id;
             }
 
             var appDto = _appsDto.Apps.FirstOrDefault(x => string.Equals(x.Id, appId));
@@ -100,28 +101,11 @@
             _appsDto = AppsDto.Load(Path.Combine(_metadataDir, "apps.json"));
             _client = ClientFactory.Instance.Create(
                 new ClientOptionsBuilder()
-                    .WithDefaultConfiguration(_brokerWorkingDir)
+                    .WithDefaultConfiguration(Directory.GetCurrentDirectory())
                     .WithApplicationId("interop.AppLifecycleManager")
                     .Build());
-            var startNativeAppLauncherTask = _startNativeAppLauncherTask.Value;
-            await Task.WhenAll(_client.ConnectAsync(), startNativeAppLauncherTask).ConfigureAwait(false);
-            var nativeAppLauncher = startNativeAppLauncherTask.GetResult();
-            return Task.WhenAll(_client.Completion, nativeAppLauncher.Completion);
-        }
-
-        private async Task<NativeAppLauncher> StartNativeAppLauncher()
-        {
-            var nativeAppLauncher = new NativeAppLauncher(_metadataDir, _subProcessLauncher, _jsonSerializer);
-            var task = TaskRunner.RunInBackground(nativeAppLauncher.StartAsync);
-            task.ContinueWithSynchronously(
-                    x =>
-                        _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(
-                            StartNativeAppLauncher,
-                            LazyThreadSafetyMode.ExecutionAndPublication),
-                    CancellationToken.None)
-                .IgnoreAwait(Log);
-            await task.ConfigureAwait(false);
-            return nativeAppLauncher;
+            await _client.ConnectAsync().ConfigureAwait(false);
+            return _client.Completion;
         }
     }
 }

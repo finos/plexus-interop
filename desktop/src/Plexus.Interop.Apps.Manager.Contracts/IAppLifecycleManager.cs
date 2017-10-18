@@ -16,12 +16,13 @@
  */
 ﻿namespace Plexus.Interop.Apps
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface IAppLifecycleManager : IAppLauncher
+    public interface IAppLifecycleManager
     {
-        Task Completion { get; }
+        ValueTask<UniqueId> LaunchAsync(string appId);
 
-        Task StartAsync();
+        IEnumerable<string> GetAvailableApps(IEnumerable<string> appIds);
     }
 }
