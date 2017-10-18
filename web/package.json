@@ -16,7 +16,7 @@
     "build-quickstart-viewer": "cd ./packages/ccy-pair-rate-viewer && yarn build",
     "build-quickstart-provider": "cd ./packages/ccy-pair-rate-provider && yarn build",
     "build-core": "run-s build-common build-transport-common build-websocket-transport build-client",
-    "build-all": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
+    "build-all": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider e2e",
     "prebuild-all": "yarn install",
     "e2e": "cd ./packages/e2e && yarn electron-e2e",
     "poste2e": "yarn coverage",
