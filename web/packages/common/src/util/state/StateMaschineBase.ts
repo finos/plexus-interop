@@ -28,10 +28,6 @@ class StateDescriptor<T> {
     public hasOutTransition(state: T): boolean {
         return this.outTransitions.filter(transtion => transtion.to === state).length > 0;
     }
-
-    public hasInTransition(state: T): boolean {
-        return this.inTransitions.filter(transtion => transtion.to === state).length > 0;
-    }
 }
 
 export class StateMaschineBase<T> implements StateMaschine<T> {
@@ -85,6 +81,7 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         if (transition.preHandler) {
             transition.preHandler()
                 .then(() => {
+                    /* istanbul ignore if */
                     if (this.logger.isTraceEnabled()) {
                         this.logger.trace(`Finished pre-handler for ${this.getCurrent()} -> ${to}`);
                     }
@@ -95,6 +92,7 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         if (transition.postHandler) {
             transition.postHandler()
                 .then(() => {
+                    /* istanbul ignore if */                    
                     if (this.logger.isTraceEnabled()) {
                         this.logger.trace(`Finished post-handler for ${this.getCurrent()} -> ${to}`);
                     }

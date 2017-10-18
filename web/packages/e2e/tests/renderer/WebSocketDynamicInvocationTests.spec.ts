@@ -34,4 +34,8 @@ describe("Client: Web Socket Dynamic invocation", () => {
         return dynamicInvocationTests.testClientCanSendDynamicPointToPointRequest();
     });
 
+    it("Sends dynamic streaming invocation and receives response", function() {
+        return dynamicInvocationTests.testClientCanSendDynamicStreamingRequest();
+    });
+
 });
