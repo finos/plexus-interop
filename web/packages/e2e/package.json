@@ -43,9 +43,11 @@
     "@types/node": "^7.0.5",
     "babel-register": "^6.23.0",
     "browserify": "^14.4.0",
+    "browserify-istanbul": "^3.0.1",
     "chai": "^4.1.0",
     "chokidar": "^1.7.0",
     "copyfiles": "^1.2.0",
+    "electron": "1.7.5",
     "electron-mocha": "^4.0.2",
     "glob": "^7.1.2",
     "jasmine-reporters": "^2.2.0",
@@ -53,6 +55,7 @@
     "karma": "^1.7.0",
     "minimist": "^1.2.0",
     "mocha": "^3.5.0",
+    "nyc": "^11.2.1",
     "path": "^0.12.7",
     "sinon": "^2.4.1",
     "strip-bom": "^3.0.0",
@@ -62,7 +65,6 @@
     "tslint": "^4.5.1",
     "typescript": "2.3.4",
     "watchify": "^3.9.0",
-    "electron": "1.7.5",
     "yarn": "^1.1.0"
   },
   "jest": {

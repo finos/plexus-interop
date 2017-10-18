@@ -112,7 +112,7 @@ function killBroker() {
 
 function runElectronTest(wsUrl) {
     log("Starting Electron Tests ...");
-    exec(`electron-mocha ${argv.file} --wsUrl ${wsUrl} ${argv.debug ? "--debug" : ""}  --renderer --reporter spec --colors`, {
+    exec(`electron-mocha --require scripts/coverage ${argv.file} --wsUrl ${wsUrl} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
         cwd: process.cwd()
     }, (error, stdout, stderr) => {
         log("Electron tests stopped, killing Broker");
