@@ -29,15 +29,11 @@ export class ClientConnectivityTests extends BaseEchoTest {
     public constructor(
         private connectionProvider: ConnectionProvider,
         private clientsSetup: ClientsSetup = new ClientsSetup()) {
-            super();
+        super();
     }
 
-    public testAllInvocationClientsReceiveErrorOnClientDisconnect(): Promise<void> {
-        return this.testAllInvocationClientsReceiveErrorOnDisconnect(true, false);
-    }
-
-    public testAllInvocationClientsReceiveErrorOnServerDisconnect(): Promise<void> {
-        return this.testAllInvocationClientsReceiveErrorOnDisconnect(false, true);
+    public testInvocationClientReceiveErrorOnClientDisconnect(): Promise<void> {
+        return this.testAllInvocationClientReceiveErrorOnDisconnect(true, false);
     }
 
     public async testClientReceiveErrorIfProvideWrongId(): Promise<void> {
@@ -56,21 +52,19 @@ export class ClientConnectivityTests extends BaseEchoTest {
         throw new Error("Expect to fail to receive connection")
     }
 
-    private testAllInvocationClientsReceiveErrorOnDisconnect(isForcedByClient: boolean, isForcedByServer: boolean): Promise<void> {
+    private testAllInvocationClientReceiveErrorOnDisconnect(isForcedByClient: boolean, isForcedByServer: boolean): Promise<void> {
 
         const echoRequest = this.clientsSetup.createRequestDto();
-        let serverStreamingContext: MethodInvocationContext | null = null;
         let client: EchoClientClient | null = null;
         let server: EchoServerClient | null = null;
 
         return new Promise<void>(async (testResolve, testError) => {
-            
+
             let handler: ServerStreamingHandler | null = null;
             let clientInvocationErrorReceived: Promise<void> | null = null;
 
             const serverRequestReceived = new Promise(async (serverRequestResolve) => {
                 handler = new ServerStreamingHandler(async (context, request, hostClient) => {
-                    serverStreamingContext = context;
                     serverRequestResolve();
                 });
                 [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler as ServerStreamingHandler);
@@ -79,9 +73,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
                         next: (r) => {
                             clientErrorReject("Not expected to receive update");
                         },
-                        complete: () => {
-                            clientErrorReject("Not expected to receive complete");
-                        },
+                        complete: () => { },
                         error: (e) => {
                             clientErrorResolve();
                         }
@@ -90,7 +82,6 @@ export class ClientConnectivityTests extends BaseEchoTest {
             });
 
             await serverRequestReceived;
-
             if (isForcedByClient) {
                 (client as EchoClientClient).disconnect();
             }
@@ -99,9 +90,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
                 (server as EchoServerClient).disconnect();
             }
 
-            await clientInvocationErrorReceived;       
-            
-            await AsyncHelper.waitFor(() => (serverStreamingContext as MethodInvocationContext).cancellationToken.isCancelled());
+            await clientInvocationErrorReceived;
 
             if (!isForcedByServer) {
                 await (server as EchoServerClient).disconnect();
@@ -112,7 +101,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
             }
 
             testResolve();
-            
+
         });
     }
 }

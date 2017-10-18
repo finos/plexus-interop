@@ -47,6 +47,10 @@ describe("Web Socket Client connectivity", () => {
             });
     });
 
+    it("Received error for open invocation on disconnect", function() {
+        return connectivityTests.testInvocationClientReceiveErrorOnClientDisconnect();
+    });
+
     it("Receives error if provide wrong cliend id to Broker", function() {
         return connectivityTests.testClientReceiveErrorIfProvideWrongId();
     });
