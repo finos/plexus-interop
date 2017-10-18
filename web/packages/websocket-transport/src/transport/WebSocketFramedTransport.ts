@@ -79,7 +79,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     public async open(connectionObserver: Observer<Frame>): Promise<void> {
         this.throwIfNotConnectedOrDisconnectRequested();
-        /* istanbul ignore if */ 
+        /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
             this.log.debug(`Received connection observer, ${this.inMessagesBuffer.size()} messages in buffer`);
         }
@@ -92,13 +92,13 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     public async writeFrame(frame: Frame): Promise<void> {
         this.throwIfNotConnectedOrDisconnectRequested();
         const data: ArrayBuffer = this.messagesConverter.serialize(frame);
-        /* istanbul ignore if */ 
+        /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
             this.log.debug(`Sending header message of ${data.byteLength} bytes to server`);
         }
         this.socket.send(data);
         if (frame.isDataFrame()) {
-            /* istanbul ignore if */ 
+            /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
                 this.log.debug(`Sending data message of ${frame.body.byteLength} bytes to server`);
             }
@@ -191,12 +191,12 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private handleMessageEvent(ev: MessageEvent): void {
-        /* istanbul ignore if */ 
+        /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
             this.log.debug("Message event received");
         }
         if (this.isTerminateMessage(ev)) {
-            /* istanbul ignore if */ 
+            /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
                 this.log.debug("Terminate message received");
             }
@@ -205,7 +205,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             this.log.warn("Terminate message already received, dropping frame", ev.data);
         } else {
             const data: Uint8Array = this.readEventData(ev);
-            /* istanbul ignore if */ 
+            /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
                 this.log.debug(`Received message with ${data.byteLength} bytes`);
             }
@@ -216,7 +216,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             } else {
                 const frame = this.messagesConverter.deserialize(data);
                 if (frame.isDataFrame()) {
-                    /* istanbul ignore if */ 
+                    /* istanbul ignore if */
                     if (this.log.isDebugEnabled()) {
                         this.log.debug("Message header frame, waiting for data frame");
                     }
@@ -230,13 +230,13 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     private addToInbox(frame: Frame): void {
         if (this.connectionObserver) {
-            /* istanbul ignore if */ 
+            /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
                 this.log.debug(`Passing frame to observer`);
             }
             this.connectionObserver.next(frame);
         } else {
-            /* istanbul ignore if */ 
+            /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
                 this.log.debug(`No connection observer adding to buffer, buffer size ${this.inMessagesBuffer.size()}`);
             }
@@ -252,13 +252,13 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         if (ev.data instanceof Array) {
             return new Uint8Array(ev.data);
         } else if (this.isArrayBuffer(ev.data)) {
-            /* istanbul ignore if */ 
+            /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
                 this.log.debug("Array Buffer message");
             }
             return new Uint8Array(ev.data);
         } else if (this.isArrayBufferView(ev.data)) {
-            /* istanbul ignore if */ 
+            /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
                 this.log.debug("ArrayBufferView Buffer message");
             }

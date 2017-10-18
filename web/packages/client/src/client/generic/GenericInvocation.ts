@@ -133,7 +133,7 @@ export class GenericInvocation {
     }
 
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
-        /* istanbul ignore if */ 
+        /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
             this.log.debug("Close invocation requested", JSON.stringify(completion));
         }
@@ -171,7 +171,7 @@ export class GenericInvocation {
             }
             return result;
         }).catch((e) => {
-            /* istanbul ignore if */ 
+            /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
                 this.log.debug("Error during channel closure", e);
             }
