@@ -233,10 +233,14 @@ export class FramedTransportChannel implements TransportChannel {
         this.log.debug(`Closing channel resources, reason - ${reason}`);
         this.channelCancellationToken.cancel(reason);
         this.stateMachine.go(ChannelState.CLOSED);
-        await this.dispose();
+        this.dispose();
         if (this.onCloseHandler) {
             this.log.debug("Reporting summarized completion");
-            this.onCloseHandler(ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion));
+            const completion = ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion);
+            if (!ClientProtocolUtils.isSuccessCompletion(completion)) {
+                this.channelObserver.error(error || completion.error);                
+            }
+            this.onCloseHandler(completion);
             this.onCloseHandler = null;
         } else if (this.channelObserver) {
             this.log.debug("Close not requested, reporting forced close");

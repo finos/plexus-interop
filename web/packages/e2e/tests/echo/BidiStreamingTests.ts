@@ -37,7 +37,6 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
         let serverReceivedError = false;
         let clientReceivedError = false;
         let serverReceivedMessage = false;
-
         return new Promise<void>((resolve, reject) => {
             const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
