@@ -1,4 +1,3 @@
-import { MethodInvocationContext } from "../MethodInvocationContext";
 /**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -15,6 +14,8 @@ import { MethodInvocationContext } from "../MethodInvocationContext";
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { MethodInvocationContext } from "../MethodInvocationContext";
+
 export interface SimpleUnaryInvocationHandler<Req, Res> {
 
     methodId: string;
