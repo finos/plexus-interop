@@ -25,8 +25,7 @@ namespace Plexus.Interop.Internal.Calls
 
     internal sealed class ServerStreamingMethodCall<TRequest, TResponse> 
         : ProcessBase, IServerStreamingMethodCall<TResponse>
-    {
-        private static readonly ILogger Log = LogManager.GetLogger<ServerStreamingMethodCall<TRequest, TResponse>>();
+    {        
         private readonly BufferedChannel<TResponse> _responseStream = new BufferedChannel<TResponse>(1);
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
@@ -38,7 +37,9 @@ namespace Plexus.Interop.Internal.Calls
             _responseStream.PropagateCompletionFrom(Completion);
         }
 
-        public IReadableChannel<TResponse> ResponseStream => _responseStream;
+        protected override ILogger Log { get; } = LogManager.GetLogger<ServerStreamingMethodCall<TRequest, TResponse>>();
+
+        public IReadOnlyChannel<TResponse> ResponseStream => _responseStream;
 
         public Task CancelAsync()
         {
@@ -62,23 +63,16 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Reading responses");
-                    while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
-                    {
-                        while (invocation.In.TryReadSafe(out var response))
-                        {
-                            if (!_responseStream.Out.TryWriteSafe(response))
-                            {
-                                await _responseStream.Out.TryWriteSafeAsync(response).ConfigureAwait(false);
-                            }
-                        }
-                    }
+                    await invocation.In
+                        .ConsumeAsync(item => _responseStream.Out.WriteAsync(item))
+                        .ConfigureAwait(false);
                     await invocation.In.Completion.ConfigureAwait(false);
-                    _responseStream.Out.TryComplete();
+                    _responseStream.Out.TryCompleteWriting();
                 }
                 catch (Exception ex)
                 {
-                    invocation.Out.TryTerminate(ex);
-                    _responseStream.Out.TryTerminate(ex);
+                    invocation.Out.TryTerminateWriting(ex);
+                    _responseStream.Out.TryTerminateWriting(ex);
                     throw;
                 }
                 finally

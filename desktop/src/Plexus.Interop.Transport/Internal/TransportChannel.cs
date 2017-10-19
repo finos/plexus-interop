@@ -40,7 +40,7 @@
             _log = LogManager.GetLogger<TransportChannel>($"{connectionId}.{channelId}");
             _incomingMessageHandler = new TransportChannelHeaderHandler<Task, ChannelMessage>(HandleIncomingAsync, HandleIncomingAsync, HandleIncomingAsync);
             _sendProcessor = new TransportChannelSendProcessor(connectionId, channelId, output, headerFactory);
-            Completion = Task.WhenAll(_sendProcessor.Completion, _receiveBuffer.In.Completion).LogCompletion(_log);
+            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
         }
 
         public UniqueId Id { get; }
@@ -53,12 +53,12 @@
 
         internal bool TerminateReceiving(Exception error = null)
         {
-            return _receiveBuffer.Out.TryTerminate(error);
+            return _receiveBuffer.Out.TryTerminateWriting(error);
         }
 
-        public IWritableChannel<TransportMessageFrame> Out => _sendProcessor;
+        public IWritableChannel<TransportMessageFrame> Out => _sendProcessor.Out;
 
-        public IReadableChannel<TransportMessageFrame> In => _receiveBuffer.In;
+        public IReadOnlyChannel<TransportMessageFrame> In => _receiveBuffer.In;
 
         public async Task HandleIncomingAsync(ChannelMessage message)
         {
@@ -69,18 +69,25 @@
             }
         }
 
+        private Task ProcessAsync()
+        {
+            return Task.WhenAll(_sendProcessor.Completion, _receiveBuffer.In.Completion);
+        }
+
         private async Task HandleIncomingAsync(ITransportFrameHeader header, ChannelMessage message)
         {
-            if (!await _receiveBuffer.Out
-                .TryWriteSafeAsync(new TransportMessageFrame(message.Payload.Value, header.HasMore))
-                .ConfigureAwait(false))
-            {                
-                _log.Trace("Skipping message because the channel is terminated: {0}", message);
+            try
+            {
+                await _receiveBuffer.Out.WriteAsync(new TransportMessageFrame(message.Payload.Value, header.HasMore));
+            }
+            catch
+            {
                 if (message.Payload.HasValue)
                 {
                     message.Payload.Value.Dispose();
                 }
-            }            
+                throw;
+            }
         }
 
         private Task HandleIncomingAsync(ITransportChannelCloseHeader header, ChannelMessage message)
@@ -88,16 +95,16 @@
             switch (header.Completion.Status)
             {
                 case CompletionStatusHeader.Completed:
-                    _receiveBuffer.Out.TryComplete();
+                    _receiveBuffer.Out.TryCompleteWriting();
                     break;
                 case CompletionStatusHeader.Canceled:
-                    _sendProcessor.TryTerminate();
-                    _receiveBuffer.Out.TryTerminate();
+                    _sendProcessor.Out.TryTerminateWriting();
+                    _receiveBuffer.Out.TryTerminateWriting();
                     break;
                 case CompletionStatusHeader.Failed:
                     var error = header.Completion.Error.Value;
-                    _sendProcessor.TryTerminate();
-                    _receiveBuffer.Out.TryTerminate(new RemoteErrorException(error));
+                    _sendProcessor.Out.TryTerminateWriting();
+                    _receiveBuffer.Out.TryTerminateWriting(new RemoteErrorException(error));
                     break;
                 default:
                     throw new InvalidOperationException();

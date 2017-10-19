@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using Plexus.Channels;
-using System.Threading.Tasks;
-
 namespace Plexus.Interop.Transport.Internal
 {
+    using Plexus.Channels;
+    using System.Threading.Tasks;
+
     internal interface ITransportSendProcessor
     {
         UniqueId InstanceId { get; }
+
+        Task Completion { get; }
 
         IWritableChannel<ChannelMessage> Out { get; }
     }

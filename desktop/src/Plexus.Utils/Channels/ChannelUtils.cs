@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Threading.Tasks;
-
 namespace Plexus.Channels
 {
+    using System;
+    using System.Threading.Tasks;
+
     public static class ChannelUtils
     {
         public static void PropagateTerminationFrom(this ITerminatableChannel channel, Task completion)
@@ -28,11 +28,11 @@ namespace Plexus.Channels
                 var c = (ITerminatableChannel)state;
                 if (task.IsFaulted)
                 {
-                    c.TryTerminate(task.Exception.ExtractInner());
+                    c.TryTerminateWriting(task.Exception.ExtractInner());
                 }
                 else if (task.IsCanceled)
                 {
-                    c.TryTerminate();
+                    c.TryTerminateWriting();
                 }
             }
 
@@ -46,19 +46,19 @@ namespace Plexus.Channels
                 var c = (IWritableChannel<T>)state;
                 if (task.IsFaulted)
                 {
-                    c.TryTerminate(task.Exception.ExtractInner());
+                    c.TryTerminateWriting(task.Exception.ExtractInner());
                 }
                 else if (task.IsCanceled)
                 {
-                    c.TryTerminate();
+                    c.TryTerminateWriting();
                 }
                 else
                 {
-                    c.TryComplete();
+                    c.TryCompleteWriting();
                 }
             }
 
-            Task.WhenAny(completion, channel.Completion).ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
+            Task.WhenAny(completion, channel.Completion).Unwrap().ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
         }
 
         public static void PropagateExceptionFrom<T>(this IWritableChannel<T> channel, Task completion)
@@ -68,15 +68,15 @@ namespace Plexus.Channels
                 var c = (IWritableChannel<T>)state;
                 if (task.IsFaulted)
                 {
-                    c.TryTerminate(task.Exception.ExtractInner());
+                    c.TryTerminateWriting(task.Exception.ExtractInner());
                 }
                 else if (task.IsCanceled)
                 {
-                    c.TryTerminate();
+                    c.TryTerminateWriting();
                 }
             }
 
-            Task.WhenAny(channel.Completion, completion).ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
+            Task.WhenAny(channel.Completion, completion).Unwrap().ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
         }
     }
 }

@@ -40,20 +40,20 @@ namespace Plexus.Interop.Internal.Calls
             try
             {
                 TRequest request = default;
-                while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
+                while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
                 {
-                    while (invocation.In.TryReadSafe(out var item))
+                    while (invocation.In.TryRead(out var item))
                     {
                         request = item;
                     }
                 }
                 var context = new MethodCallContext(info.Source.ApplicationId, info.Source.ConnectionId);
                 await _handler(request, invocation.Out, context).ConfigureAwait(false);
-                invocation.Out.TryComplete();
+                invocation.Out.TryCompleteWriting();
             }
             catch (Exception ex)
             {
-                invocation.Out.TryTerminate(ex);
+                invocation.Out.TryTerminateWriting(ex);
                 throw;
             }
             finally

@@ -37,13 +37,13 @@ namespace Plexus.Interop.Transport.Protocol
             = new ProtobufTransportProtocolSerializationProvider();
 
         private readonly ITransmissionServer _server;
-        private readonly ITransmissionConnectionFactory _clientFactory;
+        private readonly ITransmissionClient _client;
 
         public MessagingTests()
         {
             _server = RegisterDisposable(new PipeTransmissionServer(Directory.GetCurrentDirectory()));
             _server.StartAsync().GetResult();
-            _clientFactory = new PipeTransmissionClient(Directory.GetCurrentDirectory());
+            _client = new PipeTransmissionClient(Directory.GetCurrentDirectory());
         }
 
         private static IEnumerable<TransportMessage> GenerateAllTransportMessages()
@@ -65,14 +65,40 @@ namespace Plexus.Interop.Transport.Protocol
         }
 
         [Fact]
+        public void SendTransportMessageFromClientToServer()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                using (var clientConnection = await _client.ConnectAsync())
+                using (var serverConnection = await _server.In.ReadAsync())
+                {
+                    var clientSender = new MessagingSendProcessor(clientConnection, SerializationProvider.GetSerializer());
+                    var serverReceiver = new MessagingReceiveProcessor(serverConnection, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
+                    var connectionOpen = new TransportMessage(TransportHeaderPool.Instance.CreateConnectionOpenHeader(UniqueId.Generate()));
+                    var connectionClose = new TransportMessage(TransportHeaderPool.Instance.CreateConnectionCloseHeader(CompletionHeader.Completed));
+                    await clientSender.Out.WriteAsync(connectionOpen);
+                    await clientSender.Out.WriteAsync(connectionClose);
+                    clientSender.Out.TryCompleteWriting();
+
+                    var received1 = await serverReceiver.In.ReadAsync();
+                    var received2 = await serverReceiver.In.ReadAsync();
+
+                    Should.CompleteIn(serverReceiver.In.Completion, Timeout1Sec);
+                    received1.Header.ShouldBeAssignableTo<ITransportConnectionOpenHeader>();
+                    received2.Header.ShouldBeAssignableTo<ITransportConnectionCloseHeader>();                    
+                }
+            });
+        }
+
+        [Fact]
         public void CanSendMessagesOfAllTypes()
         {
             var received = new List<TransportMessage>();
-            var serverTask = RunReceiverTaskAsync(_server, async receiver =>
+            var serverTask = RunReceiverTaskAsync(() => _server.In.ReadAsync(), async receiver =>
             {
                 while (true)
                 {
-                    var maybeMessage = await receiver.In.TryReadSafeAsync().ConfigureAwait(false);
+                    var maybeMessage = await receiver.In.TryReadAsync().ConfigureAwait(false);
                     if (!maybeMessage.HasValue)
                     {
                         Log.Trace("Receving terminated for stream {0}", receiver.Id);
@@ -86,35 +112,37 @@ namespace Plexus.Interop.Transport.Protocol
 
             var testMessages = GenerateAllTransportMessages().ToArray();
 
-            var clientTask = RunSenderTaskAsync(_clientFactory, async sender =>
+            var clientTask = RunSenderTaskAsync(() => _client.ConnectAsync(), async sender =>
             {
                 foreach (var transportMessage in testMessages)
                 {
                     transportMessage.Retain();
                     await sender.Out.WriteAsync(transportMessage).ConfigureAwait(false);
                 }
-                sender.Out.TryComplete();
+                sender.Out.TryCompleteWriting();
                 await sender.Out.Completion.ConfigureAwait(false);
             });
 
             Should.CompleteIn(Task.WhenAll(clientTask, serverTask), Timeout1Sec);
 
             received.Count.ShouldBe(5);
-            var enumerator = received.GetEnumerator();
-            foreach (var expected in testMessages)
+            using (var enumerator = received.GetEnumerator())
             {
-                using (expected)
+                foreach (var expected in testMessages)
                 {
-                    enumerator.MoveNext().ShouldBe(true);
-                    using (var actual = enumerator.Current)
+                    using (expected)
                     {
-                        actual.Header.ShouldBe(expected.Header);
-                        actual.Payload.HasValue.ShouldBe(expected.Payload.HasValue);
-                        if (expected.Payload.HasValue)
+                        enumerator.MoveNext().ShouldBe(true);
+                        using (var actual = enumerator.Current)
                         {
-                            var actualPayload = actual.Payload.Value.ToArray();
-                            var expectedPayload = expected.Payload.Value.ToArray();
-                            actualPayload.ShouldBe(expectedPayload);
+                            actual.Header.ShouldBe(expected.Header);
+                            actual.Payload.HasValue.ShouldBe(expected.Payload.HasValue);
+                            if (expected.Payload.HasValue)
+                            {
+                                var actualPayload = actual.Payload.Value.ToArray();
+                                var expectedPayload = expected.Payload.Value.ToArray();
+                                actualPayload.ShouldBe(expectedPayload);
+                            }
                         }
                     }
                 }
@@ -127,10 +155,10 @@ namespace Plexus.Interop.Transport.Protocol
             var receiverTask = TaskRunner.RunInBackground(async () =>
             {
                 MessagingReceiveProcessor receiver;
-                using (var serverStream = await _server.CreateAsync().ConfigureAwait(false))
+                using (var connection = await _server.In.ReadAsync().ConfigureAwait(false))
                 {
-                    receiver = new MessagingReceiveProcessor(serverStream, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
-                    var maybeMessage = await receiver.In.TryReadSafeAsync().ConfigureAwait(false);
+                    receiver = new MessagingReceiveProcessor(connection, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
+                    await receiver.In.TryReadAsync().ConfigureAwait(false);
                 }
                 await receiver.In.ConsumeAsync(x => x.Dispose()).ConfigureAwait(false);
             });
@@ -138,7 +166,7 @@ namespace Plexus.Interop.Transport.Protocol
             var senderTask = TaskRunner.RunInBackground(async () =>
             {
                 MessagingSendProcessor sender;
-                using (var clientStream = await _clientFactory.CreateAsync().ConfigureAwait(false))
+                using (var clientStream = await _client.ConnectAsync().ConfigureAwait(false))
                 {
                     sender = new MessagingSendProcessor(clientStream, SerializationProvider.GetSerializer());
                     var result = true;
@@ -153,41 +181,39 @@ namespace Plexus.Interop.Transport.Protocol
                 Log.Trace("Awaiting completion of sender {0}", sender.Id);
                 await sender.Out.Completion.ConfigureAwait(false);
             });
-
-            Should.Throw<Exception>(() => receiverTask, TimeSpan.FromSeconds(1));
-            Log.Trace(receiverTask.Exception.ExtractInner(), "Received exception on receiving");
-            Should.Throw<Exception>(() => senderTask, TimeSpan.FromSeconds(1));
+            Should.Throw<OperationCanceledException>(receiverTask, Timeout1Sec);
+            Should.Throw<Exception>(senderTask, Timeout1Sec);
             Log.Trace(senderTask.Exception.ExtractInner(), "Received exception on sending");
         }
 
-        private Task RunReceiverTaskAsync(ITransmissionConnectionFactory streamFactory, Func<IMessagingReceiveProcessor, Task> action)
+        private Task RunReceiverTaskAsync(Func<ValueTask<ITransmissionConnection>> connectionFactory, Func<IMessagingReceiveProcessor, Task> action)
         {
             return TaskRunner.RunInBackground(async () =>
             {
-                using (var serverStream = await streamFactory.CreateAsync().ConfigureAwait(false))
+                using (var connection = await connectionFactory().ConfigureAwait(false))
                 {
-                    var receiver = new MessagingReceiveProcessor(serverStream, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
+                    var receiver = new MessagingReceiveProcessor(connection, SerializationProvider.GetDeserializer(TransportHeaderPool.Instance));
                     await action(receiver).ConfigureAwait(false);
                     await receiver.In.Completion.ConfigureAwait(false);
-                    Log.Trace("Completing server stream for connection {0}", serverStream.Id);
-                    serverStream.Out.TryComplete();
-                    await serverStream.Completion.ConfigureAwait(false);
+                    Log.Trace("Completing server stream for connection {0}", connection.Id);
+                    connection.Out.TryCompleteWriting();
+                    await connection.Completion.ConfigureAwait(false);
                 }
             });
         }
 
-        private Task RunSenderTaskAsync(ITransmissionConnectionFactory streamFactory, Func<IMessagingSendProcessor, Task> action)
+        private Task RunSenderTaskAsync(Func<ValueTask<ITransmissionConnection>> connectionFactory, Func<IMessagingSendProcessor, Task> action)
         {
             return TaskRunner.RunInBackground(async () =>
             {
-                using (var serverStream = await streamFactory.CreateAsync().ConfigureAwait(false))
+                using (var connection = await connectionFactory().ConfigureAwait(false))
                 {
-                    var sender = new MessagingSendProcessor(serverStream, SerializationProvider.GetSerializer());
+                    var sender = new MessagingSendProcessor(connection, SerializationProvider.GetSerializer());
                     await action(sender).ConfigureAwait(false);
-                    sender.Out.TryComplete();
+                    sender.Out.TryCompleteWriting();
                     await sender.Out.Completion.ConfigureAwait(false);
-                    Log.Trace("Waiting for completion of connection {0}", serverStream.Id);
-                    await serverStream.Completion.ConfigureAwait(false);
+                    Log.Trace("Waiting for completion of connection {0}", connection.Id);
+                    await connection.Completion.ConfigureAwait(false);
                 }
             });
         }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
-    using System.Threading;
     using System.Threading.Tasks;
 
     internal sealed class ClientConnection : IClientConnection
@@ -34,8 +33,6 @@
             _log = LogManager.GetLogger<ClientConnection>(Id.ToString());
             Info = clientInfo;
             _connection = connection;
-            var listen = new ProducingChannel<ITransportChannel>(1, ListenAsync);
-            IncomingChannels = listen;
             Completion = TaskRunner.RunInBackground(ProcessAsync);
         }
 
@@ -57,32 +54,13 @@
             }
         }
 
-        private async Task ListenAsync(IWriteOnlyChannel<ITransportChannel> output, CancellationToken cancellationToken)
-        {
-            while (true)
-            {
-                var result = await _connection.IncomingChannels.TryReadAsync().ConfigureAwait(false);
-                if (!result.HasValue)
-                {
-                    break;
-                }
-                var channel = result.Value;
-                _log.Trace("New invocation received: {0}", channel.Id);
-                if (!await output.TryWriteAsync(channel).ConfigureAwait(false))
-                {
-                    channel.Out.TryTerminate();
-                    break;
-                }
-            }
-        }
-
         public UniqueId Id { get; }
 
         public ClientConnectionDescriptor Info { get; }
 
         public Task Completion { get; }
 
-        public IReadableChannel<ITransportChannel> IncomingChannels { get; }
+        public IReadOnlyChannel<ITransportChannel> IncomingChannels => _connection.IncomingChannels;
 
         public async ValueTask<ITransportChannel> CreateChannelAsync()
         {

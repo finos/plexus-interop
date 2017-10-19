@@ -24,96 +24,70 @@ namespace Plexus.Interop.Broker
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
+    using Plexus.Processes;
+    using System.Collections.Generic;
     using System.IO;
-    using System.Threading;
+    using System.Linq;
     using System.Threading.Tasks;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
 
-    public sealed class BrokerRunner : StartableBase
+    public sealed class BrokerRunner : ProcessBase
     {
-        private static readonly ILogger Log = LogManager.GetLogger<BrokerRunner>();
         private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider = new ProtobufTransportProtocolSerializationProvider();
         private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider = new ProtobufProtocolSerializerFactory();
 
         private readonly string _workingDir;
-        private readonly Semaphore _instanceSemaphore;
-        private readonly CompositeTransportServer _transportServer;
-        private readonly IRegistryProvider _registryProvider;
-        private readonly IAppLifecycleManager _appLifecycleManager;
+        private readonly ServerConnectionListener _connectionListener;
+        private readonly BrokerProcessor _brokerProcessor;
+        private readonly AppLifecycleManager _appLifecycleManager;
+        private readonly IReadOnlyCollection<ITransportServer> _transportServers;
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<BrokerRunner>();
 
         public BrokerRunner(string metadataDir = null, IRegistryProvider registryProvider = null)
         {
-            _workingDir = Path.GetFullPath(Directory.GetCurrentDirectory());
-            metadataDir = metadataDir ?? _workingDir;
-            _registryProvider = registryProvider ?? (IRegistryProvider)JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
-            _instanceSemaphore = new Semaphore(1, 1, $"Global{Path.DirectorySeparatorChar}plexus-interop-broker-semaphore-{_workingDir.Replace(Path.DirectorySeparatorChar, ':')}");
-            _transportServer = new CompositeTransportServer(new[] { CreateNamedPipeServer(), CreateWebSocketServer() });
-            _appLifecycleManager = new AppLifecycleManager(metadataDir, _workingDir);
+            _workingDir = Directory.GetCurrentDirectory();
+            metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
+            registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
+            _transportServers = new ITransportServer[]
+            {
+                new TransportServer(new PipeTransmissionServer(_workingDir), DefaultTransportSerializationProvider),
+                new TransportServer(new WebSocketTransmissionServer(_workingDir), DefaultTransportSerializationProvider)
+            };
+            _connectionListener = new ServerConnectionListener(_transportServers);
+            _appLifecycleManager = new AppLifecycleManager(metadataDir);            
+            _brokerProcessor = new BrokerProcessor(
+                _connectionListener.In,
+                registryProvider,
+                DefaultProtocolSerializationProvider,
+                _appLifecycleManager);
+            OnStop(_connectionListener.Stop);
+            OnStop(_appLifecycleManager.Stop);
         }
 
-        protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
+        protected override async Task<Task> StartCoreAsync()
         {
-            Log.Debug("Trying to accure instance semaphore");
-            if (!_instanceSemaphore.WaitOne(0))
-            {
-                throw new BrokerIsAlreadyRunningException(_workingDir);
-            }
+            Log.Info("Starting broker in directory {0}", _workingDir);
+            await Task
+                .WhenAll(
+                    _connectionListener.StartAsync(),
+                    _brokerProcessor.StartAsync())
+                .ConfigureAwait(false);
+            Log.Info("Broker started in directory {0}", _workingDir);
+            return ProcessAsync();
+        }
+
+        private async Task ProcessAsync()
+        {
             try
             {
-                stopCancellationToken.ThrowIfCancellationRequested();
-                Log.Info("Starting broker in directory {0}", _workingDir);
-                BrokerProcessor brokerProcess;
-                using (stopCancellationToken.Register(OnStop))
-                {
-                    await _transportServer.StartAsync().ConfigureAwait(false);
-                    brokerProcess = new BrokerProcessor(
-                        _transportServer,
-                        _registryProvider,
-                        DefaultProtocolSerializationProvider,
-                        _appLifecycleManager);
-                    Log.Info("Broker started in directory {0}", _workingDir);
-                }
-                return TaskRunner.RunInBackground(
-                    async () =>
-                    {
-                        try
-                        {
-                            using (stopCancellationToken.Register(OnStop))
-                            {
-                                await brokerProcess.Completion.ConfigureAwait(false);
-                            }
-                        }
-                        finally
-                        {
-                            _instanceSemaphore.Release();
-                        }
-                    },
-                    stopCancellationToken);
+                await Task.WhenAll(_brokerProcessor.Completion, _appLifecycleManager.Completion);
             }
-            catch
+            finally
             {
-                _instanceSemaphore.Release();
-                throw;
+                await Task.WhenAll(_transportServers.Select(x => x.StopAsync())).ConfigureAwait(false);
             }
-        }
-
-        private void OnStop()
-        {
-            Log.Debug("Stopping transport servers");
-            _transportServer.StopAsync().IgnoreAwait(Log);
-        }
-
-        private ITransportServer CreateNamedPipeServer()
-        {
-            var pipeServer = new PipeTransmissionServer(_workingDir);
-            return new TransportServer(pipeServer, DefaultTransportSerializationProvider);
-        }
-
-        private ITransportServer CreateWebSocketServer()
-        {
-            var webSocketServer = new WebSocketTransmissionServer(_workingDir);
-            return new TransportServer(webSocketServer, DefaultTransportSerializationProvider);
         }
     }
 }

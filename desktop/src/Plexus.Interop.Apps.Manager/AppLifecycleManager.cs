@@ -14,47 +14,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps
+namespace Plexus.Interop.Apps
 {
     using Newtonsoft.Json;
     using Plexus.Interop.Apps.Internal;
     using Plexus.Interop.Apps.Internal.Generated;
+    using Plexus.Processes;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using UniqueId = Plexus.UniqueId;
 
-    public sealed class AppLifecycleManager : StartableBase, IAppLifecycleManager
+    public sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager
     {        
-        private static readonly ILogger Log = LogManager.GetLogger<AppLifecycleManager>();
-
-        private Lazy<Task<NativeAppLauncher>> _startNativeAppLauncherTask;
-
-        private IClient _client;
-        private readonly string _brokerWorkingDir;
-        private readonly string _metadataDir;
-        private readonly SubProcessLauncher _subProcessLauncher;
+        private readonly IClient _client;
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.CreateDefault();
-        private AppsDto _appsDto;
+        private readonly NativeAppLauncher _nativeAppLauncher;
+        private readonly AppsDto _appsDto;
 
-        public AppLifecycleManager(string metadataDir, string brokerWorkingDir = null)
+        public AppLifecycleManager(string metadataDir)
         {
-            _metadataDir = metadataDir;
-            _brokerWorkingDir = Path.GetFullPath(brokerWorkingDir ?? Directory.GetCurrentDirectory());
-            _subProcessLauncher = new SubProcessLauncher();
-            _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(StartNativeAppLauncher, LazyThreadSafetyMode.ExecutionAndPublication);
+            _nativeAppLauncher = new NativeAppLauncher(metadataDir, _jsonSerializer);
+            _appsDto = AppsDto.Load(Path.Combine(metadataDir, "apps.json"));
+            _client = ClientFactory.Instance.Create(
+                new ClientOptionsBuilder()
+                    .WithDefaultConfiguration(Directory.GetCurrentDirectory())
+                    .WithApplicationId("interop.AppLifecycleManager")
+                    .Build());
+            OnStop(_nativeAppLauncher.Stop);
+            OnStop(_client.Disconnect);
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();
 
         public async ValueTask<UniqueId> LaunchAsync(string appId)
         {
             Log.Info("Launching {0}", appId);
 
-            if (string.Equals(appId, "interop.NativeAppLauncher"))
+            if (string.Equals(appId, "interop.AppLifecycleManager"))
             {
-                return (await _startNativeAppLauncherTask.Value.ConfigureAwait(false)).Id;
+                await StartAsync().ConfigureAwait(false);
+                return _client.ConnectionId;
+            }
+
+            if (string.Equals(appId, "interop.NativeAppLauncher"))
+            {                
+                await _nativeAppLauncher.StartAsync().ConfigureAwait(false);
+                return _nativeAppLauncher.Id;
             }
 
             var appDto = _appsDto.Apps.FirstOrDefault(x => string.Equals(x.Id, appId));
@@ -94,32 +102,15 @@
             return appIds;
         }
 
-        protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
+        protected override async Task<Task> StartCoreAsync()
         {
-            stopCancellationToken.ThrowIfCancellationRequested();
-            _appsDto = AppsDto.Load(Path.Combine(_metadataDir, "apps.json"));
-            _client = ClientFactory.Instance.Create(
-                new ClientOptionsBuilder()
-                    .WithDefaultConfiguration(_brokerWorkingDir)
-                    .WithApplicationId("interop.AppLifecycleManager")
-                    .Build());            
-            var startNativeAppLauncherTask = _startNativeAppLauncherTask.Value;
-            await Task.WhenAll(_client.ConnectAsync(), startNativeAppLauncherTask).ConfigureAwait(false);
-            var nativeAppLauncher = startNativeAppLauncherTask.GetResult();
-            return Task.WhenAll(_client.Completion, nativeAppLauncher.Completion);
+            await _client.ConnectAsync().ConfigureAwait(false);
+            return ProcessAsync();
         }
 
-        private async Task<NativeAppLauncher> StartNativeAppLauncher()
+        private Task ProcessAsync()
         {
-            var nativeAppLauncher = new NativeAppLauncher(_brokerWorkingDir, _metadataDir, _subProcessLauncher, _jsonSerializer);
-            var task = TaskRunner.RunInBackground(nativeAppLauncher.StartAsync);
-            task.ContinueWithSynchronously(x =>
-                    _startNativeAppLauncherTask = new Lazy<Task<NativeAppLauncher>>(
-                        StartNativeAppLauncher,
-                        LazyThreadSafetyMode.ExecutionAndPublication))
-                .IgnoreAwait(Log);
-            await task.ConfigureAwait(false);
-            return nativeAppLauncher;
+            return Task.WhenAll(_client.Completion, _nativeAppLauncher.Completion);
         }
     }
 }

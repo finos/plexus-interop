@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿// ReSharper disable InconsistentlySynchronizedField
 
+// ReSharper disable InconsistentlySynchronizedField
 namespace Plexus.Interop.Transport.Internal
 {
     using Plexus.Channels;
@@ -54,7 +54,7 @@ namespace Plexus.Interop.Transport.Internal
 
         public Task Completion { get; }
 
-        public IReadableChannel<ITransportChannel> IncomingChannels => _incomingChannelQueue.In;
+        public IReadOnlyChannel<ITransportChannel> IncomingChannels => _incomingChannelQueue.In;
 
         public bool TryComplete()
         {
@@ -115,7 +115,7 @@ namespace Plexus.Interop.Transport.Internal
             try
             {
                 receiveTask = ReceiveAsync();
-                await Task.WhenAny(receiveTask, _transportSendProcessor.Out.Completion).Unwrap().ConfigureAwait(false);
+                await Task.WhenAny(receiveTask, _transportSendProcessor.Completion).Unwrap().ConfigureAwait(false);
                 await CompleteSendingAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -125,7 +125,7 @@ namespace Plexus.Interop.Transport.Internal
             }
             finally
             {
-                await Task.WhenAll(receiveTask, _transportSendProcessor.Out.Completion).ConfigureAwait(false);
+                await Task.WhenAll(receiveTask, _transportSendProcessor.Completion).ConfigureAwait(false);
             }
         }
 
@@ -134,12 +134,12 @@ namespace Plexus.Interop.Transport.Internal
             try
             {
                 await _transportReceiveProcessor.In.ConsumeAsync(HandleReceivedMessageAsync).ConfigureAwait(false);
-                _incomingChannelQueue.Out.TryComplete();
+                _incomingChannelQueue.Out.TryCompleteWriting();
                 await CompleteReceivingAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _incomingChannelQueue.Out.TryTerminate(ex);
+                _incomingChannelQueue.Out.TryTerminateWriting(ex);
                 await CompleteReceivingAsync(ex).ConfigureAwait(false);
                 throw;
             }
@@ -150,7 +150,7 @@ namespace Plexus.Interop.Transport.Internal
             Task completion;
             lock (_channels)
             {
-                _log.Trace("Terminating receiving for {0} channels: {1}", string.Join(", ", _channels.Keys), error.FormatTypeAndMessage());
+                _log.Trace("Terminating receiving for {0} channels ({1}): {2}", _channels.Count, string.Join(", ", _channels.Keys), error.FormatTypeAndMessage());
                 foreach (var channel in _channels.Values)
                 {
                     channel.TerminateReceiving(error);
@@ -169,12 +169,13 @@ namespace Plexus.Interop.Transport.Internal
                 _log.Trace("Completing sending for {0} channels", _channels.Count);
                 foreach (var channel in _channels.Values)
                 {
-                    channel.Out.TryComplete();
+                    channel.Out.TryCompleteWriting();
                 }
                 completion = Task.WhenAll(_channels.Values.Select(x => x.Out.Completion)).IgnoreExceptions();
             }
             await completion.ConfigureAwait(false);
-            _transportSendProcessor.Out.TryComplete();
+            _log.Trace("Sending completed for all channels");
+            _transportSendProcessor.Out.TryCompleteWriting();
         }
 
         private async Task TerminateSendingAsync(Exception error = null)
@@ -190,12 +191,12 @@ namespace Plexus.Interop.Transport.Internal
                 _log.Trace("Terminating sending for {0} channels: {1}", _channels.Count, error.FormatTypeAndMessage());
                 foreach (var channel in _channels.Values)
                 {
-                    channel.Out.TryTerminate(error);
+                    channel.Out.TryTerminateWriting(error);
                 }
                 completion = Task.WhenAll(_channels.Values.Select(x => x.Out.Completion)).IgnoreExceptions();
             }
             await completion.ConfigureAwait(false);
-            _transportSendProcessor.Out.TryTerminate(error);
+            _transportSendProcessor.Out.TryTerminateWriting(error);
         }
 
         private async Task HandleReceivedMessageAsync(ChannelMessage message)
@@ -252,7 +253,7 @@ namespace Plexus.Interop.Transport.Internal
                     _channels[channel.Id] = channel;
                     channel.Completion.ContinueWithSynchronously((Action<Task, object>)OnChannelCompleted, channel).IgnoreAwait(_log);
                 }
-                await _incomingChannelQueue.Out.TryWriteSafeAsync(channel).ConfigureAwait(false);
+                await _incomingChannelQueue.Out.WriteAsync(channel).ConfigureAwait(false);
             }
         }
 

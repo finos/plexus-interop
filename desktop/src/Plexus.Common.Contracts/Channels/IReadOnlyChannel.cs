@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,13 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission
+ using System.Threading.Tasks;
+
+namespace Plexus.Channels
 {
     using System.Threading;
-    using System.Threading.Tasks;
 
-    public interface ITransmissionConnectionFactory
+    public interface IReadOnlyChannel<T>
     {
-        ValueTask<ITransmissionConnection> CreateAsync(CancellationToken cancellationToken = new CancellationToken());
+        Task Completion { get; }
+
+        bool TryRead(out T item);
+
+        Task<bool> WaitReadAvailableAsync(CancellationToken cancellationToken = default);
     }
 }

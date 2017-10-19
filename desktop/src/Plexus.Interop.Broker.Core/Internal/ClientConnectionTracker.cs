@@ -36,11 +36,11 @@
         private readonly Dictionary<UniqueId, Promise<IClientConnection>> _connectionWaiters
             = new Dictionary<UniqueId, Promise<IClientConnection>>();
 
-        private readonly IAppLauncher _appLauncher;
+        private readonly IAppLifecycleManager _appLifecycleManager;
 
-        public ClientConnectionTracker(IAppLauncher appLauncher)
+        public ClientConnectionTracker(IAppLifecycleManager appLifecycleManager)
         {
-            _appLauncher = appLauncher;
+            _appLifecycleManager = appLifecycleManager;
         }
 
         public IClientConnection AcceptConnection(
@@ -82,9 +82,9 @@
             }
         }
 
-        private async Task<IClientConnection> SpawnConnectionAsync(string appId)
+        public async Task<IClientConnection> SpawnConnectionAsync(string appId)
         {
-            var appInstanceId = await _appLauncher.LaunchAsync(appId).ConfigureAwait(false);
+            var appInstanceId = await _appLifecycleManager.LaunchAsync(appId).ConfigureAwait(false);
             Promise<IClientConnection> connectionPromise;
             lock (_connections)
             {
@@ -121,7 +121,7 @@
                     return new ValueTask<IClientConnection>(targetConnection);
                 }
             }
-            var appIdToSpawn = _appLauncher.GetAvailableApps(appIds).FirstOrDefault();
+            var appIdToSpawn = _appLifecycleManager.GetAvailableApps(appIds).FirstOrDefault();
             if (string.IsNullOrEmpty(appIdToSpawn))
             {
                 throw new BrokerException($"Application is not available: {appIds.FormatEnumerable()}");

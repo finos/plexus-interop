@@ -16,9 +16,10 @@
  */
 ﻿namespace Plexus.Processes
 {
+    using System;
     using System.Threading.Tasks;
 
-    public interface IProcess
+    public interface IProcess : IDisposable
     {
         Task Completion { get; }
 

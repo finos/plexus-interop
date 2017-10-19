@@ -20,4 +20,7 @@ using Plexus.Interop.Broker.Host;
 
 [assembly:InternalsVisibleTo("Plexus.Interop.Broker.Host.Tests")]
 
-[assembly:EntryPoint(typeof(Program))]
+[assembly:EntryPoint( 
+    typeof(Program), 
+    InstanceAwareness.SingleInstancePerDirectory, 
+    "plexus-interop-broker")]

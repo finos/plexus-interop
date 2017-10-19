@@ -14,16 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading.Tasks;
-
-namespace Plexus.Channels
+namespace Plexus.Interop.Transport.Transmission
 {
-    public interface IReadableChannel<T>
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    public interface ITransmissionClient
     {
-        Task Completion { get; }
-
-        Task<bool> WaitForNextSafeAsync();
-
-        bool TryReadSafe(out T item);
+        ValueTask<ITransmissionConnection> ConnectAsync(CancellationToken cancellationToken = default);
     }
 }

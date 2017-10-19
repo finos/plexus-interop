@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,106 +14,99 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.Pipes
+namespace Plexus.Interop.Transport.Transmission.Pipes
 {
+    using Plexus.Channels;
     using Plexus.Interop.Transport.Transmission.Streams;
+    using Plexus.Processes;
     using System;
     using System.IO;
     using System.IO.Pipes;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class PipeTransmissionServer : StreamTransmissionConnectionFactoryBase, ITransmissionServer
+    public sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
     {
         private const string ServerName = "np-v1";
 
         private readonly ILogger _log;
-        private readonly Promise _completion = new Promise();
         private readonly IServerStateWriter _settingsWriter;
         private readonly string _pipeName = "plexus-interop-broker-" + Guid.NewGuid();
+        private readonly BufferedChannel<ITransmissionConnection> _buffer 
+            = new BufferedChannel<ITransmissionConnection>(1);
 
-        public PipeTransmissionServer(string brokerWorkingDir = null)
-        {            
+        public PipeTransmissionServer(string brokerWorkingDir)
+        {
             _log = LogManager.GetLogger<PipeTransmissionServer>();
-            brokerWorkingDir = brokerWorkingDir ?? Directory.GetCurrentDirectory();
             _settingsWriter = new ServerStateWriter(ServerName, brokerWorkingDir);
+            _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
-        public Task Completion => _completion.Task;
+        public IReadOnlyChannel<ITransmissionConnection> In => _buffer.In;
 
-        public Task StartAsync()
+        protected override Task<Task> StartCoreAsync()
         {
             _log.Debug("Starting");
             _settingsWriter.Write("address", _pipeName);
             _settingsWriter.SignalInitialized();
-            return TaskConstants.Completed;
+            _log.Info("Pipe server started: {0}", _pipeName);
+            return Task.FromResult(ProcessAsync());
         }
 
-        public Task StopAsync()
+        private async Task ProcessAsync()
         {
-            _log.Debug("Stopping");
-
-            // TODO: dispose all the active streams
-            _completion.TryComplete();
-            _settingsWriter.Dispose();
-            return Completion.IgnoreExceptions();
+            using (_settingsWriter)
+            {
+                while (true)
+                {
+                    var connection = await StreamTransmissionConnection
+                        .CreateAsync(UniqueId.Generate(), AcceptStreamAsync)
+                        .ConfigureAwait(false);
+                    await _buffer.Out
+                        .WriteAsync(connection, StopToken)
+                        .ConfigureAwait(false);
+                }
+            }
         }
 
-        public void Dispose()
+        private async ValueTask<Stream> AcceptStreamAsync()
         {
-            _log.Trace("Disposing");
-            StopAsync().GetResult();
-        }
-
-        protected override async ValueTask<Stream> ConnectAsync(CancellationToken cancellationToken)
-        {            
-            _log.Trace("Waiting for connection to pipe {0}", _pipeName);
+            _log.Trace("Waiting for connection");
             var pipeServerStream = new NamedPipeServerStream(
                 _pipeName,
                 PipeDirection.InOut,
                 -1,
                 PipeTransmissionMode.Byte,
                 PipeOptions.Asynchronous);
-            await WaitForConnectionAsync(pipeServerStream, cancellationToken).ConfigureAwait(false);
-            _log.Trace("Received new connection to pipe {0}", _pipeName);
-
-            // TODO: keep connected stream to dispose it on Stop
+            try
+            {
+                await WaitForConnectionAsync(pipeServerStream, StopToken).ConfigureAwait(false);
+            }
+            catch
+            {
+                pipeServerStream.Dispose();
+                throw;
+            }
+            _log.Trace("Received new connection");
             return pipeServerStream;
         }
 
 #if NET452
-        private static async Task WaitForConnectionAsync(
-            NamedPipeServerStream pipeServerStream,
+        private static async Task WaitForConnectionAsync(NamedPipeServerStream pipeServerStream,
             CancellationToken cancellationToken)
         {
-            try
+            using (cancellationToken.Register(pipeServerStream.Dispose))
             {
-                using (cancellationToken.Register(pipeServerStream.Dispose))
-                {
-                    await Task.Factory.FromAsync(pipeServerStream.BeginWaitForConnection, pipeServerStream.EndWaitForConnection, null);
-                }
-            }
-            catch
-            {
-                pipeServerStream.Dispose();
-                cancellationToken.ThrowIfCancellationRequested();
-                throw;
+                await Task.Factory.FromAsync(
+                    pipeServerStream.BeginWaitForConnection,
+                    pipeServerStream.EndWaitForConnection, 
+                    null);
             }
         }
 #else
-        private static async Task WaitForConnectionAsync(
-            NamedPipeServerStream pipeServerStream,
-            CancellationToken cancellationToken)
+        private static async Task WaitForConnectionAsync(NamedPipeServerStream pipeServerStream, CancellationToken cancellationToken)
         {
-            try
-            {
-                await pipeServerStream.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch
-            {
-                pipeServerStream.Dispose();
-                throw;
-            }
+            await pipeServerStream.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
         }
 #endif
     }

@@ -285,9 +285,9 @@ namespace Plexus.Interop
                     );                    
                     Console.WriteLine("Starting call");
                     var call = client.Call(EchoServerStreamingMethod, sentRequest);                    
-                    while (await call.ResponseStream.WaitForNextSafeAsync())
+                    while (await call.ResponseStream.WaitReadAvailableAsync())
                     {
-                        while (call.ResponseStream.TryReadSafe(out var item))
+                        while (call.ResponseStream.TryRead(out var item))
                         {
                             responses.Add(item);
                         }
@@ -307,11 +307,11 @@ namespace Plexus.Interop
                 Console.WriteLine("Starting test");
                 var receivedRequests = new List<EchoRequest>();
 
-                async Task<EchoRequest> HandleAsync(IReadableChannel<EchoRequest> requestStream, MethodCallContext context)
+                async Task<EchoRequest> HandleAsync(IReadOnlyChannel<EchoRequest> requestStream, MethodCallContext context)
                 {
-                    while (await requestStream.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (requestStream.TryReadSafe(out var item))
+                        while (requestStream.TryRead(out var item))
                         {
                             receivedRequests.Add(item);
                         }
@@ -359,13 +359,13 @@ namespace Plexus.Interop
                 Console.WriteLine("Starting test");
 
                 async Task HandleAsync(
-                    IReadableChannel<EchoRequest> requestStream, 
+                    IReadOnlyChannel<EchoRequest> requestStream, 
                     IWriteOnlyChannel<EchoRequest> responseStream, 
                     MethodCallContext context)
                 {
-                    while (await requestStream.WaitForNextSafeAsync())
+                    while (await requestStream.WaitReadAvailableAsync())
                     {
-                        while (requestStream.TryReadSafe(out var item))
+                        while (requestStream.TryRead(out var item))
                         {
                             await responseStream.WriteAsync(item);
                         }
@@ -394,9 +394,9 @@ namespace Plexus.Interop
                     await call.RequestStream.CompleteAsync();
                     Console.WriteLine("Requests sent");
 
-                    while (await call.ResponseStream.WaitForNextSafeAsync())
+                    while (await call.ResponseStream.WaitReadAvailableAsync())
                     {
-                        while (call.ResponseStream.TryReadSafe(out var item))
+                        while (call.ResponseStream.TryRead(out var item))
                         {
                             responses.Add(item);
                         }
@@ -442,8 +442,8 @@ namespace Plexus.Interop
             {
                 using (await StartTestBrokerAsync())
                 {
-                    var server1 = ConnectEchoServer();
-                    var server2 = ConnectEchoServer();
+                    ConnectEchoServer();
+                    ConnectEchoServer();
                     var client = ConnectEchoClient();
                     var discoveryResults = await client.DiscoverAsync(ServiceDiscoveryQuery.Create(EchoUnaryMethod.Reference.Service));
                     discoveryResults.Count.ShouldBe(1);

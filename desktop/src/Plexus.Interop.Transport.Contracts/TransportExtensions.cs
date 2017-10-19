@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Threading.Tasks;
-
 namespace Plexus.Interop.Transport
 {
+    using System;
+    using System.Threading.Tasks;
+
     public static class TransportExtensions
     {
         public static async ValueTask<Maybe<ITransportChannel>> TryCreateChannelAsync(this ITransportConnection connection)
@@ -44,12 +44,12 @@ namespace Plexus.Interop.Transport
         public static async Task CompleteAsync(this ITransportConnection connection)
         {
             connection.TryComplete();
-            while (await connection.IncomingChannels.WaitForNextSafeAsync().ConfigureAwait(false))
+            do
             {
-                while (connection.IncomingChannels.TryReadSafe(out _))
+                while (connection.IncomingChannels.TryRead(out _))
                 {
                 }
-            }
+            } while (await connection.IncomingChannels.WaitReadAvailableAsync().ConfigureAwait(false));
             await connection.Completion.ConfigureAwait(false);
         }
     }

@@ -69,10 +69,10 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
         
         public bool TryTerminate(Exception error = null)
         {
-            return _sendQueue.Out.TryTerminate(error);
+            return _sendQueue.Out.TryTerminateWriting(error);
         }
 
-        public IReadableChannel<TResponse> In => _inMessageBuffer.In;
+        public IReadOnlyChannel<TResponse> In => _inMessageBuffer.In;
 
         protected abstract Task InitializeSendingAsync();
 
@@ -100,17 +100,17 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
                 {
                     await Task.WhenAll(processOutMessagesTask, _inMessageBuffer.Out.Completion).ConfigureAwait(false);
                     _log.Trace("Message send/receive completed");
-                    _sendQueue.Out.TryComplete();
+                    _sendQueue.Out.TryCompleteWriting();
                 }
                 catch (Exception ex)
                 {
                     _log.Debug("Terminating invocation because of exception on message send/receive: {0}",
                         ex.FormatTypeAndMessage());
-                    _sendQueue.Out.TryTerminate(ex);
+                    _sendQueue.Out.TryTerminateWriting(ex);
                 }
                 await processSendingTask.ConfigureAwait(false);
                 _log.Trace("Completing channel");
-                _channel.Out.TryComplete();
+                _channel.Out.TryCompleteWriting();
                 await processReceivingTask.ConfigureAwait(false);
                 if (_receivedConfirmationCount != _sentMessageCount)
                 {
@@ -122,10 +122,10 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             {
                 _log.Debug("Invocation terminated: {0}", ex.FormatTypeAndMessage());
                 _startCompletion.TryFail(ex);
-                _channel.Out.TryTerminate(ex);
-                _inMessageBuffer.Out.TryTerminate(ex);
-                _outMessageBuffer.Out.TryTerminate(ex);
-                _sendQueue.Out.TryTerminate(ex);
+                _channel.Out.TryTerminateWriting(ex);
+                _inMessageBuffer.Out.TryTerminateWriting(ex);
+                _outMessageBuffer.Out.TryTerminateWriting(ex);
+                _sendQueue.Out.TryTerminateWriting(ex);
                 await _channel.In
                     .ConsumeAsync((Action<TransportMessageFrame>)Dispose)
                     .IgnoreExceptions()
@@ -159,8 +159,8 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             catch (Exception ex)
             {
                 _log.Debug("Outcoming message stream terminated: {0}", ex.FormatTypeAndMessage());
-                _outMessageBuffer.Out.TryTerminate(ex);
-                _sendQueue.Out.TryTerminate(ex);
+                _outMessageBuffer.Out.TryTerminateWriting(ex);
+                _sendQueue.Out.TryTerminateWriting(ex);
                 await _outMessageBuffer.In.ConsumeAsync((Action<TRequest>)Dispose).IgnoreExceptions().ConfigureAwait(false);
                 throw;
             }
@@ -181,9 +181,9 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             catch (Exception ex)
             {
                 _log.Debug("Sending terminated: {0}", ex.FormatTypeAndMessage());
-                _inMessageBuffer.Out.TryTerminate(ex);
-                _outMessageBuffer.Out.TryTerminate(ex);
-                _sendQueue.Out.TryTerminate(ex);
+                _inMessageBuffer.Out.TryTerminateWriting(ex);
+                _outMessageBuffer.Out.TryTerminateWriting(ex);
+                _sendQueue.Out.TryTerminateWriting(ex);
                 await _sendQueue.In.ConsumeAsync((Action<(IInvocationMessage, Maybe<TRequest>)>)Dispose).IgnoreExceptions().ConfigureAwait(false);
                 throw;
             }
@@ -203,8 +203,8 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             catch (Exception ex)
             {
                 _log.Debug("Receiving terminated: {0}", ex.FormatTypeAndMessage());
-                _inMessageBuffer.Out.TryTerminate(ex);
-                _outMessageBuffer.Out.TryTerminate(ex);
+                _inMessageBuffer.Out.TryTerminateWriting(ex);
+                _outMessageBuffer.Out.TryTerminateWriting(ex);
                 throw;
             }
         }
@@ -333,7 +333,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
                 case IncomingStreamState.Open:
                     _log.Trace("Incoming message stream completed");
                     _incomingStreamState = IncomingStreamState.Completed;
-                    _inMessageBuffer.Out.TryComplete();
+                    _inMessageBuffer.Out.TryCompleteWriting();
                     break;
                 case IncomingStreamState.ReceivingMessage:
                 case IncomingStreamState.Completed:

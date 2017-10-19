@@ -67,7 +67,7 @@
             if (request.HasValue)
             {
                 await invocation.Out.WriteAsync(request.Value).ConfigureAwait(false);
-                invocation.Out.TryComplete();
+                invocation.Out.TryCompleteWriting();
             }
             return invocation;
         }

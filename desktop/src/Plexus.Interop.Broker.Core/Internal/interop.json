@@ -10,6 +10,17 @@
 					"type": "Unary"
 				}
 			]
+		},
+		{
+			"id": "interop.InteropService",
+			"methods": [
+				{
+					"name": "ActivateApp",
+					"input": "interop.ActivateAppRequest",
+					"output": "interop.ActivateAppResponse",
+					"type": "Unary"
+				}
+			]
 		}
 	],
 	"applications": [
@@ -26,6 +37,41 @@
 				}
 		     ],
 		     "provides": [
+		     ]
+		  },
+		{
+			"id": "interop.CommandLineTool",
+			"consumes": [
+				{
+					"service": "interop.InteropService",
+					"from": [
+						"interop.InteropManager"
+					],
+					"methods": [
+						"ActivateApp"
+					]
+				}
+		     ],
+		     "provides": [
+		     ]
+		  },
+		{
+			"id": "interop.InteropManager",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.InteropService",
+		     		"title": "InteropService",
+		     		"to": [
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "ActivateApp",
+		     				"title": "ActivateApp"
+		     			}
+		     		]
+		     	}
 		     ]
 		  },
 		{

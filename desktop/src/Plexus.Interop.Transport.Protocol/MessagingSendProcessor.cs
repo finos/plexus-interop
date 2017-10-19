@@ -14,60 +14,76 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading.Tasks;
-using Plexus.Channels;
-using Plexus.Interop.Transport.Protocol.Serialization;
-using Plexus.Interop.Transport.Transmission;
-using Plexus.Pools;
-
 namespace Plexus.Interop.Transport.Protocol
 {
+    using Plexus.Channels;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
+    using Plexus.Pools;
+    using System;
+    using System.Threading.Tasks;
+
     public sealed class MessagingSendProcessor : IMessagingSendProcessor
     {
         private readonly ILogger _log;
         private readonly ITransportProtocolSerializer _serializer;
+        private readonly IChannel<TransportMessage> _buffer = new BufferedChannel<TransportMessage>(3);
+        private readonly ITransmissionConnection _connection;
 
         public MessagingSendProcessor(
             ITransmissionConnection connection,
             ITransportProtocolSerializer serializer)
         {
             Id = connection.Id;
+            _connection = connection;
             _log = LogManager.GetLogger<MessagingSendProcessor>(Id.ToString());
-            _serializer = serializer;
-            Out = new PropagatingChannel<TransportMessage, IPooledBuffer>(3, connection.Out, SendAsync, Dispose);
-            Out.Completion.LogCompletion(_log);
+            _serializer = serializer;            
+            _connection.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            Completion = _connection.Out.Completion.LogCompletion(_log);
         }
 
         public UniqueId Id { get; }
 
-        public IWritableChannel<TransportMessage> Out { get; }
+        public Task Completion { get; }
 
-        private void Dispose(TransportMessage message)
+        public IWritableChannel<TransportMessage> Out => _buffer.Out;
+        
+        private async Task ProcessAsync()
         {
-            _log.Trace("Disposing message of type {0}", message.Header.GetType().Name);
-            message.Dispose();
+            try
+            {
+                await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);
+                _log.Trace("Sending completed");
+            }
+            catch (Exception ex)
+            {
+                _log.Trace("Sending failed: {0}", ex.FormatTypeAndMessage());
+                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.In.DisposeBufferedItems();
+                throw;
+            }
         }
 
-        private async Task SendAsync(TransportMessage message, IWriteOnlyChannel<IPooledBuffer> output)
+        private async Task SendAsync(TransportMessage message)
         {
             _log.Debug("Sending message: {0}", message);
             using (var header = message.Header)
             {
-                var serializedHeader = _serializer.Serialize(header);                
-                await SendAsync(serializedHeader, output).ConfigureAwait(false);
+                var serializedHeader = _serializer.Serialize(header);
+                await SendAsync(serializedHeader).ConfigureAwait(false);
                 if (message.Payload.HasValue)
                 {
-                    var payload = message.Payload.Value;                    
-                    await SendAsync(payload, output).ConfigureAwait(false);
-                }                
+                    var payload = message.Payload.Value;
+                    await SendAsync(payload).ConfigureAwait(false);
+                }
             }
         }
 
-        private async Task SendAsync(IPooledBuffer message, IWriteOnlyChannel<IPooledBuffer> output)
+        private async Task SendAsync(IPooledBuffer message)
         {
             try
             {
-                await output.WriteAsync(message).ConfigureAwait(false);
+                await _connection.Out.WriteAsync(message).ConfigureAwait(false);
             }
             catch
             {

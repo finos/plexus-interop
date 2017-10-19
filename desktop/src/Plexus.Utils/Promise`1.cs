@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -148,6 +148,21 @@ namespace Plexus
         public void PropagateCompletionFrom(Task<T> task)
         {
             task.PropagateCompletionToPromise(this);
+        }
+
+        public void AssignCancellationToken(CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.CanBeCanceled)
+            {
+                return;
+            }
+            if (cancellationToken.IsCancellationRequested)
+            {
+                TryCancel();
+                return;
+            }
+            var registration = cancellationToken.Register(() => TryCancel());
+            Task.ContinueWithSynchronously(_ => registration.Dispose(), CancellationToken.None);
         }
     }
 }

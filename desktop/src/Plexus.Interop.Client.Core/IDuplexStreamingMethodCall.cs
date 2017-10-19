@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+ namespace Plexus.Interop
 {
     using Plexus.Channels;
 
@@ -29,7 +29,7 @@
         /// <summary>
         /// Async stream to read streaming responses.
         /// </summary>
-        IReadableChannel<TResponse> ResponseStream { get; }
+        IReadOnlyChannel<TResponse> ResponseStream { get; }
 
         /// <summary>
         /// Async stream to send streaming requests.

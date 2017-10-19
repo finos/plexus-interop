@@ -14,66 +14,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Shouldly;
-using Xunit;
-
 namespace Plexus.Channels
 {
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Shouldly;
+    using Xunit;
+
     public sealed class BufferedChannelTests : TestsSuite
     {
         [Fact]
         public void TryWriteReturnsFalseWhenBufferIsFull()
         {
             var sut = new BufferedChannel<int>(0);
-            sut.TryWriteSafe(1).ShouldBe(false);
+            sut.TryWrite(1).ShouldBe(false);
         }
 
         [Fact]
         public void TryWriteReturnsTrueWhenBufferIsNotFull()
         {
             var sut = new BufferedChannel<int>(1);
-            sut.TryWriteSafe(1).ShouldBe(true);
+            sut.TryWrite(1).ShouldBe(true);
         }
 
         [Fact]
         public void TryReadReturnsFalseWhenBufferIsEmpty()
         {
             var sut = new BufferedChannel<int>(1);
-            sut.TryReadSafe(out int _).ShouldBe(false);
+            sut.TryRead(out int _).ShouldBe(false);
         }
 
         [Fact]
         public void TryReadReturnsTrueWhenBufferIsNotEmpty()
         {
             var sut = new BufferedChannel<int>(1);
-            sut.TryWriteSafe(1).ShouldBe(true);
-            sut.TryReadSafe(out int _).ShouldBe(true);
+            sut.TryWrite(1).ShouldBe(true);
+            sut.TryRead(out int _).ShouldBe(true);
         }
 
         [Fact]
         public void WritesSynchronouslyWhenBufferHasSpace()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryWriteSafe(1).ShouldBe(true);
-            sut.TryWriteSafe(2).ShouldBe(true);
-            sut.TryWriteSafe(3).ShouldBe(false);
-            sut.TryReadSafe(out int item).ShouldBe(true);
+            sut.TryWrite(1).ShouldBe(true);
+            sut.TryWrite(2).ShouldBe(true);
+            sut.TryWrite(3).ShouldBe(false);
+            sut.TryRead(out int item).ShouldBe(true);
             item.ShouldBe(1);
-            sut.TryWriteSafe(4).ShouldBe(true);
-        }
-
-        [Fact]
-        public void WritesSynchronouslyWhenThereIsPendingReadTask()
-        {
-            var sut = new BufferedChannel<int>(0);
-            var readTask = sut.ReadAsync();
-            sut.TryWriteSafe(1).ShouldBe(false);
-            sut.WriteAsync(1).ShouldCompleteIn(Timeout1Sec);
-            Should.CompleteIn(readTask.AsTask(), TimeSpan.FromSeconds(1));
-            readTask.Result.ShouldBe(1);
+            sut.TryWrite(4).ShouldBe(true);
         }
 
         [Fact]
@@ -83,36 +72,26 @@ namespace Plexus.Channels
             Should.CompleteIn(sut.WriteAsync(1), TimeSpan.FromSeconds(1));
             var writeTask = sut.WriteAsync(2);
             writeTask.IsCompleted.ShouldBe(false);
-            sut.TryReadSafe(out int item).ShouldBe(true);
+            sut.TryRead(out var item).ShouldBe(true);
             item.ShouldBe(1);
             Should.CompleteIn(writeTask, TimeSpan.FromSeconds(1));
-            sut.TryReadSafe(out item).ShouldBe(true);
+            sut.TryRead(out item).ShouldBe(true);
             item.ShouldBe(2);
-        }
-
-        [Fact]
-        public void ReadsSynchronouslyWhenThereIsPendingWriteTask()
-        {
-            var sut = new BufferedChannel<int>(0);
-            var writeTask = sut.WriteAsync(3);
-            sut.TryReadSafe(out int item).ShouldBe(true);
-            item.ShouldBe(3);
-            Should.CompleteIn(writeTask, TimeSpan.FromSeconds(1));
         }
 
         [Fact]
         public void TryCompleteReturnsFalseIfChannelIsAlreadyCompleted()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryComplete().ShouldBe(true);
-            sut.TryComplete().ShouldBe(false);
+            sut.TryCompleteWriting().ShouldBe(true);
+            sut.TryCompleteWriting().ShouldBe(false);
         }
 
         [Fact]
         public void CompleteThrowsExceptionIfChannelIsAlreadyCompleted()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryComplete().ShouldBe(true);
+            sut.TryCompleteWriting().ShouldBe(true);
             Should.Throw<OperationCanceledException>(() => sut.Complete());
         }
 
@@ -128,7 +107,7 @@ namespace Plexus.Channels
         public void CompletionSuccessfulAfterTryCompleteCalledWithoutException()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryComplete();
+            sut.TryCompleteWriting();
             sut.Completion.Status.ShouldBe(TaskStatus.RanToCompletion);
         }
 
@@ -167,9 +146,9 @@ namespace Plexus.Channels
         public void CannotWriteAfterCompletion()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryWriteSafe(1);
+            sut.TryWrite(1);
             sut.Complete();
-            sut.TryWriteSafe(2).ShouldBe(false);
+            sut.TryWrite(2).ShouldBe(false);
             Should.Throw<OperationCanceledException>(() => sut.WriteAsync(2));
         }
 
@@ -177,15 +156,15 @@ namespace Plexus.Channels
         public void CanReadAfterCompletionUntilBufferIsEmpty()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryWriteSafe(1);
-            sut.TryWriteSafe(2);
-            sut.TryComplete();
+            sut.TryWrite(1);
+            sut.TryWrite(2);
+            sut.TryCompleteWriting();
             sut.Completion.IsCompleted.ShouldBe(false);
-            sut.TryReadSafe(out int _).ShouldBe(true);
+            sut.TryRead(out int _).ShouldBe(true);
             sut.Completion.IsCompleted.ShouldBe(false);
-            sut.TryReadSafe(out int _).ShouldBe(true);
+            sut.TryRead(out int _).ShouldBe(true);
             sut.Completion.IsCompleted.ShouldBe(true);
-            sut.TryReadSafe(out int _).ShouldBe(false);
+            sut.TryRead(out int _).ShouldBe(false);
             Should.Throw<TaskCanceledException>(() => sut.ReadAsync().AsTask());
         }
 
@@ -212,98 +191,74 @@ namespace Plexus.Channels
         }
 
         [Fact]
-        public void ResetCancelsReadTasks()
-        {
-            var sut = new BufferedChannel<int>(0);
-            var readTask1 = sut.TryReadSafeAsync();
-            var readTask2 = sut.TryReadSafeAsync();
-            sut.Reset();
-            readTask1.Result.HasValue.ShouldBeFalse();
-            readTask2.Result.HasValue.ShouldBeFalse();
-        }
-
-        [Fact]
-        public void ResetCancelsWriteTasks()
-        {
-            var sut = new BufferedChannel<int>(0);
-            var writeTask1 = sut.TryWriteSafeAsync(1);
-            var writeTask2 = sut.TryWriteSafeAsync(2);
-            sut.Reset();
-            writeTask1.Result.ShouldBeFalse();
-            writeTask2.Result.ShouldBeFalse();
-        }
-
-        [Fact]
         public void CancellationCancelsReadTasks()
         {
             var sut = new BufferedChannel<int>(0);
-            var task1 = sut.TryReadSafeAsync();
-            var task2 = sut.TryReadSafeAsync();
+            var task1 = sut.TryReadAsync();
+            var task2 = sut.TryReadAsync();
             sut.Terminate();
-            task1.Result.HasValue.ShouldBeFalse();
-            task2.Result.HasValue.ShouldBeFalse();
+            Should.Throw<OperationCanceledException>(task1.AsTask(), Timeout1Sec);
+            Should.Throw<OperationCanceledException>(task2.AsTask(), Timeout1Sec);
         }
 
         [Fact]
         public void CancellationCancelsWriteTasks()
         {
             var sut = new BufferedChannel<int>(0);
-            var task1 = sut.TryWriteSafeAsync(1);
-            var task2 = sut.TryWriteSafeAsync(1);
+            var task1 = sut.TryWriteAsync(1);
+            var task2 = sut.TryWriteAsync(1);
             sut.Terminate();
-            task1.Result.ShouldBeFalse();
-            task2.Result.ShouldBeFalse();
+            Should.Throw<OperationCanceledException>(task1, Timeout1Sec);
+            Should.Throw<OperationCanceledException>(task2, Timeout1Sec);
         }
 
         [Fact]
         public void FailCancelsReadTasks()
         {
             var sut = new BufferedChannel<int>(0);
-            var task1 = sut.TryReadSafeAsync();
-            var task2 = sut.TryReadSafeAsync();
+            var task1 = sut.TryReadAsync();
+            var task2 = sut.TryReadAsync();
             sut.Terminate(new InvalidOperationException());
-            task1.Result.HasValue.ShouldBeFalse();
-            task2.Result.HasValue.ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(task1.AsTask(), Timeout1Sec);
+            Should.Throw<InvalidOperationException>(task2.AsTask(), Timeout1Sec);
         }
 
         [Fact]
         public void FailCancelsWriteTasks()
         {
             var sut = new BufferedChannel<int>(0);
-            var task1 = sut.TryWriteSafeAsync(1);
-            var task2 = sut.TryWriteSafeAsync(1);
+            var task1 = sut.TryWriteAsync(1);
+            var task2 = sut.TryWriteAsync(1);
             sut.Terminate(new InvalidOperationException());
-            task1.Result.ShouldBeFalse();
-            task2.Result.ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(task1, Timeout1Sec);
+            Should.Throw<InvalidOperationException>(task2, Timeout1Sec);
         }
 
         [Fact]
         public void CancellationCompletesChannel()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryWriteSafe(1);
-            sut.TryWriteSafe(2);
+            sut.TryWrite(1);
+            sut.TryWrite(2);
             sut.Terminate();
             sut.Completion.IsCompleted.ShouldBe(false);
-            sut.TryReadSafe(out int _).ShouldBe(true);
-            sut.TryReadSafe(out int _).ShouldBe(true);
-            var result = sut.TryReadSafeAsync().ShouldCompleteIn(Timeout1Sec);
-            result.HasValue.ShouldBeFalse();
+            sut.TryRead(out int _).ShouldBe(true);
+            sut.TryRead(out int _).ShouldBe(true);
+            Should.Throw<TaskCanceledException>(sut.TryReadAsync().AsTask(), Timeout1Sec);
             sut.Completion.IsCanceled.ShouldBeTrue();
         }
 
         [Fact]
-        public void FailCompletesChannelEvenIfBufferIsNotEmpty()
+        public void TerminationCompletesChannelWithException()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryWriteSafe(1);
-            sut.TryWriteSafe(2);
+            sut.TryWrite(1);
+            sut.TryWrite(2);
             sut.Terminate(new InvalidOperationException());
             sut.Completion.IsCompleted.ShouldBe(false);
-            sut.TryReadSafe(out int _).ShouldBe(true);
-            sut.TryReadSafe(out int _).ShouldBe(true);
-            var result = Should.CompleteIn(() => sut.TryReadSafeAsync().AsTask(), TimeSpan.FromSeconds(1));
-            result.HasValue.ShouldBeFalse();
+            sut.TryRead(out int _).ShouldBe(true);
+            sut.TryRead(out int _).ShouldBe(true);
+            Should.Throw<InvalidOperationException>(() => sut.TryReadAsync().AsTask(), TimeSpan.FromSeconds(1));
             sut.Completion.IsFaulted.ShouldBeTrue();
         }
 
@@ -315,26 +270,26 @@ namespace Plexus.Channels
         }
 
         [Theory]
-        [InlineData(1, 1, 0)]
         [InlineData(1, 1, 1)]
+        [InlineData(1, 1, 3)]
         [InlineData(1, 1, 10)]
-        [InlineData(2, 1, 0)]
         [InlineData(2, 1, 1)]
+        [InlineData(2, 1, 3)]
         [InlineData(2, 1, 10)]
-        [InlineData(1, 2, 0)]
         [InlineData(1, 2, 1)]
+        [InlineData(1, 2, 3)]
         [InlineData(1, 2, 10)]
-        [InlineData(2, 2, 0)]
         [InlineData(2, 2, 1)]
+        [InlineData(2, 2, 3)]
         [InlineData(2, 2, 10)]
-        [InlineData(4, 4, 0)]
         [InlineData(4, 4, 1)]
+        [InlineData(4, 4, 3)]
         [InlineData(4, 4, 10)]
-        [InlineData(7, 3, 0)]
         [InlineData(7, 3, 1)]
+        [InlineData(7, 3, 3)]
         [InlineData(7, 3, 10)]
-        [InlineData(3, 7, 0)]
         [InlineData(3, 7, 1)]
+        [InlineData(3, 7, 3)]
         [InlineData(3, 7, 10)]
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void CanWriteAndReadFromSeveralThreadsConcurrently(int writeThreads, int readThreads, int bufferSize)
@@ -343,35 +298,31 @@ namespace Plexus.Channels
             var writeCount = readThreads * 100;
             var readCount = writeThreads * 100;
             var sut = new BufferedChannel<int>(bufferSize);
-            for (var reuse = 0; reuse < 3; reuse++)
+
+            async Task WriteWorker()
             {
-                async Task WriteWorker()
+                for (var i = 0; i < writeCount; i++)
                 {
-                    for (var i = 0; i < writeCount; i++)
-                    {
-                        await sut.WriteAsync(i).ConfigureAwait(false);
-                    }
+                    await sut.WriteAsync(i).ConfigureAwait(false);
                 }
-
-                async Task ReadWorker()
-                {
-                    for (var i = 0; i < readCount; i++)
-                    {
-                        await sut.ReadAsync().ConfigureAwait(false);
-                    }
-                }
-
-                var writeTasks = Enumerable.Range(0, writeThreads).Select(_ => Task.Run(WriteWorker));
-                var readTasks = Enumerable.Range(0, readThreads).Select(_ => Task.Run(ReadWorker));
-                var allTasks = writeTasks.Concat(readTasks).ToArray();
-
-                Task.WhenAll(allTasks).ShouldCompleteIn(Timeout10Sec);
-
-                sut.TryReadSafe(out int _).ShouldBe(false);
-                sut.TryComplete().ShouldBe(true);
-
-                sut.Reset();
             }
+
+            async Task ReadWorker()
+            {
+                for (var i = 0; i < readCount; i++)
+                {
+                    await sut.ReadAsync().ConfigureAwait(false);
+                }
+            }
+
+            var writeTasks = Enumerable.Range(0, writeThreads).Select(_ => Task.Run(WriteWorker));
+            var readTasks = Enumerable.Range(0, readThreads).Select(_ => Task.Run(ReadWorker));
+            var allTasks = writeTasks.Concat(readTasks).ToArray();
+
+            Task.WhenAll(allTasks).ShouldCompleteIn(Timeout10Sec);
+
+            sut.TryRead(out int _).ShouldBe(false);
+            sut.TryCompleteWriting().ShouldBe(true);
         }
     }
 }

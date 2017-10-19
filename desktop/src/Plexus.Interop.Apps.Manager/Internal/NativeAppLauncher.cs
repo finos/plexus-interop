@@ -19,35 +19,35 @@ namespace Plexus.Interop.Apps.Internal
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using Plexus.Interop.Apps.Internal.Generated;
+    using Plexus.Processes;
     using System.IO;
-    using System.Threading;
     using System.Threading.Tasks;
 
-    internal sealed class NativeAppLauncher : StartableBase
+    internal sealed class NativeAppLauncher : ProcessBase
     {
-        private static readonly ILogger Log = LogManager.GetLogger<NativeAppLauncher>();
-
         private readonly SubProcessLauncher _subProcessLauncher;
-        private readonly string _brokerWorkingDir;
         private readonly string _cmdBasePath;
         private readonly JsonSerializer _jsonSerializer;
         private IClient _client;
 
         public Plexus.UniqueId Id { get; }
 
-        public NativeAppLauncher(string brokerWorkingDir, string cmdBasePath, SubProcessLauncher subProcessLauncher, JsonSerializer jsonSerializer)
+        public NativeAppLauncher(
+            string cmdBasePath, 
+            JsonSerializer jsonSerializer)
         {
             Id = Plexus.UniqueId.Generate();
-            _brokerWorkingDir = brokerWorkingDir;
             _cmdBasePath = cmdBasePath;
-            _subProcessLauncher = subProcessLauncher;
+            _subProcessLauncher = new SubProcessLauncher();
             _jsonSerializer = jsonSerializer;
         }
 
-        protected override async Task<Task> StartProcessAsync(CancellationToken cancellationToken)
+        protected override ILogger Log { get; } = LogManager.GetLogger<NativeAppLauncher>();
+
+        protected override async Task<Task> StartCoreAsync()
         {
             var options = new ClientOptionsBuilder()
-                .WithDefaultConfiguration(_brokerWorkingDir)
+                .WithDefaultConfiguration(Directory.GetCurrentDirectory())
                 .WithApplicationId("interop.NativeAppLauncher")
                 .WithAppInstanceId(Id)
                 .WithProvidedService(

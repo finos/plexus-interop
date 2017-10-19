@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps
+namespace Plexus.Interop.Transport
 {
-    using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
-    public interface IAppLauncher
+    public interface ITransportClient
     {
-        ValueTask<UniqueId> LaunchAsync(string appId);
-
-        IEnumerable<string> GetAvailableApps(IEnumerable<string> appIds);
+        ValueTask<ITransportConnection> ConnectAsync(CancellationToken cancellationToken = default);
     }
 }

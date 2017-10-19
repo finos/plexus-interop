@@ -28,39 +28,47 @@ namespace Plexus.Interop.Internal
 
         private static readonly ILogger Log = LogManager.GetLogger<ClientConnectionFactory>();
 
-        public async Task<IClientConnection> ConnectAsync(ClientOptions options, CancellationToken cancellationToken = default)
+        public async Task<IClientConnection> ConnectAsync(ClientOptions options, CancellationToken cancellationToken)
         {
             Log.Trace("Establishing new connection with broker");
-            ITransportConnection transportConnection = null;
+            ITransportConnection transportConnection = null;            
             try
             {
-                transportConnection = await options.Transport.CreateAsync(cancellationToken);
-                Log.Debug("Connection {0} established. Performing handshake: {1}", transportConnection.Id, options);
-                var channel = await transportConnection.CreateChannelAsync().ConfigureAwait(false);
-                var protocolSerializer = options.Protocol.Serializer;
-                using (var connectRequest = options.Protocol.MessageFactory.CreateConnectRequest(options.ApplicationId, options.ApplicationInstanceId))
+                transportConnection = await options.Transport.ConnectAsync(cancellationToken).ConfigureAwait(false);
+                using (cancellationToken.Register(() => transportConnection.TryTerminate()))
                 {
-                    var serializedRequest = protocolSerializer.Serialize(connectRequest);
-                    try
+                    Log.Debug("Connection {0} established. Performing handshake: {1}", transportConnection.Id, options);
+                    var channel = await transportConnection.CreateChannelAsync().ConfigureAwait(false);
+                    var protocolSerializer = options.Protocol.Serializer;
+                    using (var connectRequest =
+                        options.Protocol.MessageFactory.CreateConnectRequest(
+                            options.ApplicationId,
+                            options.ApplicationInstanceId))
                     {
-                        await channel.Out.WriteAsync(new TransportMessageFrame(serializedRequest)).ConfigureAwait(false);
-                        channel.Out.TryComplete();
+                        var serializedRequest = protocolSerializer.Serialize(connectRequest);
+                        try
+                        {
+                            await channel.Out
+                                .WriteAsync(new TransportMessageFrame(serializedRequest), cancellationToken)
+                                .ConfigureAwait(false);
+                            channel.Out.TryCompleteWriting();
+                        }
+                        catch
+                        {
+                            serializedRequest.Dispose();
+                            throw;
+                        }
                     }
-                    catch
+                    Log.Trace("Connection {0} receiving connection response.", transportConnection.Id);
+                    using (var serializedResponse = await channel.In.ReadAsync(cancellationToken).ConfigureAwait(false))
+                    using (var connectResponse =
+                        protocolSerializer.DeserializeConnectResponse(serializedResponse.Payload))
                     {
-                        serializedRequest.Dispose();
-                        throw;
+                        await channel.Completion.ConfigureAwait(false);
+                        Log.Debug("Successfully authenticated: {0}", connectResponse);
+                        return new ClientConnection(connectResponse.ConnectionId, transportConnection);
                     }
                 }
-                Log.Trace("Connection {0} receiving connection response.", transportConnection.Id);
-                using (var serializedResponse = await channel.In.ReadAsync().ConfigureAwait(false))
-                using (var connectResponse = protocolSerializer.DeserializeConnectResponse(serializedResponse.Payload))
-                {
-                    await channel.Completion.ConfigureAwait(false);
-                    Log.Debug("Successfully authenticated: {0}", connectResponse);
-                    return new ClientConnection(connectResponse.ConnectionId, transportConnection);
-                }
-
             }
             catch (Exception ex)
             {

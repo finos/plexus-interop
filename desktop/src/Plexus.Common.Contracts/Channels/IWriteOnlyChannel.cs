@@ -18,12 +18,14 @@
 
 namespace Plexus.Channels
 {
+    using System.Threading;
+
     public interface IWriteOnlyChannel<in T>
     {
         Task Completion { get; }
 
-        bool TryWriteSafe(T item);
+        bool TryWrite(T item);
 
-        Task<bool> TryWriteSafeAsync(T item);
+        Task<bool> WaitWriteAvailableAsync(CancellationToken cancellationToken = default);
     }
 }

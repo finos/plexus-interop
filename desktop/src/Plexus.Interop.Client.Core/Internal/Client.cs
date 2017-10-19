@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal
+namespace Plexus.Interop.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Internal.Calls;
@@ -23,14 +23,14 @@
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Protocol.Invocation;
     using Plexus.Interop.Transport;
+    using Plexus.Processes;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
-    internal sealed class Client : StartableBase, IClient
+    internal sealed class Client : ProcessBase, IClient
     {        
         private readonly ClientOptions _options;
         private readonly BrokerToClientRequestHandler<Task, ITransportChannel> _incomingRequestHandler;
@@ -45,7 +45,7 @@
         public Client(ClientOptions options)
         {
             _options = options;
-            _incomingRequestHandler = new BrokerToClientRequestHandler<Task, ITransportChannel>(HandleInvocationStartRequestAsync);
+            _incomingRequestHandler = new BrokerToClientRequestHandler<Task, ITransportChannel>(HandleInvocationStartRequestAsync);            
         }
 
         public string ApplicationId => _options.ApplicationId;
@@ -54,27 +54,25 @@
 
         public UniqueId ConnectionId { get; private set; }
 
-        protected override async Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
+        protected override async Task<Task> StartCoreAsync()
         {
-            _log.Debug("Connecting");
-            _connection = await ClientConnectionFactory.Instance.ConnectAsync(_options, stopCancellationToken).ConfigureAwait(false);
+            _log.Debug("Connecting {0}", _options);
+            _connection = await ClientConnectionFactory.Instance
+                .ConnectAsync(_options, StopToken)
+                .ConfigureAwait(false);
             ConnectionId = _connection.Id;
-            _log = LogManager.GetLogger<Client>(_connection.Id.ToString());            
-            _outcomingInvocationFactory = new OutcomingInvocationFactory(_connection, _options.Protocol, _options.Marshaller);
+            _log = LogManager.GetLogger<Client>(_connection.Id.ToString());
+            _outcomingInvocationFactory =
+                new OutcomingInvocationFactory(_connection, _options.Protocol, _options.Marshaller);
             _discoveryService = new DiscoveryService(ConnectionId, _connection, _options.Protocol);
-            return ProcessAsync(stopCancellationToken);
+            return ProcessAsync();
         }
 
-        public Task ConnectAsync()
-        {
-            return StartAsync();
-        }
+        public Task ConnectAsync() => StartAsync();
 
-        public Task DisconnectAsync()
-        {
-            _log.Debug("Disconnecting");
-            return StopAsync().IgnoreExceptions();
-        }
+        public void Disconnect() => Stop();
+
+        public Task DisconnectAsync() => StopAsync();
 
         public IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request)
         {
@@ -181,15 +179,18 @@
             return discoveryResults.Select(x => new DiscoveredOnlineService(x)).ToList();
         }
 
-        private async Task ProcessAsync(CancellationToken cancellationToken)
+        private async Task ProcessAsync()
         {
-            using (cancellationToken.Register(() => _connection.TryTerminate()))
+            using (StopToken.Register(() => _connection.TryTerminate()))
             {
                 try
                 {
                     _log.Debug("Connected. Listening to incoming invocations.");
                     await ListenIncomingInvocationsAsync(_connection).ConfigureAwait(false);
                     await _connection.Completion.ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (StopToken.IsCancellationRequested)
+                {
                 }
                 catch (Exception ex)
                 {
@@ -239,7 +240,7 @@
                 }
                 catch (Exception ex)
                 {
-                    channel.Out.TryTerminate(ex);
+                    channel.Out.TryTerminateWriting(ex);
                     await channel.In.ConsumeAsync(x => { }).IgnoreExceptions().ConfigureAwait(false);
                 }
                 finally

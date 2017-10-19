@@ -28,6 +28,8 @@
 
         bool TryGetOnlineConnection(UniqueId id, out IClientConnection connection);
 
+        Task<IClientConnection> SpawnConnectionAsync(string appId);
+
         ValueTask<IClientConnection> GetOrSpawnConnectionAsync(IReadOnlyCollection<string> appId);
 
         IReadOnlyCollection<IClientConnection> GetOnlineConnections();

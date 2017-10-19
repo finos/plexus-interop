@@ -14,17 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission
+namespace Plexus.Interop.Transport.Transmission
 {
+    using Plexus.Channels;
     using System;
     using System.Threading.Tasks;
 
-    public interface ITransmissionServer : ITransmissionConnectionFactory, IDisposable
-    {
+    public interface ITransmissionServer : IDisposable
+    {   
         Task Completion { get; }
+
+        IReadOnlyChannel<ITransmissionConnection> In { get; }
 
         Task StartAsync();
 
-        Task StopAsync();
+        void Stop();
+
+        Task StopAsync();        
     }
 }

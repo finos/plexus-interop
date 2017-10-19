@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+ namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol;
@@ -92,8 +92,8 @@
             }
             catch (Exception ex)
             {
-                sourceChannel.Out.TryTerminate(ex);
-                targetChannel?.Out.TryTerminate(ex);
+                sourceChannel.Out.TryTerminateWriting(ex);
+                targetChannel?.Out.TryTerminateWriting(ex);
                 throw;
             }
             finally
@@ -172,7 +172,7 @@
             frame.Dispose();
         }
 
-        private static async Task PropagateAsync(IReadableChannel<TransportMessageFrame> channel1, IWritableChannel<TransportMessageFrame> channel2)
+        private static async Task PropagateAsync(IReadOnlyChannel<TransportMessageFrame> channel1, IWritableChannel<TransportMessageFrame> channel2)
         {
             try
             {
@@ -185,11 +185,11 @@
                     }
                     await channel2.WriteAsync(result.Value).ConfigureAwait(false);
                 }
-                channel2.TryComplete();
+                channel2.TryCompleteWriting();
             }
             catch (Exception ex)
             {
-                channel2.TryTerminate(ex);
+                channel2.TryTerminateWriting(ex);
             }
         }
     }

@@ -22,48 +22,58 @@ namespace Plexus.Interop.Broker
     using Plexus.Interop.Metamodel;
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Transport;
+    using Plexus.Processes;
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Threading.Tasks;
 
-    public sealed class BrokerProcessor
-    {
-        private static readonly ILogger Log = LogManager.GetLogger<BrokerProcessor>();
-
+    public sealed class BrokerProcessor : ProcessBase
+    {        
         private static readonly IProtocolMessageFactory DefaultProtocolMessageFactory = ProtocolMessagePool.Instance;
 
         private readonly ConcurrentDictionary<UniqueId, ITransportConnection> _activeConnections
             = new ConcurrentDictionary<UniqueId, ITransportConnection>();
 
-        private readonly IReadableChannel<ITransportConnection> _incomingConnections;
-        private readonly IAuthenticationHandler _authenticationHandler;
-        private readonly IClientRequestHandler _clientRequestHandler;
+        private readonly IReadOnlyChannel<ITransportConnection> _incomingConnections;
         private readonly IAppLifecycleManager _appLifecycleManager;
+        private readonly AuthenticationHandler _authenticationHandler;
+        private readonly ClientRequestHandler _clientRequestHandler;
 
         public BrokerProcessor(
-            IReadableChannel<ITransportConnection> incomingConnections,
+            IReadOnlyChannel<ITransportConnection> incomingConnections,
             IRegistryProvider registryProvider,
             IProtocolSerializerFactory serializerFactory,
-            IAppLifecycleManager appLifecycleManager = null)
+            IAppLifecycleManager appLifecycleManager)
         {
             _incomingConnections = incomingConnections;
+            _appLifecycleManager = appLifecycleManager;
             var registryService = new RegistryService(registryProvider);
             var protocol = new ProtocolImplementation(DefaultProtocolMessageFactory, serializerFactory);
-            _appLifecycleManager =  appLifecycleManager ?? new NoopAppLifecycleManager();
-            var connectionTracker = new ClientConnectionTracker(_appLifecycleManager);
+            var connectionTracker = new ClientConnectionTracker(appLifecycleManager);
             _authenticationHandler = new AuthenticationHandler(connectionTracker, protocol, registryService);
             _clientRequestHandler = new ClientRequestHandler(connectionTracker, protocol, registryService);
-            Completion = TaskRunner.RunInBackground(ProcessAsync);
         }
 
-        public Task Completion { get; }
+        protected override ILogger Log { get; } = LogManager.GetLogger<BrokerProcessor>();
+
+        protected override Task<Task> StartCoreAsync()
+        {
+            TaskRunner.RunInBackground(LaunchBuiltInAppsAsync).IgnoreAwait(Log, "Exception while launching built-in apps");
+            return Task.FromResult(ProcessAsync());
+        }
+
+        private Task LaunchBuiltInAppsAsync()
+        {
+            return Task.WhenAll(
+                _appLifecycleManager.LaunchAsync("interop.AppLifecycleManager").AsTask(),
+                _appLifecycleManager.LaunchAsync("interop.NativeAppLauncher").AsTask());
+        }
 
         private async Task ProcessAsync()
         {
             try
             {
-                TaskRunner.RunInBackground(() => _appLifecycleManager.StartAsync()).IgnoreAwait(Log, "Exception on app lifecycle manager initialization");
                 while (true)
                 {
                     var transportConnectionResult = await _incomingConnections.TryReadAsync().ConfigureAwait(false);

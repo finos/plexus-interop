@@ -26,7 +26,6 @@ namespace Plexus.Interop.Internal.Calls
     internal sealed class ClientStreamingMethodCall<TRequest, TResponse> : 
         ProcessBase, IClientStreamingMethodCall<TRequest, TResponse>
     {
-        private static readonly ILogger Log = LogManager.GetLogger<ClientStreamingMethodCall<TRequest, TResponse>>();
         private readonly IChannel<TRequest> _requestStream = new BufferedChannel<TRequest>(1);
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
@@ -37,6 +36,8 @@ namespace Plexus.Interop.Internal.Calls
             _invocationFactory = invocationFactory;
             Completion.LogCompletion(Log);
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<ClientStreamingMethodCall<TRequest, TResponse>>();
 
         public IWritableChannel<TRequest> RequestStream => _requestStream.Out;
 
@@ -71,19 +72,13 @@ namespace Plexus.Interop.Internal.Calls
                 {
                     TResponse response = default;
                     Log.Trace("Reading response");
-                    while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
-                    {
-                        while (invocation.In.TryReadSafe(out var item))
-                        {
-                            response = item;
-                        }
-                    }
+                    await invocation.In.ConsumeAsync(item => response = item).ConfigureAwait(false);
                     Log.Trace("Response stream completed");
                     return response;
                 }
                 catch (Exception ex)
                 {
-                    invocation.Out.TryTerminate(ex);
+                    invocation.Out.TryTerminateWriting(ex);
                     throw;
                 }
                 finally
@@ -101,21 +96,15 @@ namespace Plexus.Interop.Internal.Calls
                 try
                 {
                     Log.Trace("Writing requests");
-                    while (await _requestStream.In.WaitForNextSafeAsync().ConfigureAwait(false))
-                    {
-                        while (_requestStream.In.TryReadSafe(out var item))
-                        {
-                            await invocation.Out.TryWriteSafeAsync(item).ConfigureAwait(false);
-                        }
-                    }
-                    invocation.Out.TryComplete();
+                    await _requestStream.In.ConsumeAsync(item => invocation.Out.WriteAsync(item)).ConfigureAwait(false);
+                    invocation.Out.TryCompleteWriting();
                     await _requestStream.Out.Completion.ConfigureAwait(false);
                     Log.Trace("Requests stream completed");
                 }
                 catch (Exception ex)
                 {
                     Log.Trace("Requests stream completed with exception: {0}", ex.FormatTypeAndMessage());
-                    invocation.Out.TryTerminate(ex);
+                    invocation.Out.TryTerminateWriting(ex);
                     throw;
                 }
                 finally
