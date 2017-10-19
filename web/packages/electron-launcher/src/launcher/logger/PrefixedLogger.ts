@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Logger } from "./Logger";
-import { LogLevel } from "./LoggerFactory";
+import { Logger, LogLevel } from "@plexus-interop/common";
 
 export class PrefixedLogger implements Logger {
 
