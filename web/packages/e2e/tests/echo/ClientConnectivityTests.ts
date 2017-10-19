@@ -21,6 +21,8 @@ import { ServerStreamingHandler } from "./ServerStreamingHandler";
 import { EchoClientClient, EchoClientClientBuilder } from "../../src/echo/client/EchoClientGeneratedClient";
 import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
 import { UniqueId } from "@plexus-interop/transport-common";
+import { MethodInvocationContext } from "@plexus-interop/client";
+import { AsyncHelper } from "@plexus-interop/common";
 
 export class ClientConnectivityTests extends BaseEchoTest {
 
@@ -49,6 +51,53 @@ export class ClientConnectivityTests extends BaseEchoTest {
         throw new Error("Expect to fail to receive connection");
     }
 
+    public async testServerReceivesErrorIfClientDroppedConnection(): Promise<void> {
+
+        const echoRequest = this.clientsSetup.createRequestDto();
+        let client: EchoClientClient | null = null;
+        let server: EchoServerClient | null = null;
+        let serverInvocationContext: MethodInvocationContext | null = null;
+        return new Promise<void>(async (testResolve, testError) => {
+
+            let handler: ServerStreamingHandler | null = null;
+            let clientInvocationErrorReceived: Promise<void> | null = null;
+
+            const serverRequestReceived = new Promise(async (serverRequestResolve) => {
+                handler = new ServerStreamingHandler(async (context, request, hostClient) => {
+                    serverInvocationContext = context;
+                    serverRequestResolve();
+                });
+                [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler as ServerStreamingHandler);
+                clientInvocationErrorReceived = new Promise<void>((clientErrorResolve, clientErrorReject) => {
+                    (client as EchoClientClient).getEchoServiceProxy().serverStreaming(echoRequest, {
+                        next: (r) => {
+                            clientErrorReject("Not expected to receive update");
+                        },
+                        complete: () => clientErrorReject("Complete not expected"),
+                        error: (e) => {
+                            clientErrorResolve();
+                        }
+                    });
+                });
+            });
+
+            // wait for server to receive request to ensure invocation established
+            await serverRequestReceived;
+
+            // client closed the window
+            this.clientsSetup.getClientConnectionSetup().dropConnection();
+
+            AsyncHelper.waitFor(() => (serverInvocationContext as MethodInvocationContext).cancellationToken.isCancelled());
+            
+            await clientInvocationErrorReceived;
+
+            await (server as EchoServerClient).disconnect();
+
+            testResolve();
+
+        });
+    }
+
     private testAllInvocationClientReceiveErrorOnDisconnect(isForcedByClient: boolean, isForcedByServer: boolean): Promise<void> {
 
         const echoRequest = this.clientsSetup.createRequestDto();
@@ -70,7 +119,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
                         next: (r) => {
                             clientErrorReject("Not expected to receive update");
                         },
-                        complete: () => {}, // TOOD uncomment and fix clientErrorReject("Complete not expected"),
+                        complete: () => {},
                         error: (e) => {
                             clientErrorResolve();
                         }
@@ -79,6 +128,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
             });
 
             await serverRequestReceived;
+
             if (isForcedByClient) {
                 (client as EchoClientClient).disconnect();
             }
