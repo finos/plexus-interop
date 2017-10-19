@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Transport.Pipes
+namespace Plexus.Interop.Transport.Pipes
 {
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;

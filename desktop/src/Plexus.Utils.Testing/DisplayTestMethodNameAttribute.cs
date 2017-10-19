@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Reflection;
-using Xunit.Sdk;
-
 namespace Plexus
 {
+    using System.Reflection;
+    using Xunit.Sdk;
+
     internal sealed class DisplayTestMethodNameAttribute : BeforeAfterTestAttribute
     {
-        private static readonly ILogger Log = LogManager.GetLogger<TestsSuite>();
+        private static readonly ILogger Log = LogManager.GetLogger<DisplayTestMethodNameAttribute>();
 
         public override void Before(MethodInfo methodUnderTest)
         {

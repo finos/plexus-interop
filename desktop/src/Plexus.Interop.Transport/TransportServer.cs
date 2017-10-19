@@ -39,6 +39,8 @@ namespace Plexus.Interop.Transport
             OnStop(_transmissionServer.Stop);
         }
 
+        protected override ILogger Log { get; } = LogManager.GetLogger<TransportServer>();
+
         public IReadOnlyChannel<ITransportConnection> In => _buffer.In;
 
         protected override async Task<Task> StartCoreAsync()
@@ -50,13 +52,15 @@ namespace Plexus.Interop.Transport
         private async Task ProcessAsync()
         {
             await _transmissionServer.In.ConsumeAsync(AcceptAsync).ConfigureAwait(false);
+            Log.Debug("Transmission server completed");
         }
 
         private async Task AcceptAsync(ITransmissionConnection c)
-        {
+        {            
             try
             {
                 await _buffer.WriteAsync(_connectionFactory.Create(c), StopToken).ConfigureAwait(false);
+                Log.Debug("New connection accepted");
             }
             catch
             {

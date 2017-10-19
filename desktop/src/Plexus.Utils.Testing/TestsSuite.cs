@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus
+namespace Plexus
 {
     using Shouldly;
     using System;
@@ -90,8 +90,14 @@
             }
         }
 
-        protected void RunWithTimeout(TimeSpan timeout, Action action) =>
-            Should.CompleteIn(action, timeout);
+        protected void RunWithTimeout(TimeSpan timeout, Action action)
+            => RunWithTimeout(
+                timeout,
+                () =>
+                {
+                    action();
+                    return TaskConstants.Completed;
+                });
 
         public virtual void Dispose()
         {
@@ -101,8 +107,11 @@
                     WriteLog("Disposing test resources");
                     while (_disposables.TryPop(out var disposable))
                     {
+                        WriteLog($"Disposing {disposable.GetType().FullName}");
                         disposable.Dispose();
+                        WriteLog($"Disposed {disposable.GetType().FullName}");
                     }
+                    WriteLog("Test resources disposed");
                 });
         }
     }

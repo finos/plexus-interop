@@ -41,10 +41,10 @@ namespace Plexus.Processes
         {
             Log.Debug("Process completed in state {0}", completion.GetCompletionDescription());
             Stop();
-            while (_registrations.TryPeek(out var registration))
+            while (_registrations.TryTake(out var registration))
             {
                 registration.Dispose();
-            }            
+            }
         }
 
         protected virtual ILogger Log { get; } = NoopLogger.Instance;
@@ -74,6 +74,12 @@ namespace Plexus.Processes
                 Log.Debug("Start called after process was already started");
                 return;
             }
+            if (_stopped.IsEntered)
+            {
+                _startCompletion.TryComplete();
+                _completion.TryComplete();
+                return;
+            }
             Log.Debug("Starting");
             _startCompletion.Task.ContinueWithSynchronously(
                 t => Log.Trace("Process start task completed in state {0}", t.GetCompletionDescription()),
@@ -99,6 +105,7 @@ namespace Plexus.Processes
         {
             if (!_stopped.TryEnter())
             {
+                Log.Debug("Stop called after process was already stopped");
                 return;
             }
             Log.Debug("Stopping");
