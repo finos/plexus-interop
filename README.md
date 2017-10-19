@@ -1,4 +1,4 @@
-# Plexus Interop
+# Plexus Interop [![Symphony Software Foundation - Incubating](https://cdn.rawgit.com/symphonyoss/contrib-toolbox/master/images/ssf-badge-incubating.svg)](https://symphonyoss.atlassian.net/wiki/display/FM/Incubating)
 
 ## Overview
 
@@ -11,6 +11,10 @@ Framework architecture is based around central broker providing hub-and-spoke co
 Plexus Interop separates interoperability from the container, which provides notable advantages: different containers can be leveraged in the same workflow, launched applications residing outside of containers can participate in interop activities.
 
 ![Key components and high level architecture](./docs/src/main/asciidoc/images/architecture.png "Key components and high level architecture")
+
+## Raising an Issue
+* Please raise issues to the project mailing list <plexus-interop@symphony.foundation> issue tracker. Some people from project teams currently can't access build-in github issue tracker from corporate network.
+* Please also tag the new issue with either "Bug" or "Enhancement".
  
 ## Repository Overview
 
