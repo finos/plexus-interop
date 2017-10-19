@@ -14,13 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+declare var window: any;
+const Long = require("long");
+(<any>window).dcodeIO = { Long: Long };
 import { WebCcyPairRateProviderClientBuilder, WebCcyPairRateProviderClient } from "./gen/WebCcyPairRateProviderGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 import * as plexus from "./gen/plexus-messages";
+import { LoggerFactory, LogLevel } from "@plexus-interop/common";
+
+LoggerFactory.setLogLevel(LogLevel.TRACE);
 
 // Read launch arguments, provided by Electron Launcher
 declare var window: any;
-
 const electron = window.require("electron");
 const remote = electron.remote;
 const electronWindow: any = remote.getCurrentWindow();
@@ -51,7 +56,7 @@ new WebCcyPairRateProviderClientBuilder()
     })
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
     .withCcyPairRateServiceInvocationsHandler({
-        onGetRate: async (ccyPair: plexus.fx.ICcyPair) => {
+        onGetRate: async (context, ccyPair: plexus.fx.ICcyPair) => {
             log(`Received request for ${ccyPair.ccyPairName}'s Rate`);
             return {
                 ccyPairName: ccyPair.ccyPairName,

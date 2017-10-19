@@ -26,18 +26,6 @@ export class GUID {
         return this.str;
     }
 
-    public toBytes(): number[] {
-        const parts = this.str.split("-");
-        const ints = [];
-        let intPos = 0;
-        for (let i = 0; i < parts.length; i++) {
-            for (let j = 0; j < parts[i].length; j += 2) {
-                ints[intPos++] = parseInt(parts[i].substr(j, 2), 16);
-            }
-        }
-        return ints;
-    }
-
     private static getNewGUIDString(): string {
         let d = new Date().getTime();
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {

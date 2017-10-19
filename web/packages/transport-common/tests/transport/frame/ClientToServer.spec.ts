@@ -26,7 +26,7 @@ describe("Framed Transport Connection: Client to Server communication", () => {
 
     it("Sends message from server to client", async () => {
         const { client, server } = await setupConnections();
-        await sendReceiveAndVerify(server, client, randomPayload(3));
+        await sendReceiveAndVerify(client, server, randomPayload(3));
         await disconnect(client, server);
     });
 

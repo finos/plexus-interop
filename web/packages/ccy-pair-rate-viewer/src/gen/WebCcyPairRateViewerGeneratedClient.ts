@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -151,7 +151,7 @@ class WebCcyPairRateViewerClientImpl implements WebCcyPairRateViewerClient {
 export class WebCcyPairRateViewerClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "fx.vendorB.WebCcyPairRateViewer",
+        applicationId: "vendorB.fx.WebCcyPairRateViewer",
         applicationInstanceId: UniqueId.generateNew()
     };
 

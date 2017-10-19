@@ -68,9 +68,7 @@ export class GenericInvocation {
             },
             // active states
             {
-                from: InvocationState.OPEN, to: InvocationState.COMPLETION_RECEIVED, preHandler: async () => {
-                    this.readCancellationToken.cancel("Invocation close received");
-                }
+                from: InvocationState.OPEN, to: InvocationState.COMPLETION_RECEIVED
             }, {
                 from: InvocationState.COMPLETION_RECEIVED, to: InvocationState.COMPLETED
             }, {
@@ -98,13 +96,13 @@ export class GenericInvocation {
         this.stateMachine.throwIfNot(InvocationState.CREATED);
         this.setUuid(UniqueId.generateNew());
         const subscriptionStartedPromise = this.openSubscription(invocationObserver);
-        this.stateMachine.go(InvocationState.START_REQUESTED, {
+        this.stateMachine.goAsync(InvocationState.START_REQUESTED, {
             preHandler: async () => {
                 await subscriptionStartedPromise;
                 await sendRequest();
             }
         })
-            .catch(e => this.log.error("Invocation start failed", e));
+        .catch(e => this.log.error("Invocation start failed", e));
     }
 
     public acceptInvocation(invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
@@ -135,14 +133,17 @@ export class GenericInvocation {
     }
 
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
-        this.log.debug("Close invocation requested", JSON.stringify(completion));
+        /* istanbul ignore if */
+        if (this.log.isDebugEnabled()) {
+            this.log.debug("Close invocation requested", JSON.stringify(completion));
+        }
         if (this.stateMachine.is(InvocationState.COMPLETED)) {
             this.log.warn("Already completed");
             return Promise.resolve(completion);
         }
         this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
         this.stateMachine.go(InvocationState.COMPLETED);
-        this.log.trace("Sending send completion message");
+        this.log.trace("Sending completion message");
         await this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
         if (ClientProtocolHelper.isSuccessCompletion(completion)) {
             // wait for remote side for success case only
@@ -165,10 +166,15 @@ export class GenericInvocation {
             this.log.debug("Channel closed");
             this.closeInternal();
             const result = ClientProtocolUtils.createSummarizedCompletion(completion, channelCompletion, this.checkInternalStatus());
-            this.log.trace(`Completion result ${JSON.stringify(result)}`);
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Completion result ${JSON.stringify(result)}`);
+            }
             return result;
         }).catch((e) => {
-            this.log.debug("Error during channel closure", e);
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Error during channel closure", e);
+            }
             this.closeInternal();
             throw e;
         });
@@ -181,7 +187,7 @@ export class GenericInvocation {
             length: data.byteLength
         });
         await this.sourceChannel.sendMessage(headerPayload);
-        await this.sourceChannel.sendMessage(data);
+        this.sourceChannel.sendMessage(data);
         this.sentMessagesCounter++;
     }
 
@@ -215,6 +221,7 @@ export class GenericInvocation {
         switch (this.stateMachine.getCurrent()) {
             case InvocationState.OPEN:
                 this.log.debug("Open state, switching to COMPLETION_RECEIVED");
+                this.readCancellationToken.cancel("Invocation close received");
                 this.stateMachine.go(InvocationState.COMPLETION_RECEIVED);
                 break;
             case InvocationState.COMPLETED:
@@ -234,32 +241,38 @@ export class GenericInvocation {
         this.log.trace(`Starting listening of incoming messages`);
         return new Promise<AnonymousSubscription>((resolve, reject) => {
             this.sourceChannel.open({
+
                 started: (sourceSubscription) => {
                     this.log.debug("Source channel subscription started");
                     this.sourceChannelSubscription = sourceSubscription;
                     resolve(sourceSubscription);
                 },
+
                 startFailed: (error) => {
                     this.log.error("Unable to open source channel", error);
                     invocationObserver.startFailed(error);
                     reject(error);
                 },
+
                 next: (message) => {
                     try {
                         this.handleIncomingMessage(message, invocationObserver);
                     } catch (e) {
-                        this.log.error(`Unknown error`, e);
-                        this.terminate("Unknown error");
+                        const errorText = "Error while processing of incoming message";
+                        this.log.error(errorText, e);
+                        this.terminate(errorText);
                         invocationObserver.error(e);
                     }
                 },
+
                 complete: () => {
                     this.log.debug("Remote channel closed");
                     invocationObserver.complete();
                 },
+                
                 error: (e) => {
                     this.log.error("Error from source channel received", e);
-                    this.terminate("Error from source channel received");
+                    this.closeInternal();
                     invocationObserver.error(e);
                 }
             });
@@ -269,6 +282,10 @@ export class GenericInvocation {
 
     private handleIncomingMessage(data: ArrayBuffer, invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.trace(`Received message of ${data.byteLength} bytes`);
+        if (this.readCancellationToken.isCancelled()) {
+            this.log.warn(`Read cancelled with '${this.readCancellationToken.getReason()}', drop message`);
+            return;
+        }
         if (this.pendingHeader) {
             this.log.trace(`Received message payload of ${data.byteLength} length`);
             this.pendingHeader = null;

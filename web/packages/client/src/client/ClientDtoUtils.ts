@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RemoteInvocationInfo } from "./api/dto/RemoteInvocationInfo";
-import { clientProtocol as plexus, ClientError } from "@plexus-interop/protocol";
+import { ClientError } from "@plexus-interop/protocol";
 import { InvocationRequestInfo } from "./generic/InvocationMetaInfo";
 import { isString } from "@plexus-interop/common";
 import { ProvidedMethodReference } from "./api/dto/ProvidedMethodReference";
@@ -23,10 +22,6 @@ import { UniqueId } from "@plexus-interop/transport-common";
 import { InvocationMetaInfo } from "./generic/InvocationMetaInfo";
 
 export class ClientDtoUtils {
-
-    public static toString(dto: RemoteInvocationInfo): string {
-        return `${dto.applicationId}-${dto.serviceId}-${dto.methodId}`;
-    }
 
     public static targetInvocationHash(invocation: InvocationRequestInfo): string {
         return `${invocation.serviceId}.${invocation.methodId}`;
@@ -48,15 +43,12 @@ export class ClientDtoUtils {
         }
     }
 
-    public static toError(error: any): plexus.IError {
-        if (!error) {
-            return new ClientError();
-        }
+    public static toError(error: any): ClientError {
         if (isString(error)) {
             return new ClientError(error);
         }
         const message = error.message && isString(error.message) ? error.message : "Unknown";
-        const details = error.stack && isString(error.stack) ? error.stack : "Unknown";
+        const details = error.stack && isString(error.stack) ? error.stack : (error.details && isString(error.details) ? error.details : "Unknown");
         return new ClientError(message, details);
     }
 

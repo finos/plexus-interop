@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Frame} from "./model/Frame";
-import {UniqueId} from "../UniqueId";
-import { CancellationToken } from "@plexus-interop/common";
+import { Frame } from "./model/Frame";
+import { UniqueId } from "../UniqueId";
+import { Observer } from "@plexus-interop/common";
 
 export interface FramedTransport {
 
-    readFrame(cancellationToken?: CancellationToken): Promise<Frame>;
+    open(observer: Observer<Frame>): Promise<void>;
 
     writeFrame(frame: Frame): Promise<void>;
 

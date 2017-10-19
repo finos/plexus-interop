@@ -1,4 +1,19 @@
-
+/**
+ * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 const fs = require("fs");
 const path = require("path");
 const argv = require('minimist')(process.argv.slice(2));
@@ -18,15 +33,27 @@ function main() {
 
     const config = {
         brokerBaseDir: `${__dirname}/../../../../bin/win-x86/samples`,
-        wsAddressDir: "Servers/ws-v1",
+        wsAddressDir: "servers/ws-v1",
         wsAddressFile: "address",
-        startScript: "LaunchBroker.cmd"
+        brokerCmd: "../broker/plexus.exe",
+        brokerArgs: ` broker ${__dirname}/../metadata`
     };
 
-    const startScript = path.join(config.brokerBaseDir, config.startScript);
+    const fullBrokerCmd = path.join(config.brokerBaseDir, config.brokerCmd);
     const wsAddressDir = path.join(config.brokerBaseDir, config.wsAddressDir);
+    const addressFile = path.join(wsAddressDir, config.wsAddressFile);
 
-    log("Broker start script", startScript);
+    try {
+        fs.accessSync(addressFile);
+        log(`Deleting WS address file ${addressFile}`);
+        fs.unlinkSync(addressFile);
+        log(`Deleted ${addressFile}`); 
+    } catch (error) {
+        log(`${addressFile} does not exist`);
+    }
+
+    log("Broker start cmd", fullBrokerCmd);
+    log("Broker working dir", config.brokerBaseDir);
     log("WS address dir", wsAddressDir);
 
     log("Watching for Web Socket Server address file update");
@@ -44,21 +71,20 @@ function main() {
     setTimeout(() => {
         if (!launched) {
             launched = true;
-            const fullPath = `${config.brokerBaseDir}/address`;
-            readAddressAndRunTests(receivedPath);
+            log(`No file notification received, trying to read from default location ${addressFile}`);
+            readAddressAndRunTests(addressFile);
         }
     }, 5000);
 
     log("Starting Broker ...");
-    brokerProcess = exec(startScript, {
-        cwd: config.brokerBaseDir
+    brokerProcess = exec(fullBrokerCmd + config.brokerArgs, {
+        cwd: config.brokerBaseDir,
+        maxBuffer: 1024 * 1024
     }, (error, stdout, stderr) => {
         log("Broker stopped");
-        if (error) {
-            console.error('Std Error:', stderr);
-            console.error('Error:', error);
+        if (argv.printBrokerStdout) {
+            log('StdOut', stdout);
         }
-        log('StdOut:', stdout);
         process.exit();
     });
 }
@@ -82,11 +108,11 @@ function killBroker() {
 
 function runElectronTest(wsUrl) {
     log("Starting Electron Tests ...");
-    exec(`electron-mocha ${argv.file} --wsUrl ${wsUrl} ${argv.debug ? "--debug" : ""}  --renderer --reporter spec --colors`, {
+    exec(`electron-mocha --require scripts/coverage ${argv.file} --wsUrl ${wsUrl} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
         cwd: process.cwd()
     }, (error, stdout, stderr) => {
         log("Electron tests stopped, killing Broker");
-        if (error) {
+        if (error || stderr) {
             console.error('Std Error:', stderr);
             console.error('Error: ', error);
         }

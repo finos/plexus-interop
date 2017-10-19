@@ -20,6 +20,7 @@ import { StreamingInvocationClient } from "../streaming/StreamingInvocationClien
 import { ClientDtoUtils } from "../../ClientDtoUtils";
 import { InvocationHandlerConverter } from "../InvocationHandlerConverter";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { MethodInvocationContext } from "../MethodInvocationContext";
 
 export class UnaryHandlerConverter implements InvocationHandlerConverter<SimpleUnaryInvocationHandler<ArrayBuffer, ArrayBuffer>> {
 
@@ -28,11 +29,11 @@ export class UnaryHandlerConverter implements InvocationHandlerConverter<SimpleU
     public convert(unary: SimpleUnaryInvocationHandler<ArrayBuffer, ArrayBuffer>): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
         return {
             methodId: unary.methodId,
-            handle: (invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
+            handle: (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                 return {
                     next: (request: ArrayBuffer) => {
                         try {
-                            unary.handle(request).then(async (response) => {
+                            unary.handle(invocationContext, request).then(async (response) => {
                                 try {
                                     await invocationHostClient.next(response);
                                     await invocationHostClient.complete();

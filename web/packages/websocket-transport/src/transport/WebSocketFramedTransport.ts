@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter } from "@plexus-interop/transport-common";
-import { BlockingQueueBase, BlockingQueue, CancellationToken, Logger, LoggerFactory } from "@plexus-interop/common";
+import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults } from "@plexus-interop/transport-common";
+import { CancellationToken, Logger, LoggerFactory, Observer, LimitedBufferQueue } from "@plexus-interop/common";
+import { Queue } from "typescript-collections";
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
@@ -36,11 +37,12 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     public static OPEN: number = 1;
     public static CLOSING: number = 2;
     public static CLOSED: number = 3;
+    private connectionObserver: Observer<Frame> | null = null;
 
     constructor(
         private readonly socket: WebSocket,
         private readonly guid: UniqueId = UniqueId.generateNew(),
-        private inMessagesBuffer: BlockingQueue<Frame> = new BlockingQueueBase<Frame>(),
+        private inMessagesBuffer: Queue<Frame> = new LimitedBufferQueue<Frame>(Defaults.DEFAULT_BUFFER_SIZE),
         private messagesConverter: InternalMessagesConverter = new InternalMessagesConverter()) {
         this.socket.binaryType = "arraybuffer";
         this.log = LoggerFactory.getLogger(`WebSocketFramedTransport [${this.uuid().toString()}]`);
@@ -54,6 +56,14 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     public disconnect(): Promise<void> {
+        if (this.socketOpenToken.isCancelled()) {
+            this.log.warn("Already disconnected");
+            return Promise.resolve();
+        }
+        if (!this.isSocketClosed()) {
+            this.log.warn("Socket is CLOSED, cancelling connection");
+            this.cancelConnectionAndCleanUp();
+        }
         this.throwIfNotConnectedOrDisconnectRequested();
         return this.closeConnectionInternal();
     }
@@ -62,22 +72,44 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         return this.socket.readyState === WebSocketFramedTransport.OPEN;
     }
 
-    public async readFrame(): Promise<Frame> {
+    private isSocketClosed(): boolean {
+        return this.socket.readyState === WebSocketFramedTransport.CLOSED
+            || this.socket.readyState === WebSocketFramedTransport.CLOSING;
+    }
+
+    public async open(connectionObserver: Observer<Frame>): Promise<void> {
         this.throwIfNotConnectedOrDisconnectRequested();
-        return this.inMessagesBuffer.blockingDequeue(this.socketOpenToken);
+        /* istanbul ignore if */
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(`Received connection observer, ${this.inMessagesBuffer.size()} messages in buffer`);
+        }
+        this.connectionObserver = connectionObserver;
+        while (this.inMessagesBuffer.size() > 0) {
+            this.connectionObserver.next(this.inMessagesBuffer.dequeue());
+        }
     }
 
     public async writeFrame(frame: Frame): Promise<void> {
         this.throwIfNotConnectedOrDisconnectRequested();
         const data: ArrayBuffer = this.messagesConverter.serialize(frame);
-        this.log.debug(`Sending header message of ${data.byteLength} bytes to server`);
+        /* istanbul ignore if */
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(`Sending header message of ${data.byteLength} bytes to server`);
+        }
         this.socket.send(data);
         if (frame.isDataFrame()) {
-            this.log.debug(`Sending data message of ${frame.body.byteLength} bytes to server`);
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Sending data message of ${frame.body.byteLength} bytes to server`);
+            }
             this.socket.send(frame.body);
         } else if (frame.internalHeaderProperties.close) {
             this.sendTerminateMessage();
         }
+    }
+
+    public closeSocket(): void {
+        this.socket.close();
     }
 
     private sendTerminateMessage(): void {
@@ -95,13 +127,19 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private createConnectionReadyPromise(): Promise<void> {
+        let opened = false;
         return new Promise<void>((resolve, reject) => {
             this.socket.onopen = () => {
+                opened = true;
                 this.handleOpen();
                 resolve();
             };
-            this.socket.addEventListener("error", () => {
-                reject("Connection error");
+            this.socket.addEventListener("error", (e) => {
+                if (!opened) {
+                    reject("Connection error");
+                } else {
+                    this.log.warn("Connection error", e);
+                }
             });
         });
     }
@@ -114,7 +152,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     private async closeConnectionInternal(): Promise<void> {
         this.log.debug("Closing connection");
-        this.closeLogicalConnection();
+        this.cancelConnectionAndCleanUp();
         if (this.terminateSent && this.terminateReceived) {
             this.scheduleSocketDisconnect();
         } else if (this.terminateSent) {
@@ -143,39 +181,70 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         }, WebSocketFramedTransport.SOCKET_CLOSE_TIMEOUT);
     }
 
-    private closeLogicalConnection(reason: string = "Connection closed"): void {
+    private cancelConnectionAndCleanUp(reason: string = "Connection closed"): void {
+        this.log.debug(`Cancelling connection with reason: ${reason}`);
         this.socketOpenToken.cancel(reason);
         this.inMessagesBuffer.clear();
     }
 
     private handleCloseEvent(socket: WebSocket, ev: CloseEvent): void {
-        this.log.debug("Connection closed", ev);
+        this.log.debug("Connection closed event received", ev);
+        if (this.connectionObserver) {
+            this.connectionObserver.complete();
+        }
     }
 
     private handleMessageEvent(ev: MessageEvent): void {
-        this.log.debug("Message event received");
-        this.throwIfNotConnected();
+        /* istanbul ignore if */
+        if (this.log.isDebugEnabled()) {
+            this.log.debug("Message event received");
+        }
         if (this.isTerminateMessage(ev)) {
-            this.log.debug("Terminate message received");
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Terminate message received");
+            }
             this.terminateReceived = true;
         } else if (this.terminateReceived) {
             this.log.warn("Terminate message already received, dropping frame", ev.data);
         } else {
             const data: Uint8Array = this.readEventData(ev);
-            this.log.debug(`Received message with ${data.byteLength} bytes`);
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Received message with ${data.byteLength} bytes`);
+            }
             if (this.dataFrame) {
                 this.dataFrame.body = data.buffer;
-                this.inMessagesBuffer.enqueue(this.dataFrame);
+                this.addToInbox(this.dataFrame);
                 this.dataFrame = null;
             } else {
                 const frame = this.messagesConverter.deserialize(data);
                 if (frame.isDataFrame()) {
-                    this.log.debug("Message header frame, waiting for data frame");
+                    /* istanbul ignore if */
+                    if (this.log.isDebugEnabled()) {
+                        this.log.debug("Message header frame, waiting for data frame");
+                    }
                     this.dataFrame = frame;
                 } else {
-                    this.inMessagesBuffer.enqueue(frame);
+                    this.addToInbox(frame);
                 }
             }
+        }
+    }
+
+    private addToInbox(frame: Frame): void {
+        if (this.connectionObserver) {
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Passing frame to observer`);
+            }
+            this.connectionObserver.next(frame);
+        } else {
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`No connection observer adding to buffer, buffer size ${this.inMessagesBuffer.size()}`);
+            }
+            this.inMessagesBuffer.enqueue(frame);
         }
     }
 
@@ -187,10 +256,16 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         if (ev.data instanceof Array) {
             return new Uint8Array(ev.data);
         } else if (this.isArrayBuffer(ev.data)) {
-            this.log.debug("Array Buffer message");
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Array Buffer message");
+            }
             return new Uint8Array(ev.data);
         } else if (this.isArrayBufferView(ev.data)) {
-            this.log.debug("ArrayBufferView Buffer message");
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("ArrayBufferView Buffer message");
+            }
             return new Uint8Array(ev.data);
         } else {
             this.log.error("Unknown payload type", ev.data);
@@ -207,19 +282,15 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private handleError(socket: WebSocket, ev: Event): void {
-        this.log.error("Connection error", ev);
-        this.closeLogicalConnection("Connection error");
+        this.log.error("Connection error received", ev);
+        this.cancelConnectionAndCleanUp("Connection error received");
+        if (this.connectionObserver) {
+            this.connectionObserver.error("Web Socket Connection Error received");
+        }
     }
 
     private handleOpen(): void {
         this.log.debug("Connection opened");
-    }
-
-    private throwIfNotConnected(): void {
-        if (!this.connected()) {
-            this.log.error(`Web Socket is not connected`);
-            throw new Error(`Web Socket is not connected`);
-        }
     }
 
     private throwIfNotConnectedOrDisconnectRequested(): void {

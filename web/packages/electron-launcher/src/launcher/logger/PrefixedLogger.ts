@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Logger } from "./Logger";
+import { Logger, LogLevel } from "@plexus-interop/common";
 
 export class PrefixedLogger implements Logger {
 
@@ -39,4 +39,17 @@ export class PrefixedLogger implements Logger {
     public debug(msg: string, ...args: any[]): void {
         this.base.debug(`${this.prefix} ${msg}`, args);
     }
+
+    public getLogLevel(): LogLevel {
+        return this.base.getLogLevel();
+    }
+
+    public isDebugEnabled(): boolean {
+        return this.base.getLogLevel() <= LogLevel.DEBUG;
+    }
+
+    public isTraceEnabled(): boolean {
+        return this.base.getLogLevel() <= LogLevel.TRACE;
+    }
+
 }

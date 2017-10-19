@@ -1,0 +1,117 @@
+{
+	"services": [
+		{
+			"id": "plexus.interop.testing.EchoService",
+			"methods": [
+				{
+					"name": "Unary",
+					"input": "plexus.interop.testing.EchoRequest",
+					"output": "plexus.interop.testing.EchoRequest",
+					"type": "Unary"
+				},
+				{
+					"name": "ServerStreaming",
+					"input": "plexus.interop.testing.EchoRequest",
+					"output": "plexus.interop.testing.EchoRequest",
+					"type": "ServerStreaming"
+				},
+				{
+					"name": "ClientStreaming",
+					"input": "plexus.interop.testing.EchoRequest",
+					"output": "plexus.interop.testing.EchoRequest",
+					"type": "ClientStreaming"
+				},
+				{
+					"name": "DuplexStreaming",
+					"input": "plexus.interop.testing.EchoRequest",
+					"output": "plexus.interop.testing.EchoRequest",
+					"type": "DuplexStreaming"
+				}
+			]
+		},
+		{
+			"id": "interop.AppLauncherService",
+			"methods": [
+				{
+					"name": "Launch",
+					"input": "interop.AppLaunchRequest",
+					"output": "interop.AppLaunchResponse",
+					"type": "Unary"
+				}
+			]
+		}
+	],
+	"applications": [
+		{
+			"id": "plexus.interop.testing.EchoClient",
+			"consumes": [
+				{
+					"service": "plexus.interop.testing.EchoService",
+					"from": [
+						"plexus.interop.testing.*"
+					],
+					"methods": [
+						"Unary",
+						"ServerStreaming",
+						"ClientStreaming",
+						"DuplexStreaming"
+					]
+				}
+		     ],
+		     "provides": [
+		     ]
+		  },
+		{
+			"id": "plexus.interop.testing.EchoServer",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "plexus.interop.testing.EchoService",
+		     		"title": "Sample Echo Service",
+		     		"to": [
+		     			"plexus.interop.testing.*"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Unary",
+		     				"title": "Sample Unary Method"
+		     			},
+		     			{
+		     				"name": "ServerStreaming",
+		     				"title": "Sample Server Streaming Method"
+		     			},
+		     			{
+		     				"name": "ClientStreaming",
+		     				"title": "Sample Client Streaming Method"
+		     			},
+		     			{
+		     				"name": "DuplexStreaming",
+		     				"title": "Sample Duplex Streaming Method"
+		     			}
+		     		]
+		     	}
+		     ]
+		  },
+		{
+			"id": "plexus.interop.testing.TestAppLauncher",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.AppLauncherService",
+		     		"title": "AppLauncherService",
+		     		"to": [
+		     			"interop.AppLifecycleManager"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Launch",
+		     				"title": "Launch"
+		     			}
+		     		]
+		     	}
+		     ]
+		  }
+	]
+}

@@ -22,7 +22,7 @@ logs
 bin/
 
 ### JS ###
-
+.nyc_output
 npm-debug.log
 lerna-debug.log
 npm-debug.log.*

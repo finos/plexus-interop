@@ -17,6 +17,7 @@
 import {plexus} from "../gen/internal-client-protocol";
 
 export class ClientError implements plexus.IError {
-    public constructor(message: string = "Unknown message", details: string = "Unknown details") {
-    }
+    public constructor(
+        public readonly message: string = "Unknown message", 
+        public readonly details: string = "Unknown details") { }
 }

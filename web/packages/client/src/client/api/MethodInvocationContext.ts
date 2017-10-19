@@ -14,21 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BlockingQueueBase } from "./BlockingQueue";
+import { UniqueId } from "@plexus-interop/transport-common";
+import { ReadOnlyCancellationToken } from "@plexus-interop/common";
 
-export class BlockingBufferedQueue<T> extends BlockingQueueBase<T> {
-
+export class MethodInvocationContext {
     constructor(
-        private readonly maxBufferSize: number = 1024) {
-        super();
-    }
-
-    public async enqueue(elem: T): Promise<void> {
-        if (this.size() >= this.maxBufferSize) {
-            return Promise.reject(`Reached max buffer size ${this.maxBufferSize}`);
-        } else {
-            super.enqueue(elem);
-        }
-    }
-
+        public readonly consumerApplicationId: string,
+        public readonly consumerConnectionId: UniqueId,
+        public readonly cancellationToken: ReadOnlyCancellationToken
+    ) { }
 }

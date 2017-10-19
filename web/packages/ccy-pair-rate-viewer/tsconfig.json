@@ -12,7 +12,7 @@
       "dom"
     ],
     "types": [
-      "long"
+      "long", "node"
     ]
   },
   "include": [

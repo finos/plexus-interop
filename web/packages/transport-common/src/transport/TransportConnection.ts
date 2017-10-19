@@ -37,6 +37,11 @@ export interface TransportConnection {
     disconnect(completion?: clientProtocol.ICompletion): Promise<void>;
 
     /**
+     * Gets list of Channels managed by this Connection
+     */
+    getManagedChannels(): TransportChannel[];
+
+    /**
      * Unique connection identifier
      */
     uuid(): UniqueId;
