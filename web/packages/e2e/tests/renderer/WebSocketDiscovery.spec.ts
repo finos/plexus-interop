@@ -53,6 +53,7 @@ describe("Client: Web Socket Discovery", () => {
     // });
 
     it("Can invoke discovered unary method passing serialized data", function() {
+        this.timeout(3000);
         return pointToPointTests.testClientCanInvokeDiscoveredMethod();
     });
 

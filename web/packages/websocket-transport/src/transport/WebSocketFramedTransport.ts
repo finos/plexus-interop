@@ -108,6 +108,10 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         }
     }
 
+    public closeSocket(): void {
+        this.socket.close();
+    }
+
     private sendTerminateMessage(): void {
         this.log.debug("Sending terminate message");
         this.socket.send(WebSocketFramedTransport.TERMINATE_MESSAGE);

@@ -18,10 +18,8 @@ import { ClientsSetup } from "../common/ClientsSetup";
 import { ConnectionProvider } from "../common/ConnectionProvider";
 import { BaseEchoTest } from "./BaseEchoTest";
 import { ServerStreamingHandler } from "./ServerStreamingHandler";
-import { MethodInvocationContext } from "@plexus-interop/client";
 import { EchoClientClient, EchoClientClientBuilder } from "../../src/echo/client/EchoClientGeneratedClient";
 import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
-import { AsyncHelper } from "@plexus-interop/common";
 import { UniqueId } from "@plexus-interop/transport-common";
 
 export class ClientConnectivityTests extends BaseEchoTest {
@@ -37,19 +35,18 @@ export class ClientConnectivityTests extends BaseEchoTest {
     }
 
     public async testClientReceiveErrorIfProvideWrongId(): Promise<void> {
-
         const preparedBuilder = new EchoClientClientBuilder()
             .withClientDetails({
                 applicationId: "plexus.interop.testing.DoNotExist",
                 applicationInstanceId: UniqueId.generateNew()
             })
-            .withTransportConnectionProvider(this.connectionProvider);
+            .withTransportConnectionProvider(() => this.connectionProvider().then(c => c.getConnection()));
         try {
             await preparedBuilder.connect();
         } catch (error) {
             return Promise.resolve();
         }
-        throw new Error("Expect to fail to receive connection")
+        throw new Error("Expect to fail to receive connection");
     }
 
     private testAllInvocationClientReceiveErrorOnDisconnect(isForcedByClient: boolean, isForcedByServer: boolean): Promise<void> {
@@ -73,7 +70,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
                         next: (r) => {
                             clientErrorReject("Not expected to receive update");
                         },
-                        complete: () => { },
+                        complete: () => {}, // TOOD uncomment and fix clientErrorReject("Complete not expected"),
                         error: (e) => {
                             clientErrorResolve();
                         }

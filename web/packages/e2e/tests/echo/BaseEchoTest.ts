@@ -57,11 +57,11 @@ export class BaseEchoTest {
     }
 
     public async verifyClientChannelsCleared(clientsSetup: ClientsSetup): Promise<void> {
-        expect(clientsSetup.getClientConnection().getManagedChannels().length).to.eq(0);
+        expect(clientsSetup.getClientConnectionSetup().getConnection().getManagedChannels().length).to.eq(0);
     }
 
     public async verifyServerChannelsCleared(clientsSetup: ClientsSetup): Promise<void> {
-        expect(clientsSetup.getServerConnection().getManagedChannels().length).to.eq(0);
+        expect(clientsSetup.getServerConnectionSetup().getConnection().getManagedChannels().length).to.eq(0);
     }
 
     public verifyInvocationContext(invocationContext: MethodInvocationContext): void {
@@ -72,11 +72,11 @@ export class BaseEchoTest {
     }
 
     public waitForClientConnectionCleared(clientsSetup: ClientsSetup): Promise<void> {
-        return AsyncHelper.waitFor(() => clientsSetup.getClientConnection().getManagedChannels().length === 0);
+        return AsyncHelper.waitFor(() => clientsSetup.getClientConnectionSetup().getConnection().getManagedChannels().length === 0);
     }
 
     public waitForServerConnectionCleared(clientsSetup: ClientsSetup): Promise<void> {
-        return AsyncHelper.waitFor(() => clientsSetup.getServerConnection().getManagedChannels().length === 0);
+        return AsyncHelper.waitFor(() => clientsSetup.getServerConnectionSetup().getConnection().getManagedChannels().length === 0);
     }
 
 }

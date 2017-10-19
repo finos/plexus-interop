@@ -19,12 +19,12 @@ import { EchoServerClient, EchoServerClientBuilder, EchoServiceInvocationHandler
 import { ConnectionProvider } from "./ConnectionProvider";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import * as Long from "long";
-import { TransportConnection } from "@plexus-interop/transport-common";
+import { ConnectionSetup } from "./ConnectionSetup";
 
 export class ClientsSetup {
 
-    private clientConnection: TransportConnection | null = null;
-    private serverConnection: TransportConnection | null = null;
+    private clientConnectionSetup: ConnectionSetup | null = null;
+    private serverConnectionSetup: ConnectionSetup | null = null;
 
     public async createEchoClients(transportConnectionProvider: ConnectionProvider, serviceHandler: EchoServiceInvocationHandler): Promise<[EchoClientClient, EchoServerClient]> {
         const server = await this.createEchoServer(transportConnectionProvider, serviceHandler);
@@ -35,9 +35,8 @@ export class ClientsSetup {
     public createEchoClient(transportConnectionProvider: ConnectionProvider): Promise<EchoClientClient> {
         return new EchoClientClientBuilder()
             .withTransportConnectionProvider(async () => {
-                const connection = await transportConnectionProvider();
-                this.clientConnection = connection;
-                return connection;
+                this.clientConnectionSetup = await transportConnectionProvider();
+                return this.clientConnectionSetup.getConnection();
             })
             .connect();
     }
@@ -46,19 +45,18 @@ export class ClientsSetup {
         return new EchoServerClientBuilder()
             .withEchoServiceInvocationsHandler(serviceHandler)
             .withTransportConnectionProvider(async () => {
-                const connection = await transportConnectionProvider();
-                this.serverConnection = connection;
-                return connection;
+                this.serverConnectionSetup = await transportConnectionProvider();
+                return this.serverConnectionSetup.getConnection();
             })
             .connect();
     }
 
-    public getClientConnection(): TransportConnection {
-        return this.clientConnection as TransportConnection;
+    public getClientConnectionSetup(): ConnectionSetup {
+        return (this.clientConnectionSetup as ConnectionSetup);
     }
 
-    public getServerConnection(): TransportConnection {
-        return this.serverConnection as TransportConnection;
+    public getServerConnectionSetup(): ConnectionSetup {
+        return (this.serverConnectionSetup as ConnectionSetup);
     }
 
     public createRequestDto(): plexus.plexus.interop.testing.IEchoRequest {

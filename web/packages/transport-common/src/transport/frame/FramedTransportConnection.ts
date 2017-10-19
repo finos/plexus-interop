@@ -26,7 +26,7 @@ import { transportProtocol as plexus } from "@plexus-interop/protocol";
 import { TransportFrameHandler } from "./TransportFrameHandler";
 import { ChannelsHolder } from "../../common/ChannelsHolder";
 import { BufferedChannelsHolder } from "../../common/BufferedChannelsHolder";
-import { StateMaschineBase, StateMaschine, CancellationToken, LoggerFactory, Logger } from "@plexus-interop/common";
+import { StateMaschineBase, StateMaschine, CancellationToken, LoggerFactory, Logger, ReadWriteCancellationToken } from "@plexus-interop/common";
 
 export type ConnectionState = "CREATED" | "ACCEPT" | "OPEN" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED" | "CLOSED";
 
@@ -48,8 +48,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
 
     private log: Logger;
 
-    public readCancellationToken: CancellationToken = new CancellationToken();
-    public writeCancellationToken: CancellationToken = new CancellationToken();
+    private connectionCancellationToken: ReadWriteCancellationToken = new ReadWriteCancellationToken();
 
     private channelsHolder: ChannelsHolder<TransportChannel, ChannelDescriptor> = new BufferedChannelsHolder<TransportChannel, ChannelDescriptor>();
 
@@ -154,7 +153,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             },
             {
                 from: ConnectionState.OPEN, to: ConnectionState.CLOSE_RECEIVED, preHandler: async () => {
-                    this.readCancellationToken.cancel("Connection close received");
+                    this.connectionCancellationToken.cancelRead("Connection close received");
                 }
             },
             // graceful connection closure
@@ -187,12 +186,11 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         if (this.log.isDebugEnabled()) {
             this.log.debug(`Closing connection, current state is ${this.stateMachine.getCurrent()}`);
         }
-        this.writeCancellationToken.cancel("Connection is closed");
-        this.readCancellationToken.cancel("Connection is closed");
+        this.connectionCancellationToken.cancel("Connection is closed");
         this.stateMachine.go(ConnectionState.CLOSED);
         this.channelsHolder.getChannels().forEach((value, key: string) => {
             this.log.debug(`Cleaning channel ${key}`);
-            value.channel.closeInternal();
+            value.channel.closeInternal("Transport connection closed");
             value.channelTransportProxy.clear();
         });
         this.channelsHolder.clearAll();
@@ -345,16 +343,19 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         const strChannelId = channelId.toString();
         this.log.debug(`Creating new channel ${strChannelId}`);
         const proxyLogger = LoggerFactory.getLogger(`ChannelTranportProxy [${strChannelId}]`);
-        const channelTransportProxy = new BufferedTransportProxy(this.framedTransport, this.writeCancellationToken, proxyLogger);
+        const channelTransportProxy = new BufferedTransportProxy(this.framedTransport, this.connectionCancellationToken.getWriteToken(), proxyLogger);
         const dispose = async () => {
-            this.log.debug(`Dispose called on ${strChannelId} channel`);
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Dispose called on ${strChannelId} channel`);
+            }
             if (this.channelsHolder.channelExists(strChannelId)) {
                 const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
                 channelDescriptor.channelTransportProxy.clear();
                 this.channelsHolder.clear(strChannelId);
             }
         };
-        const channel = new FramedTransportChannel(channelId, channelTransportProxy, dispose, this.readCancellationToken);
+        const channel = new FramedTransportChannel(channelId, channelTransportProxy, dispose, this.connectionCancellationToken.getWriteToken());
         this.channelsHolder.addChannelDescriptor(strChannelId, { channel, channelTransportProxy });
         if (isIncomingChannel) {
             this.channelsHolder.enqueueIncomingChannel(channel);

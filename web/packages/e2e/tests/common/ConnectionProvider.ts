@@ -14,6 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TransportConnection } from "@plexus-interop/transport-common";
+import { ConnectionSetup } from "./ConnectionSetup";
 
-export type ConnectionProvider = () => Promise<TransportConnection>;
+export type ConnectionProvider = () => Promise<ConnectionSetup>;

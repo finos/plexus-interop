@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { plexus }from "../gen/internal-client-protocol";
+import { plexus } from "../gen/internal-client-protocol";
 
 export class ClientProtocolUtils {
 
@@ -45,6 +45,10 @@ export class ClientProtocolUtils {
                 status: plexus.Completion.Status.Completed
             };
         }
+    }
+
+    public static isSuccessCompletion(completion: plexus.ICompletion): boolean {
+        return completion && (completion.status === undefined || completion.status === plexus.Completion.Status.Completed);
     }
 
 }
