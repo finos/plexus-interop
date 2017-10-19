@@ -47,7 +47,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
             const responses: plexus.plexus.interop.testing.IEchoRequest[] = [];
-            
+
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => {
                     responses.push(response);
@@ -79,7 +79,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
             const responses: plexus.plexus.interop.testing.IEchoRequest[] = [];
-            
+
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => {
                     responses.push(response);
@@ -90,6 +90,29 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                 error: async (e) => {
                     expect(responses.length).is.eq(1);
                     responses.forEach(r => this.assertEqual(r, echoRequest));
+                    await this.clientsSetup.disconnect(client, server);
+                    resolve();
+                }
+            });
+        });
+    }
+
+    public testServerExceptionReceivedByClient(): Promise<void> {
+        const errorText = "Host error";
+        return new Promise<void>(async (resolve, reject) => {
+            const handler = new ServerStreamingHandler((context, request, hostClient) => {
+                throw new Error(errorText);
+            });
+            const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
+            client.getEchoServiceProxy().serverStreaming(this.clientsSetup.createRequestDto(), {
+                next: (response) => {
+                    reject("Not expected to receive update");
+                },
+                complete: async () => {
+                    reject("Not expected to be completed");
+                },
+                error: async (e) => {
+                    expect(e.message).to.eq(errorText);
                     await this.clientsSetup.disconnect(client, server);
                     resolve();
                 }
@@ -111,9 +134,9 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                     reject(error);
                 }
             });
-            
+
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
-            
+
             let firstCompleted = false;
             let secondCompleted = false;
 
@@ -125,25 +148,25 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                     firstCompleted = true;
                     expect(firstResponses.length).is.eq(3);
                     firstResponses.forEach(r => this.assertEqual(r, echoRequest));
-                    if (secondCompleted) { 
+                    if (secondCompleted) {
                         await this.clientsSetup.disconnect(client, server);
-                        resolve(); 
+                        resolve();
                     }
                 },
                 error: (e) => reject(e)
             });
 
             // second
-            const secondResponses: plexus.plexus.interop.testing.IEchoRequest[] = [];            
+            const secondResponses: plexus.plexus.interop.testing.IEchoRequest[] = [];
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => secondResponses.push(response),
                 complete: async () => {
                     secondCompleted = true;
                     expect(secondResponses.length).is.eq(3);
                     secondResponses.forEach(r => this.assertEqual(r, echoRequest));
-                    if (firstCompleted) { 
+                    if (firstCompleted) {
                         await this.clientsSetup.disconnect(client, server);
-                        resolve(); 
+                        resolve();
                     }
                 },
                 error: (e) => reject(e)
@@ -165,7 +188,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
             const responses: plexus.plexus.interop.testing.IEchoRequest[] = [];
-            
+
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => {
                     responses.push(response);

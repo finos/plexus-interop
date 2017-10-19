@@ -24,7 +24,7 @@ import { MethodInvocationContext } from "../MethodInvocationContext";
 
 export class ServerStreamingConverter implements InvocationHandlerConverter<ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>> {
 
-    public constructor(private readonly log: Logger = LoggerFactory.getLogger("UnaryHandlerConverter")) {}
+    public constructor(private readonly log: Logger = LoggerFactory.getLogger("ServerStreamingConverter")) {}
 
     public convert(baseHandler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
         return {

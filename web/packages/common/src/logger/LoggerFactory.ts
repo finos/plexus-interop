@@ -35,6 +35,7 @@ export class LoggerFactory {
   }
 
   public static setLogLevel(level: LogLevel): void {
+    /* istanbul ignore if */
     if (level <= LogLevel.DEBUG) {
       logPrefixer.apply(log, {
         template: "%t | [%l] ",

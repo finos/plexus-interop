@@ -68,4 +68,8 @@ describe("Client: Web Socket Streaming invocation", () => {
         return bidiStreamingTests.testClientCanCancelInvocation();
     });
 
+    it("Client receives exception from server", function() {
+        return serverStreamingTests.testServerExceptionReceivedByClient();
+    });
+
 });

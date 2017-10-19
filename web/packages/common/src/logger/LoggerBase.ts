@@ -23,6 +23,7 @@ export class LoggerBase implements Logger {
     constructor(public name: string = "Anonymous") { }
 
     public debug(msg: string, ...args: any[]): void {
+        /* istanbul ignore if */
         if (log.getLevel() <= LogLevel.DEBUG) {
             log.debug(`${this.name} ${msg}`, args);
         }
@@ -41,6 +42,7 @@ export class LoggerBase implements Logger {
     }
 
     public trace(msg: string, ...args: any[]): void {
+        /* istanbul ignore if */        
         if (log.getLevel() <= LogLevel.TRACE) {
             log.debug(`${this.name} ${msg}`, args);
         }

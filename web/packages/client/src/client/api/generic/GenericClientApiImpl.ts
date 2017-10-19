@@ -157,8 +157,13 @@ export class GenericClientApiImpl implements GenericClientApi {
     }
 
     public async sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
+        const responseObserver: Observer<ArrayBuffer> = this.createUnaryObserver(responseHandler);
+        return this.sendServerStreamingRequest(invocationInfo, request, responseObserver);
+    }
+
+    private createUnaryObserver(responseHandler: ValueHandler<ArrayBuffer>): Observer<ArrayBuffer> {
         let result: ArrayBuffer | null = null;
-        const responseObserver: Observer<ArrayBuffer> = {
+        return {
             next: (v) => {
                 this.log.trace(`Received value of ${v.byteLength} bytes`);
                 result = v;
@@ -175,7 +180,6 @@ export class GenericClientApiImpl implements GenericClientApi {
                 this.log.debug("Unary operation completed");
             }
         };
-        return this.sendServerStreamingRequest(invocationInfo, request, responseObserver);
     }
 
     public async sendUnaryRequestInternal(
@@ -183,26 +187,7 @@ export class GenericClientApiImpl implements GenericClientApi {
         requestInvocation: () => Promise<Invocation>,
         request: ArrayBuffer,
         responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
-
-        let result: ArrayBuffer | null = null;
-        const responseObserver: Observer<ArrayBuffer> = {
-            next: (v) => {
-                this.log.trace(`Received value of ${v.byteLength} bytes`);
-                result = v;
-            },
-            error: responseHandler.error.bind(responseHandler),
-            complete: () => {
-                if (result === null) {
-                    const errorText = "No messages received before completion";
-                    this.log.error(errorText);
-                    responseHandler.error(new ClientError(errorText));
-                } else {
-                    responseHandler.value(result);
-                }
-                this.log.debug("Unary operation completed");
-            }
-        };
-
+        const responseObserver: Observer<ArrayBuffer> = this.createUnaryObserver(responseHandler);
         return this.sendServerStreamingRequestInternal(strInfo, requestInvocation, request, responseObserver);
     }
 

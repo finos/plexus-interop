@@ -92,7 +92,7 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         if (transition.postHandler) {
             transition.postHandler()
                 .then(() => {
-                    /* istanbul ignore if */                    
+                    /* istanbul ignore if */
                     if (this.logger.isTraceEnabled()) {
                         this.logger.trace(`Finished post-handler for ${this.getCurrent()} -> ${to}`);
                     }

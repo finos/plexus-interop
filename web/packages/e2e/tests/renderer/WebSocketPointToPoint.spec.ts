@@ -55,4 +55,8 @@ describe("Client: Web Socket Point to Point invocation", () => {
         return pointToPointTests.testHostsExecutionStringErrorReceived();
     });
 
+    it("Receives exception from host", function() {
+        return pointToPointTests.testHostExecutionExceptionReceived();
+    });
+
 });

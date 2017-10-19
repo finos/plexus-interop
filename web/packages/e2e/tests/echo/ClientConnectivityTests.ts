@@ -52,7 +52,15 @@ export class ClientConnectivityTests extends BaseEchoTest {
     }
 
     public async testServerReceivesErrorIfClientDroppedConnection(): Promise<void> {
+        return this.testRemoteSideReceivedErrorWhenConnectionDropped(true);
+    }
 
+    public async testClientReceivesErrorIfServerDroppedConnection(): Promise<void> {
+        return this.testRemoteSideReceivedErrorWhenConnectionDropped(false);
+    }
+
+    private async testRemoteSideReceivedErrorWhenConnectionDropped(isDroppedByClient: boolean): Promise<void> {
+        
         const echoRequest = this.clientsSetup.createRequestDto();
         let client: EchoClientClient | null = null;
         let server: EchoServerClient | null = null;
@@ -84,14 +92,23 @@ export class ClientConnectivityTests extends BaseEchoTest {
             // wait for server to receive request to ensure invocation established
             await serverRequestReceived;
 
-            // client closed the window
-            this.clientsSetup.getClientConnectionSetup().dropConnection();
+            if (isDroppedByClient) {
+                this.clientsSetup.getClientConnectionSetup().dropConnection();
+            } else {
+                this.clientsSetup.getServerConnectionSetup().dropConnection();                
+            }
 
+            // server's context must be cancelled
             AsyncHelper.waitFor(() => (serverInvocationContext as MethodInvocationContext).cancellationToken.isCancelled());
-            
+
             await clientInvocationErrorReceived;
 
-            await (server as EchoServerClient).disconnect();
+            // gracefully disconnect other side
+            if (isDroppedByClient) {
+                await (server as EchoServerClient).disconnect();
+            } else {
+                await (client as EchoClientClient).disconnect();
+            }
 
             testResolve();
 
@@ -119,7 +136,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
                         next: (r) => {
                             clientErrorReject("Not expected to receive update");
                         },
-                        complete: () => {},
+                        complete: () => { },
                         error: (e) => {
                             clientErrorResolve();
                         }

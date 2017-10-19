@@ -67,6 +67,11 @@ export class PointToPointInvocationTests extends BaseEchoTest {
         return this.testMessageSentInternal(echoRequest);
     }
 
+    public testHostExecutionExceptionReceived(): Promise<void> {
+        const errorText = "Host error";        
+        return this.testHostsExecutionErrorReceivedInternal(new Error(errorText), errorText, false);
+    }
+
     public testHostsExecutionClientErrorReceived(): Promise<void> {
         const errorText = "Host error";
         return this.testHostsExecutionErrorReceivedInternal(new ClientError(errorText), errorText);
@@ -82,10 +87,15 @@ export class PointToPointInvocationTests extends BaseEchoTest {
         return this.testHostsExecutionErrorReceivedInternal(errorText, errorText);
     }
 
-    private testHostsExecutionErrorReceivedInternal(errorObj: any, errorText: string): Promise<void> {
+    private testHostsExecutionErrorReceivedInternal(errorObj: any, errorText: string, isPromise: boolean = true): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>((resolve, reject) => {
-            const handler = new UnaryServiceHandler((context: MethodInvocationContext, request) => Promise.reject(errorObj));
+            const handler = new UnaryServiceHandler((context: MethodInvocationContext, request) => {
+                if (isPromise) {
+                    return Promise.reject(errorObj);
+                } 
+                throw errorObj;
+            });
             this.clientsSetup.createEchoClients(this.connectionProvider, handler)
                 .then(clients => {
                     return clients[0].getEchoServiceProxy()
