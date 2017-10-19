@@ -28,6 +28,8 @@ namespace Plexus.Interop.Transport.Transmission
 
         Task StartAsync();
 
+        void Stop();
+
         Task StopAsync();        
     }
 }

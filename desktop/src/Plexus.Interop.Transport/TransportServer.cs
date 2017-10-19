@@ -36,6 +36,7 @@ namespace Plexus.Interop.Transport
             _connectionFactory = new TransportConnectionFactory(serializationProvider);
             _transmissionServer = transmissionServer;
             _buffer.Out.PropagateCompletionFrom(Completion);
+            OnStop(_transmissionServer.Stop);
         }
 
         public IReadOnlyChannel<ITransportConnection> In => _buffer.In;
@@ -48,15 +49,25 @@ namespace Plexus.Interop.Transport
 
         private async Task ProcessAsync()
         {
-            await _transmissionServer.In.ConsumeAsync(AcceptAsync, StopToken).ConfigureAwait(false);
+            await _transmissionServer.In.ConsumeAsync(AcceptAsync).ConfigureAwait(false);
         }
 
         private async Task AcceptAsync(ITransmissionConnection c)
         {
-            if (!await _buffer.TryWriteAsync(_connectionFactory.Create(c), StopToken))
+            try
             {
-                await c.DisconnectAsync().ConfigureAwait(false);
+                await _buffer.WriteAsync(_connectionFactory.Create(c), StopToken).ConfigureAwait(false);
             }
+            catch
+            {
+                await c.DisconnectAsync().IgnoreExceptions().ConfigureAwait(false);
+                throw;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"Transmission server: {_transmissionServer.FormatObject()}";
         }
     }
 }

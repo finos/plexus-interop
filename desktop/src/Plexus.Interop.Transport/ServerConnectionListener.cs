@@ -23,42 +23,40 @@ namespace Plexus.Interop.Transport
     using System.Linq;
     using System.Threading.Tasks;
 
-    public sealed class CompositeTransportServer : ProcessBase
+    public sealed class ServerConnectionListener : ProcessBase
     {
-        private readonly IEnumerable<Func<ITransportServer>> _serverFactories;
+        private readonly IReadOnlyCollection<ITransportServer> _servers;
         private readonly IChannel<ITransportConnection> _buffer = new BufferedChannel<ITransportConnection>(3);
 
-        public CompositeTransportServer(IEnumerable<Func<ITransportServer>> serverFactories)
+        public ServerConnectionListener(IEnumerable<ITransportServer> servers)
         {
-            _serverFactories = serverFactories.ToList();            
+            _servers = servers.ToList();
         }
 
         public IReadOnlyChannel<ITransportConnection> In => _buffer.In;
 
-        protected override ILogger Log { get; } = LogManager.GetLogger<CompositeTransportServer>();
+        protected override ILogger Log { get; } = LogManager.GetLogger<ServerConnectionListener>();
 
         protected override async Task<Task> StartCoreAsync()
         {
-            var startTasks = _serverFactories.Select(StartServerAsync).ToArray();
+            var startTasks = _servers.Select(StartServerAsync).ToArray();
             await Task.WhenAll(startTasks).IgnoreExceptions().ConfigureAwait(false);
             var servers = startTasks.Where(t => t.Status == TaskStatus.RanToCompletion).Select(t => t.GetResult());
             OnStop(() => _buffer.Out.TryCompleteWriting());
             return ProcessAsync(servers);
         }
 
-        private async Task<ITransportServer> StartServerAsync(Func<ITransportServer> factory)
+        private async Task<ITransportServer> StartServerAsync(ITransportServer server)
         {
-            ITransportServer server = null;
             try
             {
-                server = factory();
                 OnStop(server.Stop);
                 await server.StartAsync().ConfigureAwait(false);
                 return server;
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Server {0} failed to start", server);
+                Log.Error(ex, "Server failed to start: {{{0}}}", server);
                 throw;
             }
         }
@@ -75,15 +73,15 @@ namespace Plexus.Interop.Transport
             try
             {
                 await server.In.ConsumeAsync(ProcessAsync).ConfigureAwait(false);
-                Log.Debug("Server completed: {0}", server);
+                Log.Debug("Server completed: {{{0}}}", server);
             }
             catch (OperationCanceledException) when (StopToken.IsCancellationRequested)
             {
-                Log.Debug("Server stopped: {0}", server);
+                Log.Debug("Server stopped: {{{0}}}", server);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Exception on server listening {0}", server);
+                Log.Error(ex, "Exception on server listening: {{{0}}}", server);
             }            
         }
 

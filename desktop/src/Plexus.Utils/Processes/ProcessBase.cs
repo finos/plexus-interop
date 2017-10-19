@@ -32,6 +32,21 @@ namespace Plexus.Processes
         private readonly ConcurrentBag<CancellationTokenRegistration> _registrations 
             = new ConcurrentBag<CancellationTokenRegistration>();
 
+        protected ProcessBase()
+        {
+            Completion.ContinueWithSynchronously((Action<Task>)DisposeRegistrations).IgnoreAwait();
+        }
+
+        private void DisposeRegistrations(Task completion)
+        {
+            Log.Debug("Process completed in state {0}", completion.GetCompletionDescription());
+            Stop();
+            while (_registrations.TryPeek(out var registration))
+            {
+                registration.Dispose();
+            }            
+        }
+
         protected virtual ILogger Log { get; } = NoopLogger.Instance;
 
         public Task Completion => _completion.Task;
@@ -46,7 +61,7 @@ namespace Plexus.Processes
         }
 
         protected virtual Task OnCompletedAsync(Task completion)
-        {
+        {            
             return completion;
         }
 
@@ -56,19 +71,13 @@ namespace Plexus.Processes
         {
             if (!_started.TryEnter())
             {
-                Log.Trace("Start called after process was already started");
+                Log.Debug("Start called after process was already started");
                 return;
             }
-            Log.Trace("Starting");
-            if (!ReferenceEquals(Log, NoopLogger.Instance))
-            {                
-                _startCompletion.Task.ContinueWithSynchronously(
-                    t => Log.Trace("Process start task completed in state {0}", t.GetCompletionDescription()),
-                    CancellationToken.None);
-                _completion.Task.ContinueWithSynchronously(
-                    t => Log.Trace("Process completed in state {0}", t.GetCompletionDescription()),
-                    CancellationToken.None);
-            }
+            Log.Debug("Starting");
+            _startCompletion.Task.ContinueWithSynchronously(
+                t => Log.Trace("Process start task completed in state {0}", t.GetCompletionDescription()),
+                CancellationToken.None);
             var startTask = TaskRunner.RunInBackground(StartCoreAsync, StopToken);
             startTask
                 .IgnoreCancellation(StopToken)
@@ -92,7 +101,7 @@ namespace Plexus.Processes
             {
                 return;
             }
-            Log.Trace("Stopping");
+            Log.Debug("Stopping");
             _stopCancellation.Cancel();
             Start();
         }
@@ -105,18 +114,14 @@ namespace Plexus.Processes
 
         public void Dispose()
         {
-            Log.Trace("Disposing");
+            Log.Debug("Disposing");
             StopAsync().GetResult();
-            while (_registrations.TryPeek(out var registration))
-            {
-                registration.Dispose();
-            }
-            _stopCancellation.Dispose();
+            Log.Debug("Disposed");
         }
 
         protected void SetStartCompleted()
         {
-            Log.Trace("Setting start completed");
+            Log.Debug("Setting start completed");
             _startCompletion.TryComplete();
         }
     }

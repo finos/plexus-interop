@@ -16,7 +16,6 @@
  */
 namespace Plexus.Interop.Broker
 {
-    using System;
     using Plexus.Interop.Apps;
     using Plexus.Interop.Metamodel;
     using Plexus.Interop.Metamodel.Json;
@@ -26,7 +25,9 @@ namespace Plexus.Interop.Broker
     using Plexus.Interop.Transport.Transmission.Pipes;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using Plexus.Processes;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
@@ -37,9 +38,10 @@ namespace Plexus.Interop.Broker
         private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider = new ProtobufProtocolSerializerFactory();
 
         private readonly string _workingDir;
-        private readonly CompositeTransportServer _transportServer;
+        private readonly ServerConnectionListener _connectionListener;
         private readonly BrokerProcessor _brokerProcessor;
         private readonly AppLifecycleManager _appLifecycleManager;
+        private readonly IReadOnlyCollection<ITransportServer> _transportServers;
 
         protected override ILogger Log { get; } = LogManager.GetLogger<BrokerRunner>();
 
@@ -48,18 +50,19 @@ namespace Plexus.Interop.Broker
             _workingDir = Directory.GetCurrentDirectory();
             metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
             registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
-            _transportServer = new CompositeTransportServer(
-                new Func<ITransportServer>[]
-                {
-                    CreateNamedPipeServer, CreateWebSocketServer
-                });
+            _transportServers = new ITransportServer[]
+            {
+                new TransportServer(new PipeTransmissionServer(_workingDir), DefaultTransportSerializationProvider),
+                new TransportServer(new WebSocketTransmissionServer(_workingDir), DefaultTransportSerializationProvider)
+            };
+            _connectionListener = new ServerConnectionListener(_transportServers);
             _appLifecycleManager = new AppLifecycleManager(metadataDir);            
             _brokerProcessor = new BrokerProcessor(
-                _transportServer.In,
+                _connectionListener.In,
                 registryProvider,
                 DefaultProtocolSerializationProvider,
                 _appLifecycleManager);
-            OnStop(_transportServer.Stop);
+            OnStop(_connectionListener.Stop);
             OnStop(_appLifecycleManager.Stop);
         }
 
@@ -68,28 +71,23 @@ namespace Plexus.Interop.Broker
             Log.Info("Starting broker in directory {0}", _workingDir);
             await Task
                 .WhenAll(
-                    _transportServer.StartAsync(),
+                    _connectionListener.StartAsync(),
                     _brokerProcessor.StartAsync())
                 .ConfigureAwait(false);
             Log.Info("Broker started in directory {0}", _workingDir);
             return ProcessAsync();
         }
 
-        private Task ProcessAsync()
+        private async Task ProcessAsync()
         {
-            return Task.WhenAll(_brokerProcessor.Completion, _appLifecycleManager.Completion);
-        }
-
-        private ITransportServer CreateNamedPipeServer()
-        {
-            var pipeServer = new PipeTransmissionServer(_workingDir);
-            return new TransportServer(pipeServer, DefaultTransportSerializationProvider);
-        }
-
-        private ITransportServer CreateWebSocketServer()
-        {
-            var webSocketServer = new WebSocketTransmissionServer(_workingDir);
-            return new TransportServer(webSocketServer, DefaultTransportSerializationProvider);
+            try
+            {
+                await Task.WhenAll(_brokerProcessor.Completion, _appLifecycleManager.Completion);
+            }
+            finally
+            {
+                await Task.WhenAll(_transportServers.Select(x => x.StopAsync())).ConfigureAwait(false);
+            }
         }
     }
 }

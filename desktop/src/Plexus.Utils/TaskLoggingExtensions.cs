@@ -24,8 +24,9 @@ namespace Plexus
     public static class TaskLoggingExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void IgnoreAwait(this Task task, ILogger log)
+        public static void IgnoreAwait(this Task task, ILogger log = null)
         {
+            log = log ?? NoopLogger.Instance;
             task.IgnoreAwait(log, "Exception in non-awaited task");
         }
 
