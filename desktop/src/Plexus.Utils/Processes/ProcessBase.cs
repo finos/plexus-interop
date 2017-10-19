@@ -80,9 +80,9 @@ namespace Plexus.Processes
                 _completion.TryComplete();
                 return;
             }
-            Log.Debug("Starting");
+            Log.Debug("Starting process");
             _startCompletion.Task.ContinueWithSynchronously(
-                t => Log.Trace("Process start task completed in state {0}", t.GetCompletionDescription()),
+                t => Log.Trace("Start of process completed in state {0}", t.GetCompletionDescription()),
                 CancellationToken.None);
             var startTask = TaskRunner.RunInBackground(StartCoreAsync, StopToken);
             startTask
