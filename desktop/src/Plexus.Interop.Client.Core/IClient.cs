@@ -27,9 +27,11 @@
 
         UniqueId ConnectionId { get; }
 
-        Task Completion { get; }
+        Task Completion { get; }        
 
         Task ConnectAsync();
+
+        void Disconnect();
 
         Task DisconnectAsync();
     }

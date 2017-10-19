@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 /**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -14,10 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace Plexus
 {
@@ -208,17 +208,33 @@ namespace Plexus
             var log = (ILogger)state;
             if (task.IsCanceled)
             {
-                log.Debug("Canceled");
+                log.Trace("Canceled");
             }
             else if (task.IsFaulted)
             {
-                log.Debug("Faulted: {0}", task.Exception.ExtractInner().FormatTypeAndMessage());
+                log.Trace("Faulted: {0}", task.Exception.ExtractInner().FormatTypeAndMessage());
             }
             else
             {
-                log.Debug("Completed");
+                log.Trace("Completed");
             }
             return task;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string GetCompletionDescription(this Task task)
+        {
+            if (!task.IsCompleted)
+            {
+                return "NOT Completed";
+            }
+            if (task.IsCanceled)
+            {
+                return "Canceled";
+            }
+            return task.IsFaulted 
+                ? $"Faulted: {task.Exception.ExtractInner().FormatTypeAndMessage()}" 
+                : "Completed";
         }
     }
 }

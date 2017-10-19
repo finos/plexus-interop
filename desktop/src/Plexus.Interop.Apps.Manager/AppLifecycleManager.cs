@@ -29,19 +29,25 @@ namespace Plexus.Interop.Apps
 
     public sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager
     {        
-        private static readonly ILogger Log = LogManager.GetLogger<AppLifecycleManager>();
-
-        private IClient _client;
-        private readonly string _metadataDir;
+        private readonly IClient _client;
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.CreateDefault();
         private readonly NativeAppLauncher _nativeAppLauncher;
-        private AppsDto _appsDto;
+        private readonly AppsDto _appsDto;
 
         public AppLifecycleManager(string metadataDir)
         {
-            _metadataDir = metadataDir;
-            _nativeAppLauncher = new NativeAppLauncher(_metadataDir, _jsonSerializer);
+            _nativeAppLauncher = new NativeAppLauncher(metadataDir, _jsonSerializer);
+            _appsDto = AppsDto.Load(Path.Combine(metadataDir, "apps.json"));
+            _client = ClientFactory.Instance.Create(
+                new ClientOptionsBuilder()
+                    .WithDefaultConfiguration(Directory.GetCurrentDirectory())
+                    .WithApplicationId("interop.AppLifecycleManager")
+                    .Build());
+            OnStop(_nativeAppLauncher.Stop);
+            OnStop(_client.Disconnect);
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();
 
         public async ValueTask<UniqueId> LaunchAsync(string appId)
         {
@@ -98,15 +104,13 @@ namespace Plexus.Interop.Apps
 
         protected override async Task<Task> StartCoreAsync()
         {
-            _appsDto = AppsDto.Load(Path.Combine(_metadataDir, "apps.json"));
-            _client = ClientFactory.Instance.Create(
-                new ClientOptionsBuilder()
-                    .WithDefaultConfiguration(Directory.GetCurrentDirectory())
-                    .WithApplicationId("interop.AppLifecycleManager")
-                    .Build());
             await _client.ConnectAsync().ConfigureAwait(false);
-            Log.Debug("Connected");
-            return _client.Completion;
+            return ProcessAsync();
+        }
+
+        private Task ProcessAsync()
+        {
+            return Task.WhenAll(_client.Completion, _nativeAppLauncher.Completion);
         }
     }
 }

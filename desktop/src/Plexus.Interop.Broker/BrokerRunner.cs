@@ -16,6 +16,7 @@
  */
 namespace Plexus.Interop.Broker
 {
+    using System;
     using Plexus.Interop.Apps;
     using Plexus.Interop.Metamodel;
     using Plexus.Interop.Metamodel.Json;
@@ -32,7 +33,6 @@ namespace Plexus.Interop.Broker
 
     public sealed class BrokerRunner : ProcessBase
     {
-        private static readonly ILogger Log = LogManager.GetLogger<BrokerRunner>();
         private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider = new ProtobufTransportProtocolSerializationProvider();
         private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider = new ProtobufProtocolSerializerFactory();
 
@@ -41,19 +41,26 @@ namespace Plexus.Interop.Broker
         private readonly BrokerProcessor _brokerProcessor;
         private readonly AppLifecycleManager _appLifecycleManager;
 
+        protected override ILogger Log { get; } = LogManager.GetLogger<BrokerRunner>();
+
         public BrokerRunner(string metadataDir = null, IRegistryProvider registryProvider = null)
         {
             _workingDir = Directory.GetCurrentDirectory();
             metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
             registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
-            _transportServer = new CompositeTransportServer(new[] { CreateNamedPipeServer(), CreateWebSocketServer() });
-            _appLifecycleManager = new AppLifecycleManager(metadataDir);
-            OnStop(_appLifecycleManager.Stop);
+            _transportServer = new CompositeTransportServer(
+                new Func<ITransportServer>[]
+                {
+                    CreateNamedPipeServer, CreateWebSocketServer
+                });
+            _appLifecycleManager = new AppLifecycleManager(metadataDir);            
             _brokerProcessor = new BrokerProcessor(
-                _transportServer,
+                _transportServer.In,
                 registryProvider,
                 DefaultProtocolSerializationProvider,
                 _appLifecycleManager);
+            OnStop(_transportServer.Stop);
+            OnStop(_appLifecycleManager.Stop);
         }
 
         protected override async Task<Task> StartCoreAsync()
@@ -68,16 +75,9 @@ namespace Plexus.Interop.Broker
             return ProcessAsync();
         }
 
-        private async Task ProcessAsync()
+        private Task ProcessAsync()
         {
-            try
-            {
-                await _brokerProcessor.Completion.ConfigureAwait(false);
-            }
-            finally
-            {
-                await _appLifecycleManager.StopAsync().IgnoreExceptions().ConfigureAwait(false);
-            }
+            return Task.WhenAll(_brokerProcessor.Completion, _appLifecycleManager.Completion);
         }
 
         private ITransportServer CreateNamedPipeServer()

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Processes
+namespace Plexus.Processes
 {
     using System;
     using System.Collections.Concurrent;
@@ -31,6 +31,8 @@
 
         private readonly ConcurrentBag<CancellationTokenRegistration> _registrations 
             = new ConcurrentBag<CancellationTokenRegistration>();
+
+        protected virtual ILogger Log { get; } = NoopLogger.Instance;
 
         public Task Completion => _completion.Task;
 
@@ -54,7 +56,18 @@
         {
             if (!_started.TryEnter())
             {
+                Log.Trace("Start called after process was already started");
                 return;
+            }
+            Log.Trace("Starting");
+            if (!ReferenceEquals(Log, NoopLogger.Instance))
+            {                
+                _startCompletion.Task.ContinueWithSynchronously(
+                    t => Log.Trace("Process start task completed in state {0}", t.GetCompletionDescription()),
+                    CancellationToken.None);
+                _completion.Task.ContinueWithSynchronously(
+                    t => Log.Trace("Process completed in state {0}", t.GetCompletionDescription()),
+                    CancellationToken.None);
             }
             var startTask = TaskRunner.RunInBackground(StartCoreAsync, StopToken);
             startTask
@@ -79,6 +92,7 @@
             {
                 return;
             }
+            Log.Trace("Stopping");
             _stopCancellation.Cancel();
             Start();
         }
@@ -91,6 +105,7 @@
 
         public void Dispose()
         {
+            Log.Trace("Disposing");
             StopAsync().GetResult();
             while (_registrations.TryPeek(out var registration))
             {
@@ -101,6 +116,7 @@
 
         protected void SetStartCompleted()
         {
+            Log.Trace("Setting start completed");
             _startCompletion.TryComplete();
         }
     }

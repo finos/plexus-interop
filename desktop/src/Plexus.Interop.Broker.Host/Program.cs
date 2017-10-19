@@ -17,46 +17,36 @@
 namespace Plexus.Interop.Broker.Host
 {
     using Plexus.Host;
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
     public sealed class Program : IProgram
     {
         private static readonly ILogger Log = LogManager.GetLogger<Program>();
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private int _stoped;
-        private BrokerRunner _brokerRunner;        
+        private BrokerRunner _brokerRunner;
 
         public async Task<Task> StartAsync(string[] args)
         {
             var brokerArgs = BrokerArguments.Parse(args);
-            try
+            _brokerRunner = new BrokerRunner(brokerArgs.MetadataDir);
+            if (_stoped == 1)
             {
-                _brokerRunner = new BrokerRunner(brokerArgs.MetadataDir);
-                if (_stoped == 1)
-                {
-                    return Task.FromResult(0);
-                }
-                await _brokerRunner.StartAsync().ConfigureAwait(false);
-                Log.Debug("Broker process started");
-                return _brokerRunner.Completion;
+                return Task.FromResult(0);
             }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Terminated with exception");
-                return Task.FromResult(1);
-            }
+            await _brokerRunner.StartAsync().ConfigureAwait(false);
+            Log.Debug("Broker process started");
+            return _brokerRunner.Completion;
         }
 
         public async Task ShutdownAsync()
         {
-            Log.Debug("Shutting down");
-            _cancellation.Cancel();
             if (Interlocked.Exchange(ref _stoped, 1) == 0 && _brokerRunner != null)
             {
-                await _brokerRunner.Completion.IgnoreExceptions().ConfigureAwait(false);
+                Log.Debug("Shutting down");
+                _brokerRunner.Stop();
+                await _brokerRunner.Completion.ConfigureAwait(false);
             }
         }
     }

@@ -29,9 +29,7 @@ namespace Plexus.Interop.Broker
     using System.Threading.Tasks;
 
     public sealed class BrokerProcessor : ProcessBase
-    {
-        private static readonly ILogger Log = LogManager.GetLogger<BrokerProcessor>();
-
+    {        
         private static readonly IProtocolMessageFactory DefaultProtocolMessageFactory = ProtocolMessagePool.Instance;
 
         private readonly ConcurrentDictionary<UniqueId, ITransportConnection> _activeConnections
@@ -56,6 +54,8 @@ namespace Plexus.Interop.Broker
             _authenticationHandler = new AuthenticationHandler(connectionTracker, protocol, registryService);
             _clientRequestHandler = new ClientRequestHandler(connectionTracker, protocol, registryService);
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<BrokerProcessor>();
 
         protected override Task<Task> StartCoreAsync()
         {

@@ -25,7 +25,6 @@ namespace Plexus.Interop.Internal.Calls
     internal sealed class UnaryMethodCall<TRequest, TResponse> 
         : ProcessBase, IUnaryMethodCall<TResponse>, IUnaryMethodCall
     {
-        private static readonly ILogger Log = LogManager.GetLogger<UnaryMethodCall<TRequest, TResponse>>();
         private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private TResponse _response;
@@ -40,6 +39,8 @@ namespace Plexus.Interop.Internal.Calls
                 return _response;
             });
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<UnaryMethodCall<TRequest, TResponse>>();
 
         public Task<TResponse> ResponseAsync { get; }
 

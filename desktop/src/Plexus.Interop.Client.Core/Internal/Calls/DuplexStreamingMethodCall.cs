@@ -26,7 +26,6 @@ namespace Plexus.Interop.Internal.Calls
     internal sealed class DuplexStreamingMethodCall<TRequest, TResponse> : 
         ProcessBase, IDuplexStreamingMethodCall<TRequest, TResponse>
     {
-        private static readonly ILogger Log = LogManager.GetLogger<DuplexStreamingMethodCall<TRequest, TResponse>>();
         private readonly IChannel<TRequest> _requestStream = new BufferedChannel<TRequest>(1);
         private readonly IChannel<TResponse> _responseStream = new BufferedChannel<TResponse>(1);
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
@@ -37,6 +36,8 @@ namespace Plexus.Interop.Internal.Calls
             _invocationFactory = invocationFactory;
             Completion.LogCompletion(Log);
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<DuplexStreamingMethodCall<TRequest, TResponse>>();
 
         public IReadOnlyChannel<TResponse> ResponseStream => _responseStream.In;
 

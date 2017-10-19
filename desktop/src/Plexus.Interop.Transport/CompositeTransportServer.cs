@@ -14,39 +14,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Transport
 {
     using Plexus.Channels;
+    using Plexus.Processes;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Processes;
 
-    public sealed class CompositeTransportServer : ProcessBase, IReadOnlyChannel<ITransportConnection>
-    {        
-        private static readonly ILogger Log = LogManager.GetLogger<CompositeTransportServer>();
-
-        private readonly IReadOnlyCollection<ITransportServer> _servers;
+    public sealed class CompositeTransportServer : ProcessBase
+    {
+        private readonly IEnumerable<Func<ITransportServer>> _serverFactories;
         private readonly IChannel<ITransportConnection> _buffer = new BufferedChannel<ITransportConnection>(3);
 
-        public CompositeTransportServer(IEnumerable<ITransportServer> servers)
+        public CompositeTransportServer(IEnumerable<Func<ITransportServer>> serverFactories)
         {
-            _servers = servers.ToList();
+            _serverFactories = serverFactories.ToList();            
         }
+
+        public IReadOnlyChannel<ITransportConnection> In => _buffer.In;
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<CompositeTransportServer>();
 
         protected override async Task<Task> StartCoreAsync()
         {
-            Log.Debug("Starting");
-            var startTasks = _servers.Select(x => TaskRunner.RunInBackground(x.StartAsync)).ToArray();
+            var startTasks = _serverFactories.Select(StartServerAsync).ToArray();
             await Task.WhenAll(startTasks).IgnoreExceptions().ConfigureAwait(false);
-            return ProcessAsync();
+            var servers = startTasks.Where(t => t.Status == TaskStatus.RanToCompletion).Select(t => t.GetResult());
+            OnStop(() => _buffer.Out.TryCompleteWriting());
+            return ProcessAsync(servers);
         }
 
-        private async Task ProcessAsync()
+        private async Task<ITransportServer> StartServerAsync(Func<ITransportServer> factory)
         {
-            await Task.WhenAll(_servers.Select(ProcessAsync)).IgnoreExceptions();
+            ITransportServer server = null;
+            try
+            {
+                server = factory();
+                OnStop(server.Stop);
+                await server.StartAsync().ConfigureAwait(false);
+                return server;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Server {0} failed to start", server);
+                throw;
+            }
+        }
+
+        private async Task ProcessAsync(IEnumerable<ITransportServer> servers)
+        {
+            await Task.WhenAll(servers.Select(ProcessAsync)).IgnoreExceptions();
+            Log.Debug("All servers stopped");
             _buffer.Out.TryCompleteWriting();
         }
 
@@ -54,44 +74,30 @@
         {
             try
             {
-                while (true)
-                {
-                    var result = await server.In.TryReadAsync().ConfigureAwait(false);
-                    if (!result.HasValue)
-                    {
-                        break;
-                    }
-                    var connection = result.Value;
-                    try
-                    {
-                        if (!await _buffer.Out.TryWriteAsync(connection).ConfigureAwait(false))
-                        {
-                            connection.TryTerminate();
-                            break;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        connection.TryTerminate(ex);
-                        throw;
-                    }
-                }
+                await server.In.ConsumeAsync(ProcessAsync).ConfigureAwait(false);
+                Log.Debug("Server completed: {0}", server);
+            }
+            catch (OperationCanceledException) when (StopToken.IsCancellationRequested)
+            {
+                Log.Debug("Server stopped: {0}", server);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Exception while server listening {0}", server);
+                Log.Error(ex, "Exception on server listening {0}", server);
+            }            
+        }
+
+        private async Task ProcessAsync(ITransportConnection connection)
+        {
+            try
+            {
+                await _buffer.Out.WriteAsync(connection).ConfigureAwait(false);
             }
-            Log.Debug("Server listening stopped: {0}", server);
-        }
-
-        public Task<bool> WaitReadAvailableAsync(CancellationToken cancellationToken = default)
-        {
-            return _buffer.In.WaitReadAvailableAsync(cancellationToken);
-        }
-
-        public bool TryRead(out ITransportConnection item)
-        {
-            return _buffer.In.TryRead(out item);
+            catch (Exception ex)
+            {
+                connection.TryTerminate(ex);
+                throw;
+            }
         }
     }
 }

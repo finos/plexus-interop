@@ -25,8 +25,6 @@ namespace Plexus.Interop.Apps.Internal
 
     internal sealed class NativeAppLauncher : ProcessBase
     {
-        private static readonly ILogger Log = LogManager.GetLogger<NativeAppLauncher>();
-
         private readonly SubProcessLauncher _subProcessLauncher;
         private readonly string _cmdBasePath;
         private readonly JsonSerializer _jsonSerializer;
@@ -43,6 +41,8 @@ namespace Plexus.Interop.Apps.Internal
             _subProcessLauncher = new SubProcessLauncher();
             _jsonSerializer = jsonSerializer;
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<NativeAppLauncher>();
 
         protected override async Task<Task> StartCoreAsync()
         {

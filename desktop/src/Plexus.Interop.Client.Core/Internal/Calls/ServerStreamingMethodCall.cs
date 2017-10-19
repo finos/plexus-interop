@@ -25,8 +25,7 @@ namespace Plexus.Interop.Internal.Calls
 
     internal sealed class ServerStreamingMethodCall<TRequest, TResponse> 
         : ProcessBase, IServerStreamingMethodCall<TResponse>
-    {
-        private static readonly ILogger Log = LogManager.GetLogger<ServerStreamingMethodCall<TRequest, TResponse>>();
+    {        
         private readonly BufferedChannel<TResponse> _responseStream = new BufferedChannel<TResponse>(1);
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
@@ -37,6 +36,8 @@ namespace Plexus.Interop.Internal.Calls
             _invocationFactory = invocationFactory;
             _responseStream.PropagateCompletionFrom(Completion);
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<ServerStreamingMethodCall<TRequest, TResponse>>();
 
         public IReadOnlyChannel<TResponse> ResponseStream => _responseStream;
 

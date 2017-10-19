@@ -70,6 +70,8 @@ namespace Plexus.Interop.Internal
 
         public Task ConnectAsync() => StartAsync();
 
+        public void Disconnect() => Stop();
+
         public Task DisconnectAsync() => StopAsync();
 
         public IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request)
