@@ -64,15 +64,13 @@ namespace Plexus.Interop.Transport.Transmission.Streams
             {
                 try
                 {
-                    await _writer.Completion.ConfigureAwait(false);
-                    _log.Trace("Writing completed");
+                    await Task.WhenAny(_writer.Completion, _reader.In.Completion).ConfigureAwait(false);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    _log.Trace("Writing failed: {0}", ex.FormatTypeAndMessage());
-                    _reader.Cancel();
+                    _cancellation.Cancel();
                 }
-                await Task.WhenAll(_writer.Completion, _reader.Completion).ConfigureAwait(false);
+                await Task.WhenAll(_writer.Completion, _reader.In.Completion).ConfigureAwait(false);
                 _log.Trace("Processing completed. Disposing stream.");
             }
         }

@@ -26,18 +26,11 @@
             _log = LogManager.GetLogger<StreamTransmissionReader>(id.ToString());
             _stream = stream;
             _cancellationToken = cancellationToken;
-            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
+            _buffer.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            _buffer.Out.Completion.LogCompletion(_log);
         }
-
-        public Task Completion { get; }
 
         public IReadOnlyChannel<IPooledBuffer> In => _buffer.In;
-
-        public void Cancel()
-        {
-            _log.Trace("Terminating writing");
-            _buffer.Out.TryTerminateWriting();
-        }
 
         private async Task ProcessAsync()
         {
@@ -72,6 +65,7 @@
             }
             catch (Exception ex)
             {
+                _log.Trace("Process failed: {0}", ex.FormatTypeAndMessage());
                 _buffer.Out.TryTerminateWriting(ex);
                 _buffer.In.DisposeBufferedItems();
                 throw;
@@ -80,7 +74,11 @@
 
         private async Task<int> ReadLengthAsync()
         {
+#if NETSTANDARD1_3
             var length = await _stream.ReadAsync(_lengthBuffer, 0, 2, _cancellationToken).ConfigureAwait(false);
+#else
+            var length = await _stream.ReadAsync(_lengthBuffer, 0, 2, _cancellationToken).WithCancellation(_cancellationToken).ConfigureAwait(false);
+#endif
             if (length != 2)
             {
                 throw new InvalidOperationException("Stream completed unexpectedly");

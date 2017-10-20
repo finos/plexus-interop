@@ -62,9 +62,17 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                     var connection = await StreamTransmissionConnection
                         .CreateAsync(UniqueId.Generate(), AcceptStreamAsync)
                         .ConfigureAwait(false);
-                    await _buffer.Out
-                        .WriteAsync(connection, StopToken)
-                        .ConfigureAwait(false);
+                    try
+                    {
+                        await _buffer.Out
+                            .WriteAsync(connection, StopToken)
+                            .ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                        await connection.DisconnectAsync().IgnoreExceptions().ConfigureAwait(false);
+                        throw;
+                    }
                 }
             }
         }
@@ -82,8 +90,9 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             {
                 await WaitForConnectionAsync(pipeServerStream, StopToken).ConfigureAwait(false);
             }
-            catch
+            catch (Exception ex)
             {
+                _log.Trace("Waiting for new connection failed: {0}", ex.FormatTypeAndMessage());
                 pipeServerStream.Dispose();
                 throw;
             }
@@ -92,15 +101,23 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
         }
 
 #if NET452
-        private static async Task WaitForConnectionAsync(NamedPipeServerStream pipeServerStream,
+        private static async Task WaitForConnectionAsync(
+            NamedPipeServerStream pipeServerStream,
             CancellationToken cancellationToken)
         {
-            using (cancellationToken.Register(pipeServerStream.Dispose))
+            try
             {
-                await Task.Factory.FromAsync(
-                    pipeServerStream.BeginWaitForConnection,
-                    pipeServerStream.EndWaitForConnection, 
-                    null);
+                await Task.Factory
+                    .FromAsync(
+                        pipeServerStream.BeginWaitForConnection,
+                        pipeServerStream.EndWaitForConnection,
+                        null)
+                    .WithCancellation(cancellationToken);
+            }
+            catch
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                throw;
             }
         }
 #else
