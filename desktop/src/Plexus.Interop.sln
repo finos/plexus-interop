@@ -137,6 +137,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Apps.Manager
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Samples.Metadata", "Plexus.Interop.Samples.Metadata\Plexus.Interop.Samples.Metadata.csproj", "{F2B5D2A5-AF4D-4356-A023-FA8B589DEE13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.CommandLineTool", "Plexus.Interop.CommandLineTool\Plexus.Interop.CommandLineTool.csproj", "{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{ada01827-8218-4182-ad83-a25fc36ddd95}*SharedItemsImports = 13
@@ -762,6 +764,18 @@ Global
 		{F2B5D2A5-AF4D-4356-A023-FA8B589DEE13}.Release|x64.Build.0 = Release|Any CPU
 		{F2B5D2A5-AF4D-4356-A023-FA8B589DEE13}.Release|x86.ActiveCfg = Release|Any CPU
 		{F2B5D2A5-AF4D-4356-A023-FA8B589DEE13}.Release|x86.Build.0 = Release|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Debug|x64.Build.0 = Debug|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Debug|x86.Build.0 = Debug|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Release|x64.ActiveCfg = Release|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Release|x64.Build.0 = Release|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Release|x86.ActiveCfg = Release|Any CPU
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -819,6 +833,7 @@ Global
 		{843B6A56-9564-4739-9E5D-D684BD6DB489} = {441CC140-366E-46D6-B294-3E9DA10809B4}
 		{02458864-185B-402F-A945-E9766395EF21} = {D183E4A6-8BB1-4E52-9B5B-8BDB7770B5C5}
 		{F2B5D2A5-AF4D-4356-A023-FA8B589DEE13} = {441CC140-366E-46D6-B294-3E9DA10809B4}
+		{0DBE22B8-BB9B-46B6-BF02-8E1345989D0E} = {D183E4A6-8BB1-4E52-9B5B-8BDB7770B5C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {42E89A57-F634-4DB0-B861-EC0B713FE368}

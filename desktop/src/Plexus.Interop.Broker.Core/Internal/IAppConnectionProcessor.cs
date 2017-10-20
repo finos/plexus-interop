@@ -18,7 +18,7 @@
 {
     using System.Threading.Tasks;
 
-    internal interface IClientConnectionProcessor
+    internal interface IAppConnectionProcessor
     {
         UniqueId Id { get; }
 

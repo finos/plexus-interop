@@ -14,24 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Broker.Internal
+namespace Plexus.Interop.Apps.Internal
 {
-    using Plexus.Channels;
-    using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Plexus.Channels;
+    using Plexus.Interop.Apps;
+    using Plexus.Interop.Transport;
 
-    internal sealed class ClientConnection : IClientConnection
+    internal sealed class AppConnection : IAppConnection
     {
         private readonly ILogger _log;
         private readonly ITransportConnection _connection;
 
-        public ClientConnection(ITransportConnection connection, ClientConnectionDescriptor clientInfo)
+        public AppConnection(ITransportConnection connection, AppConnectionDescriptor appInfo)
         {
             Id = connection.Id;
-            _log = LogManager.GetLogger<ClientConnection>(Id.ToString());
-            Info = clientInfo;
+            _log = LogManager.GetLogger<AppConnection>(Id.ToString());
+            Info = appInfo;
             _connection = connection;
             Completion = TaskRunner.RunInBackground(ProcessAsync);
         }
@@ -56,7 +57,7 @@ namespace Plexus.Interop.Broker.Internal
 
         public UniqueId Id { get; }
 
-        public ClientConnectionDescriptor Info { get; }
+        public AppConnectionDescriptor Info { get; }
 
         public Task Completion { get; }
 
@@ -69,13 +70,13 @@ namespace Plexus.Interop.Broker.Internal
 
         public override bool Equals(object obj)
         {
-            return obj is ClientConnection connection &&
-                   EqualityComparer<ClientConnectionDescriptor>.Default.Equals(Info, connection.Info);
+            return obj is AppConnection connection &&
+                   EqualityComparer<AppConnectionDescriptor>.Default.Equals(Info, connection.Info);
         }
 
         public override int GetHashCode()
         {
-            return 1340155117 + EqualityComparer<ClientConnectionDescriptor>.Default.GetHashCode(Info);
+            return 1340155117 + EqualityComparer<AppConnectionDescriptor>.Default.GetHashCode(Info);
         }
 
         public bool TryTerminate(Exception error = null)

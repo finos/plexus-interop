@@ -12,7 +12,7 @@
 			]
 		},
 		{
-			"id": "interop.InteropService",
+			"id": "interop.AppLifecycleService",
 			"methods": [
 				{
 					"name": "ActivateApp",
@@ -37,32 +37,9 @@
 				}
 		     ],
 		     "provides": [
-		     ]
-		  },
-		{
-			"id": "interop.CommandLineTool",
-			"consumes": [
-				{
-					"service": "interop.InteropService",
-					"from": [
-						"interop.InteropManager"
-					],
-					"methods": [
-						"ActivateApp"
-					]
-				}
-		     ],
-		     "provides": [
-		     ]
-		  },
-		{
-			"id": "interop.InteropManager",
-			"consumes": [
-		     ],
-		     "provides": [
 		     	{
-		     		"service": "interop.InteropService",
-		     		"title": "InteropService",
+		     		"service": "interop.AppLifecycleService",
+		     		"title": "AppLifecycleService",
 		     		"to": [
 		     		],
 		     		"methods": [
@@ -72,6 +49,22 @@
 		     			}
 		     		]
 		     	}
+		     ]
+		  },
+		{
+			"id": "interop.CommandLineTool",
+			"consumes": [
+				{
+					"service": "interop.AppLifecycleService",
+					"from": [
+						"interop.AppLifecycleManager"
+					],
+					"methods": [
+						"ActivateApp"
+					]
+				}
+		     ],
+		     "provides": [
 		     ]
 		  },
 		{

@@ -23,32 +23,33 @@
     using Plexus.Interop.Transport;
     using System;
     using System.Threading.Tasks;
+    using Plexus.Interop.Apps;
 
     internal sealed class ClientRequestHandler : IClientRequestHandler
     {
         private static readonly ILogger Log = LogManager.GetLogger<ClientRequestHandler>();
 
         private readonly IProtocolSerializer _protocolSerializer;
-        private readonly ClientToBrokerRequestHandler<Task, (IClientConnection, ITransportChannel)> _clientToBrokerRequestHandler;
+        private readonly ClientToBrokerRequestHandler<Task, (IAppConnection, ITransportChannel)> _clientToBrokerRequestHandler;
         private readonly IDiscoveryRequestHandler _discoveryRequestHandler;
         private readonly IInvocationRequestHandler _invocationRequestHandler;
 
         public ClientRequestHandler(
-            IClientConnectionTracker clientConnectionTracker,
+            IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
             IRegistryService registryService)
         {
             _protocolSerializer = protocol.Serializer;
-            _discoveryRequestHandler = new DiscoveryRequestHandler(clientConnectionTracker, protocol, registryService);
-            _invocationRequestHandler = new InvocationRequestHandler(clientConnectionTracker, protocol, registryService);
+            _discoveryRequestHandler = new DiscoveryRequestHandler(appLifecycleManager, protocol, registryService);
+            _invocationRequestHandler = new InvocationRequestHandler(appLifecycleManager, protocol, registryService);
             _clientToBrokerRequestHandler =
-                new ClientToBrokerRequestHandler<Task, (IClientConnection, ITransportChannel)>(
+                new ClientToBrokerRequestHandler<Task, (IAppConnection, ITransportChannel)>(
                     HandleInvocationAsync,
                     HandleDiscoveryAsync,
                     HandleDiscoveryAsync);
         }
 
-        public async Task HandleChannelAsync(IClientConnection connection, ITransportChannel channel)
+        public async Task HandleChannelAsync(IAppConnection connection, ITransportChannel channel)
         {
             try
             {
@@ -70,13 +71,13 @@
 
         private async Task HandleDiscoveryAsync(
             IServiceDiscoveryRequest request,
-            (IClientConnection SourceConnection, ITransportChannel SourceChannel) args)
+            (IAppConnection SourceConnection, ITransportChannel SourceChannel) args)
         {
             var (sourceConnection, sourceChannel) = args;
             await _discoveryRequestHandler.HandleAsync(request, sourceConnection, sourceChannel).ConfigureAwait(false);
         }
 
-        private async Task HandleDiscoveryAsync(IMethodDiscoveryRequest request, (IClientConnection, ITransportChannel) args)
+        private async Task HandleDiscoveryAsync(IMethodDiscoveryRequest request, (IAppConnection, ITransportChannel) args)
         {
             var (sourceConnection, sourceChannel) = args;
             await _discoveryRequestHandler.HandleAsync(request, sourceConnection, sourceChannel).ConfigureAwait(false);
@@ -84,7 +85,7 @@
 
         private async Task HandleInvocationAsync(
             IInvocationStart request,
-            (IClientConnection SourceConnection, ITransportChannel SourceChannel) args)
+            (IAppConnection SourceConnection, ITransportChannel SourceChannel) args)
         {
             var (sourceConnection, sourceChannel) = args;
             await _invocationRequestHandler.HandleAsync(request, sourceConnection, sourceChannel).ConfigureAwait(false);

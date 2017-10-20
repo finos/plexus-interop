@@ -15,10 +15,12 @@
 // limitations under the License.
 //
 
-import "interop/InteropService.proto";
+import "interop/AppLifecycleService.proto";
 
 package interop;
 
 application CommandLineTool {
-	consumes InteropService from interop.InteropManager { ActivateApp; }
+
+	consumes AppLifecycleService from interop.AppLifecycleManager { ActivateApp; }
+
 }

@@ -21,20 +21,21 @@ namespace Plexus.Interop.Broker.Internal
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Plexus.Interop.Apps;
 
-    internal sealed class ClientConnectionProcessor : IClientConnectionProcessor
+    internal sealed class AppConnectionProcessor : IAppConnectionProcessor
     {
         private readonly ILogger _log;
 
-        private readonly IClientConnection _connection;
+        private readonly IAppConnection _connection;
         private readonly IClientRequestHandler _clientRequestHandler;
         private readonly HashSet<Task> _runnningTasks = new HashSet<Task>();
 
-        public ClientConnectionProcessor(IClientConnection connection, IClientRequestHandler clientRequestHandler)
+        public AppConnectionProcessor(IAppConnection connection, IClientRequestHandler clientRequestHandler)
         {
             _connection = connection;
             Id = _connection.Id;
-            _log = LogManager.GetLogger<ClientConnectionProcessor>(Id.ToString());
+            _log = LogManager.GetLogger<AppConnectionProcessor>(Id.ToString());
             _clientRequestHandler = clientRequestHandler;
             Completion = TaskRunner.RunInBackground(ProcessAsync);
         }

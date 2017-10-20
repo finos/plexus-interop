@@ -23,7 +23,7 @@ namespace Plexus.Interop.Apps.Internal
     using System.IO;
     using System.Threading.Tasks;
 
-    internal sealed class NativeAppLauncher : ProcessBase
+    internal sealed class NativeAppLauncherClient : ProcessBase
     {
         private readonly SubProcessLauncher _subProcessLauncher;
         private readonly string _cmdBasePath;
@@ -32,7 +32,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public Plexus.UniqueId Id { get; }
 
-        public NativeAppLauncher(
+        public NativeAppLauncherClient(
             string cmdBasePath, 
             JsonSerializer jsonSerializer)
         {
@@ -42,7 +42,7 @@ namespace Plexus.Interop.Apps.Internal
             _jsonSerializer = jsonSerializer;
         }
 
-        protected override ILogger Log { get; } = LogManager.GetLogger<NativeAppLauncher>();
+        protected override ILogger Log { get; } = LogManager.GetLogger<NativeAppLauncherClient>();
 
         protected override async Task<Task> StartCoreAsync()
         {

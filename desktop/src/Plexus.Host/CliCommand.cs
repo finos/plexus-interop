@@ -6,5 +6,6 @@
         Broker,
         Stop,
         Load,
+        Activate,
     }
 }

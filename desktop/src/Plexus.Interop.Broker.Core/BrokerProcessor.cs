@@ -36,7 +36,6 @@ namespace Plexus.Interop.Broker
             = new ConcurrentDictionary<UniqueId, ITransportConnection>();
 
         private readonly IReadOnlyChannel<ITransportConnection> _incomingConnections;
-        private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly AuthenticationHandler _authenticationHandler;
         private readonly ClientRequestHandler _clientRequestHandler;
 
@@ -44,13 +43,11 @@ namespace Plexus.Interop.Broker
             IReadOnlyChannel<ITransportConnection> incomingConnections,
             IRegistryProvider registryProvider,
             IProtocolSerializerFactory serializerFactory,
-            IAppLifecycleManager appLifecycleManager)
+            IAppLifecycleManager connectionTracker)
         {
             _incomingConnections = incomingConnections;
-            _appLifecycleManager = appLifecycleManager;
             var registryService = new RegistryService(registryProvider);
             var protocol = new ProtocolImplementation(DefaultProtocolMessageFactory, serializerFactory);
-            var connectionTracker = new ClientConnectionTracker(appLifecycleManager);
             _authenticationHandler = new AuthenticationHandler(connectionTracker, protocol, registryService);
             _clientRequestHandler = new ClientRequestHandler(connectionTracker, protocol, registryService);
         }
@@ -59,15 +56,7 @@ namespace Plexus.Interop.Broker
 
         protected override Task<Task> StartCoreAsync()
         {
-            TaskRunner.RunInBackground(LaunchBuiltInAppsAsync).IgnoreAwait(Log, "Exception while launching built-in apps");
             return Task.FromResult(ProcessAsync());
-        }
-
-        private Task LaunchBuiltInAppsAsync()
-        {
-            return Task.WhenAll(
-                _appLifecycleManager.LaunchAsync("interop.AppLifecycleManager").AsTask(),
-                _appLifecycleManager.LaunchAsync("interop.NativeAppLauncher").AsTask());
         }
 
         private async Task ProcessAsync()
@@ -127,7 +116,7 @@ namespace Plexus.Interop.Broker
             Log.Debug("Accepting new incoming connection {0}", transportConnection.Id);
             var clientConnection = await _authenticationHandler.HandleAsync(transportConnection).ConfigureAwait(false);
             Log.Debug("Incoming connection accepted: {0}", clientConnection);
-            var clientConnectionProcessor = new ClientConnectionProcessor(clientConnection, _clientRequestHandler);
+            var clientConnectionProcessor = new AppConnectionProcessor(clientConnection, _clientRequestHandler);
             await clientConnectionProcessor.Completion.ConfigureAwait(false);
         }
 

@@ -64,7 +64,7 @@ namespace Plexus.Interop.Transport.Transmission.Streams
             {
                 try
                 {
-                    await Task.WhenAny(_writer.Completion, _reader.In.Completion).ConfigureAwait(false);
+                    await Task.WhenAny(_writer.Completion, _reader.In.Completion).Unwrap().ConfigureAwait(false);
                 }
                 catch
                 {
@@ -80,10 +80,12 @@ namespace Plexus.Interop.Transport.Transmission.Streams
             _log.Trace("Disconnecting");
             _cancellation.Cancel();
             await Completion.IgnoreExceptions().ConfigureAwait(false);
+            _log.Trace("Disconnected");
         }
 
         public void Dispose()
         {
+            _log.Trace("Disposing");
             DisconnectAsync().GetResult();
         }
 

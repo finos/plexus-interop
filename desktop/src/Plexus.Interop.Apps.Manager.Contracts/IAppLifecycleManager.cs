@@ -18,11 +18,20 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Plexus.Interop.Transport;
 
     public interface IAppLifecycleManager
     {
-        ValueTask<UniqueId> LaunchAsync(string appId);
+        IAppConnection AcceptConnection(
+            ITransportConnection connection,
+            AppConnectionDescriptor info);
 
-        IEnumerable<string> GetAvailableApps(IEnumerable<string> appIds);
+        bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection);
+
+        Task<IAppConnection> SpawnConnectionAsync(string appId);
+
+        ValueTask<IAppConnection> GetOrSpawnConnectionAsync(IReadOnlyCollection<string> appId);
+
+        IReadOnlyCollection<IAppConnection> GetOnlineConnections();
     }
 }

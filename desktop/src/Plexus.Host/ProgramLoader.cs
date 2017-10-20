@@ -138,7 +138,6 @@
                 _log.Warn("Exiting because the attached parent process \"{0}\" ({1}) exited with code {2}", parentProcess.ProcessName, parentProcess.Id, parentProcess.ExitCode);
                 _loggingInitializer?.Dispose();
                 Environment.Exit(1);
-
             }
             parentProcess.EnableRaisingEvents = true;
             parentProcess.Exited += (sender, args) =>
