@@ -25,7 +25,14 @@
 
         private async Task ProcessAsync(CommandLineToolArguments options)
         {
-            await Task.WhenAll(options.ApplicationIds.Select(ActivateAsync));
+            try
+            {
+                await Task.WhenAll(options.ApplicationIds.Select(ActivateAsync)).ConfigureAwait(false);
+            }
+            finally
+            {
+                await _client.StopAsync().ConfigureAwait(false);
+            }
         }
 
         private async Task ActivateAsync(string appId)
