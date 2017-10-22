@@ -31,7 +31,6 @@ namespace Plexus.Interop.Samples.GreetingServer
         {
             var logging = new LoggingInitializer();
             var log = LogManager.GetLogger<Program>();
-            var cancellation = new CancellationTokenSource();
             try
             {
                 var brokerPath = args.Length > 0 ? args[0] : Path.GetFullPath(@"../..");
@@ -56,10 +55,10 @@ namespace Plexus.Interop.Samples.GreetingServer
                 {
                     eventArgs.Cancel = true;
                     Console.WriteLine("Disconnecting");
-                    cancellation.Cancel();
+                    client.Disconnect();
                 };
                 await client.ConnectAsync().ConfigureAwait(false);
-                Console.WriteLine("Connected");
+                Console.WriteLine("Connected");                
                 await client.Completion;
                 Console.WriteLine("Disconnected");
             }
@@ -69,10 +68,6 @@ namespace Plexus.Interop.Samples.GreetingServer
                     ex.Message);
                 log.Error(ex, "Program terminated with exception");
                 logging.Dispose();
-            }
-            finally
-            {
-                cancellation.Dispose();
             }
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();

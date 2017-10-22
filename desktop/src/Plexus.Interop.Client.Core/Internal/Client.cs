@@ -181,7 +181,7 @@ namespace Plexus.Interop.Internal
 
         private async Task ProcessAsync()
         {
-            using (StopToken.Register(() => _connection.TryTerminate()))
+            using (StopToken.Register(() => _connection.TryComplete()))
             {
                 try
                 {
