@@ -21,13 +21,19 @@ namespace Plexus.Interop
     using Plexus.Interop.Transport;
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
+    using System;
+    using System.IO;
 
     public static class ClientOptionsBuilderExtensions
     {
         public static ClientOptionsBuilder WithDefaultConfiguration(
             this ClientOptionsBuilder builder, 
-            string brokerWorkingDir)
+            string brokerWorkingDir = null)
         {
+            if (brokerWorkingDir == null)
+            {
+                brokerWorkingDir = Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ?? Directory.GetCurrentDirectory();
+            }
             return builder
                 .WithMarshaller(
                     new ProtobufMarshallerProvider())

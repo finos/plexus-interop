@@ -22,78 +22,81 @@ namespace Plexus.Interop.Samples.GreetingClient
     using System;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
     public sealed class Program
-    {        
+    {
         public static async Task Main(string[] args)
         {
-            var logging = new LoggingInitializer();
-            var log = LogManager.GetLogger<Program>();
-            try
+            using (new LoggingInitializer())
             {
-                var brokerPath = args.Length > 0 ? args[0] : Path.GetFullPath(@"../..");
-                Console.WriteLine("Connecting to {0}", brokerPath);
-                var client = ClientFactory.Instance.Create(
-                    new ClientOptionsBuilder()
-                        .WithDefaultConfiguration(brokerPath)
-                        .WithApplicationId("interop.samples.GreetingClient")
-                        .Build());
+                var log = LogManager.GetLogger<Program>();
+                try
+                {
+                    var brokerPath = args.Length > 0
+                        ? args[0]
+                        : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ??
+                          Directory.GetCurrentDirectory();
+                    Console.WriteLine("Connecting to {0}", brokerPath);
+                    var client = ClientFactory.Instance.Create(
+                        new ClientOptionsBuilder()
+                            .WithDefaultConfiguration(brokerPath)
+                            .WithApplicationId("interop.samples.GreetingClient")
+                            .Build());
 
-                await client.ConnectAsync();
-                Console.WriteLine("Connected");
+                    await client.ConnectAsync();
+                    Console.WriteLine("Connected");
 
-                var nextCase = true;
-                while (nextCase)
+                    var nextCase = true;
+                    while (nextCase)
+                    {
+                        Console.WriteLine(
+                            "> Select next example:\n" +
+                            "> '1': Unary Call\n" +
+                            "> '2': Server Streaming Call\n" +
+                            "> '3': Client Streaming Call\n" +
+                            "> '4': Duplex Streaming Call\n" +
+                            "> '5': Discovery\n" +
+                            "> '0': Disconnect");
+                        var c = Console.ReadLine();
+                        switch (c)
+                        {
+                            case "1":
+                                await UnaryRequestExampleAsync(client);
+                                break;
+                            case "2":
+                                await ServerStreamingRequestExampleAsync(client);
+                                break;
+                            case "3":
+                                await ClientStreamingRequestExampleAsync(client);
+                                break;
+                            case "4":
+                                await DuplexStreamingRequestExampleAsync(client);
+                                break;
+                            case "5":
+                                await DiscoveryExampleAsync(client);
+                                break;
+                            case "0":
+                                nextCase = false;
+                                break;
+                            default:
+                                Console.WriteLine("Unknown command: {0}", c);
+                                break;
+                        }
+                    }
+                    Console.WriteLine("Disconnecting");
+                    client.Disconnect();
+                    await client.Completion;
+                    Console.WriteLine("Disconnected");
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine(
-                        "> Select next example:\n" +
-                        "> '1': Unary Call\n" +
-                        "> '2': Server Streaming Call\n" +
-                        "> '3': Client Streaming Call\n" +
-                        "> '4': Duplex Streaming Call\n" +
-                        "> '5': Discovery\n" +
-                        "> '0': Disconnect");
-                    var c = Console.ReadLine();
-                    switch (c)
-                    {
-                        case "1":
-                            await UnaryRequestExampleAsync(client);
-                            break;
-                        case "2":
-                            await ServerStreamingRequestExampleAsync(client);
-                            break;
-                        case "3":
-                            await ClientStreamingRequestExampleAsync(client);
-                            break;
-                        case "4":
-                            await DuplexStreamingRequestExampleAsync(client);
-                            break;
-                        case "5":
-                            await DiscoveryExampleAsync(client);
-                            break;
-                        case "0":
-                            nextCase = false;
-                            break;
-                        default:
-                            Console.WriteLine("Unknown command: {0}", c);
-                            break;
-                    }
+                        "Program terminated with exception. See log for details. {0}: {1}",
+                        ex.GetType(),
+                        ex.Message);
+                    log.Error(ex, "Program terminated with exception");
                 }
-                Console.WriteLine("Disconnecting");
-                client.Disconnect();
-                await client.Completion;
-                Console.WriteLine("Disconnected");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Program terminated with exception. See log for details. {0}: {1}", ex.GetType(), ex.Message);
-                log.Error(ex, "Program terminated with exception");                
-            }
-            finally
-            {
-                logging.Dispose();                
             }
             Console.WriteLine("> Press any key to exit...");
             Console.ReadKey();

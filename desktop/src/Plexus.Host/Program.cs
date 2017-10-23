@@ -70,7 +70,7 @@ namespace Plexus.Host
                         false,
                         "Directory to seek for metadata files: apps.json and interop.json");
 
-                    syntax.DefineCommand("activate", ref command, CliCommand.Activate, "Send command to activate app to the running broker");
+                    syntax.DefineCommand("activate", ref command, CliCommand.Activate, "Activate app in the running broker");
                     syntax.DefineOption(
                         "d|directory",
                         ref workingDir,

@@ -52,7 +52,7 @@
 
         public override string ToString()
         {
-            return $"{{{nameof(ConnectionId)}: {ConnectionId}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}}}";
+            return $"{ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}";
         }
     }
 }

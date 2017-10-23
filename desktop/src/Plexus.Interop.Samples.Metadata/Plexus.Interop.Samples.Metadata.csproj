@@ -20,17 +20,21 @@
 
   </PropertyGroup>
 
-
   <ItemGroup>
-    <None Include="$(RepoRootDir)samples/metadata/**/*.*" />
+    <None Include="$(RepoRootDir)samples/greeting/**/*.*" />    
   </ItemGroup>
 
   <ItemGroup>
-    <SamplesMetadata Include="$(RepoRootDir)samples/metadata/**/*.*" />
+    <SamplesMetadata Include="$(RepoRootDir)samples/greeting/metadata/**/*.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SamplesRegistry Include="$(RepoRootDir)samples/greeting/registry/**/*.*" />
   </ItemGroup>
   
   <Target Name="PublishOnBuild" DependsOnTargets="CoreCompile" BeforeTargets="Build">
     <Copy SourceFiles="@(SamplesMetadata)" DestinationFolder="$(ArtifactsSamplesDir)metadata/%(RecursiveDir)" />
+    <Copy SourceFiles="@(SamplesRegistry)" DestinationFolder="$(ArtifactsSamplesDir)registry/%(RecursiveDir)" />
   </Target>
 
 </Project>

@@ -39,9 +39,11 @@
         {
             try
             {
-                Log.Debug("Activating app {0}", appId);
+                Log.Info("Activating app {0}", appId);
                 var response = await _client.ActivateAppAsync(appId).ConfigureAwait(false);
-                Log.Info("Activated app {0}: {1}", appId, response);
+                var connectionId = UniqueId.FromHiLo(response.AppConnectionId.Hi, response.AppConnectionId.Lo);
+                var appInstanceId = UniqueId.FromHiLo(response.AppInstanceId.Hi, response.AppInstanceId.Lo);
+                Log.Info("Activated app {0}: connectionId={1}, appInstanceId={2}", appId, connectionId, appInstanceId);
             }
             catch (Exception ex)
             {
@@ -49,11 +51,9 @@
             }
         }
 
-        public async Task ShutdownAsync()
+        public Task ShutdownAsync()
         {
-            Log.Info("Shutting down");
-            await _client.StopAsync().ConfigureAwait(false);
-            Log.Info("Shutdown completed");
+            return _client.StopAsync();
         }
     }
 }
