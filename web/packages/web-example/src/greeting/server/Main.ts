@@ -52,7 +52,7 @@ document.addEventListener("keydown", function (e) {
 
 new WebGreetingServerClientBuilder()
     .withGreetingServiceInvocationsHandler({
-        onUnary: async (request: plexus.interop.samples.IGreetingRequest) => {
+        onUnary: async (invocationContext, request: plexus.interop.samples.IGreetingRequest) => {
             log.info(`Received greeting request - ${request.name}`);
             return {
                 greeting: `Hey, ${request.name}!`
