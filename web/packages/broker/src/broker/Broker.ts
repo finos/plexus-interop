@@ -1,6 +1,7 @@
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { TransportConnection, TransportChannel } from "@plexus-interop/transport-common";
 import { StateMaschine, StateMaschineBase, ReadWriteCancellationToken, Logger, LoggerFactory } from "@plexus-interop/common";
+import { ServerConnectionFactory } from "../transport/ServerConnectionFactory";
 
 enum BrokerState { CREATED, OPEN, CLOSED };
 
@@ -14,7 +15,7 @@ export class Broker {
 
     constructor(
         private appLifeCycleManager: AppLifeCycleManager,
-        private clientConnection: TransportConnection
+        private connectionFactory: ServerConnectionFactory
     ) {
         this.state = this.defineStateMaschine();
         this.log.trace("Created");
@@ -40,6 +41,7 @@ export class Broker {
             }
         ]);
     }
+    /*
 
     private async listenForChannels(): Promise<void> {
         while (this.state.is(BrokerState.OPEN)) {
@@ -49,11 +51,6 @@ export class Broker {
     }
 
     private handleIncomingChannel(channel: TransportChannel): void {
-        /**
-         * - Method Discovery request
-         * - Service Discovery request
-         * - Invocation StartRequest
-         */
         const channelId = channel.uuid().toString();
         channel.open({
             started: () => {
@@ -74,5 +71,6 @@ export class Broker {
             error: (e) => {}
         });
     }
+    */
 
 }

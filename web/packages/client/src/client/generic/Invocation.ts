@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { Channel } from "@plexus-interop/transport-common";
-import { InvocationMetaInfo } from "../../client/generic/InvocationMetaInfo";
+import { InvocationMetaInfo } from "@plexus-interop/protocol";
 
 export interface Invocation extends Channel {
     getMetaInfo(): InvocationMetaInfo;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { Invocation } from "./Invocation";
-import { InvocationMetaInfo } from "./InvocationMetaInfo";
+import { InvocationMetaInfo } from "@plexus-interop/protocol";
 import { Observer } from "@plexus-interop/common";
 import { AnonymousSubscription } from "../api/AnonymousSubscription";
 import { ServiceDiscoveryRequest } from "../api/dto/ServiceDiscoveryRequest";

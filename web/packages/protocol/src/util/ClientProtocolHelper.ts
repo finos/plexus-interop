@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus, ClientProtocolUtils } from "@plexus-interop/protocol";
-import { InvocationMetaInfo } from "./InvocationMetaInfo";
-import { UniqueId } from "@plexus-interop/transport-common";
+import { clientProtocol as plexus, ClientProtocolUtils } from "../.";
+import { InvocationMetaInfo } from "../dto/InvocationMetaInfo";
+import { UniqueId } from "../dto/UniqueId";
 import * as Long from "long";
 import { Arrays } from "@plexus-interop/common";
 

@@ -116,18 +116,24 @@ export class GenericClientImpl implements GenericClient {
 
     private async startIncomingChannelsListener(observer: Observer<TransportChannel>): Promise<void> {
         this.log.debug("Started to listen for channels");
-        while (this.state.is(ClientState.LISTEN)) {
-            try {
-                const channel: TransportChannel = await this.transportConnection.waitForChannel(this.cancellationToken);
-                this.log.debug("Channel received");
-                observer.next(channel);
-            } catch (error) {
-                this.log.error("Error while reading frame", error);
+        this.transportConnection.open({
+            next: channel => {
+                if (this.state.is(ClientState.LISTEN)) {
+                    this.log.debug("Channel received");
+                    observer.next(channel);
+                } else {
+                    this.log.warn(`State is ${this.state.getCurrent()}, skip incoming channel`);
+                }
+            },
+            complete: () => {
+                this.log.debug("Channels subscription complted");
+                observer.complete();
+            },
+            error: e => {
+                this.log.error("Error while receceivign channel", e);
                 this.state.go(ClientState.CLOSED);
             }
-        }
-        this.log.debug("Finished to listen for Channels");
-        observer.complete();
+        });
     }
 
 }

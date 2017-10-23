@@ -19,4 +19,4 @@ export * from "./TransportConnection";
 export * from "./frame";
 export * from "./ClientConnectionFactory";
 export * from "./TransportChannel";
-export * from "./UniqueId";
+export {UniqueId as UniqueId} from "@plexus-interop/protocol";

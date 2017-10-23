@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { GUID } from "@plexus-interop/common";
-import { transportProtocol as plexus } from "@plexus-interop/protocol";
+import { plexus } from "../gen/internal-transport-protocol";
 import * as Long from "long";
 
 export class UniqueId {
