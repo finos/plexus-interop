@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { Observer } from "@plexus-interop/common";
-import { UniqueId } from "../src/transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 
 export class LogObserver<T> implements Observer<T> {
 

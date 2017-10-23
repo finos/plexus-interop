@@ -18,7 +18,7 @@ import { MessageFrame, ChannelCloseFrame } from "./model";
 import { FrameHeader } from "./FrameHeader";
 import { TransportChannel } from "../TransportChannel";
 import { FramedTransport } from "./FramedTransport";
-import { UniqueId } from "../../transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { Observer, ReadWriteCancellationToken } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
 import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, AsyncHelper, StateMaschine } from "@plexus-interop/common";

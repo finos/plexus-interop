@@ -18,7 +18,7 @@ import { TransportConnection } from "../../src/transport/TransportConnection";
 import { TransportChannel } from "../../src/transport/TransportChannel";
 import { Frame } from "../../src/transport/frame/model/Frame";
 import { TestBufferedInMemoryFramedTransport } from "./TestBufferedInMemoryFramedTransport";;
-import { UniqueId } from "../../src/transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { FramedTransportConnection } from "../../src/transport/frame/FramedTransportConnection";
 import { Queue } from "typescript-collections";
 import { LoggerFactory, Observer } from "@plexus-interop/common";

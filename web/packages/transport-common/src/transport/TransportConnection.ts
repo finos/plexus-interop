@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { TransportChannel } from "./TransportChannel";
-import { UniqueId } from "./UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { Observer } from "@plexus-interop/common";
 import { clientProtocol } from "@plexus-interop/protocol"; 
 

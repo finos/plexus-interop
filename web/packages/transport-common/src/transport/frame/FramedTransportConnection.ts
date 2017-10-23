@@ -21,7 +21,7 @@ import { TransportConnection } from "../TransportConnection";
 import { FramedTransportChannel } from "./FramedTransportChannel";
 import { BufferedTransportProxy } from "./BufferedTransportProxy";
 import { TransportChannel } from "../TransportChannel";
-import { UniqueId } from "../UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { transportProtocol as plexus } from "@plexus-interop/protocol";
 import { TransportFrameHandler } from "./TransportFrameHandler";
 import { StateMaschineBase, StateMaschine, LoggerFactory, Logger, ReadWriteCancellationToken, Observer } from "@plexus-interop/common";

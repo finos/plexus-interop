@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId } from "../../../src/transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { Observer } from "@plexus-interop/common";
 import { Subscription } from "rxjs/Subscription";
 import { TransportChannel } from "../../../src/transport/TransportChannel";

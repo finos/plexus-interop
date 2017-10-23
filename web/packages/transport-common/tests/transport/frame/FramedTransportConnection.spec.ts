@@ -20,7 +20,7 @@ import { BufferedObserver } from "../../BufferedObserver";
 import { TestBufferedInMemoryFramedTransport } from "../TestBufferedInMemoryFramedTransport";
 import { AnonymousSubscription } from "rxjs/Subscription";
 import { DelegateChannelObserver } from "../../../src/common/DelegateChannelObserver";
-import { UniqueId } from "../../../src/transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { ChannelOpenFrame } from "../../../src/transport/frame/model/ChannelOpenFrame";
 import { TransportChannel } from "../../../src/transport/TransportChannel";
 import { AsyncHelper } from "@plexus-interop/common";
