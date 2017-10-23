@@ -18,6 +18,5 @@ require("long");
 export * from "./TransportConnection";
 export * from "./frame";
 export * from "./ClientConnectionFactory";
-export * from "./ServerConnectionFactory";
 export * from "./TransportChannel";
 export * from "./UniqueId";

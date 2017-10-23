@@ -14,10 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {TransportConnection} from "./TransportConnection";
+import { ConnectionCloseFrame, ChannelCloseFrame, MessageFrame } from ".";
+import { ConnectionOpenFrame } from ".";
+import { ChannelOpenFrame } from ".";
 
-export abstract class ServerConnectionFactory {
-
-    public abstract acceptConnection(): Promise<TransportConnection>;
+export interface TransportFrameListener {
+    
+    handleConnectionCloseFrame(frame: ConnectionCloseFrame): void;
+    
+    handleConnectionOpenFrame(frame: ConnectionOpenFrame): void;
+    
+    handleChannelOpenFrame(frame: ChannelOpenFrame): void;
+    
+    handleChannelCloseFrame(frame: ChannelCloseFrame): void;
+    
+    handleMessageFrame(frame: MessageFrame): void;
 
 }

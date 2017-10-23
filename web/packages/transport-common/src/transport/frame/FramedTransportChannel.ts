@@ -93,7 +93,7 @@ export class FramedTransportChannel implements TransportChannel {
                     this.log.warn("Channel forced CREATED -> CLOSED");
                 }
             }
-        ]);
+        ], this.log);
     }
 
     private async handleConnectionError(channelObserver: Observer<ArrayBuffer>, error: any): Promise<void> {

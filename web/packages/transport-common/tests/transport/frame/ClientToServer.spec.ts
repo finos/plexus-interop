@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import { TransportConnection } from "../../../src/transport/TransportConnection";
+import { TransportChannel } from "../../../src/transport/TransportChannel";
 import { randomPayload } from "../../utils";
 import { BufferedObserver } from "../../BufferedObserver";
 import { LogObserver } from "../../LogObserver";
@@ -25,8 +26,8 @@ import { DelegateChannelObserver } from "../../../src/common/DelegateChannelObse
 describe("Framed Transport Connection: Client to Server communication", () => {
 
     it("Sends message from server to client", async () => {
-        const { client, server } = await setupConnections();
-        await sendReceiveAndVerify(client, server, randomPayload(3));
+        const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
+        await sendReceiveAndVerify(client, server, clientChannelsObserver, serverChannelsObserver, randomPayload(3));
         await disconnect(client, server);
     });
 
@@ -37,53 +38,49 @@ describe("Framed Transport Connection: Client to Server communication", () => {
         await disconnect(client, server);
     });
 
-    it("Sends message from client to server", async () => {
-        const { client, server } = await setupConnections();
-        await sendReceiveAndVerify(client, server, randomPayload(10));
-        await disconnect(client, server);
-    });
 
     it("Can send big message", async () => {
-        const { client, server } = await setupConnections();
+        const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
         const payload = randomPayload(2 * 1024);
-        await sendReceiveAndVerify(server, client, payload);
+        await sendReceiveAndVerify(client, server, clientChannelsObserver, serverChannelsObserver, payload);
         await disconnect(client, server);
     });
 
     it("Can send concurrently two messages to separate channels", async () => {
-        const { client, server } = await setupConnections();
+        const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
         await Promise.all([
-            sendReceiveAndVerify(server, client, randomPayload(64)),
-            sendReceiveAndVerify(server, client, randomPayload(3))]);
+            sendReceiveAndVerify(client, server, clientChannelsObserver, serverChannelsObserver, randomPayload(64)),
+            sendReceiveAndVerify(client, server, clientChannelsObserver, serverChannelsObserver, randomPayload(3))]);
         await disconnect(client, server);
     });
-
 
     it("Can send messages with different length in a row", async () => {
-        const { client, server } = await setupConnections();
-        await sendReceiveAndVerifyAll(client, server, [randomPayload(1), randomPayload(10), randomPayload(5)]);
+        const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
+        await sendReceiveAndVerifyAll(client, server, clientChannelsObserver, serverChannelsObserver, [randomPayload(1), randomPayload(10), randomPayload(5)]);
         await disconnect(client, server);
     });
-    
+
     it("Can continue to send messages even if remote channel requested close", async () => {
-        
-        const { client, server } = await setupConnections();
+
+        // tslint:disable-next-line:no-unused-variable
+        const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
+
         const clientChannel = await client.createChannel();
-        
+
         const payload = new ArrayBuffer(3);
-        
+
         await new Promise<AnonymousSubscription>(
             (resolve, reject) => clientChannel.open(new DelegateChannelObserver(new LogObserver(undefined, clientChannel.uuid()), (s) => resolve(s))));
 
         // sever channel opened
-        const serverChannel = await server.waitForChannel();
+        const serverChannel = await serverChannelsObserver.pullData();
         const observer = new BufferedObserver<ArrayBuffer>();
         await new Promise<AnonymousSubscription>(
             (resolve, reject) => serverChannel.open(new DelegateChannelObserver(observer, (s) => resolve(s))));
-        
+
         // server channel close requested
-        const serverChClosed = serverChannel.close();        
-        
+        const serverChClosed = serverChannel.close();
+
         clientChannel.sendMessage(payload);
         const received = await observer.pullData();
 
@@ -98,16 +95,27 @@ describe("Framed Transport Connection: Client to Server communication", () => {
     async function sendReceiveAndVerify(
         clientConnection: TransportConnection,
         serverConnection: TransportConnection,
+        clientChannelsObserver: BufferedObserver<TransportChannel>,
+        serverChannelsObserver: BufferedObserver<TransportChannel>,
         payload: ArrayBuffer): Promise<void> {
+        console.log("Creating channel");
         const clientChannel = await clientConnection.createChannel();
-        new Promise<AnonymousSubscription>(
-            (resolve, reject) => clientChannel.open(new DelegateChannelObserver(new LogObserver(undefined, clientChannel.uuid()), (s) => resolve(s))))
-            .then(() => {
-                clientChannel.sendMessage(payload);
-            });
-        const serverChannel = await serverConnection.waitForChannel();
+        console.log("Created channel");
+        await new Promise<AnonymousSubscription>(
+            (resolve, reject) => clientChannel.open(new DelegateChannelObserver(new LogObserver(undefined, clientChannel.uuid()), (s) => {
+                console.log("Client channel created");
+                resolve(s);
+            })));
+        console.log("Client channel created");
+            
+        await clientChannel.sendMessage(payload);
+        console.log("Client sent message");
+            
+        const serverChannel = await serverChannelsObserver.pullData();
+        console.log("Waiting for server chanel channel");
+        
         const observer = new BufferedObserver<ArrayBuffer>();
-        serverChannel.open(new DelegateChannelObserver(observer, (s) => {}));
+        serverChannel.open(new DelegateChannelObserver(observer, (s) => { }));
         const received = await observer.pullData();
         expect(new Uint8Array(payload)).toEqual(new Uint8Array(received));
         const clientChClosed = clientChannel.close();
@@ -119,19 +127,22 @@ describe("Framed Transport Connection: Client to Server communication", () => {
     async function sendReceiveAndVerifyAll(
         clientConnection: TransportConnection,
         serverConnection: TransportConnection,
+        clientChannelsObserver: BufferedObserver<TransportChannel>,
+        serverChannelsObserver: BufferedObserver<TransportChannel>,
         payloads: ArrayBuffer[]): Promise<void> {
-        
+
         const clientChannel = await clientConnection.createChannel();
         new Promise<AnonymousSubscription>(
             (resolve, reject) => clientChannel.open(new DelegateChannelObserver(new LogObserver(undefined, clientChannel.uuid()), (s) => resolve(s))))
             .then(() => {
                 payloads.forEach(payload => clientChannel.sendMessage(payload));
             });
-        const serverChannel = await serverConnection.waitForChannel();
-        
+
+        const serverChannel = await serverChannelsObserver.pullData();
+
         const observer = new BufferedObserver<ArrayBuffer>();
         await new Promise((resolve, _) => serverChannel.open(new DelegateChannelObserver(observer, (s) => resolve())));
-        
+
         for (let payload of payloads) {
             const received = await observer.pullData();
             expect(new Uint8Array(payload)).toEqual(new Uint8Array(received));

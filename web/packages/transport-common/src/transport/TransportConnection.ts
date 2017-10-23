@@ -16,7 +16,7 @@
  */
 import { TransportChannel } from "./TransportChannel";
 import { UniqueId } from "./UniqueId";
-import { CancellationToken } from "@plexus-interop/common";
+import { Observer } from "@plexus-interop/common";
 import { clientProtocol } from "@plexus-interop/protocol"; 
 
 export interface TransportConnection {
@@ -25,11 +25,6 @@ export interface TransportConnection {
      * Creates new logical Transport Channel
      */
     createChannel(): Promise<TransportChannel>;
-
-    /**
-     * Waits for incoming Transport Channel
-     */
-    waitForChannel(cancellationToken?: CancellationToken): Promise<TransportChannel>;
 
     /**
      * Closes connection, no more communication available through this connection
@@ -49,7 +44,7 @@ export interface TransportConnection {
     /**
      * Opens current connection, starting to receive incoming channels
      */
-    open(): Promise<void>;
+    open(channelObserver: Observer<TransportChannel>): Promise<void>;
 
 }
 
