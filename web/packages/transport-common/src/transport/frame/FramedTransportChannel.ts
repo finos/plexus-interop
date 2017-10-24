@@ -22,7 +22,7 @@ import { UniqueId } from "../../transport/UniqueId";
 import { Observer, ReadWriteCancellationToken } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
 import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, StateMaschine } from "@plexus-interop/common";
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ClientError } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ClientError, ErrorCompletion } from "@plexus-interop/protocol";
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";
 import { Queue } from "typescript-collections";
@@ -242,7 +242,7 @@ export class FramedTransportChannel implements TransportChannel {
         this.dispose();
         if (this.onCloseHandler) {
             this.log.debug("Reporting summarized completion");
-            const completion = ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion);
+            const completion = ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion || new ErrorCompletion("Remote side not completed"));
             if (!ClientProtocolUtils.isSuccessCompletion(completion)) {
                 this.channelObserver.error(error || completion.error);
             }
