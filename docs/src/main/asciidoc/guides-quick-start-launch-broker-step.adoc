@@ -2,7 +2,7 @@
 +
 [source, bash]
 ----
-cd bin\win-x86\quick-start
+cd bin\win-x86\samples\quick-start
 start plexus broker
 ----
 +

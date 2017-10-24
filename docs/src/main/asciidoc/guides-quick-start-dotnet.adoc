@@ -2,7 +2,7 @@
 [[quick-start-dotnet]]
 ==== Quick Start - .NET
 
-In this guide both consumer and provider are .NET console applications written in C# language and run using https://www.microsoft.com/net/download/core#/runtime[.NET Core].
+In this guide both consumer and provider are .NET console applications written in C# language running using https://www.microsoft.com/net/download/core#/runtime[.NET Core].
 
 ===== Run example
 
@@ -41,3 +41,22 @@ image::quick-start-dotnet-2.png[Quick Start .NET 2]
 . The viewer app shows the rate received from provider:
 +
 image::quick-start-dotnet-3.png[Quick Start .NET 3]
+
+===== Update example
+
+Let's take a closer look to example and improve the provided service with ability to provide real-time updates.
+We're going to change contract between two applications, pass the changed interop metadata to broker, update apps and run them again.
+
+====== Update metadata
+
+Open `registry/fx/CcyPairRateService.proto` file and add new `GetRateStream` method:
+
+[source, proto]
+./registry/fx/CcyPairRateService.proto
+-----
+service CcyPairRateService {
+    rpc GetRate(CcyPair) returns (CcyPairRate);
+    // new rpc call returning real-time notification stream
+    rpc GetRateStream(CcyPair) returns (stream CcyPairRate);
+}
+-----
