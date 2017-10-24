@@ -288,8 +288,11 @@ export class FramedTransportChannel implements TransportChannel {
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Sending message with id ${this.outQueue.peek().id}`);
         }
-        await this.outQueue.peek().action();
-        this.outQueue.dequeue();
+        try {
+            await this.outQueue.peek().action();            
+        } finally {
+            this.outQueue.dequeue();            
+        }
     }
 
     private async sendMessageInternal(data: ArrayBuffer): Promise<void> {
