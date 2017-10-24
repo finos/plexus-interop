@@ -1,0 +1,43 @@
+:imagesdir: ./images
+[[quick-start-dotnet]]
+==== Quick Start - .NET
+
+In this guide both consumer and provider are .NET console applications written in C# language and run using https://www.microsoft.com/net/download/core#/runtime[.NET Core].
+
+===== Run example
+
+include::guides-quick-start-launch-broker-step.adoc[]
+
+. Launch `CcyPairRateViewer`:
++
+[source, bash]
+-----
+plexus activate vendorB.fx.CcyPairRateViewer
+-----
++
+include::guides-quick-start-activate-app.adoc[]
++
+[NOTE]
+====
+In this example apps are launched using built-in `NativeAppLauncher` which run apps as usual processes by executing specified file with arguments.
+====
+
+. In the opened console window enter a currency pair name, e.g. `EURUSD` and press `Enter`:
++
+image::quick-start-dotnet-1.png[Quick Start .NET 1]
++
+include::guides-quick-start-invocation-workflow.adoc[]
++
+[NOTE]
+====
+In this example `CcyPairRateProvider` app is a provider of `CcyPairRateService`, so broker starts it by sending request to `NativeAppLauncher`
+and then redirects invocation to the launched instance.
+====
+
+. Broker starts `CcyPairRateProvider` app and redirects request to it:
++
+image::quick-start-dotnet-2.png[Quick Start .NET 2]
+
+. The viewer app shows the rate received from provider:
++
+image::quick-start-dotnet-3.png[Quick Start .NET 3]

@@ -12,12 +12,12 @@
     <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'osx-x64'">x64</PlatformTarget>
 
     <ArtifactsDir>../../../bin/$(RuntimeIdentifier)/</ArtifactsDir>
-    <SamplesDir>$(ArtifactsDir)samples/greeting/</SamplesDir>
-    <PublishDir>$(SamplesDir)apps/GreetingClient/</PublishDir>    
+    <SamplesDir>$(ArtifactsDir)samples/quick-start/</SamplesDir>
+    <PublishDir>$(SamplesDir)apps/CcyPairRateProvider/</PublishDir>    
 
     <LangVersion>latest</LangVersion>
 
-    <AssemblyName>GreetingClient</AssemblyName>
+    <AssemblyName>CcyPairRateProvider</AssemblyName>
 
     <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
@@ -35,14 +35,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="CcyPairRateProvider.cmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish">
-    <Copy SourceFiles="LaunchGreetingClient.cmd" DestinationFolder="$(SamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="LaunchGreetingClient.sh" DestinationFolder="$(SamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
-  </Target>
+  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish" />
 
 </Project>

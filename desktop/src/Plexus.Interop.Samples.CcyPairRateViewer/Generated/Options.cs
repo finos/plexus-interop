@@ -7,7 +7,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Plexus.Interop.Samples.GreetingClient.Generated {
+namespace Plexus.Interop.Samples.CcyPairRateViewer.Generated {
 
   /// <summary>Holder for reflection information generated from interop/Options.proto</summary>
   public static partial class OptionsReflection {
@@ -30,9 +30,9 @@ namespace Plexus.Interop.Samples.GreetingClient.Generated {
             "s0sgASgJOjcKDXNlcnZpY2VfdGl0bGUSHy5nb29nbGUucHJvdG9idWYuU2Vy",
             "dmljZU9wdGlvbnMYtEsgASgJOjIKCW1ldGhvZF9pZBIeLmdvb2dsZS5wcm90",
             "b2J1Zi5NZXRob2RPcHRpb25zGLJLIAEoCTo1CgxtZXRob2RfdGl0bGUSHi5n",
-            "b29nbGUucHJvdG9idWYuTWV0aG9kT3B0aW9ucxizSyABKAlCMqoCL1BsZXh1",
-            "cy5JbnRlcm9wLlNhbXBsZXMuR3JlZXRpbmdDbGllbnQuR2VuZXJhdGVkYgZw",
-            "cm90bzM="));
+            "b29nbGUucHJvdG9idWYuTWV0aG9kT3B0aW9ucxizSyABKAlCNaoCMlBsZXh1",
+            "cy5JbnRlcm9wLlNhbXBsZXMuQ2N5UGFpclJhdGVWaWV3ZXIuR2VuZXJhdGVk",
+            "YgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { pbr::FileDescriptor.DescriptorProtoFileDescriptor, },
           new pbr::GeneratedClrTypeInfo(null, null));

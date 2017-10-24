@@ -14,7 +14,7 @@
       "displayName": "Currency Pair Rate Viewer",
       "launcherId": "interop.NativeAppLauncher",
       "launcherParams": {
-        "cmd": "../apps/CcyPairRateViewer/CcyPairRateViewer.exe",
+        "cmd": "../apps/CcyPairRateViewer/CcyPairRateViewer.cmd",
         "args": ""
       }
     },
@@ -23,7 +23,7 @@
       "displayName": "Currency Pair Rate Provider",
       "launcherId": "interop.NativeAppLauncher",
       "launcherParams": {
-        "cmd": "../apps/CcyPairRateProvider/CcyPairRateProvider.exe",
+        "cmd": "../apps/CcyPairRateProvider/CcyPairRateProvider.cmd",
         "args": ""
       }
     },

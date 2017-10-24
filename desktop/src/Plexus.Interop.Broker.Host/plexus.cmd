@@ -1,2 +1,2 @@
 CD %~dp0
-%~dp0../broker/plexus.exe %*
+%~dp0../../broker/plexus.exe %*

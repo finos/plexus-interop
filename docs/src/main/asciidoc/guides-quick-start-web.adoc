@@ -5,54 +5,45 @@ In this guide both consumer and provider are Web applications written in Typescr
 
 ===== Run example
 
-To run example we first need to switch to directory `bin\win-x86\quick-start` and start a new broker instance there:
-[source, bash]
-----
-cd bin\win-x86\quick-start
-start ..\broker\plexus.exe broker .\metadata
-----
+include::guides-quick-start-launch-broker-step.adoc[]
 
-Second argument (".\metadata") specifies the directory where broker should seek for metadata: interop registry `interop.json` and app registry `apps.json`.
-
-Now let's launch our first app - `ccy-pair-rate-viewer` and connect it to the running broker instance. Our app is designed to run in Electron, so we're using `ElectronAppLauncher` which can open a given html file as Electron window:
-
+. Launch `WebCcyPairRateViewer`:
++
 [source, bash]
 -----
-start ..\samples\apps\ElectronAppLauncher\ElectronAppLauncher.exe --brokerDir . --apps "apps\WebCcyPairRateViewer\index.html"
+plexus activate vendorB.fx.WebCcyPairRateViewer
 -----
-Where `brokerDir` argument points to the currently running broker's working directory and `apps` argument lists paths to pages which should be opened as Electron windows.
++
+include::guides-quick-start-activate-app.adoc[]
++
+[NOTE]
+====
+A custom launcher called `ElectronAppLauncher` is used in this example to launch Electron apps.
+It shows how easily you can implement custom app launchers for custom ways of launching apps (e.g. for apps running in different containers similar to Electron).
 
-Great, we have running example of two apps communicating with each other, Rate Viewer app will request Currency Pair's rate and print the result.
+Check section <<guides-how-to-write-custom-app-launcher, How to write custom app launcher>> for details.
+====
+
+. In the opened window enter a currency pair name, e.g. `EURUSD` and click `Request`:
+
+. Broker should launch `WebCcyPairRateProvider` and redirect request to it. The viewer app should show the rate received from provider:
 
 ===== Update Interop Flow
 
-Let's take a look closer to example and extend provided rate with additional details - `dueDate`, to be set by provider and passed to viewer. We're going to change contract between two components, pass this information to broker and run clients again.
+Let's take a closer look to example and improve the provided service with ability to provide real-time updates.
+We're going to change contract between two applications, pass the changed interop metadata to broker, update clients and run them again.
 
 ====== Update Service
 
-Open `quick-start/metadata/fx/CcyPairRateService.proto` file, create new `CcyPairExpiringRate` structure with additional field:
+Open `quick-start/registry/fx/CcyPairRateService.proto` file and add new `GetRateStream` method:
 
-[source, proto]
-./quick-start/metadata/fx/CcyPairRateService.proto
------
-message CcyPairExpiringRate {
-    // same fields we have in CcyPairRate
-    string ccyPairName = 1;
-    double rate = 2;
-    // additional field
-    // represents dueDate in milliseconds (elapsed since 1 January 1970 00:00:00 UTC)
-    uint64 dueDate = 3;
-}
------
-
-and create new rpc method which provides fx rate with additional due date info:
 [source, proto]
 ./quick-start/metadata/fx/CcyPairRateService.proto
 -----
 service CcyPairRateService {
     rpc GetRate(CcyPair) returns (CcyPairRate);
-    // new rpc call, returning pair with expiration date
-    rpc GetExpiringRate(CcyPair) returns (CcyPairExpiringRate);
+    // new rpc call returning real-time notification stream
+    rpc GetRateStream(CcyPair) returns (stream CcyPairRate);
 }
 -----
 ====== Update CCY Rate Provider

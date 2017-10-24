@@ -135,7 +135,7 @@ namespace Plexus.Interop.Broker
             }
             else
             {
-                Log.Debug("Connection {0} completed", connection.Id);
+                Log.Info("Connection {0} completed", connection.Id);
                 connection.TryComplete();
             }            
             _activeConnections.TryRemove(connection.Id, out _);

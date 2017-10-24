@@ -11,7 +11,8 @@
 
     <RepoRootDir>../../../</RepoRootDir>
     <ArtifactsDir>$(RepoRootDir)bin/$(RuntimeIdentifier)/</ArtifactsDir>
-    <ArtifactsSamplesDir>$(ArtifactsDir)samples/</ArtifactsSamplesDir>
+    <ArtifactsSamplesDir>$(ArtifactsDir)samples/greeting/</ArtifactsSamplesDir>
+    <ArtifactsQuickStartDir>$(ArtifactsDir)samples/quick-start/</ArtifactsQuickStartDir>
 
     <LangVersion>latest</LangVersion>
 
@@ -21,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(RepoRootDir)samples/greeting/**/*.*" />    
+    <None Include="$(RepoRootDir)samples/**/*.*" />    
   </ItemGroup>
 
   <ItemGroup>
@@ -31,10 +32,21 @@
   <ItemGroup>
     <SamplesRegistry Include="$(RepoRootDir)samples/greeting/registry/**/*.*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <QuickStartMetadata Include="$(RepoRootDir)samples/quick-start/metadata/**/*.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <QuickStartRegistry Include="$(RepoRootDir)samples/quick-start/registry/**/*.*" />
+  </ItemGroup>
   
   <Target Name="PublishOnBuild" DependsOnTargets="CoreCompile" BeforeTargets="Build">
     <Copy SourceFiles="@(SamplesMetadata)" DestinationFolder="$(ArtifactsSamplesDir)metadata/%(RecursiveDir)" />
     <Copy SourceFiles="@(SamplesRegistry)" DestinationFolder="$(ArtifactsSamplesDir)registry/%(RecursiveDir)" />
+
+    <Copy SourceFiles="@(QuickStartMetadata)" DestinationFolder="$(ArtifactsQuickStartDir)metadata/%(RecursiveDir)" />
+    <Copy SourceFiles="@(QuickStartRegistry)" DestinationFolder="$(ArtifactsQuickStartDir)registry/%(RecursiveDir)" />
   </Target>
 
 </Project>

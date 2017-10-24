@@ -71,7 +71,7 @@ namespace Plexus.Processes
         {
             if (!_started.TryEnter())
             {
-                Log.Debug("Start called after process was already started");
+                Log.Trace("Start called after process was already started");
                 return;
             }
             if (_stopped.IsEntered)
@@ -82,7 +82,7 @@ namespace Plexus.Processes
             }
             Log.Debug("Starting process");
             _startCompletion.Task.ContinueWithSynchronously(
-                t => Log.Trace("Start of process completed in state {0}", t.GetCompletionDescription()),
+                t => Log.Debug("Start of process completed in state {0}", t.GetCompletionDescription()),
                 CancellationToken.None);
             var startTask = TaskRunner.RunInBackground(StartCoreAsync, StopToken);
             startTask
@@ -105,7 +105,7 @@ namespace Plexus.Processes
         {
             if (!_stopped.TryEnter())
             {
-                Log.Debug("Stop called after process was already stopped");
+                Log.Trace("Stop called after process was already stopped");
                 return;
             }
             Log.Debug("Stopping");
