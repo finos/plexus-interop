@@ -35,7 +35,7 @@ describe("Web Socket Client Benchmarks", () => {
         return (async () => {
             const result = await echoServiceBenchmark.testUnaryMessagesSentWithinPeriod(1024, 3000);
             console.log("Benchmark result:", JSON.stringify(result));
-            expect(result.messagesSent).to.be.greaterThan(180);
+            expect(result.messagesSent).to.be.greaterThan(165);
         })();
     });
 
@@ -44,7 +44,7 @@ describe("Web Socket Client Benchmarks", () => {
         return (async () => {
             const result = await echoServiceBenchmark.testStreamingEventsSentWithinPeriod(1024, 3000);
             console.log("Benchmark result:", JSON.stringify(result));
-            expect(result.messagesSent).to.be.greaterThan(350);
+            expect(result.messagesSent).to.be.greaterThan(1000);
         })();
     });
 

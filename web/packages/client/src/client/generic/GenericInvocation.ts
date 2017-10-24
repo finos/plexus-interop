@@ -318,7 +318,7 @@ export class GenericInvocation {
             } else {
                 this.log.warn(`Unknown message received ${JSON.stringify(envelopObject)}`);
             }
-        } else if (this.stateMachine.isOneOf(InvocationState.OPEN, InvocationState.COMPLETED)) {
+        } else if (this.stateMachine.isOneOf(InvocationState.OPEN, InvocationState.COMPLETED, InvocationState.COMPLETION_RECEIVED)) {
             const envelopObject = modelHelper.decodeInvocationEnvelop(data);
             if (envelopObject.message) {
                 this.log.trace(`Received message header`);
