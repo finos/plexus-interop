@@ -144,7 +144,7 @@ export class GenericInvocation {
         this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
         this.stateMachine.go(InvocationState.COMPLETED);
         this.log.trace("Sending completion message");
-        await this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
+        this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
         if (ClientProtocolHelper.isSuccessCompletion(completion)) {
             // wait for remote side for success case only
             try {
@@ -186,7 +186,7 @@ export class GenericInvocation {
         const headerPayload = modelHelper.messageHeaderPayload({
             length: data.byteLength
         });
-        await this.sourceChannel.sendMessage(headerPayload);
+        this.sourceChannel.sendMessage(headerPayload);
         this.sourceChannel.sendMessage(data);
         this.sentMessagesCounter++;
     }

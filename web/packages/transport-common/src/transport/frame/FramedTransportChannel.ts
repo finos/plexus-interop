@@ -194,6 +194,10 @@ export class FramedTransportChannel implements TransportChannel {
             }
             resultBuffer = Arrays.concatenateBuffers(resultBuffer, messageFrame.body);
             if (isLast) {
+                /* istanbul ignore if */
+                if (this.log.isTraceEnabled()) {
+                    this.log.trace(`Received message of ${resultBuffer.byteLength} bytes`);
+                }
                 channelObserver.next(resultBuffer);
                 resultBuffer = new ArrayBuffer(0);
             }
@@ -211,6 +215,10 @@ export class FramedTransportChannel implements TransportChannel {
         }
         this.stateMachine.throwIfNot(ChannelState.CLOSE_REQUESTED, ChannelState.OPEN);
         this.remoteCompletion = channelCloseFrame.getHeaderData().completion || new SuccessCompletion();
+        /* istanbul ignore if */
+        if (this.remoteCompletion && this.log.isDebugEnabled()) {
+            this.log.debug(`Remote completed with ${JSON.stringify(this.remoteCompletion)}`);
+        }
         if (!ClientProtocolUtils.isSuccessCompletion(this.remoteCompletion)) {
             // channel closed with error, report error and close
             const error = this.remoteCompletionToError(this.remoteCompletion);
@@ -274,17 +282,18 @@ export class FramedTransportChannel implements TransportChannel {
     public async sendMessage(data: ArrayBuffer): Promise<void> {
         this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
         /* istanbul ignore if */
-        if (this.log.isTraceEnabled()) {
-            this.log.trace(`Scheduling sending of message with ${data.byteLength} bytes`);
-        }
         let currentMessageIndex = ++this.messageId;
+        if (this.log.isTraceEnabled()) {
+            this.log.trace(`Scheduling sending [${currentMessageIndex}] message of ${data.byteLength} bytes`);
+        }
         this.outQueue.enqueue({
             id: currentMessageIndex,
-            action: () => this.sendMessageInternal(data)
+            action: () => this.sendMessageInternal(data, currentMessageIndex)
         });
         if (this.outQueue.size() > 1) {
             await AsyncHelper.waitFor(() => this.outQueue.peek().id === currentMessageIndex);
         } 
+        /* istanbul ignore if */
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Sending message with id ${this.outQueue.peek().id}`);
         }
@@ -295,12 +304,11 @@ export class FramedTransportChannel implements TransportChannel {
         }
     }
 
-    private async sendMessageInternal(data: ArrayBuffer): Promise<void> {
-        this.log.debug(`Sending message ${this.messageId} of ${data.byteLength} bytes`);
+    private async sendMessageInternal(data: ArrayBuffer, messageIndex: number): Promise<void> {
+        this.log.debug(`Sending message ${messageIndex} of ${data.byteLength} bytes`);
         let sentBytesCount = 0;
         const totalBytesCount = data.byteLength;
         let hasMoreFrames = false;
-        const messageIndex = this.messageId;
         let framesCounter = 0;
         do {
             let frameLength = totalBytesCount - sentBytesCount;

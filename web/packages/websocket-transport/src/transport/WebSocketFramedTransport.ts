@@ -211,7 +211,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             const data: Uint8Array = this.readEventData(ev);
             /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
-                this.log.debug(`Received message with ${data.byteLength} bytes`);
+                this.log.debug(`Received message of ${data.byteLength} bytes`);
             }
             if (this.dataFrame) {
                 this.dataFrame.body = data.buffer;
@@ -234,10 +234,6 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     private addToInbox(frame: Frame): void {
         if (this.connectionObserver) {
-            /* istanbul ignore if */
-            if (this.log.isDebugEnabled()) {
-                this.log.debug(`Passing frame to observer`);
-            }
             this.connectionObserver.next(frame);
         } else {
             /* istanbul ignore if */

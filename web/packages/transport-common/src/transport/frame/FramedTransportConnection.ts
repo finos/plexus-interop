@@ -323,12 +323,6 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
             channelDescriptor.channelTransportProxy.next(frame);
         }
-        if (frame.isLast()) {
-            /* istanbul ignore if */
-            if (this.log.isTraceEnabled()) {
-                this.log.trace(`Received last frame for message of channel ${strChannelId}`);
-            }
-        }
     }
 
     private reportErrorToChannels(error: any): void {
