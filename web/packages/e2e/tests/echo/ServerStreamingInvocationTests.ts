@@ -78,18 +78,13 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                 }
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
-            const responses: plexus.plexus.interop.testing.IEchoRequest[] = [];
-
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => {
-                    responses.push(response);
                 },
                 complete: async () => {
                     reject("Not expected to be completed");
                 },
                 error: async (e) => {
-                    expect(responses.length).is.eq(1);
-                    responses.forEach(r => this.assertEqual(r, echoRequest));
                     await this.clientsSetup.disconnect(client, server);
                     resolve();
                 }
@@ -180,25 +175,20 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
                 try {
                     await this.assertEqual(request, echoRequest);
-                    await hostClient.next(echoRequest);
                     await hostClient.cancel();
                 } catch (error) {
                     reject(error);
                 }
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
-            const responses: plexus.plexus.interop.testing.IEchoRequest[] = [];
 
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
                 next: (response) => {
-                    responses.push(response);
                 },
                 complete: async () => {
                     reject("Not expected to be completed");
                 },
                 error: async (e) => {
-                    expect(responses.length).is.eq(1);
-                    responses.forEach(r => this.assertEqual(r, echoRequest));
                     await this.clientsSetup.disconnect(client, server);
                     resolve();
                 }
