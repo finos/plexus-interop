@@ -22,7 +22,7 @@ import { FramedTransportChannel } from "./FramedTransportChannel";
 import { BufferedTransportProxy } from "./BufferedTransportProxy";
 import { TransportChannel } from "../TransportChannel";
 import { UniqueId } from "../UniqueId";
-import { transportProtocol as plexus } from "@plexus-interop/protocol";
+import { transportProtocol as plexus, ClientProtocolUtils, ClientError, SuccessCompletion } from "@plexus-interop/protocol";
 import { TransportFrameHandler } from "./TransportFrameHandler";
 import { ChannelsHolder } from "../../common/ChannelsHolder";
 import { BufferedChannelsHolder } from "../../common/BufferedChannelsHolder";
@@ -235,22 +235,28 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
     }
 
     public async handleConnectionCloseFrame(frame: ConnectionCloseFrame): Promise<void> {
-        const completion = frame.getHeaderData().completion as plexus.ICompletion;
+        const completion = frame.getHeaderData().completion as plexus.ICompletion || new SuccessCompletion();
         /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
             this.log.debug("Received connection close", JSON.stringify(completion));
         }
-        switch (this.stateMachine.getCurrent()) {
-            case ConnectionState.OPEN:
-                this.log.debug("Close received, waiting for client to close it");
-                this.stateMachine.go(ConnectionState.CLOSE_RECEIVED);
-                break;
-            case ConnectionState.CLOSE_REQUESTED:
-                this.log.debug("Close already requested, closing connection");
-                this.closeAndCleanUp();
-                break;
-            default:
-                throw new Error(`Can't handle close, invalid state ${this.stateMachine.getCurrent()}`);
+        if (!ClientProtocolUtils.isSuccessCompletion(completion)) {
+            this.log.error("Received connection close with error", JSON.stringify(completion));
+            this.reportErrorToChannels(completion.error || new ClientError("Transport closed with error"));
+            this.closeAndCleanUp();
+        } else {
+            switch (this.stateMachine.getCurrent()) {
+                case ConnectionState.OPEN:
+                    this.log.debug("Close received, waiting for client to close it");
+                    this.stateMachine.go(ConnectionState.CLOSE_RECEIVED);
+                    break;
+                case ConnectionState.CLOSE_REQUESTED:
+                    this.log.debug("Close already requested, closing connection");
+                    this.closeAndCleanUp();
+                    break;
+                default:
+                    throw new Error(`Can't handle close, invalid state ${this.stateMachine.getCurrent()}`);
+            }
         }
     }
 
