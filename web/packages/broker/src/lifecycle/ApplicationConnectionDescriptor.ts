@@ -1,7 +1,7 @@
 
 import { UniqueId } from "@plexus-interop/transport-common";
 
-export interface ApplicationReference {
+export interface ApplicationConnectionDescriptor {
     
     instanceId: UniqueId;
     

@@ -2,6 +2,7 @@ import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { TransportConnection, TransportChannel } from "@plexus-interop/transport-common";
 import { StateMaschine, StateMaschineBase, ReadWriteCancellationToken, Logger, LoggerFactory } from "@plexus-interop/common";
 import { ServerConnectionFactory } from "../transport/ServerConnectionFactory";
+import { InteropMetadata } from "../metadata/InteropMetadata";
 
 enum BrokerState { CREATED, OPEN, CLOSED };
 
@@ -15,7 +16,8 @@ export class Broker {
 
     constructor(
         private appLifeCycleManager: AppLifeCycleManager,
-        private connectionFactory: ServerConnectionFactory
+        private connectionFactory: ServerConnectionFactory,
+        private interopMetadata: InteropMetadata
     ) {
         this.state = this.defineStateMaschine();
         this.log.trace("Created");
@@ -23,12 +25,12 @@ export class Broker {
     }
 
     private start(): void {
-        this.log.debug("Starting to listen for incoming channels");
-        this.listenForChannels()
-            .catch(e => {
-                // TODO disconnect and clean up
-                this.log.error("Failed on listening of incoming channel", e);
-            });
+        this.log.debug("Starting to listen for incoming connections");
+        this.connectionFactory.acceptConnections({
+            next: this.handleIncomingConnection.bind(this),
+            error: e => {},
+            complete: () => {}
+        });
     }
 
     private defineStateMaschine(): StateMaschine<BrokerState> {
@@ -41,36 +43,9 @@ export class Broker {
             }
         ]);
     }
-    /*
 
-    private async listenForChannels(): Promise<void> {
-        while (this.state.is(BrokerState.OPEN)) {
-            const channel = await this.clientConnection.waitForChannel(this.cancellationToken.getReadToken());
-            this.handleIncomingChannel(channel);
-        }
+    private handleIncomingConnection(transportConnection: TransportConnection): void {
+        
     }
-
-    private handleIncomingChannel(channel: TransportChannel): void {
-        const channelId = channel.uuid().toString();
-        channel.open({
-            started: () => {
-                if (this.log.isTraceEnabled()) {
-                    this.log.trace(`[${channelId}] Started`);
-                }
-            },
-            startFailed: (error) => {
-                this.log.error(`Channel [${channelId}] failed to start`);
-                // TODO clean up channel resources
-            },
-            next: (data) => {
-                if (this.log.isTraceEnabled()) {
-                    this.log.trace(`[${channelId}] Received payload of ${data.byteLength} bytes`);
-                }
-            },
-            complete: () => {},
-            error: (e) => {}
-        });
-    }
-    */
 
 }

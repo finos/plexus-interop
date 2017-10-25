@@ -1,13 +1,14 @@
-import { ApplicationReference } from "./ApplicationReference";
-import { Application } from "../metadata/Application";
+import { ApplicationConnectionDescriptor } from "./ApplicationConnectionDescriptor";
+import { TransportConnection } from "@plexus-interop/transport-common";
 
 export interface AppLifeCycleManager {
 
-    getConnectedApplications(): Promise<ApplicationReference[]>;
+    getOnlineConnections(): Promise<ApplicationConnectionDescriptor[]>;
 
-    launchApplication(applicationMetadata: Application): Promise<ApplicationReference>; 
+    spawnConnection(applicationId: string): Promise<ApplicationConnectionDescriptor>; 
 
-    // TODO better place for heart bits?
-    heartBit(applicationReference: ApplicationReference): Promise<void>;
+    getOrSpawnConnection(applicationId: string): Promise<ApplicationConnectionDescriptor>;
+
+    acceptConnection(connection: TransportConnection, appDescriptor: ApplicationConnectionDescriptor): Promise<void>;
 
 }
