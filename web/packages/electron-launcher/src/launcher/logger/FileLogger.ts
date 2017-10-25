@@ -30,11 +30,11 @@ export class FileLogger implements Logger {
 
     public debug(msg: string, ...args: any[]): void {
         this.baseLogger.debug(msg, args);
-        this.log("[DEBUG]" + msg);
+        this.log(`[DEBUG] | ${msg}`);
     }
 
     private log(msg: string) {
-        this.logFile.write(util.format(msg) + "\n");
+        this.logFile.write(util.format(`${new Date().toISOString()} ${msg}${"\n"}`));
     }
 
     public info(msg: string, ...args: any[]): void {
@@ -43,15 +43,15 @@ export class FileLogger implements Logger {
     }
     public error(msg: string, ...args: any[]): void {
         this.baseLogger.error(msg, args);
-        this.log("[ERROR] " + msg);
+        this.log("[ERROR] | " + msg);
     }
     public warn(msg: string, ...args: any[]): void {
-        this.baseLogger.warn("[WARN] " + msg, args);
+        this.baseLogger.warn("[WARN] |" + msg, args);
         this.log(msg);
     }
     public trace(msg: string, ...args: any[]): void {
         this.baseLogger.trace(msg, args);
-        this.log(msg);
+        this.log("[TRACE] | " + msg);
     }
     
     public getLogLevel(): LogLevel {

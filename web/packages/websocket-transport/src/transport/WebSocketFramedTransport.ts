@@ -94,13 +94,13 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         const data: ArrayBuffer = this.messagesConverter.serialize(frame);
         /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
-            this.log.debug(`Sending header message of ${data.byteLength} bytes to server`);
+            this.log.debug(`Sending header frame of ${data.byteLength} bytes to server`);
         }
         this.socket.send(data);
         if (frame.isDataFrame()) {
             /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
-                this.log.debug(`Sending data message of ${frame.body.byteLength} bytes to server`);
+                this.log.debug(`Sending data frame of ${frame.body.byteLength} bytes to server`);
             }
             this.socket.send(frame.body);
         } else if (frame.internalHeaderProperties.close) {

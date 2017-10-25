@@ -293,10 +293,6 @@ export class FramedTransportChannel implements TransportChannel {
         if (this.outQueue.size() > 1) {
             await AsyncHelper.waitFor(() => this.outQueue.peek().id === currentMessageIndex);
         } 
-        /* istanbul ignore if */
-        if (this.log.isTraceEnabled()) {
-            this.log.trace(`Sending message with id ${this.outQueue.peek().id}`);
-        }
         try {
             await this.outQueue.peek().action();            
         } finally {
@@ -305,7 +301,7 @@ export class FramedTransportChannel implements TransportChannel {
     }
 
     private async sendMessageInternal(data: ArrayBuffer, messageIndex: number): Promise<void> {
-        this.log.debug(`Sending message ${messageIndex} of ${data.byteLength} bytes`);
+        this.log.debug(`Sending message [${messageIndex}] of ${data.byteLength} bytes`);
         let sentBytesCount = 0;
         const totalBytesCount = data.byteLength;
         let hasMoreFrames = false;
