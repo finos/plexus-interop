@@ -46,17 +46,9 @@ describe("Framed Transport Connection: Client to Server communication", () => {
         await disconnect(client, server);
     });
 
-    it("Can send concurrently two messages to separate channels", async () => {
-        const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
-        await Promise.all([
-            sendReceiveAndVerify(client, server, clientChannelsObserver, serverChannelsObserver, randomPayload(64)),
-            sendReceiveAndVerify(client, server, clientChannelsObserver, serverChannelsObserver, randomPayload(3))]);
-        await disconnect(client, server);
-    });
-
     it("Can send messages with different length in a row", async () => {
         const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
-        await sendReceiveAndVerifyAll(client, server, clientChannelsObserver, serverChannelsObserver, [randomPayload(1), randomPayload(10), randomPayload(5)]);
+        await sendReceiveAndVerifyAll(client, server, clientChannelsObserver, serverChannelsObserver, [randomPayload(1), randomPayload(5), randomPayload(10)]);
         await disconnect(client, server);
     });
 
