@@ -15,10 +15,21 @@
 // limitations under the License.
 //
 
-import "interop/InteropService.proto";
+syntax = "proto3";
 
 package interop;
 
-application InteropManager {
-	provides InteropService { ActivateApp; }
+import "interop/UniqueId.proto";
+
+service AppLifecycleService {
+	rpc ActivateApp (ActivateAppRequest) returns (ActivateAppResponse);
+}
+
+message ActivateAppRequest {
+	string app_id = 1;
+}
+
+message ActivateAppResponse {
+	UniqueId app_instance_id = 1;
+	UniqueId app_connection_id = 2;
 }

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.5;net452</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.5</TargetFrameworks>
-    <AssemblyName>Plexus.Interop.Apps</AssemblyName>
+    <AssemblyName>Plexus.Interop.Apps.Manager.Contracts</AssemblyName>
     <RootNamespace>Plexus.Interop.Apps</RootNamespace>
 
     <LangVersion>latest</LangVersion>
@@ -11,5 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Common.Contracts\Plexus.Common.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Contracts\Plexus.Interop.Transport.Contracts.csproj" />
   </ItemGroup>
 </Project>

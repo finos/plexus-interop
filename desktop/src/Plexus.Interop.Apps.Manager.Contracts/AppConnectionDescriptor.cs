@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+﻿namespace Plexus.Interop.Apps
 {
     using System.Collections.Generic;
 
-    internal sealed class ClientConnectionDescriptor
+    public sealed class AppConnectionDescriptor
     {
-        public ClientConnectionDescriptor(UniqueId connectionId, string applicationId, UniqueId applicationInstanceId)
+        public AppConnectionDescriptor(UniqueId connectionId, string applicationId, UniqueId applicationInstanceId)
         {
             ConnectionId = connectionId;
             ApplicationId = applicationId;
@@ -35,7 +35,7 @@
 
         public override bool Equals(object obj)
         {
-            return obj is ClientConnectionDescriptor info &&
+            return obj is AppConnectionDescriptor info &&
                    ConnectionId.Equals(info.ConnectionId) &&
                    ApplicationId == info.ApplicationId &&
                    ApplicationInstanceId.Equals(info.ApplicationInstanceId);
@@ -52,7 +52,7 @@
 
         public override string ToString()
         {
-            return $"{{{nameof(ConnectionId)}: {ConnectionId}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}}}";
+            return $"{ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}";
         }
     }
 }

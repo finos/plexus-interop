@@ -1,3 +1,5 @@
+REM Generate code from GreetingClient interop definitions
+
 set PLEXUS_GEN_PATH=..\..\..\bin\win-x86\sdk\plexusgen.jar
 set INTEROP_METADATA_PATH=..\..\..\samples\metadata\interop
 if not defined NUGET_PACKAGES (

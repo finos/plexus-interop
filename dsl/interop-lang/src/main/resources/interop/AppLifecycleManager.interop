@@ -16,10 +16,13 @@
 //
 
 import "interop/AppLauncherService.proto";
+import "interop/AppLifecycleService.proto";
 
 package interop;
 
 application AppLifecycleManager {
 
 	consumes AppLauncherService { Launch; }
+
+	provides AppLifecycleService { ActivateApp; }
 }

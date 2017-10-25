@@ -21,8 +21,8 @@ import { FramedTransport } from "./FramedTransport";
 import { UniqueId } from "@plexus-interop/protocol";
 import { Observer, ReadWriteCancellationToken } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
-import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, AsyncHelper, StateMaschine } from "@plexus-interop/common";
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ClientError } from "@plexus-interop/protocol";
+import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, StateMaschine, SequencedExecutor } from "@plexus-interop/common";
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ClientError, ErrorCompletion } from "@plexus-interop/protocol";
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";
 
@@ -38,11 +38,8 @@ export const ChannelState = {
 
 export class FramedTransportChannel implements TransportChannel {
 
-    private static MESSAGE_SCHEDULING_WAITING_TIMEOUT: number = 20000;
-
     private log: Logger;
     private messageId: number = 0;
-    private sendingInProgress: boolean = false;
 
     private readonly stateMachine: StateMaschine<ChannelState>;
 
@@ -52,6 +49,8 @@ export class FramedTransportChannel implements TransportChannel {
     private remoteCompletion: plexus.ICompletion;
     private channelObserver: Observer<ArrayBuffer>;
 
+    private writeExecutor: SequencedExecutor;
+
     private onCloseHandler: ((completion?: plexus.ICompletion) => void) | null;
 
     constructor(
@@ -60,6 +59,7 @@ export class FramedTransportChannel implements TransportChannel {
         private dispose: () => Promise<void>,
         baseReadToken: CancellationToken) {
         this.log = LoggerFactory.getLogger(`FramedTransportChannel [${id.toString()}]`);
+        this.writeExecutor = new SequencedExecutor(this.log);
         this.channelCancellationToken = new ReadWriteCancellationToken(new CancellationToken(baseReadToken));
         this.log.debug("Created");
         this.stateMachine = new StateMaschineBase<ChannelState>(ChannelState.CREATED, [
@@ -121,7 +121,7 @@ export class FramedTransportChannel implements TransportChannel {
     private async subscribeToMessages(channelObserver: Observer<ArrayBuffer>): Promise<void> {
         let resultBuffer = new ArrayBuffer(0);
         this.framedTransport.open({
-            
+
             next: (frame: Frame) => {
                 resultBuffer = this.handleIncomingFrame(channelObserver, frame, resultBuffer);
             },
@@ -131,7 +131,7 @@ export class FramedTransportChannel implements TransportChannel {
             error: (transportError) => this.handleConnectionError(channelObserver, transportError)
 
         })
-        .catch(connectionError => channelObserver.error(connectionError));
+            .catch(connectionError => channelObserver.error(connectionError));
     }
 
     private remoteCompletionToError(completion: plexus.ICompletion): plexus.IError {
@@ -188,6 +188,10 @@ export class FramedTransportChannel implements TransportChannel {
             }
             resultBuffer = Arrays.concatenateBuffers(resultBuffer, messageFrame.body);
             if (isLast) {
+                /* istanbul ignore if */
+                if (this.log.isTraceEnabled()) {
+                    this.log.trace(`Received message of ${resultBuffer.byteLength} bytes`);
+                }
                 channelObserver.next(resultBuffer);
                 resultBuffer = new ArrayBuffer(0);
             }
@@ -205,6 +209,10 @@ export class FramedTransportChannel implements TransportChannel {
         }
         this.stateMachine.throwIfNot(ChannelState.CLOSE_REQUESTED, ChannelState.OPEN);
         this.remoteCompletion = channelCloseFrame.getHeaderData().completion || new SuccessCompletion();
+        /* istanbul ignore if */
+        if (this.remoteCompletion && this.log.isDebugEnabled()) {
+            this.log.debug(`Remote completed with ${JSON.stringify(this.remoteCompletion)}`);
+        }
         if (!ClientProtocolUtils.isSuccessCompletion(this.remoteCompletion)) {
             // channel closed with error, report error and close
             const error = this.remoteCompletionToError(this.remoteCompletion);
@@ -236,9 +244,9 @@ export class FramedTransportChannel implements TransportChannel {
         this.dispose();
         if (this.onCloseHandler) {
             this.log.debug("Reporting summarized completion");
-            const completion = ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion);
+            const completion = ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion || new ErrorCompletion("Remote side not completed"));
             if (!ClientProtocolUtils.isSuccessCompletion(completion)) {
-                this.channelObserver.error(error || completion.error);                
+                this.channelObserver.error(error || completion.error);
             }
             this.onCloseHandler(completion);
             this.onCloseHandler = null;
@@ -252,10 +260,12 @@ export class FramedTransportChannel implements TransportChannel {
         this.clientCompletion = completion;
         this.channelCancellationToken.cancelWrite("Close requested");
         this.log.debug("Sending channel close frame");
-        this.framedTransport.writeFrame(ChannelCloseFrame.fromHeaderData({
-            channelId: this.id,
-            completion
-        }));
+        this.writeExecutor.submit(async () => {
+            this.framedTransport.writeFrame(ChannelCloseFrame.fromHeaderData({
+                channelId: this.id,
+                completion
+            }));
+        });
     }
 
     public sendLastMessage(data: ArrayBuffer): Promise<plexus.ICompletion> {
@@ -267,37 +277,19 @@ export class FramedTransportChannel implements TransportChannel {
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
         this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
+        let currentMessageIndex = ++this.messageId;
         /* istanbul ignore if */
         if (this.log.isTraceEnabled()) {
-            this.log.trace(`Scheduling sending of message with ${data.byteLength} bytes, sending in progress ${this.sendingInProgress}`);
+            this.log.trace(`Scheduling sending [${currentMessageIndex}] message of ${data.byteLength} bytes`);
         }
-        if (this.sendingInProgress) {
-            await AsyncHelper.waitFor(() => {
-                if (!this.sendingInProgress) {
-                    this.sendingInProgress = true;
-                    return true;
-                } else {
-                    return false;
-                }
-            }, this.channelCancellationToken.getWriteToken(), 0, FramedTransportChannel.MESSAGE_SCHEDULING_WAITING_TIMEOUT);
-        }
-        this.sendingInProgress = true;
-        return this.sendMessageInternal(data)
-            .then(() => {
-                this.sendingInProgress = false;
-            })
-            .catch((error) => {
-                this.sendingInProgress = false;
-                return Promise.reject(error);
-            });
+        return this.writeExecutor.submit(() => this.sendMessageInternal(data, currentMessageIndex));
     }
 
-    private async sendMessageInternal(data: ArrayBuffer): Promise<void> {
-        this.log.debug(`Sending message ${this.messageId} of ${data.byteLength} bytes`);
+    private async sendMessageInternal(data: ArrayBuffer, messageIndex: number): Promise<void> {
+        this.log.debug(`Sending message [${messageIndex}] of ${data.byteLength} bytes`);
         let sentBytesCount = 0;
         const totalBytesCount = data.byteLength;
         let hasMoreFrames = false;
-        const messageIndex = this.messageId++;
         let framesCounter = 0;
         do {
             let frameLength = totalBytesCount - sentBytesCount;

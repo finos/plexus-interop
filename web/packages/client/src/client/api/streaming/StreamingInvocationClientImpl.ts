@@ -27,7 +27,7 @@ export class StreamingInvocationClientImpl extends BaseInvocationClientImpl impl
         super(invocation, log);
     }
 
-    public async next(value: ArrayBuffer): Promise<void> {
+    public next(value: ArrayBuffer): Promise<void> {
         this.log.trace(`Sending new message of ${value.byteLength} bytes`);
         return this.invocation.sendMessage(value);
     };

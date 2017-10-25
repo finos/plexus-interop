@@ -14,23 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus
-{
-    using System;
-    using System.Threading.Tasks;
+using Plexus.Host;
+using Plexus.Interop.CommandLineTool;
 
-    public interface IStartable : IDisposable
-    {
-        Task StartCompletion { get; }
-
-        Task Completion { get; }
-
-        void Start();
-
-        void Stop();
-
-        Task StartAsync();
-
-        Task StopAsync();
-    }
-}
+[assembly: EntryPoint(
+    typeof(Program),
+    InstanceAwareness.MultiInstance,
+    "plexus-interop-cli")]

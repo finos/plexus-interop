@@ -22,57 +22,55 @@ namespace Plexus.Interop.Samples.GreetingServer
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Threading;
     using System.Threading.Tasks;
 
     public class Program
     {
         public static async Task Main(string[] args)
         {
-            var logging = new LoggingInitializer();
-            var log = LogManager.GetLogger<Program>();
-            var cancellation = new CancellationTokenSource();
-            try
+            using (new LoggingInitializer())
             {
-                var brokerPath = args.Length > 0 ? args[0] : Path.GetFullPath(@"../..");
-                Console.WriteLine("Connecting to broker {0}", brokerPath);
-                var client = ClientFactory.Instance.Create(
-                    new ClientOptionsBuilder()
-                        .WithDefaultConfiguration(brokerPath)
-                        .WithApplicationId("interop.samples.GreetingServer")
-                        .WithProvidedService(
-                            "interop.samples.GreetingService",
-                            s => s
-                                .WithUnaryMethod<GreetingRequest, GreetingResponse>("Unary", GreetingUnary)
-                                .WithServerStreamingMethod<GreetingRequest, GreetingResponse>("ServerStreaming",
-                                    GreetingServerStreaming)
-                                .WithClientStreamingMethod<GreetingRequest, GreetingResponse>("ClientStreaming",
-                                    GreetingClientStreaming)
-                                .WithDuplexStreamingMethod<GreetingRequest, GreetingResponse>("DuplexStreaming",
-                                    GreetingDuplexStreaming)
-                        )
-                        .Build());
-                Console.CancelKeyPress += (sender, eventArgs) =>
+                var log = LogManager.GetLogger<Program>();
+                try
                 {
-                    eventArgs.Cancel = true;
-                    Console.WriteLine("Disconnecting");
-                    cancellation.Cancel();
-                };
-                await client.ConnectAsync().ConfigureAwait(false);
-                Console.WriteLine("Connected");
-                await client.Completion;
-                Console.WriteLine("Disconnected");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Program terminated with exception. See log for details. {0}: {1}", ex.GetType(),
-                    ex.Message);
-                log.Error(ex, "Program terminated with exception");
-                logging.Dispose();
-            }
-            finally
-            {
-                cancellation.Dispose();
+                    var brokerPath = args.Length > 0
+                        ? args[0]
+                        : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ??
+                          Directory.GetCurrentDirectory();
+                    Console.WriteLine("Connecting to broker {0}", brokerPath);
+                    var client = ClientFactory.Instance.Create(
+                        new ClientOptionsBuilder()
+                            .WithDefaultConfiguration(brokerPath)
+                            .WithApplicationId("interop.samples.GreetingServer")
+                            .WithProvidedService(
+                                "interop.samples.GreetingService",
+                                s => s
+                                    .WithUnaryMethod<GreetingRequest, GreetingResponse>("Unary", GreetingUnary)
+                                    .WithServerStreamingMethod<GreetingRequest, GreetingResponse>("ServerStreaming",
+                                        GreetingServerStreaming)
+                                    .WithClientStreamingMethod<GreetingRequest, GreetingResponse>("ClientStreaming",
+                                        GreetingClientStreaming)
+                                    .WithDuplexStreamingMethod<GreetingRequest, GreetingResponse>("DuplexStreaming",
+                                        GreetingDuplexStreaming)
+                            )
+                            .Build());
+                    Console.CancelKeyPress += (sender, eventArgs) =>
+                    {
+                        eventArgs.Cancel = true;
+                        Console.WriteLine("Disconnecting");
+                        client.Disconnect();
+                    };
+                    await client.ConnectAsync().ConfigureAwait(false);
+                    Console.WriteLine("Connected");
+                    await client.Completion;
+                    Console.WriteLine("Disconnected");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Program terminated with exception. See log for details. {0}: {1}", ex.GetType(),
+                        ex.Message);
+                    log.Error(ex, "Program terminated with exception");
+                }
             }
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();

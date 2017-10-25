@@ -107,13 +107,13 @@ describe("Framed Transport Connection: Client to Server communication", () => {
                 resolve(s);
             })));
         console.log("Client channel created");
-            
+
         await clientChannel.sendMessage(payload);
         console.log("Client sent message");
-            
+
         const serverChannel = await serverChannelsObserver.pullData();
         console.log("Waiting for server chanel channel");
-        
+
         const observer = new BufferedObserver<ArrayBuffer>();
         serverChannel.open(new DelegateChannelObserver(observer, (s) => { }));
         const received = await observer.pullData();

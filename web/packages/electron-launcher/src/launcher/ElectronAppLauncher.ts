@@ -22,6 +22,7 @@ import { UniqueId } from "@plexus-interop/transport-common";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 import * as fs from "fs";
 import * as log from "loglevel";
+import { MethodInvocationContext } from "@plexus-interop/client";
 const stripBom = require("strip-bom");
 const path = require("path");
 
@@ -70,7 +71,7 @@ export class ElectronAppLauncher {
                 applicationInstanceId: launcherAppInstanceId
             })
             .withAppLauncherServiceInvocationsHandler({
-                onLaunch: async (request: plexus.interop.IAppLaunchRequest) => {
+                onLaunch: async (methodInvocationContext: MethodInvocationContext, request: plexus.interop.IAppLaunchRequest) => {
                     this.log.info("Received launch request: " + JSON.stringify(request));
                     let launchPath = this.readPath(request);
                     return this.launchApp(launchPath);

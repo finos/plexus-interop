@@ -20,19 +20,20 @@
     using Plexus.Interop.Protocol.Connect;
     using Plexus.Interop.Transport;
     using System.Threading.Tasks;
+    using Plexus.Interop.Apps;
     using Plexus.Interop.Protocol;
 
     internal sealed class AuthenticationHandler : IAuthenticationHandler
     {
         private static readonly ILogger Log = LogManager.GetLogger<AuthenticationHandler>();
 
-        private readonly IClientConnectionTracker _connectionTracker;        
+        private readonly IAppLifecycleManager _connectionTracker;        
         private readonly IConnectProtocolMessageFactory _messageFactory;
         private readonly IConnectProtocolSerializer _serializer;
         private readonly IRegistryService _registryService;
 
         public AuthenticationHandler(
-            IClientConnectionTracker connectionTracker,
+            IAppLifecycleManager connectionTracker,
             IProtocolImplementation protocol,
             IRegistryService registryService)
         {
@@ -42,7 +43,7 @@
             _registryService = registryService;
         }
 
-        public async Task<IClientConnection> HandleAsync(ITransportConnection connection)
+        public async Task<IAppConnection> HandleAsync(ITransportConnection connection)
         {
             Log.Trace("Accepting new connection {0}", connection.Id);
             var channel = await connection.IncomingChannels.ReadAsync().ConfigureAwait(false);
@@ -70,7 +71,7 @@
                     channel.Out.TryCompleteWriting();
                     await channel.Completion.ConfigureAwait(false);
                     var info =
-                        new ClientConnectionDescriptor(
+                        new AppConnectionDescriptor(
                             connectResponse.ConnectionId,
                             connectRequest.ApplicationId,
                             connectRequest.ApplicationInstanceId);

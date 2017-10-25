@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Broker.Internal
+namespace Plexus.Interop.Apps
 {
     using Plexus.Channels;
     using Plexus.Interop.Transport;
     using System;
     using System.Threading.Tasks;
 
-    internal interface IClientConnection
+    public interface IAppConnection
     {
         UniqueId Id { get; }
 
         Task Completion { get; }
 
-        ClientConnectionDescriptor Info { get; }
+        AppConnectionDescriptor Info { get; }
 
         ValueTask<ITransportChannel> CreateChannelAsync();
 

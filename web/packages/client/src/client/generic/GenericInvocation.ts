@@ -144,7 +144,7 @@ export class GenericInvocation {
         this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
         this.stateMachine.go(InvocationState.COMPLETED);
         this.log.trace("Sending completion message");
-        await this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
+        this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
         if (ClientProtocolHelper.isSuccessCompletion(completion)) {
             // wait for remote side for success case only
             try {
@@ -186,7 +186,7 @@ export class GenericInvocation {
         const headerPayload = modelHelper.messageHeaderPayload({
             length: data.byteLength
         });
-        await this.sourceChannel.sendMessage(headerPayload);
+        this.sourceChannel.sendMessage(headerPayload);
         this.sourceChannel.sendMessage(data);
         this.sentMessagesCounter++;
     }
@@ -221,7 +221,6 @@ export class GenericInvocation {
         switch (this.stateMachine.getCurrent()) {
             case InvocationState.OPEN:
                 this.log.debug("Open state, switching to COMPLETION_RECEIVED");
-                this.readCancellationToken.cancel("Invocation close received");
                 this.stateMachine.go(InvocationState.COMPLETION_RECEIVED);
                 break;
             case InvocationState.COMPLETED:
@@ -275,6 +274,7 @@ export class GenericInvocation {
                     this.closeInternal();
                     invocationObserver.error(e);
                 }
+
             });
         });
 
@@ -318,7 +318,7 @@ export class GenericInvocation {
             } else {
                 this.log.warn(`Unknown message received ${JSON.stringify(envelopObject)}`);
             }
-        } else if (this.stateMachine.isOneOf(InvocationState.OPEN, InvocationState.COMPLETED)) {
+        } else if (this.stateMachine.isOneOf(InvocationState.OPEN, InvocationState.COMPLETED, InvocationState.COMPLETION_RECEIVED)) {
             const envelopObject = modelHelper.decodeInvocationEnvelop(data);
             if (envelopObject.message) {
                 this.log.trace(`Received message header`);

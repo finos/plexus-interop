@@ -14,24 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+﻿namespace Plexus.Interop.CommandLineTool.Internal
 {
-    using Plexus.Interop.Transport;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-
-    internal interface IClientConnectionTracker
+    internal enum CommandLineToolCommand
     {
-        IClientConnection AcceptConnection(
-            ITransportConnection connection,
-            ClientConnectionDescriptor info);
-
-        bool TryGetOnlineConnection(UniqueId id, out IClientConnection connection);
-
-        Task<IClientConnection> SpawnConnectionAsync(string appId);
-
-        ValueTask<IClientConnection> GetOrSpawnConnectionAsync(IReadOnlyCollection<string> appId);
-
-        IReadOnlyCollection<IClientConnection> GetOnlineConnections();
+        None,
+        ActivateApp
     }
 }

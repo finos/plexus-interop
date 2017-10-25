@@ -58,20 +58,20 @@ export class EchoClientBenchmark extends BaseEchoTest {
         const echoRequest = this.clientsSetup.createRequestOfBytes(bytesPerMessage);
         const cancellationToken = new CancellationToken();
         const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
-            function sentMessages() {
+            function sendMessages() {
                 if (!cancellationToken.isCancelled()) {
                     hostClient.next(echoRequest);
                     hostClient.next(echoRequest);
                     hostClient.next(echoRequest);
                     hostClient.next(echoRequest);
                     hostClient.next(echoRequest);
-                    setTimeout(sentMessages, 0);
+                    setTimeout(sendMessages, 0);
                 } else {
                     hostClient.complete();   
                 }
             };
-            sentMessages();
-        });        
+            sendMessages();
+        });              
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         return new Promise<BenchmarkResult>(async (resolve, reject) => {
             const start = Date.now();
