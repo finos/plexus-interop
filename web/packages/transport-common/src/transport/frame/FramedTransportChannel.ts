@@ -21,12 +21,10 @@ import { FramedTransport } from "./FramedTransport";
 import { UniqueId } from "../../transport/UniqueId";
 import { Observer, ReadWriteCancellationToken } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
-import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, StateMaschine } from "@plexus-interop/common";
+import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, StateMaschine, SequencedExecutor } from "@plexus-interop/common";
 import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ClientError, ErrorCompletion } from "@plexus-interop/protocol";
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";
-import { Queue } from "typescript-collections";
-import { AsyncHelper } from "@plexus-interop/common";
 
 export type ChannelState = "CREATED" | "OPEN" | "CLOSED" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED";
 
@@ -36,11 +34,6 @@ export const ChannelState = {
     CLOSED: "CLOSED" as ChannelState,
     CLOSE_RECEIVED: "CLOSE_RECEIVED" as ChannelState,
     CLOSE_REQUESTED: "CLOSE_REQUESTED" as ChannelState
-};
-
-type PendingSendCommand = {
-    id: number,
-    action: () => Promise<void>;
 };
 
 export class FramedTransportChannel implements TransportChannel {
@@ -56,7 +49,7 @@ export class FramedTransportChannel implements TransportChannel {
     private remoteCompletion: plexus.ICompletion;
     private channelObserver: Observer<ArrayBuffer>;
 
-    private outQueue: Queue<PendingSendCommand> = new Queue<PendingSendCommand>();
+    private writeExecutor: SequencedExecutor;
 
     private onCloseHandler: ((completion?: plexus.ICompletion) => void) | null;
 
@@ -66,6 +59,7 @@ export class FramedTransportChannel implements TransportChannel {
         private dispose: () => Promise<void>,
         baseReadToken: CancellationToken) {
         this.log = LoggerFactory.getLogger(`FramedTransportChannel [${id.toString()}]`);
+        this.writeExecutor = new SequencedExecutor(this.log);
         this.channelCancellationToken = new ReadWriteCancellationToken(new CancellationToken(baseReadToken));
         this.log.debug("Created");
         this.stateMachine = new StateMaschineBase<ChannelState>(ChannelState.CREATED, [
@@ -266,10 +260,12 @@ export class FramedTransportChannel implements TransportChannel {
         this.clientCompletion = completion;
         this.channelCancellationToken.cancelWrite("Close requested");
         this.log.debug("Sending channel close frame");
-        this.framedTransport.writeFrame(ChannelCloseFrame.fromHeaderData({
-            channelId: this.id,
-            completion
-        }));
+        this.writeExecutor.submit(async () => {
+            this.framedTransport.writeFrame(ChannelCloseFrame.fromHeaderData({
+                channelId: this.id,
+                completion
+            }));
+        });
     }
 
     public sendLastMessage(data: ArrayBuffer): Promise<plexus.ICompletion> {
@@ -281,23 +277,12 @@ export class FramedTransportChannel implements TransportChannel {
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
         this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
-        /* istanbul ignore if */
         let currentMessageIndex = ++this.messageId;
+        /* istanbul ignore if */
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Scheduling sending [${currentMessageIndex}] message of ${data.byteLength} bytes`);
         }
-        this.outQueue.enqueue({
-            id: currentMessageIndex,
-            action: () => this.sendMessageInternal(data, currentMessageIndex)
-        });
-        if (this.outQueue.size() > 1) {
-            await AsyncHelper.waitFor(() => this.outQueue.peek().id === currentMessageIndex);
-        } 
-        try {
-            await this.outQueue.peek().action();            
-        } finally {
-            this.outQueue.dequeue();            
-        }
+        return this.writeExecutor.submit(() => this.sendMessageInternal(data, currentMessageIndex));
     }
 
     private async sendMessageInternal(data: ArrayBuffer, messageIndex: number): Promise<void> {
