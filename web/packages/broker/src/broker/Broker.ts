@@ -4,7 +4,7 @@ import { StateMaschine, StateMaschineBase, ReadWriteCancellationToken, Logger, L
 import { ServerConnectionFactory } from "../transport/ServerConnectionFactory";
 import { InteropMetadata } from "../metadata/InteropMetadata";
 
-enum BrokerState { CREATED, OPEN, CLOSED };
+enum BrokerState { CREATED, OPEN, CLOSED }
 
 export class Broker {
 
@@ -28,8 +28,8 @@ export class Broker {
         this.log.debug("Starting to listen for incoming connections");
         this.connectionFactory.acceptConnections({
             next: this.handleIncomingConnection.bind(this),
-            error: e => {},
-            complete: () => {}
+            error: e => { },
+            complete: () => { }
         });
     }
 
@@ -45,7 +45,7 @@ export class Broker {
     }
 
     private handleIncomingConnection(transportConnection: TransportConnection): void {
-        
+
     }
 
 }

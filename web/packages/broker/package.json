@@ -25,13 +25,11 @@
     "@plexus-interop/transport-common": "0.0.1",
     "protobufjs": "^6.8.0",
     "reflect-metadata": "^0.1.10",
-    "rxjs": "^5.4.2",
     "tslib": "^1.7.1"
   },
   "peerDependencies": {
     "@plexus-interop/transport-common": "0.0.1",
-    "protobufjs": "6.8.0",
-    "rxjs": "^5.4.2"
+    "protobufjs": "6.8.0"
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {
@@ -39,10 +37,8 @@
     "@types/long": "^3.0.31",
     "@types/node": "^7.0.5",
     "babel-register": "^6.23.0",
-    "find-port": "^2.0.1",
     "jasmine-reporters": "^2.2.0",
     "jest": "~18.1.0",
-    "mock-socket": "^7.0.0",
     "trash-cli": "^1.4.0",
     "tslint": "^5.6.0",
     "typescript": "^2.2.1",

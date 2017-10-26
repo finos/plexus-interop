@@ -1,4 +1,4 @@
-import { AsyncHandler } from "../Handler";
+import { AsyncHandler } from "../AsyncHandler";
 import { TransportChannel } from "@plexus-interop/transport-common";
 import { Completion, SuccessCompletion } from "@plexus-interop/protocol";
 
@@ -7,8 +7,8 @@ export class ClientRequestProcessor implements AsyncHandler<TransportChannel, Co
     public async handle(channel: TransportChannel): Promise<Completion> {
         return new Promise((resolve, reject) => {
             channel.open({
-                started: () => {},
-                startFailed: () => {},
+                started: () => { },
+                startFailed: () => { },
                 next: message => {
                     // TODO
                 },
@@ -19,7 +19,7 @@ export class ClientRequestProcessor implements AsyncHandler<TransportChannel, Co
                 complete: () => {
                     resolve(new SuccessCompletion());
                 }
-            })
+            });
         });
     }
 

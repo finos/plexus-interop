@@ -1,5 +1,6 @@
 import { ApplicationConnectionDescriptor } from "./ApplicationConnectionDescriptor";
 import { TransportConnection } from "@plexus-interop/transport-common";
+import { ApplicationConnection } from "./ApplicationConnection";
 
 export interface AppLifeCycleManager {
 
@@ -9,6 +10,6 @@ export interface AppLifeCycleManager {
 
     getOrSpawnConnection(applicationId: string): Promise<ApplicationConnectionDescriptor>;
 
-    acceptConnection(connection: TransportConnection, appDescriptor: ApplicationConnectionDescriptor): Promise<void>;
+    acceptConnection(connection: TransportConnection, appDescriptor: ApplicationConnectionDescriptor): Promise<ApplicationConnection>;
 
 }

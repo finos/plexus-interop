@@ -1,36 +1,46 @@
-import { AsyncHandler } from "../Handler";
-import { TransportChannel } from "@plexus-interop/transport-common";
-import { ApplicationConnection } from "../lifecycle/AppConnection";
+import { AsyncHandler } from "../AsyncHandler";
+import { TransportChannel, TransportConnection } from "@plexus-interop/transport-common";
+import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 import { UniqueId, ClientProtocolHelper } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
+import { transportProtocol as plexus } from "@plexus-interop/protocol";
 
-export class AuthenticationHandler implements AsyncHandler<TransportChannel, ApplicationConnection> {
+export class AuthenticationHandler implements AsyncHandler<[TransportConnection, TransportChannel], ApplicationConnection> {
 
     private readonly log: Logger = LoggerFactory.getLogger("AuthenticationHandler");
 
-    public handle(channel: TransportChannel): Promise<ApplicationConnection> {
+    constructor(private readonly appLifeCycleManager: AppLifeCycleManager) { }
+
+    public handle(connectionDetails: [TransportConnection, TransportChannel]): Promise<ApplicationConnection> {
+
+        const [connection, channel] = connectionDetails;
         const channelId = channel.uuid().toString();
+
         return new Promise((resolve, reject) => {
             channel.open({
-                started: () => {},
+                started: () => { },
                 startFailed: (e) => reject(e),
-                next: message => {
+                next: async message => {
+
                     if (this.log.isDebugEnabled()) {
-                        this.log.debug(`[${channelId}] connect request received`);                    
+                        this.log.debug(`[${channelId}] connect request received`);
                     }
+
                     const clientToBrokerMessage = ClientProtocolHelper.decodeConnectRequest(message);
                     if (this.log.isDebugEnabled()) {
-                        this.log.debug(`Connect request from [${clientToBrokerMessage.applicationId}] application received`);                    
+                        this.log.debug(`Connect request from [${clientToBrokerMessage.applicationId}] application received`);
                     }
-                    const connectionId = UniqueId.generateNew();
-                    channel.sendLastMessage(ClientProtocolHelper.connectResponsePayload({connectionId}));
-                    resolve({
-                        id: connectionId,
-                        info: {
-                            id: clientToBrokerMessage.applicationId,
-                            instanceId: clientToBrokerMessage.applicationInstanceId
-                        }
+
+                    const appConnection = await this.appLifeCycleManager.acceptConnection(connection, {
+                        id: clientToBrokerMessage.applicationId as string,
+                        instanceId: UniqueId.fromProperties(clientToBrokerMessage.applicationInstanceId as plexus.IUniqueId)
                     });
+
+                    channel.sendLastMessage(ClientProtocolHelper.connectResponsePayload({ connectionId: appConnection.id }))
+                        .catch(e => this.log.error("Failed to sent connection details", e));
+
+                    resolve(appConnection);
                 },
                 error: e => reject(e),
                 complete: () => {

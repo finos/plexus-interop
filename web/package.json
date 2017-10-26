@@ -12,6 +12,7 @@
     "build-electron-launcher": "cd ./packages/electron-launcher && yarn build",
     "build-protocol": "cd ./packages/protocol && yarn build",
     "build-transport-common": "cd ./packages/transport-common && yarn build",
+    "build-broker": "cd ./packages/broker && yarn build",
     "build-websocket-transport": "cd ./packages/websocket-transport && yarn build",
     "build-quickstart-viewer": "cd ./packages/ccy-pair-rate-viewer && yarn build",
     "build-quickstart-provider": "cd ./packages/ccy-pair-rate-provider && yarn build",

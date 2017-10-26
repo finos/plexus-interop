@@ -1,7 +1,4 @@
 
 
 export class InteropMetadata {
-
-    
-
 }
