@@ -36,18 +36,25 @@ describe("InMemoryCache", () => {
 
     it("I evicts value on expiration time", (done) => {
         const sut = new InMemoryCache();
-        sut.set(key, new CacheEntry(value, 5));
+        sut.set(key, new CacheEntry(value, 1));
         setTimeout(() => {
             expect(sut.get(key)).to.be.undefined;
             done();
-        }, 100);
+        }, 50);
     });
 
-    it("I calls dispose callback on value evition value on expiration time", (done) => {
+    it("It calls callback on value eviction", (done) => {
         const sut = new InMemoryCache();
         sut.set(key, new CacheEntry(value, 5, () => {
             done();
         }));
+    });
+
+    it("It can check whether value exist or not", () => {
+        const sut = new InMemoryCache();
+        sut.set(key, new CacheEntry(value));
+        expect(sut.has(key)).to.be.true;
+        expect(sut.has("123")).to.be.false;
     });
 
     it("It returns all not expired keys", () => {
@@ -58,7 +65,7 @@ describe("InMemoryCache", () => {
         keys.forEach(k => sut.set(k, new CacheEntry(value)))
         
         const receivedKeys = sut.keys();
-        
+
         expect(receivedKeys.length).to.eq(2);
         expect(receivedKeys.indexOf("k") > -1).to.be.true;
         expect(receivedKeys.indexOf("k2") > -1).to.be.true;

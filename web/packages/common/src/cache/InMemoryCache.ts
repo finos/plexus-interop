@@ -39,7 +39,7 @@ export class InMemoryCache implements Cache {
             cleanUpTimeout = globalObj.setTimeout(() => this.cleanEntry(key), entry.ttl);
         }
         this.storage.set(key, new CacheEntryDescriptor(
-            entry, 
+            entry,
             entry.ttl > 0 ? Date.now() + entry.ttl : -1,
             cleanUpTimeout
         ));
@@ -49,10 +49,14 @@ export class InMemoryCache implements Cache {
         const descriptor = this.storage.get(key);
         if (descriptor && descriptor.entry.ttl > 0) {
             clearTimeout(descriptor.cleanUpTimeOutId);
-            descriptor.cleanUpTimeOutId = 
+            descriptor.cleanUpTimeOutId =
                 globalObj.setTimeout(() => this.cleanEntry(key), descriptor.entry.ttl);
-        }       
+        }
         return false;
+    }
+
+    public has(key: string): boolean {
+        return this.storage.has(key);
     }
 
     public keys(): string[] {

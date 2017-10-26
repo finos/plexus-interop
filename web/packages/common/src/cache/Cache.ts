@@ -38,4 +38,9 @@ export interface Cache {
     */
     keys(): string[];
 
+    /**
+     * Checks if element exists in cache
+     */
+    has(key: string): boolean;
+
 }
