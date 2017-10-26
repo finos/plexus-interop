@@ -93,7 +93,7 @@
             }
             finally
             {
-                await _transport.Completion.ConfigureAwait(false);
+                await _buffer.In.Completion.ConfigureAwait(false);
             }
         }
 
