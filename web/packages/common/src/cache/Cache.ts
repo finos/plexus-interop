@@ -14,7 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./util";
-export * from "./logger";
-export * from "./rx";
-export * from "./cache";
+import { CacheEntry } from "./CacheEntry";
+
+export interface Cache {
+
+    /*
+    * Sets new entry for specific key, if entry already exists - then it will be evicted with calling appropriate dispose method
+    */
+    set<T>(key: string, entry: CacheEntry<T>, ttl?: number): Promise<void>;
+
+    /**
+     * Gets current entry
+     */
+    get<T>(key: string): T | undefined;
+
+    /**
+     * Resets ttl for corresponding entry
+     */
+    resetTtl(key: string): boolean;
+
+    /*
+    * All not expired keys
+    */
+    keys(): string[];
+
+}

@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./util";
-export * from "./logger";
-export * from "./rx";
-export * from "./cache";
+export class CacheEntry<T> {
+    constructor(
+        public readonly value: T,
+        public readonly ttl: number = -1,
+        public readonly onEvict: (value: T) => void = () => {}
+    ) {}
+}

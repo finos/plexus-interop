@@ -14,7 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./util";
-export * from "./logger";
-export * from "./rx";
-export * from "./cache";
+import { CacheEntry } from "./CacheEntry";
+
+export class CacheEntryDescriptor<T> {
+    constructor(
+        public readonly entry: CacheEntry<T>,
+        public readonly expirationTime: number,
+        public cleanUpTimeOutId: number
+    ) {}
+}
