@@ -71,21 +71,22 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
                     serialized.Dispose();
                     throw;
                 }
-            }
+            }            
         }
 
         protected override async Task InitializeReceivingAsync()
         {
-            using (var frame = await _channel.In.ReadAsync().ConfigureAwait(false))
+            _log.Trace("Awaiting invocation start events");
+            using (var frame = await _channel.In.ReadAsync(StopToken).ConfigureAwait(false))
             using (_protocol.Serializer.DeserializeInvocationStarting(frame.Payload))
             {
                 _log.Trace("Invocation starting event received: {0}", Info);
             }
-            using (var frame = await _channel.In.ReadAsync().ConfigureAwait(false))
+            using (var frame = await _channel.In.ReadAsync(StopToken).ConfigureAwait(false))
             using (_protocol.Serializer.DeserializeInvocationStarted(frame.Payload))
             {
                 _log.Trace("Invocation started event received: {0}", Info);
             }
-        }        
+        }
     }
 }

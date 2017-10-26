@@ -58,7 +58,7 @@ namespace Plexus.Interop.Internal.Calls
         private async Task ProcessAsync(IInvocation<TRequest, TResponse> invocation)
         {
             _cancellation.Token.ThrowIfCancellationRequested();
-            using (_cancellation.Token.Register(() => invocation.TryTerminate()))
+            using (_cancellation.Token.Register(() => invocation.Out.TryTerminateWriting()))
             {
                 try
                 {

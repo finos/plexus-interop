@@ -21,7 +21,7 @@ namespace Plexus.Processes
     using System.Threading;
     using System.Threading.Tasks;
 
-    public abstract class ProcessBase : IProcess
+    public abstract class ProcessBase : IDisposable
     {
         private readonly Latch _started = new Latch();
         private readonly Latch _stopped = new Latch();
@@ -71,7 +71,6 @@ namespace Plexus.Processes
         {
             if (!_started.TryEnter())
             {
-                Log.Trace("Start called after process was already started");
                 return;
             }
             if (_stopped.IsEntered)
@@ -105,7 +104,6 @@ namespace Plexus.Processes
         {
             if (!_stopped.TryEnter())
             {
-                Log.Trace("Stop called after process was already stopped");
                 return;
             }
             Log.Debug("Stopping");

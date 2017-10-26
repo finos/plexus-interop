@@ -33,8 +33,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
     {        
         private const string ServerName = "ws-v1";
 
-        private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionServer>();
-
         private IWebHost _host;
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(1);
         private readonly IServerStateWriter _stateWriter;
@@ -44,6 +42,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
             _stateWriter = new ServerStateWriter(ServerName, workingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<WebSocketTransmissionServer>();
 
         public IReadOnlyChannel<ITransmissionConnection> In => _buffer.In;
 

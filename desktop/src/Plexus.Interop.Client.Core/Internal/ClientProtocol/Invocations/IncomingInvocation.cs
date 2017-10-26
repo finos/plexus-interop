@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal.ClientProtocol.Invocations
+ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol;
@@ -50,7 +50,7 @@
                 var serialized = _protocol.Serializer.Serialize(invocationStarted);
                 try
                 {
-                    await _channel.Out.WriteAsync(new TransportMessageFrame(serialized)).ConfigureAwait(false);
+                    await _channel.Out.WriteAsync(new TransportMessageFrame(serialized), StopToken).ConfigureAwait(false);
                     _log.Trace("Invocation started event sent: {0}", Info);
                 }
                 catch
@@ -63,7 +63,7 @@
 
         protected override Task InitializeReceivingAsync()
         {
-            return TaskConstants.True;
+            return TaskConstants.Completed;
         }
     }
 }

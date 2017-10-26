@@ -66,7 +66,7 @@ namespace Plexus.Interop.Internal.Calls
 
         private async Task<TResponse> ProcessResponseAsync(IInvocation<TRequest, TResponse> invocation)
         {
-            using (_cancellation.Token.Register(() => invocation.TryTerminate()))
+            using (_cancellation.Token.Register(() => invocation.Out.TryTerminateWriting()))
             {
                 try
                 {
@@ -91,7 +91,7 @@ namespace Plexus.Interop.Internal.Calls
 
         private async Task ProcessRequestsAsync(IInvocation<TRequest, TResponse> invocation)
         {
-            using (_cancellation.Token.Register(() => invocation.TryTerminate()))
+            using (_cancellation.Token.Register(() => invocation.Out.TryTerminateWriting()))
             {
                 try
                 {

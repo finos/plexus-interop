@@ -55,6 +55,21 @@ namespace Plexus.Channels
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static async Task WriteOrDisposeAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
+            where T : IDisposable
+        {
+            try
+            {
+                await channel.WriteAsync(item, cancellationToken).ConfigureAwait(false);
+            }
+            catch
+            {
+                item.Dispose();
+                throw;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async Task<bool> TryWriteAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
         {
             do

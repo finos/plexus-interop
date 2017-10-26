@@ -19,6 +19,7 @@ namespace Plexus.Interop.Internal.Calls
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Channels;
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
     using Plexus.Processes;
 
@@ -63,19 +64,13 @@ namespace Plexus.Interop.Internal.Calls
 
         private async Task ProcessAsync(IInvocation<TRequest, TResponse> invocation)
         {
-            using (_cancellation.Token.Register(() => invocation.TryTerminate()))
+            using (_cancellation.Token.Register(() => invocation.Out.TryTerminateWriting()))
             {
                 try
                 {
                     _response = default;
                     Log.Trace("Reading response");
-                    while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
-                    {
-                        while (invocation.In.TryRead(out var response))
-                        {
-                            _response = response;
-                        }
-                    }
+                    await invocation.In.ConsumeAsync(x => _response = x).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
