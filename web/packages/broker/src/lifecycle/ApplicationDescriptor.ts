@@ -1,6 +1,10 @@
+
 import { UniqueId } from "@plexus-interop/transport-common";
 
-export interface ClientHeartBit {
+export interface ApplicationDescriptor {
+    
     applicationId: string;
-    applicationInstanceId: UniqueId;
+
+    instanceId: UniqueId;
+    
 }

@@ -28,16 +28,17 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
                     }
 
                     const clientToBrokerMessage = ClientProtocolHelper.decodeConnectRequest(message);
+                    
                     if (this.log.isDebugEnabled()) {
                         this.log.debug(`Connect request from [${clientToBrokerMessage.applicationId}] application received`);
                     }
 
                     const appConnection = await this.appLifeCycleManager.acceptConnection(connection, {
-                        id: clientToBrokerMessage.applicationId as string,
+                        applicationId: clientToBrokerMessage.applicationId as string,
                         instanceId: UniqueId.fromProperties(clientToBrokerMessage.applicationInstanceId as plexus.IUniqueId)
                     });
 
-                    channel.sendLastMessage(ClientProtocolHelper.connectResponsePayload({ connectionId: appConnection.id }))
+                    channel.sendLastMessage(ClientProtocolHelper.connectResponsePayload({ connectionId: appConnection.descriptor.connectionId }))
                         .catch(e => this.log.error("Failed to sent connection details", e));
 
                     resolve(appConnection);

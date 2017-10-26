@@ -34,7 +34,7 @@ export interface Cache {
     resetTtl(key: string): boolean;
 
     /*
-    * All not expired keys
+    * Gets all not expired keys
     */
     keys(): string[];
 

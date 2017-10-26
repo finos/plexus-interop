@@ -1,10 +1,9 @@
 
 import { UniqueId } from "@plexus-interop/transport-common";
+import { ApplicationDescriptor } from "./ApplicationDescriptor";
 
-export interface ApplicationConnectionDescriptor {
+export interface ApplicationConnectionDescriptor extends ApplicationDescriptor {
     
-    instanceId: UniqueId;
-    
-    id: string;
+    connectionId: UniqueId;
     
 }
