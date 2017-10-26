@@ -50,6 +50,21 @@ describe("InMemoryCache", () => {
         }));
     });
 
+    it("It returns all not expired keys", () => {
+
+        const sut = new InMemoryCache();
+        const keys = ["k", "k2"];
+
+        keys.forEach(k => sut.set(k, new CacheEntry(value)))
+        
+        const receivedKeys = sut.keys();
+        
+        expect(receivedKeys.length).to.eq(2);
+        expect(receivedKeys.indexOf("k") > -1).to.be.true;
+        expect(receivedKeys.indexOf("k2") > -1).to.be.true;
+
+    });
+
     it("It can restart eviction timer with ttl reset", (done) => {
         const sut = new InMemoryCache();
         sut.set(key, new CacheEntry(value, 150));

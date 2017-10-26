@@ -56,7 +56,9 @@ export class InMemoryCache implements Cache {
     }
 
     public keys(): string[] {
-        return [];
+        const result: string[] = [];
+        this.storage.forEach((v, k) => result.push(k));
+        return result;
     }
 
     public get<T>(key: string): T | undefined {
