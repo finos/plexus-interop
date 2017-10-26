@@ -50,7 +50,7 @@
                 var serialized = _protocol.Serializer.Serialize(invocationStarted);
                 try
                 {
-                    await _channel.Out.WriteAsync(new TransportMessageFrame(serialized), StopToken).ConfigureAwait(false);
+                    await _channel.Out.WriteAsync(new TransportMessageFrame(serialized), CancellationToken).ConfigureAwait(false);
                     _log.Trace("Invocation started event sent: {0}", Info);
                 }
                 catch

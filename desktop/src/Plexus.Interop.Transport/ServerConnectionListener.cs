@@ -75,7 +75,7 @@ namespace Plexus.Interop.Transport
                 await server.In.ConsumeAsync(ProcessAsync).ConfigureAwait(false);
                 Log.Debug("Server completed: {{{0}}}", server);
             }
-            catch (OperationCanceledException) when (StopToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (CancellationToken.IsCancellationRequested)
             {
                 Log.Debug("Server stopped: {{{0}}}", server);
             }

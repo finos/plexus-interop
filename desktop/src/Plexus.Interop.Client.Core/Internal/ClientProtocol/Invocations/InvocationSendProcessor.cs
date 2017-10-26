@@ -22,7 +22,7 @@
         private readonly BufferedChannel<(IInvocationMessage Header, Maybe<TRequest> Body)> _buffer
             = new BufferedChannel<(IInvocationMessage, Maybe<TRequest>)>(3);
 
-        private readonly IWritableChannel<TransportMessageFrame> _transport;
+        private readonly IWriteOnlyChannel<TransportMessageFrame> _transport;
         private readonly IMarshaller<TRequest> _marshaller;
         private readonly InvocationState _invocationState;
         private readonly IProtocolImplementation _protocol;
@@ -30,7 +30,7 @@
 
         public InvocationSendProcessor(
             UniqueId id,
-            IWritableChannel<TransportMessageFrame> transport,
+            IWriteOnlyChannel<TransportMessageFrame> transport,
             IProtocolImplementation protocol,
             IMarshaller<TRequest> marshaller, 
             InvocationState invocationState)
@@ -40,6 +40,7 @@
             _marshaller = marshaller;
             _invocationState = invocationState;
             _protocol = protocol;
+            _requestBuffer.PropagateCompletionFrom(_buffer.Out.Completion);
         }
 
         protected override ILogger Log => _log;
@@ -63,8 +64,8 @@
         {
             try
             {
-                await _requestBuffer.In.ConsumeAsync(SendRequestAsync, StopToken).ConfigureAwait(false);
-                await this.WriteOrDisposeAsync(_protocol.MessageFactory.CreateInvocationSendCompletion(), StopToken).ConfigureAwait(false);
+                await _requestBuffer.In.ConsumeAsync(SendRequestAsync, CancellationToken).ConfigureAwait(false);
+                await this.WriteOrDisposeAsync(_protocol.MessageFactory.CreateInvocationSendCompletion(), CancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -79,8 +80,7 @@
         {
             try
             {
-                await _buffer.In.ConsumeAsync(SendAsync, StopToken).ConfigureAwait(false);
-                _transport.TryCompleteWriting();
+                await _buffer.In.ConsumeAsync(SendAsync, CancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -88,7 +88,6 @@
                 _buffer.In.ConsumeBufferedItems(x => x.Header.Dispose());
                 _requestBuffer.Out.TryTerminateWriting(ex);
                 _requestBuffer.In.ConsumeBufferedItems(x => { });
-                _transport.TryTerminateWriting(ex);
                 throw;
             }
             finally
@@ -102,7 +101,7 @@
             var header = _protocol.MessageFactory.CreateInvocationMessageHeader();
             try
             {
-                await _buffer.Out.WriteAsync((header, request), StopToken);
+                await _buffer.Out.WriteAsync((header, request), CancellationToken);
             }
             catch
             {
@@ -144,12 +143,12 @@
                 {
                     isLastFrameInMessage = true;
                 }
-                var payload = await PooledBuffer.Get(_curOutcomingMessage, frameLength, StopToken).ConfigureAwait(false);                
+                var payload = await PooledBuffer.Get(_curOutcomingMessage, frameLength, CancellationToken).ConfigureAwait(false);                
                 try
                 {
                     var frame = new TransportMessageFrame(payload, !isLastFrameInMessage);
                     _log.Trace("Sending frame of message of type {0}: {1}", msg.GetType().Name, frame);
-                    await _transport.WriteAsync(frame, StopToken).ConfigureAwait(false);
+                    await _transport.WriteAsync(frame, CancellationToken).ConfigureAwait(false);
                 }
                 catch
                 {
@@ -175,7 +174,7 @@
                 {
                     _log.Trace("Sending header: {0}", header);
                     var message = new TransportMessageFrame(serialized);
-                    await _transport.WriteAsync(message, StopToken).ConfigureAwait(false);
+                    await _transport.WriteAsync(message, CancellationToken).ConfigureAwait(false);
                     _log.Trace("Sent header: {0}", header);
                 }
                 catch (Exception ex)
@@ -194,7 +193,7 @@
 
         public Task<bool> WaitWriteAvailableAsync(CancellationToken cancellationToken = default)
         {
-            using (var cancellation = CancellationTokenSource.CreateLinkedTokenSource(StopToken, cancellationToken))
+            using (var cancellation = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken, cancellationToken))
             {
                 return _buffer.WaitWriteAvailableAsync(cancellation.Token);
             }

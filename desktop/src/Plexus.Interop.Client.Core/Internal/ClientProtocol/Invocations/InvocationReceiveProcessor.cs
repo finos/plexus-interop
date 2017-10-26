@@ -41,7 +41,7 @@
                 HandleIncomingMessageHeader,
                 HandleIncomingConfirmation,
                 HandleIncomingCompletion);
-            _buffer.PropagateCompletionFrom(Completion);
+            _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
         protected override ILogger Log => _log;
@@ -57,7 +57,7 @@
 
         private async Task ProcessAsync()
         {
-            await _transport.ConsumeAsync(HandleIncomingFrameAsync, StopToken).ConfigureAwait(false);
+            await _transport.ConsumeAsync(HandleIncomingFrameAsync, CancellationToken).ConfigureAwait(false);
         }
 
         private async Task HandleIncomingFrameAsync(TransportMessageFrame frame)
@@ -95,13 +95,13 @@
             {
                 _curIncomingMessage.Position = 0;
                 var msg = _marshaller.Decode(_curIncomingMessage);                
-                await _buffer.Out.WriteAsync(msg, StopToken).ConfigureAwait(false);
+                await _buffer.Out.WriteAsync(msg, CancellationToken).ConfigureAwait(false);
                 _log.Debug("Received message of type {0} with length {1}", msg.GetType().Name, _curIncomingMessage.Length);
                 _curIncomingMessage.Position = 0;
                 _curIncomingMessage.SetLength(0);
                 _incomingStreamState = IncomingStreamState.Open;
                 var header = _protocol.MessageFactory.CreateInvocationMessageReceived();
-                await _sender.WriteOrDisposeAsync(header, StopToken).ConfigureAwait(false);
+                await _sender.WriteOrDisposeAsync(header, CancellationToken).ConfigureAwait(false);
             }
         }
 

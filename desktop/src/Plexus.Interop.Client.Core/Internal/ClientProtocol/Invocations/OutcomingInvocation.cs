@@ -77,12 +77,12 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
         protected override async Task InitializeReceivingAsync()
         {
             _log.Trace("Awaiting invocation start events");
-            using (var frame = await _channel.In.ReadAsync(StopToken).ConfigureAwait(false))
+            using (var frame = await _channel.In.ReadAsync(CancellationToken).ConfigureAwait(false))
             using (_protocol.Serializer.DeserializeInvocationStarting(frame.Payload))
             {
                 _log.Trace("Invocation starting event received: {0}", Info);
             }
-            using (var frame = await _channel.In.ReadAsync(StopToken).ConfigureAwait(false))
+            using (var frame = await _channel.In.ReadAsync(CancellationToken).ConfigureAwait(false))
             using (_protocol.Serializer.DeserializeInvocationStarted(frame.Payload))
             {
                 _log.Trace("Invocation started event received: {0}", Info);

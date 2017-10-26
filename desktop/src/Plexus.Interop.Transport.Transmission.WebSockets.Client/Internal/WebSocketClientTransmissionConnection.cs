@@ -45,8 +45,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
             _webSocket.Closed += OnClosed;
             _webSocket.Error += OnError;
 
-            _reader = new WebSocketClientTransmissionReader(Id, _webSocket, StopToken);
-            _writer = new WebSocketClientTransmissionWriter(Id, _webSocket, StopToken);
+            _reader = new WebSocketClientTransmissionReader(Id, _webSocket, CancellationToken);
+            _writer = new WebSocketClientTransmissionWriter(Id, _webSocket, CancellationToken);
 
             Completion.LogCompletion(_log);
 
@@ -102,14 +102,14 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
         {
             try
             {
-                if (StopToken.IsCancellationRequested)
+                if (CancellationToken.IsCancellationRequested)
                 {
                     _webSocket.Dispose();
                     return TaskConstants.Completed;
                 }
                 _log.Trace("Opening socket");
                 _webSocket.Open();
-                await _connectCompletion.Task.WithCancellation(StopToken).ConfigureAwait(false);
+                await _connectCompletion.Task.WithCancellation(CancellationToken).ConfigureAwait(false);
                 _log.Trace("Connected");
                 _writer.Start();
                 return ProcessAsync();

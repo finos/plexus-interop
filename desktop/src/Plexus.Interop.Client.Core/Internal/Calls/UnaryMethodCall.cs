@@ -16,18 +16,16 @@
  */
 namespace Plexus.Interop.Internal.Calls
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Plexus.Channels;
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
     using Plexus.Processes;
+    using System;
+    using System.Threading.Tasks;
 
     internal sealed class UnaryMethodCall<TRequest, TResponse> 
         : ProcessBase, IUnaryMethodCall<TResponse>, IUnaryMethodCall
     {
         private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private TResponse _response;
 
         public UnaryMethodCall(Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> invocationFactory)
@@ -47,42 +45,45 @@ namespace Plexus.Interop.Internal.Calls
 
         Task IUnaryMethodCall.ResponseAsync => ResponseAsync;
 
+        public void Cancel()
+        {
+            Stop();
+        }
+
         public Task CancelAsync()
         {
-            _cancellation.Cancel();
-            return Completion.IgnoreExceptions();
+            return StopAsync();
         }
 
         protected override async Task<Task> StartCoreAsync()
         {
-            _cancellation.Token.ThrowIfCancellationRequested();
             Log.Trace("Creating invocation");
             var invocation = await _invocationFactory().ConfigureAwait(false);
+            OnStop(() => invocation.Out.TryTerminateWriting());
             await invocation.StartCompletion.ConfigureAwait(false);
             return ProcessAsync(invocation);
         }
 
         private async Task ProcessAsync(IInvocation<TRequest, TResponse> invocation)
         {
-            using (_cancellation.Token.Register(() => invocation.Out.TryTerminateWriting()))
+            try
             {
-                try
-                {
-                    _response = default;
-                    Log.Trace("Reading response");
-                    await invocation.In.ConsumeAsync(x => _response = x).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    invocation.Out.TryTerminateWriting(ex);
-                    throw;
-                }
-                finally                
-                {
-                    Log.Trace("Awaiting invocation completion");
-                    await invocation.Completion.ConfigureAwait(false);
-                }
+                _response = default;
+                Log.Trace("Reading response");
+                await invocation.In.ConsumeAsync(x => _response = x, CancellationToken).ConfigureAwait(false);
             }
-        }        
+            catch (Exception ex)
+            {
+
+                invocation.Out.TryTerminateWriting(ex);
+                await invocation.In.ConsumeAsync(_ => { }).IgnoreExceptions().ConfigureAwait(false);
+                throw;
+            }
+            finally
+            {
+                Log.Trace("Awaiting invocation completion");
+                await invocation.Completion.ConfigureAwait(false);
+            }
+        }
     }
 }

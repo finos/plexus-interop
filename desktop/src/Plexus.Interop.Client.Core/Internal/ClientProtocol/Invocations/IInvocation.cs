@@ -30,5 +30,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
         IReadOnlyChannel<TResponse> In { get; }
 
         IWritableChannel<TRequest> Out { get; }
+
+        void Cancel();
     }
 }

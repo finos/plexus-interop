@@ -41,6 +41,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             _channel = channel;
             _sender = new InvocationSendProcessor<TRequest>(channel.Id, channel.Out, protocol, requestMarshaller, _invocationState);
             _receiver = new InvocationReceiveProcessor<TResponse>(channel.Id, channel.In, protocol, responseMarshaller, _sender, _invocationState);
+            _sender.RequestStream.PropagateCompletionFrom(_sender.Completion);
             OnStop(_sender.Stop);
             OnStop(_receiver.Stop);
         }
@@ -51,6 +52,11 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 
         public IWritableChannel<TRequest> Out => _sender.RequestStream;
 
+        public void Cancel()
+        {
+            Stop();
+        }
+
         public IReadOnlyChannel<TResponse> In => _receiver.ResponseStream;
 
         protected abstract Task InitializeSendingAsync();
@@ -58,52 +64,50 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
         protected abstract Task InitializeReceivingAsync();
 
         protected override async Task<Task> StartCoreAsync()
-        {
-            _log.Trace("Starting processing invocation");
-            await InitializeSendingAsync().ConfigureAwait(false);
-            await _sender.StartAsync().ConfigureAwait(false);
-            await InitializeReceivingAsync().ConfigureAwait(false);
-            await _receiver.StartAsync().ConfigureAwait(false);
-            return ProcessAsync();
+        {            
+            try
+            {
+                _log.Trace("Starting processing invocation");
+                await InitializeSendingAsync().ConfigureAwait(false);
+                await _sender.StartAsync().ConfigureAwait(false);
+                await InitializeReceivingAsync().ConfigureAwait(false);
+                await _receiver.StartAsync().ConfigureAwait(false);
+                return ProcessAsync();
+            }
+            catch (Exception ex)
+            {
+                _channel.Out.TryTerminateWriting(ex);
+                await _channel.In.DisposeRemainingItemsAsync().IgnoreExceptions().ConfigureAwait(false);
+                await _channel.Completion.ConfigureAwait(false);
+                throw;
+            }
         }
 
         private async Task ProcessAsync()
         {
             try
             {
-                await Task
-                    .WhenAny(_sender.RequestCompletion, _receiver.ResponseCompletion)
-                    .Unwrap()
-                    .ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                _sender.RequestStream.TryTerminateWriting(ex);
-            }
-            try
-            {
-                await Task
-                    .WhenAll(_sender.RequestCompletion, _receiver.ResponseCompletion)
-                    .ConfigureAwait(false);
+                _sender.RequestStream.PropagateCompletionFrom(_receiver.Completion);
+                await _sender.RequestCompletion.ConfigureAwait(false);                
+                _log.Trace("Requests completed");
+                await _receiver.ResponseCompletion.ConfigureAwait(false);
+                _log.Trace("Responses completed");
                 _sender.TryCompleteWriting();
+                await _sender.Completion.ConfigureAwait(false);
+                _log.Trace("Sending completed");
+                _channel.Out.TryCompleteWriting();
+                await _receiver.Completion.ConfigureAwait(false);
+                _log.Trace("Receiving completed");
             }
             catch (Exception ex)
             {
-                _sender.TryTerminateWriting(ex);
-            }
-            _log.Trace("Sending and receiving completed");
-            try
-            {
-                await Task.WhenAll(_sender.Completion, _receiver.Completion).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                _channel.Out.TryTerminateWriting(ex);
-                await _channel.In.DisposeRemainingItemsAsync().IgnoreExceptions().ConfigureAwait(false);
+                _log.Debug("Invocation terminated because of exception: {0}", ex.FormatTypeAndMessage());
+                _channel.Out.TryTerminateWriting(ex);                
                 throw;
             }
             finally
             {
+                await _channel.In.DisposeRemainingItemsAsync().IgnoreExceptions().ConfigureAwait(false);
                 await _channel.Completion.ConfigureAwait(false);
             }
         }

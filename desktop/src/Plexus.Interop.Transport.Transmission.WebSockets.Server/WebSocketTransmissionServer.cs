@@ -49,8 +49,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 
         public async Task<Task> AcceptConnectionAsync(WebSocket websocket)
         {
-            var connection = new WebSocketServerTransmissionConnection(websocket, StopToken);
-            await _buffer.Out.WriteAsync(connection, StopToken).ConfigureAwait(false);
+            var connection = new WebSocketServerTransmissionConnection(websocket, CancellationToken);
+            await _buffer.Out.WriteAsync(connection, CancellationToken).ConfigureAwait(false);
             Log.Trace("Websocket connection accepted");
             return connection.Completion;
         }        
@@ -92,7 +92,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
                 .ConfigureServices(Configure)
                 .Build();
             Log.Trace("Starting server host: {0}", url);
-            await _host.RunAsync(StopToken).ConfigureAwait(false);
+            await _host.RunAsync(CancellationToken).ConfigureAwait(false);
         }
 
         public void Configure(IServiceCollection s)

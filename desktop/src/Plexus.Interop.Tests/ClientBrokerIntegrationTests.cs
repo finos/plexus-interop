@@ -267,8 +267,7 @@ namespace Plexus.Interop
                 {
                     Console.WriteLine("Handling invocation");
                     receivedRequest = request;
-                    await responseStream.WriteAsync(request).ConfigureAwait(false);
-                    await Task.Yield();
+                    await responseStream.WriteAsync(request).ConfigureAwait(false);                    
                     await responseStream.WriteAsync(request).ConfigureAwait(false);
                     await responseStream.WriteAsync(request).ConfigureAwait(false);
                     Console.WriteLine("Responses sent");
@@ -296,6 +295,52 @@ namespace Plexus.Interop
                 }
                 receivedRequest.ShouldBe(sentRequest);
                 responses.ShouldAllBe(r => r.Equals(sentRequest));
+            });
+        }
+
+        [Fact]
+        public void ServerStreamingCancellation()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                WriteLog("Starting test");
+                var sentRequest = CreateTestRequest();
+                var serverCallCompletion = new Promise();
+
+                async Task HandleAsync(EchoRequest request, IWriteOnlyChannel<EchoRequest> responseStream, MethodCallContext context)
+                {
+                    try
+                    {
+                        WriteLog("Server handling invocation");
+                        await responseStream.WriteAsync(request).ConfigureAwait(false);
+                        WriteLog("Server waiting for cancellation");
+                        await context.CancellationToken.AsTask();
+                    }
+                    catch (Exception ex)
+                    {
+                        serverCallCompletion.TryFail(ex);
+                        throw;
+                    }
+                }
+
+                using (await StartTestBrokerAsync())
+                {
+                    var client = ConnectEchoClient();
+                    ConnectEchoServer(x => x
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            s => s.WithServerStreamingMethod<EchoRequest, EchoRequest>("ServerStreaming", HandleAsync)
+                        )
+                    );
+                    WriteLog("Starting call");
+                    var call = client.Call(EchoServerStreamingMethod, sentRequest);
+                    await call.ResponseStream.ReadAsync();
+                    WriteLog("Cancelling call");
+                    call.CancelAsync().ShouldCompleteIn(Timeout5Sec);
+                    WriteLog("Client call canceled");
+                    serverCallCompletion.Task.ShouldThrow<OperationCanceledException>(Timeout5Sec);
+                    WriteLog("Server call canceled");
+                }
             });
         }
 
