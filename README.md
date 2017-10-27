@@ -28,7 +28,7 @@ Plexus Interop repository consist of the following main sections:
 
 ## Build/Install
 
-All Plexus Interop components can be build using [Gradle](https://gradle.org/) tool using the following single command:
+All Plexus Interop components can be built using [Gradle](https://gradle.org/) tool using the following single command:
 
 `gradlew build --console plain`
 
