@@ -66,12 +66,12 @@ namespace Plexus.Interop.Internal.Calls
                 await invocation.In
                     .ConsumeAsync(item => _responseStream.Out.WriteAsync(item, CancellationToken), CancellationToken)
                     .ConfigureAwait(false);
-                _responseStream.Out.TryCompleteWriting();
+                _responseStream.Out.TryComplete();
             }
             catch (Exception ex)
             {
-                _responseStream.Out.TryTerminateWriting(ex);
-                invocation.Out.TryTerminateWriting(ex);
+                _responseStream.Out.TryTerminate(ex);
+                invocation.Out.TryTerminate(ex);
                 await invocation.In.ConsumeAsync(x => { }).IgnoreExceptions().ConfigureAwait(false);                
                 throw;
             }

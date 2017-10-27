@@ -58,7 +58,7 @@ namespace Plexus.Interop.Transport.Protocol
             catch (Exception ex)
             {
                 _log.Trace("Sending failed: {0}", ex.FormatTypeAndMessage());
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 _buffer.In.DisposeBufferedItems();
                 throw;
             }

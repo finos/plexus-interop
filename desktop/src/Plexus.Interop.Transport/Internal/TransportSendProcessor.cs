@@ -59,7 +59,7 @@ namespace Plexus.Interop.Transport.Internal
             }
             catch (Exception ex)
             {
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 _buffer.In.DisposeBufferedItems();
                 await CloseConnectionAsync(ex).ConfigureAwait(false);
             }

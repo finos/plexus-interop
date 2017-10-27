@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal.ClientProtocol.Invocations
+ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol;
@@ -85,9 +85,9 @@
             }
             catch (Exception ex)
             {
-                _requestBuffer.Out.TryTerminateWriting(ex);
+                _requestBuffer.Out.TryTerminate(ex);
                 _requestBuffer.In.ConsumeBufferedItems(x => { });
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 throw;
             }
         }
@@ -100,9 +100,9 @@
             }
             catch (Exception ex)
             {
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 _buffer.In.ConsumeBufferedItems(x => x.Header.Dispose());
-                _requestBuffer.Out.TryTerminateWriting(ex);
+                _requestBuffer.Out.TryTerminate(ex);
                 _requestBuffer.In.ConsumeBufferedItems(x => { });
                 throw;
             }
@@ -215,14 +215,14 @@
             }
         }
 
-        public bool TryCompleteWriting()
+        public bool TryComplete()
         {
-            return _buffer.TryCompleteWriting();
+            return _buffer.TryComplete();
         }
 
-        public bool TryTerminateWriting(Exception error = null)
+        public bool TryTerminate(Exception error = null)
         {
-            return _buffer.TryTerminateWriting(error);
+            return _buffer.TryTerminate(error);
         }
     }
 }

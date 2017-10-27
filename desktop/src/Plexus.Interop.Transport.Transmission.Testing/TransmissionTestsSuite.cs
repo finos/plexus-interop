@@ -235,7 +235,7 @@ namespace Plexus.Interop.Transport.Transmission
                             WriteLog($"Server sending message of length {msg.Length}");
                             await serverConnection.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
                         }
-                        serverConnection.Out.TryCompleteWriting();
+                        serverConnection.Out.TryComplete();
                         WriteLog("Server send completed");
                     });
 
@@ -276,7 +276,7 @@ namespace Plexus.Interop.Transport.Transmission
                             Log.Trace("Client sending message of length {0}", msg.Length);
                             await connection.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
                         }
-                        connection.Out.TryCompleteWriting();
+                        connection.Out.TryComplete();
                         Log.Trace("Client send completed");
                     });
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal.Calls
+ namespace Plexus.Interop.Internal.Calls
 {
     using Plexus.Channels;
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
@@ -44,11 +44,11 @@
                 await invocation.StartCompletion.ConfigureAwait(false);
                 var context = new MethodCallContext(info.Source.ApplicationId, info.Source.ConnectionId, cancellation.Token);
                 await HandleCoreAsync(invocation, context).ConfigureAwait(false);
-                invocation.Out.TryCompleteWriting();
+                invocation.Out.TryComplete();
             }
             catch (Exception ex)
             {
-                invocation.Out.TryTerminateWriting(ex);
+                invocation.Out.TryTerminate(ex);
                 invocation.In.ConsumeBufferedItems(x => { });
                 throw;
             }

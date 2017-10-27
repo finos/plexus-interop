@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
+ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
     using Plexus.Channels;
     using Plexus.Pools;
@@ -51,7 +51,7 @@
         {
             try
             {
-                using (_cancellationToken.Register(() => _buffer.Out.TryTerminateWriting()))
+                using (_cancellationToken.Register(() => _buffer.Out.TryTerminate()))
                 {
                     var curMessageLength = 0;
                     while (!_buffer.Out.IsCompleted())
@@ -80,13 +80,13 @@
                         await HandleReceiveMessageAsync(result, curMessageLength).ConfigureAwait(false);
                         curMessageLength = 0;
                     }
-                    _buffer.Out.TryCompleteWriting();
+                    _buffer.Out.TryComplete();
                 }
             }
             catch (Exception ex)
             {
                 _log.Trace("Reading terminated: {0}", ex.FormatTypeAndMessage());
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 throw;
             }
             _log.Trace("Reading completed");
@@ -116,7 +116,7 @@
                     if (string.Equals(text, "<END>"))
                     {
                         _log.Trace("Received <END> message");
-                        _buffer.Out.TryCompleteWriting();
+                        _buffer.Out.TryComplete();
                     }
                     else if (string.Equals(text, "<PING>"))
                     {
@@ -124,7 +124,7 @@
                     }
                     break;
                 case WebSocketMessageType.Close:
-                    _buffer.Out.TryCompleteWriting();
+                    _buffer.Out.TryComplete();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

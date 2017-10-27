@@ -155,7 +155,7 @@ namespace Plexus.Interop.Samples.GreetingClient
                 await requestStream.WriteAsync(request);
             }
             Console.WriteLine("Completing request stream");
-            requestStream.TryCompleteWriting();
+            requestStream.TryComplete();
             var response = await call.ResponseAsync;
             Console.WriteLine("Received response: {0}", response.Greeting);
         }
@@ -184,7 +184,7 @@ namespace Plexus.Interop.Samples.GreetingClient
                 Console.WriteLine("Received: {0}", response.Greeting);                
             }
             Console.WriteLine("Completing request stream");
-            requestStream.TryCompleteWriting();
+            requestStream.TryComplete();
             while (await responseStream.WaitReadAvailableAsync())
             {
                 while (responseStream.TryRead(out response))

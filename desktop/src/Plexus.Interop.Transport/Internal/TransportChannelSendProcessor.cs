@@ -67,7 +67,7 @@
             }
             catch (Exception ex)
             {                              
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 _buffer.In.DisposeBufferedItems();
                 await SendCloseMessageAsync(ex).IgnoreExceptions().ConfigureAwait(false);
                 _log.Trace("Sending failed: {0}", ex.FormatTypeAndMessage());

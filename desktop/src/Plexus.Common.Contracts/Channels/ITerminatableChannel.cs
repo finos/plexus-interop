@@ -20,8 +20,8 @@ namespace Plexus.Channels
 {
     public interface ITerminatableChannel
     {
-        bool TryCompleteWriting();
+        bool TryComplete();
 
-        bool TryTerminateWriting(Exception error = null);
+        bool TryTerminate(Exception error = null);
     }
 }

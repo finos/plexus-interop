@@ -51,7 +51,7 @@ namespace Plexus.Interop.Internal
                             await channel.Out
                                 .WriteAsync(new TransportMessageFrame(serializedRequest), cancellationToken)
                                 .ConfigureAwait(false);
-                            channel.Out.TryCompleteWriting();
+                            channel.Out.TryComplete();
                         }
                         catch
                         {

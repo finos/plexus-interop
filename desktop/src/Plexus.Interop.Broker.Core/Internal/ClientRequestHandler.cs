@@ -57,11 +57,11 @@
                 var frame = await channel.In.ReadAsync().ConfigureAwait(false);
                 var request = _protocolSerializer.DeserializeClientToBrokerRequest(frame.Payload);
                 await request.Handle(_clientToBrokerRequestHandler, (connection, channel)).ConfigureAwait(false);
-                channel.Out.TryCompleteWriting();
+                channel.Out.TryComplete();
             }
             catch (Exception ex)
             {
-                channel.Out.TryTerminateWriting(ex);
+                channel.Out.TryTerminate(ex);
             }
             finally
             {

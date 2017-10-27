@@ -45,7 +45,7 @@ namespace Plexus.Interop.Internal.Calls
         {
             Log.Trace("Creating invocation");
             var invocation = await _invocationFactory().ConfigureAwait(false);
-            OnStop(() => invocation.Out.TryTerminateWriting());
+            OnStop(() => invocation.Out.TryTerminate());
             await invocation.StartCompletion.ConfigureAwait(false);
             var processRequestsAsync = TaskRunner.RunInBackground(() => ProcessRequestsAsync(invocation));
             var processResponseAsync = TaskRunner.RunInBackground(() => ProcessResponseAsync(invocation));
@@ -79,7 +79,7 @@ namespace Plexus.Interop.Internal.Calls
             }
             catch (Exception ex)
             {
-                invocation.Out.TryTerminateWriting(ex);
+                invocation.Out.TryTerminate(ex);
                 throw;
             }
             finally
@@ -95,14 +95,14 @@ namespace Plexus.Interop.Internal.Calls
             {
                 Log.Trace("Writing requests");
                 await _requestStream.In.ConsumeAsync(item => invocation.Out.WriteAsync(item)).ConfigureAwait(false);
-                invocation.Out.TryCompleteWriting();
+                invocation.Out.TryComplete();
                 await _requestStream.Out.Completion.ConfigureAwait(false);
                 Log.Trace("Requests stream completed");
             }
             catch (Exception ex)
             {
                 Log.Trace("Requests stream completed with exception: {0}", ex.FormatTypeAndMessage());
-                invocation.Out.TryTerminateWriting(ex);
+                invocation.Out.TryTerminate(ex);
                 throw;
             }
             finally

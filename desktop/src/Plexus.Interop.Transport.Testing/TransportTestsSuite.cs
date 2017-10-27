@@ -150,7 +150,7 @@ namespace Plexus.Interop.Transport
                         var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                         var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
                         WriteLog("Terminating client channel");
-                        clientChannel.Out.TryTerminateWriting();
+                        clientChannel.Out.TryTerminate();
                         clientChannel.Out.Completion.IsCanceled.ShouldBe(true);
                         Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
                         WriteLog("Client channel terminated");
@@ -172,7 +172,7 @@ namespace Plexus.Interop.Transport
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                     var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
-                    serverChannel.Out.TryTerminateWriting();
+                    serverChannel.Out.TryTerminate();
                     Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
                     Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
                 });
@@ -295,7 +295,7 @@ namespace Plexus.Interop.Transport
                         sent.Add(Md5.ComputeHash(msg));
                     }
                 }
-                c.Out.TryCompleteWriting();
+                c.Out.TryComplete();
                 await receiveTask.ConfigureAwait(false);
                 Log.Info("Channel handling completed {0}. Received {1} messages.", c.Id, received.Count);
             }

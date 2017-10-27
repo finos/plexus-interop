@@ -59,7 +59,7 @@ namespace Plexus.Interop.Internal.Calls
         {
             Log.Trace("Creating invocation");
             var invocation = await _invocationFactory().ConfigureAwait(false);
-            OnStop(() => invocation.Out.TryTerminateWriting());
+            OnStop(() => invocation.Out.TryTerminate());
             await invocation.StartCompletion.ConfigureAwait(false);
             return ProcessAsync(invocation);
         }
@@ -75,7 +75,7 @@ namespace Plexus.Interop.Internal.Calls
             catch (Exception ex)
             {
 
-                invocation.Out.TryTerminateWriting(ex);
+                invocation.Out.TryTerminate(ex);
                 await invocation.In.ConsumeAsync(_ => { }).IgnoreExceptions().ConfigureAwait(false);
                 throw;
             }

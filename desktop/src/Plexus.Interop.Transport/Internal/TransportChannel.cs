@@ -53,7 +53,7 @@
 
         internal bool TerminateReceiving(Exception error = null)
         {
-            return _receiveBuffer.Out.TryTerminateWriting(error);
+            return _receiveBuffer.Out.TryTerminate(error);
         }
 
         public IWritableChannel<TransportMessageFrame> Out => _sendProcessor.Out;
@@ -95,16 +95,16 @@
             switch (header.Completion.Status)
             {
                 case CompletionStatusHeader.Completed:
-                    _receiveBuffer.Out.TryCompleteWriting();
+                    _receiveBuffer.Out.TryComplete();
                     break;
                 case CompletionStatusHeader.Canceled:
-                    _sendProcessor.Out.TryTerminateWriting();
-                    _receiveBuffer.Out.TryTerminateWriting();
+                    _sendProcessor.Out.TryTerminate();
+                    _receiveBuffer.Out.TryTerminate();
                     break;
                 case CompletionStatusHeader.Failed:
                     var error = header.Completion.Error.Value;
-                    _sendProcessor.Out.TryTerminateWriting();
-                    _receiveBuffer.Out.TryTerminateWriting(new RemoteErrorException(error));
+                    _sendProcessor.Out.TryTerminate();
+                    _receiveBuffer.Out.TryTerminate(new RemoteErrorException(error));
                     break;
                 default:
                     throw new InvalidOperationException();

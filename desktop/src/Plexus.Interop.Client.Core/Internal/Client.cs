@@ -240,7 +240,7 @@ namespace Plexus.Interop.Internal
                 }
                 catch (Exception ex)
                 {
-                    channel.Out.TryTerminateWriting(ex);
+                    channel.Out.TryTerminate(ex);
                     await channel.In.ConsumeAsync(x => { }).IgnoreExceptions().ConfigureAwait(false);
                 }
                 finally

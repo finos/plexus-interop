@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
+ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
     using Plexus.Channels;
     using Plexus.Pools;
@@ -50,7 +50,7 @@
 
         private async Task ProcessAsync()
         {
-            using (_cancellationToken.Register(() => _buffer.Out.TryTerminateWriting()))
+            using (_cancellationToken.Register(() => _buffer.Out.TryTerminate()))
             {
                 try
                 {
@@ -64,7 +64,7 @@
                 catch (Exception ex)
                 {
                     _log.Trace("Writing terminated: {0}", ex.FormatTypeAndMessage());
-                    _buffer.Out.TryTerminateWriting(ex);
+                    _buffer.Out.TryTerminate(ex);
                     _buffer.In.DisposeBufferedItems();
                     throw;
                 }

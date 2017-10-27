@@ -76,7 +76,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             }
             catch (Exception ex)
             {
-                _channel.Out.TryTerminateWriting(ex);
+                _channel.Out.TryTerminate(ex);
                 await _channel.In.DisposeRemainingItemsAsync().IgnoreExceptions().ConfigureAwait(false);
                 await _channel.Completion.ConfigureAwait(false);
                 throw;
@@ -92,17 +92,17 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
                 _log.Trace("Requests completed");
                 await _receiver.ResponseCompletion.ConfigureAwait(false);
                 _log.Trace("Responses completed");
-                _sender.TryCompleteWriting();
+                _sender.TryComplete();
                 await _sender.Completion.ConfigureAwait(false);
                 _log.Trace("Sending completed");
-                _channel.Out.TryCompleteWriting();
+                _channel.Out.TryComplete();
                 await _receiver.Completion.ConfigureAwait(false);
                 _log.Trace("Receiving completed");
             }
             catch (Exception ex)
             {
                 _log.Debug("Invocation terminated because of exception: {0}", ex.FormatTypeAndMessage());
-                _channel.Out.TryTerminateWriting(ex);                
+                _channel.Out.TryTerminate(ex);                
                 throw;
             }
             finally

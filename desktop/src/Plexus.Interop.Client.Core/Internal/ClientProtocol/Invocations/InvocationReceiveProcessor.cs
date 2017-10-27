@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal.ClientProtocol.Invocations
+ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol;
@@ -128,7 +128,7 @@
                 case IncomingStreamState.Open:
                     _log.Debug("Incoming message stream completed");
                     _incomingStreamState = IncomingStreamState.Completed;
-                    _buffer.Out.TryCompleteWriting();
+                    _buffer.Out.TryComplete();
                     break;
                 case IncomingStreamState.ReceivingMessage:
                 case IncomingStreamState.Completed:
