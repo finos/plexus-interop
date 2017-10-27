@@ -105,7 +105,7 @@ Broker tracks `interop.json` file and automatically reloads metadata when the fi
 
 ====== Modify and build provider app
 
-We changed provided service definition, so now we need to re-generate Provider's client and provide implementation for new provided method:
+We changed provided service definition, so now we need to re-generate Provider's client and provide implementation for new method:
 
 . From project root call *plexusgen* tools to re-generate Provider's client code:
 +
@@ -119,7 +119,7 @@ java -jar bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=./bin/win-x86/sample
 Plesus Gen tool will generate interfaces and proxy classes for all required functionality. It also uses https://github.com/dcodeIO/protobuf.js/tree/master/cli[ProtobufJs] to generate message definitions, based on `proto` files.
 ====
 
-. Open `web/packages/ccy-pair-rate-provider/src/index.ts` and change previously provided `onGetRate` implementation to `onGetRateStreaming` as follows:
+. Open `web/packages/ccy-pair-rate-provider/src/index.ts` and change previously provided `onGetRate` implementation to `onGetRateStream` as follows:
 +
 [source,javascript]
 -----
