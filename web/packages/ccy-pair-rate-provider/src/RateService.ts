@@ -14,14 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import * as plexus from "./gen/plexus-messages";
+
 export class RateService {
     
-    public getRate(ccyPair: string): number {
+    public getRate(ccyPair: string): plexus.fx.ICcyPairRate {
          switch (ccyPair)  {
             case "EURUSD":
-                return parseFloat((1.15 + 0.1 * Math.random()).toFixed(3));
+                return {
+                    ccyPairName: ccyPair,
+                    rate: parseFloat((1.15 + 0.1 * Math.random()).toFixed(3))
+                };
             case "EURGBP":
-                return parseFloat((0.87 + 0.1 * Math.random()).toFixed(3));
+                return {
+                    ccyPairName: ccyPair,
+                    rate: parseFloat((0.87 + 0.1 * Math.random()).toFixed(3))
+                };
             default:
                 throw new Error(`Unsupported CCY Pair name ${ccyPair}`);
         }

@@ -62,10 +62,7 @@ new WebCcyPairRateProviderClientBuilder()
     .withCcyPairRateServiceInvocationsHandler({
         onGetRate: async (context, ccyPair: plexus.fx.ICcyPair) => {
             log(`Received request for ${ccyPair.ccyPairName}'s Rate`);
-            return {
-                ccyPairName: ccyPair.ccyPairName,
-                rate: rateService.getRate(ccyPair.ccyPairName)
-            };
+            return rateService.getRate(ccyPair.ccyPairName);
         }
     })
     .connect()

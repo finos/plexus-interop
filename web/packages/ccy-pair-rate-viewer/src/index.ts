@@ -50,12 +50,10 @@ const log = (msg: string) => {
 window.getRate = () => log("Not connected to Broker");
 
 new WebCcyPairRateViewerClientBuilder()
-    // App's ID and Instance ID received from Launcher
     .withClientDetails({
         applicationId: "vendorB.fx.WebCcyPairRateViewer",
         applicationInstanceId: instanceId
     })
-    // Pass Transport to be used for connecting to Broker
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
     .connect()
     .then(async (rateViewerClient: WebCcyPairRateViewerClient) => {
@@ -64,6 +62,6 @@ new WebCcyPairRateViewerClientBuilder()
             const ccyPair = (document.getElementById("ccyPair") as HTMLInputElement).value;
             log(`Sending request for ${ccyPair}`);
             const ccyPairRate = await rateViewerClient.getCcyPairRateServiceProxy().getRate({ccyPairName: ccyPair});
-            log(`Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}`);
+            log(`Received rate ${ccyPairRate.ccyPairName} - ${ccyPairRate.rate}`);
         };
     });
