@@ -8,5 +8,6 @@ gradlew build --console plain --no-daemon
 Build produces artifacts into directory `bin`:
 
 * `broker` directory with binaries of interop broker
-* `samples` directory with quick-start and sample apps
+* `docs` directory with documenation in HTML format
+* `samples` directory with sample apps
 * `sdk` directory with code generator tool

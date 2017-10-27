@@ -22,10 +22,6 @@ include::getting-started-components.adoc[]
 
 include::getting-started-how-to-build.adoc[]
 
-=== Quick start
-
-include::guides-quick-start.adoc[]
-
 [[sample-apps]]
 === Sample apps
 
@@ -33,6 +29,10 @@ include::getting-started-how-to-run-samples.adoc[]
 
 [[guides]]
 == Guides
+
+=== Quick start
+
+include::guides-quick-start.adoc[]
 
 === Concepts
 

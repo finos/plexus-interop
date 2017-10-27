@@ -1,3 +1,4 @@
+:imagesdir: ./images
 [[quick-start-web]]
 ==== Quick Start - Web
 
@@ -15,6 +16,12 @@ plexus activate vendorB.fx.WebCcyPairRateViewer
 -----
 +
 include::guides-quick-start-activate-app.adoc[]
+
+. In the opened window enter a currency pair name, e.g. `EURUSD` and click `Request`:
++
+image::quick-start-web-1.png[Quick Start Web 1]
++
+include::guides-quick-start-invocation-workflow.adoc[]
 +
 [NOTE]
 ====
@@ -24,131 +31,103 @@ It shows how easily you can implement custom app launchers for custom ways of la
 Check section <<guides-how-to-write-custom-app-launcher, How to write custom app launcher>> for details.
 ====
 
-. In the opened window enter a currency pair name, e.g. `EURUSD` and click `Request`:
+. Broker starts `WebCcyPairRateProvider` app and redirects request to it:
++
+image::quick-start-web-2.png[Quick Start Web 2]
 
-. Broker should launch `WebCcyPairRateProvider` and redirect request to it. The viewer app should show the rate received from provider:
+. The viewer app shows the rate received from provider:
++
+image::quick-start-web-3.png[Quick Start Web 3]
 
-===== Update Interop Flow
+===== Modify example
 
 Let's take a closer look to example and improve the provided service with ability to provide real-time updates.
-We're going to change contract between two applications, pass the changed interop metadata to broker, update clients and run them again.
+We're going to change contract between two applications, pass the changed interop metadata to broker, update apps and run them again.
 
-====== Update Service
+====== Modify metadata
 
-Open `quick-start/registry/fx/CcyPairRateService.proto` file and add new `GetRateStream` method:
+First we need to modify interop registry and pass the changed metadata to broker.
 
-[source, proto]
-./quick-start/metadata/fx/CcyPairRateService.proto
+. Open `registry/fx/CcyPairRateService.proto` file and add new `GetRateStream` method:
++
+[source, php]
+./registry/fx/CcyPairRateService.proto
 -----
 service CcyPairRateService {
     rpc GetRate(CcyPair) returns (CcyPairRate);
+
     // new rpc call returning real-time notification stream
     rpc GetRateStream(CcyPair) returns (stream CcyPairRate);
 }
 -----
-====== Update CCY Rate Provider
 
-We added new method to the service. To indicate our app is going to provide the new method to others we need update its interop manifest WebCcyPairRateProvider.interop. All services and methods provided by app must be specified in its interop manifest (*.interop file).
-Let's open `quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.interop` and change `GetRate` method name to `GetExpiringRate`
-
-[source, proto]
-./quick-start/metadata/fx/vendorA/WebCcyPairRateProvider.interop
+. Open `registry/vendorA/fx/WebCcyPairRateProvider.interop` file and change provided method to `GetRateStream`:
++
+[source, php]
+./registry/vendorA/fx/WebCcyPairRateProvider.interop
 -----
-provides fx.CcyPairRateService {
-    GetExpiringRate [method_title = "Web Provider - Get rate with expiration date"];
+package vendorA.fx;
+
+import "fx/CcyPairRateService.proto";
+
+application WebCcyPairRateProvider {
+    provides fx.CcyPairRateService {
+        GetRateStream [method_title = "Web Provider - Get Rate Stream"];
+    }
 }
 -----
 
-====== Update CCY Rate Viewer
-
-On the other side we need to update consumer application and specify new service method as consumed. Consumed services are also described in applications's `*.interop` files. Let's open `quick-start/metadata/fx/vendorB/WebCcyPairRateViewer.interop` and change `GetRate` method name to `GetExpiringRate`
-
-[source, proto]
-./quick-start/metadata/fx/vendorB/WebCcyPairRateViewer.proto
+. Open `registry/vendorB/fx/WebCcyPairRateViewer.interop` file and change consumed method to `GetRateStream`:
++
+[source, php]
+./registry/vendorB/fx/WebCcyPairRateViewer.interop
 -----
+package vendorB.fx;
+
+import "fx/CcyPairRateService.proto";
+
 application WebCcyPairRateViewer {
-    consumes fx.CcyPairRateService { GetExpiringRate; }
+    consumes fx.CcyPairRateService { GetRateStream; }
 }
 -----
 
-====== Update Broker Metadata
-
-Broker component must be aware about all possible invocations to validate them and perform discovery, this information is stored in `interop.json`. To provide latest changes we simply need to generate this file from latest metadata:
-
+. To pass the changed metadata to broker, navigate back to `bin\win-x86\samples\quick-start` and re-generate metadata using *plexusgen* tool:
++
 [source, bash]
-----
-java -jar bin/win-x86/sdk/plexusgen.jar --type=json_meta --baseDir=quick-start/metadata --out=quick-start/metadata
-----
+-----
+java -jar ../../sdk/plexusgen.jar --type=json_meta --baseDir=registry --out=metadata
+-----
++
+[NOTE]
+====
+Broker tracks `interop.json` file and automatically reloads metadata when the file is changed.
+====
 
-====== Update Clients
+====== Modify and build provider app
 
-We updated client's metadata, so now we need to re-generate client's code to handle these changes, it can be done using Plexus Gen tool. Let's start with updating of Provider's code:
+TODO
 
+====== Modify and build consumer app
+
+TODO
+
+====== Launch the modified example
+
+. Launch `CcyPairRateViewer`:
++
 [source, bash]
-----
-java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateProvider.interop --out=./web/packages/ccy-pair-rate-provider/src/gen --protoc=./web/node_modules/.bin/pbts.cmd
-----
+-----
+plexus activate vendorB.fx.WebCcyPairRateViewer
+-----
 
-This command generates Typescript interfaces and classes required for connection to Broker, registering of handlers to provided actions and invocation of consumed methods. It also generated messages using https://github.com/dcodeIO/protobuf.js/tree/master/cli[ProtobufJS CLI tool]. The main generated class is `WebCcyPairRateProviderClientBuilder`, it provides interface to build and receive connected client.
+. In the opened window enter a currency pair name, e.g. `EURUSD` and press `Enter`:
++
+TODO screenshot
 
-Then we need to adjust implementation of invocation handler and add `dueDate` field to result:
+. Broker starts `WebCcyPairRateProvider` app and redirects request to it:
++
+TODO screenshot
 
-[source, typescript]
-./web/packages/ccy-pair-rate-provider/src/index.ts
-----
-    .withCcyPairRateServiceInvocationsHandler({
-        // all provided methods must be implemented
-        // so we need to change implemented method to 'onGetExpiringRate'
-        onGetExpiringRate: async (ccyPair: plexus.fx.ICcyPair) => {
-            log.info(`Received request for ${ccyPair.ccyPairName}'s Rate`);
-            return {
-                ccyPairName: ccyPair.ccyPairName,
-                rate: Math.floor(Math.random() * 10) + 1,
-                // add new additional field
-                dueDate: new Date().getTime()
-            };
-        }
-    })
-----
-
-All code changes completed, now we need to rebuild Provider component:
-
-[source, bash]
-----
-cd web/packages/ccy-pair-rate-provider
-npm run build
-----
-
-OK, provider is ready. Now let's re-generate consumer's client code in the same was as for provider component:
-
-[source, bash]
-----
-java -jar bin/sdk/plexusgen.jar --type=ts --baseDir=./quick-start/metadata --input=WebCcyPairRateViewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/packages/ccy-pair-rate-viewer/node_modules/.bin/pbts.cmd
-----
-
-adjust invocation code to print the `dueDate` field:
-
-./web/packages/ccy-pair-rate-viewer/src/index.ts
-[source, typescript]
-----
-const ccyPairRate = await rateViewerClient
-    .getCcyPairRateServiceProxy()
-    // we started to consume new method
-    .getExpiringRate({ccyPairName: "EURUSD"});
-// and receive new 'duteDate' attribute
-document.body.innerText = `Received rate ${ccyPairRate.ccyPairName}-${ccyPairRate.rate}-${ccyPairRate.dueDate}`;
-----
-and rebuild Consumer component:
-[source, bash]
-----
-cd web/packages/ccy-pair-rate-viewer
-npm run build
-----
-
-====== Run updated example
-
-We are done with all required changes, please stop currently running Broker and Example apps and run them again using instructions above. You will see that consumer Application receives updated result now.
-
-
-
-
+. The viewer app shows rates received from provider:
++
+TODO screenshot
