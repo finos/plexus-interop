@@ -65,7 +65,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                     try
                     {
                         await _buffer.Out
-                            .WriteAsync(connection, StopToken)
+                            .WriteAsync(connection, CancellationToken)
                             .ConfigureAwait(false);
                     }
                     catch
@@ -88,7 +88,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
                 PipeOptions.Asynchronous);
             try
             {
-                await WaitForConnectionAsync(pipeServerStream, StopToken).ConfigureAwait(false);
+                await WaitForConnectionAsync(pipeServerStream, CancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

@@ -1,0 +1,11 @@
+[NOTE]
+====
+When a service is called, broker does the following:
+
+. Searches for the service providers in *interop registry*.
+. If service provider app is offline, launches it by inspecting *app registry* and sending launch request to the appropriate *app launcher*.
+. Waits until the launched app connected.
+. Redirects the invocation to the service provider app.
+
+See <<guides-interop-invocation-workflow, Invocation Workflow>> section for details.
+====

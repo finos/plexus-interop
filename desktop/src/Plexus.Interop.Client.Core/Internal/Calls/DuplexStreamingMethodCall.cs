@@ -20,7 +20,6 @@ namespace Plexus.Interop.Internal.Calls
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
     using Plexus.Processes;
     using System;
-    using System.Threading;
     using System.Threading.Tasks;
 
     internal sealed class DuplexStreamingMethodCall<TRequest, TResponse> : 
@@ -28,7 +27,6 @@ namespace Plexus.Interop.Internal.Calls
     {
         private readonly IChannel<TRequest> _requestStream = new BufferedChannel<TRequest>(1);
         private readonly IChannel<TResponse> _responseStream = new BufferedChannel<TResponse>(1);
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
 
         public DuplexStreamingMethodCall(Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> invocationFactory)
@@ -47,7 +45,8 @@ namespace Plexus.Interop.Internal.Calls
         {
             Log.Trace("Creating invocation");
             var invocation = await _invocationFactory().ConfigureAwait(false);
-            await invocation.StartCompletion.ConfigureAwait(false);
+            OnStop(() => invocation.Out.TryTerminate());
+            await invocation.StartCompletion.ConfigureAwait(false);            
             var processRequestsAsync = TaskRunner.RunInBackground(() => ProcessRequestsAsync(invocation));
             var processResponseAsync = TaskRunner.RunInBackground(() => ProcessResponsesAsync(invocation));
             _requestStream.Out.PropagateCompletionFrom(invocation.Completion);
@@ -58,62 +57,60 @@ namespace Plexus.Interop.Internal.Calls
                 .ContinueWithSynchronously(_ => invocation.Completion);
         }
 
+        public void Cancel()
+        {
+            Stop();
+        }
+
         public Task CancelAsync()
         {
-            _cancellation.Cancel();
-            return Completion.IgnoreExceptions();
+            return StopAsync();
         }
 
         private async Task ProcessResponsesAsync(IInvocation<TRequest, TResponse> invocation)
         {
-            using (_cancellation.Token.Register(() => invocation.TryTerminate()))
+            try
             {
-                try
-                {
-                    Log.Trace("Reading responses");
-                    await invocation.In
-                        .ConsumeAsync(item => _responseStream.Out.WriteAsync(item))
-                        .ConfigureAwait(false);
-                    Log.Trace("Responses stream completed");
-                }
-                catch (Exception ex)
-                {
-                    invocation.Out.TryTerminateWriting(ex);
-                    throw;
-                }
-                finally
-                {
-                    Log.Trace("Awaiting response invocation completion");
-                    await invocation.In.Completion.ConfigureAwait(false);
-                }
-            }            
+                Log.Trace("Reading responses");
+                await invocation.In
+                    .ConsumeAsync(item => _responseStream.Out.WriteAsync(item, CancellationToken), CancellationToken)
+                    .ConfigureAwait(false);
+                Log.Trace("Responses stream completed");
+            }
+            catch (Exception ex)
+            {
+                invocation.Out.TryTerminate(ex);
+                throw;
+            }
+            finally
+            {
+                Log.Trace("Awaiting response invocation completion");
+                await invocation.In.Completion.ConfigureAwait(false);
+            }
         }
 
         private async Task ProcessRequestsAsync(IInvocation<TRequest, TResponse> invocation)
         {
-            using (_cancellation.Token.Register(() => invocation.TryTerminate()))
+            try
             {
-                try
-                {
-                    Log.Trace("Writing requests");
-                    await _requestStream.In
-                        .ConsumeAsync(item => invocation.Out.WriteAsync(item))
-                        .ConfigureAwait(false);
-                    invocation.Out.TryCompleteWriting();
-                    await _requestStream.Out.Completion.ConfigureAwait(false);
-                    Log.Trace("Requests stream completed");
-                }
-                catch (Exception ex)
-                {
-                    Log.Trace("Requests stream completed with exception: {0}", ex.FormatTypeAndMessage());
-                    invocation.Out.TryTerminateWriting(ex);
-                    throw;
-                }
-                finally
-                {
-                    Log.Trace("Awaiting request invocation completion");
-                    await invocation.Out.Completion.ConfigureAwait(false);
-                }
+                Log.Trace("Writing requests");
+                await _requestStream.In
+                    .ConsumeAsync(item => invocation.Out.WriteAsync(item, CancellationToken), CancellationToken)
+                    .ConfigureAwait(false);
+                invocation.Out.TryComplete();
+                await _requestStream.Out.Completion.ConfigureAwait(false);
+                Log.Trace("Requests stream completed");
+            }
+            catch (Exception ex)
+            {
+                Log.Trace("Requests stream completed with exception: {0}", ex.FormatTypeAndMessage());
+                invocation.Out.TryTerminate(ex);
+                throw;
+            }
+            finally
+            {
+                Log.Trace("Awaiting request invocation completion");
+                await invocation.Out.Completion.ConfigureAwait(false);
             }
         }
     }

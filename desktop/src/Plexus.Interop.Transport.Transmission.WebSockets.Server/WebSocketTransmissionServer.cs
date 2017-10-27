@@ -33,8 +33,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
     {        
         private const string ServerName = "ws-v1";
 
-        private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionServer>();
-
         private IWebHost _host;
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(1);
         private readonly IServerStateWriter _stateWriter;
@@ -45,12 +43,14 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
+        protected override ILogger Log { get; } = LogManager.GetLogger<WebSocketTransmissionServer>();
+
         public IReadOnlyChannel<ITransmissionConnection> In => _buffer.In;
 
         public async Task<Task> AcceptConnectionAsync(WebSocket websocket)
         {
-            var connection = new WebSocketServerTransmissionConnection(websocket, StopToken);
-            await _buffer.Out.WriteAsync(connection, StopToken).ConfigureAwait(false);
+            var connection = new WebSocketServerTransmissionConnection(websocket, CancellationToken);
+            await _buffer.Out.WriteAsync(connection, CancellationToken).ConfigureAwait(false);
             Log.Trace("Websocket connection accepted");
             return connection.Completion;
         }        
@@ -92,7 +92,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
                 .ConfigureServices(Configure)
                 .Build();
             Log.Trace("Starting server host: {0}", url);
-            await _host.RunAsync(StopToken).ConfigureAwait(false);
+            await _host.RunAsync(CancellationToken).ConfigureAwait(false);
         }
 
         public void Configure(IServiceCollection s)

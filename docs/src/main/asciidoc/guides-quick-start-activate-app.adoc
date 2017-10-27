@@ -1,0 +1,6 @@
+[NOTE]
+====
+`plexus activate` command sends request to launch the app with the given ID to *App Lifecycle Manager* - the component inside broker
+which tracks active apps and can initiate app launch when required. Each app defined in app registry has associated *App Launcher*
+which can perform actual launch of the app, so the Lifecycle Manager just redirects launch request to the App Launcher specified for the given app.
+====

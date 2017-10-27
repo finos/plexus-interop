@@ -58,7 +58,7 @@ namespace Plexus.Interop.Internal
         {
             _log.Debug("Connecting {0}", _options);
             _connection = await ClientConnectionFactory.Instance
-                .ConnectAsync(_options, StopToken)
+                .ConnectAsync(_options, CancellationToken)
                 .ConfigureAwait(false);
             ConnectionId = _connection.Id;
             _log = LogManager.GetLogger<Client>(_connection.Id.ToString());
@@ -181,7 +181,7 @@ namespace Plexus.Interop.Internal
 
         private async Task ProcessAsync()
         {
-            using (StopToken.Register(() => _connection.TryComplete()))
+            using (CancellationToken.Register(() => _connection.TryComplete()))
             {
                 try
                 {
@@ -189,7 +189,7 @@ namespace Plexus.Interop.Internal
                     await ListenIncomingInvocationsAsync(_connection).ConfigureAwait(false);
                     await _connection.Completion.ConfigureAwait(false);
                 }
-                catch (OperationCanceledException) when (StopToken.IsCancellationRequested)
+                catch (OperationCanceledException) when (CancellationToken.IsCancellationRequested)
                 {
                 }
                 catch (Exception ex)
@@ -240,7 +240,7 @@ namespace Plexus.Interop.Internal
                 }
                 catch (Exception ex)
                 {
-                    channel.Out.TryTerminateWriting(ex);
+                    channel.Out.TryTerminate(ex);
                     await channel.In.ConsumeAsync(x => { }).IgnoreExceptions().ConfigureAwait(false);
                 }
                 finally

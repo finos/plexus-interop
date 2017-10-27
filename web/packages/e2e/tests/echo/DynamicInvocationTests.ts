@@ -77,7 +77,6 @@ export class DynamicInvocationTests extends BaseEchoTest {
                     }
                 },
                 error: (e) => {
-                    console.error("Error received by client", e);
                     reject(e);
                 },
                 complete: async () => {

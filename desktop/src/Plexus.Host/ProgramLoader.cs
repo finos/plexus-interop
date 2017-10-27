@@ -93,7 +93,7 @@
                 RegisterShutdownEvent();
 
                 var programType = attribute.EntryClass;
-                _log.Info("Starting {0} with args: {1}", programType, string.Join(" ", _args));
+                _log.Debug("Starting {0} with args: {1}", programType, string.Join(" ", _args));
                 try
                 {
                     _program = (IProgram) Activator.CreateInstance(programType);
@@ -135,7 +135,7 @@
             };
 
             var shutdownEventName = "plexus-host-shutdown-" + Process.GetCurrentProcess().Id;
-            _log.Info("Registering shutdown event: {0}", shutdownEventName);
+            _log.Debug("Registering shutdown event: {0}", shutdownEventName);
             var shutdownEvent = new EventWaitHandle(false, EventResetMode.AutoReset, shutdownEventName);
             ThreadPool.RegisterWaitForSingleObject(
                 shutdownEvent,

@@ -83,15 +83,15 @@ namespace Plexus.Channels
         public void TryCompleteReturnsFalseIfChannelIsAlreadyCompleted()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryCompleteWriting().ShouldBe(true);
-            sut.TryCompleteWriting().ShouldBe(false);
+            sut.TryComplete().ShouldBe(true);
+            sut.TryComplete().ShouldBe(false);
         }
 
         [Fact]
         public void CompleteThrowsExceptionIfChannelIsAlreadyCompleted()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryCompleteWriting().ShouldBe(true);
+            sut.TryComplete().ShouldBe(true);
             Should.Throw<OperationCanceledException>(() => sut.Complete());
         }
 
@@ -107,7 +107,7 @@ namespace Plexus.Channels
         public void CompletionSuccessfulAfterTryCompleteCalledWithoutException()
         {
             var sut = new BufferedChannel<int>(2);
-            sut.TryCompleteWriting();
+            sut.TryComplete();
             sut.Completion.Status.ShouldBe(TaskStatus.RanToCompletion);
         }
 
@@ -158,7 +158,7 @@ namespace Plexus.Channels
             var sut = new BufferedChannel<int>(2);
             sut.TryWrite(1);
             sut.TryWrite(2);
-            sut.TryCompleteWriting();
+            sut.TryComplete();
             sut.Completion.IsCompleted.ShouldBe(false);
             sut.TryRead(out int _).ShouldBe(true);
             sut.Completion.IsCompleted.ShouldBe(false);
@@ -322,7 +322,7 @@ namespace Plexus.Channels
             Task.WhenAll(allTasks).ShouldCompleteIn(Timeout10Sec);
 
             sut.TryRead(out int _).ShouldBe(false);
-            sut.TryCompleteWriting().ShouldBe(true);
+            sut.TryComplete().ShouldBe(true);
         }
     }
 }

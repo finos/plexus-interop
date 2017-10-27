@@ -21,13 +21,13 @@ namespace Plexus.Processes
     using System.Threading;
     using System.Threading.Tasks;
 
-    public abstract class ProcessBase : IProcess
+    public abstract class ProcessBase : IDisposable
     {
         private readonly Latch _started = new Latch();
         private readonly Latch _stopped = new Latch();
         private readonly Promise _completion = new Promise();
         private readonly Promise _startCompletion = new Promise();        
-        private readonly CancellationTokenSource _stopCancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private readonly ConcurrentBag<CancellationTokenRegistration> _registrations 
             = new ConcurrentBag<CancellationTokenRegistration>();
@@ -53,11 +53,11 @@ namespace Plexus.Processes
 
         public Task StartCompletion => _startCompletion.Task;
 
-        protected CancellationToken StopToken => _stopCancellation.Token;
+        protected CancellationToken CancellationToken => _cancellation.Token;
 
         protected void OnStop(Action action)
         {
-            _registrations.Add(StopToken.Register(action));
+            _registrations.Add(CancellationToken.Register(action));
         }
 
         protected virtual Task OnCompletedAsync(Task completion)
@@ -71,7 +71,6 @@ namespace Plexus.Processes
         {
             if (!_started.TryEnter())
             {
-                Log.Debug("Start called after process was already started");
                 return;
             }
             if (_stopped.IsEntered)
@@ -82,16 +81,13 @@ namespace Plexus.Processes
             }
             Log.Debug("Starting process");
             _startCompletion.Task.ContinueWithSynchronously(
-                t => Log.Trace("Start of process completed in state {0}", t.GetCompletionDescription()),
+                t => Log.Debug("Start of process completed in state {0}", t.GetCompletionDescription()),
                 CancellationToken.None);
-            var startTask = TaskRunner.RunInBackground(StartCoreAsync, StopToken);
-            startTask
-                .IgnoreCancellation(StopToken)
-                .PropagateCompletionToPromise(_startCompletion);
+            var startTask = TaskRunner.RunInBackground(StartCoreAsync, CancellationToken);
+            startTask.PropagateCompletionToPromise(_startCompletion);
             startTask
                 .Unwrap()                
                 .ContinueWithSynchronously(OnCompletedAsync, CancellationToken.None)
-                .IgnoreCancellation(StopToken)
                 .PropagateCompletionToPromise(_completion);
         }
 
@@ -105,11 +101,10 @@ namespace Plexus.Processes
         {
             if (!_stopped.TryEnter())
             {
-                Log.Debug("Stop called after process was already stopped");
                 return;
             }
             Log.Debug("Stopping");
-            _stopCancellation.Cancel();
+            _cancellation.Cancel();
             Start();
         }
 

@@ -16,9 +16,8 @@
  */
 namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
-    using System;
-    using System.Threading.Tasks;
     using Plexus.Channels;
+    using System.Threading.Tasks;    
 
     internal interface IInvocation<in TRequest, TResponse>
     {
@@ -32,6 +31,6 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 
         IWritableChannel<TRequest> Out { get; }
 
-        bool TryTerminate(Exception error = null);
+        void Cancel();
     }
 }

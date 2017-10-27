@@ -38,7 +38,6 @@ describe("WebSocketFramedTransport", () => {
             mockServer = new Server(connectionUrl);
             mockServer.on("connection", () => {
                 // tslint:disable-next-line:no-console
-                console.log("Mock Web Socket connected");
             });
             done();
         });
@@ -47,7 +46,6 @@ describe("WebSocketFramedTransport", () => {
     afterEach((done) => {
         mockServer.stop(() => {
             // tslint:disable-next-line:no-console
-            console.log("Mock Server stopped");
             done();
         });
     });
@@ -64,8 +62,6 @@ describe("WebSocketFramedTransport", () => {
         transport.connectionEstablished().then(() => {
             const frame = ChannelOpenFrame.fromHeaderData({ channelId: UniqueId.generateNew() });
             mockServer.send(new Uint8Array(messagesConverter.serialize(frame)));
-            // tslint:disable-next-line:no-console
-            console.log(transport.terminateReceived);
             transport.open({
                 next: (frame) => {
                     const channelFrame = frame as ChannelOpenFrame;

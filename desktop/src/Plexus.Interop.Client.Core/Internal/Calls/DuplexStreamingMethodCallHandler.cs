@@ -17,46 +17,23 @@
 namespace Plexus.Interop.Internal.Calls
 {
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
-    using Plexus.Interop.Transport;
-    using System;
     using System.Threading.Tasks;
 
-    internal sealed class DuplexStreamingMethodCallHandler<TRequest, TResponse> : IMethodCallHandler
+    internal sealed class DuplexStreamingMethodCallHandler<TRequest, TResponse> : MethodCallHandlerBase<TRequest, TResponse>
     {
         private readonly DuplexStreamingMethodHandler<TRequest, TResponse> _handler;
-        private readonly IIncomingInvocationFactory _incomingInvocationFactory;
 
-        public DuplexStreamingMethodCallHandler(DuplexStreamingMethodHandler<TRequest, TResponse> handler, IIncomingInvocationFactory incomingInvocationFactory)
+        public DuplexStreamingMethodCallHandler(
+            DuplexStreamingMethodHandler<TRequest, TResponse> handler, 
+            IIncomingInvocationFactory incomingInvocationFactory) 
+            : base(incomingInvocationFactory)
         {
             _handler = handler;
-            _incomingInvocationFactory = incomingInvocationFactory;
         }
 
-        public async Task HandleAsync(IncomingInvocationDescriptor info, ITransportChannel channel)
+        protected override async Task HandleCoreAsync(IIncomingInvocation<TRequest, TResponse> invocation, MethodCallContext context)
         {
-            var invocation = _incomingInvocationFactory.CreateAsync<TRequest, TResponse>(info, channel);
-            try
-            {
-                await invocation.StartCompletion.ConfigureAwait(false);
-                var context = new MethodCallContext(info.Source.ApplicationId, info.Source.ConnectionId);
-                await _handler(invocation.In, invocation.Out, context).ConfigureAwait(false);
-                invocation.Out.TryCompleteWriting();
-            }
-            catch (Exception ex)
-            {
-                invocation.Out.TryTerminateWriting(ex);
-                throw;
-            }
-            finally
-            {
-                while (await invocation.In.WaitReadAvailableAsync().ConfigureAwait(false))
-                {
-                    while (invocation.In.TryRead(out _))
-                    {
-                    }
-                }
-                await invocation.Completion.ConfigureAwait(false);
-            }
+            await _handler(invocation.In, invocation.Out, context).ConfigureAwait(false);
         }
     }
 }

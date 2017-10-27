@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.Streams.Internal
+ namespace Plexus.Interop.Transport.Transmission.Streams.Internal
 {
     using Plexus.Channels;
     using Plexus.Pools;
@@ -77,12 +77,12 @@
                     _log.Trace("Received message {0} of length {1}", _count, length);
                     _count++;
                 }
-                _buffer.Out.TryCompleteWriting();
+                _buffer.Out.TryComplete();
             }
             catch (Exception ex)
             {
                 _log.Trace("Process failed: {0}", ex.FormatTypeAndMessage());
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 _buffer.In.DisposeBufferedItems();
                 throw;
             }

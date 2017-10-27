@@ -15,7 +15,7 @@ To do this, run the following commands:
 ----
 git clone https://github.com/symphonyoss/plexus-interop.git
 cd plexus-interop
-gradlew build --info
+gradlew build --console plain --no-daemon
 ----
 
 ===== Before you start
@@ -28,14 +28,14 @@ This introduction guide shows a simple case of two apps communicating with each 
 There are 2 currently supported technologies, so the guide is split into 2 sections:
 
 - <<quick-start-web, Web (TypeScript)>>
-- <<quick-start-net, .NET (C#)>>.
+- <<quick-start-dotnet, .NET (C#)>>.
 
 Note that you can combine the samples, e.g. take web implementation of `CcyPairRateViewer` from the first guide and
 .NET implementation of `CcyPairRateProvider` from the second guide and run them together.
 
 include::guides-quick-start-web.adoc[]
 
-include::guides-quick-start-net.adoc[]
+include::guides-quick-start-dotnet.adoc[]
 
 
 

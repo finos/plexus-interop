@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
+ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 {
     using Plexus.Channels;
     using Plexus.Pools;
@@ -58,7 +58,7 @@
             }
             catch (Exception ex)
             {
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 _buffer.In.DisposeBufferedItems();
                 throw;
             }

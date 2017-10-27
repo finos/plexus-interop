@@ -58,7 +58,7 @@
                     try
                     {
                         await channel.Out.WriteAsync(new TransportMessageFrame(serializedRequest)).ConfigureAwait(false);
-                        channel.Out.TryCompleteWriting();
+                        channel.Out.TryComplete();
                     }
                     catch
                     {
@@ -74,7 +74,7 @@
             }
             catch (Exception ex)
             {
-                channel.Out.TryTerminateWriting(ex);
+                channel.Out.TryTerminate(ex);
                 throw;
             }
             finally
@@ -97,7 +97,7 @@
                     try
                     {
                         await channel.Out.WriteAsync(new TransportMessageFrame(serializedRequest)).ConfigureAwait(false);
-                        channel.Out.TryCompleteWriting();
+                        channel.Out.TryComplete();
                     }
                     catch
                     {
@@ -113,7 +113,7 @@
             }
             catch (Exception ex)
             {
-                channel.Out.TryTerminateWriting(ex);
+                channel.Out.TryTerminate(ex);
                 throw;
             }
             finally

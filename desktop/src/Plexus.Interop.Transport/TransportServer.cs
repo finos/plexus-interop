@@ -59,7 +59,7 @@ namespace Plexus.Interop.Transport
         {            
             try
             {
-                await _buffer.WriteAsync(_connectionFactory.Create(c), StopToken).ConfigureAwait(false);
+                await _buffer.WriteAsync(_connectionFactory.Create(c), CancellationToken).ConfigureAwait(false);
                 Log.Debug("New connection accepted");
             }
             catch

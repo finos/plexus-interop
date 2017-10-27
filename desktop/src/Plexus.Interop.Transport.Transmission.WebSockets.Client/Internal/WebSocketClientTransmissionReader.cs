@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
+ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 {
     using Plexus.Channels;
     using Plexus.Pools;
@@ -59,7 +59,7 @@
             }
             catch (Exception ex)
             {
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
                 throw;
             }
             finally
@@ -74,13 +74,13 @@
         private void OnError(object sender, ErrorEventArgs e)
         {
             _log.Trace("OnError: {0}", e.Exception.FormatToString());
-            _buffer.Out.TryTerminateWriting(e.Exception);
+            _buffer.Out.TryTerminate(e.Exception);
         }
 
         private void OnClosed(object sender, EventArgs e)
         {
             _log.Trace("OnClosed");
-            _buffer.Out.TryTerminateWriting();
+            _buffer.Out.TryTerminate();
         }
 
         private void OnMessageReceived(object sender, MessageReceivedEventArgs e)
@@ -88,7 +88,7 @@
             if (string.Equals(e.Message, "<END>"))
             {
                 _log.Trace("Received <END> message");
-                _buffer.Out.TryCompleteWriting();
+                _buffer.Out.TryComplete();
             }
             else
             {
@@ -108,7 +108,7 @@
             {                
                 _log.Trace(ex, "Exception in OnDataReceived callback");
                 msg.Dispose();
-                _buffer.Out.TryTerminateWriting(ex);
+                _buffer.Out.TryTerminate(ex);
             }
         }
     }

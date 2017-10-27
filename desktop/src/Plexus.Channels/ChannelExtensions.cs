@@ -34,13 +34,13 @@ namespace Plexus.Channels
 
         public static async Task CompleteAsync<T>(this IWritableChannel<T> channel)
         {
-            channel.TryCompleteWriting();
+            channel.TryComplete();
             await channel.Completion.ConfigureAwait(false);
         }
 
         public static async Task TerminateAsync<T>(this IWritableChannel<T> channel, Exception error = null)
         {
-            channel.TryTerminateWriting(error);
+            channel.TryTerminate(error);
             await channel.Completion.ConfigureAwait(false);
         }
 
@@ -51,6 +51,21 @@ namespace Plexus.Channels
             if (!result)
             {
                 throw new OperationCanceledException();
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static async Task WriteOrDisposeAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
+            where T : IDisposable
+        {
+            try
+            {
+                await channel.WriteAsync(item, cancellationToken).ConfigureAwait(false);
+            }
+            catch
+            {
+                item.Dispose();
+                throw;
             }
         }
 
@@ -95,7 +110,7 @@ namespace Plexus.Channels
             this IWritableChannel<T> channel,
             Exception error = null)
         {
-            if (!channel.TryTerminateWriting(error))
+            if (!channel.TryTerminate(error))
             {
                 throw new OperationCanceledException();
             }
@@ -103,7 +118,7 @@ namespace Plexus.Channels
 
         public static void Complete<T>(this IWritableChannel<T> channel)
         {
-            if (!channel.TryCompleteWriting())
+            if (!channel.TryComplete())
             {
                 throw new OperationCanceledException();
             }

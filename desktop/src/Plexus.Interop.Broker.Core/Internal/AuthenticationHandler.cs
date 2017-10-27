@@ -68,7 +68,7 @@
                         serializedResponse.Dispose();
                         throw;
                     }
-                    channel.Out.TryCompleteWriting();
+                    channel.Out.TryComplete();
                     await channel.Completion.ConfigureAwait(false);
                     var info =
                         new AppConnectionDescriptor(

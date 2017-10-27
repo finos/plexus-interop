@@ -42,7 +42,7 @@ namespace Plexus.Interop.Transport
             var startTasks = _servers.Select(StartServerAsync).ToArray();
             await Task.WhenAll(startTasks).IgnoreExceptions().ConfigureAwait(false);
             var servers = startTasks.Where(t => t.Status == TaskStatus.RanToCompletion).Select(t => t.GetResult());
-            OnStop(() => _buffer.Out.TryCompleteWriting());
+            OnStop(() => _buffer.Out.TryComplete());
             return ProcessAsync(servers);
         }
 
@@ -65,7 +65,7 @@ namespace Plexus.Interop.Transport
         {
             await Task.WhenAll(servers.Select(ProcessAsync)).IgnoreExceptions();
             Log.Debug("All servers stopped");
-            _buffer.Out.TryCompleteWriting();
+            _buffer.Out.TryComplete();
         }
 
         private async Task ProcessAsync(ITransportServer server)
@@ -75,7 +75,7 @@ namespace Plexus.Interop.Transport
                 await server.In.ConsumeAsync(ProcessAsync).ConfigureAwait(false);
                 Log.Debug("Server completed: {{{0}}}", server);
             }
-            catch (OperationCanceledException) when (StopToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (CancellationToken.IsCancellationRequested)
             {
                 Log.Debug("Server stopped: {{{0}}}", server);
             }

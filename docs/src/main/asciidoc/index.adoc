@@ -40,12 +40,14 @@ include::guides-interop-concepts.adoc[]
 
 === Invocation workflow
 
+[[guides-interop-invocation-workflow]]
 include::guides-interop-invocation-workflow.adoc[]
 
 === Plexus Interop integration workflow
 
 include::guides-interop-integration-workflow.adoc[]
 
+[[guides-how-to-write-custom-app-launcher]]
 === How to write custom App Launcher
 
 include::guides-how-to-write-custom-app-launcher.adoc[]

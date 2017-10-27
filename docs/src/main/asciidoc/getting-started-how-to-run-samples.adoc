@@ -2,11 +2,11 @@
 
 :imagesdir: ./images
 
-Successful build (see <<how-to-build, How to build>>) on Windows machine produces sample apps into directory `bin/win-x86/samples`.
+Successful build (see <<how-to-build, How to build>>) on Windows machine produces sample apps into directory `bin/win-x86/samples/greeting`.
 
 Let's go through the most extensive example showing .NET and Web apps interoperability as well as service discovery feature:
 
-* Go to `bin/win-x86/samples`
+* Go to `bin/win-x86/samples/greeting`
 
 * Launch Broker – `LaunchBroker.cmd`
 
@@ -37,8 +37,8 @@ image::sample-4.png[Sample-4]
 
 You can find sample apps code by links below:
 
-* Sample Metadata - https://github.com/symphonyoss/plexus-interop/tree/master/samples/samples/metadata/
-* GreetingClient .NET - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingClient/
-* GreetingServer .NET - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingServer/
-* GreetingServer Web - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/web-example/src/greeting/server/
+* Sample Interop Registry - https://github.com/symphonyoss/plexus-interop/tree/master/samples/greeting/registry/
+* GreetingClient .NET - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingClient/Program.cs
+* GreetingServer .NET - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingServer/Program.cs
+* GreetingServer Web - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/web-example/src/greeting/server/Main.ts
 * ElectronAppLauncher - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/electron-launcher/src/launcher/

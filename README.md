@@ -56,7 +56,7 @@ Run .Net to Web interop example on Windows:
     - Then choose Discovery (5) and “Greeting from .Net app” from discovery response
     - Enter another name, e.g. “Mike” and hit enter - .Net Greeting Server app will be launched and print greeting request:
 
-    ![Sample-4](./docs/src/main/asciidoc/images/sample-3.png "Sample-4")
+    ![Sample-4](./docs/src/main/asciidoc/images/sample-4.png "Sample-4")
 
 
 ## Documentation

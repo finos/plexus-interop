@@ -14,28 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Processes
+﻿namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
-    using System;
-    using System.Threading.Tasks;
-
-    public sealed class Process : ProcessBase
+    internal enum IncomingStreamState
     {
-        public static IProcess Create(Func<Task<Task>> startProcessFunc)
-        {
-            return new Process(startProcessFunc);
-        }
-
-        private readonly Func<Task<Task>> _startProcessFunc;
-
-        public Process(Func<Task<Task>> startProcessFunc)
-        {
-            _startProcessFunc = startProcessFunc;
-        }
-
-        protected override Task<Task> StartCoreAsync()
-        {
-            return _startProcessFunc();
-        }
+        Open,
+        ReceivingMessage,
+        Completed
     }
 }

@@ -28,11 +28,11 @@ namespace Plexus.Channels
                 var c = (ITerminatableChannel)state;
                 if (task.IsFaulted)
                 {
-                    c.TryTerminateWriting(task.Exception.ExtractInner());
+                    c.TryTerminate(task.Exception.ExtractInner());
                 }
                 else if (task.IsCanceled)
                 {
-                    c.TryTerminateWriting();
+                    c.TryTerminate();
                 }
             }
 
@@ -46,15 +46,15 @@ namespace Plexus.Channels
                 var c = (IWritableChannel<T>)state;
                 if (task.IsFaulted)
                 {
-                    c.TryTerminateWriting(task.Exception.ExtractInner());
+                    c.TryTerminate(task.Exception.ExtractInner());
                 }
                 else if (task.IsCanceled)
                 {
-                    c.TryTerminateWriting();
+                    c.TryTerminate();
                 }
                 else
                 {
-                    c.TryCompleteWriting();
+                    c.TryComplete();
                 }
             }
 
@@ -68,11 +68,11 @@ namespace Plexus.Channels
                 var c = (IWritableChannel<T>)state;
                 if (task.IsFaulted)
                 {
-                    c.TryTerminateWriting(task.Exception.ExtractInner());
+                    c.TryTerminate(task.Exception.ExtractInner());
                 }
                 else if (task.IsCanceled)
                 {
-                    c.TryTerminateWriting();
+                    c.TryTerminate();
                 }
             }
 

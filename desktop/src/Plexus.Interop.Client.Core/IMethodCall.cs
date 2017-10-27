@@ -30,6 +30,14 @@
         /// Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
         /// As a result, all resources being used by the call should be released eventually.
         /// </summary>
+        void Cancel();
+
+        /// <summary>
+        /// Provides means to cancel the call.
+        /// If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+        /// Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+        /// As a result, all resources being used by the call should be released eventually.
+        /// </summary>
         Task CancelAsync();
     }
 }

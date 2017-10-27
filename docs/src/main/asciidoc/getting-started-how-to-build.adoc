@@ -1,5 +1,14 @@
 All Plexus Interop components can be build using https://gradle.org/[Gradle] tool using the following single command:
 
-`gradlew build --console plain`
+[source, bash]
+-----
+gradlew build --console plain --no-daemon
+-----
 
-Build produces artifacts into folder `bin`.
+Build produces artifacts into directory `bin`:
+
+* `win-x86/broker` directory with binaries of interop broker
+* `win-x86/samples` directory with sample apps
+* `win-x86/sdk` directory with code generator tool
+* `docs` directory with documenation in HTML format
+* `nuget` .NET nuget packages

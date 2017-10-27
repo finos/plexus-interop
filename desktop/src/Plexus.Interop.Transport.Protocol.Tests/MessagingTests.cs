@@ -78,7 +78,7 @@ namespace Plexus.Interop.Transport.Protocol
                     var connectionClose = new TransportMessage(TransportHeaderPool.Instance.CreateConnectionCloseHeader(CompletionHeader.Completed));
                     await clientSender.Out.WriteAsync(connectionOpen);
                     await clientSender.Out.WriteAsync(connectionClose);
-                    clientSender.Out.TryCompleteWriting();
+                    clientSender.Out.TryComplete();
 
                     var received1 = await serverReceiver.In.ReadAsync();
                     var received2 = await serverReceiver.In.ReadAsync();
@@ -119,7 +119,7 @@ namespace Plexus.Interop.Transport.Protocol
                     transportMessage.Retain();
                     await sender.Out.WriteAsync(transportMessage).ConfigureAwait(false);
                 }
-                sender.Out.TryCompleteWriting();
+                sender.Out.TryComplete();
                 await sender.Out.Completion.ConfigureAwait(false);
             });
 
@@ -196,7 +196,7 @@ namespace Plexus.Interop.Transport.Protocol
                     await action(receiver).ConfigureAwait(false);
                     await receiver.In.Completion.ConfigureAwait(false);
                     Log.Trace("Completing server stream for connection {0}", connection.Id);
-                    connection.Out.TryCompleteWriting();
+                    connection.Out.TryComplete();
                     await connection.Completion.ConfigureAwait(false);
                 }
             });
@@ -210,7 +210,7 @@ namespace Plexus.Interop.Transport.Protocol
                 {
                     var sender = new MessagingSendProcessor(connection, SerializationProvider.GetSerializer());
                     await action(sender).ConfigureAwait(false);
-                    sender.Out.TryCompleteWriting();
+                    sender.Out.TryComplete();
                     await sender.Out.Completion.ConfigureAwait(false);
                     Log.Trace("Waiting for completion of connection {0}", connection.Id);
                     await connection.Completion.ConfigureAwait(false);
