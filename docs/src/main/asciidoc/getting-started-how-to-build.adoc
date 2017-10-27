@@ -7,7 +7,8 @@ gradlew build --console plain --no-daemon
 
 Build produces artifacts into directory `bin`:
 
-* `broker` directory with binaries of interop broker
+* `win-x86/broker` directory with binaries of interop broker
+* `win-x86/samples` directory with sample apps
+* `win-x86/sdk` directory with code generator tool
 * `docs` directory with documenation in HTML format
-* `samples` directory with sample apps
-* `sdk` directory with code generator tool
+* `nuget` .NET nuget packages
