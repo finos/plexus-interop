@@ -17,10 +17,11 @@
 declare var window: any;
 const Long = require("long");
 (<any>window).dcodeIO = { Long: Long };
-import { WebCcyPairRateProviderClientBuilder, WebCcyPairRateProviderClient } from "./gen/WebCcyPairRateProviderGeneratedClient";
+import { WebCcyPairRateProviderClientBuilder } from "./gen/WebCcyPairRateProviderGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 import * as plexus from "./gen/plexus-messages";
 import { LoggerFactory, LogLevel } from "@plexus-interop/common";
+import { RateService } from "./RateService";
 
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 
@@ -32,6 +33,7 @@ const electronWindow: any = remote.getCurrentWindow();
 
 const webSocketUrl = remote.getCurrentWindow().plexusBrokerWsUrl;
 const instanceId = remote.getCurrentWindow().plexusAppInstanceId;
+
 // enable dev tools
 document.addEventListener("keydown", function (e) {
     if (e.which === 123) {
@@ -49,6 +51,8 @@ const log = (msg: string) => {
     outEl.innerText = outEl.innerText + '\n' + msg;
 };
 
+const rateService = new RateService();
+
 new WebCcyPairRateProviderClientBuilder()
     .withClientDetails({
         applicationId: "vendorA.fx.WebCcyPairRateProvider",
@@ -60,7 +64,7 @@ new WebCcyPairRateProviderClientBuilder()
             log(`Received request for ${ccyPair.ccyPairName}'s Rate`);
             return {
                 ccyPairName: ccyPair.ccyPairName,
-                rate: Math.floor(Math.random() * 10) + 1
+                rate: rateService.getRate(ccyPair.ccyPairName)
             };
         }
     })
