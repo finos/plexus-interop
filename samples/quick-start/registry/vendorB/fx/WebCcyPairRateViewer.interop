@@ -21,6 +21,6 @@ import "fx/CcyPairRateService.proto";
 
 application WebCcyPairRateViewer {
 
-    consumes fx.CcyPairRateService { GetRate; }
+    consumes fx.CcyPairRateService from vendorA.fx.WebCcyPairRateProvider { GetRate; }
 
 }

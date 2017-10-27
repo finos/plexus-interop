@@ -5,7 +5,7 @@
       "displayName": "Electron App Launcher",
       "launcherId": "interop.NativeAppLauncher",
       "launcherParams": {
-        "cmd": "../../samples/apps/ElectronAppLauncher/ElectronAppLauncher.exe",
+        "cmd": "../../greeting/ElectronAppLauncher.cmd",
         "args": ""
       }
     },
@@ -32,7 +32,7 @@
       "displayName": "Web Currency Pair Rate Provider",
       "launcherId": "interop.ElectronAppLauncher",
       "launcherParams": {
-        "path": "../apps/WebCcyPairRateProvider/index.html"
+        "path": "../../../quick-start/apps/WebCcyPairRateProvider/index.html"
       }
     },
     {
@@ -40,7 +40,7 @@
       "displayName": "Web Currency Pair Rate Viewer",
       "launcherId": "interop.ElectronAppLauncher",
       "launcherParams": {
-        "path": "../apps/WebCcyPairRateViewer/index.html"
+        "path": "../../../quick-start/apps/WebCcyPairRateViewer/index.html"
       }
     }
   ]
