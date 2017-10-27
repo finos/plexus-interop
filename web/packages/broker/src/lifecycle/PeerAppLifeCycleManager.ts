@@ -13,13 +13,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */import { AppLifeCycleManager } from "./AppLifeCycleManager";
+ */
+import { AppLifeCycleManager } from "./AppLifeCycleManager";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { ApplicationConnectionDescriptor } from "./ApplicationConnectionDescriptor";
 import { ApplicationConnection } from "./ApplicationConnection";
 import { PeerEventBus } from "../bus/PeerEventBus";
 import { Cache, InMemoryCache, Logger, LoggerFactory, CacheEntry } from "@plexus-interop/common";
 import { ApplicationDescriptor } from "./ApplicationDescriptor";
+import { PeerProxyConnection } from "./PeerProxyConnection";
 
 /**
  * Manages one client connection and proxy connections for peer brokers
@@ -34,7 +36,7 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
     private onlineConnections: Cache = new InMemoryCache();
 
     constructor(
-        private readonly peerEventBus: PeerEventBus 
+        private readonly peerEventBus: PeerEventBus
     ) {
         this.subscribeToHeartBits();
     }
@@ -43,19 +45,19 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         const connectionId = UniqueId.generateNew();
         const connectionStrId = connectionId.toString();
         this.log.debug(`New connection [${connectionStrId}] accepted`);
-        const {applicationId, instanceId} = appDescriptor;
+        const { applicationId, instanceId } = appDescriptor;
         const appConnection: ApplicationConnection = {
             descriptor: {
                 connectionId,
-                applicationId, 
+                applicationId,
                 instanceId
-            },  
+            },
             connection
         };
         // current client's connection, not expiration
         this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
         this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod} period]`);
-        this.sendHeartBitsFor(appConnection);        
+        this.sendHeartBitsFor(appConnection);
         return appConnection;
     }
 
@@ -90,9 +92,18 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
             } else {
                 // app just connected or reconnected
                 // TODO handle reconnection
-                // TODO create proxy connection and put it here
+                this.log.debug(`Heart bit for new [${connectionStrId}] connection, application id [${connectionDescriptor.applicationId}] received`);
+                const appConnection: ApplicationConnection = {
+                    descriptor: connectionDescriptor,
+                    connection: new PeerProxyConnection()
+                };
+                this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection)));
             }
         });
+    }
+
+    private handleDroppedConnection(appConnection: ApplicationConnection): void {
+        // TODO disconnect from broker and clean up
     }
 
     private getOnlineConnectionsInternal(): ApplicationConnectionDescriptor[] {
