@@ -43,7 +43,6 @@ export class PointToPointInvocationTests extends BaseEchoTest {
                     this.verifyInvocationContext(context);
                     this.assertEqual(request, echoRequest);
                 } catch (error) {
-                    console.error("Failed", error);
                     reject(error);
                 }
                 return request;

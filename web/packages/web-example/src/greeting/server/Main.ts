@@ -68,7 +68,6 @@ new WebGreetingServerClientBuilder()
     .then(() => log.info("Connected to Broker"))
     .catch(e => {
         log.error("Failed to connect");
-        console.error("Failed to connect", e);
     });
 
 

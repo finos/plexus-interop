@@ -94,7 +94,6 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                     },
                     complete: () => { },
                     error: (e) => {
-                        console.error("Error received by server", e);
                         reject(e);
                     }
                 }
@@ -116,7 +115,6 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                         }
                     },
                     error: (e) => {
-                        console.error("Error received by client", e);
                         reject(e);
                     },
                     complete: () => {}
