@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppLifeCycleManager } from "./AppLifeCycleManager";
+import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { ApplicationConnectionDescriptor } from "./ApplicationConnectionDescriptor";
-import { ApplicationConnection } from "./ApplicationConnection";
-import { PeerEventBus } from "../bus/PeerEventBus";
+import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
+import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 import { Cache, InMemoryCache, Logger, LoggerFactory, CacheEntry } from "@plexus-interop/common";
-import { ApplicationDescriptor } from "./ApplicationDescriptor";
-import { PeerProxyConnection } from "./PeerProxyConnection";
+import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
+import { PeerProxyConnection } from "../peers/PeerProxyConnection";
+import { PeerConnectionsService } from "./PeerConnectionsService";
 
 /**
  * Manages one client connection and proxy connections for peer brokers
@@ -36,15 +36,14 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
     private onlineConnections: Cache = new InMemoryCache();
 
     constructor(
-        private readonly peerEventBus: PeerEventBus
+        private readonly peerConnectionsService: PeerConnectionsService
     ) {
         this.subscribeToHeartBits();
     }
 
     public async acceptConnection(connection: TransportConnection, appDescriptor: ApplicationDescriptor): Promise<ApplicationConnection> {
-        const connectionId = UniqueId.generateNew();
+        const connectionId = connection.uuid();
         const connectionStrId = connectionId.toString();
-        this.log.debug(`New connection [${connectionStrId}] accepted`);
         const { applicationId, instanceId } = appDescriptor;
         const appConnection: ApplicationConnection = {
             descriptor: {
@@ -55,9 +54,17 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
             connection
         };
         // current client's connection, not expiration
-        this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
-        this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod} period]`);
-        this.sendHeartBitsFor(appConnection);
+        if ((connection as PeerProxyConnection).isProxy) {
+            const proxyConnection = connection as PeerProxyConnection;
+            this.log.debug(`Accepted proxy [${connectionStrId}] connection`);
+            this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection)));            
+        } else {
+            this.log.debug(`Accepted new [${connectionStrId}] connection`);            
+            this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
+            this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod} period]`);
+            this.sendHeartBitsFor(appConnection);
+        }
+        
         return appConnection;
     }
 
@@ -84,20 +91,11 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
     }
 
     private subscribeToHeartBits(): void {
-        this.peerEventBus.onConnectionHeartBit(connectionDescriptor => {
+        this.peerConnectionsService.subscribeToConnectionsHearBits(connectionDescriptor => {
             const connectionStrId = connectionDescriptor.instanceId.toString();
             if (this.onlineConnections.has(connectionStrId)) {
                 // app still with us
                 this.onlineConnections.resetTtl(connectionStrId);
-            } else {
-                // app just connected or reconnected
-                // TODO handle reconnection
-                this.log.debug(`Heart bit for new [${connectionStrId}] connection, application id [${connectionDescriptor.applicationId}] received`);
-                const appConnection: ApplicationConnection = {
-                    descriptor: connectionDescriptor,
-                    connection: new PeerProxyConnection()
-                };
-                this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection)));
             }
         });
     }
