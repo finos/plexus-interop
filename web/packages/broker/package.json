@@ -25,6 +25,7 @@
     "@plexus-interop/transport-common": "0.0.1",
     "protobufjs": "^6.8.0",
     "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.4.2",
     "tslib": "^1.7.1"
   },
   "peerDependencies": {

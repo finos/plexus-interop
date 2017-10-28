@@ -1,5 +1,5 @@
 import { ActionType } from "./ActionType";
-import { EventType } from "./EventType";
+import { EventType } from "./events/EventType";
 import { Subscription } from "@plexus-interop/common";
 
 export interface PeerTransport {
