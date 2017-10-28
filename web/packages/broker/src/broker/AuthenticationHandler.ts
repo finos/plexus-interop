@@ -35,8 +35,11 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
 
         return new Promise((resolve, reject) => {
             channel.open({
+                
                 started: () => { },
+                
                 startFailed: (e) => reject(e),
+                
                 next: async message => {
 
                     if (this.log.isDebugEnabled()) {
@@ -58,6 +61,7 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
                         .catch(e => this.log.error("Failed to sent connection details", e));
 
                     resolve(appConnection);
+
                 },
                 error: e => reject(e),
                 complete: () => {

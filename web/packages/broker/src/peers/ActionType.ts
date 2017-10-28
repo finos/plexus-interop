@@ -15,5 +15,7 @@
  * limitations under the License.
  */
 export interface ActionType<Req, Res> {
+
     id: string;
+    
 }

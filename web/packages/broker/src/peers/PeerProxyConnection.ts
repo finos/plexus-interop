@@ -18,6 +18,7 @@ import { TransportConnection, TransportChannel, UniqueId, Defaults } from "@plex
 import { Observer, BufferedObserver, Logger, LoggerFactory } from "@plexus-interop/common";
 import { clientProtocol } from "@plexus-interop/protocol"
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
+import { ProxyAuthenticationHandler } from "./ProxyAuthenticationHandler";
 
 export class PeerProxyConnection implements TransportConnection {
 
@@ -30,6 +31,8 @@ export class PeerProxyConnection implements TransportConnection {
     constructor(private readonly connectionDescriptor: ApplicationConnectionDescriptor) {
         this.log = LoggerFactory.getLogger(`PeerProxyConnection [${connectionDescriptor.connectionId.toString()}]`);
         this.channelsObserver = new BufferedObserver<TransportChannel>(Defaults.DEFAULT_BUFFER_SIZE, this.log);
+        // authentication handler as first incoming channel
+        this.channelsObserver.next(new ProxyAuthenticationHandler(connectionDescriptor));
     }
 
     public async open(channelObserver: Observer<TransportChannel>): Promise<void> {
@@ -38,7 +41,7 @@ export class PeerProxyConnection implements TransportConnection {
     }
 
     public uuid(): UniqueId {
-        throw "uuid Not implemented";
+        return this.connectionDescriptor.connectionId;
     }
 
     public getManagedChannels(): TransportChannel[] {
