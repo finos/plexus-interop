@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { Observer, Subscription } from "@plexus-interop/common";
-import { TransportConnection } from "@plexus-interop/transport-common";
+import { TransportConnection } from  "./TransportConnection";
 
 export interface ServerConnectionFactory {
 

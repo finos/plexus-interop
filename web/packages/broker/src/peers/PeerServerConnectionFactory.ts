@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ServerConnectionFactory } from "../transport/ServerConnectionFactory";
 import { Observer, Subscription, Logger, LoggerFactory, BufferedObserver, AnonymousSubscription } from "@plexus-interop/common";
-import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
+import { TransportConnection, UniqueId, ServerConnectionFactory } from "@plexus-interop/transport-common";
 import { PeerTransport } from "./PeerTransport";
 import { EventType } from "../peers/events/EventType";
 import { AppConnectionHeartBit } from "../peers/events/AppConnectionHeartBit";

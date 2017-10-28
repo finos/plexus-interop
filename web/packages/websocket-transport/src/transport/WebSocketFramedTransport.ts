@@ -112,7 +112,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     public getMaxFrameSize(): number {
-        return 60000;
+        return Defaults.DEFAULT_FRAME_SIZE;
     }
 
     public uuid(): UniqueId {
