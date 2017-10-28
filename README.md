@@ -78,3 +78,9 @@ After successful build documentation is available via:
 ## Contributing
 
 Please refer to [Contribution guidelines for this project](CONTRIBUTING.md).
+
+## Troubleshooting
+
+Problem: Gradle fails to download dependencies, how to setup proxy configuration?
+
+Solution: Pass proxy settings into Gradle via command-line parameters - e.g. `gradlew.bat -Dhttp.proxyHost=myproxy.com -Dhttp.proxyPort=8888 -Dhttps.proxyHost=myproxy.com -D https.proxyPort=4444 ...`
