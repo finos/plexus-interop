@@ -1,4 +1,4 @@
-. Switch to directory `bin\win-x86\quick-start` and start new broker instance:
+. Switch to the `bin\win-x86\quick-start` directory and start a new broker instance:
 +
 [source, bash]
 ----
@@ -8,28 +8,17 @@ start plexus broker
 +
 [NOTE]
 ====
-Broker requires metadata to run:
+Broker requires two types of metadata to run:
 
-* *app registry* which declares all available apps and how to launch them. App Lifecycle Manager component uses this registry to launch apps when requested.
-* *interop registry* which declares messages, services, and which of them are provided or consumed by each application. Broker uses this file to provide discovery capabilities and validate invocations between apps.
+* *app registry* - declares all available apps and how to launch them. App Lifecycle Manager component uses this registry to launch apps when requested.
+* *interop registry* - declares messages, services, and which of them are provided or consumed by each application. Broker uses this information to provide discovery capabilities and validate invocations between apps.
 
-By default, to simplify development, broker reads metadata from files `apps.json` and `interop.json` located in sub-directory `metadata` in broker's working directory.
-
-In real world scenarios, broker should load registries from server instead of reading them from files. This enables ability to change metadata in runtime
-and apply entitlement filter: server can send only information about apps which user entitled to launch. It's easy to implement
-your own *registry provider* to load metadata from anywhere.
-// TODO: link to guide about how to create custom registry provider
+By default Interop Broker reads metadata from `apps.json` and `interop.json` files located in `metadata` sub-directory within broker's working directory. In real world scenarios, broker will load registries from remote server instead of local files, because remote server may provide many capabilities like (admin UI, central governance, audit trail, entitlements, etc.).
+To load metadata from other data sources you need to implement your own *registry provider* (documentation on that is in progress).
 ====
 +
 [NOTE]
 ====
-Each Plexus Interop Broker instance is identified by its working directory. It is possible to run many brokers simultaneously,
-but each of them must run in a separate directory.
-====
-+
-[NOTE]
-====
-On startup broker writes addresses of supported servers (websocket and named pipe currently) to sub-directory "servers".
-Each client can read address of preferred transport from this directory. This means the only information required to connect
-to broker is its working directory.
+Each Interop Broker instance is identified by its working directory. It is possible to run many brokers in parallel,
+but instance must run in a separate directory.
 ====

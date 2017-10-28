@@ -2,13 +2,13 @@
 [[quick-start-dotnet]]
 ==== Quick Start - .NET
 
-In this guide both consumer and provider are .NET console applications written in C# language running using https://www.microsoft.com/net/download/core#/runtime[.NET Core].
+In this guide both consumer and provider are .NET console apps written in C# language running under https://www.microsoft.com/net/download/core#/runtime[.NET Core].
 
 ===== Run example
 
 include::guides-quick-start-launch-broker-step.adoc[]
 
-. Launch `CcyPairRateViewer`:
+. Launch "CCY Pair Viewer" app:
 +
 [source, bash]
 -----
@@ -19,7 +19,7 @@ include::guides-quick-start-activate-app.adoc[]
 +
 [NOTE]
 ====
-In this example apps are launched using built-in `NativeAppLauncher` which run apps as usual processes by executing specified file with arguments.
+In this example apps are launched using built-in `NativeAppLauncher` which run apps as standard OS processes.
 ====
 
 . In the opened console window enter a currency pair name, e.g. `EURUSD` and press `Enter`:
@@ -30,11 +30,10 @@ include::guides-quick-start-invocation-workflow.adoc[]
 +
 [NOTE]
 ====
-In this example `CcyPairRateProvider` app is a provider of `CcyPairRateService`, so broker starts it by sending request to `NativeAppLauncher`
-and then redirects invocation to the launched instance.
+Note that `CcyPairRateProvider` app uses the same `NativeAppLauncher` as the viewer app.
 ====
 
-. Broker starts `CcyPairRateProvider` app and redirects request to it:
+. Once `CcyPairRateProvider` app is up and running it registers in Broker, receives the message from viewer app and sends back a random rate:
 +
 image::quick-start-dotnet-2.png[Quick Start .NET 2]
 
@@ -44,12 +43,11 @@ image::quick-start-dotnet-3.png[Quick Start .NET 3]
 
 ===== Modify example
 
-Let's take a closer look to example and improve the provided service with ability to provide real-time updates.
-We're going to change contract between two applications, pass the changed interop metadata to broker, update apps and run them again.
+Let us add real-time updates of FX rates instead of a single response. For this we have to change the contract between two apps, provide updated interop metadata to the broker, update apps and run them again.
 
 ====== Modify metadata
 
-First we need to modify interop registry and pass the changed metadata to broker.
+First we need to modify interop registry and pass updated metadata to the broker.
 
 . Open `registry/fx/CcyPairRateService.proto` file and add new `GetRateStream` method:
 +
@@ -94,7 +92,7 @@ application CcyPairRateViewer {
 }
 -----
 
-. To pass the changed metadata to broker, navigate back to `bin\win-x86\samples\quick-start` and re-generate metadata using *plexusgen* tool:
+. To pass updated metadata to the broker, go back to `bin\win-x86\samples\quick-start` directory and re-generate metadata using *Plexus Generator* tool:
 +
 [source, bash]
 -----
@@ -103,14 +101,14 @@ java -jar ../../sdk/plexusgen.jar --type=json_meta --baseDir=registry --out=meta
 +
 [NOTE]
 ====
-Broker tracks `interop.json` file and automatically reloads metadata when the file is changed.
+Broker tracks `interop.json` file and automatically reloads metadata file is modified.
 ====
 
 ====== Modify and build provider app
 
-Now let's update CcyPairRateProvider app to provide real-time notifications.
+Now let us update CcyPairRateProvider app to provide real-time notifications.
 
-. Navigate to the directory `desktop/src/Plexus.Interop.Samples.CcyPairRateProvider`, open `Program.cs` and update the code to the following:
+. Navigate to the `desktop/src/Plexus.Interop.Samples.CcyPairRateProvider` directory , open `Program.cs` file and update the code:
 +
 [source, java]
 ./desktop/src/Plexus.Interop.Samples.CcyPairRateProvider/Program.cs
@@ -134,7 +132,7 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
 
         public async Task MainAsync(string[] args)
         {
-            // Read broker working dir specified either in the first
+            // Read broker's working directory specified either in the first
             // command line argument or in environment variable, or just use current working directory
             var brokerLocation = args.Length > 0
                 ? args[0]
@@ -203,7 +201,7 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
 }
 -----
 
-. Build the app by executing the following command in directory `desktop\src\Plexus.Interop.Samples.CcyPairRateProvider`:
+. Re-build the app by executing the following command in `desktop\src\Plexus.Interop.Samples.CcyPairRateProvider` directory:
 [source, bash]
 -----
 dotnet build
@@ -211,9 +209,9 @@ dotnet build
 
 ====== Modify and build consumer app
 
-Now let's update CcyPairRateViewer app to subscribe to real-time notifications.
+Now let us update "CCY Pair Rate Viewer" app to handle multiple incoming real-time updates.
 
-. Navigate to the directory `desktop/src/Plexus.Interop.Samples.CcyPairRateViewer`, open `Program.cs` and update the code to the following:
+. Navigate to the `desktop/src/Plexus.Interop.Samples.CcyPairRateViewer` directory, open `Program.cs` file and update the code to the following:
 +
 [source, java]
 ./desktop/src/Plexus.Interop.Samples.CcyPairRateProvider/Program.cs
@@ -308,7 +306,7 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer
 }
 -----
 
-. Build the app by executing the following command in directory `desktop\src\Plexus.Interop.Samples.CcyPairRateProvider`:
+. Re-build the app by executing the following command in `desktop\src\Plexus.Interop.Samples.CcyPairRateProvider` directory:
 [source, bash]
 -----
 dotnet build
@@ -316,7 +314,7 @@ dotnet build
 
 ====== Launch the modified example
 
-. Launch `CcyPairRateViewer`:
+. Launch "CCY Pair Rate Viewer":
 +
 [source, bash]
 -----
@@ -327,10 +325,10 @@ plexus activate vendorB.fx.CcyPairRateViewer
 +
 image::quick-start-dotnet-4.png[Quick Start .NET 4]
 
-. Broker starts `CcyPairRateProvider` app and redirects request to it:
+. Broker starts "CCY Pair Rate Provider" app and redirects request to it:
 +
 image::quick-start-dotnet-5.png[Quick Start .NET 5]
 
-. The viewer app shows rates received from provider:
+. The viewer app will show rate updates coming from provider until you press `CTRL-C`:
 +
 image::quick-start-dotnet-6.png[Quick Start .NET 6]

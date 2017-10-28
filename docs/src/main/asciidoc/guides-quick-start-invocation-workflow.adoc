@@ -1,11 +1,12 @@
 [NOTE]
 ====
-When a service is called, broker does the following:
+When app A calls an interop service hosted in app B the following steps happen:
 
-. Searches for the service providers in *interop registry*.
-. If service provider app is offline, launches it by inspecting *app registry* and sending launch request to the appropriate *app launcher*.
-. Waits until the launched app connected.
-. Redirects the invocation to the service provider app.
+* Broker searches for the already connected live service providers
+* If service provider is offline, broker inspects *App Registry* and sends a launch request to *App Lifecycle Manager*.
+* While app is starting broker waits (with some timeout)
+* Service provider within the launched app connects to the broker and registers itself
+* Broker sends interop message to the service provider
 
 See <<guides-interop-invocation-workflow, Invocation Workflow>> section for details.
 ====
