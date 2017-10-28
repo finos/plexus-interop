@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/client",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "Client for Plexus Interop",
@@ -16,7 +16,7 @@
     "gen-client-js": "pbjs --force-long -t static-module -r client -w commonjs -o src/gen/internal-client-protocol.js ../../../protocol/Plexus.Interop.proto",
     "gen-client-ts": "pbts --force-long -o src/gen/internal-client-protocol.d.ts src/gen/internal-client-protocol.js",
     "gen-client-protocol": "npm run gen-client-js && npm run gen-client-ts",
-    "unpublish": "npm unpublish @plexus-interop/client@0.0.1",
+    "unpublish": "npm unpublish @plexus-interop/client@0.1.1",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",
@@ -26,7 +26,7 @@
   "dependencies": {
     "@types/loglevel": "^1.4.29",
     "@types/long": "^3.0.31",
-    "@plexus-interop/transport-common": "0.0.1",
+    "@plexus-interop/transport-common": "0.1.1",
     "loglevel": "^1.4.1",
     "long": "^3.2.0",
     "reflect-metadata": "^0.1.10",

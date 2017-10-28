@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/e2e",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "private": true,
@@ -17,7 +17,7 @@
     "gen-echo-js": "pbjs --force-long -t static-module -r echo-client -w commonjs -o src/echo/gen/plexus-messages.js src/echo/metadata/messages.proto",
     "gen-echo-ts": "pbts --force-long -o src/echo/gen/plexus-messages.d.ts src/echo/gen/plexus-messages.js",
     "gen-echo-protocol": "npm run gen-echo-js && npm run gen-echo-ts",
-    "unpublish": "npm unpublish @plexus-interop/e2e@0.0.1",
+    "unpublish": "npm unpublish @plexus-interop/e2e@0.1.1",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",
@@ -35,8 +35,8 @@
   },
   "dependencies": {
     "@types/long": "^3.0.31",
-    "@plexus-interop/websocket-transport": "0.0.1",
-    "@plexus-interop/client": "0.0.1"
+    "@plexus-interop/websocket-transport": "0.1.1",
+    "@plexus-interop/client": "0.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",

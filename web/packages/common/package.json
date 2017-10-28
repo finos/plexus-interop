@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/common",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "Common functionality for Plexus Interop Web",
@@ -13,7 +13,7 @@
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/common@0.0.1",
+    "unpublish": "npm unpublish @plexus-interop/common@0.1.1",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",

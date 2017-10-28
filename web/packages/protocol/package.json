@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/protocol",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "Plexus Internal Protocol",
@@ -16,7 +16,7 @@
     "gen-transport-ts": "pbts --force-long -o src/gen/internal-transport-protocol.d.ts src/gen/internal-transport-protocol.js",
     "gen-client-protocol": "npm run gen-client-js && npm run gen-client-ts",
     "gen-transport-protocol": "npm run gen-transport-js && npm run gen-transport-ts",
-    "unpublish": "npm unpublish @plexus-interop/protocol@0.0.1",
+    "unpublish": "npm unpublish @plexus-interop/protocol@0.1.1",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",
