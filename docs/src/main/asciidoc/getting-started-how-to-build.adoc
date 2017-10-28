@@ -1,4 +1,4 @@
-All Plexus Interop components can be build using https://gradle.org/[Gradle] tool using the following single command:
+All Plexus Interop components can be built using https://gradle.org/[Gradle] tool using the following single command:
 
 [source, bash]
 -----

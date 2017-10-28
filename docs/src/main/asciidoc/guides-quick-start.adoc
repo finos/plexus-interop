@@ -9,7 +9,7 @@ For this quick start guide the following software is required:
 - https://nodejs.org/en/download/[Node.js with NPM] for Web apps development
 - https://www.microsoft.com/net/download/core[.NET Core 2.0 SDK x86] for .NET apps development
 
-You also need clone and build https://github.com/symphonyoss/plexus-interop[Plexus Interop] repository if you not did it yet.
+You also need clone and build https://github.com/symphonyoss/plexus-interop[Plexus Interop] repository if you haven't done it yet.
 To do this, run the following commands:
 [source, bash]
 ----
