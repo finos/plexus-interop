@@ -22,6 +22,7 @@ import { Cache, InMemoryCache, Logger, LoggerFactory, CacheEntry } from "@plexus
 import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
 import { PeerProxyConnection } from "../peers/PeerProxyConnection";
 import { PeerConnectionsService } from "./PeerConnectionsService";
+import { AppConnectionHeartBit } from "./events/AppConnectionHeartBit";
 
 /**
  * Manages one client connection and proxy connections for peer brokers
@@ -64,7 +65,6 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
             this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod} period]`);
             this.sendHeartBitsFor(appConnection);
         }
-        
         return appConnection;
     }
 
@@ -85,17 +85,24 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
 
     private sendHeartBitsFor(connection: ApplicationConnection): void {
         // TODO when to stop?
+        const heartBit: AppConnectionHeartBit = {
+            applicationId: connection.descriptor.applicationId,
+            connectionId: connection.descriptor.connectionId.toString(),
+            instanceId: connection.descriptor.instanceId
+        }
         setTimeout(() => {
-            this.peerEventBus.sendHeartBit(connection.descriptor);
+            this.peerConnectionsService.sendHeartBit(heartBit);
         }, this.heartBitPeriod);
     }
 
     private subscribeToHeartBits(): void {
-        this.peerConnectionsService.subscribeToConnectionsHearBits(connectionDescriptor => {
-            const connectionStrId = connectionDescriptor.instanceId.toString();
-            if (this.onlineConnections.has(connectionStrId)) {
-                // app still with us
-                this.onlineConnections.resetTtl(connectionStrId);
+        this.peerConnectionsService.subscribeToConnectionsHearBits({
+            next: connectionDescriptor => {
+                const connectionStrId = connectionDescriptor.instanceId.toString();
+                if (this.onlineConnections.has(connectionStrId)) {
+                    // app still with us
+                    this.onlineConnections.resetTtl(connectionStrId);
+                }
             }
         });
     }

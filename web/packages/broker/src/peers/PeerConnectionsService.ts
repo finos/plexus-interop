@@ -49,4 +49,8 @@ export class PeerConnectionsService {
         return this.$heartbits.subscribe(observer);
     }
 
+    public sendHeartBit(heartBit: AppConnectionHeartBit): void {
+        this.peerTransport.publish<AppConnectionHeartBit>(EventType.AppConnectionHearBit, heartBit);
+    }
+
 }
