@@ -14,11 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Observer, Subscription } from "@plexus-interop/common";
-import { TransportConnection } from "@plexus-interop/transport-common";
+import { Subscription } from "./Subscription";
 
-export interface ServerConnectionFactory {
-
-    acceptConnections(connectionsObserver: Observer<TransportConnection>): Subscription;
-
+export class AnonymousSubscription implements Subscription {
+    constructor (public readonly unsubscribe: () => void = () => {}) {}
 }
