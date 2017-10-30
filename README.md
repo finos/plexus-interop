@@ -84,3 +84,15 @@ Please refer to [Contribution guidelines for this project](CONTRIBUTING.md).
 Problem: Gradle fails to download dependencies, how to setup proxy configuration?
 
 Solution: Pass proxy settings into Gradle via command-line parameters - e.g. `gradlew.bat -Dhttp.proxyHost=myproxy.com -Dhttp.proxyPort=8888 -Dhttps.proxyHost=myproxy.com -D https.proxyPort=4444 ...`
+
+## Updating public documentation
+
+As described above, public documentation is served using [GitHub Pages](https://help.github.com/articles/what-is-github-pages) and stored in `gh-pages` branch. So to update it, you simply need to push updated documentation to this branch. `gh-pages` branch structure is different from `master`, so manual update requires few steps:
+
+* Clone (if haven't cloned it yet) repository to `plexus-interop` folder
+* Clone another copy of repository to separate `plexus-interop-docs` folder, checkout `gh-pages` branch there
+* Create branch for documentation update, e.g. `git checkout -b feature/gh-pages-update`
+* Return back to folder with main line branch, build documentation `gradlew build -p docs --console plain`
+* Copy documentation sources - `plexus-interop/docs` to `plexus-interop-docs/docs`
+* Copy generated documentation - `plexus-interop/bin/html5` to `plexus-interop-docs` (project root)
+* Go to `plexus-interop-docs`, push the changes and raise PR against `gh-pages` branch
