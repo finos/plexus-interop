@@ -17,14 +17,15 @@
 import { AsyncHandler } from "../AsyncHandler";
 import { TransportConnection, TransportChannel } from "@plexus-interop/transport-common";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { Completion, ErrorCompletion, SuccessCompletion } from "@plexus-interop/protocol";
-import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
+import { Completion, ErrorCompletion, SuccessCompletion, UniqueId } from "@plexus-interop/protocol";
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
+import { transportProtocol as plexus } from "@plexus-interop/protocol";
+import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
 
 export class ClientConnectionProcessor implements AsyncHandler<TransportConnection, Completion> {
 
     constructor(
-        private readonly authenticationProcessor: AsyncHandler<TransportChannel, ApplicationConnection>,
+        private readonly authenticationProcessor: AsyncHandler<TransportChannel, ApplicationDescriptor>,
         private readonly clientRequestProcessor: AsyncHandler<TransportChannel, Completion>,
         private readonly appLifeCycleManager: AppLifeCycleManager) { }
 
@@ -40,10 +41,16 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                     const channelStrId = channel.uuid().toString();
                     log.debug(`Received new channel [${channelStrId}]`);
                     if (!clientConnected) {
-                        // first channel is connectivity
                         try {
                             log.debug("First channel, trying to setup connection");
-                            await this.authenticationProcessor.handle(channel);
+                            const appDescriptor = await this.authenticationProcessor.handle(channel);
+                            await this.appLifeCycleManager.acceptConnection(connection, {
+                                applicationId: appDescriptor.applicationId as string,
+                                instanceId: UniqueId.fromProperties(appDescriptor.instanceId as plexus.IUniqueId),
+                            }, (connection) => {
+                                // TODO handle connection drop
+                                log.error("Connection dropped");
+                            });
                             log.trace("Connected to client");
                             clientConnected = true;
                         } catch (error) {

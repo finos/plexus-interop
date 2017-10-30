@@ -17,22 +17,35 @@
 import { AsyncHandler } from "../AsyncHandler";
 import { TransportChannel } from "@plexus-interop/transport-common";
 import { Completion, SuccessCompletion } from "@plexus-interop/protocol";
+import { LoggerFactory } from "@plexus-interop/common";
 
 export class ClientRequestProcessor implements AsyncHandler<TransportChannel, Completion> {
 
     public async handle(channel: TransportChannel): Promise<Completion> {
+        const channelStrId = channel.uuid().toString();
+        const log = LoggerFactory.getLogger(`Client Request Processor [${channelStrId}]`);
+        let firstReceived = false;
         return new Promise((resolve, reject) => {
             channel.open({
-                started: () => { },
-                startFailed: () => { },
+                started: () => log.trace("Channel started"),
+                startFailed: e => {
+                    log.error("Start failed", e);
+                    reject(e);
+                },
                 next: message => {
-                    // TODO
+                    if (!firstReceived) {
+                        
+                    } else {
+                        // TODO
+                        // forward to corresponding handler
+                    }
                 },
                 error: e => {
-                    // TODO
+                    log.error("Error from source channel received", e);
                     reject(e);
                 },
                 complete: () => {
+                    log.trace("Channel completed");
                     resolve(new SuccessCompletion());
                 }
             });
