@@ -21,6 +21,7 @@ import { Completion, ErrorCompletion, SuccessCompletion, UniqueId } from "@plexu
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { transportProtocol as plexus } from "@plexus-interop/protocol";
 import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
+import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 
 export class ClientConnectionProcessor implements AsyncHandler<TransportConnection, Completion> {
 
@@ -31,28 +32,28 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
 
     public async handle(connection: TransportConnection): Promise<Completion> {
 
-        const log = LoggerFactory.getLogger(`ConnectionProcessor [${connection.uuid().toString()}]`);
+        const log: Logger = LoggerFactory.getLogger(`ConnectionProcessor [${connection.uuid().toString()}]`);
         log.debug(`Received connection`);
 
-        let clientConnected = false;
         return new Promise((resolve, reject) => {
+            let sourceConnectionDescriptor: undefined | ApplicationConnectionDescriptor;
             connection.open({
                 next: async channel => {
                     const channelStrId = channel.uuid().toString();
                     log.debug(`Received new channel [${channelStrId}]`);
-                    if (!clientConnected) {
+                    if (!sourceConnectionDescriptor) {
                         try {
                             log.debug("First channel, trying to setup connection");
                             const appDescriptor = await this.authenticationProcessor.handle(channel);
-                            await this.appLifeCycleManager.acceptConnection(connection, {
+                            const appConnection = await this.appLifeCycleManager.acceptConnection(connection, {
                                 applicationId: appDescriptor.applicationId as string,
                                 instanceId: UniqueId.fromProperties(appDescriptor.instanceId as plexus.IUniqueId),
                             }, (connection) => {
                                 // TODO handle connection drop
                                 log.error("Connection dropped");
                             });
+                            sourceConnectionDescriptor = appConnection.descriptor;
                             log.trace("Connected to client");
-                            clientConnected = true;
                         } catch (error) {
                             log.error("Unable to authenticate client connection");
                             reject(error);

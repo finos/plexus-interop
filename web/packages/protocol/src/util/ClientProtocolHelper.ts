@@ -95,9 +95,13 @@ export class ClientProtocolHelper {
     }
 
     public static decodeServiceDiscoveryRequest(data: ArrayBuffer): plexus.interop.protocol.IServiceDiscoveryRequest {
-        const envelop = plexus.interop.protocol.ClientToBrokerRequestEnvelope.decode(new Uint8Array(data));
-        const clientToBroker = plexus.interop.protocol.ClientToBrokerRequestEnvelope.toObject(envelop) as plexus.interop.protocol.IClientToBrokerRequestEnvelope;
+        const clientToBroker = ClientProtocolHelper.decodeClientToBrokerRequest(data);
         return clientToBroker.serviceDiscoveryRequest as plexus.interop.protocol.IServiceDiscoveryRequest;
+    }
+
+    public static decodeClientToBrokerRequest(data: ArrayBuffer): plexus.interop.protocol.IClientToBrokerRequestEnvelope {
+        const envelop = plexus.interop.protocol.ClientToBrokerRequestEnvelope.decode(new Uint8Array(data));
+        return plexus.interop.protocol.ClientToBrokerRequestEnvelope.toObject(envelop) as plexus.interop.protocol.IClientToBrokerRequestEnvelope;
     }
 
     public static decodeConnectResponse(data: ArrayBuffer): plexus.interop.protocol.IConnectResponse {

@@ -34,6 +34,7 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
         const log: Logger = LoggerFactory.getLogger(`AuthenticationHandler [${channelId}]`);
 
         return new Promise((resolve, reject) => {
+            
             channel.open({
                 
                 started: () => { },

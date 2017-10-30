@@ -16,7 +16,7 @@
  */
 import { AsyncHandler } from "../AsyncHandler";
 import { TransportChannel } from "@plexus-interop/transport-common";
-import { Completion, SuccessCompletion } from "@plexus-interop/protocol";
+import { Completion, SuccessCompletion, ClientProtocolHelper } from "@plexus-interop/protocol";
 import { LoggerFactory } from "@plexus-interop/common";
 
 export class ClientRequestProcessor implements AsyncHandler<TransportChannel, Completion> {
@@ -32,9 +32,10 @@ export class ClientRequestProcessor implements AsyncHandler<TransportChannel, Co
                     log.error("Start failed", e);
                     reject(e);
                 },
-                next: message => {
+                next: messagePayload => {
                     if (!firstReceived) {
-                        
+                        const clientToBrokerRequest = ClientProtocolHelper.decodeClientToBrokerRequest(messagePayload);
+                        // TODO process client request
                     } else {
                         // TODO
                         // forward to corresponding handler
