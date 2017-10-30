@@ -14,18 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ApplicationConnectionDescriptor } from "./ApplicationConnectionDescriptor";
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { ApplicationConnection } from "./ApplicationConnection";
 import { ApplicationDescriptor } from "./ApplicationDescriptor";
 
 export interface AppLifeCycleManager {
 
-    getOnlineConnections(): Promise<ApplicationConnectionDescriptor[]>;
+    getOnlineConnections(): Promise<ApplicationConnection[]>;
 
-    spawnConnection(applicationId: string): Promise<ApplicationConnectionDescriptor>; 
+    spawnConnection(applicationId: string): Promise<ApplicationConnection>; 
 
-    getOrSpawnConnection(applicationId: string): Promise<ApplicationConnectionDescriptor>;
+    getOrSpawnConnection(applicationId: string): Promise<ApplicationConnection>;
+
+    getOrSpawnConnectionForOneOf(applicationIds: string[]): Promise<ApplicationConnection>;
 
     acceptConnection(connection: TransportConnection, appDescriptor: ApplicationDescriptor, connectionDropped: (connection: ApplicationConnection) => void): Promise<ApplicationConnection>;
 

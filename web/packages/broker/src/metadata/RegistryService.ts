@@ -1,9 +1,9 @@
-import { Application } from "./Application";
-import { ConsumedService } from "./ConsumedService";
-import { ConsumedMethodReference } from "./ConsumedMethodReference";
-import { ConsumedMethod } from "./ConsumedMethod";
-import { ProvidedMethod } from "./ProvidedMethod";
-import { ProvidedServiceReference } from "./ProvidedServiceReference";
+import { Application } from "./model/Application";
+import { ConsumedService } from "./model/ConsumedService";
+import { ConsumedMethodReference } from "./model/ConsumedMethodReference";
+import { ConsumedMethod } from "./model/ConsumedMethod";
+import { ProvidedMethod } from "./model/ProvidedMethod";
+import { ProvidedServiceReference } from "./model/ProvidedServiceReference";
 
 export interface RegistryService {
 

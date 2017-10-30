@@ -26,11 +26,13 @@ export class PeerConnectionsService {
 
     private readonly log: Logger = LoggerFactory.getLogger("PeerConnectionService");
 
-    constructor(private peerTransport: PeerTransport) {}
+    constructor(private peerTransport: PeerTransport) {
+        this.init();
+    }
 
     private $heartbits: Observable<AppConnectionHeartBit>;
 
-    private createInternalObservables() {
+    private init() {
         this.$heartbits = new Observable(observer => {
             this.log.debug("Subscribing to app hearbits");
             const sourceSubscription = this.peerTransport.subscribe(EventType.AppConnectionHearBit, (heartBit: AppConnectionHeartBit) => {

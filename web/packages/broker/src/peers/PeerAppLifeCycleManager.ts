@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
-import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
+import { TransportConnection } from "@plexus-interop/transport-common";
 import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 import { Cache, InMemoryCache, Logger, LoggerFactory, CacheEntry } from "@plexus-interop/common";
 import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
@@ -58,11 +57,10 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         };
         // current client's connection, not expiration
         if ((connection as PeerProxyConnection).isProxy) {
-            const proxyConnection = connection as PeerProxyConnection;
             this.log.debug(`Accepted proxy [${connectionStrId}] connection`);
-            this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection, connectionDropped)));            
+            this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection, connectionDropped)));
         } else {
-            this.log.debug(`Accepted new [${connectionStrId}] connection`);            
+            this.log.debug(`Accepted new [${connectionStrId}] connection`);
             this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod} period]`);
             this.connectionHeartBitInterval = this.sendHeartBitsFor(appConnection);
             this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
@@ -70,18 +68,22 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         return appConnection;
     }
 
-    public async getOrSpawnConnection(applicationId: string): Promise<ApplicationConnectionDescriptor> {
-        const appConnections = this.getOnlineConnectionsInternal()
-            .filter(connection => connection.applicationId === applicationId);
-        return appConnections.length > 0 ? appConnections[0] : this.spawnConnection(applicationId);
+    public async getOrSpawnConnection(applicationId: string): Promise<ApplicationConnection> {
+        return this.getOrSpawnConnectionForOneOf([applicationId]);
     }
 
-    public spawnConnection(applicationId: string): Promise<ApplicationConnectionDescriptor> {
+    public spawnConnection(applicationId: string): Promise<ApplicationConnection> {
         // TODO
         throw "Not implemented";
     }
 
-    public async getOnlineConnections(): Promise<ApplicationConnectionDescriptor[]> {
+    public async getOrSpawnConnectionForOneOf(applicationIds: string[]): Promise<ApplicationConnection> {
+        const appConnections = this.getOnlineConnectionsInternal()
+            .filter(connection => applicationIds.indexOf(connection.descriptor.applicationId) >= 0);
+        return appConnections.length > 0 ? appConnections[0] : this.spawnConnection(applicationIds[0]);
+    }
+
+    public async getOnlineConnections(): Promise<ApplicationConnection[]> {
         return this.getOnlineConnectionsInternal();
     }
 
@@ -113,11 +115,11 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         listener(appConnection);
     }
 
-    private getOnlineConnectionsInternal(): ApplicationConnectionDescriptor[] {
+    private getOnlineConnectionsInternal(): ApplicationConnection[] {
         return this.onlineConnections.keys()
             .map(k => this.onlineConnections.get<ApplicationConnection>(k))
             .filter(v => !!v)
-            .map(connection => (connection as ApplicationConnection).descriptor);
+            .map(c => c as ApplicationConnection);
     }
 }
 
