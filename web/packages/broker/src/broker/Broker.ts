@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
-import { TransportConnection, TransportChannel } from "@plexus-interop/transport-common";
+import { TransportConnection, TransportChannel, ServerConnectionFactory } from "@plexus-interop/transport-common";
 import { StateMaschine, StateMaschineBase, ReadWriteCancellationToken, Logger, LoggerFactory } from "@plexus-interop/common";
-import { ServerConnectionFactory } from "../transport/ServerConnectionFactory";
 import { InteropMetadata } from "../metadata/InteropMetadata";
 
 enum BrokerState { CREATED, OPEN, CLOSED }
@@ -61,7 +60,7 @@ export class Broker {
     }
 
     private handleIncomingConnection(transportConnection: TransportConnection): void {
-
+        
     }
 
 }

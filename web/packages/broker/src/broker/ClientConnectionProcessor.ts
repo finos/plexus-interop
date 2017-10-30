@@ -26,29 +26,41 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
     constructor(
         private readonly authenticationProcessor: AsyncHandler<TransportChannel, ApplicationConnection>,
         private readonly clientRequestProcessor: AsyncHandler<TransportChannel, Completion>,
-        private readonly appLifeCycleManager: AppLifeCycleManager) {}
-
-    private readonly log: Logger = LoggerFactory.getLogger("ClientConnectionProcessor");
+        private readonly appLifeCycleManager: AppLifeCycleManager) { }
 
     public async handle(connection: TransportConnection): Promise<Completion> {
-        this.log.debug(`Received new connection ${connection.uuid().toString()}`);
+
+        const log = LoggerFactory.getLogger(`ConnectionProcessor [${connection.uuid().toString()}]`);
+        log.debug(`Received connection`);
+
         let clientConnected = false;
         return new Promise((resolve, reject) => {
             connection.open({
                 next: async channel => {
-                    // first channel is connectivity
-                    if (!clientConnected) { 
+                    const channelStrId = channel.uuid().toString();
+                    log.debug(`Received new channel [${channelStrId}]`);
+                    if (!clientConnected) {
+                        // first channel is connectivity
                         try {
-                            this.log.debug("Received first channel, trying to setup connection");
+                            log.debug("First channel, trying to setup connection");
                             await this.authenticationProcessor.handle(channel);
+                            log.trace("Connected to client");
                             clientConnected = true;
                         } catch (error) {
-                            this.log.error("Unable to authenticate client connection");
+                            log.error("Unable to authenticate client connection");
                             reject(error);
                         }
                     } else {
-                        // TODO process client request                                                
-                    } 
+                        log.trace(`Processing client request channel  [${channelStrId}]`);
+                        try {
+                            const channelCompletion = await this.clientRequestProcessor.handle(channel);
+                            if (log.isTraceEnabled()) {
+                                log.trace(`Received channel completion [${JSON.stringify(channelCompletion)}]`);
+                            }
+                        } catch (error) {
+                            log.trace(`Failed on processing of [${channelStrId}] client request`);
+                        }
+                    }
                 },
                 complete: () => {
                     // TODO clean up

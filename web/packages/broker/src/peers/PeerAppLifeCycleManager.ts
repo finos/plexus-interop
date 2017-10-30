@@ -33,6 +33,8 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
 
     private readonly heartBitPeriod: number = 300;
     private readonly heartBitTtl: number = 1000;
+    // TODO stop on disconnect
+    private connectionHeartBitInterval: undefined | number | NodeJS.Timer;
 
     private onlineConnections: Cache = new InMemoryCache();
 
@@ -42,7 +44,7 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         this.subscribeToHeartBits();
     }
 
-    public async acceptConnection(connection: TransportConnection, appDescriptor: ApplicationDescriptor): Promise<ApplicationConnection> {
+    public async acceptConnection(connection: TransportConnection, appDescriptor: ApplicationDescriptor, connectionDropped: (connection: ApplicationConnection) => void): Promise<ApplicationConnection> {
         const connectionId = connection.uuid();
         const connectionStrId = connectionId.toString();
         const { applicationId, instanceId } = appDescriptor;
@@ -58,12 +60,12 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         if ((connection as PeerProxyConnection).isProxy) {
             const proxyConnection = connection as PeerProxyConnection;
             this.log.debug(`Accepted proxy [${connectionStrId}] connection`);
-            this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection)));            
+            this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection, connectionDropped)));            
         } else {
             this.log.debug(`Accepted new [${connectionStrId}] connection`);            
-            this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
             this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod} period]`);
-            this.sendHeartBitsFor(appConnection);
+            this.connectionHeartBitInterval = this.sendHeartBitsFor(appConnection);
+            this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
         }
         return appConnection;
     }
@@ -83,14 +85,13 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         return this.getOnlineConnectionsInternal();
     }
 
-    private sendHeartBitsFor(connection: ApplicationConnection): void {
-        // TODO when to stop?
+    private sendHeartBitsFor(connection: ApplicationConnection): number | NodeJS.Timer {
         const heartBit: AppConnectionHeartBit = {
             applicationId: connection.descriptor.applicationId,
             connectionId: connection.descriptor.connectionId.toString(),
             instanceId: connection.descriptor.instanceId
         }
-        setTimeout(() => {
+        return setInterval(() => {
             this.peerConnectionsService.sendHeartBit(heartBit);
         }, this.heartBitPeriod);
     }
@@ -107,8 +108,9 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         });
     }
 
-    private handleDroppedConnection(appConnection: ApplicationConnection): void {
-        // TODO disconnect from broker and clean up
+    private handleDroppedConnection(appConnection: ApplicationConnection, listener: (connection: ApplicationConnection) => void): void {
+        this.log.error(`Connection [${appConnection.descriptor.connectionId}] dropped`);
+        listener(appConnection);
     }
 
     private getOnlineConnectionsInternal(): ApplicationConnectionDescriptor[] {

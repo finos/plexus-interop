@@ -31,7 +31,7 @@ export class PeerProxyConnection implements TransportConnection {
     constructor(private readonly connectionDescriptor: ApplicationConnectionDescriptor) {
         this.log = LoggerFactory.getLogger(`PeerProxyConnection [${connectionDescriptor.connectionId.toString()}]`);
         this.channelsObserver = new BufferedObserver<TransportChannel>(Defaults.DEFAULT_BUFFER_SIZE, this.log);
-        // authentication handler as first incoming channel
+        // send authentication handler as first incoming channel
         this.channelsObserver.next(new ProxyAuthenticationHandler(connectionDescriptor));
     }
 
