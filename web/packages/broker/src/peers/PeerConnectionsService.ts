@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { AppConnectionHeartBit } from "./events/AppConnectionHeartBit";
-import { Observer, Subscription, Logger, LoggerFactory } from "@plexus-interop/common";
+import { Subscription, Logger, LoggerFactory } from "@plexus-interop/common";
 import { PartialObserver } from "rxjs/Observer";
 import { PeerTransport } from "./PeerTransport";
 import { Observable } from "rxjs/Observable";
