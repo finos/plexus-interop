@@ -36,7 +36,7 @@ Build produces artifacts into folder "bin".
 
 ## Running Samples
 
-After successfull build samples binaries will be located in `bin` directory.
+After successful build samples binaries will be located in `bin` directory.
 
 Run .Net to Web interop example on Windows:
 
