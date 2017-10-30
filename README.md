@@ -40,7 +40,7 @@ After successfull build samples binaries will be located in `bin` directory.
 
 Run .Net to Web interop example on Windows:
 
-- Go to `bin/win-x86/samples`
+- Go to `bin/win-x86/samples/greeting`
 - Launch Broker – LaunchBroker.cmd
 - Launch Greeting Client – LaunchGreetingClient.cmd
     - Choose “Discovery” option (5) and “Greeting from Electron Web app” from discovery response
