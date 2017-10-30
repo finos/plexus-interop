@@ -37,7 +37,7 @@ namespace Plexus.Interop.Internal.Calls
 
         protected override ILogger Log { get; } = LogManager.GetLogger<ClientStreamingMethodCall<TRequest, TResponse>>();
 
-        public IWritableChannel<TRequest> RequestStream => _requestStream.Out;
+        public ITerminatableWritableChannel<TRequest> RequestStream => _requestStream.Out;
 
         public Task<TResponse> ResponseAsync => _responseCompletion.Task;
 

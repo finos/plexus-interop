@@ -46,7 +46,7 @@ namespace Plexus.Interop.Transport.Protocol
 
         public Task Completion { get; }
 
-        public IWritableChannel<TransportMessage> Out => _buffer.Out;
+        public ITerminatableWritableChannel<TransportMessage> Out => _buffer.Out;
         
         private async Task ProcessAsync()
         {

@@ -35,12 +35,12 @@ namespace Plexus.Interop.Broker
         private readonly ConcurrentDictionary<UniqueId, ITransportConnection> _activeConnections
             = new ConcurrentDictionary<UniqueId, ITransportConnection>();
 
-        private readonly IReadOnlyChannel<ITransportConnection> _incomingConnections;
+        private readonly IReadableChannel<ITransportConnection> _incomingConnections;
         private readonly AuthenticationHandler _authenticationHandler;
         private readonly ClientRequestHandler _clientRequestHandler;
 
         public BrokerProcessor(
-            IReadOnlyChannel<ITransportConnection> incomingConnections,
+            IReadableChannel<ITransportConnection> incomingConnections,
             IRegistryProvider registryProvider,
             IProtocolSerializerFactory serializerFactory,
             IAppLifecycleManager connectionTracker)

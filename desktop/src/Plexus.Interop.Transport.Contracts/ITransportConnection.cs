@@ -26,7 +26,7 @@
 
         Task Completion { get; }
 
-        IReadOnlyChannel<ITransportChannel> IncomingChannels { get; }
+        IReadableChannel<ITransportChannel> IncomingChannels { get; }
 
         bool TryComplete();
 

@@ -75,9 +75,9 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 
         public UniqueId Id { get; } = UniqueId.Generate();
 
-        public IReadOnlyChannel<IPooledBuffer> In => _reader.In;
+        public IReadableChannel<IPooledBuffer> In => _reader.In;
 
-        public IWritableChannel<IPooledBuffer> Out => _writer.Out;
+        public ITerminatableWritableChannel<IPooledBuffer> Out => _writer.Out;
 
         public async Task ConnectAsync(CancellationToken cancellationToken)
         {

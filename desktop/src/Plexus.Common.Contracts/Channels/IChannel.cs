@@ -18,8 +18,8 @@
 {
     public interface IChannel<T>
     {
-        IWritableChannel<T> Out { get; }
+        ITerminatableWritableChannel<T> Out { get; }
 
-        IReadOnlyChannel<T> In { get; }
+        IReadableChannel<T> In { get; }
     }
 }

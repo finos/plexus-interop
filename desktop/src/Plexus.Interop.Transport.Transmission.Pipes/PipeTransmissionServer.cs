@@ -42,7 +42,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
-        public IReadOnlyChannel<ITransmissionConnection> In => _buffer.In;
+        public IReadableChannel<ITransmissionConnection> In => _buffer.In;
 
         protected override Task<Task> StartCoreAsync()
         {

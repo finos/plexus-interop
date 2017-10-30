@@ -33,7 +33,7 @@ namespace Plexus.Interop.Transport
             _servers = servers.ToList();
         }
 
-        public IReadOnlyChannel<ITransportConnection> In => _buffer.In;
+        public IReadableChannel<ITransportConnection> In => _buffer.In;
 
         protected override ILogger Log { get; } = LogManager.GetLogger<ServerConnectionListener>();
 

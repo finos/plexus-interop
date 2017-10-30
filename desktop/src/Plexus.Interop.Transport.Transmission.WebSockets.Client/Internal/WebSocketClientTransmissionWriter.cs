@@ -41,7 +41,7 @@
             _webSocket = webSocket;
         }
 
-        public IWritableChannel<IPooledBuffer> Out => _buffer.Out;
+        public ITerminatableWritableChannel<IPooledBuffer> Out => _buffer.Out;
 
         protected override Task<Task> StartCoreAsync()
         {

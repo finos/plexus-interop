@@ -45,9 +45,9 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         public Task Completion { get; }
 
-        public IWritableChannel<IPooledBuffer> Out => _writer.Out;
+        public ITerminatableWritableChannel<IPooledBuffer> Out => _writer.Out;
 
-        public IReadOnlyChannel<IPooledBuffer> In => _reader.In;
+        public IReadableChannel<IPooledBuffer> In => _reader.In;
 
         public void Dispose()
         {

@@ -26,6 +26,6 @@ namespace Plexus.Interop.Transport.Protocol
 
         Task Completion { get; }
 
-        IWritableChannel<TransportMessage> Out { get; }
+        ITerminatableWritableChannel<TransportMessage> Out { get; }
     }
 }
