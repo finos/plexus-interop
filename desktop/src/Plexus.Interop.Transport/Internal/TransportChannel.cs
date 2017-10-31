@@ -32,7 +32,7 @@
         public TransportChannel(
             UniqueId connectionId,
             UniqueId channelId,
-            IWriteOnlyChannel<ChannelMessage> output,
+            IWritableChannel<ChannelMessage> output,
             IChannelHeaderFactory headerFactory)
         {
             ConnectionId = connectionId;
@@ -56,9 +56,9 @@
             return _receiveBuffer.Out.TryTerminate(error);
         }
 
-        public IWritableChannel<TransportMessageFrame> Out => _sendProcessor.Out;
+        public ITerminatableWritableChannel<TransportMessageFrame> Out => _sendProcessor.Out;
 
-        public IReadOnlyChannel<TransportMessageFrame> In => _receiveBuffer.In;
+        public IReadableChannel<TransportMessageFrame> In => _receiveBuffer.In;
 
         public async Task HandleIncomingAsync(ChannelMessage message)
         {

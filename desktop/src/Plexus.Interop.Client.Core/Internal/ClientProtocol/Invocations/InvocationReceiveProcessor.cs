@@ -28,23 +28,23 @@
     internal sealed class InvocationReceiveProcessor<TResponse> : ProcessBase
     {
         private readonly ILogger _log;
-        private readonly IReadOnlyChannel<TransportMessageFrame> _transport;
+        private readonly IReadableChannel<TransportMessageFrame> _transport;
         private readonly InvocationMessageHandler<Nothing, Nothing> _incomingHandler;
         private readonly IProtocolImplementation _protocol;
         private readonly MemoryStream _curIncomingMessage = new MemoryStream();
         private readonly IMarshaller<TResponse> _marshaller;
         private readonly BufferedChannel<TResponse> _buffer = new BufferedChannel<TResponse>(1);
         private readonly InvocationState _invocationState;
-        private readonly IWriteOnlyChannel<IInvocationMessage> _sender;
+        private readonly IWritableChannel<IInvocationMessage> _sender;
 
         private IncomingStreamState _incomingStreamState;
 
         public InvocationReceiveProcessor(
             UniqueId id,
-            IReadOnlyChannel<TransportMessageFrame> transport, 
+            IReadableChannel<TransportMessageFrame> transport, 
             IProtocolImplementation protocol, 
             IMarshaller<TResponse> marshaller, 
-            IWriteOnlyChannel<IInvocationMessage> sender, 
+            IWritableChannel<IInvocationMessage> sender, 
             InvocationState invocationState)
         {
             _log = LogManager.GetLogger<InvocationReceiveProcessor<TResponse>>(id.ToString());
@@ -62,7 +62,7 @@
 
         protected override ILogger Log => _log;
 
-        public IReadOnlyChannel<TResponse> ResponseStream => _buffer.In;
+        public IReadableChannel<TResponse> ResponseStream => _buffer.In;
 
         public Task ResponseCompletion => _buffer.Out.Completion;
 

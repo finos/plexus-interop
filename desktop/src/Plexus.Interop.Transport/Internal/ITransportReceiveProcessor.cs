@@ -22,6 +22,6 @@ namespace Plexus.Interop.Transport.Internal
     {
         UniqueId InstanceId { get; }
 
-        IReadOnlyChannel<ChannelMessage> In { get; }
+        IReadableChannel<ChannelMessage> In { get; }
     }
 }

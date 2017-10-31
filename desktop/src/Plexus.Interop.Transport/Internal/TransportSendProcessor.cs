@@ -45,7 +45,7 @@ namespace Plexus.Interop.Transport.Internal
 
         public UniqueId InstanceId => _sendProcessor.Id;
 
-        public IWritableChannel<ChannelMessage> Out => _buffer.Out;
+        public ITerminatableWritableChannel<ChannelMessage> Out => _buffer.Out;
 
         public Task Completion { get; }
 

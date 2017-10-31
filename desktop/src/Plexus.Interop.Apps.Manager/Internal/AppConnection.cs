@@ -61,7 +61,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public Task Completion { get; }
 
-        public IReadOnlyChannel<ITransportChannel> IncomingChannels => _connection.IncomingChannels;
+        public IReadableChannel<ITransportChannel> IncomingChannels => _connection.IncomingChannels;
 
         public async ValueTask<ITransportChannel> CreateChannelAsync()
         {

@@ -263,7 +263,7 @@ namespace Plexus.Interop
                 var responses = new List<EchoRequest>();
                 var sentRequest = CreateTestRequest();
 
-                async Task HandleAsync(EchoRequest request, IWriteOnlyChannel<EchoRequest> responseStream, MethodCallContext context)
+                async Task HandleAsync(EchoRequest request, IWritableChannel<EchoRequest> responseStream, MethodCallContext context)
                 {
                     Console.WriteLine("Handling invocation");
                     receivedRequest = request;
@@ -307,7 +307,7 @@ namespace Plexus.Interop
                 var sentRequest = CreateTestRequest();
                 var serverCallCompletion = new Promise();
 
-                async Task HandleAsync(EchoRequest request, IWriteOnlyChannel<EchoRequest> responseStream, MethodCallContext context)
+                async Task HandleAsync(EchoRequest request, IWritableChannel<EchoRequest> responseStream, MethodCallContext context)
                 {
                     try
                     {
@@ -352,7 +352,7 @@ namespace Plexus.Interop
                 Console.WriteLine("Starting test");
                 var receivedRequests = new List<EchoRequest>();
 
-                async Task<EchoRequest> HandleAsync(IReadOnlyChannel<EchoRequest> requestStream, MethodCallContext context)
+                async Task<EchoRequest> HandleAsync(IReadableChannel<EchoRequest> requestStream, MethodCallContext context)
                 {
                     while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
@@ -404,8 +404,8 @@ namespace Plexus.Interop
                 Console.WriteLine("Starting test");
 
                 async Task HandleAsync(
-                    IReadOnlyChannel<EchoRequest> requestStream, 
-                    IWriteOnlyChannel<EchoRequest> responseStream, 
+                    IReadableChannel<EchoRequest> requestStream, 
+                    IWritableChannel<EchoRequest> responseStream, 
                     MethodCallContext context)
                 {
                     while (await requestStream.WaitReadAvailableAsync())

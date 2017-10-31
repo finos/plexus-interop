@@ -31,7 +31,7 @@ namespace Plexus.Interop.Apps
 
         ValueTask<ITransportChannel> CreateChannelAsync();
 
-        IReadOnlyChannel<ITransportChannel> IncomingChannels { get; }
+        IReadableChannel<ITransportChannel> IncomingChannels { get; }
 
         bool TryComplete();
 

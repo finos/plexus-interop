@@ -45,7 +45,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 
         protected override ILogger Log { get; } = LogManager.GetLogger<WebSocketTransmissionServer>();
 
-        public IReadOnlyChannel<ITransmissionConnection> In => _buffer.In;
+        public IReadableChannel<ITransmissionConnection> In => _buffer.In;
 
         public async Task<Task> AcceptConnectionAsync(WebSocket websocket)
         {

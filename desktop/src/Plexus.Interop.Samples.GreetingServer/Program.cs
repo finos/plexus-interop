@@ -88,8 +88,8 @@ namespace Plexus.Interop.Samples.GreetingServer
         }
 
         private static async Task GreetingDuplexStreaming(
-            IReadOnlyChannel<GreetingRequest> requestStream, 
-            IWriteOnlyChannel<GreetingResponse> responseStream, 
+            IReadableChannel<GreetingRequest> requestStream, 
+            IWritableChannel<GreetingResponse> responseStream, 
             MethodCallContext context)
         {
             Console.WriteLine("Received duplex streaming request from {{{0}}}", context);
@@ -123,7 +123,7 @@ namespace Plexus.Interop.Samples.GreetingServer
         }
 
         private static async Task<GreetingResponse> GreetingClientStreaming(
-            IReadOnlyChannel<GreetingRequest> requeststream, 
+            IReadableChannel<GreetingRequest> requeststream, 
             MethodCallContext context)
         {
             Console.WriteLine("Received client streaming request from {{{0}}}", context);
@@ -144,7 +144,7 @@ namespace Plexus.Interop.Samples.GreetingServer
 
         private static async Task GreetingServerStreaming(
             GreetingRequest request, 
-            IWriteOnlyChannel<GreetingResponse> responseStream,
+            IWritableChannel<GreetingResponse> responseStream,
             MethodCallContext context)
         {
             Console.WriteLine("Received server streaming request from {{{0}}}", context);

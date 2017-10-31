@@ -27,9 +27,9 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 
         Task StartCompletion { get; }
 
-        IReadOnlyChannel<TResponse> In { get; }
+        IReadableChannel<TResponse> In { get; }
 
-        IWritableChannel<TRequest> Out { get; }
+        ITerminatableWritableChannel<TRequest> Out { get; }
 
         void Cancel();
     }

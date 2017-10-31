@@ -28,7 +28,7 @@ namespace Plexus.Interop.Transport.Protocol
     public sealed class MessagingReceiveProcessor : IMessagingReceiveProcessor
     {
         private readonly ILogger _log;
-        private readonly IReadOnlyChannel<IPooledBuffer> _connection;
+        private readonly IReadableChannel<IPooledBuffer> _connection;
         private readonly ITransportProtocolDeserializer _deserializer;
         private readonly IChannel<TransportMessage> _buffer = new BufferedChannel<TransportMessage>(3);
 
@@ -46,7 +46,7 @@ namespace Plexus.Interop.Transport.Protocol
 
         public UniqueId Id { get; }
 
-        public IReadOnlyChannel<TransportMessage> In => _buffer.In;
+        public IReadableChannel<TransportMessage> In => _buffer.In;
 
         private async Task ProcessAsync()
         {

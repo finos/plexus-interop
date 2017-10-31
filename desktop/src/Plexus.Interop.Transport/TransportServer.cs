@@ -41,7 +41,7 @@ namespace Plexus.Interop.Transport
 
         protected override ILogger Log { get; } = LogManager.GetLogger<TransportServer>();
 
-        public IReadOnlyChannel<ITransportConnection> In => _buffer.In;
+        public IReadableChannel<ITransportConnection> In => _buffer.In;
 
         protected override async Task<Task> StartCoreAsync()
         {

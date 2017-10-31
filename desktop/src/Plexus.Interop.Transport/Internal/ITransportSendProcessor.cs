@@ -25,6 +25,6 @@ namespace Plexus.Interop.Transport.Internal
 
         Task Completion { get; }
 
-        IWritableChannel<ChannelMessage> Out { get; }
+        ITerminatableWritableChannel<ChannelMessage> Out { get; }
     }
 }

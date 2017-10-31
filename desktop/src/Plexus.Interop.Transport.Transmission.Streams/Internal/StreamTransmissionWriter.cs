@@ -47,7 +47,7 @@
 
         public Task Completion { get; }
 
-        public IWritableChannel<IPooledBuffer> Out => _buffer.Out;
+        public ITerminatableWritableChannel<IPooledBuffer> Out => _buffer.Out;
 
         private async Task ProcessAsync()
         {
