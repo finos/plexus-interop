@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,22 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+ namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Interop.Protocol.Discovery;
     using Plexus.Interop.Transport;
     using System.Threading.Tasks;
+    using Plexus.Interop.Apps;
 
     internal interface IDiscoveryRequestHandler
     {
         Task HandleAsync(
             IServiceDiscoveryRequest request, 
-            IClientConnection sourceConnection, 
+            IAppConnection sourceConnection, 
             ITransportChannel sourceChannel);
 
         Task HandleAsync(
             IMethodDiscoveryRequest request, 
-            IClientConnection sourceConnection, 
+            IAppConnection sourceConnection, 
             ITransportChannel sourceChannel);
     }
 }

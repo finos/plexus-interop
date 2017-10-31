@@ -37,11 +37,11 @@
             = new ConcurrentDictionary<IApplication, IReadOnlyCollection<IConsumedMethod>>();
 
         private IRegistry _registry;
-        private readonly IRegistryProvider _registryProvider;
+        private readonly BrokerRegistryProvider _registryProvider;
 
         public RegistryService(IRegistryProvider registryProvider)
         {
-            _registryProvider = registryProvider;            
+            _registryProvider = new BrokerRegistryProvider(registryProvider);
             _registryProvider.Updated += OnUpdated;
             if (_registry == null)
             {
@@ -276,6 +276,7 @@
         public void Dispose()
         {
             _registryProvider.Updated -= OnUpdated;
+            _registryProvider.Dispose();
         }
     }
 }

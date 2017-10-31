@@ -17,7 +17,7 @@
 import { FramedTransportConnection } from "../../../src/transport/frame";
 import { TestUtils } from "./util";
 import { BufferedObserver } from "../../BufferedObserver";
-import { InMemoryFramedTransport } from "../InMemoryFramedTransport";
+import { TestBufferedInMemoryFramedTransport } from "../TestBufferedInMemoryFramedTransport";
 import { AnonymousSubscription } from "rxjs/Subscription";
 import { DelegateChannelObserver } from "../../../src/common/DelegateChannelObserver";
 import { UniqueId } from "../../../src/transport/UniqueId";
@@ -26,7 +26,7 @@ import { ChannelOpenFrame } from "../../../src/transport/frame/model/ChannelOpen
 describe("FramedTransportConnection", () => {
 
     it("Doesn't add created channel to incoming channels queue", (done) => {
-        let mockFrameTransport = new InMemoryFramedTransport();
+        let mockFrameTransport = new TestBufferedInMemoryFramedTransport();
         const transportConnection = new FramedTransportConnection(mockFrameTransport);
         transportConnection
             .open()
@@ -35,7 +35,7 @@ describe("FramedTransportConnection", () => {
                     const channel = await transportConnection.createChannel();
                     expect(channel).toBeDefined();
                     expect(transportConnection.getIncomingChannelsSize()).toBe(0);
-                    await transportConnection.closeInternal();
+                    await transportConnection.closeAndCleanUp();
                     done();
                 })();
             });
@@ -43,20 +43,20 @@ describe("FramedTransportConnection", () => {
 
     it("Delivers messages to different channels", (done) => {
         
-        let mockFrameTransport = new InMemoryFramedTransport();
+        let mockFrameTransport = new TestBufferedInMemoryFramedTransport();
 
         const firstChannelId = UniqueId.generateNew();
         const secondChannelId = UniqueId.generateNew();
 
-        mockFrameTransport.inBuffer.enqueue(ChannelOpenFrame.fromHeaderData({
+        mockFrameTransport.next(ChannelOpenFrame.fromHeaderData({
             channelId: firstChannelId
         }));
-        mockFrameTransport.inBuffer.enqueue(ChannelOpenFrame.fromHeaderData({
+        mockFrameTransport.next(ChannelOpenFrame.fromHeaderData({
             channelId: secondChannelId
         }));
 
         TestUtils.twoShuffeledMessages(firstChannelId, secondChannelId).forEach(frame => {
-            mockFrameTransport.inBuffer.enqueue(frame);
+            mockFrameTransport.next(frame);
         });
 
         const transportConnection = new FramedTransportConnection(mockFrameTransport);
@@ -88,7 +88,7 @@ describe("FramedTransportConnection", () => {
                     expect(secondMessage).toBeDefined();
                     firstSubscription.unsubscribe();
                     secondSubscription.unsubscribe();
-                    await transportConnection.closeInternal();
+                    await transportConnection.closeAndCleanUp();
                     done();
                 })();
             });

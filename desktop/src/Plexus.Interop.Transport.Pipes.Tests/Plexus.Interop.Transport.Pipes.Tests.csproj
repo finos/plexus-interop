@@ -14,14 +14,20 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-rc3-build3818" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-rc3-build3818" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.console" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Interop.Transport.Protocol.Protobuf\Plexus.Interop.Transport.Protocol.Protobuf.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Testing\Plexus.Interop.Transport.Testing.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Pipes\Plexus.Interop.Transport.Transmission.Pipes.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Import Project="..\Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems" Label="Shared" />

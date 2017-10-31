@@ -263,12 +263,11 @@ namespace Plexus.Interop
                 var responses = new List<EchoRequest>();
                 var sentRequest = CreateTestRequest();
 
-                async Task HandleAsync(EchoRequest request, IWriteOnlyChannel<EchoRequest> responseStream, MethodCallContext context)
+                async Task HandleAsync(EchoRequest request, IWritableChannel<EchoRequest> responseStream, MethodCallContext context)
                 {
                     Console.WriteLine("Handling invocation");
                     receivedRequest = request;
-                    await responseStream.WriteAsync(request).ConfigureAwait(false);
-                    await Task.Yield();
+                    await responseStream.WriteAsync(request).ConfigureAwait(false);                    
                     await responseStream.WriteAsync(request).ConfigureAwait(false);
                     await responseStream.WriteAsync(request).ConfigureAwait(false);
                     Console.WriteLine("Responses sent");
@@ -285,9 +284,9 @@ namespace Plexus.Interop
                     );                    
                     Console.WriteLine("Starting call");
                     var call = client.Call(EchoServerStreamingMethod, sentRequest);                    
-                    while (await call.ResponseStream.WaitForNextSafeAsync())
+                    while (await call.ResponseStream.WaitReadAvailableAsync())
                     {
-                        while (call.ResponseStream.TryReadSafe(out var item))
+                        while (call.ResponseStream.TryRead(out var item))
                         {
                             responses.Add(item);
                         }
@@ -296,6 +295,52 @@ namespace Plexus.Interop
                 }
                 receivedRequest.ShouldBe(sentRequest);
                 responses.ShouldAllBe(r => r.Equals(sentRequest));
+            });
+        }
+
+        [Fact]
+        public void ServerStreamingCancellation()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                WriteLog("Starting test");
+                var sentRequest = CreateTestRequest();
+                var serverCallCompletion = new Promise();
+
+                async Task HandleAsync(EchoRequest request, IWritableChannel<EchoRequest> responseStream, MethodCallContext context)
+                {
+                    try
+                    {
+                        WriteLog("Server handling invocation");
+                        await responseStream.WriteAsync(request).ConfigureAwait(false);
+                        WriteLog("Server waiting for cancellation");
+                        await context.CancellationToken.AsTask();
+                    }
+                    catch (Exception ex)
+                    {
+                        serverCallCompletion.TryFail(ex);
+                        throw;
+                    }
+                }
+
+                using (await StartTestBrokerAsync())
+                {
+                    var client = ConnectEchoClient();
+                    ConnectEchoServer(x => x
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            s => s.WithServerStreamingMethod<EchoRequest, EchoRequest>("ServerStreaming", HandleAsync)
+                        )
+                    );
+                    WriteLog("Starting call");
+                    var call = client.Call(EchoServerStreamingMethod, sentRequest);
+                    await call.ResponseStream.ReadAsync();
+                    WriteLog("Cancelling call");
+                    call.CancelAsync().ShouldCompleteIn(Timeout5Sec);
+                    WriteLog("Client call canceled");
+                    serverCallCompletion.Task.ShouldThrow<OperationCanceledException>(Timeout5Sec);
+                    WriteLog("Server call canceled");
+                }
             });
         }
 
@@ -309,9 +354,9 @@ namespace Plexus.Interop
 
                 async Task<EchoRequest> HandleAsync(IReadableChannel<EchoRequest> requestStream, MethodCallContext context)
                 {
-                    while (await requestStream.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (requestStream.TryReadSafe(out var item))
+                        while (requestStream.TryRead(out var item))
                         {
                             receivedRequests.Add(item);
                         }
@@ -360,12 +405,12 @@ namespace Plexus.Interop
 
                 async Task HandleAsync(
                     IReadableChannel<EchoRequest> requestStream, 
-                    IWriteOnlyChannel<EchoRequest> responseStream, 
+                    IWritableChannel<EchoRequest> responseStream, 
                     MethodCallContext context)
                 {
-                    while (await requestStream.WaitForNextSafeAsync())
+                    while (await requestStream.WaitReadAvailableAsync())
                     {
-                        while (requestStream.TryReadSafe(out var item))
+                        while (requestStream.TryRead(out var item))
                         {
                             await responseStream.WriteAsync(item);
                         }
@@ -394,9 +439,9 @@ namespace Plexus.Interop
                     await call.RequestStream.CompleteAsync();
                     Console.WriteLine("Requests sent");
 
-                    while (await call.ResponseStream.WaitForNextSafeAsync())
+                    while (await call.ResponseStream.WaitReadAvailableAsync())
                     {
-                        while (call.ResponseStream.TryReadSafe(out var item))
+                        while (call.ResponseStream.TryRead(out var item))
                         {
                             responses.Add(item);
                         }
@@ -442,8 +487,8 @@ namespace Plexus.Interop
             {
                 using (await StartTestBrokerAsync())
                 {
-                    var server1 = ConnectEchoServer();
-                    var server2 = ConnectEchoServer();
+                    ConnectEchoServer();
+                    ConnectEchoServer();
                     var client = ConnectEchoClient();
                     var discoveryResults = await client.DiscoverAsync(ServiceDiscoveryQuery.Create(EchoUnaryMethod.Reference.Service));
                     discoveryResults.Count.ShouldBe(1);

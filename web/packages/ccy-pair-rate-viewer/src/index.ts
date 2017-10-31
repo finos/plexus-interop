@@ -14,31 +14,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CcyPairRateViewerClientBuilder, CcyPairRateViewerClient } from "./gen/CcyPairRateViewerGeneratedClient";
+declare var window: any;
+const Long = require("long");
+(<any>window).dcodeIO = { Long: Long };
+import { WebCcyPairRateViewerClientBuilder, WebCcyPairRateViewerClient } from "./gen/WebCcyPairRateViewerGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
+import { LoggerFactory, LogLevel } from "@plexus-interop/common";
 
 // Read launch arguments, provided by Electron Launcher
-declare var window: any;
-const electron = window.require("electron")
+LoggerFactory.setLogLevel(LogLevel.TRACE);
+const electron = window.require("electron");
 const remote = electron.remote;
+const electronWindow: any = remote.getCurrentWindow();
+
 const webSocketUrl = remote.getCurrentWindow().plexusBrokerWsUrl;
 const instanceId = remote.getCurrentWindow().plexusAppInstanceId;
+// enable dev tools
+document.addEventListener("keydown", function (e) {
+    if (e.which === 123) {
+        // F12
+        electronWindow.toggleDevTools();
+    } else if (e.which === 116) {
+        // F5
+        location.reload();
+    }
+});
 
-new CcyPairRateViewerClientBuilder()
-    // App's ID and Instance ID received from Launcher
+const outEl = document.getElementById("out");
+
+const log = (msg: string) => {
+    console.log(msg);
+    outEl.innerText = outEl.innerText + '\n' + msg;
+};
+
+window.getRate = () => log("Not connected to Broker");
+
+new WebCcyPairRateViewerClientBuilder()
     .withClientDetails({
-        applicationId: "CcyPairRateViewer",
+        applicationId: "vendorB.fx.WebCcyPairRateViewer",
         applicationInstanceId: instanceId
     })
-    // Pass Transport to be used for connecting to Broker
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
     .connect()
-    .then((rateViewerClient: CcyPairRateViewerClient) => {
-        // Client connected, we can use generated Proxy Service to perform invocation
-        rateViewerClient.getCcyPairRateServiceProxy()
-            .getRate({ccyPairName: "EURUSD"})
-            .then(rateResponse => {
-                document.body.innerText = `Received rate ${rateResponse.ccyPairName}-${rateResponse.rate}`;
-            })
-            .catch(e => console.log("Failed to receive rate", e))
+    .then(async (rateViewerClient: WebCcyPairRateViewerClient) => {
+        log("Connected to Broker");
+        window.getRate = async () => {
+            const ccyPair = (document.getElementById("ccyPair") as HTMLInputElement).value;
+            log(`Sending request for ${ccyPair}`);
+            const ccyPairRate = await rateViewerClient.getCcyPairRateServiceProxy().getRate({ccyPairName: ccyPair});
+            log(`Received rate ${ccyPairRate.ccyPairName} - ${ccyPairRate.rate}`);
+        };
     });

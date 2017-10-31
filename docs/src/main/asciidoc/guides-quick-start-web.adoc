@@ -1,0 +1,224 @@
+:imagesdir: ./images
+[[quick-start-web]]
+==== Quick Start - Web
+
+In this guide both consumer and provider are written in TypeScript language and run in https://electron.atom.io/[Electron] container.
+
+===== Run the example
+
+include::guides-quick-start-launch-broker-step.adoc[]
+
+. Launch `WebCcyPairRateViewer` app:
++
+[source, bash]
+-----
+plexus activate vendorB.fx.WebCcyPairRateViewer
+-----
++
+include::guides-quick-start-activate-app.adoc[]
+
+. App window will open. In this window you should see "Connected to Broker" message.
+
+. Enter a currency pair name (e.g. "EURUSD") and click "Get Rate" button:
++
+image::quick-start-web-1.png[Quick Start Web 1]
++
+include::guides-quick-start-invocation-workflow.adoc[]
++
+[NOTE]
+====
+This guide uses a sample `ElectronAppLauncher`. To understand how to build custom launchers see <<guides-how-to-write-custom-app-launcher, How to write custom app launcher>>.
+====
+
+. Broker starts "CCY Rate Provider" app and forwards request to it. App shows information about the request and sends back a random value.
++
+image::quick-start-web-2.png[Quick Start Web 2]
+
+. The "CCY Rate Viewer" app shows the rate received from provider:
++
+image::quick-start-web-3.png[Quick Start Web 3]
+
+===== Modify example
+
+Let us add real-time updates of FX rates instead of a single response. For this we have to change the contract between two apps, provide updated interop metadata to the broker, update apps and run them again.
+
+====== Modify metadata
+
+First we need to modify interop registry and pass updated metadata to the broker.
+
+. Open `registry/fx/CcyPairRateService.proto` file and add a new `GetRateStream` method:
++
+[source, php]
+./registry/fx/CcyPairRateService.proto
+-----
+service CcyPairRateService {
+    rpc GetRate(CcyPair) returns (CcyPairRate);
+
+    // new rpc call returning real-time notification stream
+    rpc GetRateStream(CcyPair) returns (stream CcyPairRate);
+}
+-----
+
+. Open `registry/vendorA/fx/WebCcyPairRateProvider.interop` file and change provided method to `GetRateStream`:
++
+[source, php]
+./registry/vendorA/fx/WebCcyPairRateProvider.interop
+-----
+package vendorA.fx;
+
+import "fx/CcyPairRateService.proto";
+
+application WebCcyPairRateProvider {
+    provides fx.CcyPairRateService {
+        GetRateStream [method_title = "Web Provider - Get Rate Stream"];
+    }
+}
+-----
+
+. Open `registry/vendorB/fx/WebCcyPairRateViewer.interop` file and change consumed method to `GetRateStream`:
++
+[source, php]
+./registry/vendorB/fx/WebCcyPairRateViewer.interop
+-----
+package vendorB.fx;
+
+import "fx/CcyPairRateService.proto";
+
+application WebCcyPairRateViewer {
+    consumes fx.CcyPairRateService { GetRateStream; }
+}
+-----
+
+. To pass the changed metadata to broker, navigate back to `bin\win-x86\samples\quick-start` and re-generate metadata using *plexusgen* tool:
++
+[source, bash]
+-----
+java -jar ../../sdk/plexusgen.jar --type=json_meta --baseDir=registry --out=metadata
+-----
++
+[NOTE]
+====
+Broker tracks `interop.json` file and automatically reloads metadata when the file is changed.
+====
+
+====== Modify and build provider app
+
+We changed provided service definition, so now we need to re-generate provider's client and provide implementation for new method:
+
+. From project root call *Plexus Generator* tool to re-generate provider's client code:
++
+[source, bash]
+-----
+java -jar bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=./bin/win-x86/samples/quick-start/registry --input=WebCcyPairRateProvider.interop --out=./web/packages/ccy-pair-rate-provider/src/gen --protoc=./web/node_modules/.bin/pbts.cmd
+-----
++
+[NOTE]
+====
+Plexus Generator tool will generate interfaces and proxy classes from service descriptions. It uses https://github.com/dcodeIO/protobuf.js/tree/master/cli[ProtobufJs] to generate message definitions from `.proto` files.
+====
+
+. Open `web/packages/ccy-pair-rate-provider/src/index.ts` file and change `onGetRate` implementation to `onGetRateStream`:
++
+[source,javascript]
+-----
+new WebCcyPairRateProviderClientBuilder()
+    .withClientDetails({
+        applicationId: "vendorA.fx.WebCcyPairRateProvider",
+        applicationInstanceId: instanceId
+    })
+    .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())
+    .withCcyPairRateServiceInvocationsHandler({
+        onGetRateStream: async (invocationContext, ccyPair, hostClient) => {
+            log(`Received Streaming request for ${ccyPair.ccyPairName} Rate`);
+            // send several rates and complete the invocation
+            let count = 5;
+            const sendResponse = () => {
+                if (count) {
+                    count--;
+                    hostClient.next(rateService.getRate(ccyPair.ccyPairName));
+                    setTimeout(sendResponse, 1000);
+                } else {
+                    hostClient.complete();
+                }
+            };
+            sendResponse();
+        }
+    })
+    .connect()
+    .then(() => log("Connected to Broker"))
+    .catch(e => console.error("Connection failure", e));
+-----
+
++
+[NOTE]
+====
+In this example provider will send five rates and then will close the stream.
+====
+
+. Navigate to `web/packages/ccy-pair-rate-provider` directory and run `npm run build` to re-build the app.
+
+====== Modify and build consumer app
+
+Because interop method was changed we also need to re-generate consumer's client code and modify how response is handled:
+
+. From project root call *Plexus Generator* tools to re-generate consumer's client code:
++
+[source, bash]
+-----
+java -jar bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=./bin/win-x86/samples/quick-start/registry --input=WebCcyPairRateViewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/node_modules/.bin/pbts.cmd
+-----
+
+. Open `web/packages/ccy-pair-rate-viewer/src/index.ts` and update code to invoke streaming `getRateStream` action:
++
+[source, javascript]
+-----
+new WebCcyPairRateViewerClientBuilder()
+    .withClientDetails({
+        applicationId: "vendorB.fx.WebCcyPairRateViewer",
+        applicationInstanceId: instanceId
+    })
+    .withTransportConnectionProvider(
+        () => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect()
+    )
+    .connect()
+    .then(async (rateViewerClient: WebCcyPairRateViewerClient) => {
+        log("Connected to Broker");
+        window.getRate = async () => {
+            const ccyPair = (document.getElementById("ccyPair") as HTMLInputElement).value;
+            log(`Sending request for ${ccyPair}`);
+            rateViewerClient.getCcyPairRateServiceProxy()
+                .getRateStream({ccyPairName: ccyPair}, {
+                    next: ccyRate => {
+                        log(`Received rate ${ccyRate.ccyPairName} - ${ccyRate.rate}`);
+                    },
+                    complete: () => log("Completed"),
+                    error: () => log("Error received")
+                });
+        };
+    });
+-----
+
+. Navigate to `web/packages/ccy-pair-rate-viewer` and run `npm run build` to re-build the app.
+
+====== Launch the modified example
+
+. Navigate to `bin\win-x86\samples\quick-start`
+
+. Launch the viewer app:
++
+[source, bash]
+-----
+plexus activate vendorB.fx.WebCcyPairRateViewer
+-----
+
+. In the opened window enter a currency pair name, e.g. `EURUSD` and press `Enter`:
++
+image::quick-start-web-6.png[Quick Start Web 6]
+
+. Broker starts the provider app and redirects request to it:
++
+image::quick-start-web-5.png[Quick Start Web 5]
+
+. The viewer app shows five rates received from provider and a message that reply stream was closed:
++
+image::quick-start-web-4.png[Quick Start Web 4]

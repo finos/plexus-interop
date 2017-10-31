@@ -20,7 +20,14 @@ import { ConnectionProvider } from "./ConnectionProvider";
 export class TransportsSetup {
 
     public createWebSocketTransportProvider(url: string): ConnectionProvider {
-        return () => new WebSocketConnectionFactory(new WebSocket(url)).connect();
+        return async () => {
+            const socket = new WebSocket(url);
+            const connection = await new WebSocketConnectionFactory(socket).connect();
+            return {
+                getConnection: () => connection,
+                dropConnection: () => socket.close()
+            };
+        };
     }
 
 }

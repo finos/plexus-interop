@@ -14,19 +14,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Processes
+namespace Plexus.Processes
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
     using System.Threading.Tasks;
 
-    public abstract class ProcessBase : IProcess
+    public abstract class ProcessBase : IDisposable
     {
         private readonly Latch _started = new Latch();
+        private readonly Latch _stopped = new Latch();
         private readonly Promise _completion = new Promise();
-        private readonly Promise _startCompletion = new Promise();
+        private readonly Promise _startCompletion = new Promise();        
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
+
+        private readonly ConcurrentBag<CancellationTokenRegistration> _registrations 
+            = new ConcurrentBag<CancellationTokenRegistration>();
+
+        protected ProcessBase()
+        {
+            Completion.ContinueWithSynchronously((Action<Task>)DisposeRegistrations).IgnoreAwait();
+        }
+
+        private void DisposeRegistrations(Task completion)
+        {
+            Log.Debug("Process completed in state {0}", completion.GetCompletionDescription());
+            Stop();
+            while (_registrations.TryTake(out var registration))
+            {
+                registration.Dispose();
+            }
+        }
+
+        protected virtual ILogger Log { get; } = NoopLogger.Instance;
 
         public Task Completion => _completion.Task;
 
         public Task StartCompletion => _startCompletion.Task;
+
+        protected CancellationToken CancellationToken => _cancellation.Token;
+
+        protected void OnStop(Action action)
+        {
+            _registrations.Add(CancellationToken.Register(action));
+        }
+
+        protected virtual Task OnCompletedAsync(Task completion)
+        {            
+            return completion;
+        }
+
+        protected abstract Task<Task> StartCoreAsync();
 
         public void Start()
         {
@@ -34,11 +73,58 @@
             {
                 return;
             }
-            var startTask = TaskRunner.RunInBackground(StartCoreAsync);
+            if (_stopped.IsEntered)
+            {
+                _startCompletion.TryComplete();
+                _completion.TryComplete();
+                return;
+            }
+            Log.Debug("Starting process");
+            _startCompletion.Task.ContinueWithSynchronously(
+                t => Log.Debug("Start of process completed in state {0}", t.GetCompletionDescription()),
+                CancellationToken.None);
+            var startTask = TaskRunner.RunInBackground(StartCoreAsync, CancellationToken);
             startTask.PropagateCompletionToPromise(_startCompletion);
-            startTask.Unwrap().PropagateCompletionToPromise(_completion);
-        }        
+            startTask
+                .Unwrap()                
+                .ContinueWithSynchronously(OnCompletedAsync, CancellationToken.None)
+                .PropagateCompletionToPromise(_completion);
+        }
 
-        protected abstract Task<Task> StartCoreAsync();
+        public Task StartAsync()
+        {
+            Start();
+            return StartCompletion;
+        }
+
+        public void Stop()
+        {
+            if (!_stopped.TryEnter())
+            {
+                return;
+            }
+            Log.Debug("Stopping");
+            _cancellation.Cancel();
+            Start();
+        }
+
+        public async Task StopAsync()
+        {
+            Stop();
+            await Completion.IgnoreExceptions().ConfigureAwait(false);
+        }
+
+        public void Dispose()
+        {
+            Log.Debug("Disposing");
+            StopAsync().GetResult();
+            Log.Debug("Disposed");
+        }
+
+        protected void SetStartCompleted()
+        {
+            Log.Debug("Setting start completed");
+            _startCompletion.TryComplete();
+        }
     }
 }

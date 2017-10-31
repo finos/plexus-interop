@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Plexus.Interop.Samples.GreetingClient": {
+      "commandName": "Executable",
+      "executablePath": ".\\apps\\CcyPairRateViewer\\CcyPairRateViewer.exe",
+      "workingDirectory": "$(SamplesDir)"
+    }
+  }
+}

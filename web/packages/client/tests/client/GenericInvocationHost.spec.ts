@@ -31,6 +31,7 @@ import { Observer } from "@plexus-interop/common";
 import { clientProtocol as plexus, SuccessCompletion } from "@plexus-interop/protocol"
 import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
 import { ChannelObserver } from "@plexus-interop/transport-common";
+import { MethodInvocationContext } from "../../src/client/api/MethodInvocationContext";
 
 declare var process: any;
 
@@ -55,7 +56,7 @@ describe("GenericInvocationHost", () => {
                     serviceInfo,
                     handler: {
                         methodId: "1",
-                        handle: (invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
+                        handle: (context: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                             return new LogObserver<ArrayBuffer>();
                         }
                     }
@@ -67,7 +68,7 @@ describe("GenericInvocationHost", () => {
                     serviceInfo,
                     handler: {
                         methodId: "2",
-                        handle: (req: ArrayBuffer) => {
+                        handle: (context: MethodInvocationContext, req: ArrayBuffer) => {
                             return Promise.resolve<ArrayBuffer>(new Uint8Array([]).buffer);
                         }
                     }
@@ -79,7 +80,7 @@ describe("GenericInvocationHost", () => {
                     serviceInfo,
                     handler: {
                         methodId: "3",
-                        handle: (requestPayload: ArrayBuffer, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
+                        handle: (context: MethodInvocationContext, requestPayload: ArrayBuffer, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                         }
                     }
                 }
@@ -97,7 +98,7 @@ describe("GenericInvocationHost", () => {
         setupSimpleHostedInvocation(requestPayload, async (completion: plexus.ICompletion) => {
             done();
             return new SuccessCompletion();
-        }, async (request: ArrayBuffer) => {
+        }, async (context: MethodInvocationContext, request: ArrayBuffer) => {
             console.log("Doing important stuff ...");
             return responsePayload;
         }, (invocation) => {
@@ -116,7 +117,7 @@ describe("GenericInvocationHost", () => {
             expect(completion.error).toBeDefined();
             done();
             return new SuccessCompletion();
-        }, (request: ArrayBuffer) => Promise.reject("Execution error"));
+        }, (context: MethodInvocationContext, request: ArrayBuffer) => Promise.reject("Execution error"));
 
     });
 
@@ -130,7 +131,7 @@ describe("GenericInvocationHost", () => {
             expect(completion.error).toBeDefined();
             done();
             return new SuccessCompletion();
-        }, (request: ArrayBuffer) => { throw new Error("Execution error"); });
+        }, (context: MethodInvocationContext, request: ArrayBuffer) => { throw new Error("Execution error"); });
 
     });
 
@@ -140,7 +141,7 @@ describe("GenericInvocationHost", () => {
         setupHostedInvocation(requestPayload, async (completion: plexus.ICompletion) => {
             done();
             return new SuccessCompletion();
-        }, (client) => {
+        }, (context: MethodInvocationContext, client) => {
             let count = 0;
             return {
                 next: (request) => {
@@ -165,7 +166,7 @@ describe("GenericInvocationHost", () => {
 
         const streamingHandler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> = {
             methodId: "",
-            handle: (receivedRequest: ArrayBuffer, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
+            handle: (context: MethodInvocationContext, receivedRequest: ArrayBuffer, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                 expect(receivedRequest).toBe(requestPayload);
                 invocationHostClient.next(responsePayload);
                 invocationHostClient.next(responsePayload);
@@ -193,7 +194,7 @@ describe("GenericInvocationHost", () => {
 function setupSimpleHostedInvocation(
     requestPayload: ArrayBuffer,
     invocationCloseHandler: (x: plexus.ICompletion) => Promise<plexus.ICompletion>,
-    hostedAction: (request: ArrayBuffer) => Promise<ArrayBuffer>,
+    hostedAction: (context: MethodInvocationContext, request: ArrayBuffer) => Promise<ArrayBuffer>,
     postHandler?: (invocation: Invocation) => void): void {
 
     const streamingHandler = new UnaryHandlerConverter().convert({
@@ -218,7 +219,7 @@ function setupServerStreamingHostedInvocation(
 function setupHostedInvocation(
     requestPayload: ArrayBuffer,
     invocationCloseHandler: (x: plexus.ICompletion) => Promise<plexus.ICompletion>,
-    hostedAction: (invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => Observer<ArrayBuffer>,
+    hostedAction: (context: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => Observer<ArrayBuffer>,
     postHandler?: (invocation: Invocation) => void,
     requestMessagesCount: number = 1): void {
 

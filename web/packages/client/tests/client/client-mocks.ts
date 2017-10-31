@@ -46,12 +46,10 @@ export function createRemoteInvocationInfo(): RemoteInvocationInfo {
 export class MockMarshaller implements Marshaller {
 
     public encode(messageObj: any): Uint8Array {
-        console.log("Encode", messageObj);
         return new Uint8Array([]);
     }
 
     public decode(messagePayload: Uint8Array): any {
-        console.log("Decode", messagePayload);
         return {};
     }
 }

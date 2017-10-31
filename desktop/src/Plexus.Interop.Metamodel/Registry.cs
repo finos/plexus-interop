@@ -42,5 +42,29 @@
             add { value(this); }
             remove { }
         }
+
+        public IRegistry MergeWith(IRegistry registry)
+        {
+            var newRegistry = new Registry();
+            newRegistry.AddAll(registry);
+            newRegistry.AddAll(this);
+            return newRegistry;
+        }
+
+        private void AddAll(IRegistry registry)
+        {
+            foreach (var message in registry.Messages.Values)
+            {
+                Messages[message.Id] = message;
+            }
+            foreach (var service in registry.Services.Values)
+            {
+                Services[service.Id] = service;
+            }
+            foreach (var app in registry.Applications.Values)
+            {
+                Applications[app.Id] = app;
+            }
+        }
     }
 }

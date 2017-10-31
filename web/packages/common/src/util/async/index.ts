@@ -15,4 +15,7 @@
  * limitations under the License.
  */
 export * from "./CancellationToken";
+export * from "./ReadOnlyCancellationToken";
+export * from "./ReadWriteCancellationToken";
 export * from "./AsyncHelper";
+export * from "./SequencedExecutor";

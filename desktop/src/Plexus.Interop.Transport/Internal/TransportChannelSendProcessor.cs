@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Internal
+ namespace Plexus.Interop.Transport.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol.Common;
@@ -23,18 +23,18 @@
     using System;
     using System.Threading.Tasks;
 
-    internal sealed class TransportChannelSendProcessor : IWritableChannel<TransportMessageFrame>
+    internal sealed class TransportChannelSendProcessor
     {
         private readonly ILogger _log;
         private readonly IChannel<TransportMessageFrame> _buffer = new BufferedChannel<TransportMessageFrame>(3);
-        private readonly IWriteOnlyChannel<ChannelMessage> _out;
+        private readonly IWritableChannel<ChannelMessage> _out;
         private readonly IChannelHeaderFactory _headerFactory;
         private readonly Promise _initialized = new Promise();
 
         public TransportChannelSendProcessor(
             UniqueId connectionId,
             UniqueId channelId,
-            IWriteOnlyChannel<ChannelMessage> @out,
+            IWritableChannel<ChannelMessage> @out,
             IChannelHeaderFactory headerFactory)
         {
             ChannelId = channelId;
@@ -50,42 +50,29 @@
 
         public Task Completion { get; }
 
+        public ITerminatableWritableChannel<TransportMessageFrame> Out => _buffer.Out;
+
         internal Task Initialized => _initialized.Task;
-
-        public bool TryComplete()
-        {
-            return _buffer.Out.TryComplete();
-        }
-
-        public bool TryTerminate(Exception error = null)
-        {
-            return _buffer.Out.TryTerminate(error);
-        }
-
-        public bool TryWriteSafe(TransportMessageFrame item)
-        {
-            return _buffer.Out.TryWriteSafe(item);
-        }
-
-        public Task<bool> TryWriteSafeAsync(TransportMessageFrame item)
-        {
-            return _buffer.Out.TryWriteSafeAsync(item);
-        }
 
         private async Task ProcessAsync()
         {
             try
             {
+                _log.Trace("Starting sending");
                 await SendOpenMessageAsync().ConfigureAwait(false);
                 _initialized.TryComplete();
-                await _buffer.ConsumeBufferAsync(SendAsync, Dispose).ConfigureAwait(false);
+                await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);                
                 await SendCloseMessageAsync().ConfigureAwait(false);
+                _log.Trace("Sending completed");
             }
             catch (Exception ex)
-            {
+            {                              
+                _buffer.Out.TryTerminate(ex);
+                _buffer.In.DisposeBufferedItems();
                 await SendCloseMessageAsync(ex).IgnoreExceptions().ConfigureAwait(false);
+                _log.Trace("Sending failed: {0}", ex.FormatTypeAndMessage());
                 throw;
-            }
+            }            
         }
 
         private async Task SendOpenMessageAsync()
@@ -100,7 +87,7 @@
         {
             try
             {
-                _log.Trace("Sending header {0} with body {1}", header, body);
+                _log.Trace("Sending: {0} with body {1}", header, body);
                 await _out.WriteAsync(new ChannelMessage(header, body)).ConfigureAwait(false);
             }
             catch
@@ -136,12 +123,6 @@
         {
             var header = _headerFactory.CreateFrameHeader(ChannelId, frame.HasMore, frame.Payload.Count);
             await SendAsync(header, frame.Payload).ConfigureAwait(false);
-        }
-
-        private void Dispose(TransportMessageFrame frame)
-        {
-            _log.Trace("Disposing frame {0}", frame);
-            frame.Dispose();
         }
     }
 }
