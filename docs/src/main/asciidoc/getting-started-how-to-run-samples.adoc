@@ -1,0 +1,44 @@
+==== .NET/web interoperability sample
+
+:imagesdir: ./images
+
+This sample demonstrates interoperability calls between .NET Core console apps and web app running in Electron. As an example let us test how request-response and discovery work:
+
+. Build samples - see <<how-to-build, How to build>> for details
+
+. Go to `bin/win-x86/samples/greeting` directory
+
+. Launch Interop Broker – `LaunchBroker.cmd`
+
+. Launch sample "Greeting Client" app – `LaunchGreetingClient.cmd`
+
+. Choose “Discovery” option (5) first and then “Greeting from Electron Web app” option from discovery response:
++
+image::sample-1.png[Sample-1]
+
+. Enter some name (e.g. “John”) and press Enter. Broker will launch "Web Greeting Server" app, which is configured to run in Electron container.
+Once launched the app will show the information about connection and incoming request and will send back a greeting response:
++
+image::sample-2.png[Sample-2]
+
+. "Greeting Client" app should receive the greeting and print it:
++
+image::sample-3.png[Sample-3]
+
+. Now choose Discovery (5) option in "Greeting Client" again and this time select “Greeting from .Net app” option from discovery results.
+
+. Enter another name, e.g. “Mike” and press enter. Broker will start a ".NET Greeting Server"console app. Once running this app will print information about the incoming request and will send back the greeting:
++
+image::sample-4.png[Sample-4]
+
+You may check other call types by choosing other options in the "Greeting Client" app.
+
+==== How to find sample code
+
+Source code for sample flow is here:
+
+* Sample Interop Registry - https://github.com/symphonyoss/plexus-interop/tree/master/samples/greeting/registry/
+* .NET Greeting Client - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingClient/Program.cs
+* .NET Greeting Server - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingServer/Program.cs
+* Web Greeting Server - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/web-example/src/greeting/server/Main.ts
+* Electron App Launcher - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/electron-launcher/src/launcher/

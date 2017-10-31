@@ -27,7 +27,7 @@ InteropBroker --> ConsumerComponent: response
 @enduml
 ....
 
-Let us review the most interesting scenario, which includes app launch:
+Here is the most interesting scenario, which includes app launch:
 
 * When Desktop Plexus is started it creates transport endpoints and start listen for incoming connections.
 * Plexus Interop launches app A and provides it with the configuration on how to connect to transport servers.
@@ -55,7 +55,7 @@ Plexus Host process is doing the following:
 ** Register its instance in Interop Broker (same as app A)
 * Interop Broker detects that app B is live and sends message into it using Transport
 
-Now that message is send to app B via transport remaining part is easy:
+Now that message is sent to app B via transport remaining part is easy:
 
 * Interop Transport within app B restores message blob and passes it into Client API
 * Client API deserializes blob into strongly typed message and invokes callback registered by app B code

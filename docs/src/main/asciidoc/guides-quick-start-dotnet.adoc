@@ -1,0 +1,334 @@
+:imagesdir: ./images
+[[quick-start-dotnet]]
+==== Quick Start - .NET
+
+In this guide both consumer and provider are .NET console apps written in C# language running under https://www.microsoft.com/net/download/core#/runtime[.NET Core].
+
+===== Run example
+
+include::guides-quick-start-launch-broker-step.adoc[]
+
+. Launch "CCY Pair Viewer" app:
++
+[source, bash]
+-----
+plexus activate vendorB.fx.CcyPairRateViewer
+-----
++
+include::guides-quick-start-activate-app.adoc[]
++
+[NOTE]
+====
+In this example apps are launched using built-in `NativeAppLauncher` which run apps as standard OS processes.
+====
+
+. In the opened console window enter a currency pair name, e.g. `EURUSD` and press `Enter`:
++
+image::quick-start-dotnet-1.png[Quick Start .NET 1]
++
+include::guides-quick-start-invocation-workflow.adoc[]
++
+[NOTE]
+====
+Note that `CcyPairRateProvider` app uses the same `NativeAppLauncher` as the viewer app.
+====
+
+. Once `CcyPairRateProvider` app is up and running it registers in Broker, receives the message from viewer app and sends back a random rate:
++
+image::quick-start-dotnet-2.png[Quick Start .NET 2]
+
+. The viewer app shows the rate received from provider:
++
+image::quick-start-dotnet-3.png[Quick Start .NET 3]
+
+===== Modify example
+
+Let us add real-time updates of FX rates instead of a single response. For this we have to change the contract between two apps, provide updated interop metadata to the broker, update apps and run them again.
+
+====== Modify metadata
+
+First we need to modify interop registry and pass updated metadata to the broker.
+
+. Open `registry/fx/CcyPairRateService.proto` file and add new `GetRateStream` method:
++
+[source, php]
+./registry/fx/CcyPairRateService.proto
+-----
+service CcyPairRateService {
+    rpc GetRate(CcyPair) returns (CcyPairRate);
+
+    // new rpc call returning real-time notification stream
+    rpc GetRateStream(CcyPair) returns (stream CcyPairRate);
+}
+-----
+
+. Open `registry/vendorA/fx/CcyPairRateProvider.interop` file and change provided method to `GetRateStream`:
++
+[source, php]
+./registry/vendorA/fx/CcyPairRateProvider.interop
+-----
+package vendorA.fx;
+
+import "fx/CcyPairRateService.proto";
+
+application CcyPairRateProvider {
+    provides fx.CcyPairRateService {
+        GetRateStream [method_title = ".NET Provider - Get Rate Stream"];
+    }
+}
+-----
+
+. Open `registry/vendorB/fx/CcyPairRateViewer.interop` file and change consumed method to `GetRateStream`:
++
+[source, php]
+./registry/vendorB/fx/CcyPairRateViewer.interop
+-----
+package vendorB.fx;
+
+import "fx/CcyPairRateService.proto";
+
+application CcyPairRateViewer {
+    consumes fx.CcyPairRateService { GetRateStream; }
+}
+-----
+
+. To pass updated metadata to the broker, go back to `bin\win-x86\samples\quick-start` directory and re-generate metadata using *Plexus Generator* tool:
++
+[source, bash]
+-----
+java -jar ../../sdk/plexusgen.jar --type=json_meta --baseDir=registry --out=metadata
+-----
++
+[NOTE]
+====
+Broker tracks `interop.json` file and automatically reloads metadata file is modified.
+====
+
+====== Modify and build provider app
+
+Now let us update CcyPairRateProvider app to provide real-time notifications.
+
+. Navigate to the `desktop/src/Plexus.Interop.Samples.CcyPairRateProvider` directory , open `Program.cs` file and update the code:
++
+[source, java]
+./desktop/src/Plexus.Interop.Samples.CcyPairRateProvider/Program.cs
+-----
+namespace Plexus.Interop.Samples.CcyPairRateProvider
+{
+    using Plexus.Interop.Samples.CcyPairRateProvider.Generated;
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+    using Plexus.Channels;
+
+    public sealed class Program
+    {
+        private readonly Random _random = new Random();
+
+        public static void Main(string[] args)
+        {
+            new Program().MainAsync(args).GetAwaiter().GetResult();
+        }
+
+        public async Task MainAsync(string[] args)
+        {
+            // Read broker's working directory specified either in the first
+            // command line argument or in environment variable, or just use current working directory
+            var brokerLocation = args.Length > 0
+                ? args[0]
+                : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ?? Directory.GetCurrentDirectory();
+
+            Console.WriteLine("Connecting to broker {0}.", brokerLocation);
+
+            // Defining client options
+            var clientOptions = new ClientOptionsBuilder()
+                .WithDefaultConfiguration(brokerLocation)
+                .WithApplicationId("vendorA.fx.CcyPairRateProvider")
+                .WithProvidedService("fx.CcyPairRateService", s =>
+                    s.WithServerStreamingMethod<CcyPair, CcyPairRate>("GetRateStream", GetRateAsync))
+                .Build();
+
+            // Connecting
+            var client = ClientFactory.Instance.Create(clientOptions);
+            await client.ConnectAsync();
+            Console.WriteLine("Connected. Waiting for requests. Press CTRL+C to disconnect.");
+            Console.CancelKeyPress += (sender, eventArgs) =>
+            {
+                eventArgs.Cancel = true;
+                client.Disconnect();
+            };
+
+            // Awaiting completion
+            await client.Completion;
+            Console.WriteLine("Disconnected.");
+        }
+
+        private async Task GetRateAsync(
+            CcyPair request,
+            IWriteOnlyChannel<CcyPairRate> responseStream,
+            MethodCallContext context)
+        {
+            Console.WriteLine("Received subscription: {0}", request);
+            do
+            {
+                CcyPairRate response;
+                switch (request.CcyPairName)
+                {
+                    case "EURUSD":
+                        response = new CcyPairRate
+                        {
+                            CcyPairName = "EURUSD",
+                            Rate = 1.15 + 0.05 * _random.NextDouble()
+                        };
+                        break;
+                    case "EURGBP":
+                        response = new CcyPairRate
+                        {
+                            CcyPairName = "EURGBP",
+                            Rate = 0.87 + 0.05 * _random.NextDouble()
+                        };
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException($"Unknown currency pair: {request.CcyPairName}");
+                }
+                Console.WriteLine("Sending response: {0}", response);
+                await responseStream.TryWriteAsync(response, context.CancellationToken).IgnoreAnyCancellation();
+                await Task.Delay(_random.Next(1000, 3000), context.CancellationToken).IgnoreAnyCancellation();
+            } while (!context.CancellationToken.IsCancellationRequested);
+            Console.WriteLine("Subscription completed");
+        }
+    }
+}
+-----
+
+. Re-build the app by executing the following command in `desktop\src\Plexus.Interop.Samples.CcyPairRateProvider` directory:
+[source, bash]
+-----
+dotnet build
+-----
+
+====== Modify and build consumer app
+
+Now let us update "CCY Pair Rate Viewer" app to handle multiple incoming real-time updates.
+
+. Navigate to the `desktop/src/Plexus.Interop.Samples.CcyPairRateViewer` directory, open `Program.cs` file and update the code to the following:
++
+[source, java]
+./desktop/src/Plexus.Interop.Samples.CcyPairRateProvider/Program.cs
+-----
+namespace Plexus.Interop.Samples.CcyPairRateViewer
+{
+    using Plexus.Channels;
+    using Plexus.Interop.Samples.CcyPairRateViewer.Generated;
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public sealed class Program
+    {
+        private static readonly ServerStreamingMethod<CcyPair, CcyPairRate> GetRateMethod =
+            Method.ServerStreaming<CcyPair, CcyPairRate>("fx.CcyPairRateService", "GetRateStream");
+
+        public static int Main(string[] args)
+        {
+            try
+            {
+                new Program().MainAsync(args).GetAwaiter().GetResult();
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.FormatToString());
+                Console.ReadKey(true);
+                return 1;
+            }
+        }
+
+        public async Task MainAsync(string[] args)
+        {
+            // Read broker working dir specified either in the first
+            // command line argument or in environment variable, or just use current working directory
+            var brokerLocation = args.Length > 0
+                ? args[0]
+                : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ?? Directory.GetCurrentDirectory();
+
+            Console.WriteLine("Connecting to broker {0}.", brokerLocation);
+
+            // Defining client options
+            var clientOptions = new ClientOptionsBuilder()
+                .WithDefaultConfiguration(brokerLocation)
+                .WithApplicationId("vendorB.fx.CcyPairRateViewer")
+                .Build();
+
+            // Connecting
+            var client = ClientFactory.Instance.Create(clientOptions);
+            await client.ConnectAsync();
+            Console.WriteLine("Connected.");
+
+            while (true)
+            {
+                Console.Write("Enter currency pair (e.g. \"EURUSD\") or press Enter to exit: ");
+                var ccyPairName = Console.ReadLine();
+                if (string.IsNullOrEmpty(ccyPairName))
+                {
+                    break;
+                }
+
+                // Requesting ccy pair rate from another app
+                var request = new CcyPair {CcyPairName = ccyPairName};
+                var call = client.Call(GetRateMethod, request);
+
+                ConsoleCancelEventHandler cancelHandler = null;
+                cancelHandler = (sender, eventArgs) =>
+                {
+                    Console.CancelKeyPress -= cancelHandler;
+                    Console.WriteLine("Unsubscribing");
+                    eventArgs.Cancel = true;
+                    call.Cancel();
+                };
+
+                Console.CancelKeyPress += cancelHandler;
+
+                await call.ResponseStream
+                    .ConsumeAsync(item =>
+                    {
+                        Console.WriteLine("Notification received: {0}", item);
+                        Console.WriteLine("Press CTRL+C to unscubscribe");
+                    })
+                    .IgnoreAnyCancellation();
+            }
+
+            Console.WriteLine("Disconnecting.");
+            await client.DisconnectAsync();
+            Console.WriteLine("Disconnected.");
+        }
+    }
+}
+-----
+
+. Re-build the app by executing the following command in `desktop\src\Plexus.Interop.Samples.CcyPairRateProvider` directory:
+[source, bash]
+-----
+dotnet build
+-----
+
+====== Launch the modified example
+
+. Launch "CCY Pair Rate Viewer":
++
+[source, bash]
+-----
+plexus activate vendorB.fx.CcyPairRateViewer
+-----
+
+. In the opened console window enter a currency pair name, e.g. `EURUSD` and press `Enter`:
++
+image::quick-start-dotnet-4.png[Quick Start .NET 4]
+
+. Broker starts "CCY Pair Rate Provider" app and redirects request to it:
++
+image::quick-start-dotnet-5.png[Quick Start .NET 5]
+
+. The viewer app will show rate updates coming from provider until you press `CTRL-C`:
++
+image::quick-start-dotnet-6.png[Quick Start .NET 6]
