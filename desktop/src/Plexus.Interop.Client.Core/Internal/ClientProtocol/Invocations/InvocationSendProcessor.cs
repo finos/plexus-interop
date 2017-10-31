@@ -27,7 +27,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal sealed class InvocationSendProcessor<TRequest> : ProcessBase, IWritableChannel<IInvocationMessage>
+    internal sealed class InvocationSendProcessor<TRequest> : ProcessBase, ITerminatableWritableChannel<IInvocationMessage>
     {        
         private readonly ILogger _log;
 
@@ -38,7 +38,7 @@
         private readonly BufferedChannel<(IInvocationMessage Header, Maybe<TRequest> Body)> _buffer
             = new BufferedChannel<(IInvocationMessage, Maybe<TRequest>)>(3);
 
-        private readonly IWriteOnlyChannel<TransportMessageFrame> _transport;
+        private readonly IWritableChannel<TransportMessageFrame> _transport;
         private readonly IMarshaller<TRequest> _marshaller;
         private readonly InvocationState _invocationState;
         private readonly IProtocolImplementation _protocol;
@@ -46,7 +46,7 @@
 
         public InvocationSendProcessor(
             UniqueId id,
-            IWriteOnlyChannel<TransportMessageFrame> transport,
+            IWritableChannel<TransportMessageFrame> transport,
             IProtocolImplementation protocol,
             IMarshaller<TRequest> marshaller, 
             InvocationState invocationState)
@@ -61,7 +61,7 @@
 
         protected override ILogger Log => _log;
 
-        public IWritableChannel<TRequest> RequestStream => _requestBuffer.Out;
+        public ITerminatableWritableChannel<TRequest> RequestStream => _requestBuffer.Out;
 
         public Task RequestCompletion => _requestCompletion.Task;
 

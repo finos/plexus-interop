@@ -37,9 +37,9 @@ namespace Plexus.Interop.Internal.Calls
 
         protected override ILogger Log { get; } = LogManager.GetLogger<DuplexStreamingMethodCall<TRequest, TResponse>>();
 
-        public IReadOnlyChannel<TResponse> ResponseStream => _responseStream.In;
+        public IReadableChannel<TResponse> ResponseStream => _responseStream.In;
 
-        public IWritableChannel<TRequest> RequestStream => _requestStream.Out;
+        public ITerminatableWritableChannel<TRequest> RequestStream => _requestStream.Out;
 
         protected override async Task<Task> StartCoreAsync()
         {

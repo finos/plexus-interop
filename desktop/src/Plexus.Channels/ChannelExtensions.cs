@@ -32,20 +32,20 @@ namespace Plexus.Channels
             CompletedTask = tcs.Task;
         }
 
-        public static async Task CompleteAsync<T>(this IWritableChannel<T> channel)
+        public static async Task CompleteAsync<T>(this ITerminatableWritableChannel<T> channel)
         {
             channel.TryComplete();
             await channel.Completion.ConfigureAwait(false);
         }
 
-        public static async Task TerminateAsync<T>(this IWritableChannel<T> channel, Exception error = null)
+        public static async Task TerminateAsync<T>(this ITerminatableWritableChannel<T> channel, Exception error = null)
         {
             channel.TryTerminate(error);
             await channel.Completion.ConfigureAwait(false);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async Task WriteAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
+        public static async Task WriteAsync<T>(this IWritableChannel<T> channel, T item, CancellationToken cancellationToken = default)
         {
             var result = await channel.TryWriteAsync(item, cancellationToken).ConfigureAwait(false);
             if (!result)
@@ -55,7 +55,7 @@ namespace Plexus.Channels
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async Task WriteOrDisposeAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
+        public static async Task WriteOrDisposeAsync<T>(this IWritableChannel<T> channel, T item, CancellationToken cancellationToken = default)
             where T : IDisposable
         {
             try
@@ -70,7 +70,7 @@ namespace Plexus.Channels
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async Task<bool> TryWriteAsync<T>(this IWriteOnlyChannel<T> channel, T item, CancellationToken cancellationToken = default)
+        public static async Task<bool> TryWriteAsync<T>(this IWritableChannel<T> channel, T item, CancellationToken cancellationToken = default)
         {
             do
             {
@@ -83,7 +83,7 @@ namespace Plexus.Channels
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async ValueTask<T> ReadAsync<T>(this IReadOnlyChannel<T> channel, CancellationToken cancellationToken = default)
+        public static async ValueTask<T> ReadAsync<T>(this IReadableChannel<T> channel, CancellationToken cancellationToken = default)
         {
             var result = await channel.TryReadAsync(cancellationToken).ConfigureAwait(false);
             if (!result.HasValue)
@@ -94,7 +94,7 @@ namespace Plexus.Channels
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async ValueTask<Maybe<T>> TryReadAsync<T>(this IReadOnlyChannel<T> channel, CancellationToken cancellationToken = default)
+        public static async ValueTask<Maybe<T>> TryReadAsync<T>(this IReadableChannel<T> channel, CancellationToken cancellationToken = default)
         {
             do
             {
@@ -107,7 +107,7 @@ namespace Plexus.Channels
         }
         
         public static void Terminate<T>(
-            this IWritableChannel<T> channel,
+            this ITerminatableWritableChannel<T> channel,
             Exception error = null)
         {
             if (!channel.TryTerminate(error))
@@ -116,7 +116,7 @@ namespace Plexus.Channels
             }
         }
 
-        public static void Complete<T>(this IWritableChannel<T> channel)
+        public static void Complete<T>(this ITerminatableWritableChannel<T> channel)
         {
             if (!channel.TryComplete())
             {
@@ -124,33 +124,33 @@ namespace Plexus.Channels
             }
         }
 
-        public static bool IsCompleted<T>(this IReadOnlyChannel<T> channel)
+        public static bool IsCompleted<T>(this IReadableChannel<T> channel)
         {
             return channel.Completion.IsCompleted;
         }
 
-        public static bool IsCompleted<T>(this IWritableChannel<T> channel)
+        public static bool IsCompleted<T>(this ITerminatableWritableChannel<T> channel)
         {
             return channel.Completion.IsCompleted;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task DisposeRemainingItemsAsync<T>(
-            this IReadOnlyChannel<T> channel) where T : IDisposable
+            this IReadableChannel<T> channel) where T : IDisposable
         {
             return channel.ConsumeAsync(x => x.Dispose());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DisposeBufferedItems<T>(
-            this IReadOnlyChannel<T> channel) where T : IDisposable
+            this IReadableChannel<T> channel) where T : IDisposable
         {
             channel.ConsumeBufferedItems(x => x.Dispose());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ConsumeBufferedItems<T>(
-            this IReadOnlyChannel<T> channel, Action<T> handle)
+            this IReadableChannel<T> channel, Action<T> handle)
         {
             while (channel.TryRead(out var item))
             {
@@ -160,7 +160,7 @@ namespace Plexus.Channels
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task ConsumeAsync<T>(
-            this IReadOnlyChannel<T> channel,
+            this IReadableChannel<T> channel,
             Action<T> handle,
             CancellationToken cancellationToken = default,
             Func<Task> onCompletedAsync = null,
@@ -179,7 +179,7 @@ namespace Plexus.Channels
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async Task ConsumeAsync<T>(
-            this IReadOnlyChannel<T> channel,            
+            this IReadableChannel<T> channel,            
             Func<T, Task> handleAsync,
             CancellationToken cancellationToken = default,
             Func<Task> onCompletedAsync = null,

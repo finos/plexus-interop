@@ -50,14 +50,14 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 
         public UniqueId Id => _channel.Id;
 
-        public IWritableChannel<TRequest> Out => _sender.RequestStream;
+        public ITerminatableWritableChannel<TRequest> Out => _sender.RequestStream;
 
         public void Cancel()
         {
             Stop();
         }
 
-        public IReadOnlyChannel<TResponse> In => _receiver.ResponseStream;
+        public IReadableChannel<TResponse> In => _receiver.ResponseStream;
 
         protected abstract Task InitializeSendingAsync();
 

@@ -31,19 +31,19 @@
     /// </summary>
     /// <typeparam name="TRequest">Request message type for this method.</typeparam>
     /// <typeparam name="TResponse">Response message type for this method.</typeparam>
-    public delegate Task<TResponse> ClientStreamingMethodHandler<TRequest, TResponse>(IReadOnlyChannel<TRequest> requestStream, MethodCallContext context);
+    public delegate Task<TResponse> ClientStreamingMethodHandler<TRequest, TResponse>(IReadableChannel<TRequest> requestStream, MethodCallContext context);
 
     /// <summary>
     /// Server-side handler for server streaming call.
     /// </summary>
     /// <typeparam name="TRequest">Request message type for this method.</typeparam>
     /// <typeparam name="TResponse">Response message type for this method.</typeparam>
-    public delegate Task ServerStreamingMethodHandler<in TRequest, out TResponse>(TRequest request, IWriteOnlyChannel<TResponse> responseStream, MethodCallContext context);
+    public delegate Task ServerStreamingMethodHandler<in TRequest, out TResponse>(TRequest request, IWritableChannel<TResponse> responseStream, MethodCallContext context);
 
     /// <summary>
     /// Server-side handler for duplex streaming call.
     /// </summary>
     /// <typeparam name="TRequest">Request message type for this method.</typeparam>
     /// <typeparam name="TResponse">Response message type for this method.</typeparam>
-    public delegate Task DuplexStreamingMethodHandler<TRequest, out TResponse>(IReadOnlyChannel<TRequest> requestStream, IWriteOnlyChannel<TResponse> responseStream, MethodCallContext context);
+    public delegate Task DuplexStreamingMethodHandler<TRequest, out TResponse>(IReadableChannel<TRequest> requestStream, IWritableChannel<TResponse> responseStream, MethodCallContext context);
 }

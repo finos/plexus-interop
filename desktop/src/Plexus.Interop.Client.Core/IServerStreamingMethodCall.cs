@@ -28,6 +28,6 @@
         /// <summary>
         /// Async stream to read streaming responses.
         /// </summary>
-        IReadOnlyChannel<TResponse> ResponseStream { get; }
+        IReadableChannel<TResponse> ResponseStream { get; }
     }
 }

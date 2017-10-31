@@ -39,11 +39,11 @@ namespace Plexus.Channels
             completion.ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
         }
 
-        public static void PropagateCompletionFrom<T>(this IWritableChannel<T> channel, Task completion)
+        public static void PropagateCompletionFrom<T>(this ITerminatableWritableChannel<T> channel, Task completion)
         {
             void OnCompleted(Task task, object state)
             {
-                var c = (IWritableChannel<T>)state;
+                var c = (ITerminatableWritableChannel<T>)state;
                 if (task.IsFaulted)
                 {
                     c.TryTerminate(task.Exception.ExtractInner());
@@ -61,11 +61,11 @@ namespace Plexus.Channels
             Task.WhenAny(completion, channel.Completion).Unwrap().ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
         }
 
-        public static void PropagateExceptionFrom<T>(this IWritableChannel<T> channel, Task completion)
+        public static void PropagateExceptionFrom<T>(this ITerminatableWritableChannel<T> channel, Task completion)
         {
             void OnCompleted(Task task, object state)
             {
-                var c = (IWritableChannel<T>)state;
+                var c = (ITerminatableWritableChannel<T>)state;
                 if (task.IsFaulted)
                 {
                     c.TryTerminate(task.Exception.ExtractInner());

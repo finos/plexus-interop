@@ -30,7 +30,7 @@
         /// <summary>
         /// Async stream to send streaming requests.
         /// </summary>
-        IWritableChannel<TRequest> RequestStream { get; }
+        ITerminatableWritableChannel<TRequest> RequestStream { get; }
 
         /// <summary>
         /// Asynchronous call result.

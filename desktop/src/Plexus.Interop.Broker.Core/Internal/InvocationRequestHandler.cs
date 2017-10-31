@@ -173,7 +173,7 @@
             frame.Dispose();
         }
 
-        private static async Task PropagateAsync(IReadOnlyChannel<TransportMessageFrame> channel1, IWritableChannel<TransportMessageFrame> channel2)
+        private static async Task PropagateAsync(IReadableChannel<TransportMessageFrame> channel1, ITerminatableWritableChannel<TransportMessageFrame> channel2)
         {
             try
             {

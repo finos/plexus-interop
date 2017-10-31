@@ -24,7 +24,7 @@ namespace Plexus.Interop.Transport.Transmission
     {   
         Task Completion { get; }
 
-        IReadOnlyChannel<ITransmissionConnection> In { get; }
+        IReadableChannel<ITransmissionConnection> In { get; }
 
         Task StartAsync();
 

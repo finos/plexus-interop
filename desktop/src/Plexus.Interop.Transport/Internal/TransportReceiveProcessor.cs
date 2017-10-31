@@ -48,7 +48,7 @@ namespace Plexus.Interop.Transport.Internal
 
         public UniqueId InstanceId { get; }
 
-        public IReadOnlyChannel<ChannelMessage> In => _buffer.In;
+        public IReadableChannel<ChannelMessage> In => _buffer.In;
 
         private async Task ProcessAsync()
         {

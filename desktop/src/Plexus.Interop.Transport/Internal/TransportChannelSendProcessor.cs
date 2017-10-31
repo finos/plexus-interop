@@ -27,14 +27,14 @@
     {
         private readonly ILogger _log;
         private readonly IChannel<TransportMessageFrame> _buffer = new BufferedChannel<TransportMessageFrame>(3);
-        private readonly IWriteOnlyChannel<ChannelMessage> _out;
+        private readonly IWritableChannel<ChannelMessage> _out;
         private readonly IChannelHeaderFactory _headerFactory;
         private readonly Promise _initialized = new Promise();
 
         public TransportChannelSendProcessor(
             UniqueId connectionId,
             UniqueId channelId,
-            IWriteOnlyChannel<ChannelMessage> @out,
+            IWritableChannel<ChannelMessage> @out,
             IChannelHeaderFactory headerFactory)
         {
             ChannelId = channelId;
@@ -50,7 +50,7 @@
 
         public Task Completion { get; }
 
-        public IWritableChannel<TransportMessageFrame> Out => _buffer.Out;
+        public ITerminatableWritableChannel<TransportMessageFrame> Out => _buffer.Out;
 
         internal Task Initialized => _initialized.Task;
 

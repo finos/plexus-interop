@@ -1,37 +1,28 @@
 ifdef::env-github,env-browser[:outFileSuffix: .adoc]
 
-===== Prerequisites
+In this section we will be going through the case of two simple business apps communicating with each other via Plexus Interop:
 
-For this quick start guide the following software is required:
+- `CcyPairRateProvider` - an app developed by Vendor A, which provides FX currency pair rates.
+- `CcyPairRateViewer` - an app developed by Vendor B, which allows user to request FX currency pair rates from other apps and see them.
 
-- Windows 7 or later
-- http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[JDK 8+]
-- https://nodejs.org/en/download/[Node.js with NPM] for Web apps development
-- https://www.microsoft.com/net/download/core[.NET Core 2.0 SDK x86] for .NET apps development
-
-You also need clone and build https://github.com/symphonyoss/plexus-interop[Plexus Interop] repository if you haven't done it yet.
-To do this, run the following commands:
-[source, bash]
-----
-git clone https://github.com/symphonyoss/plexus-interop.git
-cd plexus-interop
-gradlew build --console plain --no-daemon
-----
-
-===== Before you start
-
-This introduction guide shows a simple case of two apps communicating with each other using Plexus Interop:
-
-- `CcyPairRateProvider` - app developed by Vendor A providing FX pair exchange rates to other apps.
-- `CcyPairRateViewer` - app developed by Vendor B allowing user to request FX pair exchange rates from other apps.
-
-There are 2 currently supported technologies, so the guide is split into 2 sections:
+Two most popular cases for interoperability are web and .NET, so the guide is split into two independent sections:
 
 - <<quick-start-web, Web (TypeScript)>>
 - <<quick-start-dotnet, .NET (C#)>>.
 
-Note that you can combine the samples, e.g. take web implementation of `CcyPairRateViewer` from the first guide and
+Both guides describe the same flow/API, so if you want to experiment with interop between different technologies - just combine the samples, e.g. take web implementation of `CcyPairRateViewer` from the first guide and
 .NET implementation of `CcyPairRateProvider` from the second guide and run them together.
+
+===== Prerequisites
+
+You will need the following software:
+
+- Windows 7 or later
+- http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[JDK 8+]
+- https://nodejs.org/en/download/[Node.js 6+ with npm 3+] for web quick start
+- https://www.microsoft.com/net/download/core[.NET Core 2.0 SDK x86] for .NET quick start
+
+You also need to build Plexus Interop components if you have not done it yet. See <<how-to-build, How to build>> for details.
 
 include::guides-quick-start-web.adoc[]
 

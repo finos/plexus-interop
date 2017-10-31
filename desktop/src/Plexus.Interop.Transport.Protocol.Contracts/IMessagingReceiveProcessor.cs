@@ -22,6 +22,6 @@ namespace Plexus.Interop.Transport.Protocol
     {
         UniqueId Id { get; }
 
-        IReadOnlyChannel<TransportMessage> In { get; }
+        IReadableChannel<TransportMessage> In { get; }
     }
 }

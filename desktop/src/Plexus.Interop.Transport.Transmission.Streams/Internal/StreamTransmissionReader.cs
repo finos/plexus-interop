@@ -46,7 +46,7 @@
             _buffer.Out.Completion.LogCompletion(_log);
         }
 
-        public IReadOnlyChannel<IPooledBuffer> In => _buffer.In;
+        public IReadableChannel<IPooledBuffer> In => _buffer.In;
 
         private async Task ProcessAsync()
         {

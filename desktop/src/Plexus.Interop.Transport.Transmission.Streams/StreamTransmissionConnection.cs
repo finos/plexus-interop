@@ -54,9 +54,9 @@ namespace Plexus.Interop.Transport.Transmission.Streams
 
         public Task Completion { get; }
 
-        public IWritableChannel<IPooledBuffer> Out { get; }
+        public ITerminatableWritableChannel<IPooledBuffer> Out { get; }
 
-        public IReadOnlyChannel<IPooledBuffer> In { get; }
+        public IReadableChannel<IPooledBuffer> In { get; }
 
         private async Task ProcessAsync()
         {

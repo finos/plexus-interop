@@ -45,7 +45,7 @@
 
         public Task Completion { get; }
 
-        public IReadOnlyChannel<IPooledBuffer> In => _buffer.In;
+        public IReadableChannel<IPooledBuffer> In => _buffer.In;
 
         private async Task ProcessAsync()
         {

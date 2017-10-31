@@ -37,7 +37,7 @@ namespace Plexus.Interop.Internal.Calls
 
         protected override ILogger Log { get; } = LogManager.GetLogger<ServerStreamingMethodCall<TRequest, TResponse>>();
 
-        public IReadOnlyChannel<TResponse> ResponseStream => _responseStream;
+        public IReadableChannel<TResponse> ResponseStream => _responseStream;
 
         public void Cancel()
         {

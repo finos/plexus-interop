@@ -35,7 +35,7 @@
 
         public Task Completion => _transportConnection.Completion;
 
-        public IReadOnlyChannel<ITransportChannel> IncomingChannels => _transportConnection.IncomingChannels;
+        public IReadableChannel<ITransportChannel> IncomingChannels => _transportConnection.IncomingChannels;
 
         public bool TryComplete()
         {

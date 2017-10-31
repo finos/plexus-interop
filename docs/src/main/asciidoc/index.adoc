@@ -13,7 +13,7 @@ include::getting-started-overview.adoc[]
 
 include::getting-started-features.adoc[]
 
-=== Components
+=== Repository structure
 
 include::getting-started-components.adoc[]
 
@@ -30,7 +30,7 @@ include::getting-started-how-to-run-samples.adoc[]
 [[guides]]
 == Guides
 
-=== Quick start
+=== Quick starts
 
 include::guides-quick-start.adoc[]
 

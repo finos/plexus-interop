@@ -54,7 +54,7 @@ namespace Plexus.Interop.Transport.Internal
 
         public Task Completion { get; }
 
-        public IReadOnlyChannel<ITransportChannel> IncomingChannels => _incomingChannelQueue.In;
+        public IReadableChannel<ITransportChannel> IncomingChannels => _incomingChannelQueue.In;
 
         public bool TryComplete()
         {
