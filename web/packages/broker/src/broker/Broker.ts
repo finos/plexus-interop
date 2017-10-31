@@ -17,7 +17,6 @@
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { TransportConnection, TransportChannel, ServerConnectionFactory } from "@plexus-interop/transport-common";
 import { StateMaschine, StateMaschineBase, ReadWriteCancellationToken, Logger, LoggerFactory } from "@plexus-interop/common";
-import { InteropMetadata } from "../metadata/InteropMetadata";
 
 enum BrokerState { CREATED, OPEN, CLOSED }
 
@@ -31,8 +30,7 @@ export class Broker {
 
     constructor(
         private appLifeCycleManager: AppLifeCycleManager,
-        private connectionFactory: ServerConnectionFactory,
-        private interopMetadata: InteropMetadata
+        private connectionFactory: ServerConnectionFactory
     ) {
         this.state = this.defineStateMaschine();
         this.log.trace("Created");

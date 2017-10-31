@@ -21,13 +21,14 @@ import { Completion, ErrorCompletion, SuccessCompletion, UniqueId } from "@plexu
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { transportProtocol as plexus } from "@plexus-interop/protocol";
 import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
-import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
+import { ClientRequestProcessor } from "./ClientRequestProcessor";
+import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 
 export class ClientConnectionProcessor implements AsyncHandler<TransportConnection, Completion> {
 
     constructor(
         private readonly authenticationProcessor: AsyncHandler<TransportChannel, ApplicationDescriptor>,
-        private readonly clientRequestProcessor: AsyncHandler<TransportChannel, Completion>,
+        private readonly clientRequestProcessor: ClientRequestProcessor,
         private readonly appLifeCycleManager: AppLifeCycleManager) { }
 
     public async handle(connection: TransportConnection): Promise<Completion> {
@@ -36,15 +37,15 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
         log.debug(`Received connection`);
 
         return new Promise((resolve, reject) => {
-            let sourceConnectionDescriptor: undefined | ApplicationConnectionDescriptor;
+            let sourceConnection: undefined | ApplicationConnection;
             connection.open({
                 next: async channel => {
                     const channelStrId = channel.uuid().toString();
                     log.debug(`Received new channel [${channelStrId}]`);
-                    if (!sourceConnectionDescriptor) {
+                    if (!sourceConnection) {
                         try {
                             log.debug("First channel, trying to setup connection");
-                            const appDescriptor = await this.authenticationProcessor.handle(channel);
+                            const appDescriptor = await this.authenticationProcessor.handle(channel, );
                             const appConnection = await this.appLifeCycleManager.acceptConnection(connection, {
                                 applicationId: appDescriptor.applicationId as string,
                                 instanceId: UniqueId.fromProperties(appDescriptor.instanceId as plexus.IUniqueId),
@@ -52,7 +53,7 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                                 // TODO handle connection drop
                                 log.error("Connection dropped");
                             });
-                            sourceConnectionDescriptor = appConnection.descriptor;
+                            sourceConnection = appConnection;
                             log.trace("Connected to client");
                         } catch (error) {
                             log.error("Unable to authenticate client connection");
@@ -61,7 +62,7 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                     } else {
                         log.trace(`Processing client request channel  [${channelStrId}]`);
                         try {
-                            const channelCompletion = await this.clientRequestProcessor.handle(channel);
+                            const channelCompletion = await this.clientRequestProcessor.handle(channel, sourceConnection);
                             if (log.isTraceEnabled()) {
                                 log.trace(`Received channel completion [${JSON.stringify(channelCompletion)}]`);
                             }

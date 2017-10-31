@@ -14,40 +14,67 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AsyncHandler } from "../AsyncHandler";
 import { TransportChannel } from "@plexus-interop/transport-common";
-import { Completion, SuccessCompletion, ClientProtocolHelper } from "@plexus-interop/protocol";
-import { LoggerFactory } from "@plexus-interop/common";
+import { Completion, ClientProtocolHelper } from "@plexus-interop/protocol";
+import { LoggerFactory, Observer, Logger } from "@plexus-interop/common";
+import { InvocationRequestHandler } from "./InvocationRequestHandler";
+import { Observable } from "rxjs/Observable";
+import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 
-export class ClientRequestProcessor implements AsyncHandler<TransportChannel, Completion> {
+export class ClientRequestProcessor {
 
-    public async handle(channel: TransportChannel): Promise<Completion> {
+    private readonly log: Logger = LoggerFactory.getLogger("ClientRequestProcessor");
+
+    constructor(private readonly invocationRequestProcessor: InvocationRequestHandler) { }
+
+    public async handle(channel: TransportChannel, sourceConnection: ApplicationConnection): Promise<Completion> {
+
         const channelStrId = channel.uuid().toString();
         const log = LoggerFactory.getLogger(`Client Request Processor [${channelStrId}]`);
-        let firstReceived = false;
+
         return new Promise((resolve, reject) => {
+
+            let channelObserver: Observer<ArrayBuffer> | undefined;
+
             channel.open({
                 started: () => log.trace("Channel started"),
                 startFailed: e => {
                     log.error("Start failed", e);
                     reject(e);
                 },
-                next: messagePayload => {
-                    if (!firstReceived) {
+                next: async messagePayload => {
+                    if (!channelObserver) {
                         const clientToBrokerRequest = ClientProtocolHelper.decodeClientToBrokerRequest(messagePayload);
-                        // TODO process client request
+                        if (clientToBrokerRequest.invocationStartRequest) {
+                            const $inMessagesObservable = new Observable(observer => {
+                                channelObserver = observer;
+                            });
+                            const result = await this.invocationRequestProcessor.handleRequest(
+                                $inMessagesObservable,
+                                clientToBrokerRequest.invocationStartRequest,
+                                channel,
+                                sourceConnection.descriptor);
+                            resolve(result);
+                        } else {
+                            // TODO support discovery
+                            this.log.error("Nor supported request received", JSON.stringify(clientToBrokerRequest));
+                        }
                     } else {
-                        // TODO
-                        // forward to corresponding handler
+                        channelObserver.next(messagePayload);
                     }
                 },
                 error: e => {
                     log.error("Error from source channel received", e);
+                    if (channelObserver) {
+                        channelObserver.error(e);
+                    }
                     reject(e);
                 },
                 complete: () => {
+                    if (channelObserver) {
+                        channelObserver.complete();
+                    }
                     log.trace("Channel completed");
-                    resolve(new SuccessCompletion());
                 }
             });
         });
