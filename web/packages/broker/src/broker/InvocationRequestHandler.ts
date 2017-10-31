@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion } from "@plexus-interop/protocol";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 import { Completion } from "@plexus-interop/client";
 import { Observable } from "rxjs/Observable";
 import { RegistryService } from "../metadata/RegistryService";
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
-import { TransportChannel } from "@plexus-interop/transport-common";
-import { LoggerFactory, Logger } from "@plexus-interop/common";
+import { TransportChannel, Defaults } from "@plexus-interop/transport-common";
+import { LoggerFactory, Logger, BufferedObserver, Observer } from "@plexus-interop/common";
 import { ConsumedMethodReference } from "../metadata/model/ConsumedMethodReference";
 import { ProvidedMethodReference } from "../metadata/model/ProvidedMethodReference";
 import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
+import { Types } from "../util/Types";
 
 export class InvocationRequestHandler {
 
@@ -57,22 +58,76 @@ export class InvocationRequestHandler {
 
         const targetChannel = await targetAppConnection.connection.createChannel();
         const targetChannelId = targetChannel.uuid().toString();
-
         this.log.debug(`Target channel [${targetChannelId}] created`);
-        this.log.trace(`Sending InvocationStarting to [${sourceChannelId}]`);
 
+        const targetChannelObserver = new BufferedObserver(Defaults.DEFAULT_BUFFER_SIZE, this.log);
+        await targetChannel.open({
+            next: targetChannelObserver.next,
+            complete: targetChannelObserver.complete,
+            error: targetChannelObserver.error,
+            started: () => { },
+            startFailed: () => { }
+        });
+        this.log.debug(`Target channel [${targetChannelId}] opened`);
+
+        this.log.trace(`Sending InvocationStarting to [${sourceChannelId}]`);
         sourceChannel.sendMessage(ClientProtocolHelper.invocationStartingMessagePayload({}));
 
         this.log.trace(`Sending InvocationRequested to [${targetChannelId}]`);
+        targetChannel.sendMessage(ClientProtocolHelper.invocationRequestedPayload(this.createInvocationStartRequested(methodReference, sourceConnectionDescriptor)));
 
-        targetChannel.sendMessage(ClientProtocolHelper.invocationStartRequestPayload(this.createInvocationStartRequested(methodReference, sourceConnectionDescriptor)));
+        const targetPropogationCompleted = this.propogateAll($inMessages, targetChannel, sourceChannel);
+        const sourcePropogationCompleted = this.propogateAll(targetChannelObserver, sourceChannel, targetChannel);
 
+        try {
+            await Promise.all([targetPropogationCompleted, sourcePropogationCompleted]);
+        } catch (error) {
+            this.log.error("Commuinication between channels failed", error);
+            return new ErrorCompletion(error);
+        }
         return new SuccessCompletion();
+    }
+
+    private async propogateAll(source: Observable<ArrayBuffer> | BufferedObserver<ArrayBuffer>, targetChannel: TransportChannel, sourceChannel: TransportChannel): Promise<void> {
+        const targetChannelId = targetChannel.uuid().toString();
+        const sourceChannelId = sourceChannel.uuid().toString();
+        const sourceObserver: (resolve: any, reject: any) => Observer<ArrayBuffer> = (resolve, reject) => {
+            return {
+                next: async messagePayload => {
+                    if (this.log.isTraceEnabled()) {
+                        this.log.trace(`Propogating message of ${messagePayload.byteLength} from [${sourceChannelId}] to [${targetChannelId}]`);
+                    }
+                    try {
+                        targetChannel.sendMessage(messagePayload);
+                    } catch (e) {
+                        this.log.error("Unable to send message", e);
+                        reject(e);
+                    }
+                },
+                complete: () => {
+                    this.log.trace(`Source channel completed`);
+                    resolve();
+                },
+                error: e => {
+                    this.log.error(`Received error from source channel [${sourceChannelId}]`, e);
+                    reject(e);
+                }
+            }
+        };
+        if (Types.isObservable(source)) {
+            return new Promise<void>((resolve, reject) => {
+                source.subscribe(sourceObserver(resolve, reject));
+            });
+        } else {
+            return new Promise<void>((resolve, reject) => {
+                source.setObserver(sourceObserver(resolve, reject));
+            });
+        }
     }
 
     private createInvocationStartRequested(methodReference: ConsumedMethodReference | ProvidedMethodReference, sourceConnection: ApplicationConnectionDescriptor): plexus.interop.protocol.IInvocationStartRequested {
         return {
-            serviceId: this.isConsumedMethodReference(methodReference) ?
+            serviceId: Types.isConsumedMethodReference(methodReference) ?
                 (methodReference.consumedService as plexus.interop.protocol.IConsumedServiceReference).serviceId :
                 (methodReference.providedService as plexus.interop.protocol.IProvidedServiceReference).serviceId,
             methodId: methodReference.methodId,
@@ -82,7 +137,7 @@ export class InvocationRequestHandler {
     }
 
     private async resolveTargetConnection(methodReference: ConsumedMethodReference | ProvidedMethodReference, sourceConnection: ApplicationConnectionDescriptor): Promise<ApplicationConnection> {
-        if (!this.isConsumedMethodReference(methodReference)) {
+        if (!Types.isConsumedMethodReference(methodReference)) {
             throw new Error("Provided methods not implemented yet");
         } else {
             const targetMethods = this.registryService.getMatchingProvidedMethods(sourceConnection.applicationId, methodReference);
@@ -92,8 +147,5 @@ export class InvocationRequestHandler {
         }
     }
 
-    private isConsumedMethodReference(methodReference: ConsumedMethodReference | ProvidedMethodReference): methodReference is ConsumedMethodReference {
-        return (methodReference as ProvidedMethodReference).providedService !== undefined;
-    }
 
 }

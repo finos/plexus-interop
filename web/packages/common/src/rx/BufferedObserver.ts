@@ -16,7 +16,7 @@
  */
 import { Observer } from "./Observer";
 import { Queue } from "typescript-collections";
-import { Logger } from "../logger/Logger";
+import { Logger, LoggerFactory } from "../logger";
 import { LimitedBufferQueue } from "../util/collections/LimitedBufferQueue";
 
 /**
@@ -30,7 +30,7 @@ export class BufferedObserver<T> implements Observer<T> {
     private receivedError: any;
     private completed: boolean = false;
 
-    constructor(private readonly limit: number = 1024 * 10, private readonly log: Logger) {
+    constructor(private readonly limit: number = 1024 * 10, private readonly log: Logger = LoggerFactory.getLogger("BufferedObserver")) {
         this.buffer = new LimitedBufferQueue<T>(limit);
     }
 
