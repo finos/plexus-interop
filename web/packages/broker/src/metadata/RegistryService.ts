@@ -21,31 +21,56 @@ import { ConsumedMethod } from "./model/ConsumedMethod";
 import { ProvidedMethod } from "./model/ProvidedMethod";
 import { ProvidedServiceReference } from "./model/ProvidedServiceReference";
 import { RegistryProvider } from "./RegistryProvider";
+import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { Registry } from "./model/Registry";
+import { ConsumedServiceReference } from "./model/ConsumedServiceReference";
 
 export class RegistryService {
 
-    constructor(private readonly registryProvider: RegistryProvider) {}
+    private readonly log: Logger = LoggerFactory.getLogger("RegistryService");
+
+    private registry: Registry;
+
+    constructor(private readonly registryProvider: RegistryProvider) {
+        this.registry = registryProvider.getCurrent();
+        this.registryProvider.getRegistry().subscribe({
+            next: updatedRegistry => {
+                this.log.debug("Registry updated");
+                this.registry = updatedRegistry;
+            }
+        });
+    }
+
+    public getApplication(appId: string): Application {
+        const result = this.registry.applications.find(app => app.id === appId);
+        if (!result) {
+            throw new Error(`${appId} app not found`)
+        }
+        return result;
+    }
+
+    public getConsumedService(appId: string, serviceReference: ConsumedServiceReference): ConsumedService {
+        const app = this.getApplication(appId);
+        const result = app.consumedServices.find(consumedService => consumedService.service.id === serviceReference.serviceId
+            && (!serviceReference.serviceAlias || serviceReference.serviceAlias === consumedService.service.serviceAlias));
+        if (!result) {
+            throw new Error(`Service not found`);
+        }
+        return result;
+    }
 
     // TODO implement 
 
-    public getApplication(appId: string): Application {
+    public getConsumedMethod(appId: string, reference: ConsumedMethodReference): ConsumedMethod {
         throw "Not implemented";
     }
 
-    public getConsumedService(appId: string): ConsumedService {
-        throw "Not implemented";        
-    }
-
-    public getConsumedMethod(appId: string, reference: ConsumedMethodReference): ConsumedMethod {
-        throw "Not implemented";        
-    }
-
     public getProvidedService(reference: ProvidedServiceReference): ProvidedMethod {
-        throw "Not implemented";        
+        throw "Not implemented";
     }
 
     public getMatchingProvidedMethods(appId: string, consumedMethodReference: ConsumedMethodReference): ProvidedMethod[] {
-        throw "Not implemented";        
+        throw "Not implemented";
     }
 
 }

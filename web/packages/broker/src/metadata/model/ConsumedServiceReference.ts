@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Method } from "./Method";
+export interface ConsumedServiceReference {
 
-export interface Service {
-    id: string;
+    serviceId: string;
+    
     serviceAlias?: string;
-    methods: Method[];
+
 }
