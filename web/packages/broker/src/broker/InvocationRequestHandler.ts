@@ -32,11 +32,11 @@ export class InvocationRequestHandler {
 
     constructor(
         private readonly registryService: RegistryService,
-        private readonly appLifeCycleManager: AppLifeCycleManager) {}
+        private readonly appLifeCycleManager: AppLifeCycleManager) { }
 
     public async handleRequest(
         $inMessages: Observable<ArrayBuffer>,
-        invocationRequest: plexus.interop.protocol.IInvocationStartRequest, 
+        invocationRequest: plexus.interop.protocol.IInvocationStartRequest,
         sourceChannel: TransportChannel,
         sourceConnectionDescriptor: ApplicationConnectionDescriptor): Promise<Completion> {
 
@@ -47,10 +47,10 @@ export class InvocationRequestHandler {
             this.log.debug(`Handling start invocation request [${sourceChannelId}] from [${sourceConnectionId}]`);
         }
 
-        const targetAppConnection = await this.resolveTargetConnection(
-                (invocationRequest.consumedMethod as ConsumedMethodReference) 
-                    || invocationRequest.providedMethod, sourceConnectionDescriptor);
-        
+        const methodReference: ConsumedMethodReference | ProvidedMethodReference = (invocationRequest.consumedMethod as ConsumedMethodReference) || invocationRequest.providedMethod;
+
+        const targetAppConnection = await this.resolveTargetConnection(methodReference, sourceConnectionDescriptor);
+
         if (this.log.isDebugEnabled()) {
             this.log.debug(`Target connection [${targetAppConnection.descriptor.connectionId.toString()}] found`);
         }
@@ -65,34 +65,35 @@ export class InvocationRequestHandler {
 
         this.log.trace(`Sending InvocationRequested to [${targetChannelId}]`);
 
-        targetChannel.sendMessage(ClientProtocolHelper.invocationStartRequestPayload({
-                // serviceId: 
-
-                // /** InvocationStartRequested serviceAlias */
-                // serviceAlias?: string;
-
-                // /** InvocationStartRequested methodId */
-                // methodId?: string;
-
-                // /** InvocationStartRequested consumerApplicationId */
-                // consumerApplicationId?: string;
-
-                // /** InvocationStartRequested consumerConnectionId */
-                // consumerConnectionId?: plexus.IUniqueId;
-        }));
+        targetChannel.sendMessage(ClientProtocolHelper.invocationStartRequestPayload(this.createInvocationStartRequested(methodReference, sourceConnectionDescriptor)));
 
         return new SuccessCompletion();
     }
 
+    private createInvocationStartRequested(methodReference: ConsumedMethodReference | ProvidedMethodReference, sourceConnection: ApplicationConnectionDescriptor): plexus.interop.protocol.IInvocationStartRequested {
+        return {
+            serviceId: this.isConsumedMethodReference(methodReference) ?
+                (methodReference.consumedService as plexus.interop.protocol.IConsumedServiceReference).serviceId :
+                (methodReference.providedService as plexus.interop.protocol.IProvidedServiceReference).serviceId,
+            methodId: methodReference.methodId,
+            consumerApplicationId: sourceConnection.applicationId,
+            consumerConnectionId: sourceConnection.connectionId
+        }
+    }
+
     private async resolveTargetConnection(methodReference: ConsumedMethodReference | ProvidedMethodReference, sourceConnection: ApplicationConnectionDescriptor): Promise<ApplicationConnection> {
-        if ((methodReference as ProvidedMethodReference).providedService) {
+        if (!this.isConsumedMethodReference(methodReference)) {
             throw new Error("Provided methods not implemented yet");
         } else {
             const targetMethods = this.registryService.getMatchingProvidedMethods(sourceConnection.applicationId, methodReference);
             const targetAppIds = targetMethods.map(method => method.providedService.application.id);
-            const appConnection  = await this.appLifeCycleManager.getOrSpawnConnectionForOneOf(targetAppIds);
+            const appConnection = await this.appLifeCycleManager.getOrSpawnConnectionForOneOf(targetAppIds);
             return appConnection;
         }
+    }
+
+    private isConsumedMethodReference(methodReference: ConsumedMethodReference | ProvidedMethodReference): methodReference is ConsumedMethodReference {
+        return (methodReference as ProvidedMethodReference).providedService !== undefined;
     }
 
 }
