@@ -82,7 +82,8 @@ export class InvocationRequestHandler {
         try {
             await Promise.all([targetPropogationCompleted, sourcePropogationCompleted]);
         } catch (error) {
-            this.log.error("Commuinication between channels failed", error);
+            this.log.error(`Communication between channels [${sourceChannelId}] and [${targetChannelId}] failed`, error);
+            // TODO clean up/more logs?
             return new ErrorCompletion(error);
         }
         return new SuccessCompletion();
