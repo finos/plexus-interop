@@ -15,24 +15,31 @@
  * limitations under the License.
  */
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
-import { TransportConnection, TransportChannel, ServerConnectionFactory } from "@plexus-interop/transport-common";
-import { StateMaschine, StateMaschineBase, ReadWriteCancellationToken, Logger, LoggerFactory } from "@plexus-interop/common";
-
-enum BrokerState { CREATED, OPEN, CLOSED }
+import { ServerConnectionFactory } from "@plexus-interop/transport-common";
+import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { ClientConnectionProcessor } from "./ClientConnectionProcessor";
+import { AuthenticationHandler } from "./AuthenticationHandler";
+import { InvocationRequestHandler } from "./InvocationRequestHandler";
+import { RegistryProvider } from "../metadata/RegistryProvider";
+import { RegistryService } from "../metadata/RegistryService";
+import { ClientRequestProcessor } from "./ClientRequestProcessor";
 
 export class Broker {
 
-    private readonly state: StateMaschine<BrokerState>;
-
-    private readonly cancellationToken: ReadWriteCancellationToken = new ReadWriteCancellationToken();
-
     private readonly log: Logger = LoggerFactory.getLogger("Broker");
+
+    private readonly connectionProcessor: ClientConnectionProcessor;
 
     constructor(
         private appLifeCycleManager: AppLifeCycleManager,
-        private connectionFactory: ServerConnectionFactory
+        private connectionFactory: ServerConnectionFactory,
+        private registryProvider: RegistryProvider
     ) {
-        this.state = this.defineStateMaschine();
+        const authHandler = new AuthenticationHandler(this.appLifeCycleManager);
+        const registryService = new RegistryService(this.registryProvider);
+        const invocationRequestHandler = new InvocationRequestHandler(registryService, this.appLifeCycleManager);
+        const clientRequestProcessor = new ClientRequestProcessor(invocationRequestHandler);
+        this.connectionProcessor = new ClientConnectionProcessor(authHandler, clientRequestProcessor, this.appLifeCycleManager);
         this.log.trace("Created");
         this.start();
     }
@@ -40,25 +47,15 @@ export class Broker {
     private start(): void {
         this.log.debug("Starting to listen for incoming connections");
         this.connectionFactory.acceptConnections({
-            next: this.handleIncomingConnection.bind(this),
-            error: e => { },
-            complete: () => { }
-        });
-    }
-
-    private defineStateMaschine(): StateMaschine<BrokerState> {
-        return new StateMaschineBase(BrokerState.CREATED, [
-            {
-                from: BrokerState.CREATED, to: BrokerState.OPEN
+            next: connection => {
+                if (this.log.isDebugEnabled()) {
+                    this.log.debug(`Accepted new connection [${connection.uuid().toString()}]`);
+                }
+                this.connectionProcessor.handle(connection);
             },
-            {
-                from: BrokerState.OPEN, to: BrokerState.CLOSED, preHandler: async () => this.cancellationToken.cancel("Closed")
-            }
-        ]);
-    }
-
-    private handleIncomingConnection(transportConnection: TransportConnection): void {
-        
+            error: e => this.log.error("Error on receiving new connection", e),
+            complete: () => this.log.info("No more connections")
+        });
     }
 
 }

@@ -1,4 +1,3 @@
-import { RegistryProvider } from "./RegistryProvider";
 /**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -15,12 +14,18 @@ import { RegistryProvider } from "./RegistryProvider";
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { RegistryProvider } from "./RegistryProvider";
+import { Registry } from "./model/Registry";
+import { Observable } from "rxjs/Observable";
+
 export class JsonBasedRegistryProvider implements RegistryProvider {
 
     public getCurrent(): Registry {
-
+        throw "Not implemented";
     }
 
-    public getRegistry(): Observable<Registry>;
+    public getRegistry(): Observable<Registry> {
+        throw "Not implemented";
+    }
 
 }

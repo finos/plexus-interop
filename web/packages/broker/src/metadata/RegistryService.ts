@@ -20,17 +20,32 @@ import { ConsumedMethodReference } from "./model/ConsumedMethodReference";
 import { ConsumedMethod } from "./model/ConsumedMethod";
 import { ProvidedMethod } from "./model/ProvidedMethod";
 import { ProvidedServiceReference } from "./model/ProvidedServiceReference";
+import { RegistryProvider } from "./RegistryProvider";
 
-export interface RegistryService {
+export class RegistryService {
 
-    getApplication(appId: string): Application;
+    constructor(private readonly registryProvider: RegistryProvider) {}
 
-    getConsumedService(appId: string): ConsumedService;
+    // TODO implement 
 
-    getConsumedMethod(appId: string, reference: ConsumedMethodReference): ConsumedMethod;
+    public getApplication(appId: string): Application {
+        throw "Not implemented";
+    }
 
-    getProvidedService(reference: ProvidedServiceReference): ProvidedMethod;
+    public getConsumedService(appId: string): ConsumedService {
+        throw "Not implemented";        
+    }
 
-    getMatchingProvidedMethods(appId: string, consumedMethodReference: ConsumedMethodReference): ProvidedMethod[];    
+    public getConsumedMethod(appId: string, reference: ConsumedMethodReference): ConsumedMethod {
+        throw "Not implemented";        
+    }
+
+    public getProvidedService(reference: ProvidedServiceReference): ProvidedMethod {
+        throw "Not implemented";        
+    }
+
+    public getMatchingProvidedMethods(appId: string, consumedMethodReference: ConsumedMethodReference): ProvidedMethod[] {
+        throw "Not implemented";        
+    }
 
 }

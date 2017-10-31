@@ -27,7 +27,7 @@ import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 export class ClientConnectionProcessor implements AsyncHandler<TransportConnection, Completion> {
 
     constructor(
-        private readonly authenticationProcessor: AsyncHandler<TransportChannel, ApplicationDescriptor>,
+        private readonly authenticationProcessor: AsyncHandler<[TransportConnection, TransportChannel], ApplicationDescriptor>,
         private readonly clientRequestProcessor: ClientRequestProcessor,
         private readonly appLifeCycleManager: AppLifeCycleManager) { }
 
@@ -45,7 +45,7 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                     if (!sourceConnection) {
                         try {
                             log.debug("First channel, trying to setup connection");
-                            const appDescriptor = await this.authenticationProcessor.handle(channel, );
+                            const appDescriptor = await this.authenticationProcessor.handle([connection, channel]);
                             const appConnection = await this.appLifeCycleManager.acceptConnection(connection, {
                                 applicationId: appDescriptor.applicationId as string,
                                 instanceId: UniqueId.fromProperties(appDescriptor.instanceId as plexus.IUniqueId),
