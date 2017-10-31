@@ -30,21 +30,21 @@ describe("Web Socket Client Benchmarks", () => {
         transportsSetup.createWebSocketTransportProvider(wsUrl), 
         clientsSetup);
 
-    it("Sends ~50 point to point requests in 1 second", function() {
+    it("Sends ~35 point to point requests in 1 second", function() {
         this.timeout(5000);
         return (async () => {
             const result = await echoServiceBenchmark.testUnaryMessagesSentWithinPeriod(1024, 3000);
             console.log("Benchmark result:", JSON.stringify(result));
-            expect(result.messagesSent).to.be.greaterThan(140);
+            expect(result.messagesSent).to.be.greaterThan(100);
         })();
     });
 
-    it("Sends ~300 streaming messages in 1 second", function() {
+    it("Sends ~200 streaming messages in 1 second", function() {
         this.timeout(5000);
         return (async () => {
             const result = await echoServiceBenchmark.testStreamingEventsSentWithinPeriod(1024, 3000);
             console.log("Benchmark result:", JSON.stringify(result));
-            expect(result.messagesSent).to.be.greaterThan(900);
+            expect(result.messagesSent).to.be.greaterThan(600);
         })();
     });
 
