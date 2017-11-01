@@ -1,20 +1,38 @@
 = Plexus Interop
 :toc2:
-:toclevels: 2
+:toclevels: 3
 
 [[getting-started]]
 == Getting Started
 
-=== What is Plexus Interop?
+=== Overview
 
 include::getting-started-overview.adoc[]
 
-=== Code Examples
+=== Features
 
-include::getting-started-example.adoc[]
+include::getting-started-features.adoc[]
+
+=== Repository structure
+
+include::getting-started-components.adoc[]
+
+[[how-to-build]]
+=== How to build
+
+include::getting-started-how-to-build.adoc[]
+
+[[sample-apps]]
+=== Sample apps
+
+include::getting-started-how-to-run-samples.adoc[]
 
 [[guides]]
 == Guides
+
+=== Quick starts
+
+include::guides-quick-start.adoc[]
 
 === Concepts
 
@@ -22,12 +40,14 @@ include::guides-interop-concepts.adoc[]
 
 === Invocation workflow
 
+[[guides-interop-invocation-workflow]]
 include::guides-interop-invocation-workflow.adoc[]
 
 === Plexus Interop integration workflow
 
 include::guides-interop-integration-workflow.adoc[]
 
+[[guides-how-to-write-custom-app-launcher]]
 === How to write custom App Launcher
 
 include::guides-how-to-write-custom-app-launcher.adoc[]
