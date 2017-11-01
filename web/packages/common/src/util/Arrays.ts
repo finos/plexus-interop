@@ -35,4 +35,12 @@ export class Arrays {
         return new Uint8Array(typedArray).buffer;
     }
 
+    public static concat<T>(x: T[], y: T[]): T[] {
+        return x.concat(y);
+    }
+
+    public static flatMap<T, R>(f: (el: T) => R[], array: T[]): R[] {
+        return array.map(f).reduce<R[]>(Arrays.concat, []);
+    }
+
 }
