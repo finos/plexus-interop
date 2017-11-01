@@ -21,7 +21,7 @@ service CcyPairRateService {
 
 You can find Protobuf specification here - https://developers.google.com/protocol-buffers/docs/proto3
 
-==== Interop Manifests
+==== Application Interop Manifests
 
 Application interop manifests are defined using special `.interop` format. Here is an example:
 
