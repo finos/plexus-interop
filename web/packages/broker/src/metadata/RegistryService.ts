@@ -21,23 +21,24 @@ import { ConsumedMethod } from "./model/ConsumedMethod";
 import { ProvidedMethod } from "./model/ProvidedMethod";
 import { ProvidedServiceReference } from "./model/ProvidedServiceReference";
 import { RegistryProvider } from "./RegistryProvider";
-import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { join, distinct, Logger, LoggerFactory, flatMap, ExtendedMap } from "@plexus-interop/common";
 import { Registry } from "./model/Registry";
 import { ConsumedServiceReference } from "./model/ConsumedServiceReference";
+import { ProvidedService } from "./model/ProvidedService";
+import { Method } from "./model/Method";
 
 export class RegistryService {
 
     private readonly log: Logger = LoggerFactory.getLogger("RegistryService");
 
+    private appProvidedMethodsCache: ExtendedMap<string, ProvidedMethod[]> = new ExtendedMap<string, ProvidedMethod[]>();
+
     private registry: Registry;
 
     constructor(private readonly registryProvider: RegistryProvider) {
-        this.registry = registryProvider.getCurrent();
+        this.updateRegistry(registryProvider.getCurrent());
         this.registryProvider.getRegistry().subscribe({
-            next: updatedRegistry => {
-                this.log.debug("Registry updated");
-                this.registry = updatedRegistry;
-            }
+            next: updatedRegistry => this.updateRegistry(updatedRegistry)
         });
     }
 
@@ -59,18 +60,100 @@ export class RegistryService {
         return result;
     }
 
-    // TODO implement 
-
     public getConsumedMethod(appId: string, reference: ConsumedMethodReference): ConsumedMethod {
-        throw "Not implemented";
+
+        const app = this.getApplication(appId);
+
+        const consumedMethods: ConsumedMethod[] = flatMap<ConsumedService, ConsumedMethod>(consumedService => {
+            const methods: ConsumedMethod[] = [];
+            consumedService.methods.forEach(v => {
+                methods.push({
+                    method: v,
+                    consumedService
+                });
+            });
+            return methods;
+        }, app.consumedServices);
+
+        const result = consumedMethods.find(method => {
+            return this.equalsIfExist(reference.methodId, reference.methodId)
+                && (!reference.consumedService
+                    || (this.equalsIfExist(reference.consumedService.serviceAlias, method.consumedService.service.serviceAlias)
+                        && this.equalsIfExist(reference.consumedService.serviceId, method.consumedService.service.id)));
+        });
+
+        if (!result) {
+            throw new Error(`Service not found`);
+        }
+
+        return result;
     }
 
-    public getProvidedService(reference: ProvidedServiceReference): ProvidedMethod {
-        throw "Not implemented";
+    public getProvidedService(reference: ProvidedServiceReference): ProvidedService {
+        const result = this.getApplication(reference.applicationId as string)
+            .providedServices.find(x => this.equalsIfExist(reference.serviceAlias, x.service.serviceAlias) && this.equalsIfExist(reference.serviceId, x.service.id));
+        if (!result) {
+            throw new Error("Provided Service not found");
+        }
+        return result;
+    }
+
+    private updateRegistry(registry: Registry): void {
+        this.log.debug("Registry updated");
+        this.registry = registry;
+        this.appProvidedMethodsCache.clear();
     }
 
     public getMatchingProvidedMethods(appId: string, consumedMethodReference: ConsumedMethodReference): ProvidedMethod[] {
-        throw "Not implemented";
+        const consumedMethod = this.getConsumedMethod(appId, consumedMethodReference);
+        return this.getMatchingProvidedMethodsFromConsumed(consumedMethod);
     }
 
+    public getMatchingProvidedMethodsForApp(app: Application): ProvidedMethod[] {
+        return this.appProvidedMethodsCache.getOrAdd(app.id, () => this.getMatchingProvidedMethodsForAppInternal(app));
+    }
+
+    private getMatchingProvidedMethodsForAppInternal(app: Application) {
+        const allProvidedServices: ProvidedService[] = flatMap<Application, ProvidedService>(app => app.providedServices, this.registry.applications);
+
+        const consumedProvidedPairs = join(
+            app.consumedServices,
+            allProvidedServices,
+            (consumed, provided) => {
+                return { consumed, provided };
+            },
+            // matched by service id app permissions
+            (c, p) => p.to.isMatch(c.application.id)
+                && c.from.isMatch(p.application.id)
+                && c.service.id === p.service.id);
+
+        const result = flatMap<{ consumed: ConsumedService, provided: ProvidedService }, ProvidedMethod>(pair => {
+
+            const allMatchedProvidedMethods: ProvidedMethod[] = join(
+                pair.consumed.methods.valuesArray(),
+                pair.provided.methods.valuesArray(),
+                (c, p) => p,
+                // matched by method name
+                (c, p) => c.name === p.method.name);
+
+            return distinct<ProvidedMethod>(allMatchedProvidedMethods,
+                pMethod => `${pMethod.method.name}-${pMethod.providedService.application.id}`);
+
+        }, consumedProvidedPairs);
+
+        return result;
+    }
+
+    public getMatchingProvidedMethodsFromConsumed(consumedMethod: ConsumedMethod): ProvidedMethod[] {
+        return this.getMatchingProvidedMethodsForApp(consumedMethod.consumedService.application)
+            .filter(providedMethod => this.equals(consumedMethod.method, providedMethod.method));
+    }
+
+    private equals(x: Method, y: Method): boolean {
+        return x.name === y.name && x.service.id === y.service.id;
+    }
+
+    private equalsIfExist(expect: any, result: any): boolean {
+        return expect !== undefined || expect === result;
+    }
 }
