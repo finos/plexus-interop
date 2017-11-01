@@ -35,12 +35,31 @@ export class Arrays {
         return new Uint8Array(typedArray).buffer;
     }
 
-    public static concat<T>(x: T[], y: T[]): T[] {
-        return x.concat(y);
-    }
-
-    public static flatMap<T, R>(f: (el: T) => R[], array: T[]): R[] {
-        return array.map(f).reduce<R[]>(Arrays.concat, []);
-    }
-
 }
+
+function concat<T>(x: T[], y: T[]): T[] {
+    return x.concat(y);
+}
+
+export function flatMap<T, R>(f: (el: T) => R[], array: T[]): R[] {
+    return array.map(f).reduce<R[]>(concat, []);
+}
+
+export function join<T, R, Y>(first: T[], second: R[], joinFn: (x: T, y: R) => Y, predicate: (x: T, y: R) => boolean = () => true): Y[] {
+    const result: Y[] = [];
+    first.forEach(x => second.forEach(y => {
+        if (predicate(x, y)) {
+            result.push(joinFn(x, y));
+        }
+    }));
+    return result;
+}
+
+export function distinct<T>(array: T[], key: (x: T) => any): T[] {
+    const seen = new Set();
+    return array.filter(item => {
+        const k = key(item);
+        return seen.has(k) ? false : seen.add(k);
+    });
+}
+
