@@ -64,7 +64,7 @@
     "tree-kill": "^1.1.0",
     "ts-mockito": "2.0.2",
     "tslint": "^4.5.1",
-    "typescript": "2.3.4",
+    "typescript": "2.6.1",
     "watchify": "^3.9.0",
     "yarn": "^1.1.0"
   },

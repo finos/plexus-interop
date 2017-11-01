@@ -14,18 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RegistryProvider } from "./RegistryProvider";
-import { Registry } from "./model/Registry";
-import { Observable } from "rxjs/Observable";
+import { MethodReferenceDto } from "./MethodReference";
 
-export class JsonBasedRegistryProvider implements RegistryProvider {
-
-    public getCurrent(): Registry {
-        throw "Not implemented";
-    }
-
-    public getRegistry(): Observable<Registry> {
-        throw "Not implemented";
-    }
-
+export interface ProvidedServiceDto {
+    service: string;
+    title: string;
+    to: string[];
+    methods: MethodReferenceDto[];
 }

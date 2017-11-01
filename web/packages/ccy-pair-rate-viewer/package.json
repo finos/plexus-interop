@@ -23,6 +23,6 @@
     "electron": "1.7.5",
     "trash": "^4.1.0",
     "trash-cli": "^1.4.0",
-    "typescript": "^2.5.3"
+    "typescript": "2.6.1"
   }
 }

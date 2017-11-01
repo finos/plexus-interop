@@ -62,4 +62,3 @@ export function distinct<T>(array: T[], key: (x: T) => any): T[] {
         return seen.has(k) ? false : seen.add(k);
     });
 }
-
