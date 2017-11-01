@@ -1,19 +1,23 @@
-Like many other Remote Procedure Call (RPC) systems, Plexus is based around the idea of defining a service, specifying the methods that can be called remotely with their parameters and return types.
+Like many other Remote Procedure Call (RPC) systems, Plexus is based around the idea of defining a service by specifying the methods that can be called remotely with their parameters and return types.
 
-There are 4 possible types of RPC methods in Plexus, just like in http://www.grpc.io/docs/guides/concepts.html#rpc-life-cycle[GRPC]:
+There are 4 possible types of RPC methods in Plexus mirroring types supported by http://www.grpc.io/docs/guides/concepts.html#rpc-life-cycle[gRPC]:
 
-* Point-to-point RPC - consumer send a request, provider receives it, handles, and sends response back to the consumer.
-* Provider streaming RPC - consumer sends one or many requests, provider sends only one response back.
-* Consumer streaming RPC - consumer sends one request, provider sends many responses back.
-* Bidirectional streaming RPC - consumer sends many requests, provider sends many responses.
+* Point-to-point call - consumer send a request, provider receives it, handles, and sends response back to the consumer.
+* Provider streaming call - consumer sends one or many requests, provider sends only one response back.
+* Consumer streaming call - consumer sends one request, provider sends many responses back.
+* Bidirectional streaming call - consumer sends many requests, provider sends many responses.
 
-However Plexus is more than just an RPC framework:
+However Plexus goes beyond what most RPC frameworks do:
 
-* Plexus is designed to provide interoperability within the same client desktop and it tracks lifecycle of desktop apps, i.e. knows if app is running or not and can initiate app launch on demand.
-* Definitions of public APIs in proto3 format are stored in central interop registry thus defining standards of communication between apps.
-* In addition to API definitions in proto3 format, Plexus metadata also includes app manifests where each app declares which APIs it implements and which APIs it uses. This enables granular control for API usage and evolution.
-* All interop calls in Plexus are going via central Interop Broker component which works as a mediator decoupling apps from each other and allowing dynamic service discovery:
-+
+* Plexus tracks the lifecycle of desktop apps, i.e. it knows if app is running or not and can launch app on demand.
+* Plexus allows to define custom App Launchers, which allow fully custom installation, startup and shutdown flows
+* Each app specified which interop services it provides and consumes. This way it is easy to track API usage and evolve APIs.
+* Central Broker decouples apps from each other and allows dynamic discovery of service providers
+
+==== Discovery flow
+
+Step one: find API implementations:
+
 [plantuml]
 ....
 @startuml
@@ -25,7 +29,11 @@ skinparam monochrome true
 [Interop Broker] .. [App D]
 @enduml
 ....
-+
+
+Step two: select between API implementations
+
+Step three: call specific API implementer:
+
 [plantuml]
 ....
 @startuml
@@ -81,21 +89,21 @@ cloud "Central Registries" {
 ==== Key elements
 
 * *App Registry* - catalogue of apps, interop components within apps and _app launchers_
-* *App Launcher* - component responsible for starting new app instances and tracking their lifecycle. Different app launchers should be used for different app technologies (e.g. .NET Launcher, Java Launcher, Python Launcher) or custom startup flows (e.g. launcher that knows how to download app from special storage within organization).
-* *App Lifecycle Manager* - central component that tracks all live app instances. All apps are started via App Lifecycle Managers, which selects appropriate App Launcher and uses it to create new instance of an app.
+* *App Launcher* - component responsible for starting new app instances and tracking their lifecycle. Different app launchers should be used for different app technologies (e.g. .NET Launcher, Java Launcher, Python Launcher) or custom startup flows (e.g. launcher that knows how to download app from a special binary storage within organization).
+* *App Lifecycle Manager* - central component that tracks all live app instances. All apps are started via App Lifecycle Managers, which selects an appropriate App Launcher and uses this Launcher to create a new instance of the app.
 * *Interop API Definitions* - text files with formal definitions of interop APIs between apps, which define _messages_, _services_ and _applications_:
 ** *Message* - logical record of information, containing a series of name-value pairs (fields). Plexus uses Protobuf v3 protocol for defining and serializing messages.
 ** *Service* - set of related methods that can be provided by one or many applications. Plexus uses Protobuf v3 definition language syntax for defining services.
 ** *Application* - corresponds to a desktop application. Each application can provide services to other applications and consume services provided by other applications.
 * *Interop Broker* - responsible for managing interop sessions, routing messages between apps and discovery mechanisms. If message was sent to component that is not running yet then Broker asks App Launcher to start the app using mapping between components and apps.
 * *Interop Registry* - provides Interop Broker with all information about services, messages and connections between apps in run-time. Interop Registry is populated from *approved* Interop API Definitions.
-* *App Registry* - provides App Lifecycle Manager with all information about how to launch apps.
+* *App Registry* - provides App Lifecycle Manager with all information about how to launch apps: app launcher and launcher-specific parameters.
 * *Interop Transport* - responsible for delivering serialized messages between Interop Broker and client interop APIs
-* *Client Service API* - client library that app uses to provide some interop service or to consume another interop API. API is always generated from interop API definitions. Depending on app technology API can be generated either in run-time (e.g. JavaScript) or in compile time (e.g. DLLs for .NET). Compile-time generation uses Plexus SDK tools.
+* *Client Service API* - client library that app uses to provide some interop service or to consume interop service provided by another app. Service API is generated from interop API definitions. Depending on app technology API can be generated either in run-time (e.g. JavaScript) or in compile time (e.g. DLLs for .NET). Compile-time generation uses Plexus SDK tools.
 
 ==== Interop Broker
 
-Interop broker is the central component. It allows decoupling of apps from each other and provides powerful features like discovery.
+Interop broker is the central component working as a hub for all interop communications:
 
 [plantuml]
 ....
@@ -112,6 +120,6 @@ Interop Broker has several responsibilities:
 
 * It reads full information about all interoperability APIs from Interop Registry
 * It routes interop API calls and replies between app instances
-* It tracks which interop API implementations are alive. If some app calls API which is not alive yet then Broker asks App Lifecycle Manager to start the app hosting this API.
+* It tracks which interop API implementations are alive. If some app calls a service which is not online yet then Broker launches service provider app via App Lifecycle Manager.
 
-Interop Broker is not talking with apps directly - it relies on Interop Transport, which can deliver serialized messages across app boundaries.
+Note that Interop Broker is not talking with apps directly - it relies on Interop Transport, which can deliver serialized messages across app boundaries.

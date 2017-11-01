@@ -16,14 +16,22 @@
  */
 ﻿namespace Plexus.Interop.Apps
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Plexus.Interop.Transport;
 
-    public interface IAppLifecycleManager : IAppLauncher
+    public interface IAppLifecycleManager
     {
-        Task Completion { get; }
+        IAppConnection AcceptConnection(
+            ITransportConnection connection,
+            AppConnectionDescriptor info);
 
-        Task StartAsync();
+        bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection);
 
-        Task StopAsync();
+        Task<IAppConnection> SpawnConnectionAsync(string appId);
+
+        ValueTask<IAppConnection> GetOrSpawnConnectionAsync(IReadOnlyCollection<string> appId);
+
+        IReadOnlyCollection<IAppConnection> GetOnlineConnections();
     }
 }

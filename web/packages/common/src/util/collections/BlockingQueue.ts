@@ -27,9 +27,9 @@ export abstract class BlockingQueue<T> {
     public abstract dequeue(): T;
 }
 
-export class BlockingQueueBase<T> extends BlockingQueue<T> {
+export class BlockingQueueBase<T> implements BlockingQueue<T> {
 
-    private readonly internal: Queue<T> = new Queue<T>();
+    constructor(private readonly internal: Queue<T> = new Queue<T>()) {}
 
     public async blockingDequeue(cancellationToken: CancellationToken = new CancellationToken()): Promise<T> {
         if (this.internal.size() > 0) {

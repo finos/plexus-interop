@@ -16,19 +16,25 @@
  */
 ﻿namespace Plexus.Interop
 {
+    using System.Threading;
+
     public sealed class MethodCallContext
     {
         internal MethodCallContext(            
             string consumerApplicationId,
-            UniqueId consumerConnectionId)
+            UniqueId consumerConnectionId, 
+            CancellationToken cancellationToken)
         {            
             ConsumerApplicationId = consumerApplicationId;
             ConsumerConnectionId = consumerConnectionId;
+            CancellationToken = cancellationToken;
         }        
 
         public string ConsumerApplicationId { get; }
 
         public UniqueId ConsumerConnectionId { get; }
+
+        public CancellationToken CancellationToken { get; }
 
         public override string ToString()
         {

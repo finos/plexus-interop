@@ -18,6 +18,7 @@
         "noImplicitThis": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        "removeComments": false,
         "pretty": true,
         "lib": [
             "es6", "dom"

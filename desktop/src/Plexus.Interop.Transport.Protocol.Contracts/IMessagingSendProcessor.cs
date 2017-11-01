@@ -18,10 +18,14 @@
 
 namespace Plexus.Interop.Transport.Protocol
 {
+    using System.Threading.Tasks;
+
     public interface IMessagingSendProcessor
     {
         UniqueId Id { get; }
 
-        IWritableChannel<TransportMessage> Out { get; }
+        Task Completion { get; }
+
+        ITerminatableWritableChannel<TransportMessage> Out { get; }
     }
 }

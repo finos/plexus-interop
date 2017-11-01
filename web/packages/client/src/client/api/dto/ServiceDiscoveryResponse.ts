@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus } from "@plexus-interop/protocol";
+import { DiscoveredService } from "./DiscoveredService";
 
-export interface ServiceDiscoveryResponse extends plexus.interop.protocol.IServiceDiscoveryResponse {}
+export interface ServiceDiscoveryResponse {
+    services?: DiscoveredService[];
+}

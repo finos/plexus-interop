@@ -16,50 +16,27 @@
  */
 namespace Plexus.Interop.Internal.Calls
 {
+    using Plexus.Channels;
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
-    using Plexus.Interop.Transport;
-    using System;
     using System.Threading.Tasks;
 
-    internal sealed class ServerStreamingMethodCallHandler<TRequest, TResponse> : IMethodCallHandler
+    internal sealed class ServerStreamingMethodCallHandler<TRequest, TResponse> : MethodCallHandlerBase<TRequest, TResponse>
     {
         private readonly ServerStreamingMethodHandler<TRequest, TResponse> _handler;
-        private readonly IIncomingInvocationFactory _incomingInvocationFactory;
 
         public ServerStreamingMethodCallHandler(
             ServerStreamingMethodHandler<TRequest, TResponse> handler, 
-            IIncomingInvocationFactory incomingInvocationFactory)
+            IIncomingInvocationFactory incomingInvocationFactory) 
+            : base(incomingInvocationFactory)
         {
             _handler = handler;
-            _incomingInvocationFactory = incomingInvocationFactory;
         }
 
-        public async Task HandleAsync(IncomingInvocationDescriptor info, ITransportChannel channel)
+        protected override async Task HandleCoreAsync(IIncomingInvocation<TRequest, TResponse> invocation, MethodCallContext context)
         {
-            var invocation = _incomingInvocationFactory.CreateAsync<TRequest, TResponse>(info, channel);
-            try
-            {
-                TRequest request = default;
-                while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
-                {
-                    while (invocation.In.TryReadSafe(out var item))
-                    {
-                        request = item;
-                    }
-                }
-                var context = new MethodCallContext(info.Source.ApplicationId, info.Source.ConnectionId);
-                await _handler(request, invocation.Out, context).ConfigureAwait(false);
-                invocation.Out.TryComplete();
-            }
-            catch (Exception ex)
-            {
-                invocation.Out.TryTerminate(ex);
-                throw;
-            }
-            finally
-            {
-                await invocation.Completion.ConfigureAwait(false);
-            }
+            TRequest request = default;
+            await invocation.In.ConsumeAsync(x => request = x).ConfigureAwait(false);
+            await _handler(request, invocation.Out, context).ConfigureAwait(false);
         }
     }
 }

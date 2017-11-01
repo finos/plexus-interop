@@ -33,7 +33,15 @@ export interface StateMaschine<T> {
 
     getCurrent(): T;
 
-    go(to: T, dynamicPreHandlers?: Handlers): Promise<void>;
+    /**
+     * Swithing the state asynchronously only if all pre-handlers resolved
+     */
+    goAsync(to: T, dynamicHandlers?: Handlers): Promise<void>;
+
+    /**
+     * Switching the state synchronously, executing pre and post handlers at background
+     */
+    go(to: T): void;
 
     throwIfNot(...states: T[]): void;
 }

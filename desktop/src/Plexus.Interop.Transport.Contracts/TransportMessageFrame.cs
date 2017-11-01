@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using Plexus.Pools;
-
 namespace Plexus.Interop.Transport
 {
+    using Plexus.Pools;
+    using System;
+
     public struct TransportMessageFrame : IDisposable
     {
         public TransportMessageFrame(IPooledBuffer data, bool hasMore = false)

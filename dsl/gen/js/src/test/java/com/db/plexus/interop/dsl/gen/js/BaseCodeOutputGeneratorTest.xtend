@@ -45,7 +45,7 @@ class BaseCodeOutputGeneratorTest {
     }
 
     def fullExpectedContent() '''
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -208,19 +208,19 @@ class ComponentAClient {
  */
 export class ExampleServiceInvocationHandler {
 
-    onPointToPoint(request) {
+    onPointToPoint(invocationContext, request) {
         // TODO implement handler
     }
 
-    onServerStreaming(request, hostClient) {
+    onServerStreaming(invocationContext, request, hostClient) {
         // TODO implement handler
     }
 
-    onClientToServer(hostClient) {
+    onClientToServer(invocationContext, hostClient) {
         // TODO implement handler
     }
 
-    onBidiStreaming(hostClient) {
+    onBidiStreaming(invocationContext, hostClient) {
         // TODO implement handler
     }
 
@@ -236,25 +236,25 @@ class ExampleServiceInvocationHandlerInternal extends ExampleServiceInvocationHa
         this.clientHandler = clientHandler;
     }
 
-    onPointToPoint(request) {
+    onPointToPoint(invocationContext, request) {
         const responseToBinaryConverter = (from) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from) => {
             const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
             return plexus.com.plexus.model.Request.toObject(decoded);
         };
         return this.clientHandler
-            .onPointToPoint(requestFromBinaryConverter(request))
+            .onPointToPoint(invocationContext, requestFromBinaryConverter(request))
             .then(response => responseToBinaryConverter(response));
     }
 
-    onServerStreaming(request, hostClient) {
+    onServerStreaming(invocationContext, request, hostClient) {
         const responseToBinaryConverter = (from) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from) => {
             const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
             return plexus.com.plexus.model.Request.toObject(decoded);
         };
         this.clientHandler
-            .onServerStreaming(requestFromBinaryConverter(request), {
+            .onServerStreaming(invocationContext, requestFromBinaryConverter(request), {
                 next: (response) => hostClient.next(responseToBinaryConverter(response)),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),
@@ -262,14 +262,14 @@ class ExampleServiceInvocationHandlerInternal extends ExampleServiceInvocationHa
             });
     }
 
-    onClientToServer(hostClient) {
+    onClientToServer(invocationContext, hostClient) {
         const responseToBinaryConverter = (from) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from) => {
             const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
             return plexus.com.plexus.model.Request.toObject(decoded);
         };
         const baseObserver = this.clientHandler
-            .onClientToServer({
+            .onClientToServer(invocationContext, {
                 next: (response) => hostClient.next(responseToBinaryConverter(response)),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),
@@ -282,14 +282,14 @@ class ExampleServiceInvocationHandlerInternal extends ExampleServiceInvocationHa
         };
     }
 
-    onBidiStreaming(hostClient) {
+    onBidiStreaming(invocationContext, hostClient) {
         const responseToBinaryConverter = (from) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from) => {
             const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
             return plexus.com.plexus.model.Request.toObject(decoded);
         };
         const baseObserver = this.clientHandler
-            .onBidiStreaming({
+            .onBidiStreaming(invocationContext, {
                 next: (response) => hostClient.next(responseToBinaryConverter(response)),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),

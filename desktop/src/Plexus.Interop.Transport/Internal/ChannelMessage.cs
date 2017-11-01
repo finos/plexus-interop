@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using Plexus.Pools;
-using System.Collections.Generic;
-using Plexus.Interop.Transport.Protocol;
-
 namespace Plexus.Interop.Transport.Internal
 {
+    using System;
+    using Plexus.Interop.Transport.Protocol;
+    using Plexus.Pools;
+    using System.Collections.Generic;
+
     internal struct ChannelMessage : IPooledObject
     {
         public ChannelMessage(ITransportChannelHeader header)
@@ -34,6 +35,10 @@ namespace Plexus.Interop.Transport.Internal
 
         public ChannelMessage(ITransportChannelHeader header, Maybe<IPooledBuffer> payload)
         {
+            if (payload.HasValue && payload.Value == null)
+            {
+                throw new ArgumentException(nameof(payload));
+            }
             Header = header;
             Payload = payload;
         }

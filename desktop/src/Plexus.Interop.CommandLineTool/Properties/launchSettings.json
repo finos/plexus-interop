@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Plexus.Interop.Broker.Host": {
+      "commandName": "Executable",
+      "executablePath": ".\\LaunchBroker.cmd",
+      "workingDirectory": "$(ArtifactsSamplesDir)"
+    }
+  }
+}

@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export class CancellationToken {
+import { ReadOnlyCancellationToken } from "./ReadOnlyCancellationToken";
+
+export class CancellationToken implements ReadOnlyCancellationToken {
 
     private cancelled: boolean = false;
     private reason: string = "Not defined";

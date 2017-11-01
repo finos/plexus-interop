@@ -1,0 +1,91 @@
+{
+	"services": [
+		{
+			"id": "interop.AppLauncherService",
+			"methods": [
+				{
+					"name": "Launch",
+					"input": "interop.AppLaunchRequest",
+					"output": "interop.AppLaunchResponse",
+					"type": "Unary"
+				}
+			]
+		},
+		{
+			"id": "interop.AppLifecycleService",
+			"methods": [
+				{
+					"name": "ActivateApp",
+					"input": "interop.ActivateAppRequest",
+					"output": "interop.ActivateAppResponse",
+					"type": "Unary"
+				}
+			]
+		}
+	],
+	"applications": [
+		{
+			"id": "interop.AppLifecycleManager",
+			"consumes": [
+				{
+					"service": "interop.AppLauncherService",
+					"from": [
+					],
+					"methods": [
+						"Launch"
+					]
+				}
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.AppLifecycleService",
+		     		"title": "AppLifecycleService",
+		     		"to": [
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "ActivateApp",
+		     				"title": "ActivateApp"
+		     			}
+		     		]
+		     	}
+		     ]
+		  },
+		{
+			"id": "interop.CommandLineTool",
+			"consumes": [
+				{
+					"service": "interop.AppLifecycleService",
+					"from": [
+						"interop.AppLifecycleManager"
+					],
+					"methods": [
+						"ActivateApp"
+					]
+				}
+		     ],
+		     "provides": [
+		     ]
+		  },
+		{
+			"id": "interop.NativeAppLauncher",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.AppLauncherService",
+		     		"title": "AppLauncherService",
+		     		"to": [
+		     			"plexus.interop.AppLifecycleManager"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Launch",
+		     				"title": "Launch"
+		     			}
+		     		]
+		     	}
+		     ]
+		  }
+	]
+}

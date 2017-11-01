@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+ namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol;
@@ -23,34 +23,35 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Plexus.Interop.Apps;
 
     internal sealed class InvocationRequestHandler : IInvocationRequestHandler
     {
         private static readonly ILogger Log = LogManager.GetLogger<InvocationRequestHandler>();
 
-        private readonly IClientConnectionTracker _clientConnectionTracker;
+        private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly IRegistryService _registryService;
         private readonly IProtocolMessageFactory _protocolMessageFactory;
         private readonly IProtocolSerializer _protocolSerializer;
-        private readonly InvocationTargetHandler<IInvocationStartRequested, IClientConnection> _createRequestHandler;
-        private readonly InvocationTargetHandler<ValueTask<IClientConnection>, IClientConnection> _resolveTargetConnectionHandler;
+        private readonly InvocationTargetHandler<IInvocationStartRequested, IAppConnection> _createRequestHandler;
+        private readonly InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection> _resolveTargetConnectionHandler;
 
         public InvocationRequestHandler(
-            IClientConnectionTracker clientConnectionTracker,
+            IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
             IRegistryService registryService)
         {
-            _clientConnectionTracker = clientConnectionTracker;            
+            _appLifecycleManager = appLifecycleManager;            
             _protocolMessageFactory = protocol.MessageFactory;
             _protocolSerializer = protocol.Serializer;
             _registryService = registryService;
-            _createRequestHandler = new InvocationTargetHandler<IInvocationStartRequested, IClientConnection>(CreateInvocationTarget, CreateInvocationTarget);
-            _resolveTargetConnectionHandler = new InvocationTargetHandler<ValueTask<IClientConnection>, IClientConnection>(ResolveTargetConnectionAsync, ResolveTargetConnectionAsync);
+            _createRequestHandler = new InvocationTargetHandler<IInvocationStartRequested, IAppConnection>(CreateInvocationTarget, CreateInvocationTarget);
+            _resolveTargetConnectionHandler = new InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection>(ResolveTargetConnectionAsync, ResolveTargetConnectionAsync);
         }
         
-        public async Task HandleAsync(IInvocationStart request, IClientConnection sourceConnection, ITransportChannel sourceChannel)
+        public async Task HandleAsync(IInvocationStart request, IAppConnection sourceConnection, ITransportChannel sourceChannel)
         {
-            IClientConnection targetConnection = null;
+            IAppConnection targetConnection = null;
             ITransportChannel targetChannel = null;            
             try
             {
@@ -122,32 +123,32 @@
             }
         }
 
-        private ValueTask<IClientConnection> ResolveTargetConnectionAsync(
+        private ValueTask<IAppConnection> ResolveTargetConnectionAsync(
             IProvidedMethodReference method, 
-            IClientConnection source)
+            IAppConnection source)
         {
             if (method.ProvidedService.ConnectionId.HasValue)
             {
                 var connectionId = method.ProvidedService.ConnectionId.Value;
-                if (!_clientConnectionTracker.TryGetOnlineConnection(connectionId, out var connection))
+                if (!_appLifecycleManager.TryGetOnlineConnection(connectionId, out var connection))
                 {
                     throw new InvalidOperationException($"The requested connection {connectionId} is not online");
                 }
-                return new ValueTask<IClientConnection>(connection);
+                return new ValueTask<IAppConnection>(connection);
             }
-            return _clientConnectionTracker.GetOrSpawnConnectionAsync(new[] {method.ProvidedService.ApplicationId});
+            return _appLifecycleManager.GetOrSpawnConnectionAsync(new[] {method.ProvidedService.ApplicationId});
         }
 
-        private ValueTask<IClientConnection> ResolveTargetConnectionAsync(
+        private ValueTask<IAppConnection> ResolveTargetConnectionAsync(
             IConsumedMethodReference method, 
-            IClientConnection source)
+            IAppConnection source)
         {
             var targetMethods = _registryService.GetMatchingProvidedMethods(source.Info.ApplicationId, method);
             var targetApps = targetMethods.Select(x => x.ProvidedService.Application.Id).ToList();
-            return _clientConnectionTracker.GetOrSpawnConnectionAsync(targetApps);
+            return _appLifecycleManager.GetOrSpawnConnectionAsync(targetApps);
         }
 
-        private IInvocationStartRequested CreateInvocationTarget(IProvidedMethodReference reference, IClientConnection sourceConnection)
+        private IInvocationStartRequested CreateInvocationTarget(IProvidedMethodReference reference, IAppConnection sourceConnection)
         {
             return _protocolMessageFactory.CreateInvocationStartRequested(
                 reference.ProvidedService.ServiceId,
@@ -157,7 +158,7 @@
                 sourceConnection.Id);
         }
 
-        private IInvocationStartRequested CreateInvocationTarget(IConsumedMethodReference reference, IClientConnection sourceConnection)
+        private IInvocationStartRequested CreateInvocationTarget(IConsumedMethodReference reference, IAppConnection sourceConnection)
         {
             return _protocolMessageFactory.CreateInvocationStartRequested(
                 reference.ConsumedService.ServiceId,
@@ -172,7 +173,7 @@
             frame.Dispose();
         }
 
-        private static async Task PropagateAsync(IReadableChannel<TransportMessageFrame> channel1, IWritableChannel<TransportMessageFrame> channel2)
+        private static async Task PropagateAsync(IReadableChannel<TransportMessageFrame> channel1, ITerminatableWritableChannel<TransportMessageFrame> channel2)
         {
             try
             {

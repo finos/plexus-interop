@@ -31,6 +31,7 @@ describe("Client: Web Socket Discovery", () => {
         clientsSetup);
 
     it("Receives discovered methods by input message id", function() {
+        this.timeout(3000);
         return pointToPointTests.testMethodDiscoveredByInputMessageId();
     });
 
@@ -42,8 +43,26 @@ describe("Client: Web Socket Discovery", () => {
         return pointToPointTests.testMethodDiscoveredByReference();
     });
 
-    it("Can invoke discovered method passing serialized data", function() {
+    it("Receives discovered service by service ID", function() {
+        return pointToPointTests.testServiceDiscoveredById();
+    });
+
+    // TODO uncomment when Broker start to answer with empty response
+    // it("Receives empty Service Discovery response if ID is wrong", function() {
+    //     return pointToPointTests.testServiceDiscoveryReceivesEmptyResponseForWrongId();
+    // });
+
+    it("Can invoke discovered unary method passing serialized data", function() {
+        this.timeout(3000);
         return pointToPointTests.testClientCanInvokeDiscoveredMethod();
+    });
+
+    it("Can invoke discovered server streaming method passing serialized data", function() {
+        return pointToPointTests.testClientCanInvokeDiscoveredServerStreamingRequest();
+    });
+
+    it("Can invoke discovered bidi streaming method passing serialized data", function() {
+        return pointToPointTests.testClientCanInvokeDiscoveredBidiStreamingRequest();
     });
 
 });

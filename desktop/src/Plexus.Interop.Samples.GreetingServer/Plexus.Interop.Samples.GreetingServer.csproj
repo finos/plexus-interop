@@ -12,7 +12,7 @@
     <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'osx-x64'">x64</PlatformTarget>
 
     <ArtifactsDir>../../../bin/$(RuntimeIdentifier)/</ArtifactsDir>
-    <SamplesDir>$(ArtifactsDir)samples/</SamplesDir>
+    <SamplesDir>$(ArtifactsDir)samples/greeting/</SamplesDir>
     <PublishDir>$(SamplesDir)apps/GreetingServer/</PublishDir>
 
     <LangVersion>latest</LangVersion>

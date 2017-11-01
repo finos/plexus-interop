@@ -14,22 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- using Plexus.Interop.Transport.Transmission;
-using System.Threading.Tasks;
-using System;
-using Plexus.Channels;
-using Plexus.Interop.Protocol.Common;
-using Plexus.Interop.Transport.Protocol;
-using Plexus.Interop.Transport.Protocol.Serialization;
-
 namespace Plexus.Interop.Transport.Internal
 {
+    using Plexus.Channels;
+    using Plexus.Interop.Protocol.Common;
+    using Plexus.Interop.Transport.Protocol;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
+    using System;
+    using System.Threading.Tasks;
+
     internal sealed class TransportSendProcessor : ITransportSendProcessor
     {
         private readonly ILogger _log;
         private readonly ITransportHeaderFactory _transportHeaderFactory;
         private readonly IMessagingSendProcessor _sendProcessor;
-        private readonly TransportConnectionStateValidator _stateValidator = new TransportConnectionStateValidator();
+        private readonly BufferedChannel<ChannelMessage> _buffer = new BufferedChannel<ChannelMessage>(3);
 
         public TransportSendProcessor(
             ITransmissionConnection connection,
@@ -37,36 +37,47 @@ namespace Plexus.Interop.Transport.Internal
             ITransportProtocolSerializer serializer)
         {
             _sendProcessor = new MessagingSendProcessor(connection, serializer);
-            _transportHeaderFactory = transportHeaderFactory;
             _log = LogManager.GetLogger<TransportSendProcessor>(_sendProcessor.Id.ToString());
-            Out = new PropagatingChannel<ChannelMessage, TransportMessage>(
-                3,
-                _sendProcessor.Out,
-                OpenConnectionAsync,
-                SendAsync,
-                CloseConnectionAsync,
-                CloseConnectionAsync,
-                Dispose);
-            Out.Completion.LogCompletion(_log);
+            _transportHeaderFactory = transportHeaderFactory;            
+            _sendProcessor.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            Completion = _sendProcessor.Completion.LogCompletion(_log);
         }
 
         public UniqueId InstanceId => _sendProcessor.Id;
 
-        public IWritableChannel<ChannelMessage> Out { get; }
+        public ITerminatableWritableChannel<ChannelMessage> Out => _buffer.Out;
 
-        private async Task OpenConnectionAsync(IWriteOnlyChannel<TransportMessage> output)
+        public Task Completion { get; }
+
+        private async Task ProcessAsync()
+        {
+            try
+            {
+                await OpenConnectionAsync().ConfigureAwait(false);
+                await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);
+                await CloseConnectionAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _buffer.Out.TryTerminate(ex);
+                _buffer.In.DisposeBufferedItems();
+                await CloseConnectionAsync(ex).ConfigureAwait(false);
+            }
+        }
+
+        private async Task OpenConnectionAsync()
         {
             var openHeader = _transportHeaderFactory.CreateConnectionOpenHeader(InstanceId);
-            await SendAsync(new TransportMessage(openHeader), output).ConfigureAwait(false);
+            await SendAsync(new TransportMessage(openHeader)).ConfigureAwait(false);
         }
 
-        private async Task CloseConnectionAsync(IWriteOnlyChannel<TransportMessage> output)
+        private async Task CloseConnectionAsync()
         {
             var closeHeader = _transportHeaderFactory.CreateConnectionCloseHeader(CompletionHeader.Completed);
-            await SendAsync(new TransportMessage(closeHeader), output).ConfigureAwait(false);
+            await SendAsync(new TransportMessage(closeHeader)).ConfigureAwait(false);
         }
 
-        private async Task CloseConnectionAsync(Exception error, IWriteOnlyChannel<TransportMessage> output)
+        private async Task CloseConnectionAsync(Exception error)
         {
             ITransportConnectionCloseHeader closeHeader;
             if (error is OperationCanceledException)
@@ -77,7 +88,7 @@ namespace Plexus.Interop.Transport.Internal
             {
                 closeHeader = _transportHeaderFactory.CreateConnectionCloseHeader(CompletionHeader.Failed(GetErrorHeader(error)));
             }
-            await SendAsync(new TransportMessage(closeHeader), output).ConfigureAwait(false);
+            await SendAsync(new TransportMessage(closeHeader)).ConfigureAwait(false);
         }
 
         private static ErrorHeader GetErrorHeader(Exception error)
@@ -86,29 +97,23 @@ namespace Plexus.Interop.Transport.Internal
             return new ErrorHeader(message, error.FormatToString());
         }
 
-        private Task SendAsync(ChannelMessage message, IWriteOnlyChannel<TransportMessage> output)
+        private Task SendAsync(ChannelMessage message)
         {
-            return SendAsync((TransportMessage)message, output);
+            return SendAsync((TransportMessage)message);
         }
 
-        private async Task SendAsync(TransportMessage message, IWriteOnlyChannel<TransportMessage> output)
+        private async Task SendAsync(TransportMessage message)
         {
             try
             {
                 _log.Trace("Sending {0}", message);
-                await output.WriteAsync(message).ConfigureAwait(false);
+                await _sendProcessor.Out.WriteAsync(message).ConfigureAwait(false);
             }
             catch
             {
                 message.Dispose();
                 throw;
             }
-        }
-
-        private void Dispose(ChannelMessage message)
-        {
-            _log.Trace("Disposing message {0}", message);
-            message.Dispose();
         }
     }
 }

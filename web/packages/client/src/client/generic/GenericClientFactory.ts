@@ -34,7 +34,7 @@ export class GenericClientFactory {
         this.log.debug("Sending client connect request");
         return new SingleMessageRequest<plexus.interop.protocol.IConnectResponse>(this.transportConnection, this.log)
             .execute(requestPayload, (responsePayload) => modelHelper.decodeConnectResponse(responsePayload)).then(response => {
-                this.log.debug(`Client connected`);
+                this.log.info("Client connected");
                 return new GenericClientImpl(this.transportConnection);
             });
     }

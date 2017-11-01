@@ -21,11 +21,17 @@
     [AttributeUsage(AttributeTargets.Assembly)]
     public sealed class EntryPointAttribute : Attribute
     {
-        public EntryPointAttribute(Type type)
+        public EntryPointAttribute(Type entryClass, InstanceAwareness instanceAwareness, string instanceKey = null)
         {
-            Type = type;
+            EntryClass = entryClass;
+            InstanceAwareness = instanceAwareness;
+            InstanceKey = instanceKey ?? EntryClass.FullName;
         }
 
-        public Type Type { get; set; }
+        public Type EntryClass { get; set; }
+
+        public InstanceAwareness InstanceAwareness { get; set; }
+
+        public string InstanceKey { get; set; }
     }
 }

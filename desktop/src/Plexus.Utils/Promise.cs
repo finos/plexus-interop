@@ -20,6 +20,8 @@ using System.Threading.Tasks;
 
 namespace Plexus
 {
+    using System.Threading;
+
     public class Promise
     {
         private readonly Promise<Nothing> _inner = new Promise<Nothing>();
@@ -33,5 +35,13 @@ namespace Plexus
         public bool TryFail(Exception error) => _inner.TryFail(error);
 
         public bool TryFail(IEnumerable<Exception> errors) => _inner.TryFail(errors);
+
+        public void PropagateCompletionFrom(Task task)
+        {
+            task.PropagateCompletionToPromise(this);
+        }
+
+        public void AssignCancellationToken(CancellationToken cancellationToken) =>
+            _inner.AssignCancellationToken(cancellationToken);
     }
 }

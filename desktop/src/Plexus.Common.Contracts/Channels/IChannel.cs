@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Channels
+ namespace Plexus.Channels
 {
     public interface IChannel<T>
     {
-        IWritableChannel<T> Out { get; }
+        ITerminatableWritableChannel<T> Out { get; }
 
         IReadableChannel<T> In { get; }
     }

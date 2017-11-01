@@ -27,10 +27,6 @@ export class UniqueId {
         return `${longToString(this.hi)}${longToString(this.lo)}`;
     }
 
-    public static propsToString(props: plexus.IUniqueId): string {
-        return `${longToString(props.hi)}${longToString(props.lo)}`;
-    }
-
     public static generateNew(): UniqueId {
         return UniqueId.fromGuid(new GUID());
     }

@@ -1,1 +1,1 @@
-call gradlew.bat build --console plain
+call gradlew.bat build --console plain --no-daemon

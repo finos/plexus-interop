@@ -57,7 +57,7 @@ namespace Plexus
 
         public T GetValueOrDefault()
         {
-            return HasValue ? Value : default(T);
+            return HasValue ? Value : default;
         }
 
         public T GetValueOrDefault(T defaultValue)
@@ -65,14 +65,32 @@ namespace Plexus
             return HasValue ? Value : defaultValue;
         }
 
+        public T GetValueOrThrowException<TException>(TException exception) where TException : Exception
+        {
+            if (!HasValue)
+            {
+                throw exception;
+            }
+            return Value;
+        }
+
+        public T GetValueOrThrowException<TException>() where TException : Exception, new()
+        {
+            if (!HasValue)
+            {
+                throw new TException();
+            }
+            return Value;
+        }
+
         public override string ToString()
         {
-            return HasValue ? Value.ToString() : Plexus.Nothing.Instance.ToString();
+            return HasValue ? Value?.ToString() : Plexus.Nothing.Instance.ToString();
         }
 
         public override bool Equals(object obj)
         {
-            return obj is Maybe<T> && Equals((Maybe<T>)obj);
+            return obj is Maybe<T> maybe && Equals(maybe);
         }
 
         public bool Equals(Maybe<T> other)

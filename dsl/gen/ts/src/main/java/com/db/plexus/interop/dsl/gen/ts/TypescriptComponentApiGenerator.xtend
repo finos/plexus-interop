@@ -289,7 +289,7 @@ export class «app.name»ClientBuilder {
     '''
 
     def imports(PlexusGenConfig genConfig) '''
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -388,19 +388,19 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
 
     def clientHandlerSignature(Method rpcMethod, PlexusGenConfig genConfig) {
         switch (rpcMethod) {
-            case rpcMethod.isPointToPoint: '''on«rpcMethod.name»(request: «requestType(rpcMethod, genConfig)»): Promise<«responseType(rpcMethod, genConfig)»>'''
+            case rpcMethod.isPointToPoint: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, request: «requestType(rpcMethod, genConfig)»): Promise<«responseType(rpcMethod, genConfig)»>'''
             case rpcMethod.isBidiStreaming
-                    || rpcMethod.isClientStreaming: '''on«rpcMethod.name»(hostClient: StreamingInvocationClient<«responseType(rpcMethod, genConfig)»>): Observer<«requestType(rpcMethod, genConfig)»>'''
-            case rpcMethod.isServerStreaming: '''on«rpcMethod.name»(request: «requestType(rpcMethod, genConfig)», hostClient: StreamingInvocationClient<«responseType(rpcMethod, genConfig)»>): void'''
+                    || rpcMethod.isClientStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<«responseType(rpcMethod, genConfig)»>): Observer<«requestType(rpcMethod, genConfig)»>'''
+            case rpcMethod.isServerStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, request: «requestType(rpcMethod, genConfig)», hostClient: StreamingInvocationClient<«responseType(rpcMethod, genConfig)»>): void'''
         }
     }
 
     def genericClientHandlerSignature(Method rpcMethod, PlexusGenConfig genConfig) {
         switch (rpcMethod) {
-            case rpcMethod.isPointToPoint: '''on«rpcMethod.name»(request: ArrayBuffer): Promise<ArrayBuffer>'''
+            case rpcMethod.isPointToPoint: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer>'''
             case rpcMethod.isBidiStreaming
-                    || rpcMethod.isClientStreaming: '''on«rpcMethod.name»(hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer>'''
-            case rpcMethod.isServerStreaming: '''on«rpcMethod.name»(request: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>): void'''
+                    || rpcMethod.isClientStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer>'''
+            case rpcMethod.isServerStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, request: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>): void'''
         }
     }
 
@@ -416,14 +416,14 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
     def handlerPointToPointImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
         «handlerConverters(rpcMethod, genConfig)»
         return this.clientHandler
-            .on«rpcMethod.name»(requestFromBinaryConverter(request))
+            .on«rpcMethod.name»(invocationContext, requestFromBinaryConverter(request))
             .then(response => responseToBinaryConverter(response));
     '''
 
     def handlerBidiStreamingImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
         «handlerConverters(rpcMethod, genConfig)»
         const baseObserver = this.clientHandler
-            .on«rpcMethod.name»({
+            .on«rpcMethod.name»(invocationContext, {
                 next: (response) => hostClient.next(responseToBinaryConverter(response)),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),
@@ -439,7 +439,7 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
     def handlerServerStreamingImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
         «handlerConverters(rpcMethod, genConfig)»
         this.clientHandler
-            .on«rpcMethod.name»(requestFromBinaryConverter(request), {
+            .on«rpcMethod.name»(invocationContext, requestFromBinaryConverter(request), {
                 next: (response) => hostClient.next(responseToBinaryConverter(response)),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),

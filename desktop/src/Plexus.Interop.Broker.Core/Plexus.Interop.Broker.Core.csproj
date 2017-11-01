@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.5;net452</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.5</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
 
     <RootNamespace>Plexus.Interop.Broker</RootNamespace>
     <LangVersion>latest</LangVersion>
@@ -11,12 +11,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Internal\interop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Interop.Apps.Manager.Contracts\Plexus.Interop.Apps.Manager.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Metamodel.Contracts\Plexus.Interop.Metamodel.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Metamodel.Json\Plexus.Interop.Metamodel.Json.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Protocol\Plexus.Interop.Protocol.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Contracts\Plexus.Interop.Transport.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />

@@ -17,31 +17,77 @@
 import { UniqueId } from "../UniqueId";
 import { Frame } from "./model";
 import { FramedTransport } from "./FramedTransport";
-import { CancellationToken, BlockingQueue } from "@plexus-interop/common";
+import { Observer, Logger, LimitedBufferQueue } from "@plexus-interop/common";
+import { Queue } from "typescript-collections";
+import { Defaults } from "../../common/Defaults";
 
-export class BufferedReadFramedTransport implements FramedTransport {
+/**
+ * Collects all read events until client opened connection
+ */
+export abstract class BufferedReadFramedTransport implements FramedTransport, Observer<Frame> {
+
+    protected framesObserver: Observer<Frame> | null = null;
+    protected completed: boolean = false;
+    protected receivedError: any;
+    protected inBuffer: Queue<Frame> = new LimitedBufferQueue<Frame>(Defaults.DEFAULT_BUFFER_SIZE);
 
     constructor(
-        private innerTransport: FramedTransport,
-        private writeCancellationToken: CancellationToken,
-        private readCancellationToken: CancellationToken,
-        private inMessagesBuffer: BlockingQueue<Frame>) { }
+        protected readonly log: Logger) { }
 
-    public uuid(): UniqueId {
-        return this.innerTransport.uuid();
+    public abstract uuid(): UniqueId;
+
+    public abstract getMaxFrameSize(): number;
+
+    public abstract writeFrame(frame: Frame): Promise<void>;
+
+    public async open(framesObserver: Observer<Frame>): Promise<void> {
+        this.log.trace("Opening transport");
+        if (this.framesObserver) {
+            throw new Error("Already opened");
+        }
+        this.framesObserver = framesObserver;
+        while (!this.inBuffer.isEmpty()) {
+            this.framesObserver.next(this.inBuffer.dequeue());
+        }
+        if (this.receivedError) {
+            this.framesObserver.error(this.receivedError);
+        } else if (this.completed) {
+            this.framesObserver.complete();
+        }
     }
 
-    public getMaxFrameSize(): number {
-        return this.innerTransport.getMaxFrameSize();
+    public clear(): void {
+        this.inBuffer.clear();
     }
 
-    public writeFrame(frame: Frame): Promise<void> {
-        this.writeCancellationToken.throwIfCanceled();
-        return this.innerTransport.writeFrame(frame);
+    public next(frame: Frame): void {
+        /* istanbul ignore if */
+        if (this.log.isTraceEnabled()) {
+            this.log.trace(`Received frame`);
+        }
+        if (this.framesObserver) {
+            this.framesObserver.next(frame);
+        } else {
+            this.inBuffer.enqueue(frame);
+        }
     }
 
-    public readFrame(): Promise<Frame> {
-        return this.inMessagesBuffer.blockingDequeue(this.readCancellationToken);
+    public error(transportError: any): void {
+        this.log.debug("Received error", transportError);
+        if (this.framesObserver) {
+            this.framesObserver.error(transportError);
+        } else {
+            this.receivedError = transportError;
+        }
+    }
+
+    public complete(): void {
+        this.log.debug("Receive complete message");
+        if (this.framesObserver) {
+            this.framesObserver.complete();
+        } else {
+            this.completed = true;
+        }
     }
 
 }

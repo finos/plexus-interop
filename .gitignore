@@ -22,7 +22,7 @@ logs
 bin/
 
 ### JS ###
-
+.nyc_output
 npm-debug.log
 lerna-debug.log
 npm-debug.log.*
@@ -30,6 +30,8 @@ yarn-error.log
 coverage
 **/dist
 **/target/
+yarn.lock
+package-lock.json
 
 ### VS Code ###
 **/*/symbols.json

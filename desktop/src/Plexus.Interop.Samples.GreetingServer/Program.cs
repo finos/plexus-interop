@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,58 +14,63 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Samples.GreetingServer
+namespace Plexus.Interop.Samples.GreetingServer
 {
     using Plexus.Channels;
     using Plexus.Interop.Samples.GreetingServer.Generated;
+    using Plexus.Logging.NLog;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
-    using Plexus.Logging.NLog;
 
     public class Program
     {
         public static async Task Main(string[] args)
         {
-            var logging = new LoggingInitializer();
-            var log = LogManager.GetLogger<Program>();
-            try
+            using (new LoggingInitializer())
             {
-                var brokerPath = args.Length > 0 ? args[0] : Path.GetFullPath(@"../..");
-                Console.WriteLine("Connecting to broker {0}", brokerPath);
-                var client = ClientFactory.Instance.Create(
-                    new ClientOptionsBuilder()
-                        .WithDefaultConfiguration(brokerPath)
-                        .WithApplicationId("interop.samples.GreetingServer")
-                        .WithProvidedService(
-                            "interop.samples.GreetingService",
-                            s => s
-                                .WithUnaryMethod<GreetingRequest, GreetingResponse>("Unary", GreetingUnary)
-                                .WithServerStreamingMethod<GreetingRequest, GreetingResponse>("ServerStreaming",
-                                    GreetingServerStreaming)
-                                .WithClientStreamingMethod<GreetingRequest, GreetingResponse>("ClientStreaming",
-                                    GreetingClientStreaming)
-                                .WithDuplexStreamingMethod<GreetingRequest, GreetingResponse>("DuplexStreaming",
-                                    GreetingDuplexStreaming)
-                        )
-                        .Build());
-                Console.CancelKeyPress += (sender, eventArgs) =>
+                var log = LogManager.GetLogger<Program>();
+                try
                 {
-                    eventArgs.Cancel = true;
-                    Console.WriteLine("Disconnecting");
-                    client.DisconnectAsync();
-                };
-                await client.ConnectAsync().ConfigureAwait(false);
-                Console.WriteLine("Connected");
-                await client.Completion;
-                Console.WriteLine("Disconnected");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Program terminated with exception. See log for details. {0}: {1}", ex.GetType(), ex.Message);
-                log.Error(ex, "Program terminated with exception");
-                logging.Dispose();
+                    var brokerPath = args.Length > 0
+                        ? args[0]
+                        : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ??
+                          Directory.GetCurrentDirectory();
+                    Console.WriteLine("Connecting to broker {0}", brokerPath);
+                    var client = ClientFactory.Instance.Create(
+                        new ClientOptionsBuilder()
+                            .WithDefaultConfiguration(brokerPath)
+                            .WithApplicationId("interop.samples.GreetingServer")
+                            .WithProvidedService(
+                                "interop.samples.GreetingService",
+                                s => s
+                                    .WithUnaryMethod<GreetingRequest, GreetingResponse>("Unary", GreetingUnary)
+                                    .WithServerStreamingMethod<GreetingRequest, GreetingResponse>("ServerStreaming",
+                                        GreetingServerStreaming)
+                                    .WithClientStreamingMethod<GreetingRequest, GreetingResponse>("ClientStreaming",
+                                        GreetingClientStreaming)
+                                    .WithDuplexStreamingMethod<GreetingRequest, GreetingResponse>("DuplexStreaming",
+                                        GreetingDuplexStreaming)
+                            )
+                            .Build());
+                    Console.CancelKeyPress += (sender, eventArgs) =>
+                    {
+                        eventArgs.Cancel = true;
+                        Console.WriteLine("Disconnecting");
+                        client.Disconnect();
+                    };
+                    await client.ConnectAsync().ConfigureAwait(false);
+                    Console.WriteLine("Connected");
+                    await client.Completion;
+                    Console.WriteLine("Disconnected");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Program terminated with exception. See log for details. {0}: {1}", ex.GetType(),
+                        ex.Message);
+                    log.Error(ex, "Program terminated with exception");
+                }
             }
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
@@ -84,16 +89,16 @@
 
         private static async Task GreetingDuplexStreaming(
             IReadableChannel<GreetingRequest> requestStream, 
-            IWriteOnlyChannel<GreetingResponse> responseStream, 
+            IWritableChannel<GreetingResponse> responseStream, 
             MethodCallContext context)
         {
             Console.WriteLine("Received duplex streaming request from {{{0}}}", context);
             var greeting = "Hello!";            
             await responseStream.WriteAsync(new GreetingResponse {Greeting = greeting}).ConfigureAwait(false);
             Console.WriteLine("Sent: {0}", greeting);
-            while (await requestStream.WaitForNextSafeAsync().ConfigureAwait(false))
+            while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false))
             {                
-                while (requestStream.TryReadSafe(out var request))
+                while (requestStream.TryRead(out var request))
                 {
                     Console.WriteLine("Received: {0}", request.Name);
                     greeting = $"Hello, {request.Name}!";
@@ -123,9 +128,9 @@
         {
             Console.WriteLine("Received client streaming request from {{{0}}}", context);
             var names = new List<string>();
-            while (await requeststream.WaitForNextSafeAsync().ConfigureAwait(false))
+            while (await requeststream.WaitReadAvailableAsync().ConfigureAwait(false))
             {
-                while (requeststream.TryReadSafe(out var request))
+                while (requeststream.TryRead(out var request))
                 {
                     Console.WriteLine("Received: {0}", request.Name);
                     names.Add(request.Name);
@@ -139,7 +144,7 @@
 
         private static async Task GreetingServerStreaming(
             GreetingRequest request, 
-            IWriteOnlyChannel<GreetingResponse> responseStream,
+            IWritableChannel<GreetingResponse> responseStream,
             MethodCallContext context)
         {
             Console.WriteLine("Received server streaming request from {{{0}}}", context);

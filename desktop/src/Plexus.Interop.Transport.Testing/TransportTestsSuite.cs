@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Transport
 {
     using Plexus.Channels;
     using Shouldly;
@@ -28,7 +28,11 @@
     {
         protected abstract ITransportServer Server { get; }
 
-        protected abstract ITransportConnectionFactory Client { get; }
+        protected abstract ITransportClient Client { get; }
+
+        protected TransportTestsSuite(ITestOutputHelper output) : base(output)
+        {
+        }
 
         public sealed class ChannelExchange : IXunitSerializable
         {
@@ -61,9 +65,151 @@
             {
                 return $"{{[{string.Join(", ", ServerMessageLengths)}], [{string.Join(",", ClientMessageLengths)}]}}";
             }
+        }        
+
+        [Fact]
+        public void DisposeFromServerSide()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                await Server.StartAsync();
+                using (var clientConnection = await Client.ConnectAsync())
+                using (var serverConnection = await Server.In.ReadAsync())
+                {
+                    serverConnection.Dispose();
+
+                    Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                }
+            });
         }
 
-        public static TheoryData<ChannelExchange[]> TestCases =
+        [Fact]
+        public void DisposeFromClientSide()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                await Server.StartAsync();
+                using (var clientConnection = await Client.ConnectAsync())
+                using (var serverConnection = await Server.In.ReadAsync())
+                {
+                    clientConnection.Dispose();
+                    
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
+                }
+            });
+        }
+
+        [Fact]
+        public void DisconnectFromClientSide()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                await Server.StartAsync();
+                using (var clientConnection = await Client.ConnectAsync())
+                using (var serverConnection = await Server.In.ReadAsync())
+                {
+                    clientConnection.TryTerminate();
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                    WriteLog("Client completed");
+                    Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
+                    WriteLog("Server completed");                    
+                }
+            });
+        }
+
+        [Fact]
+        public void DisconnectFromServerSide()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                await Server.StartAsync();
+                using (var clientConnection = await Client.ConnectAsync())
+                using (var serverConnection = await Server.In.ReadAsync())
+                {
+                    serverConnection.TryTerminate();
+                    Should.Throw<OperationCanceledException>(serverConnection.Completion, Timeout1Sec);
+                    WriteLog("Server completed");
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                    WriteLog("Client completed");
+                }
+            });
+        }
+
+        [Fact]
+        public void TerminateChannelFromClientSide()
+        {
+            RunWith10SecTimeout(
+                async () =>
+                {
+                    await Server.StartAsync().ConfigureAwait(false);
+                    using (var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false)))
+                    using (var serverConnection = RegisterDisposable(await Server.In.ReadAsync().ConfigureAwait(false)))
+                    {
+                        var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
+                        var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
+                        WriteLog("Terminating client channel");
+                        clientChannel.Out.TryTerminate();
+                        clientChannel.Out.Completion.IsCanceled.ShouldBe(true);
+                        Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
+                        WriteLog("Client channel terminated");
+                        Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
+                        WriteLog("Server channel terminated");
+                    }
+                });
+        }
+
+        [Fact]
+        public void TerminateChannelFromServerSide()
+        {
+            RunWith10SecTimeout(
+                async () =>
+                {
+                    await Server.StartAsync().ConfigureAwait(false);
+                    var serverConnectionTask = Server.In.ReadAsync();
+                    var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
+                    var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
+                    var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
+                    var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
+                    serverChannel.Out.TryTerminate();
+                    Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
+                });
+        }
+
+        [Fact]
+        public void ShouldNotBePossibleCreateChannelOnClientSideAfterConnectionTerminatedOnServerSide()
+        {
+            RunWith10SecTimeout(
+                async () =>
+                {
+                    await Server.StartAsync();
+                    var serverConnectionTask = Server.In.ReadAsync();
+                    var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
+                    var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
+                    serverConnection.TryTerminate();
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(clientConnection.CreateChannelAsync().AsTask(), Timeout1Sec);
+                });
+        }
+
+        [Fact]
+        public void ShouldNotBePossibleCreateChannelOnClientSideAfterConnectionTerminated()
+        {
+            RunWith10SecTimeout(
+                async () =>
+                {
+                    await Server.StartAsync().ConfigureAwait(false);                    
+                    var clientConnection = await Client.ConnectAsync();
+                    var serverConnection = await Server.In.ReadAsync();
+                    clientConnection.TryTerminate();
+                    Should.Throw<OperationCanceledException>(clientConnection.CreateChannelAsync().AsTask(), Timeout1Sec);
+                    Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
+                });
+        }
+
+        public static TheoryData<ChannelExchange[]> SendMessagesInBothDirectionsTestCases =
             new TheoryData<ChannelExchange[]>
             {
                     new ChannelExchange[] { },
@@ -110,78 +256,8 @@
                     },
             };
 
-        [Fact]
-        public void TerminateChannelFromClientSide()
-        {
-            RunWith10SecTimeout(
-                async () =>
-                {
-                    await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.CreateAsync();
-                    var clientConnection = RegisterDisposable(await Client.CreateAsync().ConfigureAwait(false));
-                    var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
-                    var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
-                    var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
-                    Log.Info("Terminating channel");
-                    clientChannel.Out.TryTerminate();
-                    Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
-                    Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
-                    Log.Info("Both channels terminated");
-                });
-        }
-
-        [Fact]
-        public void TerminateChannelFromServerSide()
-        {
-            RunWith10SecTimeout(
-                async () =>
-                {
-                    await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.CreateAsync();
-                    var clientConnection = RegisterDisposable(await Client.CreateAsync().ConfigureAwait(false));
-                    var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
-                    var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
-                    var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
-                    serverChannel.Out.TryTerminate();
-                    Should.Throw<OperationCanceledException>(() => clientChannel.Completion, Timeout1Sec);
-                    Should.Throw<OperationCanceledException>(() => serverChannel.Completion, Timeout1Sec);
-                });
-        }
-
-        [Fact]
-        public void ShouldNotBePossibleCreateChannelOnClientSideAfterConnectionTerminatedOnServerSide()
-        {
-            RunWith10SecTimeout(
-                async () =>
-                {
-                    await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.CreateAsync();
-                    var clientConnection = RegisterDisposable(await Client.CreateAsync().ConfigureAwait(false));
-                    var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
-                    serverConnection.TryTerminate();
-                    Should.Throw<OperationCanceledException>(() => clientConnection.Completion);
-                    Should.Throw<OperationCanceledException>(() => clientConnection.CreateChannelAsync().AsTask());
-                });
-        }
-
-        [Fact]
-        public void ShouldNotBePossibleCreateChannelOnClientSideAfterConnectionTerminated()
-        {
-            RunWith10SecTimeout(
-                async () =>
-                {
-                    await Server.StartAsync().ConfigureAwait(false);
-                    var serverConnectionTask = Server.CreateAsync();
-                    var clientConnection = await Client.CreateAsync().ConfigureAwait(false);
-                    var serverConnection = await serverConnectionTask.ConfigureAwait(false);
-                    clientConnection.TryTerminate();
-                    Should.Throw<OperationCanceledException>(() => clientConnection.CreateChannelAsync().AsTask());
-                    Should.Throw<OperationCanceledException>(() => clientConnection.Completion);
-                });
-        }
-
         [Theory]
-        [MemberData(nameof(TestCases))]
+        [MemberData(nameof(SendMessagesInBothDirectionsTestCases))]
 #pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void SendMessagesInBothDirections(ChannelExchange[] cases)
 #pragma warning restore xUnit1026 // Theory methods should use all of their parameters
@@ -230,7 +306,7 @@
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    serverConnection = await Server.CreateAsync().ConfigureAwait(false);
+                    serverConnection = await Server.In.ReadAsync().ConfigureAwait(false);
                     Log.Info("Server connection created");
                     var channelTasks = new List<Task>();
                     foreach (var channelExchange in cases)
@@ -250,7 +326,7 @@
             var clientTask = TaskRunner.RunInBackground(
                 async () =>
                 {
-                    clientConnection = await Client.CreateAsync().ConfigureAwait(false);
+                    clientConnection = await Client.ConnectAsync().ConfigureAwait(false);
                     Log.Info("Client connection created");
                     var channelTasks = new List<Task>();
                     foreach (var channelExchange in cases)
