@@ -15,7 +15,7 @@ license {
 }
 
 task licenseFormatProto(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
-    source = fileTree(dir: 'metadata')
+    source = fileTree(dir: '.')
             .exclude("**/google/protobuf/*.proto")
             .include("**/*.proto").include("**/*.interop")
 }
@@ -23,15 +23,30 @@ task licenseFormatProto(type: com.hierynomus.gradle.license.tasks.LicenseFormat)
 tasks["license"].dependsOn licenseFormatProto
 licenseFormat.dependsOn licenseFormatProto
 
-task build(type: Copy) {
+task copySamplesMetadata(type: Copy) {
   def outputDir = "${rootDir}/bin/win-x86/samples/metadata"
   if (Os.isFamily(Os.FAMILY_MAC)) {
       outputDir="${rootDir}/bin/osx-x64/samples/metadata"
   }
   outputs.dir outputDir
-  inputs.dir 'metadata'
-  from 'metadata'
+  inputs.dir 'samples/metadata'
+  from 'samples/metadata'
   into outputDir
 }
 
+task copyQuickStartMetadata(type: Copy) {
+  def outputDir = "${rootDir}/bin/win-x86/quick-start/metadata"
+  if (Os.isFamily(Os.FAMILY_MAC)) {
+      outputDir="${rootDir}/bin/osx-x64/quick-start/metadata"
+  }
+  outputs.dir outputDir
+  inputs.dir 'quick-start/metadata'
+  from 'quick-start/metadata'
+  into outputDir
+}
+
+task build
+
+build.dependsOn copySamplesMetadata 
+build.dependsOn copyQuickStartMetadata
 build.dependsOn('license')

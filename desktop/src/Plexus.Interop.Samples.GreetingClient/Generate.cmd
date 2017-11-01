@@ -1,11 +1,13 @@
+REM Generate code from GreetingClient interop definitions
+
 set PLEXUS_GEN_PATH=..\..\..\bin\win-x86\sdk\plexusgen.jar
-set INTEROP_METADATA_PATH=..\..\..\samples\metadata\interop
+set INTEROP_METADATA_PATH=..\..\..\samples\greeting\registry
 if not defined NUGET_PACKAGES (
   set NUGET_PACKAGES=%USERPROFILE%\.nuget\packages
 )
 set PROTOC_PATH=%NUGET_PACKAGES%\google.protobuf.tools\3.4.0\tools\windows_x86\protoc.exe
 
-set INTEROP_MANIFEST_PATH=GreetingClient.interop
+set INTEROP_MANIFEST_PATH=interop\samples\GreetingClient.interop
 set CSHARP_NAMESPACE=Plexus.Interop.Samples.GreetingClient.Generated
 set CSHARP_OUT=Generated
 

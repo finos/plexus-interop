@@ -16,16 +16,15 @@
  */
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { expect } from "chai";
-import { MarshallerProvider, ProtoMarshallerProvider } from "@plexus-interop/client";
-import { Arrays } from "@plexus-interop/common";
-
+import { MarshallerProvider, ProtoMarshallerProvider, MethodInvocationContext } from "@plexus-interop/client";
+import { Arrays, LoggerFactory, LogLevel, AsyncHelper } from "@plexus-interop/common";
+import { ClientsSetup } from "../common/ClientsSetup";
 
 export class BaseEchoTest {
 
     protected marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider();
 
     public assertEqual(first: plexus.plexus.interop.testing.IEchoRequest, second: plexus.plexus.interop.testing.IEchoRequest): void {
-
         let firstInt64;
         let secondInt64;
 
@@ -55,6 +54,29 @@ export class BaseEchoTest {
 
     public decodeRequestDto(payload: ArrayBuffer): plexus.plexus.interop.testing.IEchoRequest {
         return this.marshallerProvider.getMarshaller(plexus.plexus.interop.testing.EchoRequest).decode(new Uint8Array(payload));
+    }
+
+    public async verifyClientChannelsCleared(clientsSetup: ClientsSetup): Promise<void> {
+        expect(clientsSetup.getClientConnectionSetup().getConnection().getManagedChannels().length).to.eq(0);
+    }
+
+    public async verifyServerChannelsCleared(clientsSetup: ClientsSetup): Promise<void> {
+        expect(clientsSetup.getServerConnectionSetup().getConnection().getManagedChannels().length).to.eq(0);
+    }
+
+    public verifyInvocationContext(invocationContext: MethodInvocationContext): void {
+        expect(invocationContext).to.not.be.undefined;
+        expect(invocationContext.cancellationToken).to.not.be.undefined;
+        expect(invocationContext.consumerConnectionId).to.not.be.undefined;
+        expect(invocationContext.consumerApplicationId).to.be.eq("plexus.interop.testing.EchoClient");
+    }
+
+    public waitForClientConnectionCleared(clientsSetup: ClientsSetup): Promise<void> {
+        return AsyncHelper.waitFor(() => clientsSetup.getClientConnectionSetup().getConnection().getManagedChannels().length === 0);
+    }
+
+    public waitForServerConnectionCleared(clientsSetup: ClientsSetup): Promise<void> {
+        return AsyncHelper.waitFor(() => clientsSetup.getServerConnectionSetup().getConnection().getManagedChannels().length === 0);
     }
 
 }

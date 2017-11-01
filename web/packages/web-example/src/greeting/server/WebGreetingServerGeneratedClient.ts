@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -103,7 +103,7 @@ class WebGreetingServerClientImpl implements WebGreetingServerClient {
  */
 export abstract class GreetingServiceInvocationHandler {
 
-    public abstract onUnary(request: plexus.interop.samples.IGreetingRequest): Promise<plexus.interop.samples.IGreetingResponse>;
+    public abstract onUnary(invocationContext: MethodInvocationContext, request: plexus.interop.samples.IGreetingRequest): Promise<plexus.interop.samples.IGreetingResponse>;
 
 }
 
@@ -115,14 +115,14 @@ class GreetingServiceInvocationHandlerInternal {
 
     public constructor(private readonly clientHandler: GreetingServiceInvocationHandler) {}
 
-    public onUnary(request: ArrayBuffer): Promise<ArrayBuffer> {
+    public onUnary(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
         const responseToBinaryConverter = (from: plexus.interop.samples.IGreetingResponse) => Arrays.toArrayBuffer(plexus.interop.samples.GreetingResponse.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.interop.samples.GreetingRequest.decode(new Uint8Array(from));
             return plexus.interop.samples.GreetingRequest.toObject(decoded);
         };
         return this.clientHandler
-            .onUnary(requestFromBinaryConverter(request))
+            .onUnary(invocationContext, requestFromBinaryConverter(request))
             .then(response => responseToBinaryConverter(response));
     }
 }
@@ -140,7 +140,7 @@ export class WebGreetingServerClientBuilder {
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
-    private greetingServiceHandler: GreetingServiceInvocationHandler;
+    private greetingServiceHandler: GreetingServiceInvocationHandlerInternal;
 
     public withClientDetails(clientId: ClientConnectRequest): WebGreetingServerClientBuilder {
         this.clientDetails = clientId;

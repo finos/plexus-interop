@@ -68,7 +68,6 @@ class TypescriptComponentApiGeneratorTest extends BaseCodeOutputGeneratorTest {
         val generatedResult = outputGenerator.generate(plexusConfig, apps.get(0),
             resourceSet.getResources())
 
-        println(generatedResult)
         assertEqualsIgnoreWhiteSpaces(fullExpectedContent.toString, generatedResult)
     }
 

@@ -3,16 +3,17 @@
   "types": "dist/main/src/index.d.ts",
   "description": "Web Socket based Transport for Plexus Web Interop",
   "license": "Apache-2.0",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "scripts": {
-    "prebuild": "trash dist",
+    "prebuild": "yarn lint && trash dist",
     "build": "yarn build:main",
+    "postbuild": "yarn test",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
-    "unit": "yarn build && jest --coverage",
+    "unit": "jest --coverage",
     "pretest": "yarn lint",
     "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/websocket-transport@0.0.1",
+    "unpublish": "npm unpublish @plexus-interop/websocket-transport@0.1.1",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",
@@ -21,14 +22,14 @@
   },
   "dependencies": {
     "long": "^3.2.0",
-    "@plexus-interop/transport-common": "0.0.1",
+    "@plexus-interop/transport-common": "0.1.1",
     "protobufjs": "^6.8.0",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.4.2",
     "tslib": "^1.7.1"
   },
   "peerDependencies": {
-    "@plexus-interop/transport-common": "0.0.1",
+    "@plexus-interop/transport-common": "0.1.1",
     "protobufjs": "6.8.0",
     "rxjs": "^5.4.2"
   },

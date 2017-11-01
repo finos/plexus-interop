@@ -28,7 +28,7 @@ Plexus Interop repository consist of the following main sections:
 
 ## Build/Install
 
-All Plexus Interop components can be build using [Gradle](https://gradle.org/) tool using the following single command:
+All Plexus Interop components can be built using [Gradle](https://gradle.org/) tool using the following single command:
 
 `gradlew build --console plain`
 
@@ -36,11 +36,11 @@ Build produces artifacts into folder "bin".
 
 ## Running Samples
 
-After successfull build samples binaries will be located in `bin` directory.
+After successful build samples binaries will be located in `bin` directory.
 
 Run .Net to Web interop example on Windows:
 
-- Go to `bin/win-x86/samples`
+- Go to `bin/win-x86/samples/greeting`
 - Launch Broker – LaunchBroker.cmd
 - Launch Greeting Client – LaunchGreetingClient.cmd
     - Choose “Discovery” option (5) and “Greeting from Electron Web app” from discovery response
@@ -56,7 +56,7 @@ Run .Net to Web interop example on Windows:
     - Then choose Discovery (5) and “Greeting from .Net app” from discovery response
     - Enter another name, e.g. “Mike” and hit enter - .Net Greeting Server app will be launched and print greeting request:
 
-    ![Sample-4](./docs/src/main/asciidoc/images/sample-3.png "Sample-4")
+    ![Sample-4](./docs/src/main/asciidoc/images/sample-4.png "Sample-4")
 
 
 ## Documentation
@@ -78,3 +78,21 @@ After successful build documentation is available via:
 ## Contributing
 
 Please refer to [Contribution guidelines for this project](CONTRIBUTING.md).
+
+## Troubleshooting
+
+Problem: Gradle fails to download dependencies, how to setup proxy configuration?
+
+Solution: Pass proxy settings into Gradle via command-line parameters - e.g. `gradlew.bat -Dhttp.proxyHost=myproxy.com -Dhttp.proxyPort=8888 -Dhttps.proxyHost=myproxy.com -D https.proxyPort=4444 ...`
+
+## Updating public documentation
+
+As described above, public documentation is served using [GitHub Pages](https://help.github.com/articles/what-is-github-pages) and stored in `gh-pages` branch. So to update it, you simply need to push updated documentation to this branch. `gh-pages` branch structure is different from `master`, so manual update requires few steps:
+
+* Clone (if haven't cloned it yet) repository to `plexus-interop` folder
+* Clone another copy of repository to separate `plexus-interop-docs` folder, checkout `gh-pages` branch there
+* Create branch for documentation update, e.g. `git checkout -b feature/gh-pages-update`
+* Return back to folder with main line branch, build documentation `gradlew build -p docs --console plain`
+* Copy documentation sources - `plexus-interop/docs` to `plexus-interop-docs/docs`
+* Copy generated documentation - `plexus-interop/bin/html5` to `plexus-interop-docs` (project root)
+* Go to `plexus-interop-docs`, push the changes and raise PR against `gh-pages` branch

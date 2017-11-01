@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,22 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading;
-using Plexus.Pools;
-using Plexus.Interop.Transport.Transmission;
-using System.Threading.Tasks;
-using Plexus.Channels;
-using Plexus.Interop.Transport.Protocol;
-using Plexus.Interop.Transport.Protocol.Serialization;
-
 namespace Plexus.Interop.Transport.Internal
 {
+    using System.Runtime.InteropServices;
+    using Plexus.Channels;
+    using Plexus.Interop.Transport.Protocol;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
+    using Plexus.Pools;
+    using System.Threading.Tasks;
+
     internal sealed class TransportReceiveProcessor : ITransportReceiveProcessor
     {
         private readonly ILogger _log;
         private readonly IMessagingReceiveProcessor _receiveProcessor;
         private readonly TransportConnectionStateValidator _stateValidator = new TransportConnectionStateValidator();
-        private readonly TransportHeaderHandler<Task, (Maybe<IPooledBuffer>, IWriteOnlyChannel<ChannelMessage>)> _handler;
+        private readonly TransportHeaderHandler<Task, Maybe<IPooledBuffer>> _handler;
+        private readonly BufferedChannel<ChannelMessage> _buffer = new BufferedChannel<ChannelMessage>(3);
 
         public TransportReceiveProcessor(
             ITransmissionConnection connection,
@@ -38,53 +39,31 @@ namespace Plexus.Interop.Transport.Internal
             InstanceId = connection.Id;
             _log = LogManager.GetLogger<TransportReceiveProcessor>(InstanceId.ToString());
             _receiveProcessor = new MessagingReceiveProcessor(connection, deserializer);
-            _handler = new TransportHeaderHandler<Task, (Maybe<IPooledBuffer>, IWriteOnlyChannel<ChannelMessage>)>(
+            _handler = new TransportHeaderHandler<Task, Maybe<IPooledBuffer>>(
                 HandleConnetionHeaderAsync,
                 HandleChannelHeaderAsync);
-            In = new ProducingChannel<ChannelMessage>(3, ReceveLoopAsync);
+            _buffer.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
             In.Completion.LogCompletion(_log);
         }
 
         public UniqueId InstanceId { get; }
 
-        public IReadableChannel<ChannelMessage> In { get; }
+        public IReadableChannel<ChannelMessage> In => _buffer.In;
 
-        private void Dispose(TransportMessage message)
+        private async Task ProcessAsync()
         {
-            _log.Trace("Disposing {0}", message);
-            message.Dispose();
-        }
-
-        private async Task ReceveLoopAsync(IWriteOnlyChannel<ChannelMessage> output, CancellationToken cancellationToken)
-        {
-            while (true)
-            {
-                var received = await _receiveProcessor.In.TryReadAsync().ConfigureAwait(false);
-                if (!received.HasValue)
-                {
-                    break;
-                }
-                var message = received.Value;
-                try
-                {
-                    _stateValidator.OnMessage(message.Header);
-                    await message.Header.Handle(_handler, (message.Payload, output)).ConfigureAwait(false);
-                }
-                catch
-                {
-                    message.Dispose();
-                    throw;
-                }
-            }
+            await _receiveProcessor.In.ConsumeAsync(HandleReceivedAsync).ConfigureAwait(false);
             _stateValidator.OnCompleted();
         }
 
-        private async Task HandleChannelHeaderAsync(ITransportChannelHeader header, (Maybe<IPooledBuffer> Payload, IWriteOnlyChannel<ChannelMessage> Output) args)
+        private async Task HandleReceivedAsync(TransportMessage message)
         {
-            var message = new ChannelMessage(header, args.Payload);
             try
             {
-                await args.Output.WriteAsync(message).ConfigureAwait(false);
+                _log.Trace("Received message: {0}", message);
+                _stateValidator.OnMessage(message.Header);
+                await message.Header.Handle(_handler, message.Payload).ConfigureAwait(false);
+                _log.Trace("Processed message: {0}", message);
             }
             catch
             {
@@ -93,7 +72,21 @@ namespace Plexus.Interop.Transport.Internal
             }
         }
 
-        private Task HandleConnetionHeaderAsync(ITransportConnectionHeader header, (Maybe<IPooledBuffer> Payload, IWriteOnlyChannel<ChannelMessage> Output) args)
+        private async Task HandleChannelHeaderAsync(ITransportChannelHeader header, Maybe<IPooledBuffer> payload)
+        {
+            var message = new ChannelMessage(header, payload);
+            try
+            {
+                await _buffer.Out.WriteAsync(message).ConfigureAwait(false);
+            }
+            catch
+            {
+                message.Dispose();
+                throw;
+            }
+        }
+
+        private static Task HandleConnetionHeaderAsync(ITransportConnectionHeader header, Maybe<IPooledBuffer> payload)
         {
             return TaskConstants.Completed;
         }

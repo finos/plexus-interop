@@ -1,1 +1,2 @@
-java -jar ../sdk/plexusgen.jar --type=json_meta --baseDir=metadata/interop --out=metadata && start ..\broker\plexus.exe broker metadata
+CD %~dp0
+start /wait plexus.cmd broker -m metadata

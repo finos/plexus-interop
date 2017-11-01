@@ -17,8 +17,10 @@
 import { BidiStreamingInvocationHandler } from "./BidiStreamingInvocationHandler";
 import { Invocation } from "../../../client/generic/Invocation";
 import { StreamingInvocationClientImpl } from "./StreamingInvocationClientImpl";
-import { Logger, Observer, LoggerFactory, PrefixedLogger } from "@plexus-interop/common";
+import { Logger, Observer, LoggerFactory, CancellationToken } from "@plexus-interop/common";
 import { ClientDtoUtils } from "../../ClientDtoUtils";
+import { MethodInvocationContext } from "../MethodInvocationContext";
+import { UniqueId } from "@plexus-interop/transport-common";
 
 export class StreamingInvocationHost<Req, Res> {
 
@@ -32,16 +34,18 @@ export class StreamingInvocationHost<Req, Res> {
         
         this.logger.debug("Handling invocation started");
         let baseRequestObserver: null | Observer<ArrayBuffer> = null;
+        const invocationCancellationToken = new CancellationToken();
         this.invocation.open({
 
             started: (s) => {
                 this.logger.trace("Invocation opened");
                 const metaInfo = this.invocation.getMetaInfo();
                 const hash = ClientDtoUtils.targetInvocationHash(metaInfo);
-                this.logger = new PrefixedLogger(this.logger, hash);
+                this.logger = LoggerFactory.getLogger(`Invocation Host [${hash}]`);
                 const invocationHandler = this.handlersRegistry.get(hash);
                 if (invocationHandler) {
-                    baseRequestObserver = invocationHandler.handle(new StreamingInvocationClientImpl(this.invocation, this.logger));
+                    const invocationContext = new MethodInvocationContext(metaInfo.consumerApplicationId as string, metaInfo.consumerConnectionId as UniqueId, invocationCancellationToken);
+                    baseRequestObserver = invocationHandler.handle(invocationContext, new StreamingInvocationClientImpl(this.invocation, this.logger));
                 } else {
                     this.logger.error(`No handler found for hash [${hash}]`);
                 }
@@ -61,6 +65,7 @@ export class StreamingInvocationHost<Req, Res> {
 
             error: (invocationError) => {
                 this.logger.error(`Received invocation error, passing to client`, invocationError);
+                invocationCancellationToken.cancel("Invocation error received");
                 this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<ArrayBuffer>).error(invocationError));
             }
         });

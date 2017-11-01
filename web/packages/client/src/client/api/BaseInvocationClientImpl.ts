@@ -24,21 +24,19 @@ export abstract class BaseInvocationClientImpl implements InvocationClient {
     constructor(protected invocation: Invocation, protected log: Logger) { }
 
     public async error(clientError: ClientError): Promise<void> {
-        this.log.debug(`Client reported error, closing invocation`, JSON.stringify(clientError));
-        this.close(new ErrorCompletion(clientError));
+        /* istanbul ignore if */
+        if (this.log.isDebugEnabled()) {
+            this.log.debug(`Client reported error, closing invocation`, JSON.stringify(clientError));
+        }
+        await this.close(new ErrorCompletion(clientError));
     }
 
     public async cancel(): Promise<void> {
         this.log.debug(`Client cancelled operation, closing invocation`);
-        this.close(new CancelledCompletion());
+        await this.close(new CancelledCompletion());
     }
 
-    protected close(completion: plexus.ICompletion = new SuccessCompletion()): void {
-        this.invocation.close(completion)
-            .then(() => {
-                this.log.debug("Closed");
-            }, (closeError) => {
-                this.log.error("Closed with errors", closeError);
-            });
+    protected async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<void> {
+        await this.invocation.close(completion);
     }
 }

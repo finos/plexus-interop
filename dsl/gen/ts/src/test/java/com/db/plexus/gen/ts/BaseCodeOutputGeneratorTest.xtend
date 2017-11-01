@@ -45,7 +45,7 @@ class BaseCodeOutputGeneratorTest {
     }
 
     def fullExpectedContent() '''
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -247,13 +247,13 @@ class ComponentAClientImpl implements ComponentAClient {
  */
 export abstract class ExampleServiceInvocationHandler {
 
-    public abstract onPointToPoint(request: plexus.com.plexus.model.IRequest): Promise<plexus.com.plexus.model.IResponse>;
+    public abstract onPointToPoint(invocationContext: MethodInvocationContext, request: plexus.com.plexus.model.IRequest): Promise<plexus.com.plexus.model.IResponse>;
 
-    public abstract onServerStreaming(request: plexus.com.plexus.model.IRequest, hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): void;
+    public abstract onServerStreaming(invocationContext: MethodInvocationContext, request: plexus.com.plexus.model.IRequest, hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): void;
 
-    public abstract onClientToServer(hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): Observer<plexus.com.plexus.model.IRequest>;
+    public abstract onClientToServer(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): Observer<plexus.com.plexus.model.IRequest>;
 
-    public abstract onBidiStreaming(hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): Observer<plexus.com.plexus.model.IRequest>;
+    public abstract onBidiStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): Observer<plexus.com.plexus.model.IRequest>;
 
 }
 
@@ -265,25 +265,25 @@ class ExampleServiceInvocationHandlerInternal {
 
     public constructor(private readonly clientHandler: ExampleServiceInvocationHandler) {}
 
-    public onPointToPoint(request: ArrayBuffer): Promise<ArrayBuffer> {
+    public onPointToPoint(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
         const responseToBinaryConverter = (from: plexus.com.plexus.model.IResponse) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
             return plexus.com.plexus.model.Request.toObject(decoded);
         };
         return this.clientHandler
-            .onPointToPoint(requestFromBinaryConverter(request))
+            .onPointToPoint(invocationContext, requestFromBinaryConverter(request))
             .then(response => responseToBinaryConverter(response));
     }
 
-    public onServerStreaming(request: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>): void {
+    public onServerStreaming(invocationContext: MethodInvocationContext, request: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>): void {
         const responseToBinaryConverter = (from: plexus.com.plexus.model.IResponse) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
             return plexus.com.plexus.model.Request.toObject(decoded);
         };
         this.clientHandler
-            .onServerStreaming(requestFromBinaryConverter(request), {
+            .onServerStreaming(invocationContext, requestFromBinaryConverter(request), {
                 next: (response) => hostClient.next(responseToBinaryConverter(response)),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),
@@ -291,14 +291,14 @@ class ExampleServiceInvocationHandlerInternal {
             });
     }
 
-    public onClientToServer(hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer> {
+    public onClientToServer(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer> {
         const responseToBinaryConverter = (from: plexus.com.plexus.model.IResponse) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
             return plexus.com.plexus.model.Request.toObject(decoded);
         };
         const baseObserver = this.clientHandler
-            .onClientToServer({
+            .onClientToServer(invocationContext, {
                 next: (response) => hostClient.next(responseToBinaryConverter(response)),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),
@@ -311,14 +311,14 @@ class ExampleServiceInvocationHandlerInternal {
         };
     }
 
-    public onBidiStreaming(hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer> {
+    public onBidiStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer> {
         const responseToBinaryConverter = (from: plexus.com.plexus.model.IResponse) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
             return plexus.com.plexus.model.Request.toObject(decoded);
         };
         const baseObserver = this.clientHandler
-            .onBidiStreaming({
+            .onBidiStreaming(invocationContext, {
                 next: (response) => hostClient.next(responseToBinaryConverter(response)),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),

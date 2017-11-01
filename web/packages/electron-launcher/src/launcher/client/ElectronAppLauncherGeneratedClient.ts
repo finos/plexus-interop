@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -103,7 +103,7 @@ class ElectronAppLauncherClientImpl implements ElectronAppLauncherClient {
  */
 export abstract class AppLauncherServiceInvocationHandler {
 
-    public abstract onLaunch(request: plexus.interop.IAppLaunchRequest): Promise<plexus.interop.IAppLaunchResponse>;
+    public abstract onLaunch(invocationContext: MethodInvocationContext, request: plexus.interop.IAppLaunchRequest): Promise<plexus.interop.IAppLaunchResponse>;
 
 }
 
@@ -115,14 +115,14 @@ class AppLauncherServiceInvocationHandlerInternal {
 
     public constructor(private readonly clientHandler: AppLauncherServiceInvocationHandler) {}
 
-    public onLaunch(request: ArrayBuffer): Promise<ArrayBuffer> {
+    public onLaunch(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
         const responseToBinaryConverter = (from: plexus.interop.IAppLaunchResponse) => Arrays.toArrayBuffer(plexus.interop.AppLaunchResponse.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.interop.AppLaunchRequest.decode(new Uint8Array(from));
             return plexus.interop.AppLaunchRequest.toObject(decoded);
         };
         return this.clientHandler
-            .onLaunch(requestFromBinaryConverter(request))
+            .onLaunch(invocationContext, requestFromBinaryConverter(request))
             .then(response => responseToBinaryConverter(response));
     }
 }
@@ -134,7 +134,8 @@ class AppLauncherServiceInvocationHandlerInternal {
 export class ElectronAppLauncherClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "interop.ElectronAppLauncher"
+        applicationId: "interop.ElectronAppLauncher",
+        applicationInstanceId: UniqueId.generateNew()
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;

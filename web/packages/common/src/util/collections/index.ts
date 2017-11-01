@@ -15,5 +15,4 @@
  * limitations under the License.
  */
 export * from "./BlockingQueue";
-export * from "./EvictionBlockingQueue";
-export * from "./BlockingBufferedQueue";
+export * from "./LimitedBufferQueue";

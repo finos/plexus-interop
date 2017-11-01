@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus
+namespace Plexus
 {
     using Shouldly;
     using System;
     using System.Collections.Concurrent;
     using System.Security.Cryptography;
+    using System.Threading;
     using System.Threading.Tasks;
     using Xunit;
     using Xunit.Abstractions;
@@ -50,6 +51,12 @@
             Log = LogManager.GetLogger(GetType());
         }
 
+        protected void WriteLog(string message)
+        {
+            Log.Info(message);
+            Console?.WriteLine(message);
+        }
+
         protected ILogger Log { get; }
 
         protected T RegisterDisposable<T>(T disposable) where T : IDisposable
@@ -65,22 +72,46 @@
         protected void RunWith1SecTimeout(Func<Task> func) => RunWithTimeout(Timeout1Sec, func);
         protected void RunWith1SecTimeout(Action action) => RunWithTimeout(Timeout1Sec, action);
 
-        protected void RunWithTimeout(TimeSpan timeout, Func<Task> func) =>
-            Should.CompleteIn(() => TaskRunner.RunInBackground(func), timeout);
+        protected void RunWithTimeout(TimeSpan timeout, Func<Task> func)
+        {
+            using (var cancellation = new CancellationTokenSource(timeout))
+            {
+                try
+                {
+                    TaskRunner
+                        .RunInBackground(func, cancellation.Token)
+                        .WithCancellation(cancellation.Token)
+                        .GetResult();
+                }
+                catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+                {
+                    throw new TimeoutException($"Task not completed after {timeout.TotalMilliseconds} ms");
+                }
+            }
+        }
 
-        protected void RunWithTimeout(TimeSpan timeout, Action action) =>
-            Should.CompleteIn(action, timeout);
+        protected void RunWithTimeout(TimeSpan timeout, Action action)
+            => RunWithTimeout(
+                timeout,
+                () =>
+                {
+                    action();
+                    return TaskConstants.Completed;
+                });
 
         public virtual void Dispose()
         {
             RunWith5SecTimeout(
                 () =>
                 {
-                    Log.Info("Disposing test resources");
+                    WriteLog("Disposing test resources");
                     while (_disposables.TryPop(out var disposable))
                     {
+                        WriteLog($"Disposing {disposable.GetType().FullName}");
                         disposable.Dispose();
+                        WriteLog($"Disposed {disposable.GetType().FullName}");
                     }
+                    WriteLog("Test resources disposed");
                 });
         }
     }

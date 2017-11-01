@@ -1,10 +1,10 @@
 :imagesdir: ./images
 
-**Plexus Interop** is metadata-centric language-agnostic desktop app-to-app interoperability framework with extensible model for launching new instances of desktop Apps on demand.
+**Plexus Interop** is a metadata-centric language-agnostic desktop app-to-app interoperability framework with extensible model for launching new instances of desktop applications on demand.
 
-The main goal of the framework is to enable development of extensible workflows connecting independent Apps developed in different technologies (.NET, Web, Java, Python etc) and passing context (structured data objects) between them.
+The main goal of the framework is to enable development of extensible workflows connecting independent apps developed in different technologies (.NET, Web, Java, Python, etc.) and passing context (structured data objects) between those apps.
 
-Framework architecture is based around central broker providing hub-and-spoke connectivity between Apps and brokering strongly typed RPC-style calls between them. Broker has a connection to Application Lifecycle Manager which is capable of creating new instances of the Apps based on the their runtime-metadata (e.g. container type, launch command, params etc) defined in a registry.
+Framework architecture is based around central broker providing hub-and-spoke connectivity between apps and brokering strongly-typed RPC-style calls between them. Broker has a connection to Application Lifecycle Manager which is capable of creating new instances of the apps based on the their runtime-metadata (e.g. container type, launch command, command line parameters) defined in a registry.
 
 Plexus Interop separates interoperability from the container, which provides notable advantages: different containers can be leveraged in the same workflow, launched applications residing outside of containers can participate in interop activities.
 

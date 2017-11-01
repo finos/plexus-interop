@@ -19,18 +19,47 @@ using System.Threading.Tasks;
 
 namespace Plexus
 {
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+
     public static class TaskHelper
     {
+        private static readonly ILogger Log = LogManager.GetLogger(typeof(TaskHelper));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<T> FromException<T>(Exception exception)
         {
-            var aggrEx = exception as AggregateException;
-            if (aggrEx != null)
+            if (exception is AggregateException aggrEx)
             {
                 exception = aggrEx.ExtractInner();
             }
             var tcs = new TaskCompletionSource<T>();
             tcs.SetException(exception);
             return tcs.Task;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> AsTask<T>(this CancellationToken cancellationToken)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return TaskConstants<T>.Canceled;
+            }
+            if (!cancellationToken.CanBeCanceled)
+            {
+                return TaskConstants<T>.Infinite;
+            }
+            var promise = new Promise<T>();
+            var registration = cancellationToken.Register(() => promise.TryCancel());
+            var task = promise.Task;
+            task.ContinueWithInBackground(t => registration.Dispose(), CancellationToken.None).IgnoreAwait(Log);
+            return task;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task AsTask(this CancellationToken cancellationToken)
+        {
+            return cancellationToken.AsTask<Nothing>();
         }
     }
 }

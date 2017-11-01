@@ -14,22 +14,146 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission
+namespace Plexus.Interop.Transport.Transmission
 {
     using Plexus.Channels;
     using Plexus.Pools;
     using Shouldly;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Xunit;
+    using Xunit.Abstractions;
 
     public abstract class TransmissionTestsSuite : TestsSuite
     {
         protected abstract ITransmissionServer CreateServer();
-        protected abstract ITransmissionConnectionFactory CreateClient();
+        protected abstract ITransmissionClient CreateClient();
 
-        public static readonly IEnumerable<object[]> SendAndReceiveTestData = new object[][]
+        protected TransmissionTestsSuite(ITestOutputHelper output) : base(output)
+        {
+        }
+
+        [Fact]
+        public void ConnectDisconnect()
+        {
+            RunWith5SecTimeout(async () =>
+            {
+                WriteLog("Starting server");
+                using (var server = CreateServer())
+                {
+                    await server.StartAsync();
+                    var serverConnectionTask = server.In.ReadAsync();
+                    WriteLog("Connecting client");
+                    var client = CreateClient();
+                    using (await client.ConnectAsync())
+                    {
+                        WriteLog("Client connected");
+                        using (await serverConnectionTask)
+                        {
+                            WriteLog("Disposing server connection");
+                        }
+                        WriteLog("Disposing client connection");
+                    }
+                    WriteLog("Disposing server");
+                }
+            });
+        }
+
+        [Fact]
+        public void CancelConnect()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                using (var server = CreateServer())
+                {
+                    await server.StartAsync();
+                    WriteLog("Server connected");
+                    var client = CreateClient();
+                    var cancellation = new CancellationTokenSource();
+                    var connectionTask1 = client.ConnectAsync(cancellation.Token).AsTask();
+                    var connectionTask2 = client.ConnectAsync(cancellation.Token).AsTask();
+                    var connectionTask3 = client.ConnectAsync(cancellation.Token).AsTask();
+                    var connections = new[] { connectionTask1, connectionTask2, connectionTask3 };
+                    var first = await Task.WhenAny(connections);
+                    await first;
+                    WriteLog("First connected");
+                    var second = await Task.WhenAny(connections.Except(new [] { first }));
+                    await second;
+                    WriteLog("Second connected");
+                    cancellation.Cancel();
+                    var third = connections.Except(new[] {first, second}).Single();
+                    Should.Throw<TaskCanceledException>(third, Timeout1Sec);
+                    WriteLog("Third canceled");
+                    WriteLog("Disposing server");
+                }
+            });
+        }
+
+        [Fact]
+        public void SendFromClientToServer()
+        {
+            RunWith5SecTimeout(async () =>
+            {
+                var testMsg = new byte[] {1, 2, 3, 4, 5};
+                IPooledBuffer receivedMsg;
+                WriteLog("Starting server");
+                using (var server = CreateServer())
+                {
+                    await server.StartAsync();
+                    var serverConnectionTask = server.In.ReadAsync();
+                    WriteLog("Connecting client");
+                    var client = CreateClient();
+                    using (var clientConnection = await client.ConnectAsync())
+                    {
+                        WriteLog("Client connected");                        
+                        await clientConnection.Out.WriteAsync(PooledBuffer.Get(testMsg));
+                        using (var serverConection = await serverConnectionTask)
+                        {
+                            receivedMsg = await serverConection.In.ReadAsync();
+                            WriteLog("Disposing server connection");
+                        }
+                        WriteLog("Disposing client connection");
+                    }
+                    WriteLog("Disposing server");
+                }
+                receivedMsg.ToArray().ShouldBe(testMsg);
+            });
+        }
+
+        [Fact]
+        public void SendFromServerToClient()
+        {
+            RunWith5SecTimeout(async () =>
+            {
+                var testMsg = new byte[] { 1, 2, 3, 4, 5 };
+                IPooledBuffer receivedMsg;
+                WriteLog("Starting server");
+                using (var server = CreateServer())
+                {
+                    await server.StartAsync();
+                    var serverConnectionTask = server.In.ReadAsync();
+                    WriteLog("Connecting client");
+                    var client = CreateClient();
+                    using (var clientConnection = await client.ConnectAsync())
+                    {
+                        WriteLog("Client connected");                        
+                        using (var serverConection = await serverConnectionTask)
+                        {
+                            await serverConection.Out.WriteAsync(PooledBuffer.Get(testMsg));
+                            receivedMsg = await clientConnection.In.ReadAsync();
+                            WriteLog("Disposing connections");
+                        }
+                    }
+                    WriteLog("Disposing server");
+                }
+                receivedMsg.ToArray().ShouldBe(testMsg);
+            });
+        }
+
+        public static readonly IEnumerable<object[]> ConcurrentSendAndReceiveTestData = new object[][]
         {
             new object[]
             {
@@ -74,8 +198,8 @@
         };
 
         [Theory]
-        [MemberData(nameof(SendAndReceiveTestData))]
-        public void SendAndReceive(byte[][] serverMessages, byte[][] clientMessages)
+        [MemberData(nameof(ConcurrentSendAndReceiveTestData))]
+        public void ConcurrentSendAndReceive(byte[][] serverMessages, byte[][] clientMessages)
         {
             var serverRecevied = new List<byte[]>();
             var clientReceived = new List<byte[]>();
@@ -84,7 +208,7 @@
             {
                 var server = RegisterDisposable(CreateServer());
                 await server.StartAsync().ConfigureAwaitWithTimeout(Timeout5Sec);
-                using (var serverConnection = RegisterDisposable(await server.CreateAsync().ConfigureAwait(false)))
+                using (var serverConnection = RegisterDisposable(await server.In.ReadAsync().ConfigureAwait(false)))
                 {
                     var receiveTask = TaskRunner.RunInBackground(async () =>
                     {
@@ -93,12 +217,12 @@
                             var msg = await serverConnection.In.TryReadAsync().ConfigureAwait(false);
                             if (msg.HasValue)
                             {
-                                Log.Trace("Server received message of length {0}", msg.Value.Count);
+                                WriteLog($"Server received message of length {msg.Value.Count}");
                                 serverRecevied.Add(msg.Value.ToArray());
                             }
                             else
                             {
-                                Log.Trace("Server receive completed");
+                                WriteLog("Server receive completed");
                                 break;
                             }
                         }
@@ -108,16 +232,16 @@
                     {
                         foreach (var msg in serverMessages)
                         {
-                            Log.Trace("Server sending message of length {0}", msg.Length);
+                            WriteLog($"Server sending message of length {msg.Length}");
                             await serverConnection.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
                         }
                         serverConnection.Out.TryComplete();
-                        Log.Trace("Server send completed");
+                        WriteLog("Server send completed");
                     });
 
                     await Task.WhenAll(sendTask, receiveTask, serverConnection.Completion).ConfigureAwait(false);
 
-                    Log.Trace("Server completed");
+                    WriteLog("Server completed");
                 }
             });
 
@@ -125,13 +249,13 @@
             {
                 var clientFactory = CreateClient();
                 Log.Trace("Connecting client");
-                using (var client = RegisterDisposable(await clientFactory.CreateAsync().ConfigureAwait(false)))
+                using (var connection = RegisterDisposable(await clientFactory.ConnectAsync().ConfigureAwait(false)))
                 {
                     var receiveTask = TaskRunner.RunInBackground(async () =>
                     {
                         while (true)
                         {
-                            var msg = await client.In.TryReadAsync().ConfigureAwait(false);
+                            var msg = await connection.In.TryReadAsync().ConfigureAwait(false);
                             if (msg.HasValue)
                             {
                                 Log.Trace("Client received message of length {0}", msg.Value.Count);
@@ -150,13 +274,13 @@
                         foreach (var msg in clientMessages)
                         {
                             Log.Trace("Client sending message of length {0}", msg.Length);
-                            await client.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
+                            await connection.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
                         }
-                        client.Out.TryComplete();
+                        connection.Out.TryComplete();
                         Log.Trace("Client send completed");
                     });
 
-                    await Task.WhenAll(sendTask, receiveTask, client.Completion).ConfigureAwait(false);
+                    await Task.WhenAll(sendTask, receiveTask, connection.Completion).ConfigureAwait(false);
                     Log.Trace("Client completed");
                 }
             });

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, ClientProtocolUtils } from "@plexus-interop/protocol";
 import { InvocationMetaInfo } from "./InvocationMetaInfo";
 import { UniqueId } from "@plexus-interop/transport-common";
 import * as Long from "long";
@@ -25,7 +25,7 @@ const protocol = plexus.interop.protocol;
 export class ClientProtocolHelper {
 
     public static isSuccessCompletion(completion: plexus.ICompletion): boolean {
-        return completion && (completion.status === undefined || completion.status === plexus.Completion.Status.Completed);
+        return ClientProtocolUtils.isSuccessCompletion(completion);
     }
 
     public static invocationInfoToConsumedMethodReference(invocationInfo: InvocationMetaInfo): plexus.interop.protocol.IConsumedMethodReference {

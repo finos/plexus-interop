@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using Plexus.Pools;
-using System.Collections.Generic;
-using Plexus.Interop.Transport.Protocol;
-
 namespace Plexus.Interop.Transport.Internal
 {
+    using Plexus.Interop.Transport.Protocol;
+    using Plexus.Pools;
+    using System.Collections.Generic;
+
     internal struct FrameMessage : IPooledObject
     {
         public FrameMessage(ITransportFrameHeader header, IPooledBuffer payload)

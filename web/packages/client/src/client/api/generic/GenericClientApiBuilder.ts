@@ -85,7 +85,10 @@ export class GenericClientApiBuilder {
     public connect(): Promise<GenericClientApi> {
         return this.validateState() 
             .then(() => this.transportConnectionProvider())
-            .then(connection => new GenericClientFactory(connection).createClient(this.applicationInfo))
+            .then(connection => {
+                this.log.info("Connection established");
+                return new GenericClientFactory(connection).createClient(this.applicationInfo);
+            })
             .then(genericClient => {
                 const actionsHost = new GenericInvocationsHost(this.applicationInfo.applicationId, genericClient, 
                     this.bidiStreamingInvocationHandlers,

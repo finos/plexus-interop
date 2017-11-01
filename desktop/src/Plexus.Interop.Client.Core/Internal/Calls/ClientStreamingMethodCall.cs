@@ -16,19 +16,16 @@
  */
 namespace Plexus.Interop.Internal.Calls
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Plexus.Channels;
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
     using Plexus.Processes;
+    using System;
+    using System.Threading.Tasks;
 
     internal sealed class ClientStreamingMethodCall<TRequest, TResponse> : 
         ProcessBase, IClientStreamingMethodCall<TRequest, TResponse>
     {
-        private static readonly ILogger Log = LogManager.GetLogger<ClientStreamingMethodCall<TRequest, TResponse>>();
         private readonly IChannel<TRequest> _requestStream = new BufferedChannel<TRequest>(1);
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
         private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
         private readonly Promise<TResponse> _responseCompletion = new Promise<TResponse>();
 
@@ -38,7 +35,9 @@ namespace Plexus.Interop.Internal.Calls
             Completion.LogCompletion(Log);
         }
 
-        public IWritableChannel<TRequest> RequestStream => _requestStream.Out;
+        protected override ILogger Log { get; } = LogManager.GetLogger<ClientStreamingMethodCall<TRequest, TResponse>>();
+
+        public ITerminatableWritableChannel<TRequest> RequestStream => _requestStream.Out;
 
         public Task<TResponse> ResponseAsync => _responseCompletion.Task;
 
@@ -46,6 +45,7 @@ namespace Plexus.Interop.Internal.Calls
         {
             Log.Trace("Creating invocation");
             var invocation = await _invocationFactory().ConfigureAwait(false);
+            OnStop(() => invocation.Out.TryTerminate());
             await invocation.StartCompletion.ConfigureAwait(false);
             var processRequestsAsync = TaskRunner.RunInBackground(() => ProcessRequestsAsync(invocation));
             var processResponseAsync = TaskRunner.RunInBackground(() => ProcessResponseAsync(invocation));
@@ -57,72 +57,58 @@ namespace Plexus.Interop.Internal.Calls
                 .ContinueWithSynchronously(_ => invocation.Completion);
         }
 
+        public void Cancel()
+        {
+            Stop();
+        }
+
         public Task CancelAsync()
         {
-            _cancellation.Cancel();
-            return Completion.IgnoreExceptions();
+            return StopAsync();
         }
 
         private async Task<TResponse> ProcessResponseAsync(IInvocation<TRequest, TResponse> invocation)
         {
-            using (_cancellation.Token.Register(() => invocation.TryTerminate()))
+            try
             {
-                try
-                {
-                    TResponse response = default;
-                    Log.Trace("Reading response");
-                    while (await invocation.In.WaitForNextSafeAsync().ConfigureAwait(false))
-                    {
-                        while (invocation.In.TryReadSafe(out var item))
-                        {
-                            response = item;
-                        }
-                    }
-                    Log.Trace("Response stream completed");
-                    return response;
-                }
-                catch (Exception ex)
-                {
-                    invocation.Out.TryTerminate(ex);
-                    throw;
-                }
-                finally
-                {
-                    Log.Trace("Awaiting response invocation completion");
-                    await invocation.In.Completion.ConfigureAwait(false);
-                }
-            }            
+                TResponse response = default;
+                Log.Trace("Reading response");
+                await invocation.In.ConsumeAsync(item => response = item).ConfigureAwait(false);
+                Log.Trace("Response stream completed");
+                return response;
+            }
+            catch (Exception ex)
+            {
+                invocation.Out.TryTerminate(ex);
+                throw;
+            }
+            finally
+            {
+                Log.Trace("Awaiting response invocation completion");
+                await invocation.In.Completion.ConfigureAwait(false);
+            }
         }
 
         private async Task ProcessRequestsAsync(IInvocation<TRequest, TResponse> invocation)
         {
-            using (_cancellation.Token.Register(() => invocation.TryTerminate()))
+            try
             {
-                try
-                {
-                    Log.Trace("Writing requests");
-                    while (await _requestStream.In.WaitForNextSafeAsync().ConfigureAwait(false))
-                    {
-                        while (_requestStream.In.TryReadSafe(out var item))
-                        {
-                            await invocation.Out.TryWriteSafeAsync(item).ConfigureAwait(false);
-                        }
-                    }
-                    invocation.Out.TryComplete();
-                    await _requestStream.Out.Completion.ConfigureAwait(false);
-                    Log.Trace("Requests stream completed");
-                }
-                catch (Exception ex)
-                {
-                    Log.Trace("Requests stream completed with exception: {0}", ex.FormatTypeAndMessage());
-                    invocation.Out.TryTerminate(ex);
-                    throw;
-                }
-                finally
-                {
-                    Log.Trace("Awaiting request invocation completion");
-                    await invocation.Out.Completion.ConfigureAwait(false);
-                }
+                Log.Trace("Writing requests");
+                await _requestStream.In.ConsumeAsync(item => invocation.Out.WriteAsync(item)).ConfigureAwait(false);
+                invocation.Out.TryComplete();
+                await _requestStream.Out.Completion.ConfigureAwait(false);
+                Log.Trace("Requests stream completed");
+            }
+            catch (Exception ex)
+            {
+                Log.Trace("Requests stream completed with exception: {0}", ex.FormatTypeAndMessage());
+                invocation.Out.TryTerminate(ex);
+                throw;
+            }
+            finally
+            {
+                Log.Trace("Awaiting request invocation completion");
+                await invocation.Out.Completion.ConfigureAwait(false);
             }
         }
     }
