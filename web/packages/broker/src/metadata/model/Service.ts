@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 import { Method } from "./Method";
+import { ExtendedMap } from "@plexus-interop/common";
 
 export interface Service {
     id: string;
     serviceAlias?: string;
-    methods: Method[];
+    methods: ExtendedMap<string, Method>;
 }

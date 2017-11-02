@@ -18,7 +18,7 @@ import { MethodTypeDto } from "./MethodTypeDto";
 
 export interface MethodDto {
     name: string;
-    intput: string;
+    input: string;
     output: string;
     type: MethodTypeDto;
 }

@@ -30,4 +30,6 @@ export interface ConsumedService {
 
     from: MatchPattern;
 
+    alias?: string;
+
 }

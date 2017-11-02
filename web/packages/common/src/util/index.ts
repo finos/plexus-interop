@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 export * from "./Arrays";
+export * from "./ExtendedArray";
 export * from "./GUID";
 export * from "./collections";
 export * from "./async";

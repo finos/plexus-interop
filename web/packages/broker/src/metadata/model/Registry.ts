@@ -17,9 +17,14 @@
 import { Application } from "./Application";
 import { Message } from "./Message";
 import { Service } from "./Service";
+import { ExtendedMap } from "@plexus-interop/common";
 
 export interface Registry {
-    applications: Application[];
-    messages: Message[];
-    services: Service[];
+
+    applications: ExtendedMap<string, Application>;
+
+    messages: ExtendedMap<string, Message>;
+
+    services: ExtendedMap<string, Service>;
+    
 }

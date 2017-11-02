@@ -38,7 +38,7 @@ export class Arrays {
 
 }
 
-function concat<T>(x: T[], y: T[]): T[] {
+export function concat<T>(x: T[], y: T[]): T[] {
     return x.concat(y);
 }
 

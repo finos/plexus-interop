@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { join, distinct, toMap } from "./Arrays";
+import { join, distinct, toMap, concat } from "./Arrays";
 import { ExtendedMap } from "./collections/ExtendedMap";
 
 /**
@@ -32,12 +32,16 @@ export class ExtendedArray<T> {
         return ExtendedArray.of<Y>(join(this.values, second, joinFn, predicate));
     }
 
-    public distinct(key: (x: T) => any): ExtendedArray<T> {
+    public distinct(key: (x: T) => any = x => x ): ExtendedArray<T> {
         return ExtendedArray.of(distinct(this.values, key));
     }
 
-    public getValues(): T[] {
+    public toArray(): T[] {
         return this.values;
+    }
+
+    public flatMap<R>(f: (el: T) => R[]): ExtendedArray<R> {
+        return ExtendedArray.of(this.values.map(f).reduce<R[]>(concat, []));
     }
 
     public toMap<K, V>(keyFn: (v: T) => K, vFn: (v: T) => V): ExtendedMap<K, V> {
