@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ExtendedMap } from "./collections/ExtendedMap";
 
 export class Arrays {
 
@@ -61,4 +62,10 @@ export function distinct<T>(array: T[], key: (x: T) => any): T[] {
         const k = key(item);
         return seen.has(k) ? false : seen.add(k);
     });
+}
+
+export function toMap<T, K, V>(array: T[], keyFn: (v: T) => K, vFn: (v: T) => V): ExtendedMap<K, V> {
+    const result = new ExtendedMap<K, V>();
+    array.forEach(v => result.set(keyFn(v), vFn(v)));
+    return result;
 }
