@@ -34,7 +34,10 @@ import { ConsumedServiceDto } from "./ConsumedServiceDto";
 import { ConsumedService } from "../model/ConsumedService";
 import { MatchPatternFactory } from "../model/MatchPatternFactory";
 import { ConsumedMethod } from "../model/ConsumedMethod";
-import { MethodReferenceDto } from "./MethodReferenceDto";
+import { ProvidedMethod } from "../model/ProvidedMethod";
+import { ProvidedServiceDto } from "./ProvidedServiceDto";
+import { ProvidedService } from "../model/ProvidedService";
+import { ApplicationDto } from "./ApplicationDto";
 
 export class JsonBasedRegistryProvider implements RegistryProvider {
 
@@ -67,13 +70,35 @@ export class JsonBasedRegistryProvider implements RegistryProvider {
             registryDto.services.map(s => this.convertService(messages, s)))
             .toMap(s => s.id, s => s);
 
-        const applications = new ExtendedMap<string, Application>();
+        const applications = ExtendedArray.of(
+            registryDto.applications.map(
+                appDto => this.convertApplication(services, appDto)))
+            .toMap(a => a.id, a => a);
 
         return {
             messages,
             services,
             applications
         };
+
+    }
+
+    private convertApplication(services: ExtendedMap<string, Service>, appDto: ApplicationDto): Application {
+        const providedServices: ProvidedService[] = [];
+        const consumedServices: ConsumedService[] = [];
+        const application: Application = {
+            id: appDto.id,
+            providedServices,
+            consumedServices
+        };
+        appDto.consumed.forEach(consumedDto => {
+            consumedServices.push(
+                this.convertConsumedService(consumedDto, application, services.get(consumedDto.service) as Service));
+        });
+        appDto.provides.forEach(providedDto => {
+            providedServices.push(this.convertProvidedService(providedDto, application, services.get(providedDto.service) as Service));
+        });
+        return application;
     }
 
     private convertConsumedService(serviceDto: ConsumedServiceDto, application: Application, service: Service) {
@@ -81,13 +106,14 @@ export class JsonBasedRegistryProvider implements RegistryProvider {
         const consumedService: ConsumedService = {
             service,
             application,
+            alias: serviceDto.alias,
             from: MatchPatternFactory.createMatcher(serviceDto.from),
             methods
         };
         serviceDto.methods
             .map(m => {
                 return {
-                    method: service.methods.get(this.getName(m)) as Method,
+                    method: service.methods.get(m) as Method,
                     consumedService
                 } as ConsumedMethod;
             })
@@ -95,8 +121,29 @@ export class JsonBasedRegistryProvider implements RegistryProvider {
         return consumedService;
     }
 
-    private getName(methodRef: MethodReferenceDto): string {
-        return (methodRef as { name: string }).name || methodRef as string;
+    private convertProvidedService(serviceDto: ProvidedServiceDto, application: Application, service: Service): ProvidedService {
+
+        const methods = new ExtendedMap<string, ProvidedMethod>();
+
+        const providedService: ProvidedService = {
+            service,
+            application,
+            alias: serviceDto.alias,
+            to: MatchPatternFactory.createMatcher(serviceDto.to),
+            methods
+        };
+
+        serviceDto.methods.map(pm => {
+            return {
+                method: service.methods.get(pm.name) as Method,
+                providedService,
+                title: pm.title
+            } as ProvidedMethod;
+        })
+            .forEach(pm => methods.set(pm.method.name, pm));
+
+        return providedService;
+
     }
 
     private convertService(messagesMap: Map<string, Message>, serviceDto: ServiceDto): Service {

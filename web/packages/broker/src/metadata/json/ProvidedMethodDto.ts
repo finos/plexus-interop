@@ -14,4 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export type MethodReferenceDto = string | { name: string; title: string };
+export interface ProvidedMethodDto { 
+    name: string; 
+    title: string;
+};

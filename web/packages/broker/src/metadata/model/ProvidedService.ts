@@ -30,4 +30,6 @@ export interface ProvidedService {
 
     to: MatchPattern;
 
+    alias?: string;
+
 }

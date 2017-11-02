@@ -14,11 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodReferenceDto } from "./MethodReference";
+import { ProvidedMethodDto } from "./ProvidedMethodDto";
 
 export interface ProvidedServiceDto {
+    
     service: string;
+    
     title: string;
+    
     to: string[];
-    methods: MethodReferenceDto[];
+    
+    alias?: string;
+    
+    methods: ProvidedMethodDto[];
+
 }

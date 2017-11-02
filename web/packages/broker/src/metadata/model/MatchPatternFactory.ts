@@ -28,8 +28,10 @@ export class MatchPatternFactory {
         return new ExactMatcher(pattern);
     }
 
-    public static createMatcher(pattern: string[]): MatchPattern {
-        return new MultipleMatchersHolder(pattern.map(p => MatchPatternFactory.createSingleMatcher(p)));
+    public static createMatcher(patterns: string[]): MatchPattern {
+        return patterns && patterns.length > 0 ?
+            new MultipleMatchersHolder(patterns.map(p => MatchPatternFactory.createSingleMatcher(p)))
+            : MatchPatternFactory.all;
     }
 
     private static all: MatchPattern = {
@@ -65,6 +67,6 @@ class ExactMatcher implements MatchPattern {
     public isMatch(s: string) {
         return s === this.base;
     }
-    
+
 }
 
