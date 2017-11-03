@@ -43,9 +43,9 @@ export class RegistryService {
     }
 
     public getApplication(appId: string): Application {
-        const result = this.registry.applications.find(app => app.id === appId);
+        const result = this.registry.applications.valuesArray().find(app => app.id === appId);
         if (!result) {
-            throw new Error(`${appId} app not found`)
+            throw new Error(`${appId} app not found`);
         }
         return result;
     }
@@ -64,16 +64,9 @@ export class RegistryService {
 
         const app = this.getApplication(appId);
 
-        const consumedMethods: ConsumedMethod[] = flatMap<ConsumedService, ConsumedMethod>(consumedService => {
-            const methods: ConsumedMethod[] = [];
-            consumedService.methods.forEach(v => {
-                methods.push({
-                    method: v,
-                    consumedService
-                });
-            });
-            return methods;
-        }, app.consumedServices);
+        const consumedMethods: ConsumedMethod[] = flatMap<ConsumedService, ConsumedMethod>(
+            consumedService => consumedService.methods.valuesArray(),
+            app.consumedServices);
 
         const result = consumedMethods.find(method => {
             return this.equalsIfExist(reference.methodId, reference.methodId)
@@ -113,8 +106,10 @@ export class RegistryService {
         return this.appProvidedMethodsCache.getOrAdd(app.id, () => this.getMatchingProvidedMethodsForAppInternal(app));
     }
 
-    private getMatchingProvidedMethodsForAppInternal(app: Application) {
-        const allProvidedServices: ProvidedService[] = flatMap<Application, ProvidedService>(app => app.providedServices, this.registry.applications);
+    private getMatchingProvidedMethodsForAppInternal(app: Application): ProvidedMethod[] {
+
+        const allProvidedServices: ProvidedService[] = flatMap<Application, ProvidedService>(
+            app => app.providedServices, this.registry.applications.valuesArray());
 
         const consumedProvidedPairs = join(
             app.consumedServices,
@@ -134,7 +129,7 @@ export class RegistryService {
                 pair.provided.methods.valuesArray(),
                 (c, p) => p,
                 // matched by method name
-                (c, p) => c.name === p.method.name);
+                (c, p) => c.method.name === p.method.name);
 
             return distinct<ProvidedMethod>(allMatchedProvidedMethods,
                 pMethod => `${pMethod.method.name}-${pMethod.providedService.application.id}`);

@@ -48,7 +48,7 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                             const appDescriptor = await this.authenticationProcessor.handle([connection, channel]);
                             const appConnection = await this.appLifeCycleManager.acceptConnection(connection, {
                                 applicationId: appDescriptor.applicationId as string,
-                                instanceId: UniqueId.fromProperties(appDescriptor.instanceId as plexus.IUniqueId),
+                                instanceId: UniqueId.fromProperties(appDescriptor.instanceId as plexus.IUniqueId)
                             }, (connection) => {
                                 // TODO handle connection drop
                                 log.error("Connection dropped");

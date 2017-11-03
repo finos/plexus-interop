@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ExtendedArray } from "../src/util/ExtendedArray";
+import { ExtendedArray } from "../../src/util/ExtendedArray";
 import { expect } from "chai";
 
 describe("ExtededArray", () => {

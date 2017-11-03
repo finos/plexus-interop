@@ -32,8 +32,8 @@ export class PeerConnectionsService {
 
     private $heartbits: Observable<AppConnectionHeartBit>;
 
-    private init() {
-        this.$heartbits = new Observable(observer => {
+    private init(): void {
+        this.$heartbits = new Observable<AppConnectionHeartBit>(observer => {
             this.log.debug("Subscribing to app hearbits");
             const sourceSubscription = this.peerTransport.subscribe(EventType.AppConnectionHearBit, (heartBit: AppConnectionHeartBit) => {
                 observer.next(heartBit);
@@ -41,10 +41,10 @@ export class PeerConnectionsService {
             return () => {
                 this.log.debug("Unsubscribing from app hearbits");
                 sourceSubscription.unsubscribe();
-            }
+            };
         })
-        // important, make observable shared between multiple subscriptions
-        .share();
+            // important, make observable shared between multiple subscriptions
+            .share();
     }
 
     public subscribeToConnectionsHearBits(observer: PartialObserver<AppConnectionHeartBit>): Subscription {

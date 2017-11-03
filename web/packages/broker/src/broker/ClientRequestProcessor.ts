@@ -46,7 +46,7 @@ export class ClientRequestProcessor {
                     if (!channelObserver) {
                         const clientToBrokerRequest = ClientProtocolHelper.decodeClientToBrokerRequest(messagePayload);
                         if (clientToBrokerRequest.invocationStartRequest) {
-                            const $inMessagesObservable = new Observable(observer => {
+                            const $inMessagesObservable = new Observable<ArrayBuffer>(observer => {
                                 channelObserver = observer;
                             });
                             const result = await this.invocationRequestProcessor.handleRequest(

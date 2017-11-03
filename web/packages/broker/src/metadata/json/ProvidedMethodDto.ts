@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface ProvidedMethodDto { 
-    name: string; 
+export interface ProvidedMethodDto {
+    name: string;
     title: string;
-};
+}

@@ -16,8 +16,6 @@
  */
 import { Observer, Subscription, Logger, LoggerFactory, BufferedObserver, AnonymousSubscription } from "@plexus-interop/common";
 import { TransportConnection, UniqueId, ServerConnectionFactory } from "@plexus-interop/transport-common";
-import { PeerTransport } from "./PeerTransport";
-import { EventType } from "../peers/events/EventType";
 import { AppConnectionHeartBit } from "../peers/events/AppConnectionHeartBit";
 import { PeerConnectionsService } from "../peers/PeerConnectionsService";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";

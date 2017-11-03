@@ -16,7 +16,7 @@
  */
 import { TransportConnection, TransportChannel, UniqueId, Defaults } from "@plexus-interop/transport-common";
 import { Observer, BufferedObserver, Logger, LoggerFactory } from "@plexus-interop/common";
-import { clientProtocol } from "@plexus-interop/protocol"
+import { clientProtocol } from "@plexus-interop/protocol";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 import { ProxyAuthenticationHandler } from "./ProxyAuthenticationHandler";
 

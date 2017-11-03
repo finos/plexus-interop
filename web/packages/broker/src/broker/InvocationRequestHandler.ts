@@ -113,7 +113,7 @@ export class InvocationRequestHandler {
                     this.log.error(`Received error from source channel [${sourceChannelId}]`, e);
                     reject(e);
                 }
-            }
+            };
         };
         if (Types.isObservable(source)) {
             return new Promise<void>((resolve, reject) => {
@@ -134,7 +134,7 @@ export class InvocationRequestHandler {
             methodId: methodReference.methodId,
             consumerApplicationId: sourceConnection.applicationId,
             consumerConnectionId: sourceConnection.connectionId
-        }
+        };
     }
 
     private async resolveTargetConnection(methodReference: ConsumedMethodReference | ProvidedMethodReference, sourceConnection: ApplicationConnectionDescriptor): Promise<ApplicationConnection> {

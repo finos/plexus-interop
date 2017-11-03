@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 import { AsyncHandler } from "../AsyncHandler";
-import { TransportChannel, TransportConnection } from "@plexus-interop/transport-common";
-import { ClientProtocolHelper } from "@plexus-interop/protocol";
+import { TransportChannel, TransportConnection, UniqueId } from "@plexus-interop/transport-common";
+import { ClientProtocolHelper, clientProtocol as plexus } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
@@ -57,8 +57,8 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
                         .catch(e => log.error("Failed to sent connection details", e));
 
                     resolve({
-                        applicationId: clientToBrokerMessage.applicationId,
-                        instanceId: clientToBrokerMessage.applicationInstanceId
+                        applicationId: clientToBrokerMessage.applicationId as string,
+                        instanceId: UniqueId.fromProperties(clientToBrokerMessage.applicationInstanceId as plexus.IUniqueId)
                     });
                     
                 },

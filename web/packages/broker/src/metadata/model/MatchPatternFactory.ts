@@ -54,7 +54,7 @@ class StartsWithMatcher implements MatchPattern {
 
     constructor(private readonly base: string) { }
 
-    public isMatch(s: string) {
+    public isMatch(s: string): boolean {
         return s.startsWith(this.base);
     }
 
@@ -64,7 +64,7 @@ class ExactMatcher implements MatchPattern {
 
     constructor(private readonly base: string) { }
 
-    public isMatch(s: string) {
+    public isMatch(s: string): boolean {
         return s === this.base;
     }
 

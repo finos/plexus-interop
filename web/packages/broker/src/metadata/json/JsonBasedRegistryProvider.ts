@@ -21,14 +21,13 @@ import "rxjs/add/observable/of";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/scan";
 import { RegistryDto } from "./RegistryDto";
-import { ExtendedArray, Logger, LoggerFactory, ExtendedMap } from "@plexus-interop/common";
+import { ExtendedArray, Logger, LoggerFactory, ExtendedMap, toMap } from "@plexus-interop/common";
 import { Message } from "../model/Message";
 import { ServiceDto } from "./ServiceDto";
 import { Service } from "../model/Service";
 import { Method } from "../model/Method";
 import { MethodType } from "../model/MethodType";
 import { MethodTypeDto } from "./MethodTypeDto";
-import { toMap } from "../../../../common/src/util/Arrays";
 import { Application } from "../model/Application";
 import { ConsumedServiceDto } from "./ConsumedServiceDto";
 import { ConsumedService } from "../model/ConsumedService";
@@ -101,7 +100,7 @@ export class JsonBasedRegistryProvider implements RegistryProvider {
         return application;
     }
 
-    private convertConsumedService(serviceDto: ConsumedServiceDto, application: Application, service: Service) {
+    private convertConsumedService(serviceDto: ConsumedServiceDto, application: Application, service: Service): ConsumedService {
         const methods = new ExtendedMap<string, ConsumedMethod>();
         const consumedService: ConsumedService = {
             service,

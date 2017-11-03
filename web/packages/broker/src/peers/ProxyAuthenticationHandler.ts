@@ -38,7 +38,7 @@ export class ProxyAuthenticationHandler implements TransportChannel {
 
     public async close(completion?: plexus.ICompletion): Promise<plexus.ICompletion> {
         if (this.log.isTraceEnabled()) {
-            this.log.trace(`Received completion from broker, ${JSON.stringify(completion)}`)
+            this.log.trace(`Received completion from broker, ${JSON.stringify(completion)}`);
         }
         return new SuccessCompletion();
     }

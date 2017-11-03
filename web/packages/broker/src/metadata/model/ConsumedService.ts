@@ -16,9 +16,9 @@
  */
 import { Service } from "./Service";
 import { Application } from "./Application";
-import { Method } from "./Method";
 import { MatchPattern } from "./MatchPattern";
 import { ExtendedMap } from "@plexus-interop/common";
+import { ConsumedMethod } from "./ConsumedMethod";
 
 export interface ConsumedService {
 
@@ -26,7 +26,7 @@ export interface ConsumedService {
 
     application: Application;
 
-    methods: ExtendedMap<string, Method>;
+    methods: ExtendedMap<string, ConsumedMethod>;
 
     from: MatchPattern;
 
