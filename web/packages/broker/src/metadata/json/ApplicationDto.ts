@@ -23,6 +23,6 @@ export interface ApplicationDto {
     
     provides: ProvidedServiceDto[];
     
-    consumed: ConsumedServiceDto[];
+    consumes: ConsumedServiceDto[];
 
 }

@@ -90,10 +90,12 @@ export class JsonBasedRegistryProvider implements RegistryProvider {
             providedServices,
             consumedServices
         };
-        appDto.consumed.forEach(consumedDto => {
+        appDto.consumes = appDto.consumes || [];
+        appDto.consumes.forEach(consumedDto => {
             consumedServices.push(
                 this.convertConsumedService(consumedDto, application, services.get(consumedDto.service) as Service));
         });
+        appDto.provides = appDto.provides || [];
         appDto.provides.forEach(providedDto => {
             providedServices.push(this.convertProvidedService(providedDto, application, services.get(providedDto.service) as Service));
         });
@@ -109,6 +111,7 @@ export class JsonBasedRegistryProvider implements RegistryProvider {
             from: MatchPatternFactory.createMatcher(serviceDto.from),
             methods
         };
+        serviceDto.methods = serviceDto.methods || [];
         serviceDto.methods
             .map(m => {
                 return {
