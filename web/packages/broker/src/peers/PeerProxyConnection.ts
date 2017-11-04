@@ -19,6 +19,9 @@ import { Observer, BufferedObserver, Logger, LoggerFactory } from "@plexus-inter
 import { clientProtocol } from "@plexus-interop/protocol";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 import { ProxyAuthenticationHandler } from "./ProxyAuthenticationHandler";
+import { PeerTransport } from "./PeerTransport";
+import { RemoteActions } from "./actions/RemoteActions";
+import { PeerProxyTransportChannel } from "./PeerProxyTransportChannel";
 
 export class PeerProxyConnection implements TransportConnection {
 
@@ -26,18 +29,25 @@ export class PeerProxyConnection implements TransportConnection {
 
     public readonly isProxy: boolean = true;
 
-    private readonly channelsObserver: BufferedObserver<TransportChannel>;
+    private readonly incomingChannelsObserver: BufferedObserver<TransportChannel>;
 
-    constructor(private readonly connectionDescriptor: ApplicationConnectionDescriptor) {
+    private readonly remoteConnectionId: string;
+
+    constructor(
+        private hostConnectionId: string,
+        private readonly connectionDescriptor: ApplicationConnectionDescriptor,
+        private readonly peerTransport: PeerTransport) {
+        
+        this.remoteConnectionId = connectionDescriptor.connectionId.toString();
         this.log = LoggerFactory.getLogger(`PeerProxyConnection [${connectionDescriptor.connectionId.toString()}]`);
-        this.channelsObserver = new BufferedObserver<TransportChannel>(Defaults.DEFAULT_BUFFER_SIZE, this.log);
-        // send authentication handler as first incoming channel
-        this.channelsObserver.next(new ProxyAuthenticationHandler(connectionDescriptor));
+        this.incomingChannelsObserver = new BufferedObserver<TransportChannel>(Defaults.DEFAULT_BUFFER_SIZE, this.log);
+        this.incomingChannelsObserver.next(new ProxyAuthenticationHandler(connectionDescriptor));
+
     }
 
     public async open(channelObserver: Observer<TransportChannel>): Promise<void> {
         this.log.debug(`Broker subscribed to channels`);
-        this.channelsObserver.setObserver(channelObserver);
+        this.incomingChannelsObserver.setObserver(channelObserver);
     }
 
     public uuid(): UniqueId {
@@ -52,8 +62,10 @@ export class PeerProxyConnection implements TransportConnection {
         throw "disconnect Not implemented";
     }
 
-    public createChannel(): Promise<TransportChannel> {
-        throw "Not implemented";
+    public async createChannel(): Promise<TransportChannel> {
+        this.log.debug("Received create channel request");
+        const response = await this.peerTransport.sendUnary(this.remoteConnectionId, RemoteActions.CREATE_CHANNEL, {});
+        return new PeerProxyTransportChannel(response.id, this.remoteConnectionId, this.peerTransport);
     }
 
 }

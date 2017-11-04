@@ -16,16 +16,27 @@
  */
 import { ActionType } from "./ActionType";
 import { EventType } from "./events/EventType";
-import { Subscription } from "@plexus-interop/common";
+import { Subscription, Observer } from "@plexus-interop/common";
+import { StreamingInvocationClient } from "./StreamingInvocationClient";
 
 export interface PeerTransport {
     
-    sendRequest<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req): Promise<Res>;
+    sendUnary<Req, Res>(providerId: string, actionType: ActionType<Req, Res>, requestPaylaod: Req): Promise<Res>;
     
-    hostAction<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req) => Promise<Res>): void;
+    sendServerStreaming<Req, Res>(providerId: string, actionType: ActionType<Req, Res>, requestPaylaod: Req, observer: Observer<Res>): Promise<void>;
     
+    hostUnaryAction<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req) => Promise<Res>): void;
+    
+    hostServerStreamingAction<Req, Res>(actionType: ActionType<Req, Res>, req: Req, streamingClient: StreamingInvocationClient<Res>): void;
+    
+    /**
+     * Subscribe to multicast event
+     */
     subscribe<T>(eventType: EventType<T>, handler: (payload: T) => void): Subscription;
 
+    /**
+     * Post multicast event
+     */
     publish<T>(eventType: EventType<T>, payload: T): void;
 
 }

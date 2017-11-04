@@ -1,0 +1,85 @@
+/**
+ * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { TransportChannel, ChannelObserver } from "@plexus-interop/transport-common";
+import { clientProtocol as plexus, UniqueId, SuccessCompletion } from "@plexus-interop/protocol";
+import { AnonymousSubscription, Logger, LoggerFactory } from "@plexus-interop/common";
+import { PeerTransport } from "./PeerTransport";
+import { RemoteActions } from "./actions/RemoteActions";
+
+export class PeerProxyTransportChannel implements TransportChannel {
+
+    private readonly log: Logger;
+
+    private readonly channelId: UniqueId;
+
+    public constructor(
+        private strChannelId: string,
+        private remoteConnectionId: string,
+        private peerTransport: PeerTransport) {
+        this.channelId = UniqueId.fromString(strChannelId);
+        this.log = LoggerFactory.getLogger(`PeerProxyTransportChannel [${strChannelId}]`);
+    }
+
+    public uuid(): UniqueId {
+        return this.channelId;
+    }
+
+    public async sendMessage(data: ArrayBuffer): Promise<void> {
+        this.log.trace(`Sending message of ${data.byteLength} bytes`);
+        await this.peerTransport.sendUnary(this.remoteConnectionId, RemoteActions.SEND_MESSAGE, {
+            channelId: this.strChannelId,
+            messagePayload: data
+        });
+    }
+
+    public sendLastMessage(data: ArrayBuffer): Promise<plexus.ICompletion> {
+        this.sendMessage(data);
+        return this.close();
+    }
+
+    public open(observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
+        this.log.trace("Received open channel request");
+        this.peerTransport.sendServerStreaming(this.remoteConnectionId, RemoteActions.OPEN_CHANNEL, {
+            channelId: this.strChannelId
+        }, {
+            next: payload => {
+                this.log.trace(`Received payload from remote, ${payload.byteLength} bytes`);
+                observer.next(payload);
+            },
+            error: e => {
+                this.log.error("Received remote error", e);
+                observer.error(e);
+            },
+            complete: () => { 
+                this.log.trace("Received remote completion");
+                observer.complete();
+            }
+        });
+    }
+
+    public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
+        if (this.log.isTraceEnabled()) {
+            this.log.trace(`Sending channel close ${JSON.stringify(completion)} bytes`);
+        }
+        const respone = await this.peerTransport.sendUnary(this.remoteConnectionId, RemoteActions.CLOSE_CHANNEL, {
+            channelId: this.strChannelId,
+            completion
+        });
+        return respone.completion;
+    }
+
+}
