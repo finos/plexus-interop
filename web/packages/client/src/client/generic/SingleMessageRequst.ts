@@ -16,7 +16,7 @@
  */
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { Logger } from "@plexus-interop/common";
-import { ClientProtocolHelper } from "./ClientProtocolHelper";
+import { ClientProtocolHelper } from "@plexus-interop/protocol";
 
 /**
  * Represents Single Request to Broker

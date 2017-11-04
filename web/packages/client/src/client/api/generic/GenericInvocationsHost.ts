@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { GenericClient } from "../../../client/generic/GenericClient";
-import { InvocationMetaInfo } from "../../../client/generic/InvocationMetaInfo";
+import { InvocationMetaInfo } from "@plexus-interop/protocol";
 import { ClientDtoUtils } from "../../ClientDtoUtils";
 import { Invocation } from "../../../client/generic/Invocation";
 import { BidiStreamingInvocationHandler } from "../streaming/BidiStreamingInvocationHandler";

@@ -27,6 +27,7 @@
     "@types/loglevel": "^1.4.29",
     "@types/long": "^3.0.31",
     "@plexus-interop/transport-common": "0.1.1",
+    "@plexus-interop/client-api": "0.1.1",
     "loglevel": "^1.4.1",
     "long": "^3.2.0",
     "reflect-metadata": "^0.1.10",

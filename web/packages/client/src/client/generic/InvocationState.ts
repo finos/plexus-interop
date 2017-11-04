@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export type InvocationState = "CREATED" | "START_REQUESTED" | "ACCEPTING_INVOCATION_INFO" | "OPEN" | "COMPLETION_RECEIVED" | "COMPLETED" | "REMOTE_STARTING";
-
 // tslint:disable-next-line:variable-name
-export const InvocationState = {
-    CREATED: "CREATED" as InvocationState,
-    START_REQUESTED: "START_REQUESTED" as  InvocationState,
-    REMOTE_STARTING: "REMOTE_STARTING" as  InvocationState,
-    ACCEPTING_INVOCATION_INFO: "ACCEPTING_INVOCATION_INFO" as InvocationState, 
-    OPEN: "OPEN" as InvocationState,
-    COMPLETION_RECEIVED: "COMPLETION_RECEIVED" as InvocationState, 
-    COMPLETED:  "COMPLETED" as InvocationState
+export enum InvocationState {
+    CREATED = "CREATED",
+    START_REQUESTED = "START_REQUESTED",
+    REMOTE_STARTING = "REMOTE_STARTING",
+    ACCEPTING_INVOCATION_INFO = "ACCEPTING_INVOCATION_INFO",
+    OPEN = "OPEN",
+    COMPLETION_RECEIVE = "COMPLETION_RECEIVED",
+    COMPLETED = "COMPLETED"
 };

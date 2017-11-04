@@ -18,12 +18,12 @@ import { Invocation } from "./Invocation";
 import { InvocationMetaInfo } from "@plexus-interop/protocol";
 import { Observer } from "@plexus-interop/common";
 import { AnonymousSubscription } from "../api/AnonymousSubscription";
-import { ServiceDiscoveryRequest } from "../api/dto/ServiceDiscoveryRequest";
-import { ServiceDiscoveryResponse } from "../api/dto/ServiceDiscoveryResponse";
+import { ServiceDiscoveryRequest } from "@plexus-interop/client-api";
+import { ServiceDiscoveryResponse } from "@plexus-interop/client-api";
 import { clientProtocol } from "@plexus-interop/protocol";
-import { MethodDiscoveryRequest } from "../api/dto/MethodDiscoveryRequest";
-import { MethodDiscoveryResponse } from "../api/dto/MethodDiscoveryResponse";
-import { ProvidedMethodReference } from "../api/dto/ProvidedMethodReference";
+import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
+import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
+import { ProvidedMethodReference } from "@plexus-interop/client-api";
 
 export interface GenericClient {
 
