@@ -20,8 +20,8 @@ import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { ClientConnectionProcessor } from "./ClientConnectionProcessor";
 import { AuthenticationHandler } from "./AuthenticationHandler";
 import { InvocationRequestHandler } from "./InvocationRequestHandler";
-import { RegistryProvider } from "../metadata/RegistryProvider";
-import { RegistryService } from "../metadata/RegistryService";
+import { InteropRegistryProvider } from "../metadata/interop/InteropRegistryProvider";
+import { InteropRegistryService } from "../metadata/interop/InteropRegistryService";
 import { ClientRequestProcessor } from "./ClientRequestProcessor";
 
 export class Broker {
@@ -33,10 +33,10 @@ export class Broker {
     constructor(
         private appLifeCycleManager: AppLifeCycleManager,
         private connectionFactory: ServerConnectionFactory,
-        private registryProvider: RegistryProvider
+        private registryProvider: InteropRegistryProvider
     ) {
         const authHandler = new AuthenticationHandler(this.appLifeCycleManager);
-        const registryService = new RegistryService(this.registryProvider);
+        const registryService = new InteropRegistryService(this.registryProvider);
         const invocationRequestHandler = new InvocationRequestHandler(registryService, this.appLifeCycleManager);
         const clientRequestProcessor = new ClientRequestProcessor(invocationRequestHandler);
         this.connectionProcessor = new ClientConnectionProcessor(authHandler, clientRequestProcessor, this.appLifeCycleManager);

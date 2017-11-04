@@ -17,7 +17,7 @@
 import { Registry } from "./model/Registry";
 import { Observable } from "rxjs/Observable";
 
-export interface RegistryProvider {
+export interface InteropRegistryProvider {
 
     getCurrent(): Registry;
 

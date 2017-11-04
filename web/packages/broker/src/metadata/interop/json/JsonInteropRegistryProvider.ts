@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RegistryProvider } from "../RegistryProvider";
+import { InteropRegistryProvider } from "../InteropRegistryProvider";
 import { Registry } from "../model/Registry";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
@@ -38,9 +38,9 @@ import { ProvidedServiceDto } from "./ProvidedServiceDto";
 import { ProvidedService } from "../model/ProvidedService";
 import { ApplicationDto } from "./ApplicationDto";
 
-export class JsonBasedRegistryProvider implements RegistryProvider {
+export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
-    private log: Logger = LoggerFactory.getLogger("JsonBasedRegistryProvider");
+    private log: Logger = LoggerFactory.getLogger("JsonInteropRegistryProvider");
 
     private readonly $registry: Observable<Registry>;
     private current: Registry;

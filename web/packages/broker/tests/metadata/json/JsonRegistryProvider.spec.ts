@@ -1,11 +1,11 @@
-import { JsonBasedRegistryProvider } from "../../../src/metadata/json/JsonBasedRegistryProvider";
-import { Message } from "../../../src/metadata/model/Message";
-import { Service } from "../../../src/metadata/model/Service";
-import { Method } from "../../../src/metadata/model/Method";
-import { MethodType } from "../../../src/metadata/model/MethodType";
-import { Application } from "../../../src/metadata/model/Application";
-import { ConsumedMethod } from "../../../src/metadata/model/ConsumedMethod";
-import { ProvidedMethod } from "../../../src/metadata/model/ProvidedMethod";
+import { JsonInteropRegistryProvider } from "../../../src/metadata/interop/json/JsonInteropRegistryProvider";
+import { Message } from "../../../src/metadata/interop/model/Message";
+import { Service } from "../../../src/metadata/interop/model/Service";
+import { Method } from "../../../src/metadata/interop/model/Method";
+import { MethodType } from "../../../src/metadata/interop/model/MethodType";
+import { Application } from "../../../src/metadata/interop/model/Application";
+import { ConsumedMethod } from "../../../src/metadata/interop/model/ConsumedMethod";
+import { ProvidedMethod } from "../../../src/metadata/interop/model/ProvidedMethod";
 
 const fs = require("fs");
 
@@ -15,7 +15,7 @@ describe("JsonRegistryProvider", () => {
 
     it("Can parse metadata JSON", () => {
 
-        const sut = new JsonBasedRegistryProvider(metadataJson);
+        const sut = new JsonInteropRegistryProvider(metadataJson);
         const registry = sut.getCurrent();
         expect(registry).toBeTruthy();
         expect(registry.applications.size).toBe(4);

@@ -20,14 +20,14 @@ import { ConsumedMethodReference } from "./model/ConsumedMethodReference";
 import { ConsumedMethod } from "./model/ConsumedMethod";
 import { ProvidedMethod } from "./model/ProvidedMethod";
 import { ProvidedServiceReference } from "./model/ProvidedServiceReference";
-import { RegistryProvider } from "./RegistryProvider";
+import { InteropRegistryProvider } from "./InteropRegistryProvider";
 import { join, distinct, Logger, LoggerFactory, flatMap, ExtendedMap } from "@plexus-interop/common";
 import { Registry } from "./model/Registry";
 import { ConsumedServiceReference } from "./model/ConsumedServiceReference";
 import { ProvidedService } from "./model/ProvidedService";
 import { Method } from "./model/Method";
 
-export class RegistryService {
+export class InteropRegistryService {
 
     private readonly log: Logger = LoggerFactory.getLogger("RegistryService");
 
@@ -35,7 +35,7 @@ export class RegistryService {
 
     private registry: Registry;
 
-    constructor(private readonly registryProvider: RegistryProvider) {
+    constructor(private readonly registryProvider: InteropRegistryProvider) {
         this.updateRegistry(registryProvider.getCurrent());
         this.registryProvider.getRegistry().subscribe({
             next: updatedRegistry => this.updateRegistry(updatedRegistry)
