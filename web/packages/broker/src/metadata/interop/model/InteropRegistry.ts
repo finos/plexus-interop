@@ -14,13 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppRegistry } from "./model/AppRegistry";
-import { Observable } from "rxjs/Observable";
+import { Application } from "./Application";
+import { Message } from "./Message";
+import { Service } from "./Service";
+import { ExtendedMap } from "@plexus-interop/common";
 
-export interface AppRegistryProvider {
+export interface InteropRegistry {
 
-    getCurrent(): AppRegistry;
+    applications: ExtendedMap<string, Application>;
 
-    getAppRegistry(): Observable<AppRegistry>;
+    messages: ExtendedMap<string, Message>;
 
+    services: ExtendedMap<string, Service>;
+    
 }

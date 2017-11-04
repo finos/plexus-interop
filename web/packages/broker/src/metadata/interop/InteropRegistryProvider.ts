@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Registry } from "./model/Registry";
+import { InteropRegistry } from "./model/InteropRegistry";
 import { Observable } from "rxjs/Observable";
 
 export interface InteropRegistryProvider {
 
-    getCurrent(): Registry;
+    getCurrent(): InteropRegistry;
 
-    getRegistry(): Observable<Registry>;
+    getRegistry(): Observable<InteropRegistry>;
 
 }

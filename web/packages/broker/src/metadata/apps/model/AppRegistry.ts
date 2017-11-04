@@ -14,17 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Application } from "./Application";
-import { Message } from "./Message";
-import { Service } from "./Service";
 import { ExtendedMap } from "@plexus-interop/common";
+import { Application } from "./Application";
 
-export interface Registry {
-
-    applications: ExtendedMap<string, Application>;
-
-    messages: ExtendedMap<string, Message>;
-
-    services: ExtendedMap<string, Service>;
-    
+export interface AppRegistry {
+    apps: ExtendedMap<string, Application>;
 }

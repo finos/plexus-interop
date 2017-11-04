@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 import { InteropRegistryProvider } from "../InteropRegistryProvider";
-import { Registry } from "../model/Registry";
+import { InteropRegistry } from "../model/InteropRegistry";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/map";
-import "rxjs/add/operator/scan";
 import { RegistryDto } from "./RegistryDto";
 import { ExtendedArray, Logger, LoggerFactory, ExtendedMap, toMap } from "@plexus-interop/common";
 import { Message } from "../model/Message";
@@ -40,19 +39,22 @@ import { ApplicationDto } from "./ApplicationDto";
 
 export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
-    private log: Logger = LoggerFactory.getLogger("JsonInteropRegistryProvider");
+    private log: Logger;
 
-    private readonly $registry: Observable<Registry>;
-    private current: Registry;
+    private readonly $registry: Observable<InteropRegistry>;
+    private current: InteropRegistry;
 
     public constructor(jsonMetadata: string, $jsonMetadata?: Observable<string>) {
+        this.log = LoggerFactory.getLogger("JsonInteropRegistryProvider");
         this.current = this.parseRegistry(jsonMetadata);
         this.$registry = ($jsonMetadata || Observable.of(jsonMetadata))
-            .map(this.parseRegistry)
-            .scan(r => this.current = r);
+            .map(this.parseRegistry.bind(this));
+        this.$registry.subscribe({
+            next: update => this.current = update
+        });
     }
 
-    private parseRegistry(jsonRegistry: string): Registry {
+    private parseRegistry(jsonRegistry: string): InteropRegistry {
 
         this.log.trace(`Parsing JSON registry of ${jsonRegistry.length} length`);
         const registryDto: RegistryDto = JSON.parse(jsonRegistry);
@@ -181,11 +183,11 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         }
     }
 
-    public getCurrent(): Registry {
+    public getCurrent(): InteropRegistry {
         return this.current;
     }
 
-    public getRegistry(): Observable<Registry> {
+    public getRegistry(): Observable<InteropRegistry> {
         return this.$registry;
     }
 

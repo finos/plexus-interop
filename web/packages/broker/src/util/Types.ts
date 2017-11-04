@@ -1,6 +1,6 @@
 import { Observable } from "rxjs/Observable";
-import { ProvidedMethodReference } from "../metadata/model/ProvidedMethodReference";
-import { ConsumedMethodReference } from "../metadata/model/ConsumedMethodReference";
+import { ProvidedMethodReference } from "../metadata/interop/model/ProvidedMethodReference";
+import { ConsumedMethodReference } from "../metadata/interop/model/ConsumedMethodReference";
 
 export class Types {
 

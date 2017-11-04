@@ -22,7 +22,7 @@ import { ProvidedMethod } from "./model/ProvidedMethod";
 import { ProvidedServiceReference } from "./model/ProvidedServiceReference";
 import { InteropRegistryProvider } from "./InteropRegistryProvider";
 import { join, distinct, Logger, LoggerFactory, flatMap, ExtendedMap } from "@plexus-interop/common";
-import { Registry } from "./model/Registry";
+import { InteropRegistry } from "./model/InteropRegistry";
 import { ConsumedServiceReference } from "./model/ConsumedServiceReference";
 import { ProvidedService } from "./model/ProvidedService";
 import { Method } from "./model/Method";
@@ -33,7 +33,7 @@ export class InteropRegistryService {
 
     private appProvidedMethodsCache: ExtendedMap<string, ProvidedMethod[]> = new ExtendedMap<string, ProvidedMethod[]>();
 
-    private registry: Registry;
+    private registry: InteropRegistry;
 
     constructor(private readonly registryProvider: InteropRegistryProvider) {
         this.updateRegistry(registryProvider.getCurrent());
@@ -91,7 +91,7 @@ export class InteropRegistryService {
         return result;
     }
 
-    private updateRegistry(registry: Registry): void {
+    private updateRegistry(registry: InteropRegistry): void {
         this.log.debug("Registry updated");
         this.registry = registry;
         this.appProvidedMethodsCache.clear();

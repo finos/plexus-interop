@@ -18,12 +18,12 @@ import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, Erro
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 import { Completion } from "@plexus-interop/client";
 import { Observable } from "rxjs/Observable";
-import { RegistryService } from "../metadata/RegistryService";
+import { InteropRegistryService } from "../metadata/interop/InteropRegistryService";
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { TransportChannel, Defaults } from "@plexus-interop/transport-common";
 import { LoggerFactory, Logger, BufferedObserver, Observer } from "@plexus-interop/common";
-import { ConsumedMethodReference } from "../metadata/model/ConsumedMethodReference";
-import { ProvidedMethodReference } from "../metadata/model/ProvidedMethodReference";
+import { ConsumedMethodReference } from "../metadata/interop/model/ConsumedMethodReference";
+import { ProvidedMethodReference } from "../metadata/interop/model/ProvidedMethodReference";
 import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 import { Types } from "../util/Types";
 
@@ -32,7 +32,7 @@ export class InvocationRequestHandler {
     private readonly log: Logger = LoggerFactory.getLogger("InvocationRequestHandler");
 
     constructor(
-        private readonly registryService: RegistryService,
+        private readonly registryService: InteropRegistryService,
         private readonly appLifeCycleManager: AppLifeCycleManager) { }
 
     public async handleRequest(
