@@ -45,6 +45,10 @@ export class UniqueId {
         });
     }
 
+    public equals(other: UniqueId): boolean {
+        return other && other.toString() === this.toString();
+    }
+
     public static fromProperties(props: plexus.IUniqueId): UniqueId {
         return Object.assign(new UniqueId(), props);
     }

@@ -14,16 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, clientProtocol as plexus } from "@plexus-interop/protocol";
-import { Application } from "../metadata/apps/model/Application";
-import { AppLaunchRequest } from "./AppLaunchRequest";
-import { AppLaunchResponse } from "./AppLaunchResponse";
-import { LaunchInvocationContext } from "./LaunchInvocationContext";
+import { ReadOnlyCancellationToken } from "@plexus-interop/common";
 
-export interface AppLauncher {
-
-    /**
-     * Launches new application, returns instance Id
-     */
-    launch(invocationContext: LaunchInvocationContext, request: AppLaunchRequest): Promise<AppLaunchResponse>;
+export interface LaunchInvocationContext {
+    cancellationToken: ReadOnlyCancellationToken;
 }

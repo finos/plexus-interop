@@ -22,6 +22,12 @@ import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
 import { PeerProxyConnection } from "../peers/PeerProxyConnection";
 import { PeerConnectionsService } from "./PeerConnectionsService";
 import { AppConnectionHeartBit } from "./events/AppConnectionHeartBit";
+import { AppRegistryService } from "../metadata/apps/AppRegistryService";
+import { AppLauncherRegistry } from "../launcher/AppLauncherRegistry";
+import { MethodInvocationContext } from "@plexus-interop/client-api";
+import { CancellationToken } from "@plexus-interop/common";
+import { UniqueId } from "@plexus-interop/protocol";
+import { AsyncHelper } from "@plexus-interop/common";
 
 /**
  * Manages one client connection and proxy connections for peer brokers
@@ -32,13 +38,18 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
 
     private readonly heartBitPeriod: number = 300;
     private readonly heartBitTtl: number = 1000;
+
+    // time to wait for application to start before rejecting broker's request
+    private readonly spawnConnectionTimeout: number = 5 * 60 * 1000;
+
     // TODO stop on disconnect
     private connectionHeartBitInterval: undefined | number | NodeJS.Timer;
 
     private onlineConnections: Cache = new InMemoryCache();
 
     constructor(
-        private readonly peerConnectionsService: PeerConnectionsService
+        private readonly peerConnectionsService: PeerConnectionsService,
+        private readonly appRegistryService: AppRegistryService
     ) {
         this.subscribeToHeartBits();
     }
@@ -72,9 +83,30 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         return this.getOrSpawnConnectionForOneOf([applicationId]);
     }
 
-    public spawnConnection(applicationId: string): Promise<ApplicationConnection> {
-        // TODO
-        throw "Not implemented";
+    public async spawnConnection(applicationId: string): Promise<ApplicationConnection> {
+        this.log.debug(`Spawning instance for [${applicationId}] app`);
+        const app = this.appRegistryService.getApplication(applicationId);
+        this.log.debug(`App [${applicationId}] found in registry`);
+        const appLauncher = AppLauncherRegistry.getAppLauncher(app.launcherId);
+        this.log.debug(`App Launcher found for [${applicationId}] app, launching ... `);
+        const cancellationToken = new CancellationToken();
+        const appLaunchResponse = await appLauncher.launch({
+            cancellationToken
+        }, {
+                appId: applicationId,
+                launchParams: app.launcherParams
+            });
+        this.log.debug(`Waiting for application [${applicationId}] id with instance id [${appLaunchResponse.appInstanceId.toString()}] to connect`);
+        try {
+            await AsyncHelper.waitFor(() => this.isInstanceConnected(appLaunchResponse.appInstanceId),
+                new CancellationToken(), 500, this.spawnConnectionTimeout);
+            return this.getOnlineConnectionsInternal()
+                .find(appConnection => appConnection.descriptor.instanceId.equals(appLaunchResponse.appInstanceId)) as ApplicationConnection;
+        } catch (e) {
+            this.log.error(`Failed to wait for [${appLaunchResponse.appInstanceId.toString()}] instance to start`, e);
+            cancellationToken.cancel(`Time out ${this.spawnConnectionTimeout} passed`);
+            throw e;
+        }
     }
 
     public async getOrSpawnConnectionForOneOf(applicationIds: string[]): Promise<ApplicationConnection> {
@@ -113,6 +145,12 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
     private handleDroppedConnection(appConnection: ApplicationConnection, listener: (connection: ApplicationConnection) => void): void {
         this.log.error(`Connection [${appConnection.descriptor.connectionId}] dropped`);
         listener(appConnection);
+    }
+
+    private isInstanceConnected(instanceId: UniqueId): boolean {
+        return this.getOnlineConnectionsInternal()
+            .filter(appConnection => appConnection.descriptor.instanceId.toString() === instanceId.toString())
+            .length > 0;
     }
 
     private getOnlineConnectionsInternal(): ApplicationConnection[] {
