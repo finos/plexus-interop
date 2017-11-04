@@ -23,6 +23,7 @@
   "dependencies": {
     "long": "^3.2.0",
     "@plexus-interop/transport-common": "0.1.1",
+    "@plexus-interop/client-api": "0.1.1",
     "protobufjs": "^6.8.0",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.4.2",
