@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { TransportChannel, ChannelObserver } from "@plexus-interop/transport-common";
-import { clientProtocol as plexus, UniqueId, SuccessCompletion } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, UniqueId, SuccessCompletion, ErrorCompletion, ClientError } from "@plexus-interop/protocol";
 import { AnonymousSubscription, Logger, LoggerFactory } from "@plexus-interop/common";
 import { RemoteActions } from "./actions/RemoteActions";
 import { RemoteBrokerService } from "./remote/RemoteBrokerService";
@@ -40,7 +40,7 @@ export class PeerProxyTransportChannel implements TransportChannel {
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
         this.log.trace(`Sending message of ${data.byteLength} bytes`);
-        await this.remoteBrokerService.sendUnary(RemoteActions.SEND_MESSAGE, {
+        await this.remoteBrokerService.invokeUnary(RemoteActions.SEND_MESSAGE, {
             channelId: this.strChannelId,
             messagePayload: data
         }, this.remoteConnectionId);
@@ -53,33 +53,39 @@ export class PeerProxyTransportChannel implements TransportChannel {
 
     public open(observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.trace("Received open channel request");
-        // this.remoteBrokerService.sendServerStreaming(this.remoteConnectionId, RemoteActions.OPEN_CHANNEL, {
-        //     channelId: this.strChannelId
-        // }, {
-        //     next: payload => {
-        //         this.log.trace(`Received payload from remote, ${payload.byteLength} bytes`);
-        //         observer.next(payload);
-        //     },
-        //     error: e => {
-        //         this.log.error("Received remote error", e);
-        //         observer.error(e);
-        //     },
-        //     complete: () => { 
-        //         this.log.trace("Received remote completion");
-        //         observer.complete();
-        //     }
-        // });
+        this.remoteBrokerService.invoke(RemoteActions.OPEN_CHANNEL, {
+            channelId: this.strChannelId
+        }, this.remoteConnectionId).subscribe({
+            next: payload => {
+                this.log.trace(`Received payload from remote, ${payload.byteLength} bytes`);
+                observer.next(payload);
+            },
+            error: e => {
+                this.log.error("Received remote error", e);
+                observer.error(e);
+            },
+            complete: () => {
+                this.log.trace("Received remote completion");
+                observer.complete();
+            }
+        });
     }
 
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Sending channel close ${JSON.stringify(completion)} bytes`);
         }
-        const respone = await this.remoteBrokerService.sendUnary(RemoteActions.CLOSE_CHANNEL, {
-            channelId: this.strChannelId,
-            completion
-        }, this.remoteConnectionId);
-        return respone.completion;
+        try {
+            const response = await this.remoteBrokerService.invokeUnary(RemoteActions.CLOSE_CHANNEL, {
+                channelId: this.strChannelId,
+                completion
+            }, this.remoteConnectionId);
+            return response.completion;
+        } catch (error) {
+            this.log.error("Error on close received", error);
+            return new ErrorCompletion(new ClientError(error));
+        }
+
     }
 
 }

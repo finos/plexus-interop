@@ -20,6 +20,7 @@ import { AppConnectionHeartBit } from "../peers/events/AppConnectionHeartBit";
 import { PeerConnectionsService } from "../peers/PeerConnectionsService";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 import { PeerProxyConnection } from "../peers/PeerProxyConnection";
+import { RemoteBrokerService } from "./remote/RemoteBrokerService";
 
 export class PeerServerConnectionFactory implements ServerConnectionFactory {
 
@@ -29,7 +30,9 @@ export class PeerServerConnectionFactory implements ServerConnectionFactory {
 
     private readonly connectionsObserver: BufferedObserver<TransportConnection> = new BufferedObserver(100, this.log);
 
-    constructor(private readonly peerConnectionsService: PeerConnectionsService) {
+    constructor(
+        private readonly peerConnectionsService: PeerConnectionsService,
+        private readonly remoteBrokerService: RemoteBrokerService) {
         this.listenForPeerConnections();
     }
 
@@ -39,6 +42,7 @@ export class PeerServerConnectionFactory implements ServerConnectionFactory {
     }
 
     private listenForPeerConnections(): void {
+        this.log.debug("Starting to listen for connections");
         this.peerConnectionsService.subscribeToConnectionsHearBits({
             next: (connectionDescriptor: AppConnectionHeartBit) => {
                 // create proxy connection only once
@@ -49,7 +53,7 @@ export class PeerServerConnectionFactory implements ServerConnectionFactory {
                         instanceId: connectionDescriptor.instanceId,
                         connectionId: UniqueId.fromString(connectionDescriptor.connectionId)
                     };
-                    this.connectionsObserver.next(new PeerProxyConnection(appConnectionDescriptor));
+                    this.connectionsObserver.next(new PeerProxyConnection(connectionDescriptor.connectionId, appConnectionDescriptor, this.remoteBrokerService));
                 }
             }
         });

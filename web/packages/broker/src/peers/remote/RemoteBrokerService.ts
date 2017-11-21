@@ -16,8 +16,9 @@
  */
 import { ActionType } from "../ActionType";
 import { EventType } from "../events/EventType";
-import { Subscription, Observer } from "@plexus-interop/common";
+import { Subscription } from "@plexus-interop/common";
 import { PartialObserver } from "rxjs/Observer";
+import { Observable } from "rxjs/Observable";
 
 /**
  * All action calls passed from Proxy Channels/Connections to remote connection
@@ -28,8 +29,10 @@ export interface RemoteBrokerService {
 
     publish<T>(eventType: EventType<T>, payload: T, remoteBrokerId?: string): void;
 
-    sendUnary<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Promise<Res>;
+    invoke<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Observable<Res>;
 
-    hostUnaryAction<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req) => Promise<Res>): void;
+    host<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req) => Observable<Res>): void;
 
+    invokeUnary<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Promise<Res>;
+    
 }

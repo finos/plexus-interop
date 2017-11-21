@@ -21,6 +21,6 @@ export interface EventBus {
 
     subscribe(key: string, observer: PartialObserver<Event>): Subscription;
 
-    publish(key: string, payload: any): void;
+    publish(key: string, event: Event): void;
 
 }
