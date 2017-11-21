@@ -1,3 +1,6 @@
+import { Event } from "./Event";
+import { PartialObserver } from "rxjs/Observer";
+import { Subscription } from "@plexus-interop/common";
 /**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -16,7 +19,7 @@
  */
 export interface EventBus {
 
-    subscribe(key: string, listener: (payload: any) => void): Promise<void>;
+    subscribe(key: string, observer: PartialObserver<Event>): Subscription;
 
     publish(key: string, payload: any): void;
 

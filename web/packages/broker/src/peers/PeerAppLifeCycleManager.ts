@@ -36,8 +36,8 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
 
     private readonly log: Logger = LoggerFactory.getLogger("PeerAppLifeCycleManager");
 
-    private readonly heartBitPeriod: number = 300;
-    private readonly heartBitTtl: number = 1000;
+    private readonly heartBitPeriod: number = 1000;
+    private readonly heartBitTtl: number = 10000;
 
     // time to wait for application to start before rejecting broker's request
     private readonly spawnConnectionTimeout: number = 5 * 60 * 1000;
@@ -66,13 +66,12 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
             },
             connection
         };
-        // current client's connection, not expiration
         if ((connection as PeerProxyConnection).isProxy) {
             this.log.debug(`Accepted proxy [${connectionStrId}] connection`);
             this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection, connectionDropped)));
         } else {
             this.log.debug(`Accepted new [${connectionStrId}] connection`);
-            this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod} period]`);
+            this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod}] period`);
             this.connectionHeartBitInterval = this.sendHeartBitsFor(appConnection);
             this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
         }
@@ -99,7 +98,8 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         this.log.debug(`Waiting for application [${applicationId}] id with instance id [${appLaunchResponse.appInstanceId.toString()}] to connect`);
         try {
             await AsyncHelper.waitFor(() => this.isInstanceConnected(appLaunchResponse.appInstanceId),
-                new CancellationToken(), 500, this.spawnConnectionTimeout);
+                new CancellationToken(), this.heartBitPeriod, this.spawnConnectionTimeout);
+            this.log.debug(`App [${applicationId}] id, instance id [${appLaunchResponse.appInstanceId.toString()}] is connected`);
             return this.getOnlineConnectionsInternal()
                 .find(appConnection => appConnection.descriptor.instanceId.equals(appLaunchResponse.appInstanceId)) as ApplicationConnection;
         } catch (e) {

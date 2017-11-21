@@ -17,16 +17,16 @@
 import { AppConnectionHeartBit } from "./events/AppConnectionHeartBit";
 import { Subscription, Logger, LoggerFactory } from "@plexus-interop/common";
 import { PartialObserver } from "rxjs/Observer";
-import { PeerTransport } from "./PeerTransport";
 import { Observable } from "rxjs/Observable";
 import { EventType } from "./events/EventType";
 import "rxjs/add/operator/share";
+import { RemoteBrokerService } from "./remote/RemoteBrokerService";
 
 export class PeerConnectionsService {
 
     private readonly log: Logger = LoggerFactory.getLogger("PeerConnectionService");
 
-    constructor(private peerTransport: PeerTransport) {
+    constructor(private remoteBrokerService: RemoteBrokerService) {
         this.init();
     }
 
@@ -34,10 +34,8 @@ export class PeerConnectionsService {
 
     private init(): void {
         this.$heartbits = new Observable<AppConnectionHeartBit>(observer => {
-            this.log.debug("Subscribing to app hearbits");
-            const sourceSubscription = this.peerTransport.subscribe(EventType.AppConnectionHearBit, (heartBit: AppConnectionHeartBit) => {
-                observer.next(heartBit);
-            });
+            this.log.debug("Subscribing to app heartbits");
+            const sourceSubscription = this.remoteBrokerService.subscribe(EventType.AppConnectionHearBit, observer);
             return () => {
                 this.log.debug("Unsubscribing from app hearbits");
                 sourceSubscription.unsubscribe();
@@ -52,7 +50,7 @@ export class PeerConnectionsService {
     }
 
     public sendHeartBit(heartBit: AppConnectionHeartBit): void {
-        this.peerTransport.publish<AppConnectionHeartBit>(EventType.AppConnectionHearBit, heartBit);
+        this.remoteBrokerService.publish<AppConnectionHeartBit>(EventType.AppConnectionHearBit, heartBit);
     }
 
 }

@@ -60,7 +60,7 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                             reject(error);
                         }
                     } else {
-                        log.trace(`Processing client request channel  [${channelStrId}]`);
+                        log.trace(`Processing client request channel [${channelStrId}]`);
                         try {
                             const channelCompletion = await this.clientRequestProcessor.handle(channel, sourceConnection);
                             if (log.isTraceEnabled()) {

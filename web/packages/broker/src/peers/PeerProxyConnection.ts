@@ -19,9 +19,9 @@ import { Observer, BufferedObserver, Logger, LoggerFactory } from "@plexus-inter
 import { clientProtocol } from "@plexus-interop/protocol";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 import { ProxyAuthenticationHandler } from "./ProxyAuthenticationHandler";
-import { PeerTransport } from "./PeerTransport";
 import { RemoteActions } from "./actions/RemoteActions";
 import { PeerProxyTransportChannel } from "./PeerProxyTransportChannel";
+import { RemoteBrokerService } from "./remote/RemoteBrokerService";
 
 export class PeerProxyConnection implements TransportConnection {
 
@@ -36,7 +36,7 @@ export class PeerProxyConnection implements TransportConnection {
     constructor(
         private hostConnectionId: string,
         private readonly connectionDescriptor: ApplicationConnectionDescriptor,
-        private readonly peerTransport: PeerTransport) {
+        private readonly remoteBrokerService: RemoteBrokerService) {
         
         this.remoteConnectionId = connectionDescriptor.connectionId.toString();
         this.log = LoggerFactory.getLogger(`PeerProxyConnection [${connectionDescriptor.connectionId.toString()}]`);
@@ -64,8 +64,8 @@ export class PeerProxyConnection implements TransportConnection {
 
     public async createChannel(): Promise<TransportChannel> {
         this.log.debug("Received create channel request");
-        const response = await this.peerTransport.sendUnary(this.remoteConnectionId, RemoteActions.CREATE_CHANNEL, {});
-        return new PeerProxyTransportChannel(response.id, this.remoteConnectionId, this.peerTransport);
+        const response = await this.remoteBrokerService.sendUnary(RemoteActions.CREATE_CHANNEL, {}, this.remoteConnectionId);
+        return new PeerProxyTransportChannel(response.id, this.remoteConnectionId, this.remoteBrokerService);
     }
 
 }
