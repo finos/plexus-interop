@@ -20,7 +20,7 @@
     "prebuild-all": "yarn install",
     "e2e": "cd ./packages/e2e && yarn electron-e2e",
     "poste2e": "yarn coverage",
-    "coverage": "nyc mocha; nyc report",
+    "coverage": "nyc mocha; nyc report --reporter=text --reporter=html",
     "benchmarks": "cd ./packages/e2e && yarn electron-e2e-benchmarks"
   },
   "workspaces": [
