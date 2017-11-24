@@ -26,13 +26,21 @@ Plexus Interop repository consist of the following main sections:
 * *protocol* - definitions of Plexus Interop protocol messages in [Protobuf](https://developers.google.com/protocol-buffers/) format.
 * *samples* - sample interop metadata. 
 
+Build and samples are currently tested on Windows environments; building and running on Linux/OSX environments is still experimental (see below).
+
 ## Build/Install
+
+Make sure that Java SDK is installed and [JAVA_HOME variable is set](https://www.mkyong.com/java/how-to-set-java_home-on-windows-10/).
 
 All Plexus Interop components can be built using [Gradle](https://gradle.org/) tool using the following single command:
 
-`gradlew build --console plain`
+`./gradlew build --console plain`
 
-Build produces artifacts into folder "bin".
+Build produces artifacts into folder "bin"; the first run can take 10 minutes or more, depending on your Internet connection speed.
+
+### Using OSX
+
+If running on OSX, please update `desktop/src/Plexus.Interop.sln` file and remove any code block that starts with `ProjectSection(ProjectDependencies)` and ends with `EndSection`; if you have already executed the `gradlew` build once, you must cleanup your local checkout using `git clean -d -f -X` (add `-n` for a dry run).
 
 ## Running Samples
 
@@ -40,9 +48,9 @@ After successful build samples binaries will be located in `bin` directory.
 
 Run .Net to Web interop example on Windows:
 
-- Go to `bin/win-x86/samples/greeting`
-- Launch Broker – LaunchBroker.cmd
-- Launch Greeting Client – LaunchGreetingClient.cmd
+- Go to `bin/win-x86/samples/greeting` (or `bin/osx-x64/samples/greeting` for OSX/Linux)
+- Launch Broker – `LaunchBroker.cmd` (or `LaunchBroker.sh` for OSX/Linux)
+- Launch (from a different terminal) Greeting Client – LaunchGreetingClient.cmd
     - Choose “Discovery” option (5) and “Greeting from Electron Web app” from discovery response
 
     ![Sample-1](./docs/src/main/asciidoc/images/sample-1.png "Sample-1")
