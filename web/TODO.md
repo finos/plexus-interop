@@ -2,6 +2,7 @@
 
 Web Broker TODOs:
 
+- Remote Peer Service - Host action 
 - Host Connection Heart bits
 - Local Storage Event Bus
 - Bringing all together

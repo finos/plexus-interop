@@ -23,7 +23,6 @@ import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
 
 export class AuthenticationHandler implements AsyncHandler<[TransportConnection, TransportChannel], ApplicationDescriptor> {
 
-
     constructor(private readonly appLifeCycleManager: AppLifeCycleManager) { }
 
     public handle(connectionDetails: [TransportConnection, TransportChannel]): Promise<ApplicationDescriptor> {

@@ -10,7 +10,7 @@ import { RemoteActionResult, isFailed, isSucceded, isCompleted } from "./RemoteA
 
 
 export class EventBusRemoteBrokerService implements RemoteBrokerService {
-    
+
     private requestCounter: number = 0;
 
     private readonly log: Logger;
@@ -30,12 +30,10 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
     public invoke<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Observable<Res> {
 
         const requestId = this.newRequestId();
-
         const requestTopic = this.requestTopic(remoteBrokerId, actionType);
         const responseTopic = this.responseTopic(remoteBrokerId, actionType, requestId);
 
-        return Observable.create((invocationSubscriber: Observer<Res>) => {
-
+        return new Observable((invocationSubscriber: Observer<Res>) => {
             this.eventBus.subscribe(responseTopic, (event) => {
                 this.log.trace(`Received update for ${responseTopic}`);
                 const invocationResult = event.payload as RemoteActionResult;
@@ -47,37 +45,44 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
                     invocationSubscriber.next(invocationResult.payload);
                 }
             });
-
             this.log.trace(`Sending request to ${requestTopic}`);
-
-            this.eventBusClient.publish(requestTopic, { payload: json }).then((response) => {
-                log.debug(`${this.name}: Published to ${requestTopic}`);
-                return response;
-            });
-
+            this.eventBus.publish(requestTopic, { payload: requestPaylaod });
         });
 
-        throw 'Not Implemented';
     }
 
     public publish<T>(eventType: EventType<T>, payload: T, remoteBrokerId?: string): void {
-        throw 'Not Implemented';
+        const requestTopic = this.eventTopic(eventType, remoteBrokerId);
+        this.log.trace(`Publishing to ${requestTopic}`);
+        this.eventBus.publish(requestTopic, {
+            payload
+        });
     }
 
-    public subscribe<T>(eventType: EventType<T>, observer: PartialObserver<T>): Subscription {
-        throw 'Not Implemented';
+    public subscribe<T>(eventType: EventType<T>, observer: PartialObserver<T>, remoteBrokerId?: string): Subscription {
+        const requestTopic = this.eventTopic(eventType, remoteBrokerId);
+        this.log.trace(`Subscribing to ${requestTopic}`);
+        return new Observable((observer: Observer<T>) => {
+            this.eventBus.subscribe(requestTopic, event => {
+                observer.next(event.payload);
+            });
+        }).subscribe(observer);
     }
 
-    private responseTopic(remoteId: string, actionType: ActionType<any, any>, requestId: number): string  {
+    private responseTopic(remoteId: string, actionType: ActionType<any, any>, requestId: number): string {
         return `res.${requestId}.${actionType.id}.${this.id}.${remoteId}`;
     }
 
-    private requestTopic(remoteId: string, actionType: ActionType<any, any>): string  {
+    private eventTopic(eventType: EventType<any>, remoteId?: string): string {
+        return `event.${eventType.id}${remoteId ? "." + remoteId : ""}`;
+    }
+
+    private requestTopic(remoteId: string, actionType: ActionType<any, any>): string {
         return `req.${actionType.id}.${this.id}.${remoteId}`;
     }
 
     private newRequestId(): number {
         return this.requestCounter++;
-    }    
+    }
 
 }

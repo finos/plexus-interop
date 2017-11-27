@@ -45,7 +45,7 @@ export class PeerProxyConnection implements TransportConnection {
 
     }
 
-    public async open(channelObserver: Observer<TransportChannel>): Promise<void> {
+    public async connect(channelObserver: Observer<TransportChannel>): Promise<void> {
         this.log.debug(`Broker subscribed to channels`);
         this.incomingChannelsObserver.setObserver(channelObserver);
     }
@@ -58,13 +58,19 @@ export class PeerProxyConnection implements TransportConnection {
         throw "getManagedChannels Not implemented";
     }
 
+    public isConnected(): boolean {
+        // TODO 
+        throw "isConnected Not Implemented";
+    }
+
     public disconnect(completion?: clientProtocol.ICompletion): Promise<void> {
+        // TODO 
         throw "disconnect Not implemented";
     }
 
     public async createChannel(): Promise<TransportChannel> {
         this.log.debug("Received create channel request");
-        const response = await this.remoteBrokerService.sendUnary(RemoteActions.CREATE_CHANNEL, {}, this.remoteConnectionId);
+        const response = await this.remoteBrokerService.invokeUnary(RemoteActions.CREATE_CHANNEL, {}, this.remoteConnectionId);
         return new PeerProxyTransportChannel(response.id, this.remoteConnectionId, this.remoteBrokerService);
     }
 
