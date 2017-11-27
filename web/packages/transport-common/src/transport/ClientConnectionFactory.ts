@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 import {TransportConnection} from "./TransportConnection";
+import { ConnectionDetails } from "./ConnectionDetails";
 
 export abstract class ClientConnectionFactory {
 
-    public abstract connect(): Promise<TransportConnection>;
+    public abstract connect(connectionDetails: ConnectionDetails): Promise<TransportConnection>;
 
 }

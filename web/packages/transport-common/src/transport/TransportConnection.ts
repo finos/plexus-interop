@@ -42,9 +42,14 @@ export interface TransportConnection {
     uuid(): UniqueId;
 
     /**
+     * Checks whether connection is active
+     */
+    isConnected(): boolean;
+
+    /**
      * Opens current connection, starting to receive incoming channels
      */
-    open(channelObserver: Observer<TransportChannel>): Promise<void>;
+    connect(channelObserver: Observer<TransportChannel>): Promise<void>;
 
 }
 

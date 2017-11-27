@@ -32,7 +32,7 @@ export class TestInMemoryConnectionFactory {
     public async connectClient(channelObserver: Observer<TransportChannel>): Promise<TransportConnection> {
         const connection = new FramedTransportConnection(
             new TestBufferedInMemoryFramedTransport(UniqueId.generateNew(), this.clientInBuffer, this.serverInBuffer, 8, LoggerFactory.getLogger("ClientTransport")));
-        return connection.open(channelObserver).then(() => connection);
+        return connection.connect(channelObserver).then(() => connection);
     }
 
     public async connectServer(channelObserver: Observer<TransportChannel>): Promise<TransportConnection> {

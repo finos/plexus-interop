@@ -105,7 +105,11 @@ export class FramedTransportConnection implements TransportConnection, Transport
         return this.framedTransport.uuid();
     }
 
-    public async open(channelObserver: Observer<TransportChannel>): Promise<void> {
+    public isConnected(): boolean {
+        return !this.stateMachine.isOneOf(ConnectionState.CREATED, ConnectionState.CLOSED);
+    }
+
+    public async connect(channelObserver: Observer<TransportChannel>): Promise<void> {
         this.log.debug("Opening connection");
         this.channelObserver = channelObserver;
         return this.stateMachine.goAsync(ConnectionState.OPEN);

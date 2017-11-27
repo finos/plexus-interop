@@ -49,7 +49,7 @@ describe("FramedTransportConnection", () => {
         const transportConnection = new FramedTransportConnection(mockFrameTransport);
         const channels: TransportChannel[] = [];
         
-        await transportConnection.open({
+        await transportConnection.connect({
             next: ch => channels.push(ch),
             complete: () => { },
             error: e => { }

@@ -22,4 +22,5 @@ export * from "./TransportChannel";
 export * from "./InMemoryConnectionFactory";
 export * from "./InMemoryFramedTransport";
 export * from "./ServerConnectionFactory";
+export * from "./ConnectionDetails";
 export {UniqueId as UniqueId} from "@plexus-interop/protocol";

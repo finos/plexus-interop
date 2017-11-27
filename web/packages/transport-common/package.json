@@ -9,6 +9,7 @@
     "prebuild": "yarn lint && trash dist",
     "build": "yarn build:main",
     "postbuild": "yarn test",
+    "watch": "tsc -w",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
