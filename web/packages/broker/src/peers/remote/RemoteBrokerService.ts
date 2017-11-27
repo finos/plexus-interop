@@ -29,9 +29,9 @@ export interface RemoteBrokerService {
 
     publish<T>(eventType: EventType<T>, payload: T, remoteBrokerId?: string): void;
 
-    invoke<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Observable<Res>;
+    invokeUnary<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Promise<Res>;
 
-    host<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req) => Observable<Res>): void;
+    host<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req) => Observable<Res>, hostId: string): void;
 
     invokeUnary<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Promise<Res>;
     
