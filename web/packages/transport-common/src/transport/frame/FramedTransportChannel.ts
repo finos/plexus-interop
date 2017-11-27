@@ -244,7 +244,9 @@ export class FramedTransportChannel implements TransportChannel {
         this.dispose();
         if (this.onCloseHandler) {
             this.log.debug("Reporting summarized completion");
-            const completion = ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion || new ErrorCompletion("Remote side not completed"));
+            const completion = ClientProtocolUtils.createSummarizedCompletion(
+                this.clientCompletion, 
+                this.remoteCompletion || new ErrorCompletion(new ClientError("Remote side not completed")));
             if (!ClientProtocolUtils.isSuccessCompletion(completion)) {
                 this.channelObserver.error(error || completion.error);
             }

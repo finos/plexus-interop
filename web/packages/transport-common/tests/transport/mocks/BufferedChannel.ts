@@ -73,7 +73,7 @@ export class BufferedChannel implements TransportChannel {
 
     public async sendLastMessage(data: ArrayBuffer): Promise<plexus.ICompletion> {
         await this.sendMessage(data);
-        return this.close;
+        return this.close();
     }
 
     public cancel(): void {
@@ -82,7 +82,6 @@ export class BufferedChannel implements TransportChannel {
 
     public async close(): Promise<SuccessCompletion> {
         this.log.info("Close requested");
-        this.cancel();
         return new SuccessCompletion();
     }
 
