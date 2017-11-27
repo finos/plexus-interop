@@ -18,35 +18,43 @@ import { GenericClientFactory } from "../../src/client/generic/GenericClientFact
 import { FramedTransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { when, mock, instance } from "ts-mockito";
 import { CancellationToken } from "@plexus-interop/common";
-import { ClientProtocolHelper as modelHelper } from "../../src/client/generic/ClientProtocolHelper";
+import { ClientProtocolHelper as modelHelper } from "@plexus-interop/protocol";
 import { BufferedChannel } from "./client-mocks";
 
 describe("GenericClient", () => {
 
     it("Can be created if connect request/response handshake received", async () => {
 
-        const mockedConnection = mock(FramedTransportConnection);
-        const cancellationToken = new CancellationToken();
-        const mockChannel = new BufferedChannel(cancellationToken);
+        debugger;
+        try {
+            const mockedConnection = mock(FramedTransportConnection);
+            const cancellationToken = new CancellationToken();
+            const mockChannel = new BufferedChannel(cancellationToken);
+            const id = UniqueId.generateNew();
+            when(mockedConnection.createChannel()).thenReturn(Promise.resolve(mockChannel));
+            when(mockedConnection.uuid()).thenReturn(id);
+            const connection = instance(mockedConnection);
 
-        const id = UniqueId.generateNew();
-        when(mockedConnection.createChannel()).thenReturn(Promise.resolve(mockChannel));
-        when(mockedConnection.uuid()).thenReturn(id);
-        const connection = instance(mockedConnection);
+            const sut = new GenericClientFactory(connection);
 
-        const sut = new GenericClientFactory(connection);
+            const clientPromise = sut.createClient({ applicationId: "appId" });
+            const connectRequest = modelHelper.decodeConnectRequest(await mockChannel.pullOutMessage());
+            debugger;
+            expect(connectRequest).toBeDefined();
+            expect(connectRequest.applicationId).toEqual("appId");
 
-        const clientPromise = sut.createClient({ applicationId: "appId" });
-        const connectRequest = modelHelper.decodeConnectRequest(await mockChannel.pullOutMessage());
-        expect(connectRequest).toBeDefined();
-        expect(connectRequest.applicationId).toEqual("appId");
+            mockChannel.addToInbox(modelHelper.connectResponsePayload({
+                connectionId: UniqueId.generateNew()
+            }));
+            debugger;
+            await clientPromise;
+            debugger;
+            cancellationToken.cancel("All done");
+        } catch (error) {
+            debugger;
+            console.error("error", error);
+        }
 
-        mockChannel.addToInbox(modelHelper.connectResponsePayload({
-            connectionId: UniqueId.generateNew()
-        }));
-
-        await clientPromise;
-        cancellationToken.cancel("All done");
 
     });
 
@@ -85,7 +93,7 @@ describe("GenericClient", () => {
         if (discoveryRequest.consumedService) {
             expect(discoveryRequest.consumedService.serviceId).toEqual("serviceId");
         } else {
-            fail("Consumed service is null")
+            fail("Consumed service is null");
         }
 
         mockChannel.addToInbox(modelHelper.discoveryResponsePayload(

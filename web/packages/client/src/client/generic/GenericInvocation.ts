@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { UniqueId, Channel, Defaults, ChannelObserver } from "@plexus-interop/transport-common";
-import { clientProtocol as plexus, SuccessCompletion, ErrorCompletion, ClientError, ClientProtocolUtils } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, SuccessCompletion, ErrorCompletion, ClientError, ClientProtocolUtils, InvocationMetaInfo } from "@plexus-interop/protocol";
 import { ClientProtocolHelper as modelHelper, ClientProtocolHelper } from "@plexus-interop/protocol";
 import { InvocationState } from "./InvocationState";
 import { Observer } from "@plexus-interop/common";

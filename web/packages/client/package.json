@@ -10,6 +10,7 @@
     "build": "yarn build:main",
     "postbuild": "yarn test",
     "build:main": "tsc -p tsconfig.json",
+    "watch": "tsc -w",
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "test": "yarn unit",

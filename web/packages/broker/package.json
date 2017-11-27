@@ -3,7 +3,7 @@
   "types": "dist/main/src/index.d.ts",
   "description": "Plexus Interop Broker",
   "license": "Apache-2.0",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "scripts": {
     "prebuild": "yarn lint && trash dist",
     "build": "yarn build:main",
@@ -13,7 +13,7 @@
     "unit": "jest --coverage",
     "pretest": "yarn lint",
     "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/broker@0.0.1",
+    "unpublish": "npm unpublish @plexus-interop/broker@0.1.1",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",

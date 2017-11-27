@@ -95,17 +95,17 @@ export class GenericClientImpl implements GenericClient {
             .execute(requestPayload, (responsePayload) => modelHelper.decodeServiceDiscoveryResponse(responsePayload))
             .then(response => {
                 this.log.debug(`Discovery Service response received`);
-                return response;
+                return response as ServiceDiscoveryResponse;
             });
     }
 
     public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
         const requestPayload = modelHelper.discoveryMethodRequestPayload(discoveryRequest);
-        return new SingleMessageRequest<plexus.interop.protocol.IMethodDiscoveryRequest>(this.transportConnection, this.log)
+        return new SingleMessageRequest<plexus.interop.protocol.IMethodDiscoveryResponse>(this.transportConnection, this.log)
             .execute(requestPayload, (responsePayload) => modelHelper.decodeMethodDiscoveryResponse(responsePayload))
             .then(response => {
                 this.log.debug(`Discovery Method response received`);
-                return response;
+                return response as MethodDiscoveryResponse;
             });
     }
 
@@ -115,7 +115,7 @@ export class GenericClientImpl implements GenericClient {
 
     private async startIncomingChannelsListener(observer: Observer<TransportChannel>): Promise<void> {
         this.log.debug("Started to listen for channels");
-        this.transportConnection.open({
+        this.transportConnection.connect({
             next: channel => {
                 if (this.state.is(ClientState.LISTEN)) {
                     this.log.debug("Channel received");
