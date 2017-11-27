@@ -24,44 +24,32 @@ import { BufferedChannel } from "./client-mocks";
 describe("GenericClient", () => {
 
     it("Can be created if connect request/response handshake received", async () => {
+        const mockedConnection = mock(FramedTransportConnection);
+        const cancellationToken = new CancellationToken();
+        const mockChannel = new BufferedChannel(cancellationToken);
+        const id = UniqueId.generateNew();
+        when(mockedConnection.createChannel()).thenReturn(Promise.resolve(mockChannel));
+        when(mockedConnection.uuid()).thenReturn(id);
+        const connection = instance(mockedConnection);
 
-        debugger;
-        try {
-            const mockedConnection = mock(FramedTransportConnection);
-            const cancellationToken = new CancellationToken();
-            const mockChannel = new BufferedChannel(cancellationToken);
-            const id = UniqueId.generateNew();
-            when(mockedConnection.createChannel()).thenReturn(Promise.resolve(mockChannel));
-            when(mockedConnection.uuid()).thenReturn(id);
-            const connection = instance(mockedConnection);
+        const sut = new GenericClientFactory(connection);
 
-            const sut = new GenericClientFactory(connection);
+        const clientPromise = sut.createClient({ applicationId: "appId" });
+        const connectRequest = modelHelper.decodeConnectRequest(await mockChannel.pullOutMessage());
+        expect(connectRequest).toBeDefined();
+        expect(connectRequest.applicationId).toEqual("appId");
 
-            const clientPromise = sut.createClient({ applicationId: "appId" });
-            const connectRequest = modelHelper.decodeConnectRequest(await mockChannel.pullOutMessage());
-            debugger;
-            expect(connectRequest).toBeDefined();
-            expect(connectRequest.applicationId).toEqual("appId");
-
-            mockChannel.addToInbox(modelHelper.connectResponsePayload({
-                connectionId: UniqueId.generateNew()
-            }));
-            debugger;
-            await clientPromise;
-            debugger;
-            cancellationToken.cancel("All done");
-        } catch (error) {
-            debugger;
-            console.error("error", error);
-        }
-
-
+        mockChannel.addToInbox(modelHelper.connectResponsePayload({
+            connectionId: UniqueId.generateNew()
+        }));
+        await clientPromise;
+        cancellationToken.cancel("All done");
     });
 
     it("Can execute discovery operation", async () => {
         const cancellationToken = new CancellationToken();
 
-        const mockedConnection = mock(FramedTransportConnection);        
+        const mockedConnection = mock(FramedTransportConnection);
         let mockChannel = new BufferedChannel(cancellationToken);
         const id = UniqueId.generateNew();
         when(mockedConnection.createChannel()).thenReturn(Promise.resolve(mockChannel));
@@ -102,7 +90,7 @@ describe("GenericClient", () => {
                     {
                         consumedService: {
                             serviceId: "serviceId"
-                        }, 
+                        },
                         providedService: {
                             serviceId: "serviceId"
                         }
