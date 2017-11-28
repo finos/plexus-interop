@@ -7,6 +7,9 @@ import { RemoteActions } from "../actions/RemoteActions";
 import { CreateChannelResponse } from "../actions/CreateChannelResponse";
 import { Observable } from "rxjs/Observable";
 import { ChannelRequest } from "../actions/ChannelRequest";
+import { SendMessageRequest } from "../actions/SendMessageRequest";
+import { CloseChannelRequest } from "../actions/CloseChannelRequest";
+import { CloseChannelResponse } from "../actions/CloseChannelResponse";
 
 export type DisconnectListener = (completion?: clientProtocol.ICompletion) => void;
 
@@ -61,26 +64,26 @@ export class HostTransportConnection implements TransportConnection {
     }
 
     private bindToRemoteActions(): void {
-        
+
         this.remoteBrokerService.host<{}, CreateChannelResponse>(RemoteActions.CREATE_CHANNEL, (request, responseObserver) => {
             return new Observable(observer => {
                 this.log.trace('Create channel request received');
                 this.createChannel()
-                .then(channel => {
-                    observer.next({id : channel.uuid.toString()});
-                    observer.complete();
-                })
-                .catch(e => observer.error(e));
+                    .then(channel => {
+                        observer.next({ id: channel.uuid.toString() });
+                        observer.complete();
+                    })
+                    .catch(e => observer.error(e));
             }).subscribe(responseObserver);
         }, this.stringUuid);
 
         this.remoteBrokerService.host<ChannelRequest, ArrayBuffer>(RemoteActions.OPEN_CHANNEL, (request: ChannelRequest, responseObserver) => {
             return new Observable(observer => {
                 const channel = this.getManagedChannel(request.channelId);
-                this.log.trace(`Open Channel [${request.channelId}] request received`);                
+                this.log.trace(`Open Channel [${request.channelId}] request received`);
                 if (channel) {
                     channel.open({
-                        started: () => {},
+                        started: () => { },
                         startFailed: e => observer.error(e),
                         next: msg => observer.next(msg),
                         complete: () => observer.complete(),
@@ -92,7 +95,38 @@ export class HostTransportConnection implements TransportConnection {
             }).subscribe(responseObserver);
         }, this.stringUuid);
 
-        
+        this.remoteBrokerService.host<SendMessageRequest, {}>(RemoteActions.SEND_MESSAGE, (request: SendMessageRequest, responseObserver) => {
+            return new Observable(observer => {
+                if (this.log.isTraceEnabled()) {
+                    this.log.trace(`Send Message of [${request.messagePayload.byteLength}] bytes for [${request.channelId}] channel received`);
+                }
+                const channel = this.getManagedChannel(request.channelId);
+                if (channel) {
+                    channel.sendMessage(request.messagePayload)
+                        .then(() => observer.complete())
+                        .catch(e => observer.error(e));
+                } else {
+                    observer.error(`No channel with id [${request.channelId}]`);
+                }
+            }).subscribe(responseObserver);
+        }, this.stringUuid);
+
+        this.remoteBrokerService.host<CloseChannelRequest, CloseChannelResponse>(RemoteActions.CLOSE_CHANNEL, (request: CloseChannelRequest, responseObserver) => {
+            return new Observable(observer => {
+                this.log.trace(`Close channel [${request.channelId}] received`);
+                const channel = this.getManagedChannel(request.channelId);
+                if (channel) {
+                    channel.close(request.completion)
+                        .then(completion => {
+                            observer.next({ completion });
+                            observer.complete();
+                        })
+                        .catch(e => observer.error(e));
+                } else {
+                    observer.error(`No channel with id [${request.channelId}]`);
+                }
+            }).subscribe(responseObserver);
+        }, this.stringUuid);
 
     }
 }
