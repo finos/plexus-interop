@@ -28,6 +28,7 @@ import { MethodInvocationContext } from "@plexus-interop/client-api";
 import { CancellationToken } from "@plexus-interop/common";
 import { UniqueId } from "@plexus-interop/protocol";
 import { AsyncHelper } from "@plexus-interop/common";
+import { HostTransportConnection } from "./host/HostTransportConnection";
 
 /**
  * Manages one client connection and proxy connections for peer brokers
@@ -41,9 +42,6 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
 
     // time to wait for application to start before rejecting broker's request
     private readonly spawnConnectionTimeout: number = 5 * 60 * 1000;
-
-    // TODO stop on disconnect
-    private connectionHeartBitInterval: undefined | number | NodeJS.Timer;
 
     private onlineConnections: Cache = new InMemoryCache();
 
@@ -69,11 +67,18 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         if ((connection as PeerProxyConnection).isProxy) {
             this.log.debug(`Accepted proxy [${connectionStrId}] connection`);
             this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection, connectionDropped)));
-        } else {
+        } else if ((connection as HostTransportConnection).onDisconnect) {
             this.log.debug(`Accepted new [${connectionStrId}] connection`);
             this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod}] period`);
-            this.connectionHeartBitInterval = this.sendHeartBitsFor(appConnection);
+            const connectionHeartBitInterval = this.sendHeartBitsFor(appConnection);
+            const hostConnection = connection as HostTransportConnection;
+            hostConnection.onDisconnect(() => {
+                this.log.debug(`Stopping heart bits for [${connectionStrId}]`);
+                clearInterval(connectionHeartBitInterval);
+            });
             this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
+        } else {
+            throw new Error("Unsupported Transport Connection Type");
         }
         return appConnection;
     }
@@ -119,7 +124,7 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         return this.getOnlineConnectionsInternal();
     }
 
-    private sendHeartBitsFor(connection: ApplicationConnection): number | NodeJS.Timer {
+    private sendHeartBitsFor(connection: ApplicationConnection): NodeJS.Timer {
         const heartBit: AppConnectionHeartBit = {
             applicationId: connection.descriptor.applicationId,
             connectionId: connection.descriptor.connectionId.toString(),

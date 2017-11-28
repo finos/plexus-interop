@@ -10,6 +10,8 @@ import { ChannelRequest } from "../actions/ChannelRequest";
 import { SendMessageRequest } from "../actions/SendMessageRequest";
 import { CloseChannelRequest } from "../actions/CloseChannelRequest";
 import { CloseChannelResponse } from "../actions/CloseChannelResponse";
+import { AppConnectionHeartBit } from "../events/AppConnectionHeartBit";
+import { EventType } from "../events/EventType";
 
 export type DisconnectListener = (completion?: clientProtocol.ICompletion) => void;
 
@@ -26,6 +28,7 @@ export class HostTransportConnection implements TransportConnection {
         private readonly remoteBrokerService: RemoteBrokerService) {
         this.log = LoggerFactory.getLogger(`HostTransportConnection [${this.baseConnection}]`);
         this.stringUuid = this.uuid().toString();
+        this.bindToRemoteActions();
     }
 
     public connect(channelObserver: Observer<TransportChannel>): Promise<void> {
