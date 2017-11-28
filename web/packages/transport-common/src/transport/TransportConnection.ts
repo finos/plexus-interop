@@ -37,6 +37,11 @@ export interface TransportConnection {
     getManagedChannels(): TransportChannel[];
 
     /**
+     * Gets Channel by or id, returns undefined if not found
+     */
+    getManagedChannel(id: string): TransportChannel | undefined;
+
+    /**
      * Unique connection identifier
      */
     uuid(): UniqueId;

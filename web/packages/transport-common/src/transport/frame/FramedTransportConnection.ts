@@ -91,6 +91,11 @@ export class FramedTransportConnection implements TransportConnection, Transport
         return result;
     }
 
+    public getManagedChannel(id: string): TransportChannel | undefined {
+        const descriptor = this.channelsHolder.get(id);
+        return descriptor ? descriptor.channel : undefined;
+    }
+
     public async createChannel(): Promise<TransportChannel> {
         this.stateMachine.throwIfNot(ConnectionState.OPEN);
         const uuid = UniqueId.generateNew();

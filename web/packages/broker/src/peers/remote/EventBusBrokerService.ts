@@ -31,7 +31,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
         });
     }
 
-    public host<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req) => Observable<Res>, hostId: string): void {
+    public host<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req, observer: PartialObserver<Res>) => Subscription, hostId: string): void {
 
         const requestTopic = this.requestTopic(hostId, actionType);
 
@@ -39,7 +39,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
             const requestEvent = event.payload as EventBasedRequest;
             this.log.trace(`Received [${actionType.id}.${requestEvent.requestId}] request to [${hostId}]`);
             const responseTopic = this.responseTopic(hostId, actionType, requestEvent.requestId);
-            handler(requestEvent.payload).subscribe({
+            handler(requestEvent.payload, {
                 next: update => {
                     this.eventBus.publish(responseTopic, { payload: successResult(update) })
                 },

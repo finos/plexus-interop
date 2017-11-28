@@ -54,6 +54,10 @@ export class PeerProxyConnection implements TransportConnection {
         return this.connectionDescriptor.connectionId;
     }
 
+    public getManagedChannel(): TransportChannel | undefined {
+        throw "getManagedChannel Not implemented";
+    }
+
     public getManagedChannels(): TransportChannel[] {
         throw "getManagedChannels Not implemented";
     }
