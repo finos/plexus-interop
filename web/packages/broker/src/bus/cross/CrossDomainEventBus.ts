@@ -59,7 +59,7 @@ export class CrossDomainEventBus implements EventBus {
         this.createHostMessagesSubscription();
         return new Promise((resolve, reject) => {
             this.log.info("Host iFrame created, sending ping message");
-            const message = this.createHostMessage({}, MessageType.Ping, ResponseType.Single);
+            const message = this.hostMessage({}, MessageType.Ping, ResponseType.Single);
             this.sendAndSubscribe(message, {
                 next: m => {
                     this.log.info("Success Ping response received");
@@ -119,7 +119,7 @@ export class CrossDomainEventBus implements EventBus {
         return eventsObservable;
     }
 
-    private createHostMessage<T, R>(requestPayload: T, type: MessageType<T, R>, responseType?: ResponseType): IFrameHostMessage<T, R> {
+    private hostMessage<T, R>(requestPayload: T, type: MessageType<T, R>, responseType?: ResponseType): IFrameHostMessage<T, R> {
         responseType = responseType ? responseType : ResponseType.None;
         return { id: GUID.getNewGUIDString(), type, requestPayload, responseType };
     }
@@ -134,12 +134,19 @@ export class CrossDomainEventBus implements EventBus {
         }
     }
 
-    public publish(key: string, event: Event): void {
-        throw 'Not Implemented';
+    public publish(topic: string, event: Event): void {
+        const payload = event.payload;
+        const message = this.hostMessage({ topic, payload }, MessageType.Publish);
+        this.postToIFrame(message);
     }
 
-    public subscribe(key: string, handler: (event: Event) => void): Subscription {
-        throw 'Not Implemented';
+    public subscribe(topic: string, handler: (event: Event) => void): Subscription {
+        const message = this.hostMessage({ topic }, MessageType.Subscribe, ResponseType.Stream);
+        return this.sendAndSubscribe<SubscribeRequest, Event>(message, {
+            next: message => {
+                handler(message.responsePayload as Event);
+            }
+        });
     }
 
     private emit(subscription: string, value: any, complete?: boolean): void {
