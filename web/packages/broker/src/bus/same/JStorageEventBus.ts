@@ -5,7 +5,7 @@ import { Subscription, Logger, LoggerFactory, AnonymousSubscription } from "@ple
 
 const globalObj: any = global || window;
 
-export class SameDomainEventBus implements EventBus {
+export class JStorageEventBus implements EventBus {
 
     private readonly log: Logger;
 
@@ -23,6 +23,7 @@ export class SameDomainEventBus implements EventBus {
 
     public subscribe(key: string, handler: (event: Event) => void): Subscription {
         const topic = this.internalKey(key);
+        // TODO handle unsubscribe
         this.jStorage.subscribe(this.internalKey(key), (channel: string, value: any) => {
             this.log.trace(`Received update for ${topic}`);
             handler({ payload: value });
