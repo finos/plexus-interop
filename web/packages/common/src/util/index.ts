@@ -21,3 +21,4 @@ export * from "./collections";
 export * from "./async";
 export * from "./state";
 export * from "./types";
+export * from "./dom";
