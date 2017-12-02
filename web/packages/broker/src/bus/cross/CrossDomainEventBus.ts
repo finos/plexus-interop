@@ -14,6 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Event {
-    payload: any;
+import { Event } from "../Event";
+import { EventBus } from "../EventBus";
+import { Subscription } from "@plexus-interop/common";
+
+export class CrossDomainEventBus implements EventBus {
+
+    public constructor(
+        private readonly hostIFrame: HTMLIFrameElement,
+        private readonly hostOrigin: string) { }
+
+    public publish(key: string, event: Event): void {
+        throw 'Not Implemented';
+    }
+
+    public subscribe(key: string, handler: (event: Event) => void): Subscription {
+        throw 'Not Implemented';
+    }
+
 }

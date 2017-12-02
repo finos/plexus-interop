@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Event {
-    payload: any;
+export enum ResponseType {
+    None = "NONE",
+    Stream = "STREAM",
+    Single = "SINGLE"
 }

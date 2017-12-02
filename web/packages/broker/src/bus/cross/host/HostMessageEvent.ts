@@ -14,6 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Event {
-    payload: any;
+import { IFrameHostMessage } from "../model/IFrameHostMessage";
+
+export interface HostMessageEvent {
+    message: IFrameHostMessage<any, any>;
+    sourceWindow: Window;
+    sourceOrigin: string;
 }

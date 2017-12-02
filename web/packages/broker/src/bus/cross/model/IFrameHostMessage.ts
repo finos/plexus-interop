@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Event {
-    payload: any;
+import { MessageType } from "./MessageType";
+
+export interface IFrameHostMessage<Req, Res> {
+    type: MessageType<Req, Res>;
+    responseType: ResponseType;
+    requestPayload?: Req;
+    responsePayload?: Res;
 }

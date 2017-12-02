@@ -14,6 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Event {
-    payload: any;
+import { PublishRequest } from "./PublishRequest";
+import { Event } from "../../Event";
+import { SubscribeRequest } from "./SubscribeRequest";
+
+export class MessageType<Req, Res> {
+
+    constructor(public id: number) { }
+
+    public static Ping = new MessageType<{}, {}>(1);
+
+    public static Publish = new MessageType<PublishRequest, {}>(6);
+
+    public static Subscribe = new MessageType<SubscribeRequest, Event>(8);
+
 }

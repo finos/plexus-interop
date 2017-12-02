@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Event {
-    payload: any;
+export interface CrossDomainBusConfig {
+    hostIFrameId: string;
+    hostUrl: string;
 }
