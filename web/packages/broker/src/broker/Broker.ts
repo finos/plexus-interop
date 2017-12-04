@@ -41,10 +41,9 @@ export class Broker {
         const clientRequestProcessor = new ClientRequestProcessor(invocationRequestHandler);
         this.connectionProcessor = new ClientConnectionProcessor(authHandler, clientRequestProcessor, this.appLifeCycleManager);
         this.log.trace("Created");
-        this.start();
     }
 
-    private start(): void {
+    public start(): void {
         this.log.debug("Starting to listen for incoming connections");
         this.connectionFactory.acceptConnections({
             next: connection => {

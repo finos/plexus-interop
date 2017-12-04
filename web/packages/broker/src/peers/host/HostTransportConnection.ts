@@ -67,7 +67,7 @@ export class HostTransportConnection implements TransportConnection {
 
         this.remoteBrokerService.host<{}, CreateChannelResponse>(RemoteActions.CREATE_CHANNEL, (request, responseObserver) => {
             return new Observable(observer => {
-                this.log.trace('Create channel request received');
+                this.log.trace("Create channel request received");
                 this.createChannel()
                     .then(channel => {
                         observer.next({ id: channel.uuid.toString() });
