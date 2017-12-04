@@ -18,7 +18,6 @@ import { ActionType } from "../ActionType";
 import { EventType } from "../events/EventType";
 import { Subscription } from "@plexus-interop/common";
 import { PartialObserver } from "rxjs/Observer";
-import { Observable } from "rxjs/Observable";
 
 /**
  * All action calls passed from Proxy Channels/Connections to remote connection

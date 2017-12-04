@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, clientProtocol as plexus } from "@plexus-interop/protocol";
-import { Application } from "../metadata/apps/model/Application";
 import { AppLaunchRequest } from "./AppLaunchRequest";
 import { AppLaunchResponse } from "./AppLaunchResponse";
 import { LaunchInvocationContext } from "./LaunchInvocationContext";

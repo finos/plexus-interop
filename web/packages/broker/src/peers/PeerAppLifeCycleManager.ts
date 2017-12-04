@@ -24,7 +24,6 @@ import { PeerConnectionsService } from "./PeerConnectionsService";
 import { AppConnectionHeartBit } from "./events/AppConnectionHeartBit";
 import { AppRegistryService } from "../metadata/apps/AppRegistryService";
 import { AppLauncherRegistry } from "../launcher/AppLauncherRegistry";
-import { MethodInvocationContext } from "@plexus-interop/client-api";
 import { CancellationToken } from "@plexus-interop/common";
 import { UniqueId } from "@plexus-interop/protocol";
 import { AsyncHelper } from "@plexus-interop/common";

@@ -28,7 +28,7 @@ export class JStorageEventBus implements EventBus {
     private jStorage: JStorageStatic = globalObj.$.jStorage;
 
     public constructor(readonly namespace: string = "plexus-bus") {
-        this.log = LoggerFactory.getLogger(`SameDomainEventBus [${namespace}]`);
+        this.log = LoggerFactory.getLogger(`JStorageEventBus [${namespace}]`);
     }
 
     public publish(key: string, event: Event): void {

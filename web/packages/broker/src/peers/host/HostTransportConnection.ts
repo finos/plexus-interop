@@ -2,7 +2,6 @@ import { TransportConnection, TransportChannel } from "@plexus-interop/transport
 import { Observer, Logger, LoggerFactory } from "@plexus-interop/common";
 import { UniqueId, clientProtocol } from "@plexus-interop/protocol";
 import { RemoteBrokerService } from "../remote/RemoteBrokerService";
-import { ActionType } from "../ActionType";
 import { RemoteActions } from "../actions/RemoteActions";
 import { CreateChannelResponse } from "../actions/CreateChannelResponse";
 import { Observable } from "rxjs/Observable";
@@ -10,8 +9,6 @@ import { ChannelRequest } from "../actions/ChannelRequest";
 import { SendMessageRequest } from "../actions/SendMessageRequest";
 import { CloseChannelRequest } from "../actions/CloseChannelRequest";
 import { CloseChannelResponse } from "../actions/CloseChannelResponse";
-import { AppConnectionHeartBit } from "../events/AppConnectionHeartBit";
-import { EventType } from "../events/EventType";
 
 export type DisconnectListener = (completion?: clientProtocol.ICompletion) => void;
 
