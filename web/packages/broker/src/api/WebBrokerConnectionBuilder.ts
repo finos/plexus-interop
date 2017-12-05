@@ -44,6 +44,8 @@ export class WebBrokerConnectionBuilder {
 
     public async connect(): Promise<TransportConnection> {
 
+        this.validate();
+
         this.log.info("Initialyzing App Registry Provider");
         const appRegistryProvider = await this.appRegistryProviderFactory();
 
@@ -70,6 +72,19 @@ export class WebBrokerConnectionBuilder {
         new Broker(appLifeCycleManager, brokerConnectionsFactory, interopRegistryProvider).start();
 
         return new HostTransportConnection(inMemoryClientConnection, remoteBrokerService);
+
+    }
+
+    private validate(): void {
+        if (!this.appRegistryProviderFactory) {
+            throw new Error("App Registry Provider is required");
+        }
+        if (!this.interopRegistryProviderFactory) {
+            throw new Error("Interop Registry Provider is required");
+        }
+        if (!this.eventBusProvider) {
+            throw new Error("Event Bus Provider is required");
+        }
     }
 
 }
