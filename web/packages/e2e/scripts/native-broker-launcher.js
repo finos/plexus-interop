@@ -24,12 +24,13 @@ const onFileAdded = require('./file-utils').onFileAdded;
 const stripBom = require('strip-bom');
 const log = console.log.bind(console);
 
-let brokerProcess;
+/**
+ * Starts Broker
+ * @return Process and its Working Directory
+ */
+function start() {
 
-function main() {
-
-    log('Passed arguments' + JSON.stringify(argv));
-    log('Passed arguments' + JSON.stringify(process.argv));
+    log("Starting Native Broker instance");
 
     const config = {
         brokerBaseDir: `${__dirname}/../../../../bin/win-x86/samples`,
@@ -58,69 +59,66 @@ function main() {
 
     log("Watching for Web Socket Server address file update");
 
-    let launched = false;
-    onFileAdded(wsAddressDir, (receivedPath) => {
-        if (!launched) {
-            launched = true;
-            readAddressAndRunTests(receivedPath);
-        }
+    return new Promise((resolve, reject) => {
+
+        let brokerProcess;
+        let launched = false;
+        onFileAdded(wsAddressDir, (receivedPath) => {
+            if (!launched) {
+                launched = true;
+                readClearedLine(receivedPath)
+                    .then(line => resolve({
+                        workingDir: line,
+                        process: brokerProcess
+                    }));
+            }
+        });
+
+        // if file addition was not handled due to race condition, 
+        // then try to read port from hardcoded path
+        setTimeout(() => {
+            if (!launched) {
+                launched = true;
+                log(`No file notification received, trying to read from default location ${addressFile}`);
+                readClearedLine(addressFile)
+                    .then(line => resolve({
+                        workingDir: line,
+                        process: brokerProcess
+                    }));
+            }
+        }, 5000);
+
+        log("Starting Broker ...");
+        brokerProcess = exec(fullBrokerCmd + config.brokerArgs, {
+            cwd: config.brokerBaseDir,
+            maxBuffer: 1024 * 1024
+        }, (error, stdout, stderr) => {
+            log("Broker stopped");
+            if (argv.printBrokerStdout) {
+                log('StdOut', stdout);
+            }
+            process.exit();
+        });
     });
 
-    // if file addition was not handled due to race condition, 
-    // then try to read port from hardcoded path
-    setTimeout(() => {
-        if (!launched) {
-            launched = true;
-            log(`No file notification received, trying to read from default location ${addressFile}`);
-            readAddressAndRunTests(addressFile);
-        }
-    }, 5000);
-
-    log("Starting Broker ...");
-    brokerProcess = exec(fullBrokerCmd + config.brokerArgs, {
-        cwd: config.brokerBaseDir,
-        maxBuffer: 1024 * 1024
-    }, (error, stdout, stderr) => {
-        log("Broker stopped");
-        if (argv.printBrokerStdout) {
-            log('StdOut', stdout);
-        }
-        process.exit();
-    });
 }
 
-function readAddressAndRunTests(path) {
-    log(`WS Server file ${path} has been added, reading server URL`);
-    readline(path, (line) => {
-        log('WS Server URL received', line);
-        line = stripBom(line);
-        runElectronTest(line);
-    });
-}
-
-function killBroker() {
-    if (brokerProcess) {
-        log("Killing broker process ...");
-        kill(brokerProcess.pid);
-        log("Kill signal sent");
-    }
-}
-
-function runElectronTest(wsUrl) {
-    log("Starting Electron Tests ...");
-    exec(`electron-mocha --require scripts/coverage ${argv.file} --wsUrl ${wsUrl} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
-        cwd: process.cwd()
-    }, (error, stdout, stderr) => {
-        log("Electron tests stopped, killing Broker");
-        if (error || stderr) {
-            console.error('Std Error:', stderr);
-            console.error('Error: ', error);
-        }
-        log('StdOut', stdout);
-        killBroker();
+/**
+ * Reads first line, clearing BOM symbol
+ */
+function readClearedLine(path) {
+    return new Promise((resolve, reject) => {
+        log(`Reading first line of ${path}`);
+        readline(path, (line) => {
+            log(`Data received, clearing BOM symbol`, line);
+            line = stripBom(line);
+            resolve(line);
+        });
     });
 }
 
-main();
+module.exports = {
+    start
+};
 
 
