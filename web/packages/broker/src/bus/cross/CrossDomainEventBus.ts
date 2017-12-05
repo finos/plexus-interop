@@ -51,7 +51,7 @@ export class CrossDomainEventBus implements EventBus {
 
     }
 
-    private postToIFrame(message: any) {
+    private postToIFrame(message: any): void {
         this.hostIFrame.contentWindow.postMessage(message, this.hostOrigin);
     }
 
@@ -157,10 +157,10 @@ export class CrossDomainEventBus implements EventBus {
                 observer.complete();
             }
         }
-    };
+    }
 
     private emitAndComplete(subscription: string, value: any): void {
         this.emit(subscription, value, true);
-    };
+    }
 
 }

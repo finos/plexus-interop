@@ -37,7 +37,7 @@ export function completedResult(payload?: any): RemoteActionResult {
     };
 }
 
-export function errorResult(error?: ClientError) {
+export function errorResult(error?: ClientError): RemoteActionResult {
     return {
         error,
         status: RemoteActionStatus.FAILURE

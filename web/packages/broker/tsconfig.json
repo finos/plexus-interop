@@ -26,8 +26,7 @@
         "types": [
             "node",
             "jest",
-            "long",
-            "jstorage"
+            "long"
         ],
         "baseUrl": "."
     },

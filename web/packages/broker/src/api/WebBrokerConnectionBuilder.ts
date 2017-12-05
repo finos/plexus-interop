@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TransportConnection } from "@plexus-interop/transport-common";
+import { TransportConnection, InMemoryConnectionFactory } from "@plexus-interop/transport-common";
 import { AppRegistryProvider } from "../metadata/apps/AppRegistryProvider";
 import { InteropRegistryProvider } from "../metadata/interop/InteropRegistryProvider";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
@@ -22,7 +22,6 @@ import { AppRegistryService } from "../metadata/apps/AppRegistryService";
 import { EventBus } from "../bus/EventBus";
 import { RemoteBrokerService } from "../peers/remote/RemoteBrokerService";
 import { EventBusRemoteBrokerService } from "../peers/remote/EventBusBrokerService";
-import { InMemoryConnectionFactory } from "../../../transport-common/src/transport/InMemoryConnectionFactory";
 import { PeerConnectionsService } from "../peers/PeerConnectionsService";
 import { PeerServerConnectionFactory } from "../peers/PeerServerConnectionFactory";
 import { MultiSourcesConnectionFactory } from "../transport/MultiSourcesConnectionFactory";
@@ -41,6 +40,21 @@ export class WebBrokerConnectionBuilder {
     private interopRegistryProviderFactory: () => Promise<InteropRegistryProvider>;
 
     private eventBusProvider: () => Promise<EventBus>;
+
+    public withEventBusProvider(provider: () => Promise<EventBus>): WebBrokerConnectionBuilder {
+        this.eventBusProvider = provider;
+        return this;
+    }
+
+    public withInteropRegistryProviderFactory(factory: () => Promise<InteropRegistryProvider>): WebBrokerConnectionBuilder {
+        this.interopRegistryProviderFactory = factory;
+        return this;
+    }
+
+    public withAppRegistryProviderFactory(factory: () => Promise<AppRegistryProvider>): WebBrokerConnectionBuilder {
+        this.appRegistryProviderFactory = factory;
+        return this;
+    }
 
     public async connect(): Promise<TransportConnection> {
 

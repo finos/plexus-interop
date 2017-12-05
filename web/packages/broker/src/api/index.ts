@@ -14,21 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PublishRequest } from "./PublishRequest";
-import { Event } from "../../Event";
-import { SubscribeRequest } from "./SubscribeRequest";
-
-export class MessageType<Req, Res> {
-
-    constructor(public id: number) { }
-
-    // tslint:disable-next-line:variable-name
-    public static Ping: MessageType<{}, {}> = new MessageType<{}, {}>(1);
-
-    // tslint:disable-next-line:variable-name
-    public static Publish: MessageType<PublishRequest, {}> = new MessageType<PublishRequest, {}>(6);
-
-    // tslint:disable-next-line:variable-name
-    public static Subscribe: MessageType<SubscribeRequest, Event> = new MessageType<SubscribeRequest, Event>(8);
-
-}
+export * from "./WebBrokerConnectionBuilder";
+export * from "./CrossDomainHostBuilder";
+export * from "./WebBrokerConnectionBuilder";

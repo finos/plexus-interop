@@ -16,7 +16,7 @@
  */
 import { EventBus } from "../../EventBus";
 import { Event } from "../../Event";
-import { StateMaschine, StateMaschineBase, LoggerFactory, Logger, Subscription } from "@plexus-interop/common";
+import { StateMaschine, StateMaschineBase, LoggerFactory, Logger } from "@plexus-interop/common";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/fromEvent";
 import "rxjs/add/operator/filter";

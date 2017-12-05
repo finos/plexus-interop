@@ -24,12 +24,14 @@ export class CrossDomainHostBuilder {
 
     private crossDomainConfig: CrossDomainHostConfig;
 
-    public withEventBus(eventBus: EventBus) {
+    public withEventBus(eventBus: EventBus): CrossDomainHostBuilder {
         this.eventBus = eventBus;
+        return this;
     }
 
-    public withCrossDomainConfig(crossDomainConfig: CrossDomainHostConfig) {
+    public withCrossDomainConfig(crossDomainConfig: CrossDomainHostConfig): CrossDomainHostBuilder {
         this.crossDomainConfig = crossDomainConfig;
+        return this;
     }
 
     public async build(): Promise<CrossDomainHost> {

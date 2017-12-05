@@ -55,20 +55,20 @@ export class PeerProxyTransportChannel implements TransportChannel {
         this.log.trace("Received open channel request");
         this.remoteBrokerService.invoke(RemoteActions.OPEN_CHANNEL, {
             channelId: this.strChannelId
-        }, this.remoteConnectionId).subscribe({
-            next: payload => {
-                this.log.trace(`Received payload from remote, ${payload.byteLength} bytes`);
-                observer.next(payload);
-            },
-            error: e => {
-                this.log.error("Received remote error", e);
-                observer.error(e);
-            },
-            complete: () => {
-                this.log.trace("Received remote completion");
-                observer.complete();
-            }
-        });
+        }, this.remoteConnectionId, {
+                next: payload => {
+                    this.log.trace(`Received payload from remote, ${payload.byteLength} bytes`);
+                    observer.next(payload);
+                },
+                error: e => {
+                    this.log.error("Received remote error", e);
+                    observer.error(e);
+                },
+                complete: () => {
+                    this.log.trace("Received remote completion");
+                    observer.complete();
+                }
+            });
     }
 
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {

@@ -88,7 +88,7 @@ export class HostTransportConnection implements TransportConnection {
                         next: msg => observer.next(msg),
                         complete: () => observer.complete(),
                         error: e => observer.error(e)
-                    })
+                    });
                 } else {
                     observer.error(`No channel with id [${request.channelId}]`);
                 }

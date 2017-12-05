@@ -5,7 +5,7 @@ import { PartialObserver } from "rxjs/Observer";
 import { Subscription, Observer, Logger, LoggerFactory } from "@plexus-interop/common";
 import { RemoteBrokerService } from "./RemoteBrokerService";
 import { Observable } from "rxjs/Observable";
-import { RemoteActionResult, isFailed, isSucceded, isCompleted, successResult, errorResult, completedResult } from "./RemoteActionResult";
+import { RemoteActionResult, isFailed, isCompleted, successResult, errorResult, completedResult } from "./RemoteActionResult";
 import { EventBasedRequest } from "./EventBasedRequest";
 
 export class EventBusRemoteBrokerService implements RemoteBrokerService {
@@ -41,13 +41,13 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
             const responseTopic = this.responseTopic(hostId, actionType, requestEvent.requestId);
             handler(requestEvent.payload, {
                 next: update => {
-                    this.eventBus.publish(responseTopic, { payload: successResult(update) })
+                    this.eventBus.publish(responseTopic, { payload: successResult(update) });
                 },
                 error: e => {
-                    this.eventBus.publish(responseTopic, { payload: errorResult(e) })
+                    this.eventBus.publish(responseTopic, { payload: errorResult(e) });
                 },
                 complete: () => {
-                    this.eventBus.publish(responseTopic, { payload: completedResult() })
+                    this.eventBus.publish(responseTopic, { payload: completedResult() });
                 }
             });
         });
