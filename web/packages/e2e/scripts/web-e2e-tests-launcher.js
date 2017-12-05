@@ -58,7 +58,7 @@ function killHttpServerProcess() {
 }
 
 function runElectronTest(path) {
-    log("Starting Electron Tests ...");
+    log("Starting Web Electron Tests ...");
     exec(`electron-mocha --require --path ${path} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
         cwd: process.cwd()
     }, (error, stdout, stderr) => {

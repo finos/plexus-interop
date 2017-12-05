@@ -36,6 +36,7 @@
   "dependencies": {
     "@types/long": "^3.0.31",
     "@plexus-interop/websocket-transport": "0.1.1",
+    "@plexus-interop/broker": "0.1.1",
     "@plexus-interop/client": "0.1.1"
   },
   "devDependencies": {

@@ -12,7 +12,7 @@
     "watch": "tsc -w",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
-    "unit": "jest --coverage",
+    "unit": "jest --coverage --runInBand",
     "test": "yarn unit",
     "unpublish": "npm unpublish @plexus-interop/transport-common@0.1.1",
     "postunpublish": "echo 'Unpublished'",
