@@ -24,7 +24,7 @@ import { LimitedBufferQueue } from "../util/collections/LimitedBufferQueue";
  */
 export class BufferedObserver<T> implements Observer<T> {
     
-    private realObserver: Observer<T> | undefined;
+    private baseObserver: Observer<T> | undefined;
 
     private buffer: Queue<T>;
     private receivedError: any;
@@ -35,7 +35,10 @@ export class BufferedObserver<T> implements Observer<T> {
     }
 
     public setObserver(observer: Observer<T>): void {
-        this.realObserver = observer;
+        if (this.baseObserver) {
+            throw new Error("Base observer already defined");
+        }
+        this.baseObserver = observer;
         while (!this.buffer.isEmpty()) {
             observer.next(this.buffer.dequeue());
         }
@@ -47,32 +50,32 @@ export class BufferedObserver<T> implements Observer<T> {
     }
 
     public next(value: T): void {
-        if (this.realObserver) {
+        if (this.baseObserver) {
             /* istanbul ignore if */
-            if (this.log.isDebugEnabled()) {
-                this.log.debug(`Passing frame to observer`);
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Passing frame to observer`);
             }
-            this.realObserver.next(value);
+            this.baseObserver.next(value);
         } else {
             /* istanbul ignore if */
-            if (this.log.isDebugEnabled()) {
-                this.log.debug(`No observer, adding to buffer, buffer size ${this.buffer.size()}`);
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`No observer, adding to buffer, buffer size ${this.buffer.size()}`);
             }
             this.buffer.enqueue(value);
         }
     }
 
     public error(err: any): void {
-        if (this.realObserver) {
-            this.realObserver.error(err);
+        if (this.baseObserver) {
+            this.baseObserver.error(err);
         } else {
             this.receivedError = err;
         }
     } 
 
     public complete(): void {
-        if (this.realObserver) {
-            this.realObserver.complete();
+        if (this.baseObserver) {
+            this.baseObserver.complete();
         } else {
             this.completed = true;
         }

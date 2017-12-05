@@ -24,7 +24,7 @@ import { TransportChannel } from "../TransportChannel";
 import { UniqueId, ClientProtocolUtils, ClientError, SuccessCompletion } from "@plexus-interop/protocol";
 import { transportProtocol as plexus } from "@plexus-interop/protocol";
 import { TransportFrameHandler } from "./TransportFrameHandler";
-import { StateMaschineBase, StateMaschine, LoggerFactory, Logger, ReadWriteCancellationToken, Observer } from "@plexus-interop/common";
+import { StateMaschineBase, StateMaschine, LoggerFactory, Logger, ReadWriteCancellationToken, Observer, BufferedObserver, Subscription, AnonymousSubscription } from "@plexus-interop/common";
 import { TransportFrameListener } from "./TransportFrameListener";
 
 export type ConnectionState = "CREATED" | "ACCEPT" | "OPEN" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED" | "CLOSED";
@@ -49,7 +49,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
 
     private connectionCancellationToken: ReadWriteCancellationToken = new ReadWriteCancellationToken();
 
-    private channelObserver: Observer<TransportChannel> | undefined;
+    private channelObserver: BufferedObserver<TransportChannel>;
 
     private channelsHolder: Map<string, ChannelDescriptor> = new Map();
 
@@ -59,6 +59,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
 
     constructor(private framedTransport: ConnectableFramedTransport) {
         this.log = LoggerFactory.getLogger(`FramedTransportConnection [${this.uuid().toString()}]`);
+        this.channelObserver = new BufferedObserver(1024, this.log);
         this.stateMachine = this.createStateMaschine();
         this.log.debug("Created");
     }
@@ -114,15 +115,23 @@ export class FramedTransportConnection implements TransportConnection, Transport
         return !this.stateMachine.isOneOf(ConnectionState.CREATED, ConnectionState.CLOSED);
     }
 
-    public async connect(channelObserver: Observer<TransportChannel>): Promise<void> {
-        this.log.debug("Opening connection");
-        this.channelObserver = channelObserver;
+    public subscribeToChannels(channelObserver: Observer<TransportChannel>): Subscription {
+        this.log.debug("Received channels observer");        
+        this.channelObserver.setObserver(channelObserver);
+        return new AnonymousSubscription();
+    }
+
+    public async connect(channelObserver?: Observer<TransportChannel>): Promise<void> {
+        this.log.debug(`Opening connection, channel observer ${!!channelObserver ? "provided" : "not provided"}`);
+        if (channelObserver) {
+            this.channelObserver.setObserver(channelObserver);
+        }
         return this.stateMachine.goAsync(ConnectionState.OPEN);
     }
 
     public async acceptingConnection(channelObserver: Observer<TransportChannel>): Promise<void> {
         this.log.debug("Accepting connection");
-        this.channelObserver = channelObserver;
+        this.channelObserver.setObserver(channelObserver);
         return this.stateMachine.goAsync(ConnectionState.ACCEPT);
     }
 

@@ -115,7 +115,7 @@ export class GenericClientImpl implements GenericClient {
 
     private async startIncomingChannelsListener(observer: Observer<TransportChannel>): Promise<void> {
         this.log.debug("Started to listen for channels");
-        this.transportConnection.connect({
+        this.transportConnection.subscribeToChannels({
             next: channel => {
                 if (this.state.is(ClientState.LISTEN)) {
                     this.log.debug("Channel received");

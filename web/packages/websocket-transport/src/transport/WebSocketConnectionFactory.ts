@@ -21,12 +21,12 @@ export class WebSocketConnectionFactory implements ClientConnectionFactory {
 
     constructor(private readonly socket: WebSocket) { }
 
-    public connect(connectionDetails: ConnectionDetails): Promise<TransportConnection> {
+    public connect(connectionDetails?: ConnectionDetails): Promise<TransportConnection> {
         return new Promise((resolve, reject) => {
             const webSocketTransport = new WebSocketFramedTransport(this.socket);
             webSocketTransport.connectionEstablished().then(() => {
                 const connection = new FramedTransportConnection(webSocketTransport);
-                connection.connect(connectionDetails.incomingChannelsObserver)
+                connection.connect(connectionDetails ? connectionDetails.incomingChannelsObserver : undefined)
                     .then(() => resolve(connection))
                     .catch(reject);
             }, (error) => {

@@ -16,7 +16,7 @@
  */
 import { TransportChannel } from "./TransportChannel";
 import { UniqueId } from "@plexus-interop/protocol";
-import { Observer } from "@plexus-interop/common";
+import { Observer, Subscription } from "@plexus-interop/common";
 import { clientProtocol } from "@plexus-interop/protocol"; 
 
 export interface TransportConnection {
@@ -52,9 +52,14 @@ export interface TransportConnection {
     isConnected(): boolean;
 
     /**
+     * Subscribe for incoming channels
+     */
+    subscribeToChannels(channelObserver: Observer<TransportChannel>): Subscription;
+
+    /**
      * Opens current connection, starting to receive incoming channels
      */
-    connect(channelObserver: Observer<TransportChannel>): Promise<void>;
+    connect(channelObserver?: Observer<TransportChannel>): Promise<void>;
 
 }
 
