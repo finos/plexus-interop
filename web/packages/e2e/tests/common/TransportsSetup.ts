@@ -17,7 +17,7 @@
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 import { ConnectionProvider } from "./ConnectionProvider";
 import { WebBrokerConnectionBuilder } from "@plexus-interop/broker";
-import { CrossDomainEventBusProvider } from "@plexus-interop/broker";
+import { CrossDomainEventBusProvider, CrossDomainEventBus } from "@plexus-interop/broker";
 import { TransportConnection } from "@plexus-interop/transport-common";
 
 export class TransportsSetup {
@@ -35,13 +35,17 @@ export class TransportsSetup {
 
     public createCrossDomainTransportProvider(proxyUrl: string): ConnectionProvider {
         return async () => {
+            let eventBus: CrossDomainEventBus;
             const connection: TransportConnection = await new WebBrokerConnectionBuilder()
-                .withEventBusProvider(() => new CrossDomainEventBusProvider(async () => proxyUrl).connect())
+                .withEventBusProvider(async () => {
+                    eventBus = await new CrossDomainEventBusProvider(async () => proxyUrl).connect() as CrossDomainEventBus;
+                    return eventBus;
+                })
                 .connect();
             return {
                 getConnection: () => connection,
-                dropConnection: () => {}
-            };    
+                dropConnection: () => eventBus.disconnect().catch(e => console.error("Failed to disconnect", e))
+            };
         }
     }
 
