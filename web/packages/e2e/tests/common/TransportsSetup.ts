@@ -16,6 +16,9 @@
  */
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 import { ConnectionProvider } from "./ConnectionProvider";
+import { WebBrokerConnectionBuilder } from "@plexus-interop/broker";
+import { CrossDomainEventBusProvider } from "@plexus-interop/broker";
+import { TransportConnection } from "@plexus-interop/transport-common";
 
 export class TransportsSetup {
 
@@ -28,6 +31,18 @@ export class TransportsSetup {
                 dropConnection: () => socket.close()
             };
         };
+    }
+
+    public createCrossDomainTransportProvider(proxyUrl: string): ConnectionProvider {
+        return async () => {
+            const connection: TransportConnection = await new WebBrokerConnectionBuilder()
+                .withEventBusProvider(() => new CrossDomainEventBusProvider(async () => proxyUrl).connect())
+                .connect();
+            return {
+                getConnection: () => connection,
+                dropConnection: () => {}
+            };    
+        }
     }
 
 }
