@@ -1,5 +1,7 @@
-import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { Logger, LoggerFactory, LogLevel } from "@plexus-interop/common";
 import { CrossDomainHostBuilder, JStorageEventBus } from "@plexus-interop/broker";
+
+LoggerFactory.setLogLevel(LogLevel.TRACE);
 
 export class TestCrossDomainHost {
 

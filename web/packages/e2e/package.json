@@ -8,7 +8,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "prebuild": "trash dist",
-    "build": "yarn build:main && npm run copy-assets",
+    "build": "yarn build:main && npm run copy-assets && npm run build-host-proxy",
     "build:main": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json",
     "lint": "tslint src/**/*.ts",

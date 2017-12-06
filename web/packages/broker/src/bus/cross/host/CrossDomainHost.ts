@@ -35,7 +35,10 @@ export class CrossDomainHost {
 
     private readonly parentWin: Window;
 
-    private stateMaschine: StateMaschine<HostState> = new StateMaschineBase<HostState>(HostState.CREATED, [], this.log);
+    private stateMaschine: StateMaschine<HostState> = new StateMaschineBase<HostState>(HostState.CREATED, [
+        { from: HostState.CREATED, to: HostState.CONNECTED },
+        { from: HostState.CONNECTED, to: HostState.CLOSED }
+    ], this.log);
 
     public constructor(
         private readonly internalBus: EventBus,
@@ -58,9 +61,13 @@ export class CrossDomainHost {
     }
 
     private initCommunicationWithParent(): void {
+        this.log.info("Subscribing to parent messages");
         Observable.fromEvent<MessageEvent>(window, "message")
             .filter(this.whiteListed)
             .map((event) => {
+                if (this.log.isTraceEnabled()) {
+                    this.log.trace(`Received event from ${event.origin}`);
+                }
                 return {
                     message: event.data as IFrameHostMessage<any, any>,
                     sourceWindow: event.source,
