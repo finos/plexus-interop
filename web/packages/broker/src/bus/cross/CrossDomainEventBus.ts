@@ -16,7 +16,7 @@
  */
 import { Event } from "../Event";
 import { EventBus } from "../EventBus";
-import { Subscription, Logger, LoggerFactory, Observer, GUID } from "@plexus-interop/common";
+import { Subscription, Logger, LoggerFactory, Observer, GUID, StateMaschine, StateMaschineBase } from "@plexus-interop/common";
 import { Observable } from "rxjs/Observable";
 import "rxjs/add/observable/fromEvent";
 import "rxjs/add/operator/filter";
@@ -28,12 +28,24 @@ import { ResponseType } from "./model/ResponseType";
 import { MessageType } from "./model/MessageType";
 import { PartialObserver } from "rxjs/Observer";
 
+enum State {
+    CREATED = "CREATED",
+    CONNECTED = "CONNECTED",
+    CLOSED = "CLOSED"
+}
+
 export class CrossDomainEventBus implements EventBus {
 
     private readonly log: Logger = LoggerFactory.getLogger("CrossDomainEventBus");
 
     private emitters: Map<string, Observer<any>> = new Map<string, Observer<any>>();
     private observables: Map<string, Observable<any>> = new Map<string, Observable<any>>();
+    private hostIframeEventsSubscription: Subscription;
+
+    private stateMaschine: StateMaschine<State> = new StateMaschineBase(State.CREATED, [
+        { from: State.CREATED, to: State.CONNECTED },
+        { from: State.CONNECTED, to: State.CLOSED }
+    ], this.log);
 
     public constructor(
         private readonly hostIFrame: HTMLIFrameElement,
@@ -56,6 +68,7 @@ export class CrossDomainEventBus implements EventBus {
     }
 
     public init(): Promise<EventBus> {
+        this.stateMaschine.throwIfNot(State.CREATED);
         this.createHostMessagesSubscription();
         return new Promise((resolve, reject) => {
             this.log.info("Host iFrame created, sending ping message");
@@ -63,6 +76,7 @@ export class CrossDomainEventBus implements EventBus {
             this.sendAndSubscribe(message, {
                 next: m => {
                     this.log.info("Success Ping response received");
+                    this.stateMaschine.go(State.CONNECTED);
                     resolve(this);
                 },
                 error: e => {
@@ -75,7 +89,7 @@ export class CrossDomainEventBus implements EventBus {
 
     private createHostMessagesSubscription(): void {
         this.log.info("Creating subscription to Host iFrame");
-        Observable.fromEvent<MessageEvent>(window, "message")
+        this.hostIframeEventsSubscription = Observable.fromEvent<MessageEvent>(window, "message")
             .filter(event => {
                 this.log.trace(`Received message from ${event.origin}`);
                 return event.origin === this.hostOrigin;
@@ -134,13 +148,29 @@ export class CrossDomainEventBus implements EventBus {
         }
     }
 
+    public async disconnect(): Promise<void> {
+        this.stateMaschine.throwIfNot(State.CONNECTED);
+        this.stateMaschine.go(State.CLOSED);        
+        if (this.hostIframeEventsSubscription) {
+            this.log.info("Unsubsribing from ")
+            this.hostIframeEventsSubscription.unsubscribe();
+        }
+        this.emitters.forEach((v, k) => {
+            v.error("Disconnected from Host iFrame");
+        });
+        this.emitters.clear();
+        this.observables.clear();
+    }
+
     public publish(topic: string, event: Event): void {
+        this.stateMaschine.throwIfNot(State.CONNECTED);
         const payload = event.payload;
         const message = this.hostMessage({ topic, payload }, MessageType.Publish);
         this.postToIFrame(message);
     }
 
     public subscribe(topic: string, handler: (event: Event) => void): Subscription {
+        this.stateMaschine.throwIfNot(State.CONNECTED);        
         const message = this.hostMessage({ topic }, MessageType.Subscribe, ResponseType.Stream);
         return this.sendAndSubscribe<SubscribeRequest, Event>(message, {
             next: message => {
@@ -155,6 +185,8 @@ export class CrossDomainEventBus implements EventBus {
             observer.next(value);
             if (complete) {
                 observer.complete();
+                this.emitters.delete(subscription);
+                this.observables.delete(subscription);
             }
         }
     }
