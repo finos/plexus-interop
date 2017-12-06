@@ -129,9 +129,11 @@ export class FramedTransportConnection implements TransportConnection, Transport
         return this.stateMachine.goAsync(ConnectionState.OPEN);
     }
 
-    public async acceptingConnection(channelObserver: Observer<TransportChannel>): Promise<void> {
-        this.log.debug("Accepting connection");
-        this.channelObserver.setObserver(channelObserver);
+    public async acceptingConnection(channelObserver?: Observer<TransportChannel>): Promise<void> {
+        this.log.debug(`Accepting connection, channel observer ${!!channelObserver ? "provided" : "not provided"}`);
+        if (channelObserver) {
+            this.channelObserver.setObserver(channelObserver);
+        }
         return this.stateMachine.goAsync(ConnectionState.ACCEPT);
     }
 

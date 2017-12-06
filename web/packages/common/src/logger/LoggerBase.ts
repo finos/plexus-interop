@@ -38,13 +38,13 @@ export class LoggerBase implements Logger {
     }
 
     public warn(msg: string, ...args: any[]): void {
-        log.warn(`${this.name} ${msg}`, args);
+        log.info(`${this.name} ${msg}`, args);
     }
 
     public trace(msg: string, ...args: any[]): void {
         /* istanbul ignore if */        
         if (log.getLevel() <= LogLevel.TRACE) {
-            log.debug(`${this.name} ${msg}`, args);
+            log.info(`${this.name} ${msg}`, args);
         }
     }
 

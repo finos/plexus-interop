@@ -47,6 +47,7 @@ export class InMemoryConnectionFactory implements ServerConnectionFactory, Clien
         }
         
         await clientTransportConnection.connect();
+        await serverTransportConnection.acceptingConnection();
 
         this.serverConnectionsObserver.next(serverTransportConnection);
         

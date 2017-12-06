@@ -70,14 +70,15 @@ export class WebBrokerConnectionBuilder {
         const inMemoryConnectionFactory = new InMemoryConnectionFactory();
         this.log.debug("Creating in memory host connection");
         const inMemoryClientConnection: TransportConnection = await inMemoryConnectionFactory.connect();
+        const clientConnectionGuid = inMemoryClientConnection.uuid().toString();
 
         this.log.info("Initialyzing Event Bus");
         const eventBus = await this.eventBusProvider();
 
-        const remoteBrokerService: RemoteBrokerService = new EventBusRemoteBrokerService(eventBus, inMemoryClientConnection.uuid().toString());
+        const remoteBrokerService: RemoteBrokerService = new EventBusRemoteBrokerService(eventBus, clientConnectionGuid);
 
         const peerConnectionService: PeerConnectionsService = new PeerConnectionsService(remoteBrokerService);
-        const peerConnectionsFactory = new PeerServerConnectionFactory(peerConnectionService, remoteBrokerService);
+        const peerConnectionsFactory = new PeerServerConnectionFactory(clientConnectionGuid, peerConnectionService, remoteBrokerService);
         const brokerConnectionsFactory = new MultiSourcesConnectionFactory(inMemoryConnectionFactory, peerConnectionsFactory);
 
         const appLifeCycleManager = new PeerAppLifeCycleManager(peerConnectionService, appRegistryService);

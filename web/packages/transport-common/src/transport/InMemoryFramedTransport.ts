@@ -55,12 +55,12 @@ export class InMemoryFramedTransport implements ConnectableFramedTransport {
         this.cancellationToken.throwIfCanceled();
         if (this.log.isTraceEnabled()) {
             if (frame.isDataFrame) {
-                this.log.trace(`Received data frame of ${frame.body.byteLength}`);
+                this.log.trace(`Received data frame`);
             } else {
                 this.log.trace(`Received header frame`);
             }
         }
-        this.inObserver.next(frame);
+        this.outObserver.next(frame);
     }
 
     public async open(observer: Observer<Frame>): Promise<void> {

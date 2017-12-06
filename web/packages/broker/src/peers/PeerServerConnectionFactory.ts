@@ -31,6 +31,7 @@ export class PeerServerConnectionFactory implements ServerConnectionFactory {
     private readonly connectionsObserver: BufferedObserver<TransportConnection> = new BufferedObserver(100, this.log);
 
     constructor(
+        private readonly hostConnectionGuid: string,
         private readonly peerConnectionsService: PeerConnectionsService,
         private readonly remoteBrokerService: RemoteBrokerService) {
         this.listenForPeerConnections();
@@ -46,7 +47,8 @@ export class PeerServerConnectionFactory implements ServerConnectionFactory {
         this.peerConnectionsService.subscribeToConnectionsHearBits({
             next: (connectionDescriptor: AppConnectionHeartBit) => {
                 // create proxy connection only once
-                if (!this.processedConnections.has(connectionDescriptor.connectionId)) {
+                if (!this.processedConnections.has(connectionDescriptor.connectionId)
+                    && connectionDescriptor.connectionId !== this.hostConnectionGuid) {
                     this.log.debug(`Detected new connection, app id ${connectionDescriptor.applicationId}`);
                     const appConnectionDescriptor: ApplicationConnectionDescriptor = {
                         applicationId: connectionDescriptor.applicationId,

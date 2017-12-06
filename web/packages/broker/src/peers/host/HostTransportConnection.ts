@@ -146,6 +146,7 @@ export class HostTransportConnection implements TransportConnection {
                     observer.error(`No channel with id [${request.channelId}]`);
                 }
             }).subscribe(responseObserver);
+            
         }, this.stringUuid);
 
     }

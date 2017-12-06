@@ -38,7 +38,7 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
 
         return new Promise((resolve, reject) => {
             let sourceConnection: undefined | ApplicationConnection;
-            connection.connect({
+            connection.subscribeToChannels({
                 next: async channel => {
                     const channelStrId = channel.uuid().toString();
                     log.debug(`Received new channel [${channelStrId}]`);

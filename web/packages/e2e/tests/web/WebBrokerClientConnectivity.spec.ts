@@ -46,6 +46,10 @@ describe("Web Socket Client connectivity", () => {
                 console.log("Connected!");
                 expect(client).to.not.be.undefined;
                 return client.disconnect();
+            })
+            .catch(e => {
+                debugger;
+                console.error("Failed", e);
             });
     });
 
