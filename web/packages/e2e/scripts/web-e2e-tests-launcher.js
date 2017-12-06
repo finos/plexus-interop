@@ -19,14 +19,15 @@ const { spawn, exec } = require('child_process');
 const kill = require('tree-kill');
 const log = console.log.bind(console);
 
+let httpServerProcess;
+
 function main() {
 
     log('Passed arguments' + JSON.stringify(argv));
-    let httpServerProcess;
     
     const port = argv.port || 3001;
-    const baseDir = argv.baseUrl || `${__dirname}/../metadata`;  
-    const proxyPagePath = argv.path || `${__dirname}/`;
+    const baseDir = argv.baseUrl || `${__dirname}/../dist/main/tests`;  
+    const proxyPagePath = argv.path || `host/index.html`;
 
     const proxyHostUrl = `http://localhost:${port}/${proxyPagePath}`;
 
@@ -58,8 +59,8 @@ function killHttpServerProcess() {
 }
 
 function runElectronTest(path) {
-    log("Starting Web Electron Tests ...");
-    exec(`electron-mocha --require --path ${path} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
+    log("Starting Web Broker Electron Tests ...");
+    exec(`electron-mocha ${argv.file} --hostPath ${path} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
         cwd: process.cwd()
     }, (error, stdout, stderr) => {
         log("Electron tests stopped, killing HTTP Server");

@@ -33,7 +33,8 @@ console.log('Processing files: ' + JSON.stringify(testFiles));
 
 let browserifyBundle = browserify({ entries: testFiles });
 
-if (!argv.debug) {
+if (argv.coverage) {
+    console.log('Coverage enabled, instrumenting sources');
     bundle = browserifyBundle.transform(istanbul({
         // ignore these glob paths (the ones shown are the defaults)
         ignore: [
