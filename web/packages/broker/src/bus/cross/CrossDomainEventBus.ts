@@ -27,6 +27,7 @@ import { SubscribeRequest } from "./model/SubscribeRequest";
 import { ResponseType } from "./model/ResponseType";
 import { MessageType } from "./model/MessageType";
 import { PartialObserver } from "rxjs/Observer";
+import { Defaults } from "@plexus-interop/transport-common";
 
 enum State {
     CREATED = "CREATED",
@@ -38,8 +39,13 @@ export class CrossDomainEventBus implements EventBus {
 
     private readonly log: Logger = LoggerFactory.getLogger("CrossDomainEventBus");
 
-    private emitters: Map<string, Observer<any>> = new Map<string, Observer<any>>();
-    private observables: Map<string, Observable<any>> = new Map<string, Observable<any>>();
+    private readonly singleOperationTimeOut: number = Defaults.OPERATION_TIMEOUT;
+    private readonly pingTimeout: number = 10 * 6000;
+
+    private readonly emitters: Map<string, Observer<any>> = new Map<string, Observer<any>>();
+    private readonly observables: Map<string, Observable<any>> = new Map<string, Observable<any>>();
+    private readonly rejectTimeouts: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>();
+
     private hostIframeEventsSubscription: Subscription;
 
     private stateMaschine: StateMaschine<State> = new StateMaschineBase(State.CREATED, [
@@ -51,7 +57,10 @@ export class CrossDomainEventBus implements EventBus {
         private readonly hostIFrame: HTMLIFrameElement,
         private readonly hostOrigin: string) { }
 
-    private sendAndSubscribe<T, ResType>(message: IFrameHostMessage<T, ResType>, observer: PartialObserver<IFrameHostMessage<T, ResType>>): Subscription {
+    private sendAndSubscribe<T, ResType>(
+        message: IFrameHostMessage<T, ResType>,
+        observer: PartialObserver<IFrameHostMessage<T, ResType>>,
+        rejectTimeout: number = this.singleOperationTimeOut): Subscription {
 
         const responseType = message.responseType;
         const subscriptionKey = this.subscriptionKey(message);
@@ -59,7 +68,17 @@ export class CrossDomainEventBus implements EventBus {
 
         return this.sharedObservable<IFrameHostMessage<T, ResType>>(
             subscriptionKey,
-            () => this.postToIFrame(message)).subscribe(observer);
+            () => {
+                this.postToIFrame(message);
+                if (message.responseType === ResponseType.Single) {
+                    this.rejectTimeouts.set(subscriptionKey, setTimeout(() => {
+                        const errorMsg = `Operation's timeout passed ${rejectTimeout}`;
+                        this.log.warn(errorMsg)
+                        this.emitError(subscriptionKey, errorMsg);
+                        this.rejectTimeouts.delete(subscriptionKey);
+                    }, rejectTimeout));
+                }
+            }).subscribe(observer);
 
     }
 
@@ -80,11 +99,20 @@ export class CrossDomainEventBus implements EventBus {
                     resolve(this);
                 },
                 error: e => {
-                    this.log.error("Failed to receive first Ping response");
+                    this.log.error("Failed to receive first Ping response", e);
                     reject(e);
                 }
-            });
+            }, this.pingTimeout);
         });
+    }
+
+    private clearRejectTimeout(key: string) {
+        const timeout = this.rejectTimeouts.get(key);
+        if (timeout) {
+            this.log.trace(`Clearing reject timeout for ${key}`);
+            clearTimeout(timeout);
+            this.rejectTimeouts.delete(key);
+        }
     }
 
     private createHostMessagesSubscription(): void {
@@ -150,7 +178,7 @@ export class CrossDomainEventBus implements EventBus {
 
     public async disconnect(): Promise<void> {
         this.stateMaschine.throwIfNot(State.CONNECTED);
-        this.stateMaschine.go(State.CLOSED);        
+        this.stateMaschine.go(State.CLOSED);
         if (this.hostIframeEventsSubscription) {
             this.log.info("Unsubsribing from ")
             this.hostIframeEventsSubscription.unsubscribe();
@@ -170,7 +198,7 @@ export class CrossDomainEventBus implements EventBus {
     }
 
     public subscribe(topic: string, handler: (event: Event) => void): Subscription {
-        this.stateMaschine.throwIfNot(State.CONNECTED);        
+        this.stateMaschine.throwIfNot(State.CONNECTED);
         const message = this.hostMessage({ topic }, MessageType.Subscribe, ResponseType.Stream);
         return this.sendAndSubscribe<SubscribeRequest, Event>(message, {
             next: message => {
@@ -180,15 +208,28 @@ export class CrossDomainEventBus implements EventBus {
     }
 
     private emit(subscription: string, value: any, complete?: boolean): void {
+        this.clearRejectTimeout(subscription);
         const observer = this.emitters.get(subscription);
         if (observer !== undefined) {
             observer.next(value);
             if (complete) {
                 observer.complete();
-                this.emitters.delete(subscription);
-                this.observables.delete(subscription);
+                this.clearEmitter(subscription);
             }
         }
+    }
+
+    private emitError(subscription: string, error: string): void {
+        let observer = this.emitters.get(subscription);
+        if (observer) {
+            observer.error(new Error(error));
+            this.clearEmitter(subscription);
+        }
+    }
+
+    protected clearEmitter(key: string): void {
+        this.emitters.delete(key);
+        this.observables.delete(key);
     }
 
     private emitAndComplete(subscription: string, value: any): void {

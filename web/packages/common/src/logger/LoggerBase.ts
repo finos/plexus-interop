@@ -25,7 +25,7 @@ export class LoggerBase implements Logger {
     public debug(msg: string, ...args: any[]): void {
         /* istanbul ignore if */
         if (log.getLevel() <= LogLevel.DEBUG) {
-            log.debug(`${this.name} ${msg}`, args);
+            log.info(`${this.name} ${msg}`, args);
         }
     }
 

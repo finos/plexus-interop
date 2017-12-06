@@ -19,6 +19,9 @@ import { ClientsSetup } from "../common/ClientsSetup";
 import { TransportsSetup } from "../common/TransportsSetup";
 import { readHostUrl } from "../common/utils";
 // import { ClientConnectivityTests } from "../echo/ClientConnectivityTests";
+import { LoggerFactory, LogLevel } from "@plexus-interop/common";
+
+LoggerFactory.setLogLevel(LogLevel.TRACE);
 
 describe("Web Socket Client connectivity", () => {
 

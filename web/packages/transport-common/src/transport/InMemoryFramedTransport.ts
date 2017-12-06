@@ -29,7 +29,7 @@ export class InMemoryFramedTransport implements ConnectableFramedTransport {
         private inObserver: BufferedObserver<Frame>,
         private outObserver: Observer<Frame>
     ) {
-        this.log = LoggerFactory.getLogger(`InMemoryFramedTransport [${this.id.toString}]`);
+        this.log = LoggerFactory.getLogger(`InMemoryFramedTransport [${this.id.toString()}]`);
         this.log.trace("Created");
     }
 
