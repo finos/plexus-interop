@@ -26,8 +26,8 @@ function main() {
     log('Passed arguments' + JSON.stringify(argv));
     
     const port = argv.port || 3001;
-    const baseDir = argv.baseUrl || `${__dirname}/../dist/main/tests`;  
-    const proxyPagePath = argv.path || `host/index.html`;
+    const baseDir = argv.baseUrl || `${__dirname}/../dist`;  
+    const proxyPagePath = argv.path || `main/src/views/proxyHost.html`;
 
     const proxyHostUrl = `http://localhost:${port}/${proxyPagePath}`;
 

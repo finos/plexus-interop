@@ -45,8 +45,11 @@ export class InMemoryConnectionFactory implements ServerConnectionFactory, Clien
                 Client [${clientTransportConnection.uuid().toString()}] 
                 Server [${serverTransportConnection.uuid().toString()}]`);
         }
+        
+        await clientTransportConnection.connect();
 
         this.serverConnectionsObserver.next(serverTransportConnection);
+        
         return clientTransportConnection;
     }
 

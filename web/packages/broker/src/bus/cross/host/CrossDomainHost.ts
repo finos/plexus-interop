@@ -63,8 +63,8 @@ export class CrossDomainHost {
     private initCommunicationWithParent(): void {
         this.log.info("Subscribing to parent messages");
         Observable.fromEvent<MessageEvent>(window, "message")
-            .filter(this.whiteListed)
-            .map((event) => {
+            .filter(event => this.whiteListed(event))
+            .map(event => {
                 if (this.log.isTraceEnabled()) {
                     this.log.trace(`Received event from ${event.origin}`);
                 }
