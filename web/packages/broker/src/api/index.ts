@@ -16,4 +16,4 @@
  */
 export * from "./WebBrokerConnectionBuilder";
 export * from "./CrossDomainHostBuilder";
-export * from "./WebBrokerConnectionBuilder";
+export * from "./CrossDomainEventBusProvider";

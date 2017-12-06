@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { TransportConnection, TransportChannel, UniqueId, Defaults } from "@plexus-interop/transport-common";
-import { Observer, BufferedObserver, Logger, LoggerFactory } from "@plexus-interop/common";
+import { Observer, BufferedObserver, Logger, LoggerFactory, Subscription, AnonymousSubscription } from "@plexus-interop/common";
 import { clientProtocol } from "@plexus-interop/protocol";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 import { ProxyAuthenticationHandler } from "./ProxyAuthenticationHandler";
@@ -37,17 +37,21 @@ export class PeerProxyConnection implements TransportConnection {
         private hostConnectionId: string,
         private readonly connectionDescriptor: ApplicationConnectionDescriptor,
         private readonly remoteBrokerService: RemoteBrokerService) {
-        
         this.remoteConnectionId = connectionDescriptor.connectionId.toString();
         this.log = LoggerFactory.getLogger(`PeerProxyConnection [${connectionDescriptor.connectionId.toString()}]`);
         this.incomingChannelsObserver = new BufferedObserver<TransportChannel>(Defaults.DEFAULT_BUFFER_SIZE, this.log);
         this.incomingChannelsObserver.next(new ProxyAuthenticationHandler(connectionDescriptor));
-
     }
 
     public async connect(channelObserver: Observer<TransportChannel>): Promise<void> {
-        this.log.debug(`Broker subscribed to channels`);
+        this.log.debug(`Broker subscribed to channels via connect`);
         this.incomingChannelsObserver.setObserver(channelObserver);
+    }
+
+    public subscribeToChannels(channelObserver: Observer<TransportChannel>): Subscription {
+        this.log.debug(`Broker subscribed to channels via subscibe`);
+        this.incomingChannelsObserver.setObserver(channelObserver);
+        return new AnonymousSubscription();
     }
 
     public uuid(): UniqueId {

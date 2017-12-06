@@ -1,5 +1,5 @@
 import { TransportConnection, TransportChannel } from "@plexus-interop/transport-common";
-import { Observer, Logger, LoggerFactory } from "@plexus-interop/common";
+import { Observer, Logger, LoggerFactory, Subscription } from "@plexus-interop/common";
 import { UniqueId, clientProtocol } from "@plexus-interop/protocol";
 import { RemoteBrokerService } from "../remote/RemoteBrokerService";
 import { RemoteActions } from "../actions/RemoteActions";
@@ -30,6 +30,10 @@ export class HostTransportConnection implements TransportConnection {
 
     public connect(channelObserver: Observer<TransportChannel>): Promise<void> {
         return this.baseConnection.connect(channelObserver);
+    }
+
+    public subscribeToChannels(channelObserver: Observer<TransportChannel>): Subscription {
+        return this.baseConnection.subscribeToChannels(channelObserver);
     }
 
     public isConnected(): boolean {
