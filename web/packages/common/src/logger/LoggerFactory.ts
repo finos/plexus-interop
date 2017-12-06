@@ -50,3 +50,7 @@ export class LoggerFactory {
 }
 
 LoggerFactory.setLogLevel(LogLevel.INFO);
+
+const globalObject: any = window || global || {};
+
+globalObject["plexus-interop-loggerFactory"] = LoggerFactory;

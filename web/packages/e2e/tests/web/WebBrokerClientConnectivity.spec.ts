@@ -37,7 +37,7 @@ describe("Web Socket Client connectivity", () => {
     it("Can connect/disconnect from running Broker instance", async function () {
         this.timeout(1500000);
         debugger;
-        clientsSetup
+        return clientsSetup
             .createEchoClient(transportsSetup.createCrossDomainTransportProvider(proxyHost))
             .then(client => {
                 console.log("Connected!");
