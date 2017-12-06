@@ -21,10 +21,10 @@
     "build-all": "run-s build-core build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
     "build-all-win": "run-s build-all benchmarks e2e",
     "prebuild-all": "yarn install",
-    "e2e": "cd ./packages/e2e && yarn electron-e2e",
+    "e2e": "cd ./packages/e2e && yarn e2e-native",
     "poste2e": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
-    "benchmarks": "cd ./packages/e2e && yarn electron-e2e-benchmarks"
+    "benchmarks": "cd ./packages/e2e && yarn e2e-native-benchmarks"
   },
   "workspaces": [
     "packages/*"
