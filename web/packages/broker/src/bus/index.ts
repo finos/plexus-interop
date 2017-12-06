@@ -17,3 +17,4 @@
 export * from "./EventBus";
 export * from "./Event";
 export * from "./cross";
+export * from "./same/JStorageEventBus";

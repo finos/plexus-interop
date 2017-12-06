@@ -8,7 +8,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "prebuild": "trash dist",
-    "build": "yarn build:main && npm run copy-gen-folders",
+    "build": "yarn build:main && npm run copy-assets",
     "build:main": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
@@ -26,6 +26,7 @@
     "postrepublish": "echo 'Package republished successfully!'",
     "prepare-native-e2e-tests": "node scripts/browserify-all.js --coverage true --inputGlob dist/main/tests/native/*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
     "prepare-web-e2e-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/web/*spec.js --outputFile dist/main/tests/web/RendererProcess.bundle.js",
+    "build-host-proxy": "node scripts/browserify-all.js --standalone proxyHost --inputGlob dist/main/tests/common/TestCrossDomainHost.js --outputFile dist/main/tests/web/CrossDomainHost.bundle.js",
     "prepare-native-e2e-debug-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
     "prepare-native-e2e-benchmarks": "node scripts/browserify-all.js --inputGlob dist/main/tests/benchmarks/*spec.js --outputFile dist/main/tests/benchmarks/RendererProcessBenchmarks.bundle.js",
     "native-broker-tests": "npm run prepare-native-e2e-tests && node scripts/native-e2e-tests-launcher.js --file ./dist/main/tests/native/RendererProcess.bundle.js",
@@ -35,7 +36,7 @@
     "e2e-web": "npm run build && npm run web-broker-tests",
     "e2e-native-benchmarks": "npm run build && npm run run-ws-broker-benchmarks",
     "e2e-native-debug": "npm run build && npm run prepare-native-e2e-debug-tests && node scripts/native-e2e-tests-launcher.js --printBrokerStdout true --debug true --file ./dist/main/tests/native/RendererProcess.bundle.js",
-    "copy-gen-folders": "copyfiles src/echo/gen/* dist/main"
+    "copy-assets": "copyfiles src/echo/gen/* dist/main && copyfiles src/views/* dist/main"
   },
   "dependencies": {
     "@types/long": "^3.0.31",

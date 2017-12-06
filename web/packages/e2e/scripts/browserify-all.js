@@ -26,12 +26,18 @@ var resultOutFile = path.join(process.cwd(), argv.outputFile);
 console.log('Output file:' + resultOutFile);
 var resultInputGlob = path.join(process.cwd(), argv.inputGlob);
 console.log('Input files pattern:' + resultInputGlob);
-
+if (argv.standalone) {
+    console.log(`Building UMD module [${argv.standalone}]`);
+}
 var testFiles = glob.sync(resultInputGlob);
 
 console.log('Processing files: ' + JSON.stringify(testFiles));
 
-let browserifyBundle = browserify({ entries: testFiles });
+
+let browserifyBundle = browserify({ 
+    entries: testFiles, 
+    standalone: argv.standalone 
+});
 
 if (argv.coverage) {
     console.log('Coverage enabled, instrumenting sources');
