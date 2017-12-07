@@ -129,6 +129,7 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
             connectionId: connection.descriptor.connectionId.toString(),
             instanceId: connection.descriptor.instanceId
         };
+        this.peerConnectionsService.sendHeartBit(heartBit);
         return setInterval(() => {
             this.peerConnectionsService.sendHeartBit(heartBit);
         }, this.heartBitPeriod);
