@@ -53,7 +53,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
 
         this.eventBus.subscribe(requestTopic, event => {
             const requestEvent = event.payload as EventBasedRequest;
-            this.log.trace(`Received [${actionType.id}.${requestEvent.requestId}] request to [${hostId}]`);
+            this.log.trace(`Received [${actionType.id}.${requestEvent.requestId}] request`);
             const responseTopic = this.responseTopic(hostId, actionType, requestEvent.requestId);
             handler(requestEvent.payload, {
                 next: update => {
@@ -132,7 +132,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
     }
 
     private requestTopic(remoteId: string, actionType: ActionType<any, any>): string {
-        return `req.${actionType.id}.${this.id}.${remoteId}`;
+        return `req.${actionType.id}.${remoteId}`;
     }
 
     private newRequestId(): number {

@@ -49,14 +49,14 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                             const appConnection = await this.appLifeCycleManager.acceptConnection(connection, {
                                 applicationId: appDescriptor.applicationId as string,
                                 instanceId: UniqueId.fromProperties(appDescriptor.instanceId as plexus.IUniqueId)
-                            }, (connection) => {
+                            }, c => {
                                 // TODO handle connection drop
-                                log.error("Connection dropped");
+                                log.error("Connection dropped", connection.uuid().toString());
                             });
                             sourceConnection = appConnection;
                             log.trace("Connected to client");
                         } catch (error) {
-                            log.error("Unable to authenticate client connection");
+                            log.error("Unable to authenticate client connection", error);
                             reject(error);
                         }
                     } else {
@@ -73,10 +73,12 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                 },
                 complete: () => {
                     // TODO clean up
+                    log.debug(`Channel subscrition completed for connection [${connection.uuid().toString()}]`);
                     resolve(new SuccessCompletion());
                 },
                 error: e => {
                     // TODO clean up
+                    log.error(`Error received for channels subscription [${connection.uuid().toString()}]`, e);
                     reject(new ErrorCompletion(e));
                 }
             });

@@ -33,13 +33,14 @@ export class JStorageEventBus implements EventBus {
 
     public publish(key: string, event: Event): void {
         const topic = this.internalKey(key);
-        this.log.info(`Publishing event to ${topic}`);
+        this.log.trace(`Publishing event to ${topic}`);
         this.jStorage.publish(topic, event.payload);
     }
 
     public subscribe(key: string, handler: (event: Event) => void): Subscription {
         const topic = this.internalKey(key);
         // TODO handle unsubscribe
+        this.log.trace(`Subscribing to ${topic}`);        
         this.jStorage.subscribe(this.internalKey(key), (channel: string, value: any) => {
             this.log.trace(`Received update for ${topic}`);
             handler({ payload: value });
