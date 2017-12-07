@@ -84,7 +84,7 @@ export class WebBrokerConnectionBuilder {
         const appLifeCycleManager = new PeerAppLifeCycleManager(peerConnectionService, appRegistryService);
 
         this.log.info("Starting to listen for remote connections");
-        new Broker(appLifeCycleManager, brokerConnectionsFactory, interopRegistryProvider).start();
+        new Broker(appLifeCycleManager, brokerConnectionsFactory, interopRegistryProvider, appRegistryService).start();
 
         return new HostTransportConnection(inMemoryClientConnection, remoteBrokerService);
 

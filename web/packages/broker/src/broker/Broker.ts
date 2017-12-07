@@ -23,6 +23,7 @@ import { InvocationRequestHandler } from "./InvocationRequestHandler";
 import { InteropRegistryProvider } from "../metadata/interop/InteropRegistryProvider";
 import { InteropRegistryService } from "../metadata/interop/InteropRegistryService";
 import { ClientRequestProcessor } from "./ClientRequestProcessor";
+import { AppRegistryService } from "../metadata/apps/AppRegistryService";
 
 export class Broker {
 
@@ -31,11 +32,12 @@ export class Broker {
     private readonly connectionProcessor: ClientConnectionProcessor;
 
     constructor(
-        private appLifeCycleManager: AppLifeCycleManager,
-        private connectionFactory: ServerConnectionFactory,
-        private registryProvider: InteropRegistryProvider
+        private readonly appLifeCycleManager: AppLifeCycleManager,
+        private readonly connectionFactory: ServerConnectionFactory,
+        private readonly registryProvider: InteropRegistryProvider,
+        private readonly appService: AppRegistryService
     ) {
-        const authHandler = new AuthenticationHandler(this.appLifeCycleManager);
+        const authHandler = new AuthenticationHandler(this.appService);
         const registryService = new InteropRegistryService(this.registryProvider);
         const invocationRequestHandler = new InvocationRequestHandler(registryService, this.appLifeCycleManager);
         const clientRequestProcessor = new ClientRequestProcessor(invocationRequestHandler);
@@ -50,7 +52,9 @@ export class Broker {
                 if (this.log.isDebugEnabled()) {
                     this.log.debug(`Accepted new connection [${connection.uuid().toString()}]`);
                 }
-                this.connectionProcessor.handle(connection);
+                this.connectionProcessor.handle(connection)
+                    .then(() => this.log.info(`Finished processing of [${connection.uuid().toString()}] connection`))
+                    .catch(e => this.log.error(`Error while processing of [${connection.uuid().toString()}] connection`, e));
             },
             error: e => this.log.error("Error on receiving new connection", e),
             complete: () => this.log.info("No more connections")

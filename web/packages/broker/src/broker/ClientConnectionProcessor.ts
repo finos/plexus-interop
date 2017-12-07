@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 import { AsyncHandler } from "../AsyncHandler";
-import { TransportConnection, TransportChannel } from "@plexus-interop/transport-common";
+import { TransportConnection } from "@plexus-interop/transport-common";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { Completion, ErrorCompletion, SuccessCompletion, UniqueId } from "@plexus-interop/protocol";
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { transportProtocol as plexus } from "@plexus-interop/protocol";
-import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
 import { ClientRequestProcessor } from "./ClientRequestProcessor";
 import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
+import { AuthenticationHandler } from "./AuthenticationHandler";
 
 export class ClientConnectionProcessor implements AsyncHandler<TransportConnection, Completion> {
 
     constructor(
-        private readonly authenticationProcessor: AsyncHandler<[TransportConnection, TransportChannel], ApplicationDescriptor>,
+        private readonly authenticationProcessor: AuthenticationHandler,
         private readonly clientRequestProcessor: ClientRequestProcessor,
         private readonly appLifeCycleManager: AppLifeCycleManager) { }
 

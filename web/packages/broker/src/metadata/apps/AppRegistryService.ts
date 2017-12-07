@@ -43,4 +43,8 @@ export class AppRegistryService {
         return result;
     }
 
+    public isAppExist(id: string): boolean {
+        return this.appsRegistry.apps.has(id);
+    }
+
 }
