@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion, Completion } from "@plexus-interop/protocol";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
-import { Completion } from "@plexus-interop/client";
 import { Observable } from "rxjs/Observable";
 import { InteropRegistryService } from "../metadata/interop/InteropRegistryService";
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";

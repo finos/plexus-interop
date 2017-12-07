@@ -24,10 +24,11 @@ import { RemoteBrokerService } from "../peers/remote/RemoteBrokerService";
 import { EventBusRemoteBrokerService } from "../peers/remote/EventBusBrokerService";
 import { PeerConnectionsService } from "../peers/PeerConnectionsService";
 import { PeerServerConnectionFactory } from "../peers/PeerServerConnectionFactory";
-import { MultiSourcesConnectionFactory } from "../transport/MultiSourcesConnectionFactory";
+import { MultiSourcesServerConnectionFactory } from "../transport/MultiSourcesServerConnectionFactory";
 import { Broker } from "../broker/Broker";
 import { PeerAppLifeCycleManager } from "../peers/PeerAppLifeCycleManager";
 import { HostTransportConnection } from "../peers/host/HostTransportConnection";
+import { HostConnectionFactory } from "../peers/host/HostConnectionFactory";
 
 export class WebBrokerConnectionBuilder {
 
@@ -67,10 +68,10 @@ export class WebBrokerConnectionBuilder {
         const interopRegistryProvider = await this.interopRegistryProviderFactory();
         const appRegistryService = new AppRegistryService(appRegistryProvider);
 
-        const inMemoryConnectionFactory = new InMemoryConnectionFactory();
+        const hostClientConnectionFactory = new InMemoryConnectionFactory();
         this.log.debug("Creating in memory host connection");
-        const inMemoryClientConnection: TransportConnection = await inMemoryConnectionFactory.connect();
-        const clientConnectionGuid = inMemoryClientConnection.uuid().toString();
+        const hostClientConnection: TransportConnection = await hostClientConnectionFactory.connect();
+        const clientConnectionGuid = hostClientConnection.uuid().toString();
 
         this.log.info("Initialyzing Event Bus");
         const eventBus = await this.eventBusProvider();
@@ -79,14 +80,16 @@ export class WebBrokerConnectionBuilder {
 
         const peerConnectionService: PeerConnectionsService = new PeerConnectionsService(remoteBrokerService);
         const peerConnectionsFactory = new PeerServerConnectionFactory(clientConnectionGuid, peerConnectionService, remoteBrokerService);
-        const brokerConnectionsFactory = new MultiSourcesConnectionFactory(inMemoryConnectionFactory, peerConnectionsFactory);
+        const brokerConnectionsFactory = new MultiSourcesServerConnectionFactory(
+            new HostConnectionFactory(hostClientConnectionFactory, remoteBrokerService),
+            peerConnectionsFactory);
 
         const appLifeCycleManager = new PeerAppLifeCycleManager(peerConnectionService, appRegistryService);
 
-        this.log.info("Starting to listen for remote connections");
+        this.log.info("Starting Broker");
         new Broker(appLifeCycleManager, brokerConnectionsFactory, interopRegistryProvider, appRegistryService).start();
 
-        return new HostTransportConnection(inMemoryClientConnection, remoteBrokerService);
+        return hostClientConnection;
 
     }
 

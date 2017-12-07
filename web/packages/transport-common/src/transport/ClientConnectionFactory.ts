@@ -17,8 +17,8 @@
 import {TransportConnection} from "./TransportConnection";
 import { ConnectionDetails } from "./ConnectionDetails";
 
-export abstract class ClientConnectionFactory {
+export interface ClientConnectionFactory {
 
-    public abstract connect(connectionDetails: ConnectionDetails): Promise<TransportConnection>;
+    connect(connectionDetails: ConnectionDetails): Promise<TransportConnection>;
 
 }

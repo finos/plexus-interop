@@ -14,14 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require("long");
-export * from "./TransportConnection";
-export * from "./frame";
-export * from "./ClientConnectionFactory";
-export * from "./TransportChannel";
-export * from "./InMemoryConnectionFactory";
-export * from "./InMemoryFramedTransport";
-export * from "./ServerConnectionFactory";
-export * from "./DuplexConnectionFactory";
-export * from "./ConnectionDetails";
-export {UniqueId as UniqueId} from "@plexus-interop/protocol";
+import { ServerConnectionFactory, ClientConnectionFactory } from "."; 
+
+export interface DuplexConnectionFactory extends ServerConnectionFactory, ClientConnectionFactory {}

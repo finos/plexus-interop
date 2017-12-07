@@ -170,7 +170,7 @@ export class CrossDomainEventBus implements EventBus {
         switch (hostMessage.type.id) {
             case MessageType.Subscribe.id:
                 let message = hostMessage as IFrameHostMessage<SubscribeRequest, any>;
-                return message.type.id + (message.requestPayload ? message.requestPayload.topic : message.responsePayload.key);
+                return message.type.id + "." + (message.requestPayload ? message.requestPayload.topic : message.responsePayload.key);
             default:
                 return hostMessage.id;
         }

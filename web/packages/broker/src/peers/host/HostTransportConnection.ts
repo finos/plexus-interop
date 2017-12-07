@@ -39,8 +39,8 @@ export class HostTransportConnection implements TransportConnection {
     public constructor(
         private readonly baseConnection: TransportConnection,
         private readonly remoteBrokerService: RemoteBrokerService) {
-        this.log = LoggerFactory.getLogger(`HostTransportConnection [${this.baseConnection.uuid.toString()}]`);
         this.stringUuid = this.uuid().toString();
+        this.log = LoggerFactory.getLogger(`HostTransportConnection [${this.stringUuid}]`);
         this.bindToRemoteActions();
     }
 

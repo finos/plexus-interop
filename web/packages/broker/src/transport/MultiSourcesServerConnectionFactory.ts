@@ -17,7 +17,7 @@
 import { ServerConnectionFactory, TransportConnection } from "@plexus-interop/transport-common";
 import { Observer, Subscription, AnonymousSubscription } from "@plexus-interop/common";
 
-export class MultiSourcesConnectionFactory implements ServerConnectionFactory {
+export class MultiSourcesServerConnectionFactory implements ServerConnectionFactory {
 
     private readonly sources: ServerConnectionFactory[];
 

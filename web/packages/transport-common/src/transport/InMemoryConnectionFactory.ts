@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ServerConnectionFactory } from "./ServerConnectionFactory";
+import { DuplexConnectionFactory } from "./DuplexConnectionFactory";
 import { Observer, Subscription, BufferedObserver, Logger, LoggerFactory, AnonymousSubscription } from "@plexus-interop/common";
-import { TransportConnection, ClientConnectionFactory, Defaults, Frame, FramedTransportConnection } from "../.";
+import { TransportConnection, Defaults, Frame, FramedTransportConnection } from "../.";
 import { InMemoryFramedTransport } from "./InMemoryFramedTransport";
 
 /**
  * Creates pair of coupled in memory connections for each Client's connect request
  */
-export class InMemoryConnectionFactory implements ServerConnectionFactory, ClientConnectionFactory {
+export class InMemoryConnectionFactory implements DuplexConnectionFactory {
 
     private readonly log: Logger = LoggerFactory.getLogger("InMemoryConnectionFactory");
 
