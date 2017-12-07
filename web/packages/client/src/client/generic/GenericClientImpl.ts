@@ -33,7 +33,11 @@ import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
 import { RequestedDiscoveredInvocation } from "./RequestedDiscoveredInvocation";
 
-enum ClientState { CREATED, LISTEN, CLOSED };
+enum ClientState {
+    CREATED = "CREATED",
+    LISTEN = "LISTEN",
+    CLOSED = "CLOSED"
+}
 
 export class GenericClientImpl implements GenericClient {
 
@@ -53,7 +57,7 @@ export class GenericClientImpl implements GenericClient {
             {
                 from: ClientState.LISTEN, to: ClientState.CLOSED, preHandler: async () => this.cancellationToken.cancel("Closed")
             }
-        ]);
+        ], this.log);
         this.log.trace("Created");
     }
 
