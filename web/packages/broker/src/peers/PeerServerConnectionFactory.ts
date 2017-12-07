@@ -50,6 +50,8 @@ export class PeerServerConnectionFactory implements ServerConnectionFactory {
                 if (!this.processedConnections.has(connectionDescriptor.connectionId)
                     && connectionDescriptor.connectionId !== this.hostConnectionGuid) {
                     this.log.debug(`Detected new connection, app id ${connectionDescriptor.applicationId}`);
+                    this.processedConnections.add(connectionDescriptor.connectionId);
+                    debugger;
                     const appConnectionDescriptor: ApplicationConnectionDescriptor = {
                         applicationId: connectionDescriptor.applicationId,
                         instanceId: connectionDescriptor.instanceId,

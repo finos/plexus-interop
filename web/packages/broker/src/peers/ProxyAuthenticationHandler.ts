@@ -33,7 +33,8 @@ export class ProxyAuthenticationHandler implements TransportChannel {
     }
 
     public sendLastMessage(data: ArrayBuffer): Promise<plexus.ICompletion> {
-        throw "sendLastMessage not implemented";
+        this.sendMessage(data);
+        return this.close(new SuccessCompletion());
     }
 
     public async close(completion?: plexus.ICompletion): Promise<plexus.ICompletion> {

@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./Arrays";
-export * from "./ExtendedArray";
-export * from "./GUID";
-export * from "./collections";
-export * from "./async";
-export * from "./state";
-export * from "./types";
-export * from "./dom";
-export * from "./time/TimeUtils";
+export class TimeUtils {
+
+    public static timeout(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+}
