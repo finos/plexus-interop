@@ -39,7 +39,7 @@ export class HostTransportConnection implements TransportConnection {
     public constructor(
         private readonly baseConnection: TransportConnection,
         private readonly remoteBrokerService: RemoteBrokerService) {
-        this.log = LoggerFactory.getLogger(`HostTransportConnection [${this.baseConnection}]`);
+        this.log = LoggerFactory.getLogger(`HostTransportConnection [${this.baseConnection.uuid.toString()}]`);
         this.stringUuid = this.uuid().toString();
         this.bindToRemoteActions();
     }
@@ -84,6 +84,8 @@ export class HostTransportConnection implements TransportConnection {
     }
 
     private bindToRemoteActions(): void {
+
+        this.log.info("Binding to remote actions");
 
         this.remoteBrokerService.host<{}, CreateChannelResponse>(RemoteActions.CREATE_CHANNEL, (request, responseObserver) => {
             return new Observable(observer => {
@@ -146,7 +148,7 @@ export class HostTransportConnection implements TransportConnection {
                     observer.error(`No channel with id [${request.channelId}]`);
                 }
             }).subscribe(responseObserver);
-            
+
         }, this.stringUuid);
 
     }
