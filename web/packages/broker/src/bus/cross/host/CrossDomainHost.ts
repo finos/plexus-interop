@@ -110,10 +110,15 @@ export class CrossDomainHost {
                 const request = subMsg.requestPayload as SubscribeRequest;
                 this.log.trace(`Received subscribe request, [${request.topic}]`);
                 this.internalBus.subscribe(request.topic, event => {
+                    this.log.trace(`Received event for [${request.topic}], sending to parent`);                    
                     subMsg.responsePayload = {
                         payload: event.payload
                     };
-                });
+                    this.sendToParent(
+                        subMsg,
+                        parsedEvent.sourceWindow,
+                        parsedEvent.sourceOrigin);
+                    });
                 break;
             default:
                 this.log.error(`Unsupported message type ${message.type.id}`);
