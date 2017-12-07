@@ -25,7 +25,7 @@ export class Types {
     }
 
     public static isConsumedMethodReference(methodReference: ConsumedMethodReference | ProvidedMethodReference): methodReference is ConsumedMethodReference {
-        return (methodReference as ProvidedMethodReference).providedService !== undefined;
+        return !!(methodReference as ConsumedMethodReference).consumedService;
     }
 
 }
