@@ -13,7 +13,7 @@ export class HostConnectionFactory implements ServerConnectionFactory {
 
     public acceptConnections(connectionsObserver: Observer<TransportConnection>): Subscription {
         return this.baseFactory.acceptConnections({
-            next: c => new HostTransportConnection(c, this.remoteBrokerService),
+            next: c => connectionsObserver.next(new HostTransportConnection(c, this.remoteBrokerService)),
             complete: () => connectionsObserver.complete(),
             error: e => connectionsObserver.error(e)
         });

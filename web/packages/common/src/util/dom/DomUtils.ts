@@ -1,5 +1,9 @@
+import { Logger, LoggerFactory } from "@plexus-interop/common";
+
 
 export class DomUtils {
+
+    private static log: Logger = LoggerFactory.getLogger("DomUtils");
 
     public static iFrameLoaded(iFrameElement: HTMLIFrameElement): Promise<HTMLIFrameElement> {
         return new Promise((resolve) => {
@@ -9,12 +13,18 @@ export class DomUtils {
         });
     }
 
-    public static createHiddenIFrame(id: string, url: string): Promise<HTMLIFrameElement> {
-        const iFrameElement = document.createElement("iframe");
-        iFrameElement.setAttribute("id", id);
-        iFrameElement.setAttribute("src", url);
-        iFrameElement.style.cssText = "position:absolute;width:1px;height:1px;left:-9999px;display:none";
-        document.body.appendChild(iFrameElement);
+    public static getOrCreateHiddenIFrame(id: string, url: string): Promise<HTMLIFrameElement> {
+        let iFrameElement = document.getElementById(id) as HTMLIFrameElement;
+        if (iFrameElement) {
+            DomUtils.log.debug(`iFrame [${id}] already exist`);
+            return Promise.resolve(iFrameElement as HTMLIFrameElement);
+        } else {
+            iFrameElement = document.createElement("iframe");
+            iFrameElement.setAttribute("id", id);
+            iFrameElement.setAttribute("src", url);
+            iFrameElement.style.cssText = "position:absolute;width:1px;height:1px;left:-9999px;display:none";
+            document.body.appendChild(iFrameElement);
+        }
         return DomUtils.iFrameLoaded(iFrameElement);
     }
 

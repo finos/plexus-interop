@@ -30,7 +30,7 @@ export class CrossDomainEventBusProvider {
         const proxyIframeUrl = await this.proxyUrlProvider();
 
         this.log.info(`Initialyzing proxy iFrame with url [${proxyIframeUrl}]`);
-        const proxyiFrame = await DomUtils.createHiddenIFrame("plexus-proxy-iframe", proxyIframeUrl);
+        const proxyiFrame = await DomUtils.getOrCreateHiddenIFrame("plexus-proxy-iframe", proxyIframeUrl);
 
         this.log.info("Initialyzing Event Bus");
         const crossDomainBus: CrossDomainEventBus = new CrossDomainEventBus(proxyiFrame, DomUtils.getOrigin(proxyIframeUrl));
