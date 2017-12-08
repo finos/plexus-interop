@@ -34,10 +34,10 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
         this.log = LoggerFactory.getLogger(`EventBusRemoteBrokerService [${id}]`);
     }
 
-    public invokeUnary<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Promise<Res> {
+    public invokeUnary<Req, Res>(actionType: ActionType<Req, Res>, requestPayload: Req, remoteBrokerId: string): Promise<Res> {
         return new Promise((resolve, reject) => {
             let res: Res | null = null;
-            this.invoke(actionType, requestPaylaod, remoteBrokerId, {
+            this.invoke(actionType, requestPayload, remoteBrokerId, {
                 next: update => {
                     res = update;
                 },
@@ -73,7 +73,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
 
     }
 
-    public invoke<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string, observer: PartialObserver<Res>): Subscription {
+    public invoke<Req, Res>(actionType: ActionType<Req, Res>, requestPayload: Req, remoteBrokerId: string, observer: PartialObserver<Res>): Subscription {
 
         this.log.trace(`Sending invocation ${actionType.id} to ${remoteBrokerId}`);
 
@@ -94,14 +94,15 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
                     invocationSubscriber.next(invocationResult.payload);
                 }
             });
-            
+
             this.log.trace(`Sending request to ${requestTopic}`);
+            const payload: EventBasedRequest = {
+                payload: requestPayload,
+                requestId: requestId.toString(),
+                senderId: this.id
+            };
             this.eventBus.publish(requestTopic, {
-                payload: {
-                    requestPaylaod,
-                    requestId,
-                    senderId: this.id
-                }
+                payload
             });
 
 

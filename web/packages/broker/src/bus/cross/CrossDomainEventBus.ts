@@ -193,6 +193,9 @@ export class CrossDomainEventBus implements EventBus {
     public publish(topic: string, event: Event): void {
         this.stateMaschine.throwIfNot(State.CONNECTED);
         const payload = event.payload;
+        if (this.log.isTraceEnabled()) {
+            this.log.trace(`Publishing to [${topic}]`, payload);
+        }
         const message = this.hostMessage({ topic, payload }, MessageType.Publish);
         this.postToIFrame(message);
     }

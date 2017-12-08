@@ -102,7 +102,9 @@ export class CrossDomainHost {
             case MessageType.Publish.id:
                 const pubMsg = message as IFrameHostMessage<PublishRequest, {}>;
                 const requestPayload = pubMsg.requestPayload as PublishRequest;
-                this.log.trace(`Received publish request, [${requestPayload.topic}]`);
+                if (this.log.isTraceEnabled()) {
+                    this.log.trace(`Received publish request to [${requestPayload.topic}] topic`, requestPayload.payload);
+                }
                 this.internalBus.publish(requestPayload.topic, { payload: requestPayload.payload });
                 break;
             case MessageType.Subscribe.id:
@@ -110,7 +112,9 @@ export class CrossDomainHost {
                 const request = subMsg.requestPayload as SubscribeRequest;
                 this.log.trace(`Received subscribe request, [${request.topic}]`);
                 this.internalBus.subscribe(request.topic, event => {
-                    this.log.trace(`Received event for [${request.topic}], sending to parent`);                    
+                    if (this.log.isTraceEnabled()) {
+                        this.log.trace(`Received event for [${request.topic}] topic`, event.payload);                    
+                    }
                     subMsg.responsePayload = {
                         payload: event.payload
                     };

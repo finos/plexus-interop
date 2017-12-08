@@ -28,7 +28,7 @@ export interface RemoteBrokerService {
 
     publish<T>(eventType: EventType<T>, payload: T, remoteBrokerId?: string): void;
 
-    invokeUnary<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string): Promise<Res>;
+    invokeUnary<Req, Res>(actionType: ActionType<Req, Res>, requestPayload: Req, remoteBrokerId: string): Promise<Res>;
     
     invoke<Req, Res>(actionType: ActionType<Req, Res>, requestPaylaod: Req, remoteBrokerId: string, observer: PartialObserver<Res>): Subscription;
 
