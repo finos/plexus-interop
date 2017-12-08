@@ -67,13 +67,12 @@ export class PeerProxyConnection implements TransportConnection {
     }
 
     public isConnected(): boolean {
-        // TODO 
-        throw "isConnected Not Implemented";
+        this.log.trace("isConnected called");
+        return true;
     }
 
-    public disconnect(completion?: clientProtocol.ICompletion): Promise<void> {
-        // TODO 
-        throw "disconnect Not implemented";
+    public async disconnect(completion?: clientProtocol.ICompletion): Promise<void> {
+        this.log.info("Disconnect called", completion);
     }
 
     public async createChannel(): Promise<TransportChannel> {

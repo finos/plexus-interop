@@ -23,7 +23,7 @@ import { LoggerFactory, LogLevel } from "@plexus-interop/common";
 
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 
-describe("Web Socket Client connectivity", () => {
+describe("Web Broker Client connectivity", () => {
 
     const clientsSetup = new ClientsSetup();
     const transportsSetup = new TransportsSetup();
@@ -33,24 +33,24 @@ describe("Web Socket Client connectivity", () => {
     //     transportsSetup.createCrossDomainTransportProvider(proxyHost), 
     //     clientsSetup);
 
-    it("Can receive Proxy Host from Broker", () => {
-        expect(proxyHost).is.not.empty;
-    });
+    // it("Can receive Proxy Host from Broker", () => {
+    //     expect(proxyHost).is.not.empty;
+    // });
 
-    it("Can connect/disconnect from running Broker instance", async function () {
-        this.timeout(1500000);
-        debugger;
-        return clientsSetup
-            .createEchoClient(transportsSetup.createCrossDomainTransportProvider(proxyHost))
-            .then(client => {
-                console.log("Connected!");
-                expect(client).to.not.be.undefined;
-                return client.disconnect();
-            })
-            .catch(e => {
-                debugger;
-                console.error("Failed", e);
-            });
-    });
+    // it("Can connect/disconnect from running Broker instance", async function () {
+    //     this.timeout(1500000);
+    //     debugger;
+    //     return clientsSetup
+    //         .createEchoClient(transportsSetup.createCrossDomainTransportProvider(proxyHost))
+    //         .then(client => {
+    //             console.log("Connected!");
+    //             expect(client).to.not.be.undefined;
+    //             return client.disconnect();
+    //         })
+    //         .catch(e => {
+    //             debugger;
+    //             console.error("Failed", e);
+    //         });
+    // });
 
 });

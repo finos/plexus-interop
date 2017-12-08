@@ -21,7 +21,7 @@ export interface Cache {
     /*
     * Sets new entry for specific key, if entry already exists - then it will be evicted with calling appropriate dispose method
     */
-    set<T>(key: string, entry: CacheEntry<T>, ttl?: number): Promise<void>;
+    set<T>(key: string, entry: CacheEntry<T>): Promise<void>;
 
     /**
      * Gets current entry

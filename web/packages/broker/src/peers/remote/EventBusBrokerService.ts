@@ -53,8 +53,11 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
 
         this.eventBus.subscribe(requestTopic, event => {
             const requestEvent = event.payload as EventBasedRequest;
-            this.log.trace(`Received [${actionType.id}.${requestEvent.requestId}] request`);
-            const responseTopic = this.responseTopic(hostId, actionType, requestEvent.requestId);
+            const senderId = requestEvent.senderId;
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Received [${actionType.id}.${requestEvent.requestId}] request from [${senderId}]`);
+            }
+            const responseTopic = this.responseUpdateTopic(senderId, actionType, requestEvent.requestId);
             handler(requestEvent.payload, {
                 next: update => {
                     this.eventBus.publish(responseTopic, { payload: successResult(update) });
@@ -76,7 +79,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
 
         const requestId = this.newRequestId();
         const requestTopic = this.requestTopic(remoteBrokerId, actionType);
-        const responseTopic = this.responseTopic(remoteBrokerId, actionType, requestId);
+        const responseTopic = this.responseHandlingTopic(remoteBrokerId, actionType, requestId);
 
         return new Observable((invocationSubscriber: Observer<Res>) => {
 
@@ -91,12 +94,13 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
                     invocationSubscriber.next(invocationResult.payload);
                 }
             });
-
+            
             this.log.trace(`Sending request to ${requestTopic}`);
             this.eventBus.publish(requestTopic, {
                 payload: {
                     requestPaylaod,
-                    requestId
+                    requestId,
+                    senderId: this.id
                 }
             });
 
@@ -123,7 +127,11 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
         }).subscribe(observer);
     }
 
-    private responseTopic(remoteId: string, actionType: ActionType<any, any>, requestId: number | string): string {
+    private responseHandlingTopic(remoteId: string, actionType: ActionType<any, any>, requestId: number | string): string {
+        return `res.${requestId}.${actionType.id}.${remoteId}.${this.id}`;
+    }
+
+    private responseUpdateTopic(remoteId: string, actionType: ActionType<any, any>, requestId: number | string): string {
         return `res.${requestId}.${actionType.id}.${this.id}.${remoteId}`;
     }
 

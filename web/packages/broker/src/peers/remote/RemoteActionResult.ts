@@ -36,7 +36,7 @@ export function isSucceded(result: RemoteActionResult): boolean {
 }
 
 export function isCompleted(result: RemoteActionResult): boolean {
-    return result.status === RemoteActionStatus.SUCCESS;
+    return result.status === RemoteActionStatus.COMPLETED;
 }
 
 export function successResult(payload: any): RemoteActionResult {

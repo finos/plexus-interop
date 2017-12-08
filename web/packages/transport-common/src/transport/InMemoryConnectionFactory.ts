@@ -30,7 +30,11 @@ export class InMemoryConnectionFactory implements DuplexConnectionFactory {
         new BufferedObserver<TransportConnection>(Defaults.DEFAULT_BUFFER_SIZE, this.log);
 
     public async connect(): Promise<TransportConnection> {
+        const [client] = await this.connectBoth();
+        return client;
+    }
 
+    public async connectBoth(): Promise<[TransportConnection, TransportConnection]> {
         const clientInObserver: BufferedObserver<Frame> = new BufferedObserver(Defaults.DEFAULT_BUFFER_SIZE, this.log);
         const serverInObserver: BufferedObserver<Frame> = new BufferedObserver(Defaults.DEFAULT_BUFFER_SIZE, this.log);
 
@@ -51,7 +55,7 @@ export class InMemoryConnectionFactory implements DuplexConnectionFactory {
 
         this.serverConnectionsObserver.next(serverTransportConnection);
         
-        return clientTransportConnection;
+        return [clientTransportConnection, serverTransportConnection];
     }
 
     public acceptConnections(connectionsObserver: Observer<TransportConnection>): Subscription {

@@ -92,7 +92,7 @@ export class HostTransportConnection implements TransportConnection {
                 this.log.trace("Create channel request received");
                 this.createChannel()
                     .then(channel => {
-                        observer.next({ id: channel.uuid.toString() });
+                        observer.next({ id: channel.uuid().toString() });
                         observer.complete();
                     })
                     .catch(e => observer.error(e));

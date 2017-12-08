@@ -27,7 +27,7 @@ export class InMemoryCache implements Cache {
 
     private storage: Map<string, CacheEntryDescriptor<any>> = new Map();
 
-    public async set<T>(key: string, entry: CacheEntry<T>, ttl?: number): Promise<void> {
+    public async set<T>(key: string, entry: CacheEntry<T>): Promise<void> {
         const existing = this.storage.get(key);
         if (existing) {
             this.log.trace(`${key} already exist, cleaning up and calling dispose`);

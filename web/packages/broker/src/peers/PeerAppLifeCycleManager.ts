@@ -65,9 +65,10 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         };
         if ((connection as PeerProxyConnection).isProxy) {
             this.log.debug(`Accepted proxy [${connectionStrId}] connection`);
-            this.onlineConnections.set(connectionStrId, new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection, connectionDropped)));
+            const connectionCacheEntry = new CacheEntry(appConnection, this.heartBitTtl, () => this.handleDroppedConnection(appConnection, connectionDropped));
+            this.onlineConnections.set(connectionStrId, connectionCacheEntry);
         } else if ((connection as HostTransportConnection).onDisconnect) {
-            this.log.debug(`Accepted new [${connectionStrId}] connection`);
+            this.log.debug(`Accepted host [${connectionStrId}] connection`);
             this.log.debug(`Starting to send heart bits for [${connectionStrId}] with [${this.heartBitPeriod}] period`);
             const connectionHeartBitInterval = this.sendHeartBitsFor(appConnection);
             const hostConnection = connection as HostTransportConnection;

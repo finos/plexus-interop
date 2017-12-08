@@ -49,9 +49,8 @@ export class PeerServerConnectionFactory implements ServerConnectionFactory {
                 // create proxy connection only once
                 if (!this.processedConnections.has(connectionDescriptor.connectionId)
                     && connectionDescriptor.connectionId !== this.hostConnectionGuid) {
-                    this.log.debug(`Detected new connection, app id ${connectionDescriptor.applicationId}`);
+                    this.log.debug(`Detected new connection, app id ${connectionDescriptor.applicationId} [${connectionDescriptor.connectionId}]`);
                     this.processedConnections.add(connectionDescriptor.connectionId);
-                    debugger;
                     const appConnectionDescriptor: ApplicationConnectionDescriptor = {
                         applicationId: connectionDescriptor.applicationId,
                         instanceId: connectionDescriptor.instanceId,

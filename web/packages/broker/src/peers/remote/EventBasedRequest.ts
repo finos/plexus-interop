@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 export interface EventBasedRequest {
+    senderId: string;
     requestId: string;
     payload: any;
 }
