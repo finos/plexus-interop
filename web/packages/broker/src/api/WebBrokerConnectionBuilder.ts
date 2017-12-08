@@ -27,7 +27,6 @@ import { PeerServerConnectionFactory } from "../peers/PeerServerConnectionFactor
 import { MultiSourcesServerConnectionFactory } from "../transport/MultiSourcesServerConnectionFactory";
 import { Broker } from "../broker/Broker";
 import { PeerAppLifeCycleManager } from "../peers/PeerAppLifeCycleManager";
-import { HostTransportConnection } from "../peers/host/HostTransportConnection";
 import { HostConnectionFactory } from "../peers/host/HostConnectionFactory";
 
 export class WebBrokerConnectionBuilder {
@@ -70,16 +69,17 @@ export class WebBrokerConnectionBuilder {
 
         const hostClientConnectionFactory = new InMemoryConnectionFactory();
         this.log.debug("Creating in memory host connection");
-        const hostClientConnection: TransportConnection = await hostClientConnectionFactory.connect();
-        const clientConnectionGuid = hostClientConnection.uuid().toString();
+        const [hostClientConnection, hostServerConnection] = await hostClientConnectionFactory.connectBoth();
+        const serverConnectionId = hostServerConnection.uuid().toString();
+        const clientConnectionId = hostClientConnection.uuid().toString();
 
         this.log.info("Initialyzing Event Bus");
         const eventBus = await this.eventBusProvider();
 
-        const remoteBrokerService: RemoteBrokerService = new EventBusRemoteBrokerService(eventBus, clientConnectionGuid);
+        const remoteBrokerService: RemoteBrokerService = new EventBusRemoteBrokerService(eventBus, serverConnectionId);
 
         const peerConnectionService: PeerConnectionsService = new PeerConnectionsService(remoteBrokerService);
-        const peerConnectionsFactory = new PeerServerConnectionFactory(clientConnectionGuid, peerConnectionService, remoteBrokerService);
+        const peerConnectionsFactory = new PeerServerConnectionFactory(clientConnectionId, peerConnectionService, remoteBrokerService);
         const brokerConnectionsFactory = new MultiSourcesServerConnectionFactory(
             new HostConnectionFactory(hostClientConnectionFactory, remoteBrokerService),
             peerConnectionsFactory);
