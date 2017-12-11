@@ -75,7 +75,7 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
 
                 error: e => {
                     log.error("Error from source channel received", e);
-                    reject(e)
+                    reject(e);
                 },
 
                 complete: () => {

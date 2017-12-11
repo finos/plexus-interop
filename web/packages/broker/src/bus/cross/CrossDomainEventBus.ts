@@ -73,7 +73,7 @@ export class CrossDomainEventBus implements EventBus {
                 if (message.responseType === ResponseType.Single) {
                     this.rejectTimeouts.set(subscriptionKey, setTimeout(() => {
                         const errorMsg = `Operation's timeout passed ${rejectTimeout}`;
-                        this.log.warn(errorMsg)
+                        this.log.warn(errorMsg);
                         this.emitError(subscriptionKey, errorMsg);
                         this.rejectTimeouts.delete(subscriptionKey);
                     }, rejectTimeout));
@@ -106,7 +106,7 @@ export class CrossDomainEventBus implements EventBus {
         });
     }
 
-    private clearRejectTimeout(key: string) {
+    private clearRejectTimeout(key: string): void {
         const timeout = this.rejectTimeouts.get(key);
         if (timeout) {
             this.log.trace(`Clearing reject timeout for ${key}`);
@@ -180,7 +180,7 @@ export class CrossDomainEventBus implements EventBus {
         this.stateMaschine.throwIfNot(State.CONNECTED);
         this.stateMaschine.go(State.CLOSED);
         if (this.hostIframeEventsSubscription) {
-            this.log.info("Unsubsribing from ")
+            this.log.info("Unsubsribing from Host iFrame");
             this.hostIframeEventsSubscription.unsubscribe();
         }
         this.emitters.forEach((v, k) => {
