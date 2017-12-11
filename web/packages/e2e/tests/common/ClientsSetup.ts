@@ -31,8 +31,8 @@ export class ClientsSetup {
 
     public async createEchoClients(transportConnectionProvider: ConnectionProvider, serviceHandler: EchoServiceInvocationHandler): Promise<[EchoClientClient, EchoServerClient]> {
         const server = await this.createEchoServer(transportConnectionProvider, serviceHandler);
-        await TimeUtils.timeout(this.clientConnectionDelay);
         const client = await this.createEchoClient(transportConnectionProvider);
+        await TimeUtils.timeout(this.clientConnectionDelay);        
         return [client, server];
     }
 

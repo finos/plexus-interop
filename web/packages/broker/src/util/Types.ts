@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 import { Observable } from "rxjs/Observable";
+import { isString } from "@plexus-interop/common";
 import { ProvidedMethodReference } from "../metadata/interop/model/ProvidedMethodReference";
 import { ConsumedMethodReference } from "../metadata/interop/model/ConsumedMethodReference";
+import { ClientError } from "@plexus-interop/protocol";
 
 export class Types {
 
@@ -26,6 +28,23 @@ export class Types {
 
     public static isConsumedMethodReference(methodReference: ConsumedMethodReference | ProvidedMethodReference): methodReference is ConsumedMethodReference {
         return !!(methodReference as ConsumedMethodReference).consumedService;
+    }
+
+    public static isError(value: any): value is Error {
+        return value && value.stack && value.message;
+    }
+
+    public static toClientError(e: any): ClientError {
+        if (Types.isError(e)) {
+            return new ClientError(e.message, e.stack);
+        } else if (isString(e)) {
+            return new ClientError(e);
+        } else if (e.message && e.details) {
+            return new ClientError(e.message, e.details);
+        } else {
+            e = new Error("Unknown error received");
+            return Types.toClientError(e);
+        }
     }
 
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { TransportConnection, TransportChannel } from "@plexus-interop/transport-common";
-import { Observer, Logger, LoggerFactory, Subscription } from "@plexus-interop/common";
+import { Observer, Logger, LoggerFactory, Subscription, stringToArrayBuffer } from "@plexus-interop/common";
 import { UniqueId, clientProtocol } from "@plexus-interop/protocol";
 import { RemoteBrokerService } from "../remote/RemoteBrokerService";
 import { RemoteActions } from "../actions/RemoteActions";
@@ -101,6 +101,7 @@ export class HostTransportConnection implements TransportConnection {
 
         this.remoteBrokerService.host<ChannelRequest, ArrayBuffer>(RemoteActions.OPEN_CHANNEL, (request: ChannelRequest, responseObserver) => {
             return new Observable(observer => {
+                debugger;                
                 const channel = this.getManagedChannel(request.channelId);
                 this.log.trace(`Open Channel [${request.channelId}] request received`);
                 if (channel) {
@@ -119,12 +120,13 @@ export class HostTransportConnection implements TransportConnection {
 
         this.remoteBrokerService.host<SendMessageRequest, {}>(RemoteActions.SEND_MESSAGE, (request: SendMessageRequest, responseObserver) => {
             return new Observable(observer => {
+                debugger;
                 if (this.log.isTraceEnabled()) {
-                    this.log.trace(`Send Message of [${request.messagePayload.byteLength}] bytes for [${request.channelId}] channel received`);
+                    this.log.trace(`Send Message of [${request.messagePayload.length}] length for [${request.channelId}] channel received`);
                 }
                 const channel = this.getManagedChannel(request.channelId);
                 if (channel) {
-                    channel.sendMessage(request.messagePayload)
+                    channel.sendMessage(stringToArrayBuffer(request.messagePayload))
                         .then(() => observer.complete())
                         .catch(e => observer.error(e));
                 } else {
@@ -135,6 +137,7 @@ export class HostTransportConnection implements TransportConnection {
 
         this.remoteBrokerService.host<CloseChannelRequest, CloseChannelResponse>(RemoteActions.CLOSE_CHANNEL, (request: CloseChannelRequest, responseObserver) => {
             return new Observable(observer => {
+                debugger;                
                 this.log.trace(`Close channel [${request.channelId}] received`);
                 const channel = this.getManagedChannel(request.channelId);
                 if (channel) {

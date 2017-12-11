@@ -24,16 +24,18 @@ import { RemoteBrokerService } from "./remote/RemoteBrokerService";
 
 export class PeerServerConnectionFactory implements ServerConnectionFactory {
 
-    private readonly log: Logger = LoggerFactory.getLogger("PeerServerConnectionFactory");
+    private readonly log: Logger;
 
     private readonly processedConnections: Set<string> = new Set();
 
-    private readonly connectionsObserver: BufferedObserver<TransportConnection> = new BufferedObserver(100, this.log);
+    private readonly connectionsObserver: BufferedObserver<TransportConnection>;
 
     constructor(
         private readonly hostConnectionGuid: string,
         private readonly peerConnectionsService: PeerConnectionsService,
         private readonly remoteBrokerService: RemoteBrokerService) {
+        this.log = LoggerFactory.getLogger("PeerServerConnectionFactory");
+        this.connectionsObserver = new BufferedObserver(100, this.log);
         this.listenForPeerConnections();
     }
 

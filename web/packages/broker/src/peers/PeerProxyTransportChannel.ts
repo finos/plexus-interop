@@ -16,7 +16,7 @@
  */
 import { TransportChannel, ChannelObserver } from "@plexus-interop/transport-common";
 import { clientProtocol as plexus, UniqueId, SuccessCompletion, ErrorCompletion, ClientError } from "@plexus-interop/protocol";
-import { AnonymousSubscription, Logger, LoggerFactory } from "@plexus-interop/common";
+import { AnonymousSubscription, Logger, LoggerFactory, arrayBufferToString } from "@plexus-interop/common";
 import { RemoteActions } from "./actions/RemoteActions";
 import { RemoteBrokerService } from "./remote/RemoteBrokerService";
 
@@ -42,7 +42,7 @@ export class PeerProxyTransportChannel implements TransportChannel {
         this.log.trace(`Sending message of ${data.byteLength} bytes`);
         await this.remoteBrokerService.invokeUnary(RemoteActions.SEND_MESSAGE, {
             channelId: this.strChannelId,
-            messagePayload: data
+            messagePayload: arrayBufferToString(data)
         }, this.remoteConnectionId);
     }
 

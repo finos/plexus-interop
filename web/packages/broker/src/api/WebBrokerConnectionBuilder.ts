@@ -21,7 +21,7 @@ import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { AppRegistryService } from "../metadata/apps/AppRegistryService";
 import { EventBus } from "../bus/EventBus";
 import { RemoteBrokerService } from "../peers/remote/RemoteBrokerService";
-import { EventBusRemoteBrokerService } from "../peers/remote/EventBusBrokerService";
+import { EventBusRemoteBrokerService } from "../peers/remote/EventBusRemoteBrokerService";
 import { PeerConnectionsService } from "../peers/PeerConnectionsService";
 import { PeerServerConnectionFactory } from "../peers/PeerServerConnectionFactory";
 import { MultiSourcesServerConnectionFactory } from "../transport/MultiSourcesServerConnectionFactory";

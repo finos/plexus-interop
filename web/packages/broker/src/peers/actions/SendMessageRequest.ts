@@ -16,5 +16,5 @@
  */
 export interface SendMessageRequest {
     channelId: string;
-    messagePayload: ArrayBuffer;
+    messagePayload: string;
 }
