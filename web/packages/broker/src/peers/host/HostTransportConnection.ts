@@ -25,6 +25,7 @@ import { ChannelRequest } from "../actions/ChannelRequest";
 import { SendMessageRequest } from "../actions/SendMessageRequest";
 import { CloseChannelRequest } from "../actions/CloseChannelRequest";
 import { CloseChannelResponse } from "../actions/CloseChannelResponse";
+import { Types } from "../../util/Types";
 
 export type DisconnectListener = (completion?: clientProtocol.ICompletion) => void;
 
@@ -95,7 +96,7 @@ export class HostTransportConnection implements TransportConnection {
                         observer.next({ id: channel.uuid().toString() });
                         observer.complete();
                     })
-                    .catch(e => observer.error(e));
+                    .catch(e => observer.error(Types.toClientError(e)));
             }).subscribe(responseObserver);
         }, this.stringUuid);
 
@@ -110,7 +111,7 @@ export class HostTransportConnection implements TransportConnection {
                         startFailed: e => observer.error(e),
                         next: msg => observer.next(msg),
                         complete: () => observer.complete(),
-                        error: e => observer.error(e)
+                        error: e => observer.error(Types.toClientError(e))
                     });
                 } else {
                     observer.error(`No channel with id [${request.channelId}]`);
@@ -128,7 +129,7 @@ export class HostTransportConnection implements TransportConnection {
                 if (channel) {
                     channel.sendMessage(stringToArrayBuffer(request.messagePayload))
                         .then(() => observer.complete())
-                        .catch(e => observer.error(e));
+                        .catch(e => observer.error(Types.toClientError(e)));
                 } else {
                     observer.error(`No channel with id [${request.channelId}]`);
                 }
@@ -146,7 +147,7 @@ export class HostTransportConnection implements TransportConnection {
                             observer.next({ completion });
                             observer.complete();
                         })
-                        .catch(e => observer.error(e));
+                        .catch(e => observer.error(Types.toClientError(e)));
                 } else {
                     observer.error(`No channel with id [${request.channelId}]`);
                 }
