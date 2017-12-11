@@ -61,11 +61,11 @@ export class InvocationRequestHandler {
 
         const targetChannelObserver = new BufferedObserver(Defaults.DEFAULT_BUFFER_SIZE, this.log);
         await targetChannel.open({
-            next: targetChannelObserver.next,
-            complete: targetChannelObserver.complete,
-            error: targetChannelObserver.error,
+            next: m => targetChannelObserver.next(m),
+            complete: () => targetChannelObserver.complete(),
+            error: e => targetChannelObserver.error(e),
             started: () => { },
-            startFailed: () => { }
+            startFailed: e => this.log.error("Failed to start target channel", e)
         });
         this.log.debug(`Target channel [${targetChannelId}] opened`);
 
