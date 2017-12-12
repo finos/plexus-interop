@@ -41,7 +41,12 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
                 next: update => {
                     res = update;
                 },
-                complete: () => res ? resolve(res) : reject(new Error("No updates before completion")),
+                complete: () => {
+                    if (!res) {
+                        this.log.trace(`[${actionType.id}] - No response, resolve with empty object`);
+                    } 
+                    resolve(res || {} as Res);
+                },
                 error: e => reject(e)
             });
         });
