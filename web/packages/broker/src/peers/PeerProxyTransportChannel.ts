@@ -16,7 +16,7 @@
  */
 import { TransportChannel, ChannelObserver } from "@plexus-interop/transport-common";
 import { clientProtocol as plexus, UniqueId, SuccessCompletion, ErrorCompletion, ClientError } from "@plexus-interop/protocol";
-import { AnonymousSubscription, Logger, LoggerFactory, arrayBufferToString } from "@plexus-interop/common";
+import { AnonymousSubscription, Logger, LoggerFactory, arrayBufferToString, stringToArrayBuffer } from "@plexus-interop/common";
 import { RemoteActions } from "./actions/RemoteActions";
 import { RemoteBrokerService } from "./remote/RemoteBrokerService";
 
@@ -32,6 +32,7 @@ export class PeerProxyTransportChannel implements TransportChannel {
         private remoteBrokerService: RemoteBrokerService) {
         this.channelId = UniqueId.fromString(strChannelId);
         this.log = LoggerFactory.getLogger(`PeerProxyTransportChannel [${strChannelId}]`);
+        this.log.debug("Created");
     }
 
     public uuid(): UniqueId {
@@ -53,12 +54,14 @@ export class PeerProxyTransportChannel implements TransportChannel {
 
     public open(observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.trace("Received open channel request");
+        debugger;
         this.remoteBrokerService.invoke(RemoteActions.OPEN_CHANNEL, {
             channelId: this.strChannelId
         }, this.remoteConnectionId, {
                 next: payload => {
-                    this.log.trace(`Received payload from remote, ${payload.byteLength} bytes`);
-                    observer.next(payload);
+                    const abPayload = stringToArrayBuffer(payload);
+                    this.log.trace(`Received payload from remote, ${abPayload.byteLength} bytes`);
+                    observer.next(abPayload);
                 },
                 error: e => {
                     this.log.error("Received remote error", e);
@@ -85,7 +88,6 @@ export class PeerProxyTransportChannel implements TransportChannel {
             this.log.error("Error on close received", error);
             return new ErrorCompletion(new ClientError(error));
         }
-
     }
 
 }

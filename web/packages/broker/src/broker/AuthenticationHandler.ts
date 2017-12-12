@@ -67,7 +67,7 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
                             .catch(e => log.error("Failed to sent connection details", e));
                         resolve({
                             applicationId: clientToBrokerMessage.applicationId as string,
-                            instanceId: UniqueId.fromProperties(clientToBrokerMessage.applicationInstanceId as plexus.IUniqueId)
+                            instanceId: UniqueId.fromProperties(clientToBrokerMessage.applicationInstanceId as plexus.IUniqueId).toString()
                         });
                     }
                     

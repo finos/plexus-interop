@@ -39,12 +39,18 @@ export class Arrays {
 }
 
 export function arrayBufferToString(buf: ArrayBuffer): string {
-    return String.fromCharCode.apply(null, new Uint16Array(buf));
+    let binaryString = "";
+    let bytes = new Uint8Array(buf);
+    const length = bytes.length;
+    for (let i = 0; i < length; i++) {
+        binaryString += String.fromCharCode(bytes[i]);
+    }
+    return binaryString;
 }
 
 export function stringToArrayBuffer(str: string): ArrayBuffer {
-    const buf = new ArrayBuffer(str.length * 2);
-    const bufView = new Uint16Array(buf);
+    const buf = new ArrayBuffer(str.length);
+    const bufView = new Uint8Array(buf);
     for (let i = 0, strLen = str.length; i < strLen; i++) {
         bufView[i] = str.charCodeAt(i);
     }

@@ -98,14 +98,14 @@ export class InvocationRequestHandler {
                         this.log.trace(`Propogating message of ${messagePayload.byteLength} from [${sourceChannelId}] to [${targetChannelId}]`);
                     }
                     try {
-                        targetChannel.sendMessage(messagePayload);
+                        await targetChannel.sendMessage(messagePayload);
                     } catch (e) {
                         this.log.error("Unable to send message", e);
                         reject(e);
                     }
                 },
                 complete: () => {
-                    this.log.trace(`Source channel completed`);
+                    this.log.trace(`Source channel [${sourceChannelId}] completed`);
                     resolve();
                 },
                 error: e => {

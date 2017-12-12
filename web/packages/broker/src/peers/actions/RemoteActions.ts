@@ -29,6 +29,6 @@ export class RemoteActions {
 
     public static readonly CLOSE_CHANNEL: ActionType<CloseChannelRequest, CloseChannelResponse> = { id: "CLOSE_CHANNEL" };
 
-    public static readonly OPEN_CHANNEL: ActionType<ChannelRequest, ArrayBuffer> = { id: "OPEN_CHANNEL" };
+    public static readonly OPEN_CHANNEL: ActionType<ChannelRequest, string> = { id: "OPEN_CHANNEL" };
 
 }

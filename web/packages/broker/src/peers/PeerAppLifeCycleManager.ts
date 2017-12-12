@@ -104,9 +104,10 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         try {
             await AsyncHelper.waitFor(() => this.isInstanceConnected(appLaunchResponse.appInstanceId),
                 new CancellationToken(), this.heartBitPeriod, this.spawnConnectionTimeout);
-            this.log.debug(`App [${applicationId}] id, instance id [${appLaunchResponse.appInstanceId.toString()}] is connected`);
+            const launchedAppInstanceId = appLaunchResponse.appInstanceId.toString();
+            this.log.debug(`App [${applicationId}] id, instance id [${launchedAppInstanceId}] is connected`);
             return this.getOnlineConnectionsInternal()
-                .find(appConnection => appConnection.descriptor.instanceId.equals(appLaunchResponse.appInstanceId)) as ApplicationConnection;
+                .find(appConnection => appConnection.descriptor.instanceId === launchedAppInstanceId) as ApplicationConnection;
         } catch (e) {
             this.log.error(`Failed to wait for [${appLaunchResponse.appInstanceId.toString()}] instance to start`, e);
             cancellationToken.cancel(`Time out ${this.spawnConnectionTimeout} passed`);
@@ -137,9 +138,10 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
     }
 
     private subscribeToHeartBits(): void {
+        this.log.trace("Subscribing to app heartbits");
         this.peerConnectionsService.subscribeToConnectionsHearBits({
             next: connectionDescriptor => {
-                const connectionStrId = connectionDescriptor.instanceId.toString();
+                const connectionStrId = connectionDescriptor.connectionId;
                 if (this.onlineConnections.has(connectionStrId)) {
                     // app still with us
                     this.onlineConnections.resetTtl(connectionStrId);

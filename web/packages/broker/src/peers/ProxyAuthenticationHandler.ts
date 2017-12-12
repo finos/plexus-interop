@@ -49,7 +49,7 @@ export class ProxyAuthenticationHandler implements TransportChannel {
         observer.started(new AnonymousSubscription());
         observer.next(ClientProtocolHelper.connectRequestPayload({
             applicationId: this.connectionDescriptor.applicationId,
-            applicationInstanceId: this.connectionDescriptor.instanceId
+            applicationInstanceId: UniqueId.fromString(this.connectionDescriptor.instanceId)
         }));
         observer.complete();
     }
