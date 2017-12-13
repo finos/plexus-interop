@@ -1,3 +1,7 @@
-<p>
-  metadata-loader works!
-</p>
+<div class="input-group">
+  <span class="input-group-addon" id="basic-addon1">Enter metadata URL</span>
+  <input type="text" class="form-control" placeholder="Enter metadata URL" aria-label="Enter metadata URL" value="/metadata" [ngModel]="metadataUrl">
+  <span class="input-group-btn">
+    <a class="btn btn-primary" type="button" (click)="connect(metadataUrl)">Go!</a>
+  </span>
+</div>
