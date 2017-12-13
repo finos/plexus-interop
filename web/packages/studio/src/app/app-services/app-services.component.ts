@@ -17,7 +17,26 @@ export class AppServicesComponent implements OnInit {
     private router: Router) {
   }
 
+  services = [1, 2, 3, 4, 5, 6, 7].map(i => {
+    return {
+      type: 'consumed',
+      name: 'Service ' + i,
+      actions: [
+        { name: 'Action 1 ' + i },
+        { name: 'Action 2 ' + i }
+      ]
+    }
+  });
+
   ngOnInit() {
+  }
+
+  openComsumed() {
+    this.router.navigate(['/consumed']);
+  }
+
+  openProvided() {
+    this.router.navigate(['/provided']);
   }
 
 }

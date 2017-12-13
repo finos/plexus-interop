@@ -16,6 +16,8 @@ import { createLogger } from 'redux-logger';
 // import { rootReducer } from './reducers';
 import { rootReducer, IAppState, INITIAL_STATE } from './services/store';
 import { AppServicesComponent } from './app-services/app-services.component';
+import { ConsumedServiceComponent } from './consumed-service/consumed-service.component';
+import { ProvidedServiceComponent } from './provided-service/provided-service.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import { AppServicesComponent } from './app-services/app-services.component';
     MetadataLoaderComponent,
     AppListComponent,
     HeaderComponent,
-    AppServicesComponent
+    AppServicesComponent,
+    ConsumedServiceComponent,
+    ProvidedServiceComponent
   ],
   imports: [
     BrowserModule,

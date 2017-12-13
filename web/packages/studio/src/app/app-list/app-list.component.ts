@@ -17,7 +17,7 @@ export class AppListComponent implements OnInit {
     private ngRedux: NgRedux<IAppState>,
     private router: Router) { }
 
-  appList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => { return { name: 'Service ' + i }; });
+  appList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => { return { name: 'Application ' + i }; });
 
   ngOnInit() {
   }
