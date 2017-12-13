@@ -55,4 +55,13 @@ describe("Client: Web Broker Point to Point invocation", () => {
         return serverStreamingTests.testServerSendsStreamWithCancelToClient();
     });
 
+    it("Sends streaming messages in two directions", function () {
+        this.timeout(5000);
+        return bidiStreamingTests.testClientAndServerCanSendMessages();
+    });
+
+    it("Sends client stream messages to server", function () {
+        return clientStreamingTests.testClientCanSendStreamToServer();
+    });
+
 });
