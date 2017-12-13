@@ -18,6 +18,12 @@ import * as log from "loglevel";
 import { Logger } from "./Logger";
 import { LogLevel } from "./LoggerFactory";
 
+// target conn 92D846E87E914C7EA94E91A697BCD842 
+// target ch CE4F782A62864F159D44062B872ED664
+
+
+
+
 export class LoggerBase implements Logger {
 
     constructor(public name: string = "Anonymous") { }
@@ -27,14 +33,14 @@ export class LoggerBase implements Logger {
         if (log.getLevel() <= LogLevel.DEBUG) {
             // TODO remove
             log.info(`${this.name} ${msg}`, args);
-            log.debug(`${this.name} ${msg}`, args);
+            // log.debug(`${this.name} ${msg}`, args);
         }
     }
 
     public info(msg: string, ...args: any[]): void {
         log.info(`${this.name} ${msg}`, args);
         // TODO remove        
-        log.debug(`${this.name} ${msg}`, args);
+        // log.debug(`${this.name} ${msg}`, args);
     }
 
     public error(msg: string, ...args: any[]): void {
@@ -50,7 +56,7 @@ export class LoggerBase implements Logger {
         if (log.getLevel() <= LogLevel.TRACE) {
             // TODO remove        
             log.info(`${this.name} ${msg}`, args);
-            log.debug(`${this.name} ${msg}`, args);
+            // log.debug(`${this.name} ${msg}`, args);
         }
     }
 

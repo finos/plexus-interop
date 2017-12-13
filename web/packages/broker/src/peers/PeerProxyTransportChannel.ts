@@ -54,7 +54,6 @@ export class PeerProxyTransportChannel implements TransportChannel {
 
     public open(observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.trace("Received open channel request");
-        debugger;
         this.remoteBrokerService.invoke(RemoteActions.OPEN_CHANNEL, {
             channelId: this.strChannelId
         }, this.remoteConnectionId, {

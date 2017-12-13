@@ -28,7 +28,7 @@ import { Types } from "../util/Types";
 
 export class InvocationRequestHandler {
 
-    private readonly log: Logger = LoggerFactory.getLogger("InvocationRequestHandler");
+    private log: Logger = LoggerFactory.getLogger("InvocationRequestHandler");
 
     constructor(
         private readonly registryService: InteropRegistryService,
@@ -57,7 +57,9 @@ export class InvocationRequestHandler {
 
         const targetChannel = await targetAppConnection.connection.createChannel();
         const targetChannelId = targetChannel.uuid().toString();
-        this.log.debug(`Target channel [${targetChannelId}] created`);
+
+        this.log = LoggerFactory.getLogger(`InvocationRequestHandler ${sourceChannelId}->${targetChannelId}`);
+        this.log.debug(`Target channel created`);
 
         const targetChannelObserver = new BufferedObserver(Defaults.DEFAULT_BUFFER_SIZE, this.log);
         await targetChannel.open({
@@ -67,9 +69,10 @@ export class InvocationRequestHandler {
             started: () => { },
             startFailed: e => this.log.error("Failed to start target channel", e)
         });
-        this.log.debug(`Target channel [${targetChannelId}] opened`);
 
-        this.log.trace(`Sending InvocationStarting to [${sourceChannelId}]`);
+        this.log.debug(`Target channel opened`);
+
+        this.log.trace(`Sending InvocationStarting to source`);
         sourceChannel.sendMessage(ClientProtocolHelper.invocationStartingMessagePayload({}));
 
         this.log.trace(`Sending InvocationRequested to [${targetChannelId}]`);
@@ -81,10 +84,11 @@ export class InvocationRequestHandler {
         try {
             await Promise.all([targetPropogationCompleted, sourcePropogationCompleted]);
         } catch (error) {
-            this.log.error(`Communication between channels [${sourceChannelId}] and [${targetChannelId}] failed`, error);
+            this.log.error(`Communication between channels failed`, error);
             // TODO clean up/more logs?
             return new ErrorCompletion(error);
         }
+        this.log.info(`Completed`)
         return new SuccessCompletion();
     }
 
@@ -95,7 +99,7 @@ export class InvocationRequestHandler {
             return {
                 next: async messagePayload => {
                     if (this.log.isTraceEnabled()) {
-                        this.log.trace(`Propogating message of ${messagePayload.byteLength} from [${sourceChannelId}] to [${targetChannelId}]`);
+                        this.log.trace(`[${sourceChannelId}]->[${targetChannelId}] Transferring message of ${messagePayload.byteLength} bytes`);
                     }
                     try {
                         await targetChannel.sendMessage(messagePayload);
