@@ -25,16 +25,12 @@ export class LoggerBase implements Logger {
     public debug(msg: string, ...args: any[]): void {
         /* istanbul ignore if */
         if (log.getLevel() <= LogLevel.DEBUG) {
-            // TODO remove
             log.info(`${this.name} ${msg}`, args);
-            // log.debug(`${this.name} ${msg}`, args);
         }
     }
 
     public info(msg: string, ...args: any[]): void {
         log.info(`${this.name} ${msg}`, args);
-        // TODO remove        
-        // log.debug(`${this.name} ${msg}`, args);
     }
 
     public error(msg: string, ...args: any[]): void {
@@ -48,9 +44,7 @@ export class LoggerBase implements Logger {
     public trace(msg: string, ...args: any[]): void {
         /* istanbul ignore if */        
         if (log.getLevel() <= LogLevel.TRACE) {
-            // TODO remove        
             log.info(`${this.name} ${msg}`, args);
-            // log.debug(`${this.name} ${msg}`, args);
         }
     }
 

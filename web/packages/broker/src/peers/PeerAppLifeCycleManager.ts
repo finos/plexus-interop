@@ -36,9 +36,6 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
 
     private readonly log: Logger = LoggerFactory.getLogger("PeerAppLifeCycleManager");
 
-    private readonly heartBitPeriod: number = 1000;
-    private readonly heartBitTtl: number = 10000;
-
     // time to wait for application to start before rejecting broker's request
     private readonly spawnConnectionTimeout: number = 5 * 60 * 1000;
 
@@ -46,7 +43,9 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
 
     constructor(
         private readonly peerConnectionsService: PeerConnectionsService,
-        private readonly appRegistryService: AppRegistryService
+        private readonly appRegistryService: AppRegistryService,
+        private readonly heartBitPeriod: number,
+        private readonly heartBitTtl: number
     ) {
         this.subscribeToHeartBits();
     }

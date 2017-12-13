@@ -18,7 +18,7 @@ import { expect } from "chai";
 import { ClientsSetup } from "../common/ClientsSetup";
 import { TransportsSetup } from "../common/TransportsSetup";
 import { readHostUrl } from "../common/utils";
-// import { ClientConnectivityTests } from "../echo/ClientConnectivityTests";
+import { ClientConnectivityTests } from "../echo/ClientConnectivityTests";
 import { LoggerFactory, LogLevel } from "@plexus-interop/common";
 
 LoggerFactory.setLogLevel(LogLevel.TRACE);
@@ -29,28 +29,26 @@ describe("Web Broker Client connectivity", () => {
     const transportsSetup = new TransportsSetup();
     const proxyHost = readHostUrl();
 
-    // const connectivityTests = new ClientConnectivityTests(
-    //     transportsSetup.createCrossDomainTransportProvider(proxyHost), 
-    //     clientsSetup);
+    const connectivityTests = new ClientConnectivityTests(
+        transportsSetup.createCrossDomainTransportProvider(proxyHost), 
+        clientsSetup);
 
-    // it("Can receive Proxy Host from Broker", () => {
-    //     expect(proxyHost).is.not.empty;
-    // });
+    it("Can receive Proxy Host from Broker", () => {
+        expect(proxyHost).is.not.empty;
+    });
 
-    // it("Can connect/disconnect from running Broker instance", async function () {
-    //     this.timeout(1500000);
-    //     debugger;
-    //     return clientsSetup
-    //         .createEchoClient(transportsSetup.createCrossDomainTransportProvider(proxyHost))
-    //         .then(client => {
-    //             console.log("Connected!");
-    //             expect(client).to.not.be.undefined;
-    //             return client.disconnect();
-    //         })
-    //         .catch(e => {
-    //             debugger;
-    //             console.error("Failed", e);
-    //         });
-    // });
+    it("Can connect/disconnect from running Broker instance", async function () {
+        this.timeout(5000);
+        return clientsSetup
+            .createEchoClient(transportsSetup.createCrossDomainTransportProvider(proxyHost))
+            .then(client => {
+                console.log("Connected!");
+                expect(client).to.not.be.undefined;
+                return client.disconnect();
+            })
+            .catch(e => {
+                console.error("Failed", e);
+            });
+    });
 
 });

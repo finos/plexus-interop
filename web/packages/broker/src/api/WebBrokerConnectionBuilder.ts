@@ -28,6 +28,7 @@ import { MultiSourcesServerConnectionFactory } from "../transport/MultiSourcesSe
 import { Broker } from "../broker/Broker";
 import { PeerAppLifeCycleManager } from "../peers/PeerAppLifeCycleManager";
 import { HostConnectionFactory } from "../peers/host/HostConnectionFactory";
+import { AppLifeCycleConfig } from "../../dist/main/src/api/AppLifeCycleConfig";
 
 export class WebBrokerConnectionBuilder {
 
@@ -40,6 +41,13 @@ export class WebBrokerConnectionBuilder {
     private interopRegistryProviderFactory: () => Promise<InteropRegistryProvider>;
 
     private eventBusProvider: () => Promise<EventBus>;
+
+    private appLifeCycleConfig: AppLifeCycleConfig = { heartBitTtl: 5000, heartBitPeriod: 1500 };
+
+    public withAppLifeCycleConfig(config: AppLifeCycleConfig): WebBrokerConnectionBuilder {
+        this.appLifeCycleConfig = config;
+        return this;
+    }
 
     public withEventBusProvider(provider: () => Promise<EventBus>): WebBrokerConnectionBuilder {
         this.eventBusProvider = provider;
@@ -84,7 +92,11 @@ export class WebBrokerConnectionBuilder {
             new HostConnectionFactory(hostClientConnectionFactory, remoteBrokerService),
             peerConnectionsFactory);
 
-        const appLifeCycleManager = new PeerAppLifeCycleManager(peerConnectionService, appRegistryService);
+        const appLifeCycleManager = new PeerAppLifeCycleManager(
+            peerConnectionService, 
+            appRegistryService, 
+            this.appLifeCycleConfig.heartBitPeriod, 
+            this.appLifeCycleConfig.heartBitTtl);
 
         this.log.info("Starting Broker");
         new Broker(appLifeCycleManager, brokerConnectionsFactory, interopRegistryProvider, appRegistryService).start();
