@@ -29,6 +29,8 @@ import { Broker } from "../broker/Broker";
 import { PeerAppLifeCycleManager } from "../peers/PeerAppLifeCycleManager";
 import { HostConnectionFactory } from "../peers/host/HostConnectionFactory";
 import { AppLifeCycleConfig } from "./AppLifeCycleConfig";
+import { AppLauncher } from "../launcher/AppLauncher";
+import { AppLauncherRegistry } from "../launcher/AppLauncherRegistry";
 
 export class WebBrokerConnectionBuilder {
 
@@ -44,8 +46,15 @@ export class WebBrokerConnectionBuilder {
 
     private appLifeCycleConfig: AppLifeCycleConfig = { heartBitTtl: 5000, heartBitPeriod: 1500 };
 
+    private readonly launcherRegistry: AppLauncherRegistry = new AppLauncherRegistry();
+
     public withAppLifeCycleConfig(config: AppLifeCycleConfig): WebBrokerConnectionBuilder {
         this.appLifeCycleConfig = config;
+        return this;
+    }
+
+    public withAppLauncher(launcherId: string, launcher: AppLauncher): WebBrokerConnectionBuilder {
+        this.launcherRegistry.registerAppLauncher(launcherId, launcher);
         return this;
     }
 
@@ -95,6 +104,7 @@ export class WebBrokerConnectionBuilder {
         const appLifeCycleManager = new PeerAppLifeCycleManager(
             peerConnectionService,
             appRegistryService,
+            this.launcherRegistry,
             this.appLifeCycleConfig.heartBitPeriod,
             this.appLifeCycleConfig.heartBitTtl);
 

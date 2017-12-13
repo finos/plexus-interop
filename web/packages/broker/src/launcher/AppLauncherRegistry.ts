@@ -16,18 +16,26 @@
  */
 import { AppLauncher } from "./AppLauncher";
 import { UrlWebAppLauncher } from "./UrlWebAppLauncher";
+import { Logger, LoggerFactory } from "@plexus-interop/common";
 
 export class AppLauncherRegistry {
 
     public static readonly URL_APP_LAUNCHER: string = "plexus.interop.UrlWebAppLauncher";
 
-    private static registry: Map<string, AppLauncher> = new Map<string, AppLauncher>();
+    private readonly log: Logger = LoggerFactory.getLogger("AppLauncherRegistry");
 
-    public static registerAppLauncher(id: string, launcher: AppLauncher): void {
-        AppLauncherRegistry.registry.set(id, launcher);
+    private registry: Map<string, AppLauncher> = new Map<string, AppLauncher>();
+
+    public constructor() {
+        this.registerAppLauncher(AppLauncherRegistry.URL_APP_LAUNCHER, new UrlWebAppLauncher());
     }
 
-    public static getAppLauncher(launcherId: string): AppLauncher {
+    public registerAppLauncher(id: string, launcher: AppLauncher): void {
+        this.log.info(`Registering [${id}] App Launcher`);
+        this.registry.set(id, launcher);
+    }
+
+    public getAppLauncher(launcherId: string): AppLauncher {
         const res = this.registry.get(launcherId);
         if (!res) {
             throw new Error(`App Launcher with [${launcherId}] ID is not found`);
@@ -36,5 +44,3 @@ export class AppLauncherRegistry {
     }
 
 }
-
-AppLauncherRegistry.registerAppLauncher(AppLauncherRegistry.URL_APP_LAUNCHER, new UrlWebAppLauncher());

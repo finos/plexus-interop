@@ -44,6 +44,7 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
     constructor(
         private readonly peerConnectionsService: PeerConnectionsService,
         private readonly appRegistryService: AppRegistryService,
+        private readonly launcherRegistry: AppLauncherRegistry,
         private readonly heartBitPeriod: number,
         private readonly heartBitTtl: number
     ) {
@@ -90,7 +91,7 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         this.log.debug(`Spawning instance for [${applicationId}] app`);
         const app = this.appRegistryService.getApplication(applicationId);
         this.log.debug(`App [${applicationId}] found in registry`);
-        const appLauncher = AppLauncherRegistry.getAppLauncher(app.launcherId);
+        const appLauncher = this.launcherRegistry.getAppLauncher(app.launcherId);
         this.log.debug(`App Launcher found for [${applicationId}] app, launching ... `);
         const cancellationToken = new CancellationToken();
         const appLaunchResponse = await appLauncher.launch({

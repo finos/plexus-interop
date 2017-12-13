@@ -19,9 +19,6 @@ import { ClientsSetup } from "../common/ClientsSetup";
 import { TransportsSetup } from "../common/TransportsSetup";
 import { readHostUrl } from "../common/utils";
 import { ClientConnectivityTests } from "../echo/ClientConnectivityTests";
-import { LoggerFactory, LogLevel } from "@plexus-interop/common";
-
-LoggerFactory.setLogLevel(LogLevel.TRACE);
 
 describe("Web Broker Client connectivity", () => {
 
@@ -30,7 +27,7 @@ describe("Web Broker Client connectivity", () => {
     const proxyHost = readHostUrl();
 
     const connectivityTests = new ClientConnectivityTests(
-        transportsSetup.createCrossDomainTransportProvider(proxyHost), 
+        transportsSetup.createCrossDomainTransportProvider(proxyHost),
         clientsSetup);
 
     it("Can receive Proxy Host from Broker", () => {
@@ -51,7 +48,7 @@ describe("Web Broker Client connectivity", () => {
             });
     });
 
-    it("Receives error if provide wrong client id to Broker", function() {
+    it("Receives error if provide wrong client id to Broker", function () {
         return connectivityTests.testClientReceiveErrorIfProvideWrongId();
     });
 
