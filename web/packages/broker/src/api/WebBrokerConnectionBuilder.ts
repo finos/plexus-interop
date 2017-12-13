@@ -28,7 +28,7 @@ import { MultiSourcesServerConnectionFactory } from "../transport/MultiSourcesSe
 import { Broker } from "../broker/Broker";
 import { PeerAppLifeCycleManager } from "../peers/PeerAppLifeCycleManager";
 import { HostConnectionFactory } from "../peers/host/HostConnectionFactory";
-import { AppLifeCycleConfig } from "../../dist/main/src/api/AppLifeCycleConfig";
+import { AppLifeCycleConfig } from "./AppLifeCycleConfig";
 
 export class WebBrokerConnectionBuilder {
 
@@ -93,9 +93,9 @@ export class WebBrokerConnectionBuilder {
             peerConnectionsFactory);
 
         const appLifeCycleManager = new PeerAppLifeCycleManager(
-            peerConnectionService, 
-            appRegistryService, 
-            this.appLifeCycleConfig.heartBitPeriod, 
+            peerConnectionService,
+            appRegistryService,
+            this.appLifeCycleConfig.heartBitPeriod,
             this.appLifeCycleConfig.heartBitTtl);
 
         this.log.info("Starting Broker");
