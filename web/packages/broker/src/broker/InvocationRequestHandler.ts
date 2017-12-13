@@ -85,10 +85,22 @@ export class InvocationRequestHandler {
             await Promise.all([targetPropogationCompleted, sourcePropogationCompleted]);
         } catch (error) {
             this.log.error(`Communication between channels failed`, error);
-            // TODO clean up/more logs?
+            const completion = new ErrorCompletion(error);
+            sourceChannel.close(completion);
+            targetChannel.close(completion);
+            return completion;
+        }
+
+        this.log.info(`All messages sent, closing channels`);
+        const targetClosed = targetChannel.close();
+        const sourceClosed = sourceChannel.close();
+        try {
+            await Promise.all([targetClosed, sourceClosed]);
+            this.log.info(`Channels closed`);
+        } catch (error) {
+            this.log.error(`Failed to close channels`, error);
             return new ErrorCompletion(error);
         }
-        this.log.info(`Completed`)
         return new SuccessCompletion();
     }
 
