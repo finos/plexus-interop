@@ -51,4 +51,8 @@ describe("Web Broker Client connectivity", () => {
             });
     });
 
+    it("Receives error if provide wrong client id to Broker", function() {
+        return connectivityTests.testClientReceiveErrorIfProvideWrongId();
+    });
+
 });

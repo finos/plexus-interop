@@ -21,7 +21,7 @@ import { PointToPointInvocationTests } from "../echo/PointToPointInvocationTests
 
 describe("Client: Web Broker Point to Point invocation", () => {
 
-    const clientsSetup = new ClientsSetup(1000);
+    const clientsSetup = new ClientsSetup(500);
     const transportsSetup = new TransportsSetup();
 
     const proxyHost = readHostUrl();

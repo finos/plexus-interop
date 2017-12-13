@@ -17,9 +17,8 @@
 import { AsyncHandler } from "../AsyncHandler";
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { Completion, ErrorCompletion, SuccessCompletion, UniqueId } from "@plexus-interop/protocol";
+import { Completion, ErrorCompletion, SuccessCompletion, UniqueId, ClientError } from "@plexus-interop/protocol";
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
-import { transportProtocol as plexus } from "@plexus-interop/protocol";
 import { ClientRequestProcessor } from "./ClientRequestProcessor";
 import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 import { AuthenticationHandler } from "./AuthenticationHandler";
@@ -50,13 +49,13 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                                 applicationId: appDescriptor.applicationId as string,
                                 instanceId: appDescriptor.instanceId
                             }, c => {
-                                // TODO handle connection drop
                                 log.error("Connection dropped", connection.uuid().toString());
                             });
                             sourceConnection = appConnection;
                             log.trace("Connected to client");
                         } catch (error) {
                             log.error("Unable to authenticate client connection", error);
+                            connection.disconnect(new ErrorCompletion(new ClientError(error)));
                             reject(error);
                         }
                     } else {
