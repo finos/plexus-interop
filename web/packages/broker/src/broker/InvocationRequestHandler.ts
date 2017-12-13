@@ -91,16 +91,17 @@ export class InvocationRequestHandler {
             return completion;
         }
 
-        this.log.info(`All messages sent, closing channels`);
+        this.log.debug(`All messages sent, closing channels`);
         const targetClosed = targetChannel.close();
         const sourceClosed = sourceChannel.close();
         try {
             await Promise.all([targetClosed, sourceClosed]);
-            this.log.info(`Channels closed`);
+            this.log.debug(`Channels closed`);
         } catch (error) {
             this.log.error(`Failed to close channels`, error);
             return new ErrorCompletion(error);
         }
+        this.log.info("Completed");
         return new SuccessCompletion();
     }
 

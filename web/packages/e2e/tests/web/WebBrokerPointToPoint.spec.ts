@@ -21,7 +21,7 @@ import { PointToPointInvocationTests } from "../echo/PointToPointInvocationTests
 
 describe("Client: Web Broker Point to Point invocation", () => {
 
-    const clientsSetup = new ClientsSetup(3000);
+    const clientsSetup = new ClientsSetup(1000);
     const transportsSetup = new TransportsSetup();
 
     const proxyHost = readHostUrl();
@@ -31,7 +31,7 @@ describe("Client: Web Broker Point to Point invocation", () => {
         clientsSetup);
 
     it("Sends invocation request and receives response", function () {
-        this.timeout(10000000);
+        this.timeout(5000);
         try {
             return pointToPointTests.testMessageSent()
                 .catch(e => {
@@ -46,17 +46,12 @@ describe("Client: Web Broker Point to Point invocation", () => {
             debugger;
             return Promise.reject(error);
         }
-
     });
 
-    // it("Sends invocation request with huge payload and receives response", function() {
-    //     this.timeout(5000);
-    //     return pointToPointTests.testHugeMessageSent();
-    // });
-
-    // it("Sends few invocations in a row", function() {
-    //     return pointToPointTests.testFewMessagesSent();
-    // });
+    it("Sends few invocations in a row", function() {
+        this.timeout(5000);        
+        return pointToPointTests.testFewMessagesSent();
+    });
 
     // it("Receives error from host", function() {
     //     return pointToPointTests.testHostsExecutionErrorReceived();
