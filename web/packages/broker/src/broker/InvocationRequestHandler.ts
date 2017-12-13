@@ -47,62 +47,73 @@ export class InvocationRequestHandler {
             this.log.debug(`Handling start invocation request [${sourceChannelId}] from [${sourceConnectionId}]`);
         }
 
-        const methodReference: ConsumedMethodReference | ProvidedMethodReference = (invocationRequest.consumedMethod as ConsumedMethodReference) || invocationRequest.providedMethod;
-
-        const targetAppConnection = await this.resolveTargetConnection(methodReference, sourceConnectionDescriptor);
-
-        if (this.log.isDebugEnabled()) {
-            this.log.debug(`Target connection [${targetAppConnection.descriptor.connectionId.toString()}] found`);
-        }
-
-        const targetChannel = await targetAppConnection.connection.createChannel();
-        const targetChannelId = targetChannel.uuid().toString();
-
-        this.log = LoggerFactory.getLogger(`InvocationRequestHandler ${sourceChannelId}->${targetChannelId}`);
-        this.log.debug(`Target channel created`);
-
-        const targetChannelObserver = new BufferedObserver(Defaults.DEFAULT_BUFFER_SIZE, this.log);
-        await targetChannel.open({
-            next: m => targetChannelObserver.next(m),
-            complete: () => targetChannelObserver.complete(),
-            error: e => targetChannelObserver.error(e),
-            started: () => { },
-            startFailed: e => this.log.error("Failed to start target channel", e)
-        });
-
-        this.log.debug(`Target channel opened`);
-
-        this.log.trace(`Sending InvocationStarting to source`);
-        sourceChannel.sendMessage(ClientProtocolHelper.invocationStartingMessagePayload({}));
-
-        this.log.trace(`Sending InvocationRequested to [${targetChannelId}]`);
-        targetChannel.sendMessage(ClientProtocolHelper.invocationRequestedPayload(this.createInvocationStartRequested(methodReference, sourceConnectionDescriptor)));
-
-        const targetPropogationCompleted = this.propogateAll($inMessages, targetChannel, sourceChannel);
-        const sourcePropogationCompleted = this.propogateAll(targetChannelObserver, sourceChannel, targetChannel);
-
         try {
-            await Promise.all([targetPropogationCompleted, sourcePropogationCompleted]);
-        } catch (error) {
-            this.log.error(`Communication between channels failed`, error);
-            const completion = new ErrorCompletion(error);
+
+            const methodReference: ConsumedMethodReference | ProvidedMethodReference = (invocationRequest.consumedMethod as ConsumedMethodReference) || invocationRequest.providedMethod;
+            const targetAppConnection = await this.resolveTargetConnection(methodReference, sourceConnectionDescriptor);
+
+            if (this.log.isDebugEnabled()) {
+                this.log.debug(`Target connection [${targetAppConnection.descriptor.connectionId.toString()}] found`);
+            }
+
+            const targetChannel = await targetAppConnection.connection.createChannel();
+
+            try {
+                
+                const targetChannelId = targetChannel.uuid().toString();
+                this.log = LoggerFactory.getLogger(`InvocationRequestHandler ${sourceChannelId}->${targetChannelId}`);
+                this.log.debug(`Target channel created`);
+
+                const targetChannelObserver = new BufferedObserver(Defaults.DEFAULT_BUFFER_SIZE, this.log);
+                await targetChannel.open({
+                    next: m => targetChannelObserver.next(m),
+                    complete: () => targetChannelObserver.complete(),
+                    error: e => targetChannelObserver.error(e),
+                    started: () => { },
+                    startFailed: e => this.log.error("Failed to start target channel", e)
+                });
+
+                this.log.trace(`Sending InvocationStarting to source`);
+                sourceChannel.sendMessage(ClientProtocolHelper.invocationStartingMessagePayload({}));
+
+                this.log.trace(`Sending InvocationRequested to [${targetChannelId}]`);
+                targetChannel.sendMessage(ClientProtocolHelper.invocationRequestedPayload(this.createInvocationStartRequested(methodReference, sourceConnectionDescriptor)));
+
+                const targetPropogationCompleted = this.propogateAll($inMessages, targetChannel, sourceChannel);
+                const sourcePropogationCompleted = this.propogateAll(targetChannelObserver, sourceChannel, targetChannel);
+
+                await Promise.all([targetPropogationCompleted, sourcePropogationCompleted]);
+
+                this.log.debug(`All messages sent, closing channels`);
+                const targetClosed = targetChannel.close();
+                const sourceClosed = sourceChannel.close();
+
+                try {
+                    await Promise.all([targetClosed, sourceClosed]);
+                    this.log.debug(`Channels closed`);
+                } catch (error) {
+                    this.log.error(`Failed to close channels`, error);
+                    return new ErrorCompletion(error);
+                }
+
+                this.log.info("Completed");
+                return new SuccessCompletion();
+
+            } catch (error) {
+                this.log.error(`Communication between channels failed`, error);
+                const completion = new ErrorCompletion(error);
+                targetChannel.close(completion);
+                sourceChannel.close(completion);
+                return completion;
+            }
+
+        } catch (targetError) {
+            this.log.error(`Error on getting target channel`, targetError);
+            const completion = new ErrorCompletion(targetError);
             sourceChannel.close(completion);
-            targetChannel.close(completion);
             return completion;
         }
 
-        this.log.debug(`All messages sent, closing channels`);
-        const targetClosed = targetChannel.close();
-        const sourceClosed = sourceChannel.close();
-        try {
-            await Promise.all([targetClosed, sourceClosed]);
-            this.log.debug(`Channels closed`);
-        } catch (error) {
-            this.log.error(`Failed to close channels`, error);
-            return new ErrorCompletion(error);
-        }
-        this.log.info("Completed");
-        return new SuccessCompletion();
     }
 
     private async propogateAll(source: Observable<ArrayBuffer> | BufferedObserver<ArrayBuffer>, targetChannel: TransportChannel, sourceChannel: TransportChannel): Promise<void> {
