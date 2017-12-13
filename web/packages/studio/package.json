@@ -25,6 +25,7 @@
     "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.7",
     "bootstrap": "^4.0.0-beta.2",
     "core-js": "^2.4.1",
+    "font-awesome": "^4.7.0",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
     "rxjs": "^5.5.2",

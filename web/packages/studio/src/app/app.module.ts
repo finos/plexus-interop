@@ -15,13 +15,15 @@ import { NgReduxModule, NgRedux } from '@angular-redux/store';
 import { createLogger } from 'redux-logger';
 // import { rootReducer } from './reducers';
 import { rootReducer, IAppState, INITIAL_STATE } from './services/store';
+import { AppServicesComponent } from './app-services/app-services.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MetadataLoaderComponent,
     AppListComponent,
-    HeaderComponent
+    HeaderComponent,
+    AppServicesComponent
   ],
   imports: [
     BrowserModule,
