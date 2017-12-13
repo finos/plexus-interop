@@ -49,24 +49,28 @@ describe("Client: Web Broker Point to Point invocation", () => {
     });
 
     it("Sends few invocations in a row", function() {
-        this.timeout(5000);        
+        this.timeout(3000);        
         return pointToPointTests.testFewMessagesSent();
     });
 
-    // it("Receives error from host", function() {
-    //     return pointToPointTests.testHostsExecutionErrorReceived();
-    // });
+    it("Receives error from host", function() {
+        this.timeout(3000);                
+        return pointToPointTests.testHostsExecutionErrorReceived();
+    });
 
-    // it("Receives Client Error from host", function() {
-    //     return pointToPointTests.testHostsExecutionClientErrorReceived();
-    // });
+    it("Receives Client Error from host", function() {
+        this.timeout(3000);        
+        return pointToPointTests.testHostsExecutionClientErrorReceived();
+    });
 
-    // it("Receives string error from host", function() {
-    //     return pointToPointTests.testHostsExecutionStringErrorReceived();
-    // });
+    it("Receives string error from host", function() {
+        this.timeout(3000);        
+        return pointToPointTests.testHostsExecutionStringErrorReceived();
+    });
 
-    // it("Receives exception from host", function() {
-    //     return pointToPointTests.testHostExecutionExceptionReceived();
-    // });
+    it("Receives exception from host", function() {
+        this.timeout(3000);        
+        return pointToPointTests.testHostExecutionExceptionReceived();
+    });
 
 });
