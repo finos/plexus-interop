@@ -59,7 +59,7 @@ export class InvocationRequestHandler {
             const targetChannel = await targetAppConnection.connection.createChannel();
 
             try {
-                
+
                 const targetChannelId = targetChannel.uuid().toString();
                 this.log = LoggerFactory.getLogger(`InvocationRequestHandler ${sourceChannelId}->${targetChannelId}`);
                 this.log.debug(`Target channel created`);
@@ -117,8 +117,10 @@ export class InvocationRequestHandler {
     }
 
     private async propogateAll(source: Observable<ArrayBuffer> | BufferedObserver<ArrayBuffer>, targetChannel: TransportChannel, sourceChannel: TransportChannel): Promise<void> {
+
         const targetChannelId = targetChannel.uuid().toString();
         const sourceChannelId = sourceChannel.uuid().toString();
+        
         const sourceObserver: (resolve: any, reject: any) => Observer<ArrayBuffer> = (resolve, reject) => {
             return {
                 next: async messagePayload => {

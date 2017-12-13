@@ -19,7 +19,7 @@ import { TransportsSetup } from "../common/TransportsSetup";
 import { readHostUrl } from "../common/utils";
 import { PointToPointInvocationTests } from "../echo/PointToPointInvocationTests";
 
-describe("Client: Web Broker Point to Point invocation", () => {
+describe("Web Broker: Point to Point invocation", () => {
 
     const clientsSetup = new ClientsSetup(500);
     const transportsSetup = new TransportsSetup();

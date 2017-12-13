@@ -20,7 +20,7 @@ import { TransportsSetup } from "../common/TransportsSetup";
 import { readHostUrl } from "../common/utils";
 import { ClientConnectivityTests } from "../echo/ClientConnectivityTests";
 
-describe("Web Broker Client connectivity", () => {
+describe("Web Broker: Client connectivity", () => {
 
     const clientsSetup = new ClientsSetup();
     const transportsSetup = new TransportsSetup();

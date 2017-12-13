@@ -21,7 +21,7 @@ import { ServerStreamingInvocationTests } from "../echo/ServerStreamingInvocatio
 import { BidiStreamingInvocationTests } from "../echo/BidiStreamingTests";
 import { ClientInvocationTests } from "../echo/ClientStreamingTests";
 
-describe("Client: Web Broker Point to Point invocation", () => {
+describe("Web Broker: Streaming invocations", () => {
 
     const clientsSetup = new ClientsSetup(500);
     const transportsSetup = new TransportsSetup();
@@ -62,6 +62,10 @@ describe("Client: Web Broker Point to Point invocation", () => {
 
     it("Sends client stream messages to server", function () {
         return clientStreamingTests.testClientCanSendStreamToServer();
+    });
+
+    it("Client receives exception from server", function() {
+        return serverStreamingTests.testServerExceptionReceivedByClient();
     });
 
 });
