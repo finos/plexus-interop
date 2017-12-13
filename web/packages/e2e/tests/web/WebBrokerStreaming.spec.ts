@@ -47,4 +47,12 @@ describe("Client: Web Broker Point to Point invocation", () => {
         return serverStreamingTests.testServerSendsFewStreamsInParrallelToClient();
     });
 
+    it("Sends stream of messages and error to client", function () {
+        return serverStreamingTests.testServerSendsStreamWithErrorToClient();
+    });
+
+    it("Sends stream of messages and cancel operation to client", function () {
+        return serverStreamingTests.testServerSendsStreamWithCancelToClient();
+    });
+
 });

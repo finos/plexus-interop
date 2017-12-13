@@ -39,12 +39,12 @@ describe("Web Broker Client connectivity", () => {
         return clientsSetup
             .createEchoClient(transportsSetup.createCrossDomainTransportProvider(proxyHost))
             .then(client => {
-                console.log("Connected!");
                 expect(client).to.not.be.undefined;
                 return client.disconnect();
             })
             .catch(e => {
                 console.error("Failed", e);
+                throw e;
             });
     });
 
