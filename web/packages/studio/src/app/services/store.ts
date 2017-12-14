@@ -6,7 +6,7 @@ import { AppActions } from './app.actions';
 export interface IAppState {
     connected: boolean;
     metadataUrl: string | null;
-    application: { name: string } | null
+    application: App | null
 }
 
 export const INITIAL_STATE: IAppState = {
@@ -18,7 +18,7 @@ export const INITIAL_STATE: IAppState = {
 export function rootReducer(state: IAppState, action: Action): IAppState {
     switch (action.type) {
         case AppActions.CONNECT_TO_PLEXUS:
-            return {               
+            return {
                 ...state,
                 connected: true,
                 metadataUrl: '/metadata'
