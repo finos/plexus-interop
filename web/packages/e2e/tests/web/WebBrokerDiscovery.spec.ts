@@ -43,4 +43,9 @@ describe("Web Broker: Discovery", () => {
         return discoveryTests.testMethodDiscoveredByReference();
     });
 
+    it("Can invoke discovered unary method passing serialized data", function() {
+        this.timeout(3000);
+        return discoveryTests.testClientCanInvokeDiscoveredMethod();
+    });
+
 });

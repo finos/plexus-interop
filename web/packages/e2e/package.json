@@ -25,7 +25,7 @@
     "republish": "npm run unpublish && npm i && npm run publish-package",
     "postrepublish": "echo 'Package republished successfully!'",
     "prepare-native-e2e-tests": "node scripts/browserify-all.js --coverage true --inputGlob dist/main/tests/native/*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
-    "prepare-web-e2e-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/web/*spec.js --outputFile dist/main/tests/web/RendererProcess.bundle.js",
+    "prepare-web-e2e-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/web/*Discovery*spec.js --outputFile dist/main/tests/web/RendererProcess.bundle.js",
     "build-host-proxy": "node scripts/browserify-all.js --standalone proxyHost --inputGlob dist/main/tests/common/TestCrossDomainHost.js --outputFile dist/main/tests/web/CrossDomainHost.bundle.js",
     "prepare-native-e2e-debug-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
     "prepare-native-e2e-benchmarks": "node scripts/browserify-all.js --inputGlob dist/main/tests/benchmarks/*spec.js --outputFile dist/main/tests/benchmarks/RendererProcessBenchmarks.bundle.js",
