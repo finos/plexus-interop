@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion, Completion } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion, Completion, UniqueId } from "@plexus-interop/protocol";
 import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
 import { Observable } from "rxjs/Observable";
 import { InteropRegistryService } from "../metadata/interop/InteropRegistryService";
@@ -168,7 +168,23 @@ export class InvocationRequestHandler {
 
     private async resolveTargetConnection(methodReference: ConsumedMethodReference | ProvidedMethodReference, sourceConnection: ApplicationConnectionDescriptor): Promise<ApplicationConnection> {
         if (!Types.isConsumedMethodReference(methodReference)) {
-            throw new Error("Provided methods not implemented yet");
+            if (!methodReference.providedService) {
+                throw new Error("Provided Service information is required");
+            }
+            let appConnection;
+            if (methodReference.providedService && methodReference.providedService.connectionId) {
+                const onlineApps = await this.appLifeCycleManager.getOnlineConnections();
+                const connectionId = UniqueId.fromProperties(methodReference.providedService.connectionId as plexus.IUniqueId);
+                this.log.trace(`Looking for app by connection id [${connectionId.toString()}]`);
+                appConnection = onlineApps.find(a => connectionId.equals(a.connection.uuid()));
+            } else if (methodReference.providedService && methodReference.providedService.applicationId) {
+                this.log.trace(`Looking for app by app id [${methodReference.providedService.applicationId}]`);                
+                appConnection = this.appLifeCycleManager.getOrSpawnConnection(methodReference.providedService.applicationId);
+            }
+            if (!appConnection) {
+                throw new Error("Requested application is not online");
+            }
+            return appConnection;
         } else {
             const targetMethods = this.registryService.getMatchingProvidedMethods(sourceConnection.applicationId, methodReference);
             const targetAppIds = targetMethods.map(method => method.providedService.application.id);
