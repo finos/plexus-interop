@@ -1,0 +1,23 @@
+<nav class="navbar navbar-light bg-light justify-content-between">
+  <a class="navbar-brand" href="/">
+    <img width="300" alt="Plexus Studio Logo" src="assets/plexus-logo-lg.png">
+  </a>
+
+  <div class="connection-statuses">
+    <div class="form-inline connection-status" *ngIf="connected$ | async">
+      <span class="navbar-text mr-2">Metadata:</span>
+      <a target="_blank" href="{{metadataUrl$ | async}}">{{metadataUrl$ | async}}</a>
+      <a class="nav-link" href="javascript:void(0)" (click)="disconnectFromPlexus()">
+        <i class="fa fa-times" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    <div class="form-inline connection-status" *ngIf="!!currentApp">
+      <span class="navbar-text mr-2">Application:</span>
+      <a #openCurrentAppBtn href="javascript:void(0)" (click)="openCurrentApp()">{{currentApp?.name}}</a>
+      <a #disconnectFromAppBtn class="nav-link" href="javascript:void(0)" (click)="disconnectFromApp()">
+        <i class="fa fa-times" aria-hidden="true"></i>
+      </a>
+    </div>
+  </div>
+</nav>

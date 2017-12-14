@@ -1,0 +1,13 @@
+# You can use comments here
+styleLoaders:
+  - style-loader
+  - css-loader
+  - sass-loader
+
+styles:
+  normalize: true
+  print: true
+
+scripts:
+  alert: true
+  button: true
