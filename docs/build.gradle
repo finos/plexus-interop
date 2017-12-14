@@ -23,7 +23,7 @@ asciidoctor {
             'idprefix': '',
             'idseparator': '-',
             'docinfo1': '',
-            'imagesDir': 'images',
+	    'imagesDir': 'images',
             'source-highlighter': 'coderay',
 	    encoding : ' utf-8 ' 
 }

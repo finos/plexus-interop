@@ -14,20 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
+namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
-    using NLog.Extensions.Logging;
     using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
     internal sealed class WebSocketServer
-    {
+    {        
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketServer>();
 
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
         private readonly IWebSocketHandler _handler;
 
         public WebSocketServer(IWebSocketHandler handler)
@@ -48,7 +50,7 @@
         {
             Log.Debug("Configure");
 
-            loggerFactory.AddNLog();
+            LogManager.ConfigureLogging(loggerFactory);
 
             lifetime.ApplicationStarted.Register(_handler.OnListeningStarted);
 
@@ -57,7 +59,7 @@
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseWebSockets();
+            app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(5)});
 
             app.Use(async (context, next) =>
             {
@@ -65,22 +67,41 @@
                 {
                     try
                     {
-                        Log.Trace("Accepting websocket connection");
-                        var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
-                        await _handler.HandleAsync(webSocket).ConfigureAwait(false);
+                        Log.Trace("Websocket connection received");
+                        var connectionTask = await AcceptWebsocketConnectionAsync(context).ConfigureAwait(false);
+                        await connectionTask.ConfigureAwait(false);
                         Log.Trace("Websocket connection completed");
                     }
                     catch (Exception ex)
                     {
                         Log.Trace("Websocket connection terminated with exception: {0}", ex.FormatTypeAndMessage());
+                        throw;
                     }
                 }
                 else
                 {
-                    Log.Trace("Non-websocket connection received");
+                    Log.Trace("Non-websocket request received");
                     await next().ConfigureAwait(false);
                 }
             });
+        }
+
+        private async Task<Task> AcceptWebsocketConnectionAsync(HttpContext context)
+        {
+            Task connectionTask;
+            await _semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                Log.Trace("Accepting websocket connection");
+                var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);                
+                connectionTask = await _handler.AcceptConnectionAsync(webSocket).ConfigureAwait(false);
+                Log.Trace("Websocket connection accepted");
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+            return connectionTask;
         }
     }
 }

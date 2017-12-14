@@ -19,7 +19,10 @@ import { ClientsSetup } from "../common/ClientsSetup";
 import { BaseEchoTest } from "./BaseEchoTest";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientStreamingHandler } from "./ClientStreamingHandler";
-import { StreamingInvocationClient } from "@plexus-interop/client";
+import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
+import { EchoClientClient } from "../../src/echo/client/EchoClientGeneratedClient";
+import { EchoServerClient } from "../../src/echo/server/EchoServerGeneratedClient";
+import { AsyncHelper } from "@plexus-interop/common";
 
 export class BidiStreamingInvocationTests extends BaseEchoTest {
 
@@ -29,46 +32,92 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
         super();
     }
 
-    public testClientAndServerCanSendMessages(): Promise<void> {
+    public testClientCanCancelInvocation(): Promise<void> {
+
+        let serverReceivedError = false;
+        let clientReceivedError = false;
+        let serverReceivedMessage = false;
         return new Promise<void>((resolve, reject) => {
-            const serverHandler = new ClientStreamingHandler((hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
+            const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
                     next: (clientRequest) => {
+                        serverReceivedMessage = true;
+                    },
+                    complete: () => reject("Complete not expected"),
+                    error: (e) => {
+                        serverReceivedError = true;
+                    }
+                }
+            });
+            try {
+                (async () => {
+                    const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+                    const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
+                        next: (serverResponse) => reject("Not expected to receive message"),
+                        error: (e) => {
+                            clientReceivedError = true;
+                        },
+                        complete: () => reject("Not expected to complete successfuly")
+                    });
+                    streamingClient.next(this.clientsSetup.createRequestDto());
+                    await AsyncHelper.waitFor(() => serverReceivedMessage === true);
+                    streamingClient.cancel();
+                    await AsyncHelper.waitFor(() => serverReceivedError === true);
+                    await AsyncHelper.waitFor(() => clientReceivedError === true);
+                    await this.waitForClientConnectionCleared(this.clientsSetup);
+                    await this.waitForServerConnectionCleared(this.clientsSetup);
+                    await this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
+                    resolve();
+
+                })();
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    public testClientAndServerCanSendMessages(): Promise<void> {
+        let client: EchoClientClient | null = null;
+        let server: EchoServerClient | null = null;
+        return new Promise<void>((resolve, reject) => {
+            const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
+                return {
+                    next: async (clientRequest) => {
                         if (clientRequest.stringField === "Hey") {
                             hostClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
                         } else if (clientRequest.stringField === "Ping") {
                             hostClient.next(this.clientsSetup.createSimpleRequestDto("Pong"));
-                            hostClient.complete();
+                            await hostClient.complete();
+                            this.verifyServerChannelsCleared(this.clientsSetup)
+                                .catch(e => reject(e));
                         }
                     },
                     complete: () => { },
                     error: (e) => {
-                        console.error("Error received by server", e);
                         reject(e);
                     }
                 }
             });
             (async () => {
-                const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+                [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
                 const streamingClient = await client.getEchoServiceProxy().duplexStreaming({
                     next: (serverResponse) => {
                         if (serverResponse.stringField === "Hey") {
                             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Ping"));
                         } else if (serverResponse.stringField === "Pong") {
                             streamingClient.complete().then(() => {
-                                return this.clientsSetup.disconnect(client, server);
+                                this.verifyClientChannelsCleared(this.clientsSetup)
+                                    .catch(e => reject(e));
+                                return this.clientsSetup.disconnect(client as EchoClientClient, server as EchoServerClient);
                             })
-                            .then(() => resolve())
-                            .catch(e => reject(e));
+                                .then(() => resolve())
+                                .catch(e => reject(e));
                         }
                     },
                     error: (e) => {
-                        console.error("Error received by client", e);
                         reject(e);
                     },
-                    complete: () => {
-                        console.log("Remote completed");
-                    }
+                    complete: () => {}
                 });
                 streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
             })();

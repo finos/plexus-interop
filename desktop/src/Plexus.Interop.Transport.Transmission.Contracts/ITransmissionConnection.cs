@@ -14,17 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission
+namespace Plexus.Interop.Transport.Transmission
 {
-    using System;
-    using System.Threading.Tasks;
     using Plexus.Channels;
     using Plexus.Pools;
+    using System;
+    using System.Threading.Tasks;
 
     public interface ITransmissionConnection : IChannel<IPooledBuffer>, IDisposable
     {
         UniqueId Id { get; }
 
         Task Completion { get; }
+
+        Task DisconnectAsync();
     }
 }

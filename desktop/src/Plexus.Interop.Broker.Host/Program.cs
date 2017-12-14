@@ -16,9 +16,7 @@
  */
 namespace Plexus.Interop.Broker.Host
 {
-    using System;
     using Plexus.Host;
-    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -29,34 +27,26 @@ namespace Plexus.Interop.Broker.Host
         private int _stoped;
         private BrokerRunner _brokerRunner;
 
-        public async Task<int> RunAsync(string[] args)
+        public async Task<Task> StartAsync(string[] args)
         {
-            try
+            var brokerArgs = BrokerArguments.Parse(args);
+            _brokerRunner = new BrokerRunner(brokerArgs.MetadataDir);
+            if (_stoped == 1)
             {
-                var metadataDir = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
-                _brokerRunner = new BrokerRunner(metadataDir);
-                if (_stoped == 1)
-                {
-                    return 0;
-                }
-                await _brokerRunner.StartAsync().ConfigureAwait(false);
-                await _brokerRunner.Completion.ConfigureAwait(false);
-                Log.Debug("Broker process completed");
-                return 0;
+                return Task.FromResult(0);
             }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Terminated with exception");
-                return 1;
-            }
+            await _brokerRunner.StartAsync().ConfigureAwait(false);
+            Log.Debug("Broker process started");
+            return _brokerRunner.Completion;
         }
 
         public async Task ShutdownAsync()
         {
-            Log.Debug("Shutting down");
             if (Interlocked.Exchange(ref _stoped, 1) == 0 && _brokerRunner != null)
             {
-                await _brokerRunner.StopAsync().ConfigureAwait(false);
+                Log.Debug("Shutting down");
+                _brokerRunner.Stop();
+                await _brokerRunner.Completion.ConfigureAwait(false);
             }
         }
     }

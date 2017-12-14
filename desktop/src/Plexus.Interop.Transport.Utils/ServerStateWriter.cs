@@ -41,7 +41,7 @@
 
         public void SignalInitialized()
         {
-            Log.Info("Signalling initialization {0}", _eventName);
+            Log.Debug("Signalling initialization {0}", _eventName);
             _waitHandle.Set();
         }
 

@@ -19,7 +19,7 @@ function onFileAdded(dir, callback) {
     wsAddressWatcher
         .on('add', path => {
             console.log(`File ${path} has been added`);
-            setTimeout(() => callback(path), 2000);
+            callback(path);
         })
         .on('change', path => console.log(`File ${path} has been changed`));
 }

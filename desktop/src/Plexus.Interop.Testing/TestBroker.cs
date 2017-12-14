@@ -22,10 +22,12 @@
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Processes;
+    using Process = System.Diagnostics.Process;
 
-    public sealed class TestBroker : StartableBase
+    public sealed class TestBroker : ProcessBase
     {
-        private static readonly ILogger Log = LogManager.GetLogger<TestBroker>();
+        private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(3);
 
         private static readonly string RuntimeIdentifier =
 #if NET452
@@ -40,7 +42,7 @@
                 "plexus"));
 
         private readonly string _workingDir;
-        private readonly Promise _completion = new Promise();
+        private readonly Promise _processExited = new Promise();
         private readonly Process _process;
 
         public TestBroker(string workingDir = null)
@@ -69,18 +71,22 @@
             {
                 if (_process.ExitCode != 0)
                 {
-                    _completion.TryFail(
+                    _processExited.TryFail(
                         new InvalidOperationException(
                             $"Broker process exited with non-zero exit code {_process.ExitCode}"));
                 }
                 else
                 {
-                    _completion.TryComplete();
+                    _processExited.TryComplete();
                 }
             };
+
+            OnStop(SendShutdownEvent);
         }
 
-        protected override Task<Task> StartProcessAsync(CancellationToken stopCancellationToken)
+        protected override ILogger Log { get; } = LogManager.GetLogger<TestBroker>();
+
+        protected override Task<Task> StartCoreAsync()
         {
             Log.Info("Starting test broker in directory {0}", _workingDir);
             if (!_process.Start())
@@ -88,19 +94,10 @@
                 throw new InvalidOperationException("Broker failed to start");
             }
             Log.Info("Test broker started in directory {0}", _workingDir);
-            return Task.FromResult(RunBrokerAsync(stopCancellationToken));
+            return Task.FromResult(_processExited.Task);
         }
 
-        private async Task RunBrokerAsync(CancellationToken cancellationToken)
-        {
-            using (cancellationToken.Register(OnStop))
-            {
-                await _completion.Task.ConfigureAwait(false);
-                Log.Info("Stopped");
-            }
-        }
-
-        private void OnStop()
+        private void SendShutdownEvent()
         {
             Log.Info("Stopping");
             var shutdownEventName = "plexus-host-shutdown-" + _process.Id;
@@ -110,13 +107,12 @@
                 EventResetMode.AutoReset,
                 shutdownEventName);
             shutdownEvent.Set();
-            _completion.Task.ContinueWithSynchronously(_ => shutdownEvent.Dispose());
-            var timeout = TimeSpan.FromSeconds(5);
-            Task.Delay(timeout).ContinueWithSynchronously(t =>
+            _processExited.Task.ContinueWithSynchronously(_ => shutdownEvent.Dispose());
+            Task.Delay(StopTimeout).ContinueWithSynchronously(t =>
             {
                 if (!_process.HasExited)
                 {
-                    Log.Warn("Killing broker forcibly after {0}sec shutdown awaiting", timeout.TotalSeconds);
+                    Log.Warn("Killing broker forcibly after {0}sec shutdown awaiting", StopTimeout.TotalSeconds);
                     _process.Kill();
                 }
             });

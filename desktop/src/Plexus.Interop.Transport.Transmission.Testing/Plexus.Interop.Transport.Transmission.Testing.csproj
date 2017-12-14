@@ -5,14 +5,16 @@
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.3</TargetFrameworks>
     
     <RootNamespace>Plexus.Interop.Transport.Transmission</RootNamespace>
+    <LangVersion>latest</LangVersion>
     <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
 
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.3.0-beta5-build3769" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.console" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

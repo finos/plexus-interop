@@ -1,0 +1,8 @@
+Plexus Interop repository consist of the following main sections:
+
+* https://github.com/symphonyoss/plexus-interop/tree/master/desktop[desktop] - Interop Broker, .NET Interop Client and sample apps implemented in C# using https://www.microsoft.com/net/download/core[.NET Core 2.0]
+* https://github.com/symphonyoss/plexus-interop/tree/master/web[web] - Web Interop Client and sample apps implemented in https://www.typescriptlang.org/[TypeScript]
+* https://github.com/symphonyoss/plexus-interop/tree/master/dsl[dsl] - https://developers.google.com/protocol-buffers/[Protobuf] and Plexus Interop grammar parsers, validators and code-generators implemented using https://eclipse.org/Xtext/[Xtext framework]
+* https://github.com/symphonyoss/plexus-interop/tree/master/docs[docs] - project documentation implemented in http://asciidoc.org/[AsciiDoc] format using http://asciidoctor.org/[Asciidoctor] processor
+* https://github.com/symphonyoss/plexus-interop/tree/master/protocol[protocol] - definitions of Plexus Interop internal protocol messages in https://developers.google.com/protocol-buffers/[Protobuf] format
+* https://github.com/symphonyoss/plexus-interop/tree/master/samples[samples] - sample interop metadata

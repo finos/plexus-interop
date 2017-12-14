@@ -17,16 +17,22 @@
 import { NopServiceHandler } from "./NopServiceHandler";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { Observer } from "@plexus-interop/common";
-import { StreamingInvocationClient } from "@plexus-interop/client";
+import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
 
 export class ClientStreamingHandler extends NopServiceHandler {
 
-    public constructor(private handler: (hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => Observer<plexus.plexus.interop.testing.IEchoRequest>) {
+    public constructor(private handler: (context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => Observer<plexus.plexus.interop.testing.IEchoRequest>) {
         super();
     }
 
-    public onDuplexStreaming(hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): Observer<plexus.plexus.interop.testing.IEchoRequest> {
-        return this.handler(hostClient);
+    public onDuplexStreaming(context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): Observer<plexus.plexus.interop.testing.IEchoRequest> {
+        return this.handler(context, hostClient);
+    }
+
+    public onClientStreaming(
+        context: MethodInvocationContext,
+        hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): Observer<plexus.plexus.interop.testing.IEchoRequest> {
+        return this.handler(context, hostClient);
     }
 
 }

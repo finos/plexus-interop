@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
     using Plexus.Interop.Protocol;
@@ -31,7 +31,7 @@
 
         public UniqueId ApplicationInstanceId { get; private set; }
 
-        public ITransportConnectionFactory Transport { get; private set; }
+        public ITransportClient Transport { get; private set; }
 
         public IProtocolImplementation Protocol { get; private set; }
 
@@ -49,7 +49,7 @@
             return this;
         }
 
-        public ClientOptionsBuilder WithTransport(ITransportConnectionFactory transport)
+        public ClientOptionsBuilder WithTransport(ITransportClient transport)
         {
             Transport = transport;
             return this;

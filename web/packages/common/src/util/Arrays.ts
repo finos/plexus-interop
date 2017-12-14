@@ -31,14 +31,6 @@ export class Arrays {
         return full;
     }
 
-    public static shuffle(a: any[]): any[] {
-        for (let i = a.length; i; i--) {
-            let j = Math.floor(Math.random() * i);
-            [a[i - 1], a[j]] = [a[j], a[i - 1]];
-        }
-        return a;
-    }
-
     public static toArrayBuffer(typedArray: Uint8Array): ArrayBuffer {
         return new Uint8Array(typedArray).buffer;
     }

@@ -12,22 +12,33 @@
     <RepoRootDir>../../../</RepoRootDir>
     <ArtifactsDir>$(RepoRootDir)bin/$(RuntimeIdentifier)/</ArtifactsDir>
     <PublishDir>$(ArtifactsDir)broker/</PublishDir>
-    <ArtifactsSamplesDir>$(ArtifactsDir)samples/</ArtifactsSamplesDir>
+    <ArtifactsSamplesDir>$(ArtifactsDir)samples/greeting/</ArtifactsSamplesDir>
+    <QuickStartSamplesDir>$(ArtifactsDir)samples/quick-start/</QuickStartSamplesDir>
     
     <LangVersion>latest</LangVersion>
     <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
 
+    <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
+
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="plexus.cmd" />
+    <None Remove="GenBrokerMetadata.cmd" />
     <None Remove="LaunchBroker.cmd" />
     <None Remove="LaunchBroker.sh" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="plexus.cmd" />
+    <Content Include="GenBrokerMetadata.cmd" />
     <Content Include="LaunchBroker.cmd" />
     <Content Include="LaunchBroker.sh" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="0.1.0-e171010-1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,8 +48,15 @@
   </ItemGroup>
 
   <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish">
-    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />       
+    <Copy SourceFiles="plexus.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />    
+    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
+
+    <Copy SourceFiles="plexus.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
   </Target>
 
 </Project>

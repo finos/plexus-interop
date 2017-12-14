@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { LogLevel } from "./LoggerFactory";
+
 export interface Logger {
 
     debug(msg: string, ...args: any[]): void;
@@ -25,5 +27,11 @@ export interface Logger {
     warn(msg: string, ...args: any[]): void;
 
     trace(msg: string, ...args: any[]): void;
+    
+    getLogLevel(): LogLevel;
+
+    isDebugEnabled(): boolean;
+
+    isTraceEnabled(): boolean;
 
 }

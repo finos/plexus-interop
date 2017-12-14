@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using Google.Protobuf;
     using Plexus.Channels;
@@ -22,6 +22,7 @@
     using Plexus.Interop.Testing.Generated;
     using Shouldly;
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -30,6 +31,8 @@
 
     public sealed class ClientBrokerIntegrationTests : TestsSuite
     {
+        private readonly ConcurrentBag<TestBroker> _startedTestBrokers = new ConcurrentBag<TestBroker>();
+
         private static readonly UnaryMethod<EchoRequest, EchoRequest> EchoUnaryMethod =
             Method.Unary<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "Unary");
         
@@ -49,12 +52,22 @@
         private async Task<TestBroker> StartTestBrokerAsync()
         {            
             var broker = RegisterDisposable(new TestBroker());
+            _startedTestBrokers.Add(broker);
             await broker.StartAsync();
             broker.Completion.ContinueWithOnErrorSynchronously(t =>
             {
                 Log.Error(t.Exception.ExtractInner(), "Test broker exited with exception");
             }).IgnoreAwait(Log);
             return broker;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            foreach (var testBroker in _startedTestBrokers)
+            {
+                testBroker.Completion.ShouldCompleteIn(Timeout1Sec);
+            }
         }
 
         [Fact]
@@ -250,12 +263,11 @@
                 var responses = new List<EchoRequest>();
                 var sentRequest = CreateTestRequest();
 
-                async Task HandleAsync(EchoRequest request, IWriteOnlyChannel<EchoRequest> responseStream, MethodCallContext context)
+                async Task HandleAsync(EchoRequest request, IWritableChannel<EchoRequest> responseStream, MethodCallContext context)
                 {
                     Console.WriteLine("Handling invocation");
                     receivedRequest = request;
-                    await responseStream.WriteAsync(request).ConfigureAwait(false);
-                    await Task.Yield();
+                    await responseStream.WriteAsync(request).ConfigureAwait(false);                    
                     await responseStream.WriteAsync(request).ConfigureAwait(false);
                     await responseStream.WriteAsync(request).ConfigureAwait(false);
                     Console.WriteLine("Responses sent");
@@ -272,9 +284,9 @@
                     );                    
                     Console.WriteLine("Starting call");
                     var call = client.Call(EchoServerStreamingMethod, sentRequest);                    
-                    while (await call.ResponseStream.WaitForNextSafeAsync())
+                    while (await call.ResponseStream.WaitReadAvailableAsync())
                     {
-                        while (call.ResponseStream.TryReadSafe(out var item))
+                        while (call.ResponseStream.TryRead(out var item))
                         {
                             responses.Add(item);
                         }
@@ -283,6 +295,52 @@
                 }
                 receivedRequest.ShouldBe(sentRequest);
                 responses.ShouldAllBe(r => r.Equals(sentRequest));
+            });
+        }
+
+        [Fact]
+        public void ServerStreamingCancellation()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                WriteLog("Starting test");
+                var sentRequest = CreateTestRequest();
+                var serverCallCompletion = new Promise();
+
+                async Task HandleAsync(EchoRequest request, IWritableChannel<EchoRequest> responseStream, MethodCallContext context)
+                {
+                    try
+                    {
+                        WriteLog("Server handling invocation");
+                        await responseStream.WriteAsync(request).ConfigureAwait(false);
+                        WriteLog("Server waiting for cancellation");
+                        await context.CancellationToken.AsTask();
+                    }
+                    catch (Exception ex)
+                    {
+                        serverCallCompletion.TryFail(ex);
+                        throw;
+                    }
+                }
+
+                using (await StartTestBrokerAsync())
+                {
+                    var client = ConnectEchoClient();
+                    ConnectEchoServer(x => x
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            s => s.WithServerStreamingMethod<EchoRequest, EchoRequest>("ServerStreaming", HandleAsync)
+                        )
+                    );
+                    WriteLog("Starting call");
+                    var call = client.Call(EchoServerStreamingMethod, sentRequest);
+                    await call.ResponseStream.ReadAsync();
+                    WriteLog("Cancelling call");
+                    call.CancelAsync().ShouldCompleteIn(Timeout5Sec);
+                    WriteLog("Client call canceled");
+                    serverCallCompletion.Task.ShouldThrow<OperationCanceledException>(Timeout5Sec);
+                    WriteLog("Server call canceled");
+                }
             });
         }
 
@@ -296,9 +354,9 @@
 
                 async Task<EchoRequest> HandleAsync(IReadableChannel<EchoRequest> requestStream, MethodCallContext context)
                 {
-                    while (await requestStream.WaitForNextSafeAsync().ConfigureAwait(false))
+                    while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false))
                     {
-                        while (requestStream.TryReadSafe(out var item))
+                        while (requestStream.TryRead(out var item))
                         {
                             receivedRequests.Add(item);
                         }
@@ -347,12 +405,12 @@
 
                 async Task HandleAsync(
                     IReadableChannel<EchoRequest> requestStream, 
-                    IWriteOnlyChannel<EchoRequest> responseStream, 
+                    IWritableChannel<EchoRequest> responseStream, 
                     MethodCallContext context)
                 {
-                    while (await requestStream.WaitForNextSafeAsync())
+                    while (await requestStream.WaitReadAvailableAsync())
                     {
-                        while (requestStream.TryReadSafe(out var item))
+                        while (requestStream.TryRead(out var item))
                         {
                             await responseStream.WriteAsync(item);
                         }
@@ -381,9 +439,9 @@
                     await call.RequestStream.CompleteAsync();
                     Console.WriteLine("Requests sent");
 
-                    while (await call.ResponseStream.WaitForNextSafeAsync())
+                    while (await call.ResponseStream.WaitReadAvailableAsync())
                     {
-                        while (call.ResponseStream.TryReadSafe(out var item))
+                        while (call.ResponseStream.TryRead(out var item))
                         {
                             responses.Add(item);
                         }
@@ -429,8 +487,8 @@
             {
                 using (await StartTestBrokerAsync())
                 {
-                    var server1 = ConnectEchoServer();
-                    var server2 = ConnectEchoServer();
+                    ConnectEchoServer();
+                    ConnectEchoServer();
                     var client = ConnectEchoClient();
                     var discoveryResults = await client.DiscoverAsync(ServiceDiscoveryQuery.Create(EchoUnaryMethod.Reference.Service));
                     discoveryResults.Count.ShouldBe(1);
@@ -550,7 +608,52 @@
                     serverStreaming.Type.ShouldBe(MethodType.ServerStreaming);
                 }
             });
-        }        
+        }
+
+        [Fact]
+        public void ExceptionWhenTargetAppIsNotRunningAndCannotBeStarted()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var client = ConnectEchoClient();
+                    Should.Throw<Exception>(async () => await client.Call(EchoUnaryMethod, new EchoRequest()), Timeout5Sec);
+                }
+            });
+        }
+
+        [Fact]
+        public void AppLauncherStartAppWhenRequired()
+        {
+            EchoRequest receivedRequest = null;
+
+            Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
+            {
+                receivedRequest = request;
+                return Task.FromResult(request);
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var serverOptionsBuilder = new ClientOptionsBuilder()
+                        .WithDefaultConfiguration("TestBroker")
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
+                        .WithApplicationId("plexus.interop.testing.EchoServer");
+                    var appLauncher = RegisterDisposable(new TestAppLauncher(new [] { serverOptionsBuilder }));
+                    await appLauncher.StartAsync();
+                    var client = ConnectEchoClient();
+                    var request = CreateTestRequest();
+                    var response = await client.Call(EchoUnaryMethod, request);
+                    response.ShouldBe(request);
+                    receivedRequest.ShouldBe(request);
+                }
+            });
+        }
 
         private IClient ConnectEchoClient()
         {

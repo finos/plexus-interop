@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+ namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Channels;
     using Plexus.Interop.Metamodel;
@@ -25,6 +25,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Plexus.Interop.Apps;
     using MethodType = Plexus.Interop.Protocol.Discovery.MethodType;
 
     internal sealed class DiscoveryRequestHandler : IDiscoveryRequestHandler
@@ -33,10 +34,10 @@
 
         private readonly IProtocolImplementation _protocol;
         private readonly IRegistryService _registryService;
-        private readonly IClientConnectionTracker _connectionTracker;
+        private readonly IAppLifecycleManager _connectionTracker;
 
         public DiscoveryRequestHandler(
-            IClientConnectionTracker connectionTracker,
+            IAppLifecycleManager connectionTracker,
             IProtocolImplementation protocol,
             IRegistryService registryService)
         {
@@ -47,7 +48,7 @@
 
         public async Task HandleAsync(
             IServiceDiscoveryRequest request, 
-            IClientConnection sourceConnection, 
+            IAppConnection sourceConnection, 
             ITransportChannel sourceChannel)
         {
             IReadOnlyCollection<(IConsumedMethod Consumed, IProvidedMethod Provided)> methodMatches;
@@ -126,7 +127,7 @@
 
         public async Task HandleAsync(
             IMethodDiscoveryRequest request, 
-            IClientConnection sourceConnection,
+            IAppConnection sourceConnection,
             ITransportChannel sourceChannel)
         {
             Log.Info("Handling method discovery request {{{0}}} from {{{1}}}", request, sourceConnection);

@@ -15,29 +15,32 @@
  * limitations under the License.
  */
 import { EchoServiceInvocationHandler } from "../../src/echo/server/EchoServerGeneratedClient";
-import { StreamingInvocationClient } from "@plexus-interop/client";
+import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
 import { Observer } from "@plexus-interop/common";
 
 import * as plexus from "../../src/echo/gen/plexus-messages";
 
 export class NopServiceHandler implements EchoServiceInvocationHandler {
 
-    public onUnary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
+    public onUnary(context: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
         throw new Error("Not implemented");
     }
 
     public onServerStreaming(
+        context: MethodInvocationContext, 
         request: plexus.plexus.interop.testing.IEchoRequest, 
         hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): void {
         throw new Error("Not implemented");        
     }
 
     public onClientStreaming(
+        context: MethodInvocationContext, 
         hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): Observer<plexus.plexus.interop.testing.IEchoRequest> {
         throw new Error("Not implemented");        
     }
 
     public onDuplexStreaming(
+        context: MethodInvocationContext, 
         hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): Observer<plexus.plexus.interop.testing.IEchoRequest> {
         throw new Error("Not implemented");        
     }

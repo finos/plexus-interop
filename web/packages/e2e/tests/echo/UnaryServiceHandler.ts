@@ -16,15 +16,16 @@
  */
 import { NopServiceHandler } from "./NopServiceHandler";
 import * as plexus from "../../src/echo/gen/plexus-messages";
+import { MethodInvocationContext } from "@plexus-interop/client";
 
 export class UnaryServiceHandler extends NopServiceHandler {
 
-    public constructor(private handler: (request: plexus.plexus.interop.testing.IEchoRequest) => Promise<plexus.plexus.interop.testing.IEchoRequest>) {
+    public constructor(private handler: (context: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest) => Promise<plexus.plexus.interop.testing.IEchoRequest>) {
         super();
     }
 
-    public onUnary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
-        return this.handler(request);
+    public onUnary(context: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
+        return this.handler(context, request);
     }
 
 }

@@ -1,0 +1,137 @@
+{
+	"services": [
+		{
+			"id": "interop.AppLauncherService",
+			"methods": [
+				{
+					"name": "Launch",
+					"input": "interop.AppLaunchRequest",
+					"output": "interop.AppLaunchResponse",
+					"type": "Unary"
+				}
+			]
+		},
+		{
+			"id": "interop.samples.GreetingService",
+			"methods": [
+				{
+					"name": "Unary",
+					"input": "interop.samples.GreetingRequest",
+					"output": "interop.samples.GreetingResponse",
+					"type": "Unary"
+				},
+				{
+					"name": "ServerStreaming",
+					"input": "interop.samples.GreetingRequest",
+					"output": "interop.samples.GreetingResponse",
+					"type": "ServerStreaming"
+				},
+				{
+					"name": "ClientStreaming",
+					"input": "interop.samples.GreetingRequest",
+					"output": "interop.samples.GreetingResponse",
+					"type": "ClientStreaming"
+				},
+				{
+					"name": "DuplexStreaming",
+					"input": "interop.samples.GreetingRequest",
+					"output": "interop.samples.GreetingResponse",
+					"type": "DuplexStreaming"
+				}
+			]
+		}
+	],
+	"applications": [
+		{
+			"id": "interop.ElectronAppLauncher",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.AppLauncherService",
+		     		"title": "AppLauncherService",
+		     		"to": [
+		     			"interop.AppLifecycleManager"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Launch",
+		     				"title": "Launch"
+		     			}
+		     		]
+		     	}
+		     ]
+		  },
+		{
+			"id": "interop.samples.GreetingClient",
+			"consumes": [
+				{
+					"service": "interop.samples.GreetingService",
+					"from": [
+						"interop.samples.*"
+					],
+					"methods": [
+						"Unary",
+						"ServerStreaming",
+						"ClientStreaming",
+						"DuplexStreaming"
+					]
+				}
+		     ],
+		     "provides": [
+		     ]
+		  },
+		{
+			"id": "interop.samples.GreetingServer",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.samples.GreetingService",
+		     		"title": "Greeting service implemented by .NET app",
+		     		"to": [
+		     			"interop.samples.GreetingClient"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Unary",
+		     				"title": "Greeting from .NET app"
+		     			},
+		     			{
+		     				"name": "ServerStreaming",
+		     				"title": "Greetings from .NET app"
+		     			},
+		     			{
+		     				"name": "ClientStreaming",
+		     				"title": "ClientStreaming"
+		     			},
+		     			{
+		     				"name": "DuplexStreaming",
+		     				"title": "DuplexStreaming"
+		     			}
+		     		]
+		     	}
+		     ]
+		  },
+		{
+			"id": "interop.samples.WebGreetingServer",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "interop.samples.GreetingService",
+		     		"title": "GreetingService",
+		     		"to": [
+		     			"interop.samples.GreetingClient"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "Unary",
+		     				"title": "Greeting from Electron Web app"
+		     			}
+		     		]
+		     	}
+		     ]
+		  }
+	]
+}

@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Net.WebSockets;
-using System.Threading.Tasks;
-
 namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
+    using System.Net.WebSockets;
+    using System.Threading.Tasks;
+
     internal interface IWebSocketHandler
     {
         void OnListeningStarted();
 
-        Task HandleAsync(WebSocket socket);        
+        Task<Task> AcceptConnectionAsync(WebSocket socket);        
     }
 }

@@ -14,19 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using NLogManager = NLog.LogManager;
-
 namespace Plexus.Logging.NLog
 {
-    public sealed class LoggerFactory : ILoggerFactory
+    using global::NLog.Config;
+    using System;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using System.Threading.Tasks;
+    using global::NLog.Extensions.Logging;
+    using NLogManager = global::NLog.LogManager;
+
+    internal sealed class LoggerFactory : ILoggerFactory
     {
+        public LoggerFactory()
+        {
+            if (!TryLoadFromWorkDir("Nlog.config"))
+            {
+                TryLoadFromWorkDir("nlog.config");
+            }
+        }
+
+        private static bool TryLoadFromWorkDir(string fileName)
+        {
+            var pathToCheck = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+            if (File.Exists(pathToCheck))
+            {
+                NLogManager.Configuration = new XmlLoggingConfiguration(pathToCheck);
+                NLogManager.ReconfigExistingLoggers();
+                return true;
+            }
+            return false;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogger Create(string name)
         {
             return new Logger(NLogManager.GetLogger(name));
+        }
+
+        public void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
+        {
+            loggerFactory.ConfigureNLog(NLogManager.Configuration);
         }
 
         public Task FlushAsync(TimeSpan timeout)

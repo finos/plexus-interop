@@ -210,8 +210,6 @@ class EchoClientClientImpl implements EchoClientClient {
 
 }
 
-
-
 /**
  * Client API builder
  *
@@ -224,7 +222,6 @@ export class EchoClientClientBuilder {
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
-
 
     public withClientDetails(clientId: ClientConnectRequest): EchoClientClientBuilder {
         this.clientDetails = clientId;

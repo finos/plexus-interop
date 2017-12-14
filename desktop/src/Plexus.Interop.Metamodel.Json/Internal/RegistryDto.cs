@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Metamodel.Json.Internal
+namespace Plexus.Interop.Metamodel.Json.Internal
 {
+    using Newtonsoft.Json;
     using System.Collections.Generic;
     using System.IO;
-    using Newtonsoft.Json;
 
     internal sealed class RegistryDto
     {
@@ -28,12 +28,22 @@
         [JsonProperty("applications")]
         public List<ApplicationDto> Applications { get; set; } = new List<ApplicationDto>();
 
-        public static RegistryDto Load(string filePath)
+        public static RegistryDto LoadFromFile(string filePath)
         {
-            using (StreamReader file = File.OpenText(filePath))
+            using (var file = File.OpenText(filePath))
+            using (var reader = new JsonTextReader(file))
+            {
+                var serializer = new JsonSerializer();
+                return serializer.Deserialize<RegistryDto>(reader);
+            }
+        }
+
+        public static RegistryDto LoadFromStream(Stream stream)
+        {
+            using (var file = new StreamReader(stream))
             using (JsonReader reader = new JsonTextReader(file))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 return serializer.Deserialize<RegistryDto>(reader);
             }
         }

@@ -18,7 +18,7 @@ import { CancellationToken } from "./CancellationToken";
 
 export class AsyncHelper {
 
-    public static readonly STATUS_CHECK_INTERVAL: number = 50;
+    public static readonly STATUS_CHECK_INTERVAL: number = 0;
 
     public static waitFor(
         condition: (() => boolean),

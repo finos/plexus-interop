@@ -16,6 +16,7 @@
         "noImplicitThis": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        "removeComments": false,
         "sourceMap": true,
         "pretty": true,
         "lib": [

@@ -1,2 +1,2 @@
-CD %~dp0apps\GreetingClient\
-start cmd /c GreetingClient.exe
+CD %~dp0
+start /wait %~dp0apps/GreetingClient/GreetingClient.exe

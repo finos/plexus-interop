@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,18 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Protocol.Protobuf;
     using Plexus.Interop.Transport;
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
+    using System;
+    using System.IO;
 
     public static class ClientOptionsBuilderExtensions
     {
-        public static ClientOptionsBuilder WithDefaultConfiguration(this ClientOptionsBuilder builder, string brokerWorkingDir)
+        public static ClientOptionsBuilder WithDefaultConfiguration(
+            this ClientOptionsBuilder builder, 
+            string brokerWorkingDir = null)
         {
+            if (brokerWorkingDir == null)
+            {
+                brokerWorkingDir = Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ?? Directory.GetCurrentDirectory();
+            }
             return builder
                 .WithMarshaller(
                     new ProtobufMarshallerProvider())
@@ -34,7 +42,7 @@
                         ProtocolMessagePool.Instance,
                         new ProtobufProtocolSerializerFactory()))
                 .WithTransport(
-                    new TransportConnectionFactory(
+                    new TransportClient(
                         new PipeTransmissionClient(brokerWorkingDir),
                         new ProtobufTransportProtocolSerializationProvider()));
         }

@@ -16,20 +16,22 @@
  */
 import { NopServiceHandler } from "./NopServiceHandler";
 import * as plexus from "../../src/echo/gen/plexus-messages";
-import { StreamingInvocationClient } from "@plexus-interop/client";
+import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
 
 export class ServerStreamingHandler extends NopServiceHandler {
 
     constructor(private handler: (
+        context: MethodInvocationContext,
         request: plexus.plexus.interop.testing.IEchoRequest, 
         hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => void) {
         super();
     }
 
     public onServerStreaming(
+        context: MethodInvocationContext,        
         request: plexus.plexus.interop.testing.IEchoRequest, 
         hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): void {
-        this.handler(request, hostClient);        
+        this.handler(context, request, hostClient);        
     }
 
 }
