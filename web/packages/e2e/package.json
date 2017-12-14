@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/e2e",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "private": true,
@@ -44,9 +44,9 @@
   },
   "dependencies": {
     "@types/long": "^3.0.31",
-    "@plexus-interop/websocket-transport": "0.1.1",
-    "@plexus-interop/broker": "0.1.1",
-    "@plexus-interop/client": "0.1.1"
+    "@plexus-interop/websocket-transport": "0.1.2",
+    "@plexus-interop/broker": "0.1.2",
+    "@plexus-interop/client": "0.1.2"
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",

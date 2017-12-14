@@ -1,13 +1,13 @@
 {
   "name": "@plexus-interop/ccy-pair-rate-viewer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Quick start Rate Viewer App",
   "main": "index.js",
   "private": true,
   "license": "Apache-2.0",
   "dependencies": {
-    "@plexus-interop/client": "0.1.1",
-    "@plexus-interop/websocket-transport": "0.1.1"
+    "@plexus-interop/client": "0.1.2",
+    "@plexus-interop/websocket-transport": "0.1.2"
   },
   "scripts": {
     "prebuild": "trash dist",

@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/client-api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "Client contracts, shared between client and broker",
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",
-    "@plexus-interop/common": "0.1.1",
+    "@plexus-interop/common": "0.1.2",
     "@types/long": "^3.0.31",
     "loglevel": "^1.4.1",
     "long": "^3.2.0",

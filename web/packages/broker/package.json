@@ -3,7 +3,7 @@
   "types": "dist/main/src/index.d.ts",
   "description": "Plexus Interop Broker",
   "license": "Apache-2.0",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "prebuild": "yarn lint && trash dist",
     "build": "yarn build:main && yarn build:host",
@@ -23,8 +23,8 @@
     "postrepublish": "echo 'Package republished successfully!'"
   },
   "dependencies": {
-    "@plexus-interop/client-api": "0.1.1",
-    "@plexus-interop/transport-common": "0.1.1",
+    "@plexus-interop/client-api": "0.1.2",
+    "@plexus-interop/transport-common": "0.1.2",
     "@types/jstorage": "^0.3.30",
     "jstorage": "^0.4.8",
     "long": "^3.2.0",
