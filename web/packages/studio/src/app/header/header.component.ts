@@ -1,25 +1,28 @@
+import { Subscription } from 'rxjs/Subscription';
 import { App } from './../services/model';
 import { IAppState } from '../services/store';
 import { NgRedux, select } from '@angular-redux/store';
 import { AppActions } from '../services/app.actions';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/operator/combineLatest';
 import { Router } from '@angular/router';
+import { ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
-  @select('metadataUrl') readonly metadataUrl$: Observable<string>
-  @select('connected') readonly connected$: Observable<boolean>
+export class HeaderComponent implements OnInit, OnDestroy {
+  @select('metadataUrl') readonly metadataUrl$: Observable<string>;
+  @select('connected') readonly connected$: Observable<boolean>;
+  @select('application') readonly application$: Observable<App>;
 
-  
-  @select('application') readonly application$: Observable<App>
+  currentApp: App;
 
-  appConnected$: Observable<boolean>;
-  appName$: Observable<string>
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private actions: AppActions,
@@ -28,8 +31,13 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.appName$ = this.application$.map(app => app && app.name);
-    this.appConnected$ = this.application$.map(app => !!app);
+    this.subscriptions.push(this.application$.subscribe(app => this.currentApp = app));
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    });
   }
 
   disconnectFromPlexus() {
@@ -40,5 +48,12 @@ export class HeaderComponent implements OnInit {
   disconnectFromApp() {
     this.ngRedux.dispatch(this.actions.disconnectFromApp());
     this.router.navigate(['/apps']);
+  }
+
+  openCurrentApp() {
+    if (this.currentApp) {
+      this.ngRedux.dispatch(this.actions.connectToApp(this.currentApp));
+      this.router.navigate(['/app']);
+    }
   }
 }

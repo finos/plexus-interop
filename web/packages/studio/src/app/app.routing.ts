@@ -11,5 +11,5 @@ export const AppRoutes: Routes = [
   { path: 'apps', component: AppListComponent, resolve: [] },
   { path: 'app', component: AppServicesComponent },
   { path: 'consumed', component: ConsumedServiceComponent },
-  { path: 'consumed', component: ProvidedServiceComponent }
+  { path: 'provided', component: ProvidedServiceComponent }
 ];
