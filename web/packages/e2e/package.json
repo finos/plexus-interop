@@ -25,18 +25,22 @@
     "republish": "npm run unpublish && npm i && npm run publish-package",
     "postrepublish": "echo 'Package republished successfully!'",
     "prepare-native-e2e-tests": "node scripts/browserify-all.js --coverage true --inputGlob dist/main/tests/native/*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
-    "prepare-web-e2e-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/web/*spec.js --outputFile dist/main/tests/web/RendererProcess.bundle.js",
     "build-host-proxy": "node scripts/browserify-all.js --standalone proxyHost --inputGlob dist/main/tests/common/TestCrossDomainHost.js --outputFile dist/main/tests/web/CrossDomainHost.bundle.js",
+   
     "prepare-native-e2e-debug-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
     "prepare-native-e2e-benchmarks": "node scripts/browserify-all.js --inputGlob dist/main/tests/benchmarks/*spec.js --outputFile dist/main/tests/benchmarks/RendererProcessBenchmarks.bundle.js",
     "native-broker-tests": "npm run prepare-native-e2e-tests && node scripts/native-e2e-tests-launcher.js --file ./dist/main/tests/native/RendererProcess.bundle.js",
-    "web-broker-tests": "npm run prepare-web-e2e-tests && node scripts/web-e2e-tests-launcher.js --file ./dist/main/tests/web/RendererProcess.bundle.js",
-    "run-ws-broker-benchmarks": "npm run prepare-native-e2e-benchmarks && node scripts/native-e2e-tests-launcher.js --file ./dist/main/tests/benchmarks/RendererProcessBenchmarks.bundle.js",
-    "e2e-native": "npm run build && npm run native-broker-tests",
+   
     "e2e-web": "npm run build && npm run web-broker-tests",
+    "web-broker-tests": "npm run prepare-web-e2e-tests && node scripts/web-e2e-tests-launcher.js --file ./dist/main/tests/web/RendererProcess.bundle.js",
+    "prepare-web-e2e-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/web/*spec.js --outputFile dist/main/tests/web/RendererProcess.bundle.js",
+
+    "run-ws-broker-benchmarks": "npm run prepare-native-e2e-benchmarks && node scripts/native-e2e-tests-launcher.js --file ./dist/main/tests/benchmarks/RendererProcessBenchmarks.bundle.js",   
+    "e2e-native": "npm run build && npm run native-broker-tests",
     "e2e-native-benchmarks": "npm run build && npm run run-ws-broker-benchmarks",
     "e2e-native-debug": "npm run build && npm run prepare-native-e2e-debug-tests && node scripts/native-e2e-tests-launcher.js --printBrokerStdout true --debug true --file ./dist/main/tests/native/RendererProcess.bundle.js",
     "copy-assets": "copyfiles src/echo/gen/* dist/main && copyfiles src/views/* dist/main"
+    
   },
   "dependencies": {
     "@types/long": "^3.0.31",

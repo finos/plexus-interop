@@ -6,10 +6,11 @@
   "version": "0.1.1",
   "scripts": {
     "prebuild": "yarn lint && trash dist",
-    "build": "yarn build:main",
+    "build": "yarn build:main && yarn build:host",
     "postbuild": "yarn test",
     "build:main": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json",
+    "build:host": "browserify dist/main/src/api/CrossDomainHostBuilder.js -s proxyHost -o dist/main/src/CrossDomainHostBuilder.bundle.js",
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "pretest": "yarn lint",
@@ -41,6 +42,7 @@
     "jasmine-reporters": "^2.2.0",
     "jest": "~18.1.0",
     "trash-cli": "^1.4.0",
+    "browserify": "^14.4.0",
     "tslint": "^5.6.0",
     "typescript": "2.6.1",
     "yarn": "^1.1.0"

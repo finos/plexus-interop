@@ -17,10 +17,11 @@
 import { EventBus } from "../bus/EventBus";
 import { CrossDomainHost } from "../bus/cross/host/CrossDomainHost";
 import { CrossDomainHostConfig } from "../bus/cross/host/CrossDomainHostConfig";
+import { JStorageEventBus } from "../bus/same/JStorageEventBus";
 
 export class CrossDomainHostBuilder {
 
-    private eventBus: EventBus;
+    private eventBus: EventBus = new JStorageEventBus();
 
     private crossDomainConfig: CrossDomainHostConfig;
 
