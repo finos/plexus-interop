@@ -16,5 +16,7 @@
  */
 export * from "./apps/json/JsonAppRegistryProvider";
 export * from "./apps/AppRegistryProvider";
+export * from "./apps/AppRegistryService";
 export * from "./interop/InteropRegistryProvider";
 export * from "./interop/json/JsonInteropRegistryProvider";
+export * from "./interop/InteropRegistryService";

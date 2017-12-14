@@ -20,12 +20,15 @@ import { LoggerFactory, Observer, Logger } from "@plexus-interop/common";
 import { InvocationRequestHandler } from "./InvocationRequestHandler";
 import { Observable } from "rxjs/Observable";
 import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
+import { DiscoveryRequestHandler } from "./DiscoveryRequestHandler";
 
 export class ClientRequestProcessor {
 
     private readonly log: Logger = LoggerFactory.getLogger("ClientRequestProcessor");
 
-    constructor(private readonly invocationRequestProcessor: InvocationRequestHandler) { }
+    constructor(
+        private readonly invocationRequestProcessor: InvocationRequestHandler, 
+        private readonly discoveryRequestHandler: DiscoveryRequestHandler) { }
 
     public async handle(channel: TransportChannel, sourceConnection: ApplicationConnection): Promise<Completion> {
 
@@ -49,15 +52,26 @@ export class ClientRequestProcessor {
                             const $inMessagesObservable = new Observable<ArrayBuffer>(observer => {
                                 channelObserver = observer;
                             });
-                            const result = await this.invocationRequestProcessor.handleRequest(
+                            try {
+                                const result = await this.invocationRequestProcessor.handleRequest(
                                 $inMessagesObservable,
                                 clientToBrokerRequest.invocationStartRequest,
                                 channel,
                                 sourceConnection.descriptor);
-                            resolve(result);
+                                resolve(result);
+                            } catch (error) {
+                                reject(error);
+                            }
+                        } else if (clientToBrokerRequest.methodDiscoveryRequest) {
+                            try {
+                                await this.discoveryRequestHandler.handleMethodDiscovery(clientToBrokerRequest.methodDiscoveryRequest, channel, sourceConnection);
+                                resolve();
+                            } catch (error) {
+                                reject(error);
+                            }
                         } else {
-                            // TODO support discovery
-                            this.log.error("Nor supported request received", JSON.stringify(clientToBrokerRequest));
+                            // TODO support service discovery
+                            this.log.error("Not supported request received", JSON.stringify(clientToBrokerRequest));
                         }
                     } else {
                         channelObserver.next(messagePayload);

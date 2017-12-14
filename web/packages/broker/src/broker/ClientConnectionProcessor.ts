@@ -71,12 +71,10 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                     }
                 },
                 complete: () => {
-                    // TODO clean up
                     log.debug(`Channel subscrition completed for connection [${connection.uuid().toString()}]`);
                     resolve(new SuccessCompletion());
                 },
                 error: e => {
-                    // TODO clean up
                     log.error(`Error received for channels subscription [${connection.uuid().toString()}]`, e);
                     reject(new ErrorCompletion(e));
                 }

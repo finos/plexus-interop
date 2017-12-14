@@ -64,6 +64,12 @@ describe("Web Broker: Streaming invocations", () => {
         return clientStreamingTests.testClientCanSendStreamToServer();
     });
 
+    // TODO fix test with cancel of invocation
+    // 
+    // it("Client can cancel invocation", function() {
+    //     return bidiStreamingTests.testClientCanCancelInvocation();
+    // });
+
     it("Client receives exception from server", function() {
         return serverStreamingTests.testServerExceptionReceivedByClient();
     });

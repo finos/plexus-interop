@@ -24,6 +24,7 @@ import { InteropRegistryProvider } from "../metadata/interop/InteropRegistryProv
 import { InteropRegistryService } from "../metadata/interop/InteropRegistryService";
 import { ClientRequestProcessor } from "./ClientRequestProcessor";
 import { AppRegistryService } from "../metadata/apps/AppRegistryService";
+import { DiscoveryRequestHandler } from "./DiscoveryRequestHandler";
 
 export class Broker {
 
@@ -40,7 +41,8 @@ export class Broker {
         const authHandler = new AuthenticationHandler(this.appService);
         const registryService = new InteropRegistryService(this.registryProvider);
         const invocationRequestHandler = new InvocationRequestHandler(registryService, this.appLifeCycleManager);
-        const clientRequestProcessor = new ClientRequestProcessor(invocationRequestHandler);
+        const discoveryRequestHandler = new DiscoveryRequestHandler(appLifeCycleManager, appService, registryService);
+        const clientRequestProcessor = new ClientRequestProcessor(invocationRequestHandler, discoveryRequestHandler);
         this.connectionProcessor = new ClientConnectionProcessor(authHandler, clientRequestProcessor, this.appLifeCycleManager);
         this.log.trace("Created");
     }

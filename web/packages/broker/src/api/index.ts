@@ -17,3 +17,4 @@
 export * from "./WebBrokerConnectionBuilder";
 export * from "./CrossDomainHostBuilder";
 export * from "./CrossDomainEventBusProvider";
+export * from "./AppLifeCycleConfig";

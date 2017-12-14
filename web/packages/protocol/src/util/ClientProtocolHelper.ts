@@ -70,6 +70,10 @@ export class ClientProtocolHelper {
         });
     }
 
+    public static discoveryMethodResponsePayload(header: plexus.interop.protocol.IMethodDiscoveryResponse): ArrayBuffer {
+        return Arrays.toArrayBuffer(protocol.MethodDiscoveryResponse.encode(header).finish());
+    }
+
     public static discoveryResponsePayload(request: plexus.interop.protocol.IServiceDiscoveryResponse): ArrayBuffer {
         return Arrays.toArrayBuffer(protocol.ServiceDiscoveryResponse.encode(request).finish());
     }
