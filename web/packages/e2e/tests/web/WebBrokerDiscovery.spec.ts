@@ -16,18 +16,18 @@
  */
 import { ClientsSetup } from "../common/ClientsSetup";
 import { TransportsSetup } from "../common/TransportsSetup";
-import { readWsUrl } from "../common/utils";
+import { readHostUrl } from "../common/utils";
 import { DiscoveryTests } from "../echo/DiscoveryTests";
 
-describe("Client: Web Socket Discovery", () => {
+describe("Web Broker: Discovery", () => {
 
-    const clientsSetup = new ClientsSetup();
+    const clientsSetup = new ClientsSetup(500);
     const transportsSetup = new TransportsSetup();
 
-    const wsUrl = readWsUrl();    
-    
+    const proxyHost = readHostUrl();
+
     const discoveryTests = new DiscoveryTests(
-        transportsSetup.createWebSocketTransportProvider(wsUrl),
+        transportsSetup.createCrossDomainTransportProvider(proxyHost),
         clientsSetup);
 
     it("Receives discovered methods by input message id", function() {
@@ -41,23 +41,6 @@ describe("Client: Web Socket Discovery", () => {
 
     it("Receives discovered methods by method reference", function() {
         return discoveryTests.testMethodDiscoveredByReference();
-    });
-
-    it("Receives discovered service by service ID", function() {
-        return discoveryTests.testServiceDiscoveredById();
-    });
-
-    it("Can invoke discovered unary method passing serialized data", function() {
-        this.timeout(3000);
-        return discoveryTests.testClientCanInvokeDiscoveredMethod();
-    });
-
-    it("Can invoke discovered server streaming method passing serialized data", function() {
-        return discoveryTests.testClientCanInvokeDiscoveredServerStreamingRequest();
-    });
-
-    it("Can invoke discovered bidi streaming method passing serialized data", function() {
-        return discoveryTests.testClientCanInvokeDiscoveredBidiStreamingRequest();
     });
 
 });
