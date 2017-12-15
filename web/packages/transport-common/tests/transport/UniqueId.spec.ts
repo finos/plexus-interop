@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId } from "../../src/transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { GUID } from "@plexus-interop/common";
 
 describe("UniqueId", () => {

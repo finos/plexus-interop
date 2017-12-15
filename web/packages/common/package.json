@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/common",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "Common functionality for Plexus Interop Web",
@@ -10,6 +10,7 @@
     "build": "yarn build:main",
     "postbuild": "yarn test",
     "build:main": "tsc -p tsconfig.json",
+    "build:watch": "tsc -w -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "test": "yarn unit",
@@ -44,7 +45,7 @@
     "trash-cli": "^1.4.0",
     "ts-mockito": "2.0.2",
     "tslint": "^4.5.1",
-    "typescript": "~2.3.4",
+    "typescript": "2.6.1",
     "yarn": "^1.1.0"
   },
   "jest": {

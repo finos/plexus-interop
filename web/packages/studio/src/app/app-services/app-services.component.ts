@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-services',
   templateUrl: './app-services.component.html',
-  styleUrls: ['./app-services.component.scss']
+  styleUrls: ['./app-services.component.css']
 })
 export class AppServicesComponent implements OnInit {
 

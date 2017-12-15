@@ -17,7 +17,7 @@
 import { GenericClientApi } from "./GenericClientApi";
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { GenericClientFactory } from "../../generic/GenericClientFactory";
-import { ClientConnectRequest } from "../../../client/api/dto/ClientConnectRequest";
+import { ClientConnectRequest } from "@plexus-interop/client-api";
 import { GenericClientApiImpl } from "./GenericClientApiImpl";
 import { GenericInvocationsHost } from "./GenericInvocationsHost";
 import { GenericUnaryInvocationHandler } from "./GenericUnaryInvocationHandler";

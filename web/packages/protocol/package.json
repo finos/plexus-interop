@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/protocol",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "Plexus Internal Protocol",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "trash-cli": "^1.4.0",
-    "typescript": "~2.3.4",
+    "typescript": "2.6.1",
     "yarn": "^1.1.0",
     "copyfiles": "^1.2.0",
     "espree": "^3.4.3"

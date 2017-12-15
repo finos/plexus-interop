@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { Observer } from "@plexus-interop/common";
-import { UniqueId } from "../src/transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 
 export class LogObserver<T> implements Observer<T> {
 
@@ -26,7 +26,7 @@ export class LogObserver<T> implements Observer<T> {
     }
 
     public next(data: T): void {
-        console.log(`${this.id.toString()} - Next`, data);        
+        console.log(`${this.id.toString()} - Next`);        
         if (this._next) {
             this._next(data);
         }

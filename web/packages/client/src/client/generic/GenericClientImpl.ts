@@ -18,23 +18,26 @@ import { GenericClient } from "./GenericClient";
 import { Invocation } from "../../client/generic/Invocation";
 import { GenericInvocation } from "./GenericInvocation";
 import { TransportChannel, TransportConnection } from "@plexus-interop/transport-common";
-import { InvocationRequestInfo } from "./InvocationMetaInfo";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
 import { RequestedInvocation } from "./RequestedInvocation";
 import { StateMaschine, StateMaschineBase, CancellationToken, Logger, LoggerFactory } from "@plexus-interop/common";
 import { AcceptedInvocation } from "./AcceptedInvocation";
 import { Observer } from "@plexus-interop/common";
-import { ServiceDiscoveryRequest } from "../api/dto/ServiceDiscoveryRequest";
-import { ServiceDiscoveryResponse } from "../api/dto/ServiceDiscoveryResponse";
+import { ServiceDiscoveryRequest } from "@plexus-interop/client-api";
+import { ServiceDiscoveryResponse } from "@plexus-interop/client-api";
 import { SingleMessageRequest } from "./SingleMessageRequst";
-import { ClientProtocolHelper as modelHelper } from "./ClientProtocolHelper";
-import { clientProtocol as plexus, SuccessCompletion } from "@plexus-interop/protocol";
-import { MethodDiscoveryRequest } from "../api/dto/MethodDiscoveryRequest";
-import { MethodDiscoveryResponse } from "../api/dto/MethodDiscoveryResponse";
-import { ProvidedMethodReference } from "../api/dto/ProvidedMethodReference";
+import { ClientProtocolHelper as modelHelper } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, SuccessCompletion, InvocationRequestInfo } from "@plexus-interop/protocol";
+import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
+import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
+import { ProvidedMethodReference } from "@plexus-interop/client-api";
 import { RequestedDiscoveredInvocation } from "./RequestedDiscoveredInvocation";
 
-enum ClientState { CREATED, LISTEN, CLOSED };
+enum ClientState {
+    CREATED = "CREATED",
+    LISTEN = "LISTEN",
+    CLOSED = "CLOSED"
+}
 
 export class GenericClientImpl implements GenericClient {
 
@@ -54,7 +57,7 @@ export class GenericClientImpl implements GenericClient {
             {
                 from: ClientState.LISTEN, to: ClientState.CLOSED, preHandler: async () => this.cancellationToken.cancel("Closed")
             }
-        ]);
+        ], this.log);
         this.log.trace("Created");
     }
 
@@ -96,17 +99,17 @@ export class GenericClientImpl implements GenericClient {
             .execute(requestPayload, (responsePayload) => modelHelper.decodeServiceDiscoveryResponse(responsePayload))
             .then(response => {
                 this.log.debug(`Discovery Service response received`);
-                return response;
+                return response as ServiceDiscoveryResponse;
             });
     }
 
     public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
         const requestPayload = modelHelper.discoveryMethodRequestPayload(discoveryRequest);
-        return new SingleMessageRequest<plexus.interop.protocol.IMethodDiscoveryRequest>(this.transportConnection, this.log)
+        return new SingleMessageRequest<plexus.interop.protocol.IMethodDiscoveryResponse>(this.transportConnection, this.log)
             .execute(requestPayload, (responsePayload) => modelHelper.decodeMethodDiscoveryResponse(responsePayload))
             .then(response => {
                 this.log.debug(`Discovery Method response received`);
-                return response;
+                return response as MethodDiscoveryResponse;
             });
     }
 
@@ -116,18 +119,24 @@ export class GenericClientImpl implements GenericClient {
 
     private async startIncomingChannelsListener(observer: Observer<TransportChannel>): Promise<void> {
         this.log.debug("Started to listen for channels");
-        while (this.state.is(ClientState.LISTEN)) {
-            try {
-                const channel: TransportChannel = await this.transportConnection.waitForChannel(this.cancellationToken);
-                this.log.debug("Channel received");
-                observer.next(channel);
-            } catch (error) {
-                this.log.error("Error while reading frame", error);
+        this.transportConnection.subscribeToChannels({
+            next: channel => {
+                if (this.state.is(ClientState.LISTEN)) {
+                    this.log.debug("Channel received");
+                    observer.next(channel);
+                } else {
+                    this.log.warn(`State is ${this.state.getCurrent()}, skip incoming channel`);
+                }
+            },
+            complete: () => {
+                this.log.debug("Channels subscription complted");
+                observer.complete();
+            },
+            error: e => {
+                this.log.error("Error while receceivign channel", e);
                 this.state.go(ClientState.CLOSED);
             }
-        }
-        this.log.debug("Finished to listen for Channels");
-        observer.complete();
+        });
     }
 
 }

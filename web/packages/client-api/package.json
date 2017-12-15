@@ -1,0 +1,42 @@
+{
+  "name": "@plexus-interop/client-api",
+  "version": "0.1.2",
+  "types": "dist/main/src/index.d.ts",
+  "main": "dist/main/src/index.js",
+  "description": "Client contracts, shared between client and broker",
+  "license": "Apache-2.0",
+  "scripts": {
+    "prebuild": "yarn lint && trash dist",
+    "build": "yarn build:main",
+    "build:main": "tsc -p tsconfig.json",
+    "lint": "tslint src/**/*.ts",
+    "unpublish": "npm unpublish @plexus-interop/client-api@0.1.1",
+    "postunpublish": "echo 'Unpublished'",
+    "prerepublish": "echo 'Republishing started...'",
+    "publish-package": "npm run build && npm publish",
+    "republish": "npm run unpublish && npm i && npm run publish-package",
+    "postrepublish": "echo 'Package republished successfully!'"
+  },
+  "dependencies": {
+    "@types/loglevel": "^1.4.29",
+    "@plexus-interop/common": "0.1.2",
+    "@types/long": "^3.0.31",
+    "loglevel": "^1.4.1",
+    "long": "^3.2.0",
+    "reflect-metadata": "^0.1.10",
+    "tslib": "^1.6.0"
+  },
+  "devDependencies": {
+    "trash": "^4.1.0",
+    "trash-cli": "^1.4.0",
+    "tslint": "^4.5.1",
+    "typescript": "2.6.1",
+    "yarn": "^1.1.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  }
+}

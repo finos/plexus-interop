@@ -24,3 +24,9 @@ export function readWsUrl(): string {
     const wsUrl = args.filter(v => v.indexOf("ws://") !== -1)[0];
     return wsUrl;
 }
+
+export function readHostUrl(): string {
+    const args: string[] = readEncodedConfig().rawArgs;
+    const hostUrl = args.filter(v => v.indexOf("http://") !== -1)[0];
+    return hostUrl;
+}

@@ -17,9 +17,9 @@
 import { GenericInvocation } from "../../src/client/generic/GenericInvocation";
 import { InvocationState } from "../../src/client/generic/InvocationState";
 import { clientProtocol as plexus } from "@plexus-interop/protocol";
-import { InvocationMetaInfo } from "../../src/client/generic/InvocationMetaInfo";
+import { InvocationMetaInfo } from "@plexus-interop/protocol";
 import { UniqueId, DelegateChannelObserver } from "@plexus-interop/transport-common";
-import { ClientProtocolHelper as modelHelper } from "../../src/client/generic/ClientProtocolHelper";
+import { ClientProtocolHelper as modelHelper } from "@plexus-interop/protocol";
 import { randomPayload } from "../utils";
 import { AsyncHelper, Observer } from "@plexus-interop/common";
 import { LogObserver } from "../LogObserver";
@@ -212,7 +212,7 @@ describe("Invocation", () => {
         addToInbox(modelHelper.invocationStartingMessagePayload({}));
         addToInbox(modelHelper.invocationStartedMessagePayload({}));
         
-        return startedPromise.then(() => UniqueId.generateNew());
+        return startedPromise.then<UniqueId>(() => UniqueId.generateNew());
     }
 
 });

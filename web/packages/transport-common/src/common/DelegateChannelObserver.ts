@@ -18,7 +18,6 @@ import { ChannelObserver } from "./ChannelObserver";
 import { AnonymousSubscription } from "rxjs/Subscription";
 import { Observer } from "@plexus-interop/common";
 
-
 export class DelegateChannelObserver<T> implements ChannelObserver<AnonymousSubscription, T> {
 
     constructor(private baseObserver: Observer<T>,

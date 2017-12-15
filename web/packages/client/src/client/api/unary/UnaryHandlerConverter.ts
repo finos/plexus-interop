@@ -20,7 +20,7 @@ import { StreamingInvocationClient } from "../streaming/StreamingInvocationClien
 import { ClientDtoUtils } from "../../ClientDtoUtils";
 import { InvocationHandlerConverter } from "../InvocationHandlerConverter";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { MethodInvocationContext } from "../MethodInvocationContext";
+import { MethodInvocationContext } from "@plexus-interop/client-api";
 
 export class UnaryHandlerConverter implements InvocationHandlerConverter<SimpleUnaryInvocationHandler<ArrayBuffer, ArrayBuffer>> {
 

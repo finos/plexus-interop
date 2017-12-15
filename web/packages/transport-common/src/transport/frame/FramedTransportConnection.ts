@@ -21,12 +21,11 @@ import { TransportConnection } from "../TransportConnection";
 import { FramedTransportChannel } from "./FramedTransportChannel";
 import { BufferedTransportProxy } from "./BufferedTransportProxy";
 import { TransportChannel } from "../TransportChannel";
-import { UniqueId } from "../UniqueId";
-import { transportProtocol as plexus, ClientProtocolUtils, ClientError, SuccessCompletion } from "@plexus-interop/protocol";
+import { UniqueId, ClientProtocolUtils, ClientError, SuccessCompletion } from "@plexus-interop/protocol";
+import { transportProtocol as plexus } from "@plexus-interop/protocol";
 import { TransportFrameHandler } from "./TransportFrameHandler";
-import { ChannelsHolder } from "../../common/ChannelsHolder";
-import { BufferedChannelsHolder } from "../../common/BufferedChannelsHolder";
-import { StateMaschineBase, StateMaschine, CancellationToken, LoggerFactory, Logger, ReadWriteCancellationToken } from "@plexus-interop/common";
+import { StateMaschineBase, StateMaschine, LoggerFactory, Logger, ReadWriteCancellationToken, Observer, BufferedObserver, Subscription, AnonymousSubscription } from "@plexus-interop/common";
+import { TransportFrameListener } from "./TransportFrameListener";
 
 export type ConnectionState = "CREATED" | "ACCEPT" | "OPEN" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED" | "CLOSED";
 
@@ -44,19 +43,23 @@ type ChannelDescriptor = {
     channelTransportProxy: BufferedTransportProxy
 };
 
-export class FramedTransportConnection extends TransportFrameHandler implements TransportConnection {
+export class FramedTransportConnection implements TransportConnection, TransportFrameListener {
 
     private log: Logger;
 
     private connectionCancellationToken: ReadWriteCancellationToken = new ReadWriteCancellationToken();
 
-    private channelsHolder: ChannelsHolder<TransportChannel, ChannelDescriptor> = new BufferedChannelsHolder<TransportChannel, ChannelDescriptor>();
+    private channelObserver: BufferedObserver<TransportChannel>;
+
+    private channelsHolder: Map<string, ChannelDescriptor> = new Map();
+
+    private framesHandler: TransportFrameHandler = new TransportFrameHandler();
 
     private readonly stateMachine: StateMaschine<ConnectionState>;
 
     constructor(private framedTransport: ConnectableFramedTransport) {
-        super();
         this.log = LoggerFactory.getLogger(`FramedTransportConnection [${this.uuid().toString()}]`);
+        this.channelObserver = new BufferedObserver(1024, this.log);
         this.stateMachine = this.createStateMaschine();
         this.log.debug("Created");
     }
@@ -81,17 +84,17 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         }
     }
 
-    public waitForChannel(cancellationToken: CancellationToken = new CancellationToken()): Promise<TransportChannel> {
-        this.stateMachine.throwIfNot(ConnectionState.OPEN);
-        return this.channelsHolder.waitForIncomingChannel(cancellationToken);
-    }
-
     public getManagedChannels(): TransportChannel[] {
         const result: TransportChannel[] = [];
-        this.channelsHolder.getChannels().forEach(value => {
+        this.channelsHolder.forEach(value => {
             result.push(value.channel);
         });
         return result;
+    }
+
+    public getManagedChannel(id: string): TransportChannel | undefined {
+        const descriptor = this.channelsHolder.get(id);
+        return descriptor ? descriptor.channel : undefined;
     }
 
     public async createChannel(): Promise<TransportChannel> {
@@ -108,13 +111,29 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         return this.framedTransport.uuid();
     }
 
-    public async open(): Promise<void> {
-        this.log.debug("Opening connection");
+    public isConnected(): boolean {
+        return !this.stateMachine.isOneOf(ConnectionState.CREATED, ConnectionState.CLOSED);
+    }
+
+    public subscribeToChannels(channelObserver: Observer<TransportChannel>): Subscription {
+        this.log.debug("Received channels observer");        
+        this.channelObserver.setObserver(channelObserver);
+        return new AnonymousSubscription();
+    }
+
+    public async connect(channelObserver?: Observer<TransportChannel>): Promise<void> {
+        this.log.debug(`Opening connection, channel observer ${!!channelObserver ? "provided" : "not provided"}`);
+        if (channelObserver) {
+            this.channelObserver.setObserver(channelObserver);
+        }
         return this.stateMachine.goAsync(ConnectionState.OPEN);
     }
 
-    public async acceptingConnection(): Promise<void> {
-        this.log.debug("Accepting connection");
+    public async acceptingConnection(channelObserver?: Observer<TransportChannel>): Promise<void> {
+        this.log.debug(`Accepting connection, channel observer ${!!channelObserver ? "provided" : "not provided"}`);
+        if (channelObserver) {
+            this.channelObserver.setObserver(channelObserver);
+        }
         return this.stateMachine.goAsync(ConnectionState.ACCEPT);
     }
 
@@ -160,7 +179,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             {
                 from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED
             }
-        ]);
+        ], this.log);
     }
 
     private async sendConnectionCloseMessage(completion?: plexus.ICompletion): Promise<void> {
@@ -188,12 +207,12 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         }
         this.connectionCancellationToken.cancel("Connection is closed");
         this.stateMachine.go(ConnectionState.CLOSED);
-        this.channelsHolder.getChannels().forEach((value, key: string) => {
+        this.channelsHolder.forEach((value, key: string) => {
             this.log.debug(`Cleaning channel ${key}`);
             value.channel.closeInternal("Transport connection closed");
             value.channelTransportProxy.clear();
         });
-        this.channelsHolder.clearAll();
+        this.channelsHolder.clear();
         this.disconnectFromSource()
             .catch(e => this.log.error("Failed to disconnect from source", e));
     }
@@ -217,7 +236,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
                     ConnectionState.CLOSE_REQUESTED,
                     ConnectionState.OPEN,
                     ConnectionState.ACCEPT)) {
-                    this.handleFrame(frame, this.log);
+                    this.framesHandler.handleFrame(frame, this.log, this);
                 } else {
                     this.log.warn("Not connected, dropping frame");
                 }
@@ -264,7 +283,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         this.log.trace("Received channel open frame");
         const channelId = UniqueId.fromProperties(frame.getHeaderData().channelId as plexus.IUniqueId);
         this.log.debug(`Received open channel request ${channelId}`);
-        if (!this.channelsHolder.channelExists(channelId.toString())) {
+        if (!this.channelsHolder.has(channelId.toString())) {
             this.createInChannel(channelId);
         } else {
             this.log.warn(`Channel ${channelId.toString()} already exist`);
@@ -278,8 +297,8 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Received channel close frame, channelId ${strChannelId}`);
         }
-        if (this.channelsHolder.channelExists(strChannelId)) {
-            const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
+        if (this.channelsHolder.has(strChannelId)) {
+            const channelDescriptor = this.channelsHolder.get(strChannelId) as ChannelDescriptor;
             this.log.debug("Pass close frame to channel", strChannelId);
             channelDescriptor.channelTransportProxy.next(frame);
             channelDescriptor.channelTransportProxy.complete();
@@ -298,10 +317,6 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         }
     }
 
-    public getIncomingChannelsSize(): number {
-        return this.channelsHolder.getIncomingChannelsSize();
-    }
-
     public handleMessageFrame(frame: MessageFrame): void {
         const channelIdProps = frame.getHeaderData().channelId as plexus.IUniqueId;
         const channelId = UniqueId.fromProperties(channelIdProps);
@@ -310,7 +325,7 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Received message frame, channelId ${strChannelId}`);
         }
-        const channelExists = this.channelsHolder.channelExists(strChannelId);
+        const channelExists = this.channelsHolder.has(strChannelId);
         if (!channelExists) {
             // not first frame, however no buffer exist
             this.log.error(`Dropped frame, no incoming buffer exist for ${strChannelId}`);
@@ -320,13 +335,13 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             if (this.log.isDebugEnabled()) {
                 this.log.debug(`Received data frame for channel ${strChannelId}`);
             }
-            const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
+            const channelDescriptor = this.channelsHolder.get(strChannelId) as ChannelDescriptor;
             channelDescriptor.channelTransportProxy.next(frame);
         }
     }
 
     private reportErrorToChannels(error: any): void {
-        this.channelsHolder.getChannels().forEach((value, key: string) => {
+        this.channelsHolder.forEach((value, key: string) => {
             value.channelTransportProxy.error(error);
         });
     }
@@ -349,16 +364,16 @@ export class FramedTransportConnection extends TransportFrameHandler implements 
             if (this.log.isDebugEnabled()) {
                 this.log.debug(`Dispose called on ${strChannelId} channel`);
             }
-            if (this.channelsHolder.channelExists(strChannelId)) {
-                const channelDescriptor = this.channelsHolder.getChannelDescriptor(strChannelId);
+            if (this.channelsHolder.has(strChannelId)) {
+                const channelDescriptor = this.channelsHolder.get(strChannelId) as ChannelDescriptor;
                 channelDescriptor.channelTransportProxy.clear();
-                this.channelsHolder.clear(strChannelId);
+                this.channelsHolder.delete(strChannelId);
             }
         };
         const channel = new FramedTransportChannel(channelId, channelTransportProxy, dispose, this.connectionCancellationToken.getWriteToken());
-        this.channelsHolder.addChannelDescriptor(strChannelId, { channel, channelTransportProxy });
+        this.channelsHolder.set(strChannelId, { channel, channelTransportProxy });
         if (isIncomingChannel) {
-            this.channelsHolder.enqueueIncomingChannel(channel);
+            (this.channelObserver as Observer<TransportChannel>).next(channel);
         }
         return { channel, channelTransportProxy };
     }

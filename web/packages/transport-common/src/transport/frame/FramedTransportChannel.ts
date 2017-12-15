@@ -18,7 +18,7 @@ import { MessageFrame, ChannelCloseFrame } from "./model";
 import { FrameHeader } from "./FrameHeader";
 import { TransportChannel } from "../TransportChannel";
 import { FramedTransport } from "./FramedTransport";
-import { UniqueId } from "../../transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { Observer, ReadWriteCancellationToken } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
 import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, StateMaschine, SequencedExecutor } from "@plexus-interop/common";
@@ -93,7 +93,7 @@ export class FramedTransportChannel implements TransportChannel {
                     this.log.warn("Channel forced CREATED -> CLOSED");
                 }
             }
-        ]);
+        ], this.log);
     }
 
     private async handleConnectionError(channelObserver: Observer<ArrayBuffer>, error: any): Promise<void> {
@@ -244,7 +244,9 @@ export class FramedTransportChannel implements TransportChannel {
         this.dispose();
         if (this.onCloseHandler) {
             this.log.debug("Reporting summarized completion");
-            const completion = ClientProtocolUtils.createSummarizedCompletion(this.clientCompletion, this.remoteCompletion || new ErrorCompletion("Remote side not completed"));
+            const completion = ClientProtocolUtils.createSummarizedCompletion(
+                this.clientCompletion, 
+                this.remoteCompletion || new ErrorCompletion(new ClientError("Remote side not completed")));
             if (!ClientProtocolUtils.isSuccessCompletion(completion)) {
                 this.channelObserver.error(error || completion.error);
             }
