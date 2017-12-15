@@ -1,0 +1,12 @@
+import { GenericClientApi, StreamingInvocationClient, ValueHandler, InvocationClient } from "@plexus-interop/client";
+import { InvocationRequestInfo, Completion } from "@plexus-interop/protocol";
+
+export interface InteropClientService {
+
+    sendUnaryRequest(invocationInfo: InvocationRequestInfo, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient>;
+
+    setUnaryActionHandler(serviceId: string, methodId: string, handler: (requestJson: string) => Promise<string>);
+
+    disconnect(): Promise<Completion>;
+
+}
