@@ -1,16 +1,22 @@
 import { Injectable } from "@angular/core";
 import { InteropRegistryService, UrlInteropRegistryProvider, AppRegistryService, UrlAppRegistryProvider } from "@plexus-interop/broker";
 
-@Injectable()
-export class InteropServiceFactory {
+const APP_REGISTY_FILE_NAME = 'apps.json';
+const INTEROP_REGISTY_FILE_NAME = 'interop.json';
 
-    public async getInteropRegistryService(url: string): Promise<InteropRegistryService> {
+@Injectable()
+export class InteropServiceFactory {    
+    public async getInteropRegistryService(baseUrl: string): Promise<InteropRegistryService> {
+        const url = baseUrl + INTEROP_REGISTY_FILE_NAME;
+
         const provider = new UrlInteropRegistryProvider(url);
         await provider.start();
         return new InteropRegistryService(provider);
     }
 
-    public async getAppRegistryService(url: string): Promise<AppRegistryService> {
+    public async getAppRegistryService(baseUrl: string): Promise<AppRegistryService> {
+        const url = baseUrl + APP_REGISTY_FILE_NAME;
+
         const provider = new UrlAppRegistryProvider(url);
         await provider.start();
         return new AppRegistryService(provider);

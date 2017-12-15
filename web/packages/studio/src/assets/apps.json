@@ -1,0 +1,24 @@
+{
+  "apps": [
+    {
+      "id": "com.db.autobahn.WebAppLauncher",
+      "displayName": "Autobahn Web App Launcher"
+    },
+    {
+      "id": "com.db.cm.CashManager",
+      "displayName": "Cash Manager",
+      "launcherId": "com.db.autobahn.WebAppLauncher",
+      "launcherParams": {
+          "appKey": "CM"
+      }
+    },
+    {
+      "id": "com.db.ci.CashInquiry",
+      "displayName": "Cash Inquiry",
+      "launcherId": "com.db.autobahn.WebAppLauncher",
+      "launcherParams": {
+          "appKey": "CI"          
+      }
+    }
+  ]
+}

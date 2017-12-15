@@ -1,3 +1,5 @@
+import { AppRegistryService } from '@plexus-interop/broker';
+import { InteropServiceFactory } from './InteropServiceFactory';
 import { AppActions } from './app.actions';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
@@ -11,19 +13,33 @@ import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class Effects {
-  @Effect() connectToPlexus$: Observable<Action> = this
-    .actions$
-    .ofType(AppActions.METADATA_LOAD_START)
-    .mergeMap(action =>
-      this.http.get('https://google.com')
-        // If successful, dispatch success action with result
-        .map(data => ({ type: AppActions.METADATA_LOAD_SUCCESS, payload: data }))
-        // If request fails, dispatch failed action
-        .catch(() => of({ type: AppActions.METADATA_LOAD_FAILED }))
-    );
+    @Effect() connectToPlexus$: Observable<Action> = this
+        .actions$
+        .ofType(AppActions.METADATA_LOAD_START)
+        .mergeMap(action => {
+            const interopRegistryServicePromise = this.interopServiceFactory.getInteropRegistryService('/assets/');
+            const appRegistryServicePromise = this.interopServiceFactory.getAppRegistryService('/assets/');
 
-  constructor(
-    private http: Http,
-    private actions$: Actions
-  ) {}      
+            return Promise.all([interopRegistryServicePromise, appRegistryServicePromise]).then(([interopRegistryService, appRegistryServicePromise]) => {
+                inter
+                return null;
+            });
+
+                // .get
+                // .then(appRegistryService => {
+                //     return null;
+                // });
+
+            // this.http.get('/assets/apps.json')
+            // If successful, dispatch success action with result
+            // .map(data => ({ type: AppActions.METADATA_LOAD_SUCCESS, payload: data }))
+            // If request fails, dispatch failed action
+            // .catch(() => of({ type: AppActions.METADATA_LOAD_FAILED }))
+        });
+
+    constructor(
+        private http: Http,
+        private actions$: Actions,
+        private interopServiceFactory: InteropServiceFactory
+    ) { }
 }

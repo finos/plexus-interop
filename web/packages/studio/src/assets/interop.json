@@ -1,0 +1,53 @@
+{
+	"services": [
+		{
+			"id": "com.db.ci.MT103Service",
+			"methods": [
+				{
+					"name": "OpenMT103",
+					"input": "com.db.ci.OpenMT103Request",
+					"output": "com.db.ci.OpenMT103Response",
+					"type": "Unary"
+				}
+			]
+		}
+	],
+	"applications": [
+		{
+			"id": "com.db.ci.CashInquiry",
+			"consumes": [
+		     ],
+		     "provides": [
+		     	{
+		     		"service": "com.db.ci.MT103Service",
+		     		"title": "MT103Service",
+		     		"to": [
+		     			"com.db.cm.CashManager"
+		     		],
+		     		"methods": [
+		     			{
+		     				"name": "OpenMT103",
+		     				"title": "OpenMT103"
+		     			}
+		     		]
+		     	}
+		     ]
+		  },
+		{
+			"id": "com.db.cm.CashManager",
+			"consumes": [
+				{
+					"service": "com.db.ci.MT103Service",
+					"from": [
+						"com.db.ci.CashInquiry"
+					],
+					"methods": [
+						"OpenMT103"
+					]
+				}
+		     ],
+		     "provides": [
+		     ]
+		  }
+	]
+}
