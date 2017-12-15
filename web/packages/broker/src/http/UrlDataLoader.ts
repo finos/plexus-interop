@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import { Observable } from "rxjs/Observable";
+import "rxjs/add/observable/throw";
 import "superagent";
 import * as request from "superagent";
 import { Logger, LoggerFactory } from "@plexus-interop/common";

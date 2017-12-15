@@ -1,3 +1,4 @@
+import { TypedAction } from './TypedAction';
 import { AppRegistryService } from '@plexus-interop/broker';
 import { InteropServiceFactory } from './InteropServiceFactory';
 import { AppActions } from './app.actions';
@@ -9,31 +10,26 @@ import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Action } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
-import { of } from 'rxjs/observable/of';
+import * as fromAlerts from './reducers/alerts';
 
 @Injectable()
 export class Effects {
-    @Effect() connectToPlexus$: Observable<Action> = this
+    @Effect() connectToPlexus$: Observable<TypedAction<any>> = this
         .actions$
-        .ofType(AppActions.METADATA_LOAD_START)
+        .ofType<TypedAction<string>>(AppActions.METADATA_LOAD_START)
         .mergeMap(action => {
-            const interopRegistryServicePromise = this.interopServiceFactory.getInteropRegistryService('/assets/');
-            const appRegistryServicePromise = this.interopServiceFactory.getAppRegistryService('/assets/');
+            const baseUrl = action.payload;
+            const interopRegistryServicePromise = this.interopServiceFactory.getInteropRegistryService(baseUrl);
+            const appRegistryServicePromise = this.interopServiceFactory.getAppRegistryService(baseUrl);
 
-            return Promise.all([interopRegistryServicePromise, appRegistryServicePromise]).then(([interopRegistryService, appRegistryServicePromise]) => {                
-                return null;
-            });
+            return Promise
+                .all([interopRegistryServicePromise, appRegistryServicePromise])
+                .then(([interopRegistryService, appRegistryService]) => {
+                    const apps = appRegistryService.getApplications();
 
-                // .get
-                // .then(appRegistryService => {
-                //     return null;
-                // });
-
-            // this.http.get('/assets/apps.json')
-            // If successful, dispatch success action with result
-            // .map(data => ({ type: AppActions.METADATA_LOAD_SUCCESS, payload: data }))
-            // If request fails, dispatch failed action
-            // .catch(() => of({ type: AppActions.METADATA_LOAD_FAILED }))
+                    return { type: AppActions.METADATA_LOAD_SUCCESS, payload: apps };
+                },
+                error => ({ type: fromAlerts.Actions.ALERT_ERROR, payload: error }));
         });
 
     constructor(

@@ -10,6 +10,7 @@ import * as fromRoot from '../services/reducers';
   styleUrls: ['./metadata-loader.component.css']
 })
 export class MetadataLoaderComponent implements OnInit {
+  metadataUrl: string;
 
   constructor(
     private actions: AppActions,
@@ -24,6 +25,8 @@ export class MetadataLoaderComponent implements OnInit {
       type: AppActions.METADATA_LOAD_START,
       payload: metadataUrl
     });
+    console.info(this.metadataUrl);
+    console.info(metadataUrl);
 
     this.router.navigate(['/apps']);
   }

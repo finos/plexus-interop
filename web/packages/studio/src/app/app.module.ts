@@ -1,3 +1,4 @@
+import { InteropServiceFactory } from './services/InteropServiceFactory';
 import { metaReducers } from './services/reducers';
 import { CustomRouterStateSerializer } from './services/utils';
 import { AppActions } from './services/app.actions';
@@ -51,7 +52,8 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
   ],
   providers: [
     AppActions,
-    { provide: RouterStateSerializer, useClass: CustomRouterStateSerializer }
+    { provide: RouterStateSerializer, useClass: CustomRouterStateSerializer },
+    InteropServiceFactory
   ],
   bootstrap: [AppComponent]
 })

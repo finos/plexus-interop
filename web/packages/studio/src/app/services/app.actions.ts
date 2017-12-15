@@ -12,4 +12,5 @@ export class AppActions {
     static DISCONNECT_FROM_PLEXUS = 'DISCONNECT_FROM_PLEXUS';
     static DISCONNECT_FROM_APP = 'DISCONNECT_FROM_APP';
     static CONNECT_TO_APP = 'CONNECT_TO_APP';
+    static ALERT_ERROR = 'ALERT_ERROR';
 }

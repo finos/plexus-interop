@@ -20,14 +20,14 @@ export class InteropServiceFactory {
 
     public async createInteropRegistryProvider(baseUrl: string): Promise<InteropRegistryProvider> {
         baseUrl = this.urlResolver.getInteropMetadataUrl(baseUrl);
-        const provider = new UrlInteropRegistryProvider(baseUrl);
+        const provider = new UrlInteropRegistryProvider(baseUrl, 10000);
         await provider.start();
         return provider;
     }
 
     public async createAppRegistryProvider(baseUrl: string): Promise<AppRegistryProvider> {
         baseUrl = this.urlResolver.getAppMetadataUrl(baseUrl);
-        const provider = new UrlAppRegistryProvider(baseUrl);
+        const provider = new UrlAppRegistryProvider(baseUrl, 10000);
         await provider.start();
         return provider;
     }
