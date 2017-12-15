@@ -14,10 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./apps/json/JsonAppRegistryProvider";
-export * from "./apps/AppRegistryProvider";
-export * from "./apps/AppRegistryService";
-export * from "./interop/InteropRegistryProvider";
-export * from "./interop/json/JsonInteropRegistryProvider";
-export * from "./interop/InteropRegistryService";
-export * from "./interop/model";
+export * from "./Application";
+export * from "./ConsumedService";
+export * from "./ConsumedServiceReference";
+export * from "./ConsumedMethod";
+export * from "./ConsumedMethodReference";
+export * from "./InteropRegistry";
+export * from "./Message";
+export * from "./Method";
+export * from "./MethodType";
+export * from "./ProvidedMethod";
+export * from "./ProvidedMethodReference";
+export * from "./ProvidedService";
+export * from "./ProvidedServiceReference";
+export * from "./Service";
