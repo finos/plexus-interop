@@ -1,4 +1,3 @@
-
 import { Injectable } from "@angular/core";
 import { InteropRegistryService, UrlInteropRegistryProvider, AppRegistryService, UrlAppRegistryProvider } from "@plexus-interop/broker";
 
