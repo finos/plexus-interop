@@ -12,7 +12,6 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-redux/store": "^6.5.8-0",
     "@angular/animations": "^5.0.0",
     "@angular/common": "^5.0.0",
     "@angular/compiler": "^5.0.0",
@@ -23,6 +22,9 @@
     "@angular/platform-browser-dynamic": "^5.0.0",
     "@angular/router": "^5.0.0",
     "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.7",
+    "@ngrx/router-store": "^4.1.1",
+    "@ngrx/store": "^4.1.1",
+    "@ngrx/store-devtools": "^4.1.1",
     "bootstrap": "^4.0.0-beta.2",
     "core-js": "^2.4.1",
     "font-awesome": "^4.7.0",

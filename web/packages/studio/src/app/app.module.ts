@@ -1,3 +1,5 @@
+import { metaReducers } from './services/reducers';
+import { CustomRouterStateSerializer } from './services/utils';
 import { AppActions } from './services/app.actions';
 import { AppRoutes } from './app.routing';
 import { BrowserModule } from '@angular/platform-browser';
@@ -11,13 +13,18 @@ import { RouterModule } from '@angular/router';
 import { AppListComponent } from './app-list/app-list.component';
 import { HeaderComponent } from './header/header.component';
 
-import { NgReduxModule, NgRedux } from '@angular-redux/store';
-import { createLogger } from 'redux-logger';
-// import { rootReducer } from './reducers';
-import { rootReducer, IAppState, INITIAL_STATE } from './services/store';
+import { reducers } from './services/reducers';
 import { AppServicesComponent } from './app-services/app-services.component';
 import { ConsumedServiceComponent } from './consumed-service/consumed-service.component';
 import { ProvidedServiceComponent } from './provided-service/provided-service.component';
+
+import { StoreModule } from '@ngrx/store';
+
+import {
+  StoreRouterConnectingModule,
+  RouterStateSerializer,
+} from '@ngrx/router-store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 @NgModule({
   declarations: [
@@ -34,16 +41,13 @@ import { ProvidedServiceComponent } from './provided-service/provided-service.co
     NgbModule.forRoot(),
     FormsModule,
     RouterModule.forRoot(AppRoutes),
-    NgReduxModule
+    StoreModule.forRoot(reducers, { metaReducers })
   ],
-  providers: [AppActions],
+  providers: [
+    AppActions,
+    { provide: RouterStateSerializer, useClass: CustomRouterStateSerializer }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(ngRedux: NgRedux<IAppState>) {
-    ngRedux.configureStore(
-      rootReducer,
-      INITIAL_STATE,
-      [createLogger()]);
-  }
 }

@@ -11,8 +11,8 @@ export class AppActions {
     static DISCONNECT_FROM_APP = 'DISCONNECT_FROM_APP';
     static CONNECT_TO_APP = 'CONNECT_TO_APP';
 
-    connect(): Action {
-        return { type: AppActions.CONNECT_TO_PLEXUS };
+    connect(metadataUrl: string): TypedAction<string> {
+        return { type: AppActions.CONNECT_TO_PLEXUS, payload:  metadataUrl};
     }
 
     disconnect(): Action {
