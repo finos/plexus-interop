@@ -1,25 +1,35 @@
 import { Injectable } from "@angular/core";
-import { InteropRegistryService, UrlInteropRegistryProvider, AppRegistryService, UrlAppRegistryProvider } from "@plexus-interop/broker";
-
-const APP_REGISTY_FILE_NAME = 'apps.json';
-const INTEROP_REGISTY_FILE_NAME = 'interop.json';
+import { InteropRegistryService, UrlInteropRegistryProvider, AppRegistryService, UrlAppRegistryProvider, AppRegistryProvider, InteropRegistryProvider } from "@plexus-interop/broker";
+import { UrlResolver } from "./UrlResolver";
 
 @Injectable()
 export class InteropServiceFactory {    
-    public async getInteropRegistryService(baseUrl: string): Promise<InteropRegistryService> {
-        const url = baseUrl + INTEROP_REGISTY_FILE_NAME;
+    private readonly urlResolver: UrlResolver = new UrlResolver();
 
-        const provider = new UrlInteropRegistryProvider(url);
-        await provider.start();
+    public async getInteropRegistryService(baseUrl: string): Promise<InteropRegistryService> {
+        const provider = await this.createInteropRegistryProvider(baseUrl);
+
         return new InteropRegistryService(provider);
     }
 
     public async getAppRegistryService(baseUrl: string): Promise<AppRegistryService> {
-        const url = baseUrl + APP_REGISTY_FILE_NAME;
+        const provider = await this.createAppRegistryProvider(baseUrl);
 
-        const provider = new UrlAppRegistryProvider(url);
-        await provider.start();
         return new AppRegistryService(provider);
+    }
+
+    public async createInteropRegistryProvider(baseUrl: string): Promise<InteropRegistryProvider> {
+        baseUrl = this.urlResolver.getInteropMetadataUrl(baseUrl);
+        const provider = new UrlInteropRegistryProvider(baseUrl);
+        await provider.start();
+        return provider;
+    }
+
+    public async createAppRegistryProvider(baseUrl: string): Promise<AppRegistryProvider> {
+        baseUrl = this.urlResolver.getAppMetadataUrl(baseUrl);
+        const provider = new UrlAppRegistryProvider(baseUrl);
+        await provider.start();
+        return provider;
     }
 
 }

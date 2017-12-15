@@ -102,6 +102,22 @@ export class InteropRegistryService {
         return this.getMatchingProvidedMethodsFromConsumed(consumedMethod);
     }
 
+    public getProvidedServices(appId: string): ProvidedService[] {
+        const app = this.registry.applications.get(appId);
+        if (!app) {
+            throw new Error(`App ${appId} doesn't exist`);
+        }
+        return app.providedServices;
+    }
+
+    public getConsumedServices(appId: string): ConsumedService[] {
+        const app = this.registry.applications.get(appId);
+        if (!app) {
+            throw new Error(`App ${appId} doesn't exist`);
+        }
+        return app.consumedServices;
+    }
+
     public getMatchingProvidedMethodsForApp(app: Application): ProvidedMethod[] {
         return this.appProvidedMethodsCache.getOrAdd(app.id, () => this.getMatchingProvidedMethodsForAppInternal(app));
     }
