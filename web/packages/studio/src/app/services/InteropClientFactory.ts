@@ -39,7 +39,6 @@ export class IntropClientFactory {
         const unaryHandlers = new Map<string, UnaryStringHandler>();
 
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
-            // unary support for first version
             .filter(pm => pm.method.type === MethodType.Unary)
             .forEach(pm => {
                 // create dummy implementation
