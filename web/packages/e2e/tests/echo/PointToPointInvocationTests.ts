@@ -40,6 +40,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
         return new Promise<void>((resolve, reject) => {
             const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => {
                 try {
+                    debugger;
                     this.verifyInvocationContext(context);
                     this.assertEqual(request, echoRequest);
                 } catch (error) {
@@ -52,6 +53,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
                     return clients[0].getEchoServiceProxy()
                         .unary(echoRequest)
                         .then(echoResponse => {
+                            debugger;
                             this.assertEqual(echoRequest, echoResponse);
                             return this.clientsSetup.disconnect(clients[0], clients[1]);
                         });

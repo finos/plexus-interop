@@ -17,3 +17,4 @@
 export * from "./util";
 export * from "./logger";
 export * from "./rx";
+export * from "./cache";

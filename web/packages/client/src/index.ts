@@ -16,4 +16,5 @@
  */
 export * from "./client";
 export {UniqueId as UniqueId} from "@plexus-interop/transport-common";
+export {InvocationRequestInfo as InvocationRequestInfo} from "@plexus-interop/protocol";
 export {ReadOnlyCancellationToken as ReadOnlyCancellationToken} from "@plexus-interop/common";

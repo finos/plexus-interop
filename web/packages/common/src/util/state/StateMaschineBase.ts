@@ -78,17 +78,18 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         }
         const descriptor = this.lookup(this.getCurrent());        
         const transition = descriptor.outTransitions.find(transition => transition.to === to) as Transition<T>;
+        const old = this.getCurrent();
         if (transition.preHandler) {
             transition.preHandler()
                 .then(() => {
                     /* istanbul ignore if */
                     if (this.logger.isTraceEnabled()) {
-                        this.logger.trace(`Finished pre-handler for ${this.getCurrent()} -> ${to}`);
+                        this.logger.trace(`Finished pre-handler for ${old} -> ${to}`);
                     }
                 })
                 .catch(e => this.logger.error(`Pre-handler for ${this.getCurrent()} -> ${to} failed`, e));
         }
-        this.current = to;
+        this.switchInternal(to);
         if (transition.postHandler) {
             transition.postHandler()
                 .then(() => {
@@ -101,13 +102,21 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         }
     }
 
+    private switchInternal(to: T): void {
+        /* istanbul ignore if */
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(`${this.getCurrent()} -> ${to}`);
+        }
+        this.current = to;
+    }
+
     public goAsync(to: T, dynamicHandlers?: Handlers): Promise<void> {
         if (this.canGo(to)) {
             const descriptor = this.lookup(this.getCurrent());                    
             const transition = descriptor.outTransitions.find(transition => transition.to === to) as Transition<T>;
             return new Promise<void>((resolve, reject) => {
                 const preHandlePassed = () => {
-                    this.current = transition.to;
+                    this.switchInternal(transition.to);
                     const postHandlerPromises = [dynamicHandlers ? dynamicHandlers.postHandler : null, transition.postHandler]
                         .filter(handler => !!handler)
                         .map(handler => handler as () => Promise<void>)

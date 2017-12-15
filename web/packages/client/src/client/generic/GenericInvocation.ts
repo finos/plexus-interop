@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 import { UniqueId, Channel, Defaults, ChannelObserver } from "@plexus-interop/transport-common";
-import { clientProtocol as plexus, SuccessCompletion, ErrorCompletion, ClientError, ClientProtocolUtils } from "@plexus-interop/protocol";
-import { InvocationMetaInfo } from "./InvocationMetaInfo";
-import { ClientProtocolHelper as modelHelper, ClientProtocolHelper } from "./ClientProtocolHelper";
+import { clientProtocol as plexus, SuccessCompletion, ErrorCompletion, ClientError, ClientProtocolUtils, InvocationMetaInfo } from "@plexus-interop/protocol";
+import { ClientProtocolHelper as modelHelper, ClientProtocolHelper } from "@plexus-interop/protocol";
 import { InvocationState } from "./InvocationState";
 import { Observer } from "@plexus-interop/common";
 import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
 import { StateMaschine, CancellationToken, Logger, LoggerFactory, StateMaschineBase, AsyncHelper } from "@plexus-interop/common";
-import { ProvidedMethodReference } from "../api/dto/ProvidedMethodReference";
+import { ProvidedMethodReference } from "@plexus-interop/client-api";
 import { ClientDtoUtils } from "../ClientDtoUtils";
 
 export class GenericInvocation {

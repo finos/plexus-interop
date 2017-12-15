@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 @Component({
   selector: 'app-app-list',
   templateUrl: './app-list.component.html',
-  styleUrls: ['./app-list.component.scss']
+  styleUrls: ['./app-list.component.css']
 })
 export class AppListComponent implements OnInit {
 

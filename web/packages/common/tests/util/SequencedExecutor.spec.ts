@@ -15,9 +15,6 @@
  * limitations under the License.
  */
 import { SequencedExecutor } from "../../src/util/async/SequencedExecutor";
-import { LoggerFactory, LogLevel } from "../../src/logger/LoggerFactory";
-
-LoggerFactory.setLogLevel(LogLevel.TRACE);
 
 describe("SequencedExecutor", () => {
 

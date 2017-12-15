@@ -31,6 +31,12 @@ export class ReadWriteCancellationToken {
         this.writeToken.cancel(reason);
     }
 
+    public throwIfCanceled(): void {
+        if (this.isCancelled()) {
+            throw Error(this.readToken.getReason() || this.writeToken.getReason() || "Cancelled");
+        }
+    }
+
     public isCancelled(): boolean {
         return this.readToken.isCancelled() && this.writeToken.isCancelled();
     } 

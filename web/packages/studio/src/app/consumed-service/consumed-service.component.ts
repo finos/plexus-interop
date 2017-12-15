@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'app-consumed-service',
   templateUrl: './consumed-service.component.html',
-  styleUrls: ['./consumed-service.component.scss']
+  styleUrls: ['./consumed-service.component.css']
 })
 export class ConsumedServiceComponent implements OnInit {
 

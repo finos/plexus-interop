@@ -17,11 +17,10 @@
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { GenericClient } from "./GenericClient";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { ClientProtocolHelper as modelHelper } from "./ClientProtocolHelper";
 import { GenericClientImpl } from "./GenericClientImpl";
 import { SingleMessageRequest } from "./SingleMessageRequst";
-import { ClientConnectRequest } from "../api/dto/ClientConnectRequest";
-import { clientProtocol as plexus } from "@plexus-interop/protocol";
+import { ClientConnectRequest } from "@plexus-interop/client-api";
+import { clientProtocol as plexus, ClientProtocolHelper } from "@plexus-interop/protocol";
 
 export class GenericClientFactory {
 
@@ -30,10 +29,11 @@ export class GenericClientFactory {
     constructor(private readonly transportConnection: TransportConnection) { }
 
     public async createClient(request: ClientConnectRequest): Promise<GenericClient> {
-        const requestPayload = modelHelper.connectRequestPayload(request);
+        const requestPayload = ClientProtocolHelper.connectRequestPayload(request);
         this.log.debug("Sending client connect request");
         return new SingleMessageRequest<plexus.interop.protocol.IConnectResponse>(this.transportConnection, this.log)
-            .execute(requestPayload, (responsePayload) => modelHelper.decodeConnectResponse(responsePayload)).then(response => {
+            .execute(requestPayload, (responsePayload) => ClientProtocolHelper.decodeConnectResponse(responsePayload))
+            .then(response => {
                 this.log.info("Client connected");
                 return new GenericClientImpl(this.transportConnection);
             });
