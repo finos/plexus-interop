@@ -10,4 +10,8 @@ export class UrlResolver {
         return `${baseUrl}/interop.json`;
     } 
 
+    public getAppMetadataUrl(baseUrl: string): string {
+        return `${baseUrl}/apps.json`;
+    }
+
 }

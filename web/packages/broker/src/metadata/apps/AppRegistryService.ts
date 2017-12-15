@@ -43,6 +43,10 @@ export class AppRegistryService {
         return result;
     }
 
+    public getApplications(): Application[] {
+        return this.appsRegistry.apps.valuesArray();
+    }
+
     public isAppExist(id: string): boolean {
         return this.appsRegistry.apps.has(id);
     }
