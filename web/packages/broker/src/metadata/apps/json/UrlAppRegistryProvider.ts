@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryProvider } from "../InteropRegistryProvider";
 import { Observable } from "rxjs/Observable";
-import { InteropRegistry } from "../model/InteropRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { UrlDataLoader } from "../../../http/UrlDataLoader";
-import { JsonInteropRegistryProvider } from "./JsonInteropRegistryProvider";
+import { JsonAppRegistryProvider } from "./JsonAppRegistryProvider";
+import { AppRegistryProvider } from "../AppRegistryProvider";
+import { AppRegistry } from "../model/AppRegistry";
 
-export class UrlInteropRegistryProvider implements InteropRegistryProvider {
+export class UrlAppRegistryProvider implements AppRegistryProvider {
 
-    private readonly log: Logger = LoggerFactory.getLogger("UrlInteropRegistryProvider");
+    private readonly log: Logger = LoggerFactory.getLogger("UrlAppRegistryProvider");
 
     private urlDataLoader: UrlDataLoader = new UrlDataLoader();
 
-    private jsonInteropRegistryProvider: JsonInteropRegistryProvider;
+    private jsonAppRegistryProvider: JsonAppRegistryProvider;
 
     private started: boolean = false;
 
@@ -35,15 +35,15 @@ export class UrlInteropRegistryProvider implements InteropRegistryProvider {
         private readonly url: string,
         private readonly interval: number = -1) { }
 
-    public getRegistry(): Observable<InteropRegistry> {
-        return this.started ? this.jsonInteropRegistryProvider.getRegistry() : Observable.throw(new Error("Not started"));
+    public getAppRegistry(): Observable<AppRegistry> {
+        return this.started ? this.jsonAppRegistryProvider.getAppRegistry() : Observable.throw(new Error("Not started"));
     }
 
-    public getCurrent(): InteropRegistry {
+    public getCurrent(): AppRegistry {
         if (!this.started) {
             throw new Error("Not started");
         }
-        return this.jsonInteropRegistryProvider.getCurrent();
+        return this.jsonAppRegistryProvider.getCurrent();
     }
 
     public async start(): Promise<void> {
@@ -53,9 +53,9 @@ export class UrlInteropRegistryProvider implements InteropRegistryProvider {
         this.log.debug(`Starting to load metadata from [${this.url}] with ${this.interval} interval`);
         const response = await this.urlDataLoader.fetchData(this.url);
         if (this.interval > 0) {
-            this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response);
+            this.jsonAppRegistryProvider = new JsonAppRegistryProvider(response);
         } else {
-            this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response, this.urlDataLoader.fetchWithInterval(this.url, this.interval));
+            this.jsonAppRegistryProvider = new JsonAppRegistryProvider(response, this.urlDataLoader.fetchWithInterval(this.url, this.interval));
         }
         this.started = true;
     }

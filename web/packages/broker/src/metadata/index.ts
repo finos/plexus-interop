@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 export * from "./apps/json/JsonAppRegistryProvider";
+export * from "./apps/json/UrlAppRegistryProvider";
 export * from "./apps/AppRegistryProvider";
 export * from "./apps/AppRegistryService";
 export * from "./interop/InteropRegistryProvider";
 export * from "./interop/json/JsonInteropRegistryProvider";
+export * from "./interop/json/UrlInteropRegistryProvider";
 export * from "./interop/InteropRegistryService";
 export * from "./interop/model";
