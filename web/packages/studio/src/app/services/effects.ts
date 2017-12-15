@@ -20,8 +20,7 @@ export class Effects {
             const interopRegistryServicePromise = this.interopServiceFactory.getInteropRegistryService('/assets/');
             const appRegistryServicePromise = this.interopServiceFactory.getAppRegistryService('/assets/');
 
-            return Promise.all([interopRegistryServicePromise, appRegistryServicePromise]).then(([interopRegistryService, appRegistryServicePromise]) => {
-                inter
+            return Promise.all([interopRegistryServicePromise, appRegistryServicePromise]).then(([interopRegistryService, appRegistryServicePromise]) => {                
                 return null;
             });
 
