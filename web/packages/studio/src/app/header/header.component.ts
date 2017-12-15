@@ -56,7 +56,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   openCurrentApp() {
     if (this.currentApp) {
       this.store.dispatch({ type: AppActions.CONNECT_TO_APP, payload: this.currentApp });
-      this.store.dispatch(this.actions.connectToApp(this.currentApp));
       this.router.navigate(['/app']);
     }
   }

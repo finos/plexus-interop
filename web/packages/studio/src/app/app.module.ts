@@ -20,6 +20,10 @@ import { ProvidedServiceComponent } from './provided-service/provided-service.co
 
 import { StoreModule } from '@ngrx/store';
 
+import { EffectsModule } from '@ngrx/effects';
+import { Effects } from './services/effects';
+import { HttpModule } from '@angular/http';
+
 import {
   StoreRouterConnectingModule,
   RouterStateSerializer,
@@ -41,7 +45,9 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     NgbModule.forRoot(),
     FormsModule,
     RouterModule.forRoot(AppRoutes),
-    StoreModule.forRoot(reducers, { metaReducers })
+    StoreModule.forRoot(reducers, { metaReducers }),
+    EffectsModule.forRoot([Effects]),
+    HttpModule 
   ],
   providers: [
     AppActions,

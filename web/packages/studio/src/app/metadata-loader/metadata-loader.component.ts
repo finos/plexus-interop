@@ -21,7 +21,7 @@ export class MetadataLoaderComponent implements OnInit {
 
   connect(metadataUrl: string) {
     this.store.dispatch({
-      type: AppActions.CONNECT_TO_PLEXUS,
+      type: AppActions.METADATA_LOAD_START,
       payload: metadataUrl
     });
 
