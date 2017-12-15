@@ -74,7 +74,7 @@ function main() {
             log(`No file notification received, trying to read from default location ${addressFile}`);
             readAddressAndRunTests(addressFile);
         }
-    }, 5000);
+    }, 15000);
 
     log("Starting Broker ...");
     brokerProcess = exec(fullBrokerCmd + config.brokerArgs, {
