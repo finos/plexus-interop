@@ -3,7 +3,7 @@ import { MessageEncoder } from "./MessageEncoder";
 
 export class EncoderProvider {
 
-    public getMessageEncoder(): MessageEncoder {
+    public getMessageEncoder(messageId: string): MessageEncoder {
         throw new Error("Not implemented");
     }    
 
