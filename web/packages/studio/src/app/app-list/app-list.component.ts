@@ -1,3 +1,5 @@
+import { Application } from './../../../../broker/dist/main/src/metadata/apps/model/Application.d';
+import { Observable } from 'rxjs/Observable';
 import { AppActions } from '../services/app.actions';
 import { App } from './../services/model';
 import { Component, OnInit } from '@angular/core';
@@ -11,17 +13,15 @@ import { Store } from '@ngrx/store';
   styleUrls: ['./app-list.component.css']
 })
 export class AppListComponent implements OnInit {
+  apps: Observable<Application[]>;
 
   constructor(
     private actions: AppActions,
     private store: Store<fromRoot.State>,
     private router: Router) { }
 
-  appList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => {
-    return { name: 'Application ' + i };
-  });
-
   ngOnInit() {
+    this.apps = this.store.select(state => state.plexus.apps);
   }
 
   connectToApp(app: App) {

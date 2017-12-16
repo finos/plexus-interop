@@ -48,12 +48,12 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     RouterModule.forRoot(AppRoutes),
     StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([Effects]),
-    HttpModule 
+    HttpModule
   ],
   providers: [
     AppActions,
     { provide: RouterStateSerializer, useClass: CustomRouterStateSerializer },
-    InteropServiceFactory
+    { provide: InteropServiceFactory, useClass: InteropServiceFactory }
   ],
   bootstrap: [AppComponent]
 })

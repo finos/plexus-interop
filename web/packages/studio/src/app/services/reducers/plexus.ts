@@ -14,7 +14,7 @@ export interface State {
 const initialState: State = {
     loading: false,
     connected: false,
-    metadataUrl: '/',
+    metadataUrl: '/assets',
     connectedApp: undefined,
     apps: []
 };

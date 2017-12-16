@@ -2,8 +2,13 @@ import { Injectable } from "@angular/core";
 import { InteropRegistryService, UrlInteropRegistryProvider, AppRegistryService, UrlAppRegistryProvider, AppRegistryProvider, InteropRegistryProvider } from "@plexus-interop/broker";
 import { UrlResolver } from "./UrlResolver";
 
+export interface RegistryUrls {
+    apps: string,
+    interop: string
+}
+
 @Injectable()
-export class InteropServiceFactory {    
+export class InteropServiceFactory {
     private readonly urlResolver: UrlResolver = new UrlResolver();
 
     public async getInteropRegistryService(baseUrl: string): Promise<InteropRegistryService> {
@@ -16,6 +21,13 @@ export class InteropServiceFactory {
         const provider = await this.createAppRegistryProvider(baseUrl);
 
         return new AppRegistryService(provider);
+    }
+
+    public getMetadataUrls(baseUrl: string): RegistryUrls {
+        return {
+            apps: this.urlResolver.getAppMetadataUrl(baseUrl),
+            interop: this.urlResolver.getInteropMetadataUrl(baseUrl)
+        }
     }
 
     public async createInteropRegistryProvider(baseUrl: string): Promise<InteropRegistryProvider> {
@@ -31,5 +43,4 @@ export class InteropServiceFactory {
         await provider.start();
         return provider;
     }
-
 }

@@ -27,11 +27,13 @@ export const reducers: ActionReducerMap<State> = {
 };
 
 export function logger(reducer: ActionReducer<State>): ActionReducer<State> {
-  return function(state: State, action: any): State {
-    console.log('state', state);
-    console.log('action', action);
+  return function (state: State, action: any): State {
+    let result = reducer(state, action);
+    
+    console.log('action: ', action);
+    console.log('state: ', result);  
 
-    return reducer(state, action);
+    return result;
   };
 }
 

@@ -5,19 +5,42 @@
 
   <div class="connection-statuses">
     <div class="form-inline connection-status" *ngIf="connected$ | async">
-      <span class="navbar-text mr-2">Metadata:</span>
-      <a target="_blank" href="{{metadataUrl$ | async}}">{{metadataUrl$ | async}}</a>
-      <a class="nav-link" href="javascript:void(0)" (click)="disconnectFromPlexus()">
+      <span class="navbar-text mr-2">Metadata base:</span>
+      <a target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
+      <a class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
     </div>
 
     <div class="form-inline connection-status" *ngIf="!!currentApp">
       <span class="navbar-text mr-2">Application:</span>
-      <a #openCurrentAppBtn href="javascript:void(0)" (click)="openCurrentApp()">{{currentApp?.name}}</a>
-      <a #disconnectFromAppBtn class="nav-link" href="javascript:void(0)" (click)="disconnectFromApp()">
+      <a #openCurrentAppBtn href="javascript:" (click)="openCurrentApp()">{{currentApp?.displayName}}</a>
+      <a #disconnectFromAppBtn class="nav-link" href="javascript:" (click)="disconnectFromApp()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
     </div>
   </div>
 </nav>
+
+<ng-template #metadataModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Metada URLs</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body container-fluid">
+    <div class="row">
+      <span class="col-sm-2"> Apps: </span>
+      <a class="col-sm-10" target="_blank" href="{{metadataUrls?.apps}}">{{metadataUrls?.apps}}</a>
+    </div>
+
+    <div class="row">
+      <span class="col-sm-2"> Interop: </span>
+      <a class="col-sm-10" target="_blank" href="{{metadataUrls?.interop}}">{{metadataUrls?.interop}}</a>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+  </div>
+</ng-template>

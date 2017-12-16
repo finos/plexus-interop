@@ -1,5 +1,7 @@
+import { SubsctiptionsRegistry } from './../services/SubsctiptionsRegistry';
+import { InteropServiceFactory, RegistryUrls } from '../services/InteropServiceFactory';
+import { Application } from './../../../../broker/dist/main/src/metadata/apps/model/Application.d';
 import { Subscription } from 'rxjs/Subscription';
-import { App } from './../services/model';
 import { AppActions } from '../services/app.actions';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
@@ -9,38 +11,44 @@ import { Router } from '@angular/router';
 import { ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/reducers';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.css'],
+  providers: [SubsctiptionsRegistry]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  readonly metadataUrl$: Observable<string>;
-  readonly connected$: Observable<boolean>;
-  readonly application$: Observable<App>;
+  metadataUrl$: Observable<string>;
+  connected$: Observable<boolean>;
+  application$: Observable<Application>;
 
-  currentApp: App;
-
-  private subscriptions: Subscription[] = [];
+  public currentApp: Application;
+  metadataUrls: RegistryUrls;
 
   constructor(
     private actions: AppActions,
     private store: Store<fromRoot.State>,
-    private router: Router) {
-    this.metadataUrl$ = store.select(state => state.plexus.metadataUrl);
-    this.application$ = store.select(state => state.plexus.application);
-    this.connected$ = store.select(state => state.plexus.connected);
+    private router: Router,
+    private interopServiceFactory: InteropServiceFactory,
+    private subscriptions: SubsctiptionsRegistry,
+    private modalService: NgbModal) {
   }
 
   ngOnInit() {
-    this.subscriptions.push(this.application$.subscribe(app => this.currentApp = app));
+    this.metadataUrl$ = this.store.select(state => state.plexus.metadataUrl);
+    this.application$ = this.store.select(state => state.plexus.connectedApp);
+    this.connected$ = this.store.select(state => state.plexus.connected);
+    
+    this.subscriptions.add(this.application$.subscribe(app => this.currentApp = app));
+    this.subscriptions.add(this.metadataUrl$.combineLatest(this.connected$.filter(i => i)).subscribe(([metadata, _]) => {
+      this.metadataUrls = this.interopServiceFactory.getMetadataUrls(metadata);
+    }));
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(subscription => {
-      subscription.unsubscribe();
-    });
+    this.subscriptions.unsubscribeAll();
   }
 
   disconnectFromPlexus() {
@@ -58,5 +66,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.store.dispatch({ type: AppActions.CONNECT_TO_APP, payload: this.currentApp });
       this.router.navigate(['/app']);
     }
+  }
+
+  openModal(content) {
+    this.modalService.open(content);
   }
 }
