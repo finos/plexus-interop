@@ -30,6 +30,9 @@ import com.db.plexus.interop.dsl.ProvidedMethod
 import java.util.LinkedList
 import com.db.plexus.interop.dsl.protobuf.Option
 import org.eclipse.emf.ecore.EObject
+import com.db.plexus.interop.dsl.protobuf.Message
+import com.db.plexus.interop.dsl.protobuf.Field
+import com.db.plexus.interop.dsl.protobuf.PrimitiveFieldType
 
 public class InteropLangUtils {
 
@@ -37,6 +40,36 @@ public class InteropLangUtils {
         return Arrays.stream(resources)
         .flatMap([resource | getServices(resource).stream()])
         .collect(Collectors.toList());
+    }
+
+    def static List<Message> getMessages(Resource... resources) {
+        return Arrays.stream(resources)
+        .flatMap([resource | getMessages(resource).stream()])
+        .collect(Collectors.toList());
+    }
+
+    def static String getType(Field field) {
+        val typeRef = field.getTypeReference();
+        if (typeRef instanceof PrimitiveFieldType) {
+            return (typeRef as PrimitiveFieldType).getValue().literal.toLowerCase();
+        } else {
+            return "Unsupported";
+        }
+    }
+
+    def static List<Field> getFields(Message message) {
+        return message.getBody()
+        .getElements()
+        .stream()
+        .filter([el | el instanceof Field])
+        .map([el | el as Field])
+        .collect(Collectors.toList());
+    }
+
+    def static List<Message> getMessages(Resource resource) {
+        return resource.allContents
+        .filter(typeof(Message))
+        .toList();
     }
 
     def static List<Service> getServices(Resource resource) {
@@ -51,10 +84,10 @@ public class InteropLangUtils {
 
     def static Service getService(Method method) {
         var obj = method as EObject
-        while (obj !== null) {
+        while(obj !== null) {
             val parent = obj.eContainer
             val service = tryGetService(parent)
-            if (service !== null) {
+            if(service !== null) {
                 return service
             }
             obj = obj.eContainer;

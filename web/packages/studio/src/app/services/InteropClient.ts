@@ -8,8 +8,8 @@ export interface InteropClient {
 
     sendUnaryRequest(invocationInfo: InvocationRequestInfo, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient>;
 
-    setUnaryActionHandler(serviceId: string, methodId: string, handler: (requestJson: string) => Promise<string>);
+    setUnaryActionHandler(serviceId: string, methodId: string, handler: (requestJson: string) => Promise<string>): void;
 
-    disconnect(): Promise<Completion>;
+    disconnect(): Promise<void>;
 
 }
