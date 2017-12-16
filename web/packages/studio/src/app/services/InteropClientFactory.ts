@@ -11,7 +11,7 @@ import { EncoderProvider } from "./EncoderProvider";
 import { GenericClientWrapper } from "./GenericClientWrapper";
 
 @Injectable()
-export class IntropClientFactory {
+export class InteropClientFactory {
 
     private readonly log: Logger = LoggerFactory.getLogger("IntropClientFactory");
 

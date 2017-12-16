@@ -15,36 +15,59 @@
  * limitations under the License.
  */
 import * as log from "loglevel";
-import { Logger } from "./Logger";
+import { Logger, LoggerDelegate } from "./Logger";
 import { LogLevel } from "./LoggerFactory";
 
-export class LoggerBase implements Logger {
+export class LoggerBase implements Logger, LoggerDelegate {
 
-    constructor(public name: string = "Anonymous") { }
+    constructor(
+        public name: string,
+        private loggerDelegates: LoggerDelegate[]
+    ) { }
 
     public debug(msg: string, ...args: any[]): void {
         /* istanbul ignore if */
         if (log.getLevel() <= LogLevel.DEBUG) {
-            log.info(`${this.name} ${msg}`, args);
+            this.log(LogLevel.DEBUG, msg, args);
         }
     }
 
     public info(msg: string, ...args: any[]): void {
-        log.info(`${this.name} ${msg}`, args);
+        this.log(LogLevel.INFO, msg, args);
     }
 
     public error(msg: string, ...args: any[]): void {
-        log.error(`${this.name} ${msg}`, args);
+        this.log(LogLevel.ERROR, msg, args);
     }
 
     public warn(msg: string, ...args: any[]): void {
-        log.info(`${this.name} ${msg}`, args);
+        this.log(LogLevel.INFO, msg, args);
     }
 
     public trace(msg: string, ...args: any[]): void {
-        /* istanbul ignore if */        
+        /* istanbul ignore if */
         if (log.getLevel() <= LogLevel.TRACE) {
-            log.info(`${this.name} ${msg}`, args);
+            this.log(LogLevel.TRACE, msg, args);
+        }
+    }
+
+    public log(logLevel: LogLevel, msg: string, args: any[]): void {
+        let actualMessage = `${this.name} ${msg}`;
+
+        switch (logLevel) {
+            case LogLevel.DEBUG: log.debug(actualMessage, args); break;
+            case LogLevel.TRACE: log.trace(actualMessage, args); break;
+            case LogLevel.WARN: log.warn(actualMessage, args); break;
+            case LogLevel.ERROR: log.warn(actualMessage, args); break;
+            case LogLevel.SILENT: /* be silent */ break;
+            default: throw `Unkown LogLevel: ${logLevel}`;
+        }
+
+        try {
+            this.loggerDelegates.forEach(logger => logger.log(logLevel, msg, args));
+        }
+        catch (error) {
+            this.error(`Error in log delegates: ${error}. Swallowed.`);
         }
     }
 

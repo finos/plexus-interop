@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { LoggerDelegate } from "./index";
 import * as log from "loglevel";
 import { Logger } from "./Logger";
 import { LoggerBase } from "./LoggerBase";
@@ -29,9 +30,19 @@ export enum LogLevel {
 }
 
 export class LoggerFactory {
+  private static additionalRecipients: LoggerDelegate[] = [];
+
+  public static registerDecorator(logger: LoggerDelegate): { unregister: () => void } {
+    let newRecipientsLen = LoggerFactory.additionalRecipients.push(logger);
+    let registeredRecipientIndex = newRecipientsLen - 1;
+
+    return {
+      unregister: () => LoggerFactory.additionalRecipients = LoggerFactory.additionalRecipients.splice(registeredRecipientIndex, 1)
+    };
+  }
 
   public static getLogger(name: string = "Anonymous"): Logger {
-    return new LoggerBase(name);
+    return new LoggerBase(name, this.additionalRecipients);
   }
 
   public static setLogLevel(level: LogLevel): void {

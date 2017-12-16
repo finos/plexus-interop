@@ -31,5 +31,4 @@ describe("Arrays Util", () => {
             new Uint8Array(stringToArrayBuffer(arrayBufferToString(first.buffer))));
     });
 
-
 });

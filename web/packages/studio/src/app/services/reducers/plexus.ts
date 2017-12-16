@@ -1,22 +1,22 @@
+import { InteropClient } from '../InteropClient';
+import { Application } from '@plexus-interop/broker/dist/main/src/metadata/apps/model/Application';
 import { TypedAction } from './../TypedAction';
-import { Application } from '@plexus-interop/broker/src/metadata/apps/model/Application';
+import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from '../app.actions';
 import { Action } from '@ngrx/store';
+import { PlexusConnectedActionParams, StudioState } from '../model';
 
-export interface State {
-    loading: boolean,
-    connected: boolean;
-    metadataUrl: string;
-    connectedApp: Application;
-    apps: Application[]
-}
-
-const initialState: State = {
+const initialState: StudioState = {
     loading: false,
     connected: false,
     metadataUrl: '/assets',
     connectedApp: undefined,
-    apps: []
+    apps: [],
+    services: {
+        interopRegistryService: undefined,
+        interopClient: undefined,
+        сonnectionProvider: undefined
+    }
 };
 
 function getPayload<T>(action: Action): T {
@@ -24,10 +24,9 @@ function getPayload<T>(action: Action): T {
 };
 
 export function reducer(
-    state: State = initialState,
+    state: StudioState = initialState,
     action: Action
-): State {
-
+): StudioState {
     switch (action.type) {
         case AppActions.METADATA_LOAD_START:
             return {
@@ -36,10 +35,17 @@ export function reducer(
                 loading: true
             };
         case AppActions.METADATA_LOAD_SUCCESS:
+            let payload = getPayload<PlexusConnectedActionParams>(action);
+
             return {
                 ...state,
                 connected: true,
-                apps: getPayload<Application[]>(action),
+                apps: payload.apps,
+                services: {
+                    ...state.services,
+                    interopRegistryService: payload.interopRegistryService,
+                    сonnectionProvider: payload.сonnectionProvider
+                },
                 loading: false
             };
         case AppActions.METADATA_LOAD_FAILED:
@@ -55,10 +61,13 @@ export function reducer(
                 ...state,
                 connectedApp: null
             };
-        case AppActions.CONNECT_TO_APP:
+        case AppActions.CONNECT_TO_APP_SUCCESS:
             return {
                 ...state,
-                connectedApp: getPayload<Application>(action)
+                services: {
+                    ...state.services,
+                    interopClient: getPayload<InteropClient>(action)
+                }
             };
         default:
             return state;

@@ -1,3 +1,4 @@
+import { StudioState } from './model';
 import {
   ActionReducerMap,
   createSelector,
@@ -12,7 +13,7 @@ import * as fromRouter from '@ngrx/router-store';
 import * as fromPlexus from './reducers/plexus';
 
 export interface State {
-  plexus: fromPlexus.State;
+  plexus: StudioState;
   routerReducer: fromRouter.RouterReducerState<RouterStateUrl>;
 }
 

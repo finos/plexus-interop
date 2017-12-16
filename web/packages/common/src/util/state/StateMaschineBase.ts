@@ -102,14 +102,6 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         }
     }
 
-    private switchInternal(to: T): void {
-        /* istanbul ignore if */
-        if (this.logger.isTraceEnabled()) {
-            this.logger.trace(`${this.getCurrent()} -> ${to}`);
-        }
-        this.current = to;
-    }
-
     public goAsync(to: T, dynamicHandlers?: Handlers): Promise<void> {
         if (this.canGo(to)) {
             const descriptor = this.lookup(this.getCurrent());                    
@@ -156,6 +148,14 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
         if (this.logger) {
             this.logger.error(m);
         }
+    }
+    
+    private switchInternal(to: T): void {
+        /* istanbul ignore if */
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(`${this.getCurrent()} -> ${to}`);
+        }
+        this.current = to;
     }
 
     private putIfAbsent(state: T): void {

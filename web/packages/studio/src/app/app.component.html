@@ -1,6 +1,14 @@
-<div class="container p-lg-3">
-  <app-header></app-header>
-  <div class="p-lg-2">
+<div class="container p-lg-3 flex-fill flex-flow-column">
+  <app-header class="header"></app-header>
+  
+  <div class="pt-lg-3 app-content">
     <router-outlet></router-outlet>
+  </div>
+  <hr>
+
+  <div class="form-group footer">
+    <label for="plexusLogsArea">Plexus Logs:</label>
+    <textarea disabled="disabled" class="form-control" id="plexusLogsArea" rows="5" [(ngModel)]="output"></textarea>
+    <button class="btn btn-link" type="button" (click)="clear()">Clear</button>
   </div>
 </div>
