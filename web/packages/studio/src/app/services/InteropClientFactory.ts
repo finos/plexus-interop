@@ -56,7 +56,7 @@ export class InteropClientFactory {
                             const requestObj = requestMarshaller.decode(request);
                             const stringHandler = unaryHandlers.get(methodFullName);
                             const stringResponse = await stringHandler(JSON.stringify(requestObj));
-                            return requestMarshaller.encode(JSON.parse(stringResponse));
+                            return responseMarshaller.encode(JSON.parse(stringResponse));
                         }
                     }
                 });
