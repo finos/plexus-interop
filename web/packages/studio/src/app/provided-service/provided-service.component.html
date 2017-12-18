@@ -3,29 +3,4 @@
     <label for="exampleFormControlTextarea1">Enter reponse:</label>
     <textarea class="form-control" id="exampleFormControlTextarea1" rows="1" [(ngModel)]="messageContent"></textarea>
   </div>
-
-  <div>
-    <div class="form-group">
-      <label for="exampleSelect1">Intercepted app:</label>
-      <select class="form-control" id="exampleSelect1">
-      <option>Application 1</option>
-      <option>Application 2</option>
-      <option>Application 3</option>
-      <option>Application 4</option>
-      <option>Application 5</option>
-    </select>
-    </div>
-  </div>
-
-  <div>
-    <button class="btn btn-primary mb-2" href="#">Intercept</button>
-  </div>
-
-  <hr>
-
-  <div class="form-group">
-    <label for="exampleFormControlTextarea1">Output:</label>
-    <textarea disabled="disabled" class="form-control" id="exampleFormControlTextarea1" rows="5" [(ngModel)]="output"></textarea>
-    <button class="btn btn-link" type="button" (click)="clear()">Clear</button>
-  </div>
 </div>

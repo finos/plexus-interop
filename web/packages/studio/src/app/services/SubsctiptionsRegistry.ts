@@ -5,8 +5,8 @@ import { Subscription } from 'rxjs/Subscription';
 export class SubsctiptionsRegistry {
     private subscriptions: Subscription[] = [];
 
-    public add(subscription: Subscription): void {
-        this.subscriptions.push(subscription);
+    public add(...subscriptions: Subscription[]): void {
+        subscriptions.forEach(s => this.subscriptions.push(s));
     }
 
     public unsubscribeAll(): void {

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { TransportConnection } from '@plexus-interop/transport-common/src/transport/TransportConnection';
+import { InteropClient } from '../services/InteropClient';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppActions } from "../services/app.actions";
 import { Store } from "@ngrx/store";
 import * as fromRoot from '../services/reducers';
@@ -6,7 +8,6 @@ import { Router } from "@angular/router";
 import { SubsctiptionsRegistry } from "../services/SubsctiptionsRegistry";
 import { InteropRegistryService } from "@plexus-interop/broker";
 import { DiscoveredMethod, InvocationRequestInfo } from "@plexus-interop/client";
-import { InteropClient } from "../services/InteropClient";
 import { UniqueId } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 
@@ -16,15 +17,15 @@ import { Logger, LoggerFactory } from "@plexus-interop/common";
   styleUrls: ['./consumed-service.component.css'],
   providers: [SubsctiptionsRegistry]
 })
-export class ConsumedServiceComponent implements OnInit {
+export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   private readonly log: Logger = LoggerFactory.getLogger("ConsumedServiceComponent");
 
   private registryService: InteropRegistryService;
 
   private interopClient: InteropClient;
-
   private discoveredMethods: DiscoveredMethod[];
+  private connection: TransportConnection;
 
   private selectedDiscoveredMethod: DiscoveredMethod;
 
@@ -42,12 +43,23 @@ export class ConsumedServiceComponent implements OnInit {
     const consumedMethod$ = this.store
       .filter(state => !!state.plexus.consumedMethod)
       .map(state => state.plexus);
+
     this.subscriptions.add(
       consumedMethod$.subscribe(state => {
         this.interopClient = state.services.interopClient;
         this.discoveredMethods = state.consumedMethod.discoveredMethods.methods;
+        this.interopClient = state.services.interopClient;
+
+        state.services.сonnectionProvider().then(connection => {
+          this.connection = connection;
+        })
       }));
 
+    this.formatAndUpdateArea();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribeAll();
   }
 
   sendRequest() {
@@ -71,7 +83,19 @@ export class ConsumedServiceComponent implements OnInit {
 
   formatAndUpdateArea() {
     this.messageContent = this.format(this.messageContent);
-    console.info(this.messageContent);
+  }
+
+  invoke(method: DiscoveredMethod) {
+    this.interopClient.sendUnaryRequest({
+      serviceAlias: method.providedMethod.providedService.serviceAlias,
+      serviceId: method.providedMethod.providedService.serviceId,
+      methodId: method.providedMethod.methodId,
+      applicationId: method.providedMethod.providedService.applicationId,
+      connectionId: this.connection.uuid()
+    }, "xxx", {
+        value: console.info,
+        error: console.error
+      });
   }
 
   toInvocationRequest(discoveredMethod: DiscoveredMethod): InvocationRequestInfo {
@@ -84,5 +108,4 @@ export class ConsumedServiceComponent implements OnInit {
       connectionId
     };
   }
-
 }
