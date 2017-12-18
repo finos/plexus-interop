@@ -1,7 +1,15 @@
+import { LoggerFactory } from '@plexus-interop/common';
 import { State } from './reducers';
 import { TransportConnectionFactory } from './TransportConnectionFactory';
 import { App as Application, ConsumedMethod } from "@plexus-interop/broker";
-import { PlexusConnectedActionParams, ServicesSnapshot, StudioState, Alert, AppConnectedActionParams } from './model';
+import {
+    Alert,
+    AppConnectedActionParams,
+    MetadataLoadActionParams,
+    PlexusConnectedActionParams,
+    ServicesSnapshot,
+    StudioState,
+} from './model';
 import { InteropClientFactory } from './InteropClientFactory';
 import { TypedAction } from './TypedAction';
 import { AppRegistryService } from '@plexus-interop/broker';
@@ -17,30 +25,60 @@ import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Action, Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
-import * as fromAlerts from './reducers/alerts';
 import { Router } from '@angular/router';
 
 @Injectable()
 export class Effects {
-    @Effect() connectToPlexus$: Observable<TypedAction<PlexusConnectedActionParams>> = this
+    @Effect() autoConnectToPlexus$: Observable<Action> = this
         .actions$
-        .ofType<TypedAction<string>>(AppActions.METADATA_LOAD_START)
-        .mergeMap(async action => {
-            const baseUrl = action.payload;
-            const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(baseUrl);
-            const appRegistryService = await this.interopServiceFactory.getAppRegistryService(baseUrl);
-            const apps = appRegistryService.getApplications();
-
-            const сonnectionProvider = await this.transportConnectionFactory.createWebTransportProvider(baseUrl);
+        .ofType(AppActions.AUTO_CONNECT)
+        .withLatestFrom(this.store.select(state => state.plexus))
+        .mergeMap(async ([action, state]) => {
+            console.info(state);
+            const payload: MetadataLoadActionParams = {
+                baseUrl: state.metadataUrl,
+                silentOnFailure: true
+            };
 
             return {
-                type: AppActions.METADATA_LOAD_SUCCESS,
-                payload: {
-                    apps,
-                    interopRegistryService,
-                    сonnectionProvider
-                }
+                type: AppActions.METADATA_LOAD_START,
+                payload: payload
             };
+        });
+
+    @Effect() connectToPlexus$: Observable<TypedAction<PlexusConnectedActionParams>> = this
+        .actions$
+        .ofType<TypedAction<MetadataLoadActionParams>>(AppActions.METADATA_LOAD_START)
+        .mergeMap(async action => {
+            const params = action.payload;
+            const baseUrl = params.baseUrl;
+
+            try {
+                const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(baseUrl);
+                const appRegistryService = await this.interopServiceFactory.getAppRegistryService(baseUrl);
+                const apps = appRegistryService.getApplications();
+
+                const сonnectionProvider = await this.transportConnectionFactory.createWebTransportProvider(baseUrl);
+                return {
+                    type: AppActions.METADATA_LOAD_SUCCESS,
+                    payload: {
+                        apps,
+                        interopRegistryService,
+                        сonnectionProvider
+                    }
+                };
+            }
+            catch (error) {
+                const log = LoggerFactory.getLogger(Effects.name);
+                const msg = `Connection not successful. Please enter correct metadata base url..`;
+
+                if (params.silentOnFailure) {
+                    log.info(msg);
+                } else {
+                    log.error(msg);
+                    throw error;
+                }
+            }
         });
 
     @Effect() disconnectMetadata = this.actions$
@@ -77,31 +115,31 @@ export class Effects {
         });
 
     @Effect() loadConsumedMethod$: Observable<TypedAction<any>> =
-        this.actions$
-            .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
-            .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
-            .mergeMap(async ([action, services]) => {
+    this.actions$
+        .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
+        .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
+        .mergeMap(async ([action, services]) => {
 
-                const method = action.payload;
-                const interopClient = services.interopClient;
+            const method = action.payload;
+            const interopClient = services.interopClient;
 
-                const discoveredMethods = await interopClient.discoverMethod({
-                    consumedMethod: {
-                        consumedService: {
-                            serviceId: method.consumedService.service.id
-                        },
-                        methodId: method.method.name
-                    }
-                });
-
-                return {
-                    type: AppActions.CONSUMED_METHOD_SUCCESS,
-                    payload: {
-                        method,
-                        discoveredMethods
-                    }
-                };
+            const discoveredMethods = await interopClient.discoverMethod({
+                consumedMethod: {
+                    consumedService: {
+                        serviceId: method.consumedService.service.id
+                    },
+                    methodId: method.method.name
+                }
             });
+
+            return {
+                type: AppActions.CONSUMED_METHOD_SUCCESS,
+                payload: {
+                    method,
+                    discoveredMethods
+                }
+            };
+        });
 
     @Effect() appConnected$: Observable<Action> = this
         .actions$

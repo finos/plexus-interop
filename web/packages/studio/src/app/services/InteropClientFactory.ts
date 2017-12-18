@@ -1,3 +1,4 @@
+import { UrlParamsProvider } from './UrlParamsProvider';
 
 import { InteropClient } from "./InteropClient";
 import { Injectable } from "@angular/core";
@@ -23,11 +24,12 @@ export class InteropClientFactory {
         this.log.info(`Connecting as ${appId}`);
 
         let genericClientBuilder = new GenericClientApiBuilder();
+        let appInstanceId = UrlParamsProvider.getParam('appInstanceId');
 
         genericClientBuilder = genericClientBuilder
             .withClientDetails({
                 applicationId: appId,
-                applicationInstanceId: UniqueId.generateNew()
+                applicationInstanceId: appInstanceId ? UniqueId.fromString(appInstanceId) : UniqueId.generateNew()
             })
             .withTransportConnectionProvider(connectionProvider);
 

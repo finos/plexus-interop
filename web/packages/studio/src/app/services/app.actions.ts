@@ -29,4 +29,6 @@ export class AppActions {
     static DO_NOTHING = 'DO_NOTHING';
 
     static ALERT_ERROR = 'ALERT_ERROR';
+    
+    static AUTO_CONNECT = 'AUTO_CONNECT';
 }

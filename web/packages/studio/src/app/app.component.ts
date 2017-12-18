@@ -1,7 +1,11 @@
+import { AppActions } from './services/app.actions';
+import { Store } from '@ngrx/store';
 
 import { LoggerFactory, LogLevel, Logger, TimeUtils } from '@plexus-interop/common';
 import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { ElementRef, Renderer2 } from '@angular/core';
+
+import { State } from './services/reducers';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +15,8 @@ import { ElementRef, Renderer2 } from '@angular/core';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Plexus Studio';
   plexusLogs = "";
+  constructor(private store: Store<State>) {
+  }
 
   private loggerDelegateRegistration: { unregister: () => void };
   private logger: Logger;
@@ -37,6 +43,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.logger = LoggerFactory.getLogger();
     this.logger.info('Welcome to Plexus Studio!');
+
+    this.store.dispatch({
+      type: AppActions.AUTO_CONNECT
+    });
   }
 
   public ngOnDestroy(): void {

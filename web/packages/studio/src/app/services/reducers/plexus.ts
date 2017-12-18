@@ -4,12 +4,18 @@ import { TypedAction } from './../TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from "../app.actions";
 import { Action } from '@ngrx/store';
-import { AppConnectedActionParams, PlexusConnectedActionParams, StudioState, ConsumedMethodState } from '../model';
+import {
+    AppConnectedActionParams,
+    ConsumedMethodState,
+    MetadataLoadActionParams,
+    PlexusConnectedActionParams,
+    StudioState,
+} from '../model';
 
 const initialState: StudioState = {
     loading: false,
     connected: false,
-    metadataUrl: '/assets',
+    metadataUrl: window.location.href + 'assets',
     connectedApp: undefined,
     consumedMethod: undefined,
     providedMethod: undefined,
@@ -33,7 +39,7 @@ export function reducer(
         case AppActions.METADATA_LOAD_START:
             return {
                 ...initialState,
-                metadataUrl: getPayload<string>(action),
+                metadataUrl: getPayload<MetadataLoadActionParams>(action).baseUrl,
                 loading: true
             };
         case AppActions.METADATA_LOAD_SUCCESS:

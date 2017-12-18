@@ -43,6 +43,11 @@ export interface AppConnectedActionParams {
     application: Application
 }
 
+export interface MetadataLoadActionParams {
+    baseUrl: string,
+    silentOnFailure: boolean
+}
+
 export interface Alert {
     message: string,
     type: AlertType
