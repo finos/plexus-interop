@@ -81,9 +81,6 @@ export class AppServicesComponent implements OnInit {
           actions: service.methods.valuesArray().map(method => ({ name: method.method.name }))
         }));
       });
-    this.subscriptions.add(this.store.select(state => state.plexus).subscribe(plexus => {
-      this.registryService = plexus.services.interopRegistryService;
-    }));
   }
   openConsumed() {
 
