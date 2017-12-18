@@ -19,6 +19,10 @@ export class ConsumedServiceComponent implements OnInit {
 
   private discoveredMethods: DiscoveredMethod[];
 
+  private selectedDiscoveredMethod: DiscoveredMethod;
+
+  messageContent: string;
+
   constructor(
     private actions: AppActions,
     private store: Store<fromRoot.State>,
@@ -28,6 +32,8 @@ export class ConsumedServiceComponent implements OnInit {
 
   ngOnInit() {
 
+    this.messageContent = "Enter Message Payload in JSON format";
+    
     const consumedMethod$ = this.store
       .filter(state => !!state.plexus.consumedMethod)
       .map(state => state.plexus);
@@ -37,6 +43,19 @@ export class ConsumedServiceComponent implements OnInit {
         this.discoveredMethods = state.consumedMethod.discoveredMethods.methods;
       }));
 
+  }
+
+  sendRequest() {
+    console.log(this.selectedDiscoveredMethod);
+  }
+
+  format(messageStr) {
+    return JSON.stringify(JSON.parse(messageStr), null, 2);
+  }
+
+  formatAndUpdateArea() {
+    this.messageContent = this.format(this.messageContent);
+    console.info(this.messageContent);
   }
 
 }
