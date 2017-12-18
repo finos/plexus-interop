@@ -23,13 +23,10 @@ import com.google.inject.Inject
 import org.eclipse.xtext.resource.XtextResourceSet
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenerator
 import org.eclipse.emf.common.util.URI
-import com.db.plexus.interop.dsl.gen.InteropLangUtils
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
-import java.util.Arrays
 import static org.junit.Assert.*;
 import org.junit.Test
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 
 @RunWith(typeof(XtextRunner))
