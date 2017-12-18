@@ -17,3 +17,4 @@
 export * from "./api";
 export * from "./bus";
 export * from "./metadata";
+export * from "./io";
