@@ -2,9 +2,10 @@
   <div class="col-sm-6">
     <h5>Consumed</h5>
     <div class="list-group list-group-flush">
-      <div class="list-group-item" *ngFor="let service of consumedServices | async">
-        {{service.name}}
-        <a class="list-group-item list-group-item-action list-group-item-secondary" *ngFor="let action of service.actions" (click)="openConsumed(action)">{{action.name}}</a>
+      <div class="list-group-item" *ngFor="let consumedService of consumedServices | async">
+        {{consumedService?.service.id}}
+        <a class="list-group-item list-group-item-action list-group-item-secondary" *ngFor="let method of getMethodsArray(consumedService)"
+          (click)="openConsumed(method)">{{method?.method.name}}</a>
       </div>
     </div>
   </div>
@@ -12,9 +13,10 @@
   <div class="col-sm-6">
     <h5>Provided</h5>
     <div class="list-group list-group-flush">
-      <div class="list-group-item" *ngFor="let service of providedServices | async">
-        {{service.name}}
-        <a class="list-group-item list-group-item-action list-group-item-secondary" *ngFor="let action of service.actions" (click)="openProvided(action)">{{action.name}}</a>
+      <div class="list-group-item" *ngFor="let providedService of providedServices | async">
+        {{providedService?.service.id}}
+        <a class="list-group-item list-group-item-action list-group-item-secondary" *ngFor="let method of getMethodsArray(providedService)"
+          (click)="openProvided(method)">{{method?.method.name}}</a>
       </div>
     </div>
   </div>

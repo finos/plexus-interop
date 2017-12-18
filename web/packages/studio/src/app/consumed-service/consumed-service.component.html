@@ -1,31 +1,21 @@
 <div>
   <div class="form-group">
-    <label for="exampleFormControlTextarea1">Enter reponse:</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="1" [(ngModel)]="messageContent"></textarea>
+    <label for="exampleFormControlTextarea1">Enter message JSON:</label>
+    <textarea class="form-control" id="exampleFormControlTextarea1" rows="10" [(ngModel)]="messageContent"></textarea>
+    <button class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
   </div>
 
   <div>
     <div class="form-group">
-      <label for="exampleSelect1">Intercepted app:</label>
+      <label for="exampleSelect1">Target method:</label>
       <select class="form-control" id="exampleSelect1">
-      <option>Application 1</option>
-      <option>Application 2</option>
-      <option>Application 3</option>
-      <option>Application 4</option>
-      <option>Application 5</option>
+      <option *ngFor="let method of discoveredMethods">{{method.methodTitle}}</option>
     </select>
     </div>
   </div>
 
   <div>
-    <button class="btn btn-primary mb-2" href="#">Intercept</button>
+    <button class="btn btn-primary mb-2" href="javascript:" (click)="invoke()">Invoke</button>
   </div>
 
-  <hr>
-
-  <div class="form-group">
-    <label for="exampleFormControlTextarea1">Output:</label>
-    <textarea disabled="disabled" class="form-control" id="exampleFormControlTextarea1" rows="5" [(ngModel)]="output"></textarea>
-    <button class="btn btn-link" type="button" (click)="clear()">Clear</button>
-  </div>
 </div>

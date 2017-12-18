@@ -10,16 +10,6 @@ import * as fromRoot from '../services/reducers';
 import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
 import 'rxjs/add/operator/concat';
 
-enum ServiceType {
-  PROVIDED, CONSUMED
-}
-
-interface PlexusStudioService {
-  name: string,
-  type: ServiceType,
-  actions: { name: string }[]
-}
-
 @Component({
   selector: 'app-services',
   templateUrl: './app-services.component.html',
@@ -38,11 +28,9 @@ export class AppServicesComponent implements OnInit {
     private subscribtions: SubsctiptionsRegistry) {
   }
 
-  consumedServices: Observable<PlexusStudioService[]> = Observable.of([]);
-  providedServices: Observable<PlexusStudioService[]> = Observable.of([]);
+  consumedServices: Observable<ConsumedService[]> = Observable.of([]);
+  providedServices: Observable<ProvidedService[]> = Observable.of([]);
 
-  allServices: Observable<PlexusStudioService[]>;
-  
   private subscriptions: SubsctiptionsRegistry;
 
   public ngOnInit(): void {
@@ -57,11 +45,7 @@ export class AppServicesComponent implements OnInit {
         const app = state.connectedApp;
         const consumed = services.interopRegistryService.getConsumedServices(app.id);
 
-        return consumed.map(service => ({
-          name: service.alias,
-          type: ServiceType.CONSUMED,
-          actions: service.methods.valuesArray().map(method => ({ name: method.method.name }))
-        }));
+        return consumed;
       });
 
     this.providedServices = this.store
@@ -75,29 +59,23 @@ export class AppServicesComponent implements OnInit {
         const app = state.connectedApp;
         const provided = services.interopRegistryService.getProvidedServices(app.id);
 
-        return provided.map(service => ({
-          name: service.alias,
-          type: ServiceType.CONSUMED,
-          actions: service.methods.valuesArray().map(method => ({ name: method.method.name }))
-        }));
+        return provided;
       });
   }
-  openConsumed() {
-
-    if (this.registryService) {
-
-      // TODO change to selected
-      const consumedMethod: ConsumedMethod =
-        this.registryService.getApplication("com.db.cm.CashManager")
-          .consumedServices[0].methods.get("OpenMT103");
-
+  
+  openConsumed(consumedMethod) {
+    // if (this.registryService) {
       this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: consumedMethod });
-
-    }
+    // }
   }
 
-  openProvided() {
-    this.router.navigate(['/provided']);
+  openProvided(method) {
+    // this.router.navigate(['/provided']);
+     this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: method });
+  }
+
+  getMethodsArray(service: ProvidedService | ConsumedService) {
+    return service.methods.valuesArray();
   }
 
 }

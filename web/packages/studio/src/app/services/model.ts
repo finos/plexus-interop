@@ -1,3 +1,4 @@
+import { ProvidedMethod } from '@plexus-interop/broker';
 import { InteropClient } from './InteropClient';
 import { TransportConnectionProvider } from './TransportConnectionProvider';
 import { App as Application, ConsumedMethod } from '@plexus-interop/broker';
@@ -17,6 +18,7 @@ export interface StudioState {
     metadataUrl: string;
     connectedApp: Application;
     consumedMethod: ConsumedMethodState,
+    providedMethod: ProvidedMethodState,
     apps: Application[],
     services: ServicesSnapshot
 }
@@ -24,6 +26,10 @@ export interface StudioState {
 export interface ConsumedMethodState {
     method: ConsumedMethod;
     discoveredMethods: MethodDiscoveryResponse;
+}
+
+export interface ProvidedMethodState {
+    method: ProvidedMethod;
 }
 
 export interface PlexusConnectedActionParams {
@@ -45,3 +51,4 @@ export interface Alert {
 export enum AlertType {
     INFO, SUCCESS, USER_FAIL, ERROR
 }
+

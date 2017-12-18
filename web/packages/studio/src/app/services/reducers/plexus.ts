@@ -12,6 +12,7 @@ const initialState: StudioState = {
     metadataUrl: '/assets',
     connectedApp: undefined,
     consumedMethod: undefined,
+    providedMethod: undefined,
     apps: [],
     services: {
         interopRegistryService: undefined,
