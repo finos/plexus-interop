@@ -64,7 +64,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     this.interopClient.sendUnaryRequest(
       this.toInvocationRequest(this.selectedDiscoveredMethod), this.messageContent, {
         value: v => {
-          this.log.info(`Response received, ${v}`);
+          this.log.info(`Response received:  ${this.format(v)}`);
         },
         error: e => {
           this.log.error(`Error received`, e);

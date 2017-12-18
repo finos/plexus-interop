@@ -9,6 +9,7 @@ import { UnaryStringHandler } from "./UnaryStringHandler";
 import { flatMap, Logger, LoggerFactory } from "@plexus-interop/common";
 import { GenericClientWrapper } from "./GenericClientWrapper";
 import { DynamicMarshallerFactory } from "@plexus-interop/broker";
+import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
 
 @Injectable()
 export class InteropClientFactory {
@@ -37,13 +38,14 @@ export class InteropClientFactory {
         const unaryHandlers = new Map<string, UnaryStringHandler>();
 
         const marshallerFactory = new DynamicMarshallerFactory(interopRegistryService.getRegistry());
+        const defaultGenerator = new DefaultMessageGenerator(interopRegistryService);
 
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .filter(pm => pm.method.type === MethodType.Unary)
             .forEach(pm => {
                 // create dummy implementation
                 const methodFullName = `${pm.providedService.service.id}.${pm.method.name}`;
-                unaryHandlers.set(methodFullName, async requestJson => requestJson);
+                unaryHandlers.set(methodFullName, async requestJson => defaultGenerator.generate(pm.method.outputMessage.id));
                 genericClientBuilder.withUnaryInvocationHandler({
                     serviceInfo: {
                         serviceId: pm.providedService.service.id
@@ -66,7 +68,7 @@ export class InteropClientFactory {
 
         this.log.info(`Connected as ${appId}`);
 
-        return new GenericClientWrapper(appId, client, interopRegistryService, marshallerFactory, unaryHandlers);
+        return new GenericClientWrapper(appId, client, interopRegistryService, marshallerFactory, unaryHandlers, defaultGenerator);
     }
 
 }

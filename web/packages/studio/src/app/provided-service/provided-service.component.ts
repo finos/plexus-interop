@@ -44,8 +44,7 @@ export class ProvidedServiceComponent implements OnInit {
         this.providedMethod.providedService.service.id,
         this.providedMethod.method.name,
         async requestJson => {
-          this.log.info(`"Received request:
-          ${this.format(requestJson)}`);
+          this.log.info(`"Received request: ${this.format(requestJson)}`);
           return this.messageContent;
         });
       this.log.info("Set interceptor");
@@ -59,7 +58,7 @@ export class ProvidedServiceComponent implements OnInit {
   createDefaultMessage() {
     if (this.providedMethod) {
       const method = this.providedMethod.method;
-      this.messageContent = this.interopClient.createDefaultPayload(method.inputMessage.id);
+      this.messageContent = this.interopClient.createDefaultPayload(method.outputMessage.id);
       this.formatAndUpdateArea();
     }
   }
