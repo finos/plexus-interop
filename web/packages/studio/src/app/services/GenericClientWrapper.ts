@@ -2,8 +2,7 @@ import { InteropClient } from "./InteropClient";
 import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest } from "@plexus-interop/client";
 import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
-import { EncoderProvider } from "./EncoderProvider";
-import { InteropRegistryService } from "@plexus-interop/broker";
+import { InteropRegistryService, DynamicMarshallerFactory } from "@plexus-interop/broker";
 import { UnaryStringHandler } from "./UnaryStringHandler";
 
 export class GenericClientWrapper implements InteropClient {
@@ -12,7 +11,7 @@ export class GenericClientWrapper implements InteropClient {
         private readonly appId: string,
         private readonly genericClient: GenericClientApi,
         private readonly interopRegistryService: InteropRegistryService,
-        private readonly encoderProvider: EncoderProvider,
+        private readonly encoderProvider: DynamicMarshallerFactory,
         private readonly unaryHandlers: Map<string, UnaryStringHandler>) { }
 
     public disconnect(): Promise<void> {
@@ -23,7 +22,7 @@ export class GenericClientWrapper implements InteropClient {
         this.unaryHandlers.set(`${serviceId}.${methodId}`, handler);
     }
 
-    public sendUnaryRequest(invocationInfo: InvocationRequestInfo, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient> {
+    public async sendUnaryRequest(invocationInfo: InvocationRequestInfo, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient> {
         const consumedMethod = this.interopRegistryService.getConsumedMethod(this.appId, {
             consumedService: {
                 serviceId: invocationInfo.serviceId
@@ -34,10 +33,13 @@ export class GenericClientWrapper implements InteropClient {
         const inputMessageId = consumedMethod.method.inputMessage.id;
         const outputMessageId = consumedMethod.method.outputMessage.id;
 
-        const requestEncoder = this.encoderProvider.getMessageEncoder(consumedMethod.method.inputMessage.id);
-        const responseEncoder = this.encoderProvider.getMessageEncoder(consumedMethod.method.outputMessage.id);
+        const requestEncoder = this.encoderProvider.getMarshaller(consumedMethod.method.inputMessage.id);
+        const responseEncoder = this.encoderProvider.getMarshaller(consumedMethod.method.outputMessage.id);
 
-        return this.genericClient.sendUnaryRequest(invocationInfo, requestEncoder.encode(requestJson), {
+        const requestData = JSON.parse(requestJson);
+        requestEncoder.validate(requestData);
+
+        return await this.genericClient.sendUnaryRequest(invocationInfo, requestEncoder.encode(requestData), {
             value: v => {
                 responseHandler.value(responseEncoder.decode(v));
             },

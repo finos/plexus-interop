@@ -1,6 +1,6 @@
 import { InteropClient } from './InteropClient';
 import { TransportConnectionProvider } from './TransportConnectionProvider';
-import { Application } from '@plexus-interop/broker/dist/main/src/metadata/apps/model/Application';
+import { App as Application } from '@plexus-interop/broker';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { TransportConnection } from "@plexus-interop/transport-common";
 

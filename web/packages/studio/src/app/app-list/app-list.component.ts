@@ -1,4 +1,4 @@
-import { Application } from '@plexus-interop/broker/src/metadata/apps/model/Application';
+import { App as Application } from '@plexus-interop/broker';
 import { Observable } from 'rxjs/Observable';
 import { AppActions } from '../services/app.actions';
 import { Component, OnInit } from '@angular/core';

@@ -50,6 +50,10 @@ export class InteropRegistryService {
         return result;
     }
 
+    public getRegistry(): InteropRegistry {
+        return this.registry;
+    }
+
     public getConsumedService(appId: string, serviceReference: ConsumedServiceReference): ConsumedService {
         const app = this.getApplication(appId);
         const result = app.consumedServices.find(consumedService => consumedService.service.id === serviceReference.serviceId

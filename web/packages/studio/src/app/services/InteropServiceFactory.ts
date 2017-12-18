@@ -10,6 +10,7 @@ export interface RegistryUrls {
 
 @Injectable()
 export class InteropServiceFactory {
+
     private readonly urlResolver: UrlResolver = new UrlResolver();
 
     public async getInteropRegistryService(baseUrl: string): Promise<InteropRegistryService> {

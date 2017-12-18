@@ -28,7 +28,7 @@ describe("Logger Factory", () => {
         let logger = LoggerFactory.getLogger("LoggerFactory.spec");
         logger.error("test error", { arg: "arg" });
 
-        expect(called).toEqual([{ msg: "test msg", args: [{ arg: "arg" }], logLevel: LogLevel.ERROR }]);
+        expect(called).toEqual([{ msg: "test error", args: [{ arg: "arg" }], logLevel: LogLevel.ERROR }]);
     });
 
     it("Should be able to removed registered logger implementations", () => {
@@ -44,6 +44,6 @@ describe("Logger Factory", () => {
         unregisterObj.unregister();
         logger.error("test error2", { arg: "arg2" });
 
-        expect(called).toEqual([{ msg: "test msg", args: [{ arg: "arg" }], logLevel: LogLevel.ERROR }]);
+        expect(called).toEqual([{ msg: "test error", args: [{ arg: "arg" }], logLevel: LogLevel.ERROR }]);
     });
 });
