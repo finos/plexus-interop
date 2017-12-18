@@ -5,27 +5,27 @@
       "fields": [
         {
           "name": "stringField",
-          "number": "1",
+          "number": 1,
           "type": "string"
         },
         {
           "name": "booleanField",
-          "number": "2",
+          "number": 2,
           "type": "bool"
         },
         {
           "name": "sIntField",
-          "number": "3",
+          "number": 3,
           "type": "sint32"
         },
         {
           "name": "uIntField",
-          "number": "4",
+          "number": 4,
           "type": "uint32"
         },
         {
           "name": "requestField",
-          "number": "5",
+          "number": 5,
           "type": "com.plexus.model.Request"
         }
       ]
@@ -35,7 +35,7 @@
       "fields": [
         {
           "name": "result",
-          "number": "1",
+          "number": 1,
           "type": "string"
         }
       ]
