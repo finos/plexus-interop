@@ -5,27 +5,32 @@
       "fields": [
         {
           "name": "stringField",
-          "number": 1,
+          "num": 1,
+          "primitive": true,
           "type": "string"
         },
         {
           "name": "booleanField",
-          "number": 2,
+          "num": 2,
+          "primitive": true,
           "type": "bool"
         },
         {
           "name": "sIntField",
-          "number": 3,
+          "num": 3,
+          "primitive": true,
           "type": "sint32"
         },
         {
           "name": "uIntField",
-          "number": 4,
+          "num": 4,
+          "primitive": true,
           "type": "uint32"
         },
         {
           "name": "requestField",
-          "number": 5,
+          "num": 5,
+          "primitive": false,
           "type": "com.plexus.model.Request"
         }
       ]
@@ -35,7 +40,8 @@
       "fields": [
         {
           "name": "result",
-          "number": 1,
+          "num": 1,
+          "primitive": true,
           "type": "string"
         }
       ]

@@ -59,6 +59,14 @@ public class InteropLangUtils {
         }
     }
 
+    def static boolean isPrimitive(Field field) {
+        val typeRef = field.getTypeReference();
+        switch typeRef {
+            PrimitiveFieldType: true
+            default: false
+        }
+    }
+
     def static getFullName(EObject obj, IQualifiedNameProvider qualifiedNameProvider) {
         return qualifiedNameProvider.getFullyQualifiedName(obj).skipFirst(1).toString()
     }
