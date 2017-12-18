@@ -33,6 +33,8 @@ import org.eclipse.emf.ecore.EObject
 import com.db.plexus.interop.dsl.protobuf.Message
 import com.db.plexus.interop.dsl.protobuf.Field
 import com.db.plexus.interop.dsl.protobuf.PrimitiveFieldType
+import com.db.plexus.interop.dsl.protobuf.ComplexFieldType
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 
 public class InteropLangUtils {
 
@@ -48,12 +50,25 @@ public class InteropLangUtils {
         .collect(Collectors.toList());
     }
 
-    def static String getType(Field field) {
+    def static String getType(Field field, IQualifiedNameProvider qualifiedNameProvider) {
         val typeRef = field.getTypeReference();
-        if (typeRef instanceof PrimitiveFieldType) {
-            return (typeRef as PrimitiveFieldType).getValue().literal.toLowerCase();
-        } else {
-            return "Unsupported";
+        switch typeRef {
+            PrimitiveFieldType: typeRef.getValue().literal.toLowerCase()
+            ComplexFieldType: getType(typeRef, qualifiedNameProvider)
+            default: "Unsupported"
+        }
+    }
+
+    def static getFullName(EObject obj, IQualifiedNameProvider qualifiedNameProvider) {
+        return qualifiedNameProvider.getFullyQualifiedName(obj).skipFirst(1).toString()
+    }
+
+    def static String getType(ComplexFieldType complexFieldType, IQualifiedNameProvider nameProvider) {
+        val complexType = complexFieldType.getValue()
+        switch complexType {
+            Message: getFullName(complexType, nameProvider)
+            Enum: getFullName(complexType, nameProvider)
+            default: "Unsupported"
         }
     }
 

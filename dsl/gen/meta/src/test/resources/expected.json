@@ -1,0 +1,152 @@
+{
+  "messages": [
+    {
+      "id": "com.plexus.model.Request",
+      "fields": [
+        {
+          "name": "stringField",
+          "number": "1",
+          "type": "string"
+        },
+        {
+          "name": "booleanField",
+          "number": "2",
+          "type": "bool"
+        },
+        {
+          "name": "sIntField",
+          "number": "3",
+          "type": "sint32"
+        },
+        {
+          "name": "uIntField",
+          "number": "4",
+          "type": "uint32"
+        },
+        {
+          "name": "requestField",
+          "number": "5",
+          "type": "com.plexus.model.Request"
+        }
+      ]
+    },
+    {
+      "id": "com.plexus.model.Response",
+      "fields": [
+        {
+          "name": "result",
+          "number": "1",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "com.plexus.services.ExampleService",
+      "methods": [
+        {
+          "name": "PointToPoint",
+          "input": "com.plexus.model.Request",
+          "output": "com.plexus.model.Response",
+          "type": "Unary"
+        },
+        {
+          "name": "ServerStreaming",
+          "input": "com.plexus.model.Request",
+          "output": "com.plexus.model.Response",
+          "type": "ServerStreaming"
+        },
+        {
+          "name": "ClientToServer",
+          "input": "com.plexus.model.Request",
+          "output": "com.plexus.model.Response",
+          "type": "ClientStreaming"
+        },
+        {
+          "name": "BidiStreaming",
+          "input": "com.plexus.model.Request",
+          "output": "com.plexus.model.Response",
+          "type": "DuplexStreaming"
+        }
+      ]
+    }
+  ],
+  "applications": [
+    {
+      "id": "com.plexus.components.ComponentA",
+      "consumes": [
+        {
+          "service": "com.plexus.services.ExampleService",
+          "from": [
+          ],
+          "methods": [
+            "PointToPoint",
+            "ServerStreaming",
+            "ClientToServer",
+            "BidiStreaming"
+          ]
+        }
+      ],
+      "provides": [
+        {
+          "service": "com.plexus.services.ExampleService",
+          "title": "ExampleService",
+          "to": [
+            "com.plexus.*"
+          ],
+          "methods": [
+            {
+              "name": "PointToPoint",
+              "title": "PointToPoint"
+            },
+            {
+              "name": "ServerStreaming",
+              "title": "ServerStreaming"
+            },
+            {
+              "name": "ClientToServer",
+              "title": "ClientToServer"
+            },
+            {
+              "name": "BidiStreaming",
+              "title": "BidiStreaming"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "com.plexus.components.ComponentC",
+      "consumes": [
+      ],
+      "provides": [
+        {
+          "service": "com.plexus.services.ExampleService",
+          "title": "ExampleService",
+          "to": [
+            "com.plexus.*"
+          ],
+          "methods": [
+            {
+              "name": "PointToPoint",
+              "title": "PointToPoint"
+            },
+            {
+              "name": "ServerStreaming",
+              "title": "ServerStreaming"
+            },
+            {
+              "name": "ClientToServer",
+              "title": "ClientToServer"
+            },
+            {
+              "name": "BidiStreaming",
+              "title": "BidiStreaming"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

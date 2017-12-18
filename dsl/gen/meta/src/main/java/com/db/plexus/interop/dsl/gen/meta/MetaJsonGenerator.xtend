@@ -40,16 +40,18 @@ class MetaJsonGenerator implements CodeOutputGenerator {
 		{
 		    "messages": [
 		    	«FOR message : resources.messages SEPARATOR ','»
+		    	{
 					"id": "«message.fullName»",
 					"fields": [
 						«FOR field: message.fields SEPARATOR ','»
 						{
 							"name": "«field.name»",
 							"number": "«field.number»",
-							"type": "«field.type»"
+							"type": "«getType(field, qualifiedNameProvider)»"
 						}
         				«ENDFOR»
 					]
+				}
 		    	«ENDFOR»
 		    ],
 			"services": [
