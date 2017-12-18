@@ -30,6 +30,11 @@ describe("DynamicMarshallerFactory", () => {
         ]
     });
 
+    const validMessage = {
+        stringField: "stringData",
+        boolField: true
+    };   
+
     const registry: InteropRegistry = {
         messages,
         applications: new ExtendedMap<string, Application>(),
@@ -43,12 +48,32 @@ describe("DynamicMarshallerFactory", () => {
         expect(marshaller).toBeDefined();
     });
 
+    it("Reuse same Marshaller for next calls", () => {
+        expect(sut.getMarshaller(messageId))
+            .toBe(sut.getMarshaller(messageId));
+    });
+
+    it("It creates Marshaller with validation support", () => {
+        const marshaller = sut.getMarshaller(messageId);
+        marshaller.validate(validMessage);        
+    });
+
     it("Raises an Error for Marshaller request on not existing Message", () => {
         try {
             sut.getMarshaller("Do not exist");
             fail("Should fail");
         } catch (error) {  
         }
+    });
+
+    it("It creates Marshaller with primitive types support", () => {
+        debugger;
+        const marshaller = sut.getMarshaller(messageId);  
+        const encoded = marshaller.encode(validMessage);
+        expect(encoded).toBeDefined();
+        const decoded = marshaller.decode(encoded);
+        console.log(JSON.stringify(decoded));
+        expect(decoded).toEqual(validMessage);
     });
 
 });

@@ -48,7 +48,10 @@ export class DynamicMarshallerFactory {
             throw new Error(`${messageId} not found in Registry`);
         }
 
-        const type = new Type(message.id);
+        const lastDotIndex = message.id.lastIndexOf("\.");
+        const name = lastDotIndex > 0 ? message.id.substr(lastDotIndex + 1, message.id.length - 1) : message.id;
+
+        const type = new Type(name);
 
         message.fields
             .filter(f => f.primitive)
