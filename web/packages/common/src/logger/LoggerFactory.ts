@@ -32,7 +32,7 @@ export enum LogLevel {
 export class LoggerFactory {
   private static additionalRecipients: LoggerDelegate[] = [];
 
-  public static registerDecorator(logger: LoggerDelegate): { unregister: () => void } {
+  public static registerDelegate(logger: LoggerDelegate): { unregister: () => void } {
     let newRecipientsLen = LoggerFactory.additionalRecipients.push(logger);
     let registeredRecipientIndex = newRecipientsLen - 1;
 

@@ -55,8 +55,9 @@ export class LoggerBase implements Logger, LoggerDelegate {
         let actualMessage = `${this.name} ${msg}`;
 
         switch (logLevel) {
-            case LogLevel.DEBUG: log.debug(actualMessage, args); break;
             case LogLevel.TRACE: log.trace(actualMessage, args); break;
+            case LogLevel.DEBUG: log.debug(actualMessage, args); break;
+            case LogLevel.INFO: log.info(actualMessage, args); break;
             case LogLevel.WARN: log.warn(actualMessage, args); break;
             case LogLevel.ERROR: log.warn(actualMessage, args); break;
             case LogLevel.SILENT: /* be silent */ break;

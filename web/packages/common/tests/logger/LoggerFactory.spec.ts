@@ -21,20 +21,20 @@ describe("Logger Factory", () => {
     it("Should be able to register additional logger implementations", () => {
         let called: { msg: string, args: any, logLevel: LogLevel }[] = [];
 
-        LoggerFactory.registerDecorator({
+        LoggerFactory.registerDelegate({
             log: (logLevel, msg, args) => { called.push({ msg, args, logLevel }); }
         });
 
         let logger = LoggerFactory.getLogger("LoggerFactory.spec");
         logger.error("test error", { arg: "arg" });
 
-        expect(called).toEqual([{ msg: "test error", args: { arg: "arg" }, logLevel: LogLevel.ERROR }]);
+        expect(called).toEqual([{ msg: "test msg", args: [{ arg: "arg" }], logLevel: LogLevel.ERROR }]);
     });
 
     it("Should be able to removed registered logger implementations", () => {
         let called: { msg: string, args: any, logLevel: LogLevel }[] = [];
 
-        let unregisterObj = LoggerFactory.registerDecorator({
+        let unregisterObj = LoggerFactory.registerDelegate({
             log: (logLevel, msg, args) => { called.push({ msg, args, logLevel }); }
         });
 
@@ -44,6 +44,6 @@ describe("Logger Factory", () => {
         unregisterObj.unregister();
         logger.error("test error2", { arg: "arg2" });
 
-        expect(called).toEqual([{ msg: "test error", args: { arg: "arg" }, logLevel: LogLevel.ERROR }]);
+        expect(called).toEqual([{ msg: "test msg", args: [{ arg: "arg" }], logLevel: LogLevel.ERROR }]);
     });
 });

@@ -11,6 +11,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/operator/withLatestFrom';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
@@ -54,7 +55,7 @@ export class Effects {
     @Effect() connectToApp$: Observable<TypedAction<any>> = this
         .actions$
         .ofType<TypedAction<Application>>(AppActions.CONNECT_TO_APP_START)
-        .combineLatest(this.store.select(state => state.plexus.services))
+        .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
         .mergeMap(async ([action, services]) => {
             const application = action.payload;
             const appId = application.id;
@@ -75,7 +76,7 @@ export class Effects {
             return { type: AppActions.DO_NOTHING };
         });
 
-   @Effect() appConnectionFailed$: Observable<Action> = this
+    @Effect() appConnectionFailed$: Observable<Action> = this
         .actions$
         .ofType(AppActions.CONNECT_TO_APP_FAILED)
         .map(_ => {
