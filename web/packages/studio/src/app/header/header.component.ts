@@ -1,12 +1,13 @@
 import { SubsctiptionsRegistry } from './../services/SubsctiptionsRegistry';
 import { InteropServiceFactory, RegistryUrls } from '../services/InteropServiceFactory';
-import { Application } from './../../../../broker/dist/main/src/metadata/apps/model/Application.d';
+import { App as Application } from '@plexus-interop/broker';
 import { Subscription } from 'rxjs/Subscription';
 import { AppActions } from '../services/app.actions';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/operator/filter';
 import { Router } from '@angular/router';
 import { ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';

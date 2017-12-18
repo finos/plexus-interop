@@ -1,5 +1,5 @@
 import { InteropClient } from '../InteropClient';
-import { Application } from '@plexus-interop/broker/dist/main/src/metadata/apps/model/Application';
+import { App as Application } from '@plexus-interop/broker';
 import { TypedAction } from './../TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from '../app.actions';

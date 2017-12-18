@@ -1,6 +1,6 @@
 import { State } from './reducers';
 import { TransportConnectionFactory } from './TransportConnectionFactory';
-import { Application } from '@plexus-interop/broker/dist/main/src/metadata/apps/model/Application';
+import { App as Application } from '@plexus-interop/broker';
 import { PlexusConnectedActionParams, ServicesSnapshot, StudioState, Alert } from './model';
 import { InteropClientFactory } from './InteropClientFactory';
 import { TypedAction } from './TypedAction';

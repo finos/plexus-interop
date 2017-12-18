@@ -1,4 +1,4 @@
-import { LoggerFactory } from '@plexus-interop/common/dist/main/src/logger/index';
+import { LoggerFactory } from '@plexus-interop/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 @Component({

@@ -1,4 +1,5 @@
-import { Application } from '@plexus-interop/broker/src/metadata/apps/model/Application';
+
+import { App as Application } from '@plexus-interop/broker';
 import { TypedAction } from '../TypedAction';
 import { Action } from '@ngrx/store';
 
