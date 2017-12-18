@@ -17,5 +17,15 @@
     </div>
   </div>
 
-  <button class="btn btn-primary" type="button">Invoke</button>
+  <div>
+    <button class="btn btn-primary mb-2" href="#">Intercept</button>
+  </div>
+
+  <hr>
+
+  <div class="form-group">
+    <label for="exampleFormControlTextarea1">Output:</label>
+    <textarea disabled="disabled" class="form-control" id="exampleFormControlTextarea1" rows="5" [(ngModel)]="output"></textarea>
+    <button class="btn btn-link" type="button" (click)="clear()">Clear</button>
+  </div>
 </div>

@@ -9,6 +9,7 @@ import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/reducers';
 import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
 import 'rxjs/add/operator/concat';
+import 'rxjs/add/observable/of';
 
 @Component({
   selector: 'app-services',
@@ -30,7 +31,7 @@ export class AppServicesComponent implements OnInit {
 
   consumedServices: Observable<ConsumedService[]> = Observable.of([]);
   providedServices: Observable<ProvidedService[]> = Observable.of([]);
-
+  
   private subscriptions: SubsctiptionsRegistry;
 
   public ngOnInit(): void {
@@ -62,16 +63,14 @@ export class AppServicesComponent implements OnInit {
         return provided;
       });
   }
-  
-  openConsumed(consumedMethod) {
-    // if (this.registryService) {
-      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: consumedMethod });
-    // }
-  }
 
   openProvided(method) {
     // this.router.navigate(['/provided']);
      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: method });
+  }
+
+  openConsumed(selected: {name: string, method: ConsumedMethod}) {
+      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: selected.method });
   }
 
   getMethodsArray(service: ProvidedService | ConsumedService) {

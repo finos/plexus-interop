@@ -1,5 +1,7 @@
-import { LoggerFactory, LogLevel, Logger } from '@plexus-interop/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+
+import { LoggerFactory, LogLevel, Logger, TimeUtils } from '@plexus-interop/common';
+import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
+import { ElementRef, Renderer2 } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -16,15 +18,20 @@ export class AppComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     LoggerFactory.setLogLevel(LogLevel.DEBUG);
     this.loggerDelegateRegistration = LoggerFactory.registerDelegate({
+
       log: (logLevel: LogLevel, msg: string, args: any[]) => {
-        if (!!this.plexusLogs) {
-          this.plexusLogs += `\n`;
+
+        let message = `[${TimeUtils.format(new Date())}] ${LogLevel[logLevel]} ${msg}`;
+        if (args && args.length > 0) {
+          message += '| args: ' + args;
         }
 
-        this.plexusLogs += `${LogLevel[logLevel]} ${msg}`;
-        if (args && args.length > 0) {
-          this.plexusLogs += '| args: ' + args;
+        if (this.plexusLogs) {
+          this.plexusLogs = `${message}\n${this.plexusLogs}`;
+        } else {
+          this.plexusLogs = message;
         }
+
       }
     });
 

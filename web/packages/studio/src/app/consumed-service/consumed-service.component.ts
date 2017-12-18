@@ -7,7 +7,9 @@ import * as fromRoot from '../services/reducers';
 import { Router } from "@angular/router";
 import { SubsctiptionsRegistry } from "../services/SubsctiptionsRegistry";
 import { InteropRegistryService } from "@plexus-interop/broker";
-import { DiscoveredMethod } from "@plexus-interop/client";
+import { DiscoveredMethod, InvocationRequestInfo } from "@plexus-interop/client";
+import { UniqueId } from "@plexus-interop/protocol";
+import { Logger, LoggerFactory } from "@plexus-interop/common";
 
 @Component({
   selector: 'app-consumed-service',
@@ -17,31 +19,18 @@ import { DiscoveredMethod } from "@plexus-interop/client";
 })
 export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
+  private readonly log: Logger = LoggerFactory.getLogger("ConsumedServiceComponent");
+
   private registryService: InteropRegistryService;
+
   private interopClient: InteropClient;
   private discoveredMethods: DiscoveredMethod[];
   private connection: TransportConnection;
 
+  private selectedDiscoveredMethod: DiscoveredMethod;
+
   messageContent: string;
-  messageContentString = `{
-    "build-client": "cd ./packages/client && yarn build",
-    "build-common": "cd ./packages/common && yarn build ",
-    "build-e2e": "cd ./packages/e2e && yarn build",
-    "build-web-example": "cd ./packages/web-example && yarn build",
-    "build-electron-launcher": "cd ./packages/electron-launcher && yarn build",
-    "build-protocol": "cd ./packages/protocol && yarn build",
-    "build-transport-common": "cd ./packages/transport-common && yarn build",
-    "build-websocket-transport": "cd ./packages/websocket-transport && yarn build",
-    "build-quickstart-viewer": "cd ./packages/ccy-pair-rate-viewer && yarn build",
-    "build-quickstart-provider": "cd ./packages/ccy-pair-rate-provider && yarn build",
-    "build-core": "run-s build-common build-transport-common build-websocket-transport build-client",
-    "build-all-win": "run-s build-all benchmarks e2e",
-    "prebuild-all": "yarn install",
-    "e2e": "cd ./packages/e2e && yarn electron-e2e",
-    "poste2e": "yarn coverage",
-    "coverage": "nyc report --reporter=text --reporter=html",
-    "benchmarks": "cd ./packages/e2e && yarn electron-e2e-benchmarks"
-  }`;
+
   constructor(
     private actions: AppActions,
     private store: Store<fromRoot.State>,
@@ -50,12 +39,14 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const state$ = this.store
+    this.messageContent = "";
+    const consumedMethod$ = this.store
       .filter(state => !!state.plexus.consumedMethod)
       .map(state => state.plexus);
 
     this.subscriptions.add(
-      state$.subscribe(state => {
+      consumedMethod$.subscribe(state => {
+        this.interopClient = state.services.interopClient;
         this.discoveredMethods = state.consumedMethod.discoveredMethods.methods;
         this.interopClient = state.services.interopClient;
 
@@ -64,7 +55,6 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
         })
       }));
 
-    this.messageContent = this.messageContentString;
     this.formatAndUpdateArea();
   }
 
@@ -72,6 +62,20 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribeAll();
   }
 
+  sendRequest() {
+    this.interopClient.sendUnaryRequest(
+      this.toInvocationRequest(this.selectedDiscoveredMethod), this.messageContent, {
+        value: v => {
+          this.log.info(`Response received, ${v}`);
+        },
+        error: e => {
+          this.log.error(`Error received`, e);
+        }
+      })
+      .catch(e => {
+        this.log.error(`Error received`, e);
+      });
+  }
 
   format(messageStr) {
     return JSON.stringify(JSON.parse(messageStr), null, 2);
@@ -92,5 +96,16 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
         value: console.info,
         error: console.error
       });
+  }
+
+  toInvocationRequest(discoveredMethod: DiscoveredMethod): InvocationRequestInfo {
+    const connectionId = discoveredMethod.providedMethod.providedService.connectionId ?
+      UniqueId.fromProperties(discoveredMethod.providedMethod.providedService.connectionId) : null;
+    return {
+      methodId: discoveredMethod.providedMethod.methodId,
+      serviceId: discoveredMethod.providedMethod.providedService.serviceId,
+      applicationId: discoveredMethod.providedMethod.providedService.applicationId,
+      connectionId
+    };
   }
 }

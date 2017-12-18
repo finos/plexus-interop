@@ -1,21 +1,18 @@
+<div class="form-group">
+  <label for="exampleFormControlTextarea1">Enter message JSON:</label>
+  <textarea class="form-control" id="exampleFormControlTextarea1" rows="10" [(ngModel)]="messageContent"></textarea>
+  <button class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
+</div>
+
 <div>
   <div class="form-group">
-    <label for="exampleFormControlTextarea1">Enter message JSON:</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="10" [(ngModel)]="messageContent"></textarea>
-    <button class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
-  </div>
-
-  <div>
-    <div class="form-group">
-      <label for="exampleSelect1">Target method:</label>
-      <select class="form-control" id="exampleSelect1">
-      <option *ngFor="let method of discoveredMethods">{{method.methodTitle}}</option>
+    <label for="exampleSelect1">Target app:</label>
+    <select class="form-control" id="targetAppId" [(ngModel)]="selectedDiscoveredMethod">
+      <option *ngFor="let discoveredMethod of discoveredMethods" [ngValue]="discoveredMethod">
+        {{discoveredMethod.providedMethod.providedService.applicationId}}
+      </option>
     </select>
-    </div>
   </div>
-
-  <div>
-    <button class="btn btn-primary mb-2" href="javascript:" (click)="invoke()">Invoke</button>
-  </div>
-
 </div>
+
+<button class="btn btn-primary" (click)="sendRequest()" type="button">Invoke</button>
