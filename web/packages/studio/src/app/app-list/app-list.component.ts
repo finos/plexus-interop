@@ -26,4 +26,5 @@ export class AppListComponent implements OnInit {
   connectToApp(app: Application) {
     this.store.dispatch({ type: AppActions.CONNECT_TO_APP_START, payload: app });
   }
+
 }

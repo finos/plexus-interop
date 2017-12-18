@@ -1,6 +1,6 @@
 import { State } from './reducers';
 import { TransportConnectionFactory } from './TransportConnectionFactory';
-import { App as Application } from '@plexus-interop/broker';
+import { App as Application, ConsumedMethod } from "@plexus-interop/broker";
 import { PlexusConnectedActionParams, ServicesSnapshot, StudioState, Alert } from './model';
 import { InteropClientFactory } from './InteropClientFactory';
 import { TypedAction } from './TypedAction';
@@ -63,16 +63,50 @@ export class Effects {
 
             return {
                 type: AppActions.CONNECT_TO_APP_SUCCESS,
-                payload: { interopClient }
+                payload: interopClient
             };
         });
+
+    @Effect() loadConsumedMethod$: Observable<TypedAction<any>> =
+        this.actions$
+            .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
+            .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
+            .mergeMap(async ([action, services]) => {
+
+                const method = action.payload;
+                const interopClient = services.interopClient;
+
+                const discoveredMethods = await interopClient.discoverMethod({
+                    consumedMethod: {
+                        consumedService: {
+                            serviceId: method.consumedService.service.id
+                        },
+                        methodId: method.method.name
+                    }
+                });
+
+                return {
+                    type: AppActions.CONSUMED_METHOD_SUCCESS,
+                    payload: {
+                        method,
+                        discoveredMethods
+                    }
+                };
+            });
 
     @Effect() appConnected$: Observable<Action> = this
         .actions$
         .ofType(AppActions.CONNECT_TO_APP_SUCCESS)
         .map(_ => {
             this.router.navigate(['/app']);
+            return { type: AppActions.DO_NOTHING };
+        });
 
+    @Effect() consumedActionLoaded$: Observable<Action> = this
+        .actions$
+        .ofType(AppActions.CONSUMED_METHOD_SUCCESS)
+        .map(_ => {
+            this.router.navigate(['/consumed']);
             return { type: AppActions.DO_NOTHING };
         });
 
