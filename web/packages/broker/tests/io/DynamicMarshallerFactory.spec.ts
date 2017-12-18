@@ -33,7 +33,12 @@ describe("DynamicMarshallerFactory", () => {
     const validMessage = {
         stringField: "stringData",
         boolField: true
-    };   
+    };  
+
+    const invalidTypeMessage = {
+        stringField: "stringData",
+        boolField: "true"
+    };    
 
     const registry: InteropRegistry = {
         messages,
@@ -66,13 +71,23 @@ describe("DynamicMarshallerFactory", () => {
         }
     });
 
+    it("Creates Marshaller which fail on messages with wrong type", () => {
+        const marshaller = sut.getMarshaller(messageId);
+
+        try {
+            marshaller.validate(invalidTypeMessage);
+            fail("Should fail");
+        } catch (error) {  
+            // tslint:disable-next-line:no-console
+            console.log("Error raised", error);
+        }
+    });
+
     it("It creates Marshaller with primitive types support", () => {
-        debugger;
         const marshaller = sut.getMarshaller(messageId);  
         const encoded = marshaller.encode(validMessage);
         expect(encoded).toBeDefined();
         const decoded = marshaller.decode(encoded);
-        console.log(JSON.stringify(decoded));
         expect(decoded).toEqual(validMessage);
     });
 
