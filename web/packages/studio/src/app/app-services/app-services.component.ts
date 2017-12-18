@@ -7,7 +7,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/reducers';
-import { App, ConsumedService, ProvidedService } from '@plexus-interop/broker';
+import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
 import 'rxjs/add/operator/concat';
 
 enum ServiceType {
@@ -28,10 +28,12 @@ interface PlexusStudioService {
 })
 export class AppServicesComponent implements OnInit {
 
+  private registryService: InteropRegistryService;
+
   constructor(
+    private store: Store<fromRoot.State>,
     private actions: AppActions,
     private router: Router,
-    private store: Store<fromRoot.State>,
     private interopClientFactory: InteropClientFactory,
     private subscribtions: SubsctiptionsRegistry) {
   }
@@ -41,6 +43,8 @@ export class AppServicesComponent implements OnInit {
 
   allServices: Observable<PlexusStudioService[]>;
   
+  private subscriptions: SubsctiptionsRegistry;
+
   public ngOnInit(): void {
     this.consumedServices = this.store
       .select(state => state.plexus)
@@ -77,10 +81,22 @@ export class AppServicesComponent implements OnInit {
           actions: service.methods.valuesArray().map(method => ({ name: method.method.name }))
         }));
       });
+    this.subscriptions.add(this.store.select(state => state.plexus).subscribe(plexus => {
+      this.registryService = plexus.services.interopRegistryService;
+    }));
   }
+  openConsumed() {
 
-  openComsumed() {
-    this.router.navigate(['/consumed']);
+    if (this.registryService) {
+
+      // TODO change to selected
+      const consumedMethod: ConsumedMethod =
+        this.registryService.getApplication("com.db.cm.CashManager")
+          .consumedServices[0].methods.get("OpenMT103");
+
+      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: consumedMethod });
+
+    }
   }
 
   openProvided() {

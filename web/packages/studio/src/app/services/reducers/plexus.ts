@@ -1,16 +1,17 @@
 import { InteropClient } from '../InteropClient';
-import { App as Application } from '@plexus-interop/broker';
+import { App as Application, ConsumedMethod } from "@plexus-interop/broker";
 import { TypedAction } from './../TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
-import { AppActions } from '../app.actions';
+import { AppActions } from "../app.actions";
 import { Action } from '@ngrx/store';
-import { AppConnectedActionParams, PlexusConnectedActionParams, StudioState } from '../model';
+import { AppConnectedActionParams, PlexusConnectedActionParams, StudioState, ConsumedMethodState } from '../model';
 
 const initialState: StudioState = {
     loading: false,
     connected: false,
     metadataUrl: '/assets',
     connectedApp: undefined,
+    consumedMethod: undefined,
     apps: [],
     services: {
         interopRegistryService: undefined,
@@ -36,7 +37,6 @@ export function reducer(
             };
         case AppActions.METADATA_LOAD_SUCCESS:
             let payload = getPayload<PlexusConnectedActionParams>(action);
-
             return {
                 ...state,
                 connected: true,
@@ -69,6 +69,11 @@ export function reducer(
                     ...state.services,
                     interopClient: getPayload<AppConnectedActionParams>(action).interopClient
                 }
+            };
+        case AppActions.CONSUMED_METHOD_SUCCESS:
+            return {
+                ...state,
+                consumedMethod: getPayload<ConsumedMethodState>(action)
             };
         default:
             return state;

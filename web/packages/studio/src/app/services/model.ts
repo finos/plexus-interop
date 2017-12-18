@@ -1,8 +1,9 @@
 import { InteropClient } from './InteropClient';
 import { TransportConnectionProvider } from './TransportConnectionProvider';
-import { App as Application } from '@plexus-interop/broker';
+import { App as Application, ConsumedMethod } from '@plexus-interop/broker';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { TransportConnection } from "@plexus-interop/transport-common";
+import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
 
 export interface ServicesSnapshot {
     interopRegistryService: InteropRegistryService,
@@ -15,8 +16,14 @@ export interface StudioState {
     connected: boolean;
     metadataUrl: string;
     connectedApp: Application;
+    consumedMethod: ConsumedMethodState,
     apps: Application[],
     services: ServicesSnapshot
+}
+
+export interface ConsumedMethodState {
+    method: ConsumedMethod;
+    discoveredMethods: MethodDiscoveryResponse;
 }
 
 export interface PlexusConnectedActionParams {
