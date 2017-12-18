@@ -43,6 +43,14 @@ export class Effects {
             };
         });
 
+    @Effect() disconnectMetadata = this.actions$
+        .ofType(AppActions.DISCONNECT_FROM_PLEXUS)
+        .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
+        .mergeMap(async ([action, services]) => {
+            const connection = await services.сonnectionProvider();
+            await connection.disconnect();
+        });
+
     @Effect() plexusConnected$: Observable<Action> = this
         .actions$
         .ofType(AppActions.METADATA_LOAD_SUCCESS)
@@ -80,7 +88,7 @@ export class Effects {
         .actions$
         .ofType(AppActions.CONNECT_TO_APP_FAILED)
         .map(_ => {
-            this.router.navigate(['/app']);
+            this.router.navigate(['/apps']);
 
             return { type: AppActions.DO_NOTHING };
         });
