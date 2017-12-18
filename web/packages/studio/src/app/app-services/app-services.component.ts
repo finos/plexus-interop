@@ -69,8 +69,8 @@ export class AppServicesComponent implements OnInit {
      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: method });
   }
 
-  openConsumed(selected: {name: string, method: ConsumedMethod}) {
-      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: selected.method });
+  openConsumed(method: ConsumedMethod) {
+      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: method });
   }
 
   getMethodsArray(service: ProvidedService | ConsumedService) {
