@@ -82,24 +82,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   createDefaultMessage() {
     if (this.consumedMethod) {
       const method = this.consumedMethod.method;
-      const defaultPayload: any = {};
-      method.inputMessage.fields.forEach(field => {
-        if (!field.primitive) {
-          defaultPayload[field.name] = {};
-        } else {
-          switch (field.type) {
-            case "string":
-              defaultPayload[field.name] = "stringValue";
-              break;
-            case "bool":
-              defaultPayload[field.name] = false;
-              break;
-            default:
-              defaultPayload[field.name] = 0;
-          }
-        }
-      });
-      this.messageContent = JSON.stringify(defaultPayload);
+      this.messageContent = this.interopClient.createDefaultPayload(method.inputMessage.id);
       this.formatAndUpdateArea();
     }
   }

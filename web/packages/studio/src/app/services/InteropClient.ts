@@ -12,4 +12,6 @@ export interface InteropClient {
 
     disconnect(): Promise<void>;
 
+    createDefaultPayload(messageId: string): string;
+
 }

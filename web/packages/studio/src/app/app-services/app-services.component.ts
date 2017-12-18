@@ -52,21 +52,22 @@ export class AppServicesComponent implements OnInit {
     this.providedServices = this.store
       .select(state => state.plexus)
       .map(state => {
+
         if (!state.connectedApp) {
           return [];
         }
 
         const services = state.services;
         const app = state.connectedApp;
-        const provided = services.interopRegistryService.getProvidedServices(app.id);
 
-        return provided;
+        return services.interopRegistryService.getProvidedServices(app.id);
+
       });
   }
 
   openProvided(method) {
-    // this.router.navigate(['/provided']);
-     this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: method });
+     this.store.dispatch({ type: AppActions.SELECT_PROVIDED_METHOD, payload: method });
+     this.router.navigate(['/provided']);
   }
 
   openConsumed(method: ConsumedMethod) {
