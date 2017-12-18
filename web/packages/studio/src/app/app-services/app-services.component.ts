@@ -42,7 +42,7 @@ export class AppServicesComponent implements OnInit {
   consumedServices: Observable<PlexusStudioService[]> = Observable.of([]);
   providedServices: Observable<PlexusStudioService[]> = Observable.of([]);
 
-  allServices: Observable<PlexusStudioService[]>;
+  allServices: Observable<PlexusStudioService[]> = Observable.of([]);
   
   private subscriptions: SubsctiptionsRegistry;
 
@@ -61,7 +61,11 @@ export class AppServicesComponent implements OnInit {
         return consumed.map(service => ({
           name: service.alias,
           type: ServiceType.CONSUMED,
-          actions: service.methods.valuesArray().map(method => ({ name: method.method.name }))
+          actions: service.methods.valuesArray().map(
+            method => ({ 
+              name: method.method.name,
+              method
+            }))
         }));
       });
 
@@ -84,18 +88,8 @@ export class AppServicesComponent implements OnInit {
       });
   }
 
-  openConsumed() {
-
-    if (this.registryService) {
-
-      // TODO change to selected
-      const consumedMethod: ConsumedMethod =
-        this.registryService.getApplication("com.db.cm.CashManager")
-          .consumedServices[0].methods.get("OpenMT103");
-
-      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: consumedMethod });
-
-    }
+  openConsumed(selected: {name: string, method: ConsumedMethod}) {
+      this.store.dispatch({ type: AppActions.SELECT_CONSUMED_METHOD, payload: selected.method });
   }
 
   openProvided() {
