@@ -1,7 +1,7 @@
 import { State } from './reducers';
 import { TransportConnectionFactory } from './TransportConnectionFactory';
 import { App as Application } from '@plexus-interop/broker';
-import { PlexusConnectedActionParams, ServicesSnapshot, StudioState, Alert } from './model';
+import { Alert, AppConnectedActionParams, PlexusConnectedActionParams, ServicesSnapshot, StudioState } from './model';
 import { InteropClientFactory } from './InteropClientFactory';
 import { TypedAction } from './TypedAction';
 import { AppRegistryService } from '@plexus-interop/broker';
@@ -60,7 +60,7 @@ export class Effects {
             return { type: AppActions.DO_NOTHING };
         });
 
-    @Effect() connectToApp$: Observable<TypedAction<any>> = this
+    @Effect() connectToApp$: Observable<TypedAction<AppConnectedActionParams>> = this
         .actions$
         .ofType<TypedAction<Application>>(AppActions.CONNECT_TO_APP_START)
         .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
@@ -71,7 +71,7 @@ export class Effects {
 
             return {
                 type: AppActions.CONNECT_TO_APP_SUCCESS,
-                payload: { interopClient }
+                payload: { interopClient, application }
             };
         });
 

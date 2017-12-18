@@ -26,7 +26,8 @@ export interface PlexusConnectedActionParams {
 }
 
 export interface AppConnectedActionParams {
-    interopClient: InteropClient
+    interopClient: InteropClient,
+    application: Application
 }
 
 export interface Alert {

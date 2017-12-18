@@ -4,7 +4,7 @@ import { TypedAction } from './../TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from '../app.actions';
 import { Action } from '@ngrx/store';
-import { PlexusConnectedActionParams, StudioState } from '../model';
+import { AppConnectedActionParams, PlexusConnectedActionParams, StudioState } from '../model';
 
 const initialState: StudioState = {
     loading: false,
@@ -64,9 +64,10 @@ export function reducer(
         case AppActions.CONNECT_TO_APP_SUCCESS:
             return {
                 ...state,
+                connectedApp: getPayload<AppConnectedActionParams>(action).application,
                 services: {
                     ...state.services,
-                    interopClient: getPayload<InteropClient>(action)
+                    interopClient: getPayload<AppConnectedActionParams>(action).interopClient
                 }
             };
         default:
