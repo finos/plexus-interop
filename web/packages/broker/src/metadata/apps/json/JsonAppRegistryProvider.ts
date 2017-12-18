@@ -36,19 +36,19 @@ export class JsonAppRegistryProvider implements AppRegistryProvider {
         });
     }
 
-    private parseRegistry(json: string): AppRegistry {
-        const appsDto: { apps: Application[] } = JSON.parse(json);
-        return {
-            apps: toMap(appsDto.apps, app => app.id, app => app)
-        };
-    }
-
     public getAppRegistry(): Observable<AppRegistry> {
         return this.$registry;
     }
 
     public getCurrent(): AppRegistry {
         return this.current;
+    }
+
+    private parseRegistry(json: string): AppRegistry {
+        const appsDto: { apps: Application[] } = JSON.parse(json);
+        return {
+            apps: toMap(appsDto.apps, app => app.id, app => app)
+        };
     }
 
 }

@@ -53,6 +53,14 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
             next: update => this.current = update
         });
     }
+    
+    public getCurrent(): InteropRegistry {
+        return this.current;
+    }
+
+    public getRegistry(): Observable<InteropRegistry> {
+        return this.$registry;
+    }
 
     private parseRegistry(jsonRegistry: string): InteropRegistry {
 
@@ -179,12 +187,5 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         }
     }
 
-    public getCurrent(): InteropRegistry {
-        return this.current;
-    }
-
-    public getRegistry(): Observable<InteropRegistry> {
-        return this.$registry;
-    }
 
 }

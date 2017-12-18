@@ -8,6 +8,12 @@
           "num": 1,
           "primitive": true,
           "type": "string"
+        },
+        {
+          "name": "boolField",
+          "num": 2,
+          "primitive": true,
+          "type": "bool"
         }
       ]
     }

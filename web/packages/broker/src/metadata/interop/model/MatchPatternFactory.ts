@@ -18,6 +18,16 @@ import { MatchPattern } from "./MatchPattern";
 
 export class MatchPatternFactory {
 
+    private static all: MatchPattern = {
+        isMatch: () => true
+    };
+
+    public static createMatcher(patterns: string[]): MatchPattern {
+        return patterns && patterns.length > 0 ?
+            new MultipleMatchersHolder(patterns.map(p => MatchPatternFactory.createSingleMatcher(p)))
+            : MatchPatternFactory.all;
+    }
+
     private static createSingleMatcher(pattern: string): MatchPattern {
         if (pattern === "*") {
             return MatchPatternFactory.all;
@@ -27,16 +37,6 @@ export class MatchPatternFactory {
         }
         return new ExactMatcher(pattern);
     }
-
-    public static createMatcher(patterns: string[]): MatchPattern {
-        return patterns && patterns.length > 0 ?
-            new MultipleMatchersHolder(patterns.map(p => MatchPatternFactory.createSingleMatcher(p)))
-            : MatchPatternFactory.all;
-    }
-
-    private static all: MatchPattern = {
-        isMatch: () => true
-    };
 
 }
 

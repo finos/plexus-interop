@@ -57,6 +57,86 @@ export class CrossDomainEventBus implements EventBus {
         private readonly hostIFrame: HTMLIFrameElement,
         private readonly hostOrigin: string) { }
 
+
+    public init(): Promise<EventBus> {
+        this.stateMaschine.throwIfNot(State.CREATED);
+        this.createHostMessagesSubscription();
+        return new Promise((resolve, reject) => {
+            this.log.info("Host iFrame created, sending ping message");
+            const message = this.hostMessage({}, MessageType.Ping, ResponseType.Single);
+            this.sendAndSubscribe(message, {
+                next: m => {
+                    this.log.info("Success Ping response received");
+                    this.stateMaschine.go(State.CONNECTED);
+                    resolve(this);
+                },
+                error: e => {
+                    this.log.error("Failed to receive first Ping response", e);
+                    reject(e);
+                }
+            }, this.pingTimeout);
+        });
+    }
+
+    public async disconnect(): Promise<void> {
+        this.stateMaschine.throwIfNot(State.CONNECTED);
+        this.stateMaschine.go(State.CLOSED);
+        if (this.hostIframeEventsSubscription) {
+            this.log.info("Unsubsribing from Host iFrame");
+            this.hostIframeEventsSubscription.unsubscribe();
+        }
+        this.emitters.forEach((v, k) => {
+            v.error("Disconnected from Host iFrame");
+        });
+        this.emitters.clear();
+        this.observables.clear();
+    }
+
+    public publish(topic: string, event: Event): void {
+        this.stateMaschine.throwIfNot(State.CONNECTED);
+        const payload = event.payload;
+        if (this.log.isTraceEnabled()) {
+            this.log.trace(`Publishing to [${topic}]`, payload);
+        }
+        const message = this.hostMessage({ topic, payload }, MessageType.Publish);
+        this.postToIFrame(message);
+    }
+
+    public subscribe(topic: string, handler: (event: Event) => void): Subscription {
+        this.stateMaschine.throwIfNot(State.CONNECTED);
+        const message = this.hostMessage({ topic }, MessageType.Subscribe, ResponseType.Stream);
+        return this.sendAndSubscribe<SubscribeRequest, Event>(message, {
+            next: message => {
+                handler(message.responsePayload as Event);
+            }
+        });
+    }
+
+    protected sharedObservable<T>(key: string, postInit?: (key: string, observable: Observable<T>) => void): Observable<T> {
+        let eventsObservable = this.observables.get(key);
+        if (eventsObservable === undefined) {
+            eventsObservable = Observable.create((observer: Observer<T>) => {
+                this.log.debug(`Creating ${key} observable`);
+                this.emitters.set(key, observer);
+                return () => {
+                    this.log.debug(`Cleaning up ${key} observable`);
+                    this.emitters.delete(key);
+                    this.observables.delete(key);
+                };
+            }).publish().refCount() as Observable<T>;
+            this.observables.set(key, eventsObservable);
+            if (postInit) {
+                postInit(key, eventsObservable);
+            }
+        }
+        return eventsObservable;
+    }
+
+    protected clearEmitter(key: string): void {
+        this.emitters.delete(key);
+        this.observables.delete(key);
+    }
+
     private sendAndSubscribe<T, ResType>(
         message: IFrameHostMessage<T, ResType>,
         observer: PartialObserver<IFrameHostMessage<T, ResType>>,
@@ -84,26 +164,6 @@ export class CrossDomainEventBus implements EventBus {
 
     private postToIFrame(message: any): void {
         this.hostIFrame.contentWindow.postMessage(message, this.hostOrigin);
-    }
-
-    public init(): Promise<EventBus> {
-        this.stateMaschine.throwIfNot(State.CREATED);
-        this.createHostMessagesSubscription();
-        return new Promise((resolve, reject) => {
-            this.log.info("Host iFrame created, sending ping message");
-            const message = this.hostMessage({}, MessageType.Ping, ResponseType.Single);
-            this.sendAndSubscribe(message, {
-                next: m => {
-                    this.log.info("Success Ping response received");
-                    this.stateMaschine.go(State.CONNECTED);
-                    resolve(this);
-                },
-                error: e => {
-                    this.log.error("Failed to receive first Ping response", e);
-                    reject(e);
-                }
-            }, this.pingTimeout);
-        });
     }
 
     private clearRejectTimeout(key: string): void {
@@ -141,26 +201,6 @@ export class CrossDomainEventBus implements EventBus {
         }
     }
 
-    protected sharedObservable<T>(key: string, postInit?: (key: string, observable: Observable<T>) => void): Observable<T> {
-        let eventsObservable = this.observables.get(key);
-        if (eventsObservable === undefined) {
-            eventsObservable = Observable.create((observer: Observer<T>) => {
-                this.log.debug(`Creating ${key} observable`);
-                this.emitters.set(key, observer);
-                return () => {
-                    this.log.debug(`Cleaning up ${key} observable`);
-                    this.emitters.delete(key);
-                    this.observables.delete(key);
-                };
-            }).publish().refCount() as Observable<T>;
-            this.observables.set(key, eventsObservable);
-            if (postInit) {
-                postInit(key, eventsObservable);
-            }
-        }
-        return eventsObservable;
-    }
-
     private hostMessage<T, R>(requestPayload: T, type: MessageType<T, R>, responseType?: ResponseType): IFrameHostMessage<T, R> {
         responseType = responseType ? responseType : ResponseType.None;
         return { id: GUID.getNewGUIDString(), type, requestPayload, responseType };
@@ -176,39 +216,6 @@ export class CrossDomainEventBus implements EventBus {
         }
     }
 
-    public async disconnect(): Promise<void> {
-        this.stateMaschine.throwIfNot(State.CONNECTED);
-        this.stateMaschine.go(State.CLOSED);
-        if (this.hostIframeEventsSubscription) {
-            this.log.info("Unsubsribing from Host iFrame");
-            this.hostIframeEventsSubscription.unsubscribe();
-        }
-        this.emitters.forEach((v, k) => {
-            v.error("Disconnected from Host iFrame");
-        });
-        this.emitters.clear();
-        this.observables.clear();
-    }
-
-    public publish(topic: string, event: Event): void {
-        this.stateMaschine.throwIfNot(State.CONNECTED);
-        const payload = event.payload;
-        if (this.log.isTraceEnabled()) {
-            this.log.trace(`Publishing to [${topic}]`, payload);
-        }
-        const message = this.hostMessage({ topic, payload }, MessageType.Publish);
-        this.postToIFrame(message);
-    }
-
-    public subscribe(topic: string, handler: (event: Event) => void): Subscription {
-        this.stateMaschine.throwIfNot(State.CONNECTED);
-        const message = this.hostMessage({ topic }, MessageType.Subscribe, ResponseType.Stream);
-        return this.sendAndSubscribe<SubscribeRequest, Event>(message, {
-            next: message => {
-                handler(message.responsePayload as Event);
-            }
-        });
-    }
 
     private emit(subscription: string, value: any, complete?: boolean): void {
         this.clearRejectTimeout(subscription);
@@ -228,11 +235,6 @@ export class CrossDomainEventBus implements EventBus {
             observer.error(new Error(error));
             this.clearEmitter(subscription);
         }
-    }
-
-    protected clearEmitter(key: string): void {
-        this.emitters.delete(key);
-        this.observables.delete(key);
     }
 
     private emitAndComplete(subscription: string, value: any): void {

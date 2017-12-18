@@ -91,12 +91,6 @@ export class InteropRegistryService {
         return result;
     }
 
-    private updateRegistry(registry: InteropRegistry): void {
-        this.log.debug("Registry updated");
-        this.registry = registry;
-        this.appProvidedMethodsCache.clear();
-    }
-
     public getMatchingProvidedMethods(appId: string, consumedMethodReference: ConsumedMethodReference): ProvidedMethod[] {
         const consumedMethod = this.getConsumedMethod(appId, consumedMethodReference);
         return this.getMatchingProvidedMethodsFromConsumed(consumedMethod);
@@ -120,6 +114,17 @@ export class InteropRegistryService {
 
     public getMatchingProvidedMethodsForApp(app: Application): ProvidedMethod[] {
         return this.appProvidedMethodsCache.getOrAdd(app.id, () => this.getMatchingProvidedMethodsForAppInternal(app));
+    }
+    
+    public getMatchingProvidedMethodsFromConsumed(consumedMethod: ConsumedMethod): ProvidedMethod[] {
+        return this.getMatchingProvidedMethodsForApp(consumedMethod.consumedService.application)
+            .filter(providedMethod => this.equals(consumedMethod.method, providedMethod.method));
+    }
+    
+    private updateRegistry(registry: InteropRegistry): void {
+        this.log.debug("Registry updated");
+        this.registry = registry;
+        this.appProvidedMethodsCache.clear();
     }
 
     private getMatchingProvidedMethodsForAppInternal(app: Application): ProvidedMethod[] {
@@ -153,11 +158,6 @@ export class InteropRegistryService {
         }, consumedProvidedPairs);
 
         return result;
-    }
-
-    public getMatchingProvidedMethodsFromConsumed(consumedMethod: ConsumedMethod): ProvidedMethod[] {
-        return this.getMatchingProvidedMethodsForApp(consumedMethod.consumedService.application)
-            .filter(providedMethod => this.equals(consumedMethod.method, providedMethod.method));
     }
 
     private equals(x: Method, y: Method): boolean {

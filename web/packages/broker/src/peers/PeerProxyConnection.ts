@@ -25,13 +25,13 @@ import { RemoteBrokerService } from "./remote/RemoteBrokerService";
 
 export class PeerProxyConnection implements TransportConnection {
 
-    private readonly log: Logger;
-
-    public readonly isProxy: boolean = true;
-
     private readonly incomingChannelsObserver: BufferedObserver<TransportChannel>;
 
     private readonly remoteConnectionId: string;
+
+    private readonly log: Logger;
+
+    public readonly isProxy: boolean = true;
 
     constructor(
         private hostConnectionId: string,

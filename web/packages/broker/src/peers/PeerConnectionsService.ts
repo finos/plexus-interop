@@ -26,11 +26,19 @@ export class PeerConnectionsService {
 
     private readonly log: Logger = LoggerFactory.getLogger("PeerConnectionService");
 
+    private $heartbits: Observable<AppConnectionHeartBit>;
+
     constructor(private remoteBrokerService: RemoteBrokerService) {
         this.init();
     }
 
-    private $heartbits: Observable<AppConnectionHeartBit>;
+    public subscribeToConnectionsHearBits(observer: PartialObserver<AppConnectionHeartBit>): Subscription {
+        return this.$heartbits.subscribe(observer);
+    }
+
+    public sendHeartBit(heartBit: AppConnectionHeartBit): void {
+        this.remoteBrokerService.publish<AppConnectionHeartBit>(EventType.AppConnectionHearBit, heartBit);
+    }
 
     private init(): void {
         this.$heartbits = new Observable<AppConnectionHeartBit>(observer => {
@@ -43,14 +51,6 @@ export class PeerConnectionsService {
         })
             // important, make observable shared between multiple subscriptions
             .share();
-    }
-
-    public subscribeToConnectionsHearBits(observer: PartialObserver<AppConnectionHeartBit>): Subscription {
-        return this.$heartbits.subscribe(observer);
-    }
-
-    public sendHeartBit(heartBit: AppConnectionHeartBit): void {
-        this.remoteBrokerService.publish<AppConnectionHeartBit>(EventType.AppConnectionHearBit, heartBit);
     }
 
 }

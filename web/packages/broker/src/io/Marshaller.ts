@@ -14,21 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PublishRequest } from "./PublishRequest";
-import { Event } from "../../Event";
-import { SubscribeRequest } from "./SubscribeRequest";
-
-export class MessageType<Req, Res> {
-
-    // tslint:disable-next-line:variable-name
-    public static Ping: MessageType<{}, {}> = new MessageType<{}, {}>(1);
-
-    // tslint:disable-next-line:variable-name
-    public static Publish: MessageType<PublishRequest, {}> = new MessageType<PublishRequest, {}>(6);
-
-    // tslint:disable-next-line:variable-name
-    public static Subscribe: MessageType<SubscribeRequest, Event> = new MessageType<SubscribeRequest, Event>(8);
-
-    constructor(public id: number) { }
+export interface Marshaller<BaseType, EncodedType> {
     
+    encode(messageObj: BaseType): EncodedType;
+    
+    decode(messagePayload: EncodedType): BaseType;
+
+    validate(messageObj: BaseType): void;
+
 }

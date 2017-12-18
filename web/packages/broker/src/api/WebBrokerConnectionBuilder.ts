@@ -36,8 +36,6 @@ export class WebBrokerConnectionBuilder {
 
     private readonly log: Logger = LoggerFactory.getLogger("WebBrokerConnectionBuilder");
 
-    public constructor() { }
-
     private appRegistryProviderFactory: () => Promise<AppRegistryProvider>;
 
     private interopRegistryProviderFactory: () => Promise<InteropRegistryProvider>;
