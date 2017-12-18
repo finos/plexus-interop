@@ -9,6 +9,7 @@ import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/reducers';
 import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
 import 'rxjs/add/operator/concat';
+import 'rxjs/add/observable/of';
 
 enum ServiceType {
   PROVIDED, CONSUMED
@@ -82,6 +83,7 @@ export class AppServicesComponent implements OnInit {
         }));
       });
   }
+
   openConsumed() {
 
     if (this.registryService) {
