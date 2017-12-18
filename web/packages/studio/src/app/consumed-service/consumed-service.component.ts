@@ -6,7 +6,7 @@ import { Store } from "@ngrx/store";
 import * as fromRoot from '../services/reducers';
 import { Router } from "@angular/router";
 import { SubsctiptionsRegistry } from "../services/SubsctiptionsRegistry";
-import { InteropRegistryService } from "@plexus-interop/broker";
+import { InteropRegistryService, ConsumedMethod } from "@plexus-interop/broker";
 import { DiscoveredMethod, InvocationRequestInfo } from "@plexus-interop/client";
 import { UniqueId } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
@@ -25,7 +25,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   private interopClient: InteropClient;
   private discoveredMethods: DiscoveredMethod[];
-  private connection: TransportConnection;
+  private consumedMethod: ConsumedMethod;
 
   private selectedDiscoveredMethod: DiscoveredMethod;
 
@@ -40,6 +40,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.messageContent = "";
+
     const consumedMethod$ = this.store
       .filter(state => !!state.plexus.consumedMethod)
       .map(state => state.plexus);
@@ -49,13 +50,10 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
         this.interopClient = state.services.interopClient;
         this.discoveredMethods = state.consumedMethod.discoveredMethods.methods;
         this.interopClient = state.services.interopClient;
-
-        state.services.сonnectionProvider().then(connection => {
-          this.connection = connection;
-        })
+        this.registryService = state.services.interopRegistryService;
+        this.consumedMethod = state.consumedMethod.method;
       }));
 
-    this.formatAndUpdateArea();
   }
 
   ngOnDestroy() {
@@ -77,25 +75,37 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
       });
   }
 
-  format(messageStr) {
-    return JSON.stringify(JSON.parse(messageStr), null, 2);
+  format(data) {
+    return JSON.stringify(JSON.parse(data), null, 2);
+  }
+
+  createDefaultMessage() {
+    if (this.consumedMethod) {
+      const method = this.consumedMethod.method;
+      const defaultPayload: any = {};
+      method.inputMessage.fields.forEach(field => {
+        if (!field.primitive) {
+          defaultPayload[field.name] = {};
+        } else {
+          switch (field.type) {
+            case "string":
+              defaultPayload[field.name] = "stringValue";
+              break;
+            case "bool":
+              defaultPayload[field.name] = false;
+              break;
+            default:
+              defaultPayload[field.name] = 0;
+          }
+        }
+      });
+      this.messageContent = JSON.stringify(defaultPayload);
+      this.formatAndUpdateArea();
+    }
   }
 
   formatAndUpdateArea() {
     this.messageContent = this.format(this.messageContent);
-  }
-
-  invoke(method: DiscoveredMethod) {
-    this.interopClient.sendUnaryRequest({
-      serviceAlias: method.providedMethod.providedService.serviceAlias,
-      serviceId: method.providedMethod.providedService.serviceId,
-      methodId: method.providedMethod.methodId,
-      applicationId: method.providedMethod.providedService.applicationId,
-      connectionId: this.connection.uuid()
-    }, "xxx", {
-        value: console.info,
-        error: console.error
-      });
   }
 
   toInvocationRequest(discoveredMethod: DiscoveredMethod): InvocationRequestInfo {
