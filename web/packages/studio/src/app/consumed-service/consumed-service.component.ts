@@ -59,6 +59,9 @@ export class ConsumedServiceComponent implements OnInit {
         error: e => {
           this.log.error(`Error received`, e);
         }
+      })
+      .catch(e => {
+        this.log.error(`Error received`, e);
       });
   }
 
