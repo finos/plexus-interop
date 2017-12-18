@@ -36,10 +36,17 @@ describe("JsonRegistryProvider", () => {
         expect(registry).toBeTruthy();
         expect(registry.applications.size).toBe(4);
         expect(registry.services.size).toBe(2);
-        expect(registry.messages.size).toBe(3);
+        expect(registry.messages.size).toBe(1);
 
         const message = registry.messages.get("interop.testing.EchoRequest") as Message;
         expect(message.id).toBe("interop.testing.EchoRequest");
+        expect(message.fields.length).toBeGreaterThan(0);
+
+        const firstField = message.fields[0];
+        expect(firstField.name).toBe("stringField");
+        expect(firstField.num).toBe(1);
+        expect(firstField.type).toBe("string");
+        expect(firstField.primitive).toBe(true);
 
         const service = registry.services.get("interop.testing.EchoService") as Service;
         expect(service.id).toBe("interop.testing.EchoService");

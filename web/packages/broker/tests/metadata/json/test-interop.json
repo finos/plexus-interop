@@ -1,4 +1,17 @@
 {
+  "messages": [
+    {
+      "id": "interop.testing.EchoRequest",
+      "fields": [
+        {
+          "name": "stringField",
+          "num": 1,
+          "primitive": true,
+          "type": "string"
+        }
+      ]
+    }
+  ],
   "services": [
     {
       "id": "interop.testing.EchoService",

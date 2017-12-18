@@ -60,12 +60,8 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         const registryDto: RegistryDto = JSON.parse(jsonRegistry);
         this.log.trace(`Finished parsing ${jsonRegistry.length} length`);
 
-        const messages: ExtendedMap<string, Message> = ExtendedArray.of(registryDto.services)
-            .flatMap(s => ExtendedArray.of(s.methods)
-                .flatMap(m => [m.input, m.output])
-                .toArray())
-            .distinct()
-            .toMap(x => x, x => { return { id: x }; });
+        const messages: ExtendedMap<string, Message> = ExtendedArray.of(registryDto.messages)
+            .toMap(x => x.id, x => x );
 
         const services = ExtendedArray.of(
             registryDto.services.map(s => this.convertService(messages, s)))

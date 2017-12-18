@@ -16,8 +16,11 @@
  */
 import { ApplicationDto } from "./ApplicationDto";
 import { ServiceDto } from "./ServiceDto";
+import { Message } from "../model/Message";
 
 export interface RegistryDto {
+
+    messages: Message[];
     
     applications: ApplicationDto[];
     

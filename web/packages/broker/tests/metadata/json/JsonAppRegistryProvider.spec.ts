@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import { JsonAppRegistryProvider } from "../../../src/metadata/apps/json/JsonAppRegistryProvider";
-import { Observable } from "rxjs/Observable";
 import { Application } from "../../../src/metadata/apps/model/Application";
 
 const fs = require("fs");
