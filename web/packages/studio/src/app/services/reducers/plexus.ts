@@ -15,7 +15,7 @@ import {
 const initialState: StudioState = {
     loading: false,
     connected: false,
-    metadataUrl: window.location.href + 'assets',
+    metadataUrl: window.location.origin + '/assets',
     connectedApp: undefined,
     consumedMethod: undefined,
     providedMethod: undefined,
