@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId } from "@plexus-interop/protocol";
+import { UniqueId, clientProtocol as plexus } from "@plexus-interop/protocol";
 import { GUID } from "@plexus-interop/common";
 
 describe("UniqueId", () => {
@@ -30,6 +30,13 @@ describe("UniqueId", () => {
         const uniqueId = UniqueId.fromGuid(new GUID(guidString));
         expect(uniqueId.hi.toString(10)).toEqual("14045576757775176003");
         expect(uniqueId.lo.toString(10)).toEqual("9413943867230945018");
+    });
+
+    it("Can be serialyzed from string to Proto and restored back", () => {
+        const guidString = "4687E14CC9F84270B0862703616225C7";
+        const uniqueId = UniqueId.fromString(guidString);
+        const fromProps = UniqueId.fromProperties(uniqueId as plexus.IUniqueId);
+        expect(guidString).toEqual(fromProps.toString());
     });
 
 });

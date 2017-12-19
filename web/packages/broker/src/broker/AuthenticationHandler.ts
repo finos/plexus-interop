@@ -65,6 +65,8 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
                     } else {
                         channel.sendLastMessage(ClientProtocolHelper.connectResponsePayload({ connectionId: connection.uuid() }))
                             .catch(e => log.error("Failed to sent connection details", e));
+                        const instanceId = UniqueId.fromProperties(clientToBrokerMessage.applicationInstanceId as plexus.IUniqueId);
+                        log.debug(`Received connection request with instance ID ${instanceId.toString()}`);
                         resolve({
                             applicationId: clientToBrokerMessage.applicationId as string,
                             instanceId: UniqueId.fromProperties(clientToBrokerMessage.applicationInstanceId as plexus.IUniqueId).toString()
