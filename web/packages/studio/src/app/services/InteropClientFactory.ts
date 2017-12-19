@@ -25,7 +25,11 @@ export class InteropClientFactory {
         this.log.info(`Connecting as ${appId}`);
 
         let genericClientBuilder = new GenericClientApiBuilder();
-        let appInstanceId = UrlParamsProvider.getParam('appInstanceId');
+        let appInstanceId = UrlParamsProvider.getParam('plexusInstanceId');
+        
+        if (appInstanceId) {
+            this.log.info(`Connecting with ${appInstanceId} instance ID`);
+        }
 
         genericClientBuilder = genericClientBuilder
             .withClientDetails({

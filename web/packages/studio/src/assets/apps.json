@@ -1,23 +1,19 @@
 {
   "apps": [
     {
-      "id": "com.db.autobahn.WebAppLauncher",
-      "displayName": "Autobahn Web App Launcher"
-    },
-    {
       "id": "com.db.cm.CashManager",
       "displayName": "Cash Manager",
-      "launcherId": "com.db.autobahn.WebAppLauncher",
+      "launcherId": "plexus.interop.UrlWebAppLauncher",
       "launcherParams": {
-          "appKey": "CM"
+          "url": "/?appId=com.db.cm.CashManager"
       }
     },
     {
       "id": "com.db.ci.CashInquiry",
       "displayName": "Cash Inquiry",
-      "launcherId": "com.db.autobahn.WebAppLauncher",
+      "launcherId": "plexus.interop.UrlWebAppLauncher",
       "launcherParams": {
-          "appKey": "CI"          
+          "url": "/?appId=com.db.ci.CashInquiry"          
       }
     }
   ]

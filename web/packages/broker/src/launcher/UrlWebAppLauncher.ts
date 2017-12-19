@@ -31,9 +31,9 @@ export class UrlWebAppLauncher implements AppLauncher {
         const appInstanceId = UniqueId.generateNew();
         const launchUrl: string = request.launchParams.url;
         const instanceIdParam = `${UrlWebAppLauncher.instanceIdRequestParam}=${appInstanceId.toString()}`;
-        const url = launchUrl.indexOf("?") !== -1 ? `${launchUrl}?${instanceIdParam}` : `${launchUrl}&${instanceIdParam}`;
+        const url = launchUrl.indexOf("?") === -1 ? `${launchUrl}?${instanceIdParam}` : `${launchUrl}&${instanceIdParam}`;
         this.log.info(`Launching application with [${url}] url`);
-        window.open(url);
+        window.open(url, "_blank");
         return {
             appInstanceId
         };

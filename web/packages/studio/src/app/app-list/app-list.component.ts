@@ -35,11 +35,13 @@ export class AppListComponent implements OnInit, OnDestroy {
         .combineLatest(this.apps)
         .subscribe(([params, apps]) => {
           const appId = params['appId'];
-          const expectedApp = apps.find(app => app.id === appId);
-          if (!expectedApp) {
-            this.logger.warn(`Params provided app with Id='${appId}' not found. Please, select from the list`);
-          } else {
-            this.connectToApp(expectedApp);
+          if (appId) {
+            const expectedApp = apps.find(app => app.id === appId);
+            if (!expectedApp) {
+              this.logger.warn(`Params provided app with Id='${appId}' not found. Please, select from the list`);
+            } else {
+              this.connectToApp(expectedApp);
+            }
           }
         }));
   }
