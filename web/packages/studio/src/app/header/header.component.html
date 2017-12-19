@@ -1,13 +1,13 @@
 <nav class="navbar navbar-light bg-light justify-content-between">
   <a class="navbar-brand" href="/">
-    <img width="200" alt="Plexus Studio Logo" src="assets/plexus-logo-lg.png">
+    <img #navbarBrandImg width="200" alt="Plexus Studio Logo" src="assets/plexus-logo-lg.png">
   </a>
 
   <div class="connection-statuses">
     <div class="form-inline connection-status" *ngIf="connected$ | async">
       <span class="navbar-text mr-2">Connected to:</span>
-      <a target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
-      <a class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
+      <a #openMetadataDetailsBtn target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
+      <a #disconnectFromMetdataBtn class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
     </div>
@@ -25,22 +25,22 @@
 <ng-template #metadataModal let-c="close" let-d="dismiss">
   <div class="modal-header">
     <h4 class="modal-title">Metada URLs</h4>
-    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+    <button  #closeMetadaDetailsModalCrossBtn type="button" class="close" aria-label="Close" (click)="d('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body container-fluid">
     <div class="row">
       <span class="col-sm-2"> Apps: </span>
-      <a class="col-sm-10" target="_blank" href="{{metadataUrls?.apps}}">{{metadataUrls?.apps}}</a>
+      <a #appsJsonLink class="col-sm-10" target="_blank" href="{{metadataUrls?.apps}}">{{metadataUrls?.apps}}</a>
     </div>
 
     <div class="row">
       <span class="col-sm-2"> Interop: </span>
-      <a class="col-sm-10" target="_blank" href="{{metadataUrls?.interop}}">{{metadataUrls?.interop}}</a>
+      <a #interopJsonLink class="col-sm-10" target="_blank" href="{{metadataUrls?.interop}}">{{metadataUrls?.interop}}</a>
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+    <button #closeMetadataDetailsModalBtn type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
   </div>
 </ng-template>

@@ -2,10 +2,10 @@
 <div>
   <div class="form-group">
     <label for="exampleFormControlTextarea1">Enter reponse:</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="10" [(ngModel)]="messageContent"></textarea>
-    <button class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
-    <button class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
+    <textarea #responseContentArea class="form-control" id="exampleFormControlTextarea1" rows="10" [(ngModel)]="messageContent"></textarea>
+    <button #formatResponseContentBtn class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
+    <button #defaultResponseContentBtn class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
   </div>
 </div>
 
-<button class="btn btn-primary" (click)="intercept()" type="button">Intercept</button>
+<button #interceptBtn class="btn btn-primary" (click)="intercept()" type="button">Intercept</button>
