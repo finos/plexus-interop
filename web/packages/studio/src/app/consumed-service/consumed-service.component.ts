@@ -93,7 +93,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   createDefaultMessage() {
-    if (this.consumedMethod) {
+    if (this.consumedMethod && this.interopClient) {
       const method = this.consumedMethod.method;
       this.messageContent = this.interopClient.createDefaultPayload(method.inputMessage.id);
       this.formatAndUpdateArea();
