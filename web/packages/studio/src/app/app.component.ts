@@ -24,8 +24,11 @@ export class AppComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     LoggerFactory.setLogLevel(LogLevel.DEBUG);
     this.loggerDelegateRegistration = LoggerFactory.registerDelegate({
-
       log: (logLevel: LogLevel, msg: string, args: any[]) => {
+        if (logLevel <= LogLevel.DEBUG) {
+          // Too many logs in output
+          return;
+        }
 
         let message = `[${TimeUtils.format(new Date())}] ${LogLevel[logLevel]} ${msg}`;
         if (args && args.length > 0) {
