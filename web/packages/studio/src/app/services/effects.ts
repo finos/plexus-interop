@@ -66,7 +66,7 @@ export class Effects {
                 let сonnectionProvider;
                 if (wsUrl) {
                     this.plexusLogger.info(`Connecting to Native WS Transport in ${wsUrl}`);
-
+                    сonnectionProvider = await this.transportConnectionFactory.createWebSocketTransportProvider(wsUrl);
                 } else {
                     this.plexusLogger.info(`Connecting to Web Transport`);
                     сonnectionProvider = await this.transportConnectionFactory.createWebTransportProvider(baseUrl);
