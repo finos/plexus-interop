@@ -1,7 +1,6 @@
 import { SubsctiptionsRegistry } from './../services/SubsctiptionsRegistry';
 import { OnDestroy } from '@angular/core';
 import { LoggerFactory } from '@plexus-interop/common';
-import { SubsctiptionsRegistry } from '../services/SubsctiptionsRegistry';
 import { App as Application } from '@plexus-interop/broker';
 import { Observable } from 'rxjs/Observable';
 import { AppActions } from '../services/app.actions';

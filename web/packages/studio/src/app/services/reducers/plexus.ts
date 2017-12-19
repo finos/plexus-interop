@@ -4,6 +4,7 @@ import { TypedAction } from './../TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from "../app.actions";
 import { Action } from '@ngrx/store';
+import { UrlParamsProvider } from "../UrlParamsProvider";
 import {
     AppConnectedActionParams,
     ConsumedMethodState,
@@ -12,10 +13,13 @@ import {
     StudioState,
 } from '../model';
 
+const baseUrlParam = UrlParamsProvider.getParam("baseUrl");
+const defaultUrl = baseUrlParam || window.location.origin + '/assets';
+
 const initialState: StudioState = {
     loading: false,
     connected: false,
-    metadataUrl: window.location.origin + '/assets',
+    metadataUrl: defaultUrl,
     connectedApp: undefined,
     consumedMethod: undefined,
     providedMethod: undefined,
