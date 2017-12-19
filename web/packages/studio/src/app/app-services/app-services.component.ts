@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs/Observable';
-import { SubsctiptionsRegistry } from '../services/SubsctiptionsRegistry';
-import { StudioState } from './../services/model';
-import { InteropClientFactory } from '../services/InteropClientFactory';
-import { AppActions } from '../services/app.actions';
+import { SubsctiptionsRegistry } from '../services/ui/SubsctiptionsRegistry';
+import { StudioState } from './../services/ui/model';
+import { InteropClientFactory } from '../services/core/InteropClientFactory';
+import { AppActions } from '../services/ui/app.actions';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as fromRoot from '../services/reducers';
+import * as fromRoot from '../services/ui/root-reducers';
 import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/observable/of';

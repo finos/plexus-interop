@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AppActions } from "../services/app.actions";
+import { AppActions } from "../services/ui/app.actions";
 import { Store } from "@ngrx/store";
-import * as fromRoot from '../services/reducers';
+import * as fromRoot from '../services/ui/root-reducers';
 import { ProvidedMethod } from "@plexus-interop/broker";
-import { InteropClient } from "../services/InteropClient";
-import { SubsctiptionsRegistry } from "../services/SubsctiptionsRegistry";
+import { InteropClient } from "../services/core/InteropClient";
+import { SubsctiptionsRegistry } from "../services/ui/SubsctiptionsRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 
 @Component({

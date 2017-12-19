@@ -1,9 +1,9 @@
-import { SubsctiptionsRegistry } from '../services/SubsctiptionsRegistry';
-import { AppActions } from '../services/app.actions';
+import { SubsctiptionsRegistry } from '../services/ui/SubsctiptionsRegistry';
+import { AppActions } from '../services/ui/app.actions';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as fromRoot from '../services/reducers';
+import * as fromRoot from '../services/ui/root-reducers';
 import 'rxjs/add/operator/first';
 
 @Component({

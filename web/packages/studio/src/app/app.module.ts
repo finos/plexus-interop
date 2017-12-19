@@ -1,9 +1,8 @@
-import { TransportConnectionFactory } from './services/TransportConnectionFactory';
-import { InteropClientFactory } from './services/InteropClientFactory';
-import { InteropServiceFactory } from './services/InteropServiceFactory';
-import { metaReducers } from './services/reducers';
-import { CustomRouterStateSerializer } from './services/utils';
-import { AppActions } from './services/app.actions';
+import { TransportConnectionFactory } from './services/core/TransportConnectionFactory';
+import { InteropClientFactory } from './services/core/InteropClientFactory';
+import { InteropServiceFactory } from './services/core/InteropServiceFactory';
+import { metaReducers } from './services/ui/root-reducers';
+import { AppActions } from './services/ui/app.actions';
 import { AppRoutes } from './app.routing';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -16,7 +15,7 @@ import { RouterModule } from '@angular/router';
 import { AppListComponent } from './app-list/app-list.component';
 import { HeaderComponent } from './header/header.component';
 
-import { reducers } from './services/reducers';
+import { reducers } from './services/ui/root-reducers';
 import { AppServicesComponent } from './app-services/app-services.component';
 import { ConsumedServiceComponent } from './consumed-service/consumed-service.component';
 import { ProvidedServiceComponent } from './provided-service/provided-service.component';
@@ -24,7 +23,7 @@ import { ProvidedServiceComponent } from './provided-service/provided-service.co
 import { StoreModule } from '@ngrx/store';
 
 import { EffectsModule } from '@ngrx/effects';
-import { Effects } from './services/effects';
+import { Effects } from './services/ui/effects';
 import { HttpModule } from '@angular/http';
 
 import {
@@ -54,7 +53,6 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
   ],
   providers: [
     AppActions,
-    { provide: RouterStateSerializer, useClass: CustomRouterStateSerializer },
     InteropServiceFactory,
     InteropClientFactory,
     TransportConnectionFactory

@@ -1,11 +1,11 @@
 import { TransportConnection } from '@plexus-interop/transport-common/src/transport/TransportConnection';
-import { InteropClient } from '../services/InteropClient';
+import { InteropClient } from '../services/core/InteropClient';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AppActions } from "../services/app.actions";
+import { AppActions } from "../services/ui/app.actions";
 import { Store } from "@ngrx/store";
-import * as fromRoot from '../services/reducers';
+import * as fromRoot from '../services/ui/root-reducers';
 import { Router } from "@angular/router";
-import { SubsctiptionsRegistry } from "../services/SubsctiptionsRegistry";
+import { SubsctiptionsRegistry } from "../services/ui/SubsctiptionsRegistry";
 import { InteropRegistryService, ConsumedMethod } from "@plexus-interop/broker";
 import { DiscoveredMethod, InvocationRequestInfo } from "@plexus-interop/client";
 import { UniqueId } from "@plexus-interop/protocol";

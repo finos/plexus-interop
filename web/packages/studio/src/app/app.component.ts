@@ -1,11 +1,11 @@
-import { AppActions } from './services/app.actions';
+import { AppActions } from './services/ui/app.actions';
 import { Store } from '@ngrx/store';
 
 import { LoggerFactory, LogLevel, Logger, TimeUtils } from '@plexus-interop/common';
 import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { ElementRef, Renderer2 } from '@angular/core';
 
-import { State } from './services/reducers';
+import { State } from './services/ui/root-reducers';
 
 @Component({
   selector: 'app-root',
