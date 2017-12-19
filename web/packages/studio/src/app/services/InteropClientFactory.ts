@@ -54,7 +54,7 @@ export class InteropClientFactory {
                 unaryHandlers.set(methodFullName, async requestJson => {
                     this.log.info(`Received request to default handler: ${requestJson}`);
                     return defaultGenerator.generate(pm.method.outputMessage.id);
-                };
+                });
                 genericClientBuilder.withUnaryInvocationHandler({
                     serviceInfo: {
                         serviceId: pm.providedService.service.id

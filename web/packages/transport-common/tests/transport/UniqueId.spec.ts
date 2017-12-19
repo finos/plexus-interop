@@ -22,7 +22,7 @@ describe("UniqueId", () => {
     it("Can be created from string and converted back", () => {
         const guidString = "C2EBE9A500AC114382A50C11EDC47EFA";
         const uniqueId = UniqueId.fromGuid(new GUID(guidString));
-        expect(uniqueId.toString()).toEqual(guidString)
+        expect(uniqueId.toString()).toEqual(guidString);
     });
 
     it("Parses GUID string in the same way as Broker", () => {
