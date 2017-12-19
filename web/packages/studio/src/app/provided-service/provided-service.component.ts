@@ -4,14 +4,14 @@ import { Store } from "@ngrx/store";
 import * as fromRoot from '../services/ui/root-reducers';
 import { ProvidedMethod } from "@plexus-interop/broker";
 import { InteropClient } from "../services/core/InteropClient";
-import { SubsctiptionsRegistry } from "../services/ui/SubsctiptionsRegistry";
+import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 
 @Component({
   selector: 'app-provided-service',
   templateUrl: './provided-service.component.html',
   styleUrls: ['./provided-service.component.css'],
-  providers: [SubsctiptionsRegistry]
+  providers: [SubscriptionsRegistry]
 })
 export class ProvidedServiceComponent implements OnInit {
 

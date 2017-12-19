@@ -1,4 +1,4 @@
-import { SubsctiptionsRegistry } from './../services/ui/SubsctiptionsRegistry';
+import { SubscriptionsRegistry } from './../services/ui/SubscriptionsRegistry';
 import { OnDestroy } from '@angular/core';
 import { LoggerFactory } from '@plexus-interop/common';
 import { App as Application } from '@plexus-interop/broker';
@@ -13,7 +13,7 @@ import { Store } from '@ngrx/store';
   selector: 'app-app-list',
   templateUrl: './app-list.component.html',
   styleUrls: ['./app-list.component.css'],
-  providers: [SubsctiptionsRegistry]
+  providers: [SubscriptionsRegistry]
 })
 export class AppListComponent implements OnInit, OnDestroy {
   apps: Observable<Application[]>;
@@ -25,7 +25,7 @@ export class AppListComponent implements OnInit, OnDestroy {
     private store: Store<fromRoot.State>,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private subsctiptionsRegistry: SubsctiptionsRegistry) { }
+    private subsctiptionsRegistry: SubscriptionsRegistry) { }
 
   ngOnInit() {
     this.apps = this.store.select(state => state.plexus.apps);

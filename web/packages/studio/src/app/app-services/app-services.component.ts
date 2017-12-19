@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { SubsctiptionsRegistry } from '../services/ui/SubsctiptionsRegistry';
+import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
 import { StudioState } from './../services/ui/model';
 import { InteropClientFactory } from '../services/core/InteropClientFactory';
 import { AppActions } from '../services/ui/app.actions';
@@ -15,7 +15,7 @@ import 'rxjs/add/observable/of';
   selector: 'app-services',
   templateUrl: './app-services.component.html',
   styleUrls: ['./app-services.component.css'],
-  providers: [SubsctiptionsRegistry]
+  providers: [SubscriptionsRegistry]
 })
 export class AppServicesComponent implements OnInit {
 

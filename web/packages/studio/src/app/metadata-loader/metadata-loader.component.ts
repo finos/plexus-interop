@@ -1,4 +1,4 @@
-import { SubsctiptionsRegistry } from '../services/ui/SubsctiptionsRegistry';
+import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
 import { AppActions } from '../services/ui/app.actions';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
@@ -10,7 +10,7 @@ import 'rxjs/add/operator/first';
   selector: 'app-metadata-loader',
   templateUrl: './metadata-loader.component.html',
   styleUrls: ['./metadata-loader.component.css'],
-  providers: [SubsctiptionsRegistry]
+  providers: [SubscriptionsRegistry]
 })
 export class MetadataLoaderComponent implements OnInit, OnDestroy {
   public metadataUrl: string;
@@ -19,7 +19,7 @@ export class MetadataLoaderComponent implements OnInit, OnDestroy {
     private actions: AppActions,
     private store: Store<fromRoot.State>,
     private router: Router,
-    private subscriptions: SubsctiptionsRegistry) {
+    private subscriptions: SubscriptionsRegistry) {
   }
 
   ngOnInit() {

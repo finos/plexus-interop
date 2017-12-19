@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
 @Injectable()
-export class SubsctiptionsRegistry {
+export class SubscriptionsRegistry {
     private subscriptions: Subscription[] = [];
 
     public add(...subscriptions: Subscription[]): void {
