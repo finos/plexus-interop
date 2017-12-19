@@ -29,7 +29,9 @@ export class UrlWebAppLauncher implements AppLauncher {
 
     public async launch(invocationContext: LaunchInvocationContext, request: AppLaunchRequest): Promise<AppLaunchResponse> {
         const appInstanceId = UniqueId.generateNew();
-        const url = `${request.launchParams.url}?${UrlWebAppLauncher.instanceIdRequestParam}=${appInstanceId.toString()}`;
+        const launchUrl: string = request.launchParams.url;
+        const instanceIdParam = `${UrlWebAppLauncher.instanceIdRequestParam}=${appInstanceId.toString()}`;
+        const url = launchUrl.indexOf("?") !== -1 ? `${launchUrl}?${instanceIdParam}` : `${launchUrl}&${instanceIdParam}`;
         this.log.info(`Launching application with [${url}] url`);
         window.open(url);
         return {
