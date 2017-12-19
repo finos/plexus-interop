@@ -6,8 +6,7 @@ import { MetadataLoaderComponent } from './metadata-loader/metadata-loader.compo
 import { Routes } from '@angular/router';
 
 export const AppRoutes: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
-  { path: 'home', component: MetadataLoaderComponent },
+  { path: '', component: MetadataLoaderComponent },
   { path: 'apps', component: AppListComponent, resolve: [] },
   { path: 'app', component: AppServicesComponent },
   { path: 'consumed', component: ConsumedServiceComponent },

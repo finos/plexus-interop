@@ -54,12 +54,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   disconnectFromPlexus() {
     this.store.dispatch({ type: AppActions.DISCONNECT_FROM_PLEXUS });
-    this.router.navigate(['/home']);
   }
 
   disconnectFromApp() {
     this.store.dispatch({ type: AppActions.DISCONNECT_FROM_APP });
-    this.router.navigate(['/apps']);
+    // this.router.navigate(['/apps']);
   }
 
   openCurrentApp() {

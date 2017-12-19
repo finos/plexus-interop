@@ -61,12 +61,24 @@ export function reducer(
             };
         case AppActions.DISCONNECT_FROM_PLEXUS:
             return {
+                ...state
+            };
+        case AppActions.DISCONNECT_FROM_PLEXUS_SUCCESS:
+            return {
                 ...initialState
             };
         case AppActions.DISCONNECT_FROM_APP:
             return {
                 ...state,
-                connectedApp: null
+            };
+        case AppActions.DISCONNECT_FROM_APP_SUCCESS:
+            return {
+                ...state,
+                connectedApp: undefined,
+                services: {
+                    ...state.services,
+                    interopClient: undefined
+                }
             };
         case AppActions.SELECT_PROVIDED_METHOD:
             return {
