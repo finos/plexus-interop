@@ -104,7 +104,7 @@ export class Effects {
         .actions$
         .ofType(AppActions.METADATA_LOAD_SUCCESS)
         .map(_ => {
-            this.router.navigate(['/apps']);
+            this.router.navigate(['/apps'], { queryParamsHandling: 'merge' });
 
             return { type: AppActions.DO_NOTHING };
         });
@@ -126,7 +126,7 @@ export class Effects {
         });
 
     @Effect() loadConsumedMethod$: Observable<TypedAction<any>> =
-        this.actions$
+    this.actions$
         .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
         .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
         .mergeMap(async ([action, services]) => {
@@ -156,7 +156,7 @@ export class Effects {
         .actions$
         .ofType(AppActions.CONNECT_TO_APP_SUCCESS)
         .map(_ => {
-            this.router.navigate(['/app']);
+            this.router.navigate(['/app'], { queryParamsHandling: 'merge' });
 
             return { type: AppActions.DO_NOTHING };
         });
@@ -165,7 +165,7 @@ export class Effects {
         .actions$
         .ofType(AppActions.CONSUMED_METHOD_SUCCESS)
         .map(_ => {
-            this.router.navigate(['/consumed']);
+            this.router.navigate(['/consumed'], { queryParamsHandling: 'merge' });
 
             return { type: AppActions.DO_NOTHING };
         });
