@@ -26,13 +26,13 @@ export class AppServicesComponent implements OnInit {
     private actions: AppActions,
     private router: Router,
     private interopClientFactory: InteropClientFactory,
-    private subscribtions: SubsctiptionsRegistry) {
+    private subscribtions: SubscriptionsRegistry) {
   }
 
   consumedServices: Observable<ConsumedService[]> = Observable.of([]);
   providedServices: Observable<ProvidedService[]> = Observable.of([]);
   
-  private subscriptions: SubsctiptionsRegistry;
+  private subscriptions: SubscriptionsRegistry;
 
   public ngOnInit(): void {
     this.consumedServices = this.store

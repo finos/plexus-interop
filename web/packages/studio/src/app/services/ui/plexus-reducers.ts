@@ -1,17 +1,17 @@
-import { InteropClient } from '../InteropClient';
+import { InteropClient } from '../core/InteropClient';
 import { App as Application, ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
-import { TypedAction } from './../TypedAction';
+import { TypedAction } from './TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
-import { AppActions } from "../app.actions";
+import { AppActions } from "./app.actions";
 import { Action } from '@ngrx/store';
-import { UrlParamsProvider } from "../UrlParamsProvider";
+import { UrlParamsProvider } from "../core/UrlParamsProvider";
 import {
     AppConnectedActionParams,
     ConsumedMethodState,
     MetadataLoadActionParams,
     PlexusConnectedActionParams,
     StudioState,
-} from '../model';
+} from './model';
 
 const baseUrlParam = UrlParamsProvider.getParam("baseUrl");
 const defaultUrl = baseUrlParam || window.location.origin + '/assets';

@@ -33,7 +33,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private store: Store<fromRoot.State>,
     private router: Router,
     private interopServiceFactory: InteropServiceFactory,
-    private subscriptions: SubsctiptionsRegistry,
+    private subscriptions: SubscriptionsRegistry,
     private modalService: NgbModal) {
   }
 

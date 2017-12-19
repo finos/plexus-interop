@@ -26,7 +26,7 @@ export class ProvidedServiceComponent implements OnInit {
   constructor(
     private actions: AppActions,
     private store: Store<fromRoot.State>,
-    private subscriptions: SubsctiptionsRegistry) { }
+    private subscriptions: SubscriptionsRegistry) { }
 
   ngOnInit() {
     this.subscriptions.add(this.store
