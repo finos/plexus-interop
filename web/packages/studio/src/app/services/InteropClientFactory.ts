@@ -26,7 +26,7 @@ export class InteropClientFactory {
 
         let genericClientBuilder = new GenericClientApiBuilder();
         let appInstanceId = UrlParamsProvider.getParam('plexusInstanceId');
-        
+
         if (appInstanceId) {
             this.log.info(`Connecting with ${appInstanceId} instance ID`);
         }
@@ -51,7 +51,10 @@ export class InteropClientFactory {
             .forEach(pm => {
                 // create dummy implementation
                 const methodFullName = `${pm.providedService.service.id}.${pm.method.name}`;
-                unaryHandlers.set(methodFullName, async requestJson => defaultGenerator.generate(pm.method.outputMessage.id));
+                unaryHandlers.set(methodFullName, async requestJson => {
+                    this.log.info(`Received request to default handler: ${requestJson}`);
+                    return defaultGenerator.generate(pm.method.outputMessage.id);
+                };
                 genericClientBuilder.withUnaryInvocationHandler({
                     serviceInfo: {
                         serviceId: pm.providedService.service.id
