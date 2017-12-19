@@ -39,8 +39,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.messageContent = "";
-
+    this.messageContent = ""
     const consumedMethod$ = this.store
       .filter(state => !!state.plexus.consumedMethod)
       .map(state => state.plexus);
@@ -52,6 +51,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
         this.interopClient = state.services.interopClient;
         this.registryService = state.services.interopRegistryService;
         this.consumedMethod = state.consumedMethod.method;
+        this.createDefaultMessage();
       }));
 
   }
@@ -61,18 +61,31 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   sendRequest() {
-    this.interopClient.sendUnaryRequest(
-      this.toInvocationRequest(this.selectedDiscoveredMethod), this.messageContent, {
-        value: v => {
-          this.log.info(`Response received:  ${this.format(v)}`);
-        },
-        error: e => {
-          this.log.error(`Error received`, e);
-        }
-      })
-      .catch(e => {
+    this.log.info("Selected method", this.selectedDiscoveredMethod);
+    const handler = {
+      value: v => {
+        this.log.info(`Response received:  ${this.format(v)}`);
+      },
+      error: e => {
         this.log.error(`Error received`, e);
-      });
+      }
+    };
+    if (!!this.selectedDiscoveredMethod) {
+
+      this.interopClient.sendUnaryRequest(
+        this.selectedDiscoveredMethod, this.messageContent, handler)
+        .catch(e => {
+          this.log.error(`Error received`, e);
+        });
+
+    } else {
+      this.interopClient.sendUnaryRequest(
+        this.consumedMethod, this.messageContent, handler)
+        .catch(e => {
+          this.log.error(`Error received`, e);
+        });
+    }
+
   }
 
   format(data) {
