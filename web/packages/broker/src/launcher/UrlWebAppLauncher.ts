@@ -23,7 +23,7 @@ import { LaunchInvocationContext } from "./LaunchInvocationContext";
 
 export class UrlWebAppLauncher implements AppLauncher {
 
-    public static readonly instanceIdRequestParam: string = "plexus-instance-id";
+    public static readonly instanceIdRequestParam: string = "plexusInstanceId";
 
     private readonly log: Logger = LoggerFactory.getLogger("UrlWebAppLauncher");
 
