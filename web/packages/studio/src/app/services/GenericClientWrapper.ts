@@ -4,6 +4,7 @@ import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
 import { InteropRegistryService, DynamicMarshallerFactory } from "@plexus-interop/broker";
 import { UnaryStringHandler } from "./UnaryStringHandler";
+import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
 
 export class GenericClientWrapper implements InteropClient {
 
@@ -12,7 +13,9 @@ export class GenericClientWrapper implements InteropClient {
         private readonly genericClient: GenericClientApi,
         private readonly interopRegistryService: InteropRegistryService,
         private readonly encoderProvider: DynamicMarshallerFactory,
-        private readonly unaryHandlers: Map<string, UnaryStringHandler>) { }
+        private readonly unaryHandlers: Map<string, UnaryStringHandler>,
+        private readonly defaultGenerator: DefaultMessageGenerator) {
+    }
 
     public disconnect(): Promise<void> {
         return this.genericClient.disconnect();
@@ -41,7 +44,7 @@ export class GenericClientWrapper implements InteropClient {
 
         return await this.genericClient.sendUnaryRequest(invocationInfo, requestEncoder.encode(requestData), {
             value: v => {
-                responseHandler.value(responseEncoder.decode(v));
+                responseHandler.value(JSON.stringify(responseEncoder.decode(v)));
             },
             error: e => {
                 responseHandler.error(e);
@@ -51,6 +54,10 @@ export class GenericClientWrapper implements InteropClient {
 
     public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
         return this.genericClient.discoverMethod(discoveryRequest)
+    }
+
+    public createDefaultPayload(messageId: string): string {
+        return this.defaultGenerator.generate(messageId);
     }
 
 }

@@ -22,7 +22,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private logger: Logger;
 
   public ngOnInit(): void {
-    LoggerFactory.setLogLevel(LogLevel.DEBUG);
+    LoggerFactory.setLogLevel(LogLevel.INFO);
     this.loggerDelegateRegistration = LoggerFactory.registerDelegate({
 
       log: (logLevel: LogLevel, msg: string, args: any[]) => {

@@ -1,11 +1,11 @@
 <nav class="navbar navbar-light bg-light justify-content-between">
   <a class="navbar-brand" href="/">
-    <img width="300" alt="Plexus Studio Logo" src="assets/plexus-logo-lg.png">
+    <img width="200" alt="Plexus Studio Logo" src="assets/plexus-logo-lg.png">
   </a>
 
   <div class="connection-statuses">
     <div class="form-inline connection-status" *ngIf="connected$ | async">
-      <span class="navbar-text mr-2">Metadata base:</span>
+      <span class="navbar-text mr-2">Connected to:</span>
       <a target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
       <a class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
         <i class="fa fa-times" aria-hidden="true"></i>

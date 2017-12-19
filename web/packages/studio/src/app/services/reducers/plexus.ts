@@ -1,5 +1,5 @@
 import { InteropClient } from '../InteropClient';
-import { App as Application, ConsumedMethod } from "@plexus-interop/broker";
+import { App as Application, ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
 import { TypedAction } from './../TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from "../app.actions";
@@ -67,6 +67,13 @@ export function reducer(
             return {
                 ...state,
                 connectedApp: null
+            };
+        case AppActions.SELECT_PROVIDED_METHOD:
+            return {
+                ...state,
+                providedMethod: {
+                    method: getPayload<ProvidedMethod>(action)
+                }
             };
         case AppActions.CONNECT_TO_APP_SUCCESS:
             return {
