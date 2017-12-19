@@ -5,6 +5,7 @@ import { CrossDomainEventBus, WebBrokerConnectionBuilder, CrossDomainEventBusPro
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { InteropServiceFactory } from "./InteropServiceFactory";
 import { UrlResolver } from "./UrlResolver";
+import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 
 @Injectable()
 export class TransportConnectionFactory {
@@ -27,6 +28,10 @@ export class TransportConnectionFactory {
                 .connect();
             return connection;
         };
+    }
+
+    public createWebSocketTransportProvider(wsUrl: string): TransportConnectionProvider {
+        return () => new WebSocketConnectionFactory(new WebSocket(wsUrl)).connect();
     }
 
 }

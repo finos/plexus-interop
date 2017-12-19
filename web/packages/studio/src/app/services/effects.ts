@@ -26,6 +26,7 @@ import { Observable } from 'rxjs/Observable';
 import { Action, Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 import { Router } from '@angular/router';
+import { UrlParamsProvider } from "./UrlParamsProvider";
 
 @Injectable()
 export class Effects {
@@ -59,7 +60,18 @@ export class Effects {
                 const appRegistryService = await this.interopServiceFactory.getAppRegistryService(baseUrl);
                 const apps = appRegistryService.getApplications();
 
-                const сonnectionProvider = await this.transportConnectionFactory.createWebTransportProvider(baseUrl);
+
+                const wsUrl = UrlParamsProvider.getParam("wsUrl");
+
+                let сonnectionProvider;
+                if (wsUrl) {
+                    this.plexusLogger.info(`Connecting to Native WS Transport in ${wsUrl}`);
+
+                } else {
+                    this.plexusLogger.info(`Connecting to Web Transport`);
+                    сonnectionProvider = await this.transportConnectionFactory.createWebTransportProvider(baseUrl);
+                }
+
                 this.plexusLogger.info(`Connect to ${baseUrl} metadata folder successful!`);
 
                 return {
@@ -70,15 +82,12 @@ export class Effects {
                         сonnectionProvider
                     }
                 };
-            }
-            catch (error) {
-                const msg = `Connection not successful. Please enter correct metadata base url..`;
-
+            } catch (error) {
+                const msg = `Connection not successful. Please enter correct metadata base url.`;
                 if (params.silentOnFailure) {
                     this.plexusLogger.info(msg);
                 } else {
                     this.plexusLogger.error(msg);
-
                     return {
                         type: AppActions.DISCONNECT_FROM_PLEXUS
                     };
@@ -114,8 +123,10 @@ export class Effects {
         .ofType<TypedAction<Application>>(AppActions.CONNECT_TO_APP_START)
         .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
         .mergeMap(async ([action, services]) => {
+
             const application = action.payload;
             const appId = application.id;
+
             const interopClient = await this.interopClientFactory.connect(appId, services.interopRegistryService, services.сonnectionProvider);
 
             return {
@@ -127,30 +138,30 @@ export class Effects {
 
     @Effect() loadConsumedMethod$: Observable<TypedAction<any>> =
         this.actions$
-        .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
-        .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
-        .mergeMap(async ([action, services]) => {
+            .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
+            .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
+            .mergeMap(async ([action, services]) => {
 
-            const method = action.payload;
-            const interopClient = services.interopClient;
+                const method = action.payload;
+                const interopClient = services.interopClient;
 
-            const discoveredMethods = await interopClient.discoverMethod({
-                consumedMethod: {
-                    consumedService: {
-                        serviceId: method.consumedService.service.id
-                    },
-                    methodId: method.method.name
-                }
+                const discoveredMethods = await interopClient.discoverMethod({
+                    consumedMethod: {
+                        consumedService: {
+                            serviceId: method.consumedService.service.id
+                        },
+                        methodId: method.method.name
+                    }
+                });
+
+                return {
+                    type: AppActions.CONSUMED_METHOD_SUCCESS,
+                    payload: {
+                        method,
+                        discoveredMethods
+                    }
+                };
             });
-
-            return {
-                type: AppActions.CONSUMED_METHOD_SUCCESS,
-                payload: {
-                    method,
-                    discoveredMethods
-                }
-            };
-        });
 
     @Effect() appConnected$: Observable<Action> = this
         .actions$
