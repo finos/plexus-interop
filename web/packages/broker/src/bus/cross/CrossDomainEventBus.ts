@@ -48,7 +48,7 @@ export class CrossDomainEventBus implements EventBus {
 
     private hostIframeEventsSubscription: Subscription;
 
-    private stateMaschine: StateMaschine<State> = new StateMaschineBase(State.CREATED, [
+    private readonly stateMaschine: StateMaschine<State> = new StateMaschineBase(State.CREATED, [
         { from: State.CREATED, to: State.CONNECTED },
         { from: State.CONNECTED, to: State.CLOSED }
     ], this.log);
@@ -85,9 +85,7 @@ export class CrossDomainEventBus implements EventBus {
             this.log.info("Unsubsribing from Host iFrame");
             this.hostIframeEventsSubscription.unsubscribe();
         }
-        this.emitters.forEach((v, k) => {
-            v.error("Disconnected from Host iFrame");
-        });
+        this.emitters.forEach((v, k) => v.error("Disconnected from Host iFrame"));
         this.emitters.clear();
         this.observables.clear();
     }
@@ -106,9 +104,7 @@ export class CrossDomainEventBus implements EventBus {
         this.stateMaschine.throwIfNot(State.CONNECTED);
         const message = this.hostMessage({ topic }, MessageType.Subscribe, ResponseType.Stream);
         return this.sendAndSubscribe<SubscribeRequest, Event>(message, {
-            next: message => {
-                handler(message.responsePayload as Event);
-            }
+            next: message => handler(message.responsePayload as Event)
         });
     }
 
@@ -197,6 +193,7 @@ export class CrossDomainEventBus implements EventBus {
                 this.emit(this.subscriptionKey(hostMessage), hostMessage);
                 break;
             default:
+                this.log.error(`Unsupported host message type ${hostMessage.responseType}`);
                 break;
         }
     }
