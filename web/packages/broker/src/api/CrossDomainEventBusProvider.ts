@@ -22,7 +22,7 @@ export class CrossDomainEventBusProvider {
 
     private readonly log: Logger = LoggerFactory.getLogger("CrossDomainEventBusProvider");
 
-    public constructor(private readonly proxyUrlProvider: () => Promise<string>) { }
+    public constructor(private readonly proxyUrlProvider: () => Promise<string>, private readonly id: string = "plexus-proxy-iframe") { }
 
     public async connect(): Promise<EventBus> {
 
@@ -30,7 +30,7 @@ export class CrossDomainEventBusProvider {
         const proxyIframeUrl = await this.proxyUrlProvider();
 
         this.log.info(`Initialyzing proxy iFrame with url [${proxyIframeUrl}]`);
-        const proxyiFrame = await DomUtils.getOrCreateHiddenIFrame("plexus-proxy-iframe", proxyIframeUrl);
+        const proxyiFrame = await DomUtils.getOrCreateHiddenIFrame(this.id, proxyIframeUrl);
 
         this.log.info("Initialyzing Event Bus");
         const crossDomainBus: CrossDomainEventBus = new CrossDomainEventBus(proxyiFrame, DomUtils.getOrigin(proxyIframeUrl));

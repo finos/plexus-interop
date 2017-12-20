@@ -73,10 +73,10 @@ export class Effects {
             const baseUrl = params.baseUrl;
 
             try {
+                
                 const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(baseUrl);
                 const appRegistryService = await this.interopServiceFactory.getAppRegistryService(baseUrl);
                 const apps = appRegistryService.getApplications();
-
 
                 const wsUrl = UrlParamsProvider.getParam("wsUrl");
 

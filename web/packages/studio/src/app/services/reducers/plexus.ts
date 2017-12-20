@@ -30,7 +30,7 @@ import {
 } from '../model';
 
 const baseUrlParam = UrlParamsProvider.getParam("baseUrl");
-const defaultUrl = baseUrlParam || window.location.origin + '/assets';
+const defaultUrl = baseUrlParam || "";
 
 const initialState: StudioState = {
     loading: false,

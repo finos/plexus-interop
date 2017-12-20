@@ -50,12 +50,11 @@ export class MetadataLoaderComponent implements OnInit, OnDestroy {
   }
 
   connect(metadataUrl: string) {
-    var checkAbsPat = /^https?:\/\//i
-
+    const checkAbsPath = /^https?:\/\//i
     this.store.dispatch({
       type: AppActions.METADATA_LOAD_START,
       payload: {
-        baseUrl: checkAbsPat.test(metadataUrl) ? metadataUrl : window.location.origin + metadataUrl,
+        baseUrl: checkAbsPath.test(metadataUrl) ? metadataUrl : window.location.origin + metadataUrl,
         silentOnFailure: false
       }
     });
