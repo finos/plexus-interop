@@ -59,9 +59,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.logger = LoggerFactory.getLogger();
     this.logger.info('Welcome to Plexus Studio!');
+
     this.store.dispatch({
       type: AppActions.AUTO_CONNECT
     });
+    
   }
 
   public ngOnDestroy(): void {

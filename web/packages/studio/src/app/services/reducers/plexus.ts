@@ -29,8 +29,9 @@ import {
     StudioState,
 } from '../model';
 
-const baseUrlParam = UrlParamsProvider.getParam("baseUrl");
-const defaultUrl = baseUrlParam || "";
+const mode = UrlParamsProvider.getParam("mode");
+
+const defaultUrl = UrlParamsProvider.getParam("baseUrl") || mode === "dev" ? "http://localhost:8080" : undefined;
 
 const initialState: StudioState = {
     loading: false,

@@ -54,15 +54,19 @@ export class Effects {
         .ofType(AppActions.AUTO_CONNECT)
         .withLatestFrom(this.store.select(state => state.plexus))
         .mergeMap(async ([action, state]) => {
-            const payload: MetadataLoadActionParams = {
-                baseUrl: state.metadataUrl,
-                silentOnFailure: true
-            };
 
-            return {
-                type: AppActions.METADATA_LOAD_START,
-                payload: payload
-            };
+            if (state.metadataUrl) {
+                const payload: MetadataLoadActionParams = {
+                    baseUrl: state.metadataUrl,
+                    silentOnFailure: true
+                };
+                return {
+                    type: AppActions.METADATA_LOAD_START,
+                    payload: payload
+                };
+            } else {
+                return { type: AppActions.DO_NOTHING };
+            }
         });
 
     @Effect() connectToPlexus$: Observable<Action> = this
@@ -73,7 +77,7 @@ export class Effects {
             const baseUrl = params.baseUrl;
 
             try {
-                
+
                 const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(baseUrl);
                 const appRegistryService = await this.interopServiceFactory.getAppRegistryService(baseUrl);
                 const apps = appRegistryService.getApplications();
@@ -89,7 +93,7 @@ export class Effects {
                     сonnectionProvider = await this.transportConnectionFactory.createWebTransportProvider(baseUrl);
                 }
 
-                this.plexusLogger.info(`Connect to ${baseUrl} metadata folder successful!`);
+                this.plexusLogger.info(`Successfully loaded metadata from ${baseUrl}`);
 
                 return {
                     type: AppActions.METADATA_LOAD_SUCCESS,
@@ -116,9 +120,11 @@ export class Effects {
         .ofType(AppActions.DISCONNECT_FROM_PLEXUS)
         .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
         .mergeMap(async ([action, services]) => {
-            const connection = await services.сonnectionProvider();
-            await connection.disconnect();
-
+            
+            if (services.interopClient) {
+                await services.interopClient.disconnect();
+            } 
+            
             this.plexusLogger.info(`Disconnect from metadata - success!`);
 
             this.router.navigate(['/']);
