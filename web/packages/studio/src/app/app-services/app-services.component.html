@@ -1,21 +1,25 @@
 <div class="row">
   <div class="col-sm-6">
-    <h5>Consumed</h5>
-    <div class="list-group list-group-flush">
-      <div class="list-group-item" *ngFor="let consumedService of consumedServices | async">
-        {{consumedService?.service.id}}
-        <a class="list-group-item list-group-item-action list-group-item-secondary" *ngFor="let method of getMethodsArray(consumedService)"
-          (click)="openConsumed(method)">{{method?.method.name}}</a>
+    <h5>Consumed services</h5>
+    <div class="p-2">
+      <div *ngFor="let consumedService of consumedServices | async">
+        <span id="consumed-service-header-{{consumedService?.service.id}}">{{consumedService?.service.id}}</span>
+        <div class="list-group mt-2">
+          <a id="consumed-action-item-{{method?.method.name}}" class="list-group-item list-group-item-action" *ngFor="let method of getMethodsArray(consumedService)"
+            (click)="openConsumed(method)">{{method?.method.name}}</a>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-sm-6">
-    <h5>Provided</h5>
-    <div class="list-group list-group-flush">
-      <div class="list-group-item" *ngFor="let providedService of providedServices | async">
-        {{providedService?.service.id}}
-        <a class="list-group-item list-group-item-action list-group-item-secondary" *ngFor="let method of getMethodsArray(providedService)"
-          (click)="openProvided(method)">{{method?.method.name}}</a>
+    <h5>Provided services</h5>
+    <div class="p-2">
+      <div *ngFor="let providedService of providedServices | async">
+        <span id="provided-service-header-{{providedService?.service.id}}">{{providedService?.service.id}}</span>
+        <div class="list-group mt-2">
+          <a id="provided-action-item-{{method?.method.name}}" class="list-group-item list-group-item-action" *ngFor="let method of getMethodsArray(providedService)"
+            (click)="openProvided(method)">{{method?.method.name}}</a>
+        </div>
       </div>
     </div>
   </div>

@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 import { Observable } from 'rxjs/Observable';
-import { SubsctiptionsRegistry } from '../services/SubsctiptionsRegistry';
-import { StudioState } from './../services/model';
-import { InteropClientFactory } from '../services/client/InteropClientFactory';
-import { AppActions } from '../services/app.actions';
+import { StudioState } from '../services/ui/model';
+import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
+import { InteropClientFactory } from '../services/core/InteropClientFactory';
+import { AppActions } from '../services/ui/app.actions';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as fromRoot from '../services/reducers';
+import * as fromRoot from '../services/ui/root-reducers';
 import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/observable/of';
@@ -31,7 +31,7 @@ import 'rxjs/add/observable/of';
   selector: 'app-services',
   templateUrl: './app-services.component.html',
   styleUrls: ['./app-services.component.css'],
-  providers: [SubsctiptionsRegistry]
+  providers: [SubscriptionsRegistry]
 })
 export class AppServicesComponent implements OnInit {
 
@@ -40,7 +40,7 @@ export class AppServicesComponent implements OnInit {
     private actions: AppActions,
     private router: Router,
     private interopClientFactory: InteropClientFactory,
-    private subscribtions: SubsctiptionsRegistry) {
+    private subscribtions: SubscriptionsRegistry) {
   }
 
   consumedServices: Observable<ConsumedService[]> = Observable.of([]);

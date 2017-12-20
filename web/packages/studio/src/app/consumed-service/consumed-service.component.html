@@ -1,15 +1,15 @@
 <div class="form-group">
   <label for="exampleFormControlTextarea1">Enter message JSON:</label>
-  <textarea class="form-control" id="exampleFormControlTextarea1" rows="10" [(ngModel)]="messageContent"></textarea>
-  <button class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
-  <button class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
+  <textarea id="message-content-area" class="form-control" rows="10" [(ngModel)]="messageContent"></textarea>
+  <button id="format-content-btn" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
+  <button id="default-msg-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
 </div>
 
 <div>
   <div class="form-group">
     <label for="exampleSelect1">Target app:</label>
-    <select class="form-control" id="targetAppId" [(ngModel)]="selectedDiscoveredMethod">
-      <option *ngFor="let discoveredMethod of discoveredMethods" [ngValue]="discoveredMethod">
+    <select id="target-app-dropdown" class="form-control" [(ngModel)]="selectedDiscoveredMethod">
+      <option id="target-app-option-{{discoveredMethod.providedMethod.providedService.applicationId}}" *ngFor="let discoveredMethod of discoveredMethods" [ngValue]="discoveredMethod">
         {{discoveredMethod.providedMethod.providedService.applicationId}}
       </option>
     </select>

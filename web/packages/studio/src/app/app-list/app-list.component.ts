@@ -1,11 +1,3 @@
-import { SubsctiptionsRegistry } from './../services/SubsctiptionsRegistry';
-import { OnDestroy } from '@angular/core';
-import { LoggerFactory } from '@plexus-interop/common';
-import { App as Application } from '@plexus-interop/broker';
-import { Observable } from 'rxjs/Observable';
-import { AppActions } from '../services/app.actions';
-import { Component, OnInit } from '@angular/core';
-import * as fromRoot from '../services/reducers';
 /**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -22,6 +14,14 @@ import * as fromRoot from '../services/reducers';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { SubscriptionsRegistry } from './../services/ui/SubscriptionsRegistry';
+import { OnDestroy } from '@angular/core';
+import { LoggerFactory } from '@plexus-interop/common';
+import { App as Application } from '@plexus-interop/broker';
+import { Observable } from 'rxjs/Observable';
+import { AppActions } from '../services/ui/app.actions';
+import { Component, OnInit } from '@angular/core';
+import * as fromRoot from '../services/ui/root-reducers';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 
@@ -29,7 +29,7 @@ import { Store } from '@ngrx/store';
   selector: 'app-app-list',
   templateUrl: './app-list.component.html',
   styleUrls: ['./app-list.component.css'],
-  providers: [SubsctiptionsRegistry]
+  providers: [SubscriptionsRegistry]
 })
 export class AppListComponent implements OnInit, OnDestroy {
 
@@ -42,7 +42,7 @@ export class AppListComponent implements OnInit, OnDestroy {
     private store: Store<fromRoot.State>,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private subsctiptionsRegistry: SubsctiptionsRegistry) { }
+    private subsctiptionsRegistry: SubscriptionsRegistry) { }
 
   ngOnInit() {
     this.apps = this.store.select(state => state.plexus.apps);

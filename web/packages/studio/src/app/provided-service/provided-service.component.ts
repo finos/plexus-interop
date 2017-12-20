@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 import { Component, OnInit } from '@angular/core';
-import { AppActions } from "../services/app.actions";
+import { AppActions } from "../services/ui/app.actions";
 import { Store } from "@ngrx/store";
-import * as fromRoot from '../services/reducers';
+import * as fromRoot from '../services/ui/root-reducers';
 import { ProvidedMethod } from "@plexus-interop/broker";
-import { InteropClient } from "../services/client/InteropClient";
-import { SubsctiptionsRegistry } from "../services/SubsctiptionsRegistry";
+import { InteropClient } from "../services/core/InteropClient";
+import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 
 @Component({
   selector: 'app-provided-service',
   templateUrl: './provided-service.component.html',
   styleUrls: ['./provided-service.component.css'],
-  providers: [SubsctiptionsRegistry]
+  providers: [SubscriptionsRegistry]
 })
 export class ProvidedServiceComponent implements OnInit {
 
@@ -42,7 +42,7 @@ export class ProvidedServiceComponent implements OnInit {
   constructor(
     private actions: AppActions,
     private store: Store<fromRoot.State>,
-    private subscriptions: SubsctiptionsRegistry) { }
+    private subscriptions: SubscriptionsRegistry) { }
 
   ngOnInit() {
     this.subscriptions.add(this.store

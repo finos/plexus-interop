@@ -9,3 +9,7 @@ html, body, .flex-fill {
 .flex-flow-column {
     flex-flow: column;
 }
+
+a, button {
+    cursor: pointer;
+}

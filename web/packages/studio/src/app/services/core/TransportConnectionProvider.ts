@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Action } from '@ngrx/store';
+import { TransportConnection } from "@plexus-interop/transport-common";
 
-export interface TypedAction<P> extends Action {
-    payload: P;
-    error?: boolean;
-}
+export type TransportConnectionProvider = () => Promise<TransportConnection>;
+
+

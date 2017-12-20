@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UrlParamsProvider } from '../UrlParamsProvider';
+import { UrlParamsProvider } from './UrlParamsProvider';
 import { InteropClient } from "./InteropClient";
 import { Injectable } from "@angular/core";
 import { TransportConnectionProvider } from "../transport/TransportConnectionProvider";
@@ -25,7 +25,7 @@ import { UnaryStringHandler } from "./UnaryStringHandler";
 import { flatMap, Logger, LoggerFactory } from "@plexus-interop/common";
 import { GenericClientWrapper } from "./GenericClientWrapper";
 import { DynamicMarshallerFactory } from "@plexus-interop/broker";
-import { DefaultMessageGenerator } from "../DefaultMessageGenerator";
+import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
 
 @Injectable()
 export class InteropClientFactory {

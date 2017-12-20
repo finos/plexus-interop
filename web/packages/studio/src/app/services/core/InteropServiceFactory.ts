@@ -17,7 +17,7 @@
 import { Injectable } from "@angular/core";
 import { InteropRegistryService, UrlInteropRegistryProvider, AppRegistryService, UrlAppRegistryProvider, AppRegistryProvider, InteropRegistryProvider } from
     "@plexus-interop/broker";
-import { UrlResolver } from "../UrlResolver";
+import { UrlResolver } from "./UrlResolver";
 
 export interface RegistryUrls {
     apps: string,

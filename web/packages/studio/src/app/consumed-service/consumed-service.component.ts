@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 import { TransportConnection } from '@plexus-interop/transport-common/src/transport/TransportConnection';
-import { InteropClient } from '../services/client/InteropClient';
+import { InteropClient } from '../services/core/InteropClient';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AppActions } from "../services/app.actions";
+import { AppActions } from "../services/ui/app.actions";
 import { Store } from "@ngrx/store";
-import * as fromRoot from '../services/reducers';
+import * as fromRoot from '../services/ui/root-reducers';
 import { Router } from "@angular/router";
-import { SubsctiptionsRegistry } from "../services/SubsctiptionsRegistry";
+import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { InteropRegistryService, ConsumedMethod } from "@plexus-interop/broker";
 import { DiscoveredMethod, InvocationRequestInfo } from "@plexus-interop/client";
 import { UniqueId } from "@plexus-interop/protocol";
@@ -31,7 +31,7 @@ import { Logger, LoggerFactory } from "@plexus-interop/common";
   selector: 'app-consumed-service',
   templateUrl: './consumed-service.component.html',
   styleUrls: ['./consumed-service.component.css'],
-  providers: [SubsctiptionsRegistry]
+  providers: [SubscriptionsRegistry]
 })
 export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
@@ -51,7 +51,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     private actions: AppActions,
     private store: Store<fromRoot.State>,
     private router: Router,
-    private subscriptions: SubsctiptionsRegistry) {
+    private subscriptions: SubscriptionsRegistry) {
   }
 
   ngOnInit() {
@@ -109,7 +109,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   createDefaultMessage() {
-    if (this.consumedMethod) {
+    if (this.consumedMethod && this.interopClient) {
       const method = this.consumedMethod.method;
       this.messageContent = this.interopClient.createDefaultPayload(method.inputMessage.id);
       this.formatAndUpdateArea();

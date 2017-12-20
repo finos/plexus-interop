@@ -20,7 +20,7 @@ import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { MethodDiscoveryResponse, ProvidedMethodReference } from "@plexus-interop/client-api";
 import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod } from "@plexus-interop/broker";
 import { UnaryStringHandler } from "./UnaryStringHandler";
-import { DefaultMessageGenerator } from "../DefaultMessageGenerator";
+import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
 
 export class GenericClientWrapper implements InteropClient {
 
@@ -74,8 +74,8 @@ export class GenericClientWrapper implements InteropClient {
         if ((methodToInvoke as DiscoveredMethod).providedMethod) {
             const provided = methodToInvoke as DiscoveredMethod;
             return await this.genericClient.sendDiscoveredUnaryRequest(
-                provided.providedMethod, 
-                requestEncoder.encode(requestData), 
+                provided.providedMethod,
+                requestEncoder.encode(requestData),
                 internalResponseHandler);
         } else {
             const consumed = methodToInvoke as ConsumedMethod;
@@ -85,13 +85,13 @@ export class GenericClientWrapper implements InteropClient {
                 serviceId: consumed.consumedService.service.id,
                 methodId: consumed.method.name
             }, requestEncoder.encode(requestData), {
-                value: v => {
-                    responseHandler.value(JSON.stringify(responseEncoder.decode(v)));
-                },
-                error: e => {
-                    responseHandler.error(e);
-                }
-            });
+                    value: v => {
+                        responseHandler.value(JSON.stringify(responseEncoder.decode(v)));
+                    },
+                    error: e => {
+                        responseHandler.error(e);
+                    }
+                });
         }
     }
 

@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 import { ProvidedMethod } from '@plexus-interop/broker';
-import { InteropClient } from './client/InteropClient';
-import { TransportConnectionProvider } from './transport/TransportConnectionProvider';
+import { InteropClient } from '../core/InteropClient';
+import { TransportConnectionProvider } from '../core/TransportConnectionProvider';
 import { App as Application, ConsumedMethod } from '@plexus-interop/broker';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { TransportConnection } from "@plexus-interop/transport-common";

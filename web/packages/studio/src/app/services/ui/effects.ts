@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 import { LoggerFactory } from '@plexus-interop/common';
-import { logger, State } from './reducers';
-import { TransportConnectionFactory } from './transport/TransportConnectionFactory';
+import { logger, State } from './root-reducers';
+import { TransportConnectionFactory } from '../core/TransportConnectionFactory';
 import { App as Application, ConsumedMethod } from "@plexus-interop/broker";
 import {
     Alert,
@@ -26,10 +26,10 @@ import {
     ServicesSnapshot,
     StudioState,
 } from './model';
-import { InteropClientFactory } from './client/InteropClientFactory';
 import { TypedAction } from './TypedAction';
+import { InteropClientFactory } from '../core/InteropClientFactory';
 import { AppRegistryService } from '@plexus-interop/broker';
-import { InteropServiceFactory } from './client/InteropServiceFactory';
+import { InteropServiceFactory } from '../core/InteropServiceFactory';
 import { AppActions } from './app.actions';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
@@ -42,8 +42,8 @@ import { Observable } from 'rxjs/Observable';
 import { Action, Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 import { Router } from '@angular/router';
-import { UrlParamsProvider } from "./UrlParamsProvider";
 import { DiscoveryMode } from "@plexus-interop/client-api";
+import { UrlParamsProvider } from "../core/UrlParamsProvider";
 
 @Injectable()
 export class Effects {

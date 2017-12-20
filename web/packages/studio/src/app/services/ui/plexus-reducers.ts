@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropClient } from '../client/InteropClient';
+import { InteropClient } from '../core/InteropClient';
 import { App as Application, ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
-import { TypedAction } from './../TypedAction';
+import { TypedAction } from './TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
-import { AppActions } from "../app.actions";
+import { AppActions } from "./app.actions";
 import { Action } from '@ngrx/store';
-import { UrlParamsProvider } from "../UrlParamsProvider";
+import { UrlParamsProvider } from "../core/UrlParamsProvider";
 import {
     AppConnectedActionParams,
     ConsumedMethodState,
     MetadataLoadActionParams,
     PlexusConnectedActionParams,
     StudioState,
-} from '../model';
+} from './model';
 
 const mode = UrlParamsProvider.getParam("mode");
 

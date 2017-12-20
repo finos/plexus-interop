@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { App as Application } from '@plexus-interop/broker';
-import { TypedAction } from '../TypedAction';
+import { TypedAction } from '../ui/TypedAction';
 import { Action } from '@ngrx/store';
 
 export class Actions {

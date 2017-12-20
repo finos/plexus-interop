@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppActions } from './services/app.actions';
+import { AppActions } from './services/ui/app.actions';
 import { Store } from '@ngrx/store';
 import { LoggerFactory, LogLevel, Logger, TimeUtils } from '@plexus-interop/common';
 import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { ElementRef, Renderer2 } from '@angular/core';
-import { State } from './services/reducers';
+import { State } from './services/ui/root-reducers';
 
 @Component({
   selector: 'app-root',
@@ -40,8 +40,11 @@ export class AppComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     
     this.loggerDelegateRegistration = LoggerFactory.registerDelegate({
-
       log: (logLevel: LogLevel, msg: string, args: any[]) => {
+        if (logLevel <= LogLevel.DEBUG) {
+          // Too many logs in output
+          return;
+        }
 
         let message = `[${TimeUtils.format(new Date())}] ${LogLevel[logLevel]} ${msg}`;
         if (args && args.length > 0) {
