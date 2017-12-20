@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { TransportConnection } from '@plexus-interop/transport-common/src/transport/TransportConnection';
-import { InteropClient } from '../services/InteropClient';
+import { InteropClient } from '../services/client/InteropClient';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppActions } from "../services/app.actions";
 import { Store } from "@ngrx/store";

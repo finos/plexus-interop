@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { SubsctiptionsRegistry } from './../services/SubsctiptionsRegistry';
-import { InteropServiceFactory, RegistryUrls } from '../services/InteropServiceFactory';
+import { InteropServiceFactory, RegistryUrls } from '../services/client/InteropServiceFactory';
 import { App as Application } from '@plexus-interop/broker';
 import { Subscription } from 'rxjs/Subscription';
 import { AppActions } from '../services/app.actions';

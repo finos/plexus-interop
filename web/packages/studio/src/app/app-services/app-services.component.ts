@@ -17,7 +17,7 @@
 import { Observable } from 'rxjs/Observable';
 import { SubsctiptionsRegistry } from '../services/SubsctiptionsRegistry';
 import { StudioState } from './../services/model';
-import { InteropClientFactory } from '../services/InteropClientFactory';
+import { InteropClientFactory } from '../services/client/InteropClientFactory';
 import { AppActions } from '../services/app.actions';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';

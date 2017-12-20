@@ -19,7 +19,7 @@ import { AppActions } from "../services/app.actions";
 import { Store } from "@ngrx/store";
 import * as fromRoot from '../services/reducers';
 import { ProvidedMethod } from "@plexus-interop/broker";
-import { InteropClient } from "../services/InteropClient";
+import { InteropClient } from "../services/client/InteropClient";
 import { SubsctiptionsRegistry } from "../services/SubsctiptionsRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 
