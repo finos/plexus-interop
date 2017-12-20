@@ -58,9 +58,6 @@ export class BufferedObserver<T> implements Observer<T> {
             this.baseObserver.next(value);
         } else {
             /* istanbul ignore if */
-            if (!this.log) {
-                debugger;
-            }
             if (this.log.isTraceEnabled()) {
                 this.log.trace(`No observer, adding to buffer, buffer size ${this.buffer.size()}`);
             }

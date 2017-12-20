@@ -27,6 +27,7 @@ import { Action, Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 import { Router } from '@angular/router';
 import { UrlParamsProvider } from "./UrlParamsProvider";
+import { DiscoveryMode } from "@plexus-interop/client-api";
 
 @Injectable()
 export class Effects {
@@ -145,14 +146,24 @@ export class Effects {
                 const method = action.payload;
                 const interopClient = services.interopClient;
 
-                const discoveredMethods = await interopClient.discoverMethod({
+                const discoveryRequest = {
                     consumedMethod: {
                         consumedService: {
                             serviceId: method.consumedService.service.id
                         },
                         methodId: method.method.name
                     }
+                };
+
+                // offline
+                const discoveredMethods = await interopClient.discoverMethod(discoveryRequest);
+                // online
+                const onlineMethods = await interopClient.discoverMethod({
+                    ...discoveryRequest,
+                    discoveryMode: DiscoveryMode.Online
                 });
+
+                discoveredMethods.methods.concat(onlineMethods.methods);
 
                 return {
                     type: AppActions.CONSUMED_METHOD_SUCCESS,

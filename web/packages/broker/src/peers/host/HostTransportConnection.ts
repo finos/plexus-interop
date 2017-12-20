@@ -101,8 +101,7 @@ export class HostTransportConnection implements TransportConnection {
         }, this.stringUuid);
 
         this.remoteBrokerService.host<ChannelRequest, ArrayBuffer>(RemoteActions.OPEN_CHANNEL, (request: ChannelRequest, responseObserver) => {                          
-            return new Observable(observer => {
-                debugger;                
+            return new Observable(observer => {            
                 const channel = this.getManagedChannel(request.channelId);
                 this.log.trace(`Open Channel [${request.channelId}] request received`);
                 if (channel) {

@@ -35,34 +35,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
         const echoRequest = this.clientsSetup.createRequestDto();
         return this.testMessageSentInternal(echoRequest);
     }
-
-    private testMessageSentInternal(echoRequest: plexus.plexus.interop.testing.IEchoRequest): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => {
-                try {
-                    debugger;
-                    this.verifyInvocationContext(context);
-                    this.assertEqual(request, echoRequest);
-                } catch (error) {
-                    reject(error);
-                }
-                return request;
-            });
-            return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
-                .then(clients => {
-                    return clients[0].getEchoServiceProxy()
-                        .unary(echoRequest)
-                        .then(echoResponse => {
-                            debugger;
-                            this.assertEqual(echoRequest, echoResponse);
-                            return this.clientsSetup.disconnect(clients[0], clients[1]);
-                        });
-                })
-                .then(() => resolve())
-                .catch(error => reject(error));
-        });
-    }
-
+    
     public testHugeMessageSent(): Promise<void> {
         const echoRequest = this.clientsSetup.createHugeRequestDto(10 * 65000);
         return this.testMessageSentInternal(echoRequest);
@@ -86,6 +59,57 @@ export class PointToPointInvocationTests extends BaseEchoTest {
     public testHostsExecutionStringErrorReceived(): Promise<void> {
         const errorText = "Host error";
         return this.testHostsExecutionErrorReceivedInternal(errorText, errorText);
+    }
+    
+    public testFewMessagesSent(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        return new Promise<void>((resolve, reject) => {
+            const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => request);
+            return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+                .then(clients => {
+                    return (async () => {
+                        let echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
+                        this.assertEqual(echoRequest, echoResponse);
+                        echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
+                        this.assertEqual(echoRequest, echoResponse);
+                        echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
+                        this.assertEqual(echoRequest, echoResponse);
+                    })()
+                        .then(() => {
+                            return this.clientsSetup.disconnect(clients[0], clients[1]);
+                        });
+                })
+                .then(() => resolve())
+                .catch(error => {
+                    reject(error);
+                });
+        });
+
+    }
+
+    private testMessageSentInternal(echoRequest: plexus.plexus.interop.testing.IEchoRequest): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => {
+                try {
+                    this.verifyInvocationContext(context);
+                    this.assertEqual(request, echoRequest);
+                } catch (error) {
+                    reject(error);
+                }
+                return request;
+            });
+            return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+                .then(clients => {
+                    return clients[0].getEchoServiceProxy()
+                        .unary(echoRequest)
+                        .then(echoResponse => {
+                            this.assertEqual(echoRequest, echoResponse);
+                            return this.clientsSetup.disconnect(clients[0], clients[1]);
+                        });
+                })
+                .then(() => resolve())
+                .catch(error => reject(error));
+        });
     }
 
     private testHostsExecutionErrorReceivedInternal(errorObj: any, errorText: string, isPromise: boolean = true): Promise<void> {
@@ -112,32 +136,6 @@ export class PointToPointInvocationTests extends BaseEchoTest {
                 .then(() => resolve())
                 .catch(error => reject(error));
         });
-    }
-
-    public testFewMessagesSent(): Promise<void> {
-        const echoRequest = this.clientsSetup.createRequestDto();
-        return new Promise<void>((resolve, reject) => {
-            const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => request);
-            return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
-                .then(clients => {
-                    return (async () => {
-                        let echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
-                        this.assertEqual(echoRequest, echoResponse);
-                        echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
-                        this.assertEqual(echoRequest, echoResponse);
-                        echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
-                        this.assertEqual(echoRequest, echoResponse);
-                    })()
-                        .then(() => {
-                            return this.clientsSetup.disconnect(clients[0], clients[1]);
-                        });
-                })
-                .then(() => resolve())
-                .catch(error => {
-                    reject(error);
-                });
-        });
-
     }
 
 }

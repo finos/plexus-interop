@@ -32,20 +32,7 @@ describe("Web Broker: Point to Point invocation", () => {
 
     it("Sends invocation request and receives response", function () {
         this.timeout(5000);
-        try {
-            return pointToPointTests.testMessageSent()
-                .catch(e => {
-                    console.error("failed", e);
-                    debugger;
-                })
-                .then(() => {
-                    debugger;
-                    return Promise.resolve();
-                });
-        } catch (error) {
-            debugger;
-            return Promise.reject(error);
-        }
+        return pointToPointTests.testMessageSent();
     });
 
     it("Sends few invocations in a row", function() {
