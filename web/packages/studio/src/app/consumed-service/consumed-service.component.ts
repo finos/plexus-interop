@@ -77,7 +77,6 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   sendRequest() {
-    this.log.info("Selected method", this.selectedDiscoveredMethod);
     const handler = {
       value: v => {
         this.log.info(`Response received:  ${this.format(v)}`);
@@ -87,13 +86,11 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
       }
     };
     if (!!this.selectedDiscoveredMethod) {
-
       this.interopClient.sendUnaryRequest(
         this.selectedDiscoveredMethod, this.messageContent, handler)
         .catch(e => {
           this.log.error(`Error received`, e);
         });
-
     } else {
       this.interopClient.sendUnaryRequest(
         this.consumedMethod, this.messageContent, handler)
@@ -101,7 +98,12 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
           this.log.error(`Error received`, e);
         });
     }
+  }
 
+  label(providedMethod: DiscoveredMethod): string {
+    const connectionId = providedMethod.providedMethod.providedService.connectionId;
+    const guidPostfix = connectionId ? ` - ${UniqueId.fromProperties(connectionId).toString()}` : "";
+    return `${providedMethod.providedMethod.providedService.applicationId}${guidPostfix}`
   }
 
   format(data) {

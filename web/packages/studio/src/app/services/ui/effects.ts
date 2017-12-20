@@ -86,10 +86,10 @@ export class Effects {
 
                 let сonnectionProvider;
                 if (wsUrl) {
-                    this.plexusLogger.info(`Connecting to Native WS Transport in ${wsUrl}`);
+                    this.plexusLogger.info(`Creating Native WS Transport Provider using ${wsUrl} endpoint`);
                     сonnectionProvider = await this.transportConnectionFactory.createWebSocketTransportProvider(wsUrl);
                 } else {
-                    this.plexusLogger.info(`Connecting to Web Transport`);
+                    this.plexusLogger.info(`Creating Web Transport Provider`);
                     сonnectionProvider = await this.transportConnectionFactory.createWebTransportProvider(baseUrl);
                 }
 
@@ -185,7 +185,9 @@ export class Effects {
                     discoveryMode: DiscoveryMode.Online
                 });
 
-                discoveredMethods.methods.concat(onlineMethods.methods);
+                if (onlineMethods && onlineMethods.methods) {
+                    onlineMethods.methods.forEach(pm => discoveredMethods.methods.push(pm));
+                }
 
                 return {
                     type: AppActions.CONSUMED_METHOD_SUCCESS,

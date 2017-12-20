@@ -10,7 +10,7 @@
     <label for="exampleSelect1">Target app:</label>
     <select id="target-app-dropdown" class="form-control" [(ngModel)]="selectedDiscoveredMethod">
       <option id="target-app-option-{{discoveredMethod.providedMethod.providedService.applicationId}}" *ngFor="let discoveredMethod of discoveredMethods" [ngValue]="discoveredMethod">
-        {{discoveredMethod.providedMethod.providedService.applicationId}}
+        {{label(discoveredMethod)}}
       </option>
     </select>
   </div>
