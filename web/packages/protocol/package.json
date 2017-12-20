@@ -16,7 +16,7 @@
     "gen-transport-ts": "pbts --force-long -o src/gen/internal-transport-protocol.d.ts src/gen/internal-transport-protocol.js",
     "gen-client-protocol": "npm run gen-client-js && npm run gen-client-ts",
     "gen-transport-protocol": "npm run gen-transport-js && npm run gen-transport-ts",
-    "unpublish": "npm unpublish @plexus-interop/protocol@0.1.1",
+    "unpublish": "npm unpublish @plexus-interop/protocol@0.1.2",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",

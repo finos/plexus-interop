@@ -31,6 +31,7 @@ export enum LogLevel {
 }
 
 export class LoggerFactory {
+  
   private static additionalRecipients: LoggerDelegate[] = [];
 
   public static registerDelegate(logger: LoggerDelegate): { unregister: () => void } {

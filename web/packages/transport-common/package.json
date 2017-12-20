@@ -14,7 +14,7 @@
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage --runInBand",
     "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/transport-common@0.1.1",
+    "unpublish": "npm unpublish @plexus-interop/transport-common@0.1.2",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",

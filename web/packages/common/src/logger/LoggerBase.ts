@@ -52,24 +52,38 @@ export class LoggerBase implements Logger, LoggerDelegate {
     }
 
     public log(logLevel: LogLevel, msg: string, args: any[]): void {
+
         let actualMessage = `${this.name} ${msg}`;
 
         switch (logLevel) {
-            case LogLevel.TRACE: log.trace(actualMessage, args); break;
-            case LogLevel.DEBUG: log.debug(actualMessage, args); break;
-            case LogLevel.INFO: log.info(actualMessage, args); break;
-            case LogLevel.WARN: log.warn(actualMessage, args); break;
-            case LogLevel.ERROR: log.warn(actualMessage, args); break;
-            case LogLevel.SILENT: /* be silent */ break;
-            default: throw `Unkown LogLevel: ${logLevel}`;
+            case LogLevel.TRACE: 
+                log.trace(actualMessage, args); 
+                break;
+            case LogLevel.DEBUG: 
+                log.debug(actualMessage, args); 
+                break;
+            case LogLevel.INFO: 
+                log.info(actualMessage, args); 
+                break;
+            case LogLevel.WARN: 
+                log.warn(actualMessage, args); 
+                break;
+            case LogLevel.ERROR: 
+                log.warn(actualMessage, args); 
+                break;
+            case LogLevel.SILENT: 
+                /* be silent */
+                break;
+            default: 
+                throw `Unkown LogLevel: ${logLevel}`;
         }
-
         try {
             this.loggerDelegates.forEach(logger => logger.log(logLevel, msg, args));
         }
         catch (error) {
             this.error(`Error in log delegates: ${error}. Swallowed.`);
         }
+        
     }
 
     public getLogLevel(): LogLevel {

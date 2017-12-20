@@ -18,7 +18,7 @@
     "gen-echo-js": "pbjs --force-long -t static-module -r echo-client -w commonjs -o src/echo/gen/plexus-messages.js src/echo/metadata/messages.proto",
     "gen-echo-ts": "pbts --force-long -o src/echo/gen/plexus-messages.d.ts src/echo/gen/plexus-messages.js",
     "gen-echo-protocol": "npm run gen-echo-js && npm run gen-echo-ts",
-    "unpublish": "npm unpublish @plexus-interop/e2e@0.1.1",
+    "unpublish": "npm unpublish @plexus-interop/e2e@0.1.2",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",

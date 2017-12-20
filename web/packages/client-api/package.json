@@ -10,7 +10,7 @@
     "build": "yarn build:main",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
-    "unpublish": "npm unpublish @plexus-interop/client-api@0.1.1",
+    "unpublish": "npm unpublish @plexus-interop/client-api@0.1.2",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",

@@ -15,7 +15,7 @@
     "unit": "jest --coverage",
     "pretest": "yarn lint",
     "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/broker@0.1.1",
+    "unpublish": "npm unpublish @plexus-interop/broker@0.1.2",
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",
