@@ -96,13 +96,6 @@ export class FramedTransportChannel implements TransportChannel {
         ], this.log);
     }
 
-    private async handleConnectionError(channelObserver: Observer<ArrayBuffer>, error: any): Promise<void> {
-        if (!this.channelCancellationToken.isReadCancelled()) {
-            this.log.error("Transport connection error received", error);
-            this.closeInternal("Transport connection error", error);
-        }
-    }
-
     public open(channelObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug("Opening channel");
         this.stateMachine.throwIfNot(ChannelState.CREATED);
@@ -116,30 +109,6 @@ export class FramedTransportChannel implements TransportChannel {
                 this.subscribeToMessages(channelObserver);
                 channelObserver.started(subscription);
             });
-    }
-
-    private async subscribeToMessages(channelObserver: Observer<ArrayBuffer>): Promise<void> {
-        let resultBuffer = new ArrayBuffer(0);
-        this.framedTransport.open({
-
-            next: (frame: Frame) => {
-                resultBuffer = this.handleIncomingFrame(channelObserver, frame, resultBuffer);
-            },
-
-            complete: () => this.log.debug("Received complete from transport"),
-
-            error: (transportError) => this.handleConnectionError(channelObserver, transportError)
-
-        })
-            .catch(connectionError => channelObserver.error(connectionError));
-    }
-
-    private remoteCompletionToError(completion: plexus.ICompletion): plexus.IError {
-        if (completion) {
-            return completion.error || new ClientError(`Remote completed with status ${this.remoteCompletion.status}`);
-        } else {
-            return new ClientError("Channel closed unexpectedly");
-        }
     }
 
     public uuid(): UniqueId {
@@ -170,37 +139,6 @@ export class FramedTransportChannel implements TransportChannel {
                     reject(e);
                 });
         });
-    }
-
-    private handleIncomingFrame(channelObserver: Observer<ArrayBuffer>, frame: Frame, resultBuffer: ArrayBuffer): ArrayBuffer {
-        if (this.channelCancellationToken.isReadCancelled()) {
-            this.log.warn("Read cancelled, dropping frame");
-            return resultBuffer;
-        }
-        if (!frame) {
-            this.log.warn("Empty frame, dropping it");
-        } else if (frame.internalHeaderProperties.messageFrame) {
-            const messageFrame = frame as MessageFrame;
-            const isLast = !messageFrame.getHeaderData().hasMore;
-            /* istanbul ignore if */
-            if (this.log.isTraceEnabled()) {
-                this.log.trace(`Received ${isLast ? "last" : ""} message frame, ${messageFrame.body.byteLength} bytes`);
-            }
-            resultBuffer = Arrays.concatenateBuffers(resultBuffer, messageFrame.body);
-            if (isLast) {
-                /* istanbul ignore if */
-                if (this.log.isTraceEnabled()) {
-                    this.log.trace(`Received message of ${resultBuffer.byteLength} bytes`);
-                }
-                channelObserver.next(resultBuffer);
-                resultBuffer = new ArrayBuffer(0);
-            }
-        } else if (frame.internalHeaderProperties.channelClose) {
-            this.onChannelClose(frame as ChannelCloseFrame);
-        } else {
-            this.log.warn("Unknown frame received", frame);
-        }
-        return resultBuffer;
     }
 
     public async onChannelClose(channelCloseFrame: ChannelCloseFrame): Promise<void> {
@@ -245,7 +183,7 @@ export class FramedTransportChannel implements TransportChannel {
         if (this.onCloseHandler) {
             this.log.debug("Reporting summarized completion");
             const completion = ClientProtocolUtils.createSummarizedCompletion(
-                this.clientCompletion, 
+                this.clientCompletion,
                 this.remoteCompletion || new ErrorCompletion(new ClientError("Remote side not completed")));
             if (!ClientProtocolUtils.isSuccessCompletion(completion)) {
                 this.channelObserver.error(error || completion.error);
@@ -256,18 +194,6 @@ export class FramedTransportChannel implements TransportChannel {
             this.log.debug("Close not requested, reporting forced close");
             this.channelObserver.error(error || new ClientError(reason));
         }
-    }
-
-    private async sendChannelClosedRequest(completion: plexus.ICompletion = new SuccessCompletion()): Promise<void> {
-        this.clientCompletion = completion;
-        this.channelCancellationToken.cancelWrite("Close requested");
-        this.log.debug("Sending channel close frame");
-        this.writeExecutor.submit(async () => {
-            this.framedTransport.writeFrame(ChannelCloseFrame.fromHeaderData({
-                channelId: this.id,
-                completion
-            }));
-        });
     }
 
     public sendLastMessage(data: ArrayBuffer): Promise<plexus.ICompletion> {
@@ -285,6 +211,80 @@ export class FramedTransportChannel implements TransportChannel {
             this.log.trace(`Scheduling sending [${currentMessageIndex}] message of ${data.byteLength} bytes`);
         }
         return this.writeExecutor.submit(() => this.sendMessageInternal(data, currentMessageIndex));
+    }
+
+    private async subscribeToMessages(channelObserver: Observer<ArrayBuffer>): Promise<void> {
+        let resultBuffer = new ArrayBuffer(0);
+        this.framedTransport.open({
+
+            next: (frame: Frame) => {
+                resultBuffer = this.handleIncomingFrame(channelObserver, frame, resultBuffer);
+            },
+
+            complete: () => this.log.debug("Received complete from transport"),
+
+            error: (transportError) => this.handleConnectionError(channelObserver, transportError)
+
+        })
+            .catch(connectionError => channelObserver.error(connectionError));
+    }
+
+    private async sendChannelClosedRequest(completion: plexus.ICompletion = new SuccessCompletion()): Promise<void> {
+        this.clientCompletion = completion;
+        this.channelCancellationToken.cancelWrite("Close requested");
+        this.log.debug("Sending channel close frame");
+        this.writeExecutor.submit(async () => {
+            this.framedTransport.writeFrame(ChannelCloseFrame.fromHeaderData({
+                channelId: this.id,
+                completion
+            }));
+        });
+    }
+
+    private handleIncomingFrame(channelObserver: Observer<ArrayBuffer>, frame: Frame, resultBuffer: ArrayBuffer): ArrayBuffer {
+        if (this.channelCancellationToken.isReadCancelled()) {
+            this.log.warn("Read cancelled, dropping frame");
+            return resultBuffer;
+        }
+        if (!frame) {
+            this.log.warn("Empty frame, dropping it");
+        } else if (frame.internalHeaderProperties.messageFrame) {
+            const messageFrame = frame as MessageFrame;
+            const isLast = !messageFrame.getHeaderData().hasMore;
+            /* istanbul ignore if */
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Received ${isLast ? "last" : ""} message frame, ${messageFrame.body.byteLength} bytes`);
+            }
+            resultBuffer = Arrays.concatenateBuffers(resultBuffer, messageFrame.body);
+            if (isLast) {
+                /* istanbul ignore if */
+                if (this.log.isTraceEnabled()) {
+                    this.log.trace(`Received message of ${resultBuffer.byteLength} bytes`);
+                }
+                channelObserver.next(resultBuffer);
+                resultBuffer = new ArrayBuffer(0);
+            }
+        } else if (frame.internalHeaderProperties.channelClose) {
+            this.onChannelClose(frame as ChannelCloseFrame);
+        } else {
+            this.log.warn("Unknown frame received", frame);
+        }
+        return resultBuffer;
+    }
+
+    private remoteCompletionToError(completion: plexus.ICompletion): plexus.IError {
+        if (completion) {
+            return completion.error || new ClientError(`Remote completed with status ${this.remoteCompletion.status}`);
+        } else {
+            return new ClientError("Channel closed unexpectedly");
+        }
+    }
+
+    private async handleConnectionError(channelObserver: Observer<ArrayBuffer>, error: any): Promise<void> {
+        if (!this.channelCancellationToken.isReadCancelled()) {
+            this.log.error("Transport connection error received", error);
+            this.closeInternal("Transport connection error", error);
+        }
     }
 
     private async sendMessageInternal(data: ArrayBuffer, messageIndex: number): Promise<void> {

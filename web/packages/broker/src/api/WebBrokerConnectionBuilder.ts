@@ -85,16 +85,16 @@ export class WebBrokerConnectionBuilder {
         const hostClientConnectionFactory = new InMemoryConnectionFactory();
         this.log.debug("Creating in memory host connection");
         const [hostClientConnection, hostServerConnection] = await hostClientConnectionFactory.connectBoth();
-        const serverConnectionId = hostServerConnection.uuid().toString();
-        const clientConnectionId = hostClientConnection.uuid().toString();
+        const hostServerConnectionId = hostServerConnection.uuid().toString();
+        const hostClientConnectionId = hostClientConnection.uuid().toString();
 
         this.log.info("Initialyzing Event Bus");
         const eventBus = await this.eventBusProvider();
 
-        const remoteBrokerService: RemoteBrokerService = new EventBusRemoteBrokerService(eventBus, serverConnectionId);
+        const remoteBrokerService: RemoteBrokerService = new EventBusRemoteBrokerService(eventBus, hostServerConnectionId);
 
         const peerConnectionService: PeerConnectionsService = new PeerConnectionsService(remoteBrokerService);
-        const peerConnectionsFactory = new PeerServerConnectionFactory(clientConnectionId, peerConnectionService, remoteBrokerService);
+        const peerConnectionsFactory = new PeerServerConnectionFactory(hostClientConnectionId, peerConnectionService, remoteBrokerService);
         const brokerConnectionsFactory = new MultiSourcesServerConnectionFactory(
             new HostConnectionFactory(hostClientConnectionFactory, remoteBrokerService),
             peerConnectionsFactory);

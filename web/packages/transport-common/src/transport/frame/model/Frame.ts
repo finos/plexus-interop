@@ -41,9 +41,9 @@ export abstract class Frame {
 
 export abstract class BaseFrame<T> extends Frame {
 
-    public abstract getHeaderData(): T;
-
     private _body: ArrayBuffer;
+
+    public abstract getHeaderData(): T;
     
     public get body(): ArrayBuffer {
         return this._body;

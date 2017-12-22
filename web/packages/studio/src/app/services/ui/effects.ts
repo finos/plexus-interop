@@ -47,6 +47,7 @@ import { UrlParamsProvider } from "../core/UrlParamsProvider";
 
 @Injectable()
 export class Effects {
+    
     private plexusLogger = LoggerFactory.getLogger(Effects.name);
 
     @Effect() autoConnectToPlexus$: Observable<Action> = this

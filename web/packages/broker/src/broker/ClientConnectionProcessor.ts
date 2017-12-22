@@ -22,6 +22,7 @@ import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { ClientRequestProcessor } from "./ClientRequestProcessor";
 import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
 import { AuthenticationHandler } from "./AuthenticationHandler";
+import { TasksTracker } from "./TasksTracker";
 
 export class ClientConnectionProcessor implements AsyncHandler<TransportConnection, Completion> {
 
@@ -32,8 +33,11 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
 
     public async handle(connection: TransportConnection): Promise<Completion> {
 
-        const log: Logger = LoggerFactory.getLogger(`ConnectionProcessor [${connection.uuid().toString()}]`);
+        const connectionGuid = connection.uuid().toString();
+        const log: Logger = LoggerFactory.getLogger(`ConnectionProcessor [${connectionGuid}]`);
         log.debug(`Received connection`);
+
+        const requestsTracker = new TasksTracker();
 
         return new Promise((resolve, reject) => {
             let sourceConnection: undefined | ApplicationConnection;
@@ -49,7 +53,7 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                                 applicationId: appDescriptor.applicationId as string,
                                 instanceId: appDescriptor.instanceId
                             }, c => {
-                                log.error("Connection dropped", connection.uuid().toString());
+                                log.error("Connection dropped");
                             });
                             sourceConnection = appConnection;
                             log.trace("Connected to client");
@@ -61,7 +65,9 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                     } else {
                         log.trace(`Processing client request channel [${channelStrId}]`);
                         try {
-                            const channelCompletion = await this.clientRequestProcessor.handle(channel, sourceConnection);
+                            const channelCompletion = await requestsTracker.start(
+                                channelStrId,
+                                () => this.clientRequestProcessor.handle(channel, sourceConnection as ApplicationConnection));
                             if (log.isTraceEnabled()) {
                                 log.trace(`Received channel completion [${JSON.stringify(channelCompletion)}]`);
                             }
@@ -70,12 +76,21 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                         }
                     }
                 },
-                complete: () => {
-                    log.debug(`Channel subscrition completed for connection [${connection.uuid().toString()}]`);
-                    resolve(new SuccessCompletion());
+                complete: async () => {
+                    log.debug(`Channel subscrition completed for connection`);
+                    try {
+                        const result = await requestsTracker.completePending();
+                        log.info(`Completed pending actions`);
+                        await connection.disconnect(result);
+                        log.info(`Diconnected`);
+                        resolve(result);
+                    } catch (e) {
+                        log.error(`Failed to complete pending requests`, e);
+                        reject(new ErrorCompletion(e));
+                    }
                 },
                 error: e => {
-                    log.error(`Error received for channels subscription [${connection.uuid().toString()}]`, e);
+                    log.error(`Error received for channels subscription`, e);
                     reject(new ErrorCompletion(e));
                 }
             });

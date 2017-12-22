@@ -46,7 +46,7 @@ export class AppServicesComponent implements OnInit {
   consumedServices: Observable<ConsumedService[]> = Observable.of([]);
   providedServices: Observable<ProvidedService[]> = Observable.of([]);
 
-  subscriptions: SubsctiptionsRegistry;
+  subscriptions: SubscriptionsRegistry;
   registryService: InteropRegistryService;
 
   public ngOnInit(): void {

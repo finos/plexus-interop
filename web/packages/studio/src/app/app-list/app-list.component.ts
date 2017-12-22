@@ -46,7 +46,6 @@ export class AppListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.apps = this.store.select(state => state.plexus.apps);
-
     this.subsctiptionsRegistry.add(
       this.activatedRoute.queryParams
         .combineLatest(this.apps)

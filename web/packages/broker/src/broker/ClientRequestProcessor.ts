@@ -54,10 +54,10 @@ export class ClientRequestProcessor {
                             });
                             try {
                                 const result = await this.invocationRequestProcessor.handleRequest(
-                                $inMessagesObservable,
-                                clientToBrokerRequest.invocationStartRequest,
-                                channel,
-                                sourceConnection.descriptor);
+                                    $inMessagesObservable,
+                                    clientToBrokerRequest.invocationStartRequest,
+                                    channel,
+                                    sourceConnection.descriptor);
                                 resolve(result);
                             } catch (error) {
                                 reject(error);

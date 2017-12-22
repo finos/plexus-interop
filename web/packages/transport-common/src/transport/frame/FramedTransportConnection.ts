@@ -136,66 +136,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
         }
         return this.stateMachine.goAsync(ConnectionState.ACCEPT);
     }
-
-    private createStateMaschine(): StateMaschine<ConnectionState> {
-        return new StateMaschineBase<ConnectionState>(ConnectionState.CREATED, [
-            // initializing connection
-            {
-                from: ConnectionState.CREATED, to: ConnectionState.OPEN,
-                preHandler: this.openConnectionInternal.bind(this),
-                postHandler: async () => {
-                    this.listenForIncomingFrames();
-                }
-            },
-            // accepting connection
-            {
-                from: ConnectionState.CREATED, to: ConnectionState.ACCEPT,
-                postHandler: async () => {
-                    this.listenForIncomingFrames();
-                }
-            },
-            // connection accepted
-            {
-                from: ConnectionState.ACCEPT, to: ConnectionState.OPEN,
-                preHandler: this.openConnectionInternal.bind(this)
-            },
-            // closing connection message requested
-            {
-                from: ConnectionState.OPEN, to: ConnectionState.CLOSE_REQUESTED
-            },
-            // forced connection closure
-            {
-                from: ConnectionState.OPEN, to: ConnectionState.CLOSED
-            },
-            {
-                from: ConnectionState.CLOSE_RECEIVED, to: ConnectionState.CLOSED
-            },
-            {
-                from: ConnectionState.OPEN, to: ConnectionState.CLOSE_RECEIVED, preHandler: async () => {
-                    this.connectionCancellationToken.cancelRead("Connection close received");
-                }
-            },
-            // graceful connection closure
-            {
-                from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED
-            }
-        ], this.log);
-    }
-
-    private async sendConnectionCloseMessage(completion?: plexus.ICompletion): Promise<void> {
-        this.log.debug("Requesting close connection");
-        this.framedTransport.writeFrame(ConnectionCloseFrame.fromHeaderData({ completion }));
-    }
-
-    private async openConnectionInternal(): Promise<void> {
-        this.log.trace("Opening connection");
-        const id = this.framedTransport.uuid();
-        this.framedTransport.writeFrame(
-            ConnectionOpenFrame.fromHeaderData({
-                connectionId: id
-            }));
-    }
-
+    
     public closeAndCleanUp(): void {
         if (this.stateMachine.is(ConnectionState.CLOSED)) {
             this.log.warn("Already closed");
@@ -217,42 +158,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
             .catch(e => this.log.error("Failed to disconnect from source", e));
     }
 
-    private async disconnectFromSource(): Promise<void> {
-        this.log.debug("Disconnecting from source transport");
-        return this.framedTransport
-            .disconnect()
-            .then(() => {
-                this.log.debug("Transport disconnected");
-            }, (error) => {
-                this.log.error("Transport disconnect error", error);
-            });
-    }
-
-    private async listenForIncomingFrames(): Promise<void> {
-        this.log.debug("Start listening of incoming frames");
-        this.framedTransport.open({
-            next: (frame) => {
-                if (this.stateMachine.isOneOf(
-                    ConnectionState.CLOSE_REQUESTED,
-                    ConnectionState.OPEN,
-                    ConnectionState.ACCEPT)) {
-                    this.framesHandler.handleFrame(frame, this.log, this);
-                } else {
-                    this.log.warn("Not connected, dropping frame");
-                }
-            },
-            error: (transportError) => {
-                this.log.error("Error from source transport", transportError);
-                this.reportErrorToChannels(transportError);
-                this.closeAndCleanUp();
-            },
-            complete: () => {
-                this.log.debug("Source connection completed");
-                this.closeAndCleanUp();
-            }
-        });
-    }
-
+    
     public async handleConnectionCloseFrame(frame: ConnectionCloseFrame): Promise<void> {
         const completion = frame.getHeaderData().completion as plexus.ICompletion || new SuccessCompletion();
         /* istanbul ignore if */
@@ -268,9 +174,11 @@ export class FramedTransportConnection implements TransportConnection, Transport
                 case ConnectionState.OPEN:
                     this.log.debug("Close received, waiting for client to close it");
                     this.stateMachine.go(ConnectionState.CLOSE_RECEIVED);
+                    this.channelObserver.complete();                    
                     break;
                 case ConnectionState.CLOSE_REQUESTED:
                     this.log.debug("Close already requested, closing connection");
+                    this.channelObserver.complete();                    
                     this.closeAndCleanUp();
                     break;
                 default:
@@ -338,6 +246,101 @@ export class FramedTransportConnection implements TransportConnection, Transport
             const channelDescriptor = this.channelsHolder.get(strChannelId) as ChannelDescriptor;
             channelDescriptor.channelTransportProxy.next(frame);
         }
+    }
+
+    private createStateMaschine(): StateMaschine<ConnectionState> {
+        return new StateMaschineBase<ConnectionState>(ConnectionState.CREATED, [
+            // initializing connection
+            {
+                from: ConnectionState.CREATED, to: ConnectionState.OPEN,
+                preHandler: this.openConnectionInternal.bind(this),
+                postHandler: async () => {
+                    this.listenForIncomingFrames();
+                }
+            },
+            // accepting connection
+            {
+                from: ConnectionState.CREATED, to: ConnectionState.ACCEPT,
+                postHandler: async () => {
+                    this.listenForIncomingFrames();
+                }
+            },
+            // connection accepted
+            {
+                from: ConnectionState.ACCEPT, to: ConnectionState.OPEN,
+                preHandler: this.openConnectionInternal.bind(this)
+            },
+            // closing connection message requested
+            {
+                from: ConnectionState.OPEN, to: ConnectionState.CLOSE_REQUESTED
+            },
+            // forced connection closure
+            {
+                from: ConnectionState.OPEN, to: ConnectionState.CLOSED
+            },
+            {
+                from: ConnectionState.CLOSE_RECEIVED, to: ConnectionState.CLOSED
+            },
+            {
+                from: ConnectionState.OPEN, to: ConnectionState.CLOSE_RECEIVED, preHandler: async () => {
+                    this.connectionCancellationToken.cancelRead("Connection close received");
+                }
+            },
+            // graceful connection closure
+            {
+                from: ConnectionState.CLOSE_REQUESTED, to: ConnectionState.CLOSED
+            }
+        ], this.log);
+    }
+
+    private async sendConnectionCloseMessage(completion?: plexus.ICompletion): Promise<void> {
+        this.log.debug("Requesting close connection");
+        this.framedTransport.writeFrame(ConnectionCloseFrame.fromHeaderData({ completion }));
+    }
+
+    private async openConnectionInternal(): Promise<void> {
+        this.log.trace("Opening connection");
+        const id = this.framedTransport.uuid();
+        this.framedTransport.writeFrame(
+            ConnectionOpenFrame.fromHeaderData({
+                connectionId: id
+            }));
+    }
+
+    private async disconnectFromSource(): Promise<void> {
+        this.log.debug("Disconnecting from source transport");
+        return this.framedTransport
+            .disconnect()
+            .then(() => {
+                this.log.debug("Transport disconnected");
+            }, (error) => {
+                this.log.error("Transport disconnect error", error);
+            });
+    }
+
+    private async listenForIncomingFrames(): Promise<void> {
+        this.log.debug("Start listening of incoming frames");
+        this.framedTransport.open({
+            next: (frame) => {
+                if (this.stateMachine.isOneOf(
+                    ConnectionState.CLOSE_REQUESTED,
+                    ConnectionState.OPEN,
+                    ConnectionState.ACCEPT)) {
+                    this.framesHandler.handleFrame(frame, this.log, this);
+                } else {
+                    this.log.warn("Not connected, dropping frame");
+                }
+            },
+            error: (transportError) => {
+                this.log.error("Error from source transport", transportError);
+                this.reportErrorToChannels(transportError);
+                this.closeAndCleanUp();
+            },
+            complete: () => {
+                this.log.debug("Source connection completed");
+                this.closeAndCleanUp();
+            }
+        });
     }
 
     private reportErrorToChannels(error: any): void {

@@ -6,7 +6,7 @@
   "description": "General Transport for Plexus Web Interop",
   "license": "Apache-2.0",
   "scripts": {
-    "prebuild": "yarn lint && trash dist",
+    "prebuild": "yarn lint",
     "build": "yarn build:main",
     "postbuild": "yarn test",
     "build:watch": "tsc -w",

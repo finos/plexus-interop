@@ -19,9 +19,13 @@ import { TypedAction } from '../ui/TypedAction';
 import { Action } from '@ngrx/store';
 
 export class Actions {
+
     public static readonly ALERT_INFO = 'ALERT_INFO';
+
     public static readonly ALERT_ERROR = 'ALERT_ERROR';
+    
     public static readonly ALERT_USER_FAIL = 'ALERT_USER_FAIL';
+
 }
 
 export enum AlertType {
