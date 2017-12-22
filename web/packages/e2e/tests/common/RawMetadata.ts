@@ -41,6 +41,19 @@ export class RawMetadata {
 
     public static interopJson: string = `   
     {
+        "messages": [
+            {
+                "id": "plexus.interop.testing.EchoRequest",
+                "fields": [
+                    {
+                        "name": "stringField",
+                        "num": 1,
+                        "primitive": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        ],
         "services": [
             {
                 "id": "plexus.interop.testing.EchoService",
