@@ -310,9 +310,9 @@ export class GenericInvocation {
                 this.log.trace(`Received invocation request message ${JSON.stringify(envelopObject.invocationStartRequested)}`);
                 this.metaInfo = ClientProtocolHelper.toInvocationInfo(envelopObject.invocationStartRequested);
                 // accepted invocation started
-                invocationObserver.started(new Subscription(() => this.close()));
                 this.setUuid(UniqueId.generateNew());
                 this.stateMachine.go(InvocationState.OPEN);
+                invocationObserver.started(new Subscription(() => this.close()));
                 this.sourceChannel.sendMessage(modelHelper.invocationStartedMessagePayload({
                     invocationId: this.uuid()
                 }));

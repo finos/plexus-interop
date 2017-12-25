@@ -96,6 +96,8 @@ export class ProvidedServiceComponent implements OnInit {
         case MethodType.ClientStreaming:
         case MethodType.DuplexStreaming:
           this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
+            this.log.info(`Sending ${this.messagesToSend} messages`);
+            this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
             return {
               next: request => {
                 this.printRequest(request);
@@ -103,8 +105,6 @@ export class ProvidedServiceComponent implements OnInit {
               error: e => this.handleError(e),
               complete: () => {
                 this.handleCompleted();
-                this.log.info(`Sending ${this.messagesToSend} messages`);
-                this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
               }
             };
           });
