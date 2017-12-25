@@ -19,7 +19,7 @@ import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryReques
 import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { MethodDiscoveryResponse, ProvidedMethodReference } from "@plexus-interop/client-api";
 import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod } from "@plexus-interop/broker";
-import { UnaryStringHandler } from "./UnaryStringHandler";
+import { UnaryStringHandler } from "./InteropClientFactory";
 import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
 
 export class GenericClientWrapper implements InteropClient {
@@ -85,13 +85,13 @@ export class GenericClientWrapper implements InteropClient {
                 serviceId: consumed.consumedService.service.id,
                 methodId: consumed.method.name
             }, requestEncoder.encode(requestData), {
-                    value: v => {
-                        responseHandler.value(JSON.stringify(responseEncoder.decode(v)));
-                    },
-                    error: e => {
-                        responseHandler.error(e);
-                    }
-                });
+                value: v => {
+                    responseHandler.value(JSON.stringify(responseEncoder.decode(v)));
+                },
+                error: e => {
+                    responseHandler.error(e);
+                }
+            });
         }
     }
 

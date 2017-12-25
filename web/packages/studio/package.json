@@ -1,5 +1,5 @@
 {
-  "name": "plexus-studio",
+  "name": "@plexus-interop/studio",
   "version": "0.1.2",
   "license": "Apache-2.0",
   "scripts": {
@@ -58,6 +58,6 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "~5.7.0",
-    "typescript": "~2.4.2"
+    "typescript": "2.6.1"
   }
 }
