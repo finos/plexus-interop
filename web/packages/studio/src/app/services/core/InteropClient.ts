@@ -18,17 +18,36 @@ import { GenericClientApi, StreamingInvocationClient, ValueHandler, InvocationCl
 import { InvocationRequestInfo, Completion } from "@plexus-interop/protocol";
 import { ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
+import { Observer } from "@plexus-interop/common";
+import { ServerStreamingStringHandler, UnaryStringHandler, BidiStreamingStringHandler } from "./StringHandlers";
 
 export interface InteropClient {
 
+    // core
+
     discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
-
-    sendUnaryRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient>;
-
-    setUnaryActionHandler(serviceId: string, methodId: string, handler: (requestJson: string) => Promise<string>): void;
 
     disconnect(): Promise<void>;
 
     createDefaultPayload(messageId: string): string;
+
+    // unary
+
+    sendUnaryRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient>;
+
+    setUnaryActionHandler(serviceId: string, methodId: string, handler: UnaryStringHandler): void;
+
+    // server streaming
+
+    sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: Observer<string>): Promise<InvocationClient>;
+
+    setServerStreamingActionHandler(serviceId: string, methodId: string, handler: ServerStreamingStringHandler): void;
+    
+
+    // bidi streaming
+
+    sendBidiStreamingRequest(responseObserver: Observer<string>): Promise<StreamingInvocationClient<string>>;
+
+    setBidiStreamingActionHandler(serviceId: string, methodId: string, handler: BidiStreamingStringHandler): void;    
 
 }

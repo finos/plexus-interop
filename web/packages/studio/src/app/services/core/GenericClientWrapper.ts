@@ -15,12 +15,26 @@
  * limitations under the License.
  */
 import { InteropClient } from "./InteropClient";
-import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod } from "@plexus-interop/client";
+import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient } from "@plexus-interop/client";
 import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { MethodDiscoveryResponse, ProvidedMethodReference } from "@plexus-interop/client-api";
 import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod } from "@plexus-interop/broker";
-import { UnaryStringHandler } from "./InteropClientFactory";
 import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
+import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler } from "./StringHandlers";
+import { Observer } from "@plexus-interop/common";
+
+type DiscoveredMetaInfo = {
+    inputMessageId: string,
+    outputMessageId: string,
+    provided: ProvidedMethodReference,
+}
+
+type ConsumedMetaInfo = {
+    serviceId: string,
+    methodId: string,
+    inputMessageId: string,
+    outputMessageId: string
+}
 
 export class GenericClientWrapper implements InteropClient {
 
@@ -30,6 +44,8 @@ export class GenericClientWrapper implements InteropClient {
         private readonly interopRegistryService: InteropRegistryService,
         private readonly encoderProvider: DynamicMarshallerFactory,
         private readonly unaryHandlers: Map<string, UnaryStringHandler>,
+        private readonly serverStreamingHandlers: Map<string, ServerStreamingStringHandler>,
+        private readonly bidiHandlers: Map<string, BidiStreamingStringHandler>,
         private readonly defaultGenerator: DefaultMessageGenerator) {
     }
 
@@ -41,26 +57,38 @@ export class GenericClientWrapper implements InteropClient {
         this.unaryHandlers.set(`${serviceId}.${methodId}`, handler);
     }
 
+    private isConsumed(methodToInvoke: DiscoveredMethod | ConsumedMethod): methodToInvoke is ConsumedMethod {
+        return !!(methodToInvoke as ConsumedMethod).consumedService;
+    }
+
+    private toMetaInfo(method: DiscoveredMethod | ConsumedMethod): DiscoveredMetaInfo | ConsumedMetaInfo {
+        if (this.isConsumed(method)) {
+            return {
+                inputMessageId: method.method.inputMessage.id,
+                outputMessageId: method.method.outputMessage.id,
+                serviceId: method.consumedService.service.id,
+                methodId: method.method.name
+            };
+        }
+        return {
+            inputMessageId: method.inputMessageId as string,
+            outputMessageId: method.outputMessageId as string,
+            provided: method.providedMethod
+        };
+    }
+
     public async sendUnaryRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient> {
 
-        let inputMessageId;
-        let outputMessageId;
-
-        if ((methodToInvoke as DiscoveredMethod).providedMethod) {
-            const provided = methodToInvoke as DiscoveredMethod;
-            inputMessageId = provided.inputMessageId as string;
-            outputMessageId = provided.outputMessageId as string;
-        } else {
-            const consumed = methodToInvoke as ConsumedMethod;
-            inputMessageId = consumed.method.inputMessage.id;
-            outputMessageId = consumed.method.outputMessage.id;
-        }
+        const metaInfo = this.toMetaInfo(methodToInvoke);
+        const { inputMessageId, outputMessageId } = metaInfo;
 
         const requestEncoder = this.encoderProvider.getMarshaller(inputMessageId);
         const responseEncoder = this.encoderProvider.getMarshaller(outputMessageId);
 
         const requestData = JSON.parse(requestJson);
         requestEncoder.validate(requestData);
+
+        const encodedRequest = requestEncoder.encode(requestData);
 
         const internalResponseHandler = {
             value: v => {
@@ -71,36 +99,68 @@ export class GenericClientWrapper implements InteropClient {
             }
         };
 
-        if ((methodToInvoke as DiscoveredMethod).providedMethod) {
-            const provided = methodToInvoke as DiscoveredMethod;
+        if (!this.isConsumed(methodToInvoke)) {
+            const provided = (metaInfo as DiscoveredMetaInfo).provided;
             return await this.genericClient.sendDiscoveredUnaryRequest(
-                provided.providedMethod,
-                requestEncoder.encode(requestData),
+                provided,
+                encodedRequest,
                 internalResponseHandler);
         } else {
-            const consumed = methodToInvoke as ConsumedMethod;
-            inputMessageId = consumed.method.inputMessage.id;
-            outputMessageId = consumed.method.outputMessage.id;
+            const consumedMetaInfo = (metaInfo as ConsumedMetaInfo);
             return await this.genericClient.sendUnaryRequest({
-                serviceId: consumed.consumedService.service.id,
-                methodId: consumed.method.name
-            }, requestEncoder.encode(requestData), {
-                value: v => {
-                    responseHandler.value(JSON.stringify(responseEncoder.decode(v)));
-                },
-                error: e => {
-                    responseHandler.error(e);
-                }
-            });
+                serviceId: consumedMetaInfo.serviceId,
+                methodId: consumedMetaInfo.methodId
+            }, encodedRequest, internalResponseHandler);
         }
     }
 
-    public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
-        return this.genericClient.discoverMethod(discoveryRequest)
+    public setBidiStreamingActionHandler(serviceId: string, methodId: string, handler: BidiStreamingStringHandler): void {
+        this.bidiHandlers.set(`${serviceId}.${methodId}`, handler);
+    }
+
+    public setServerStreamingActionHandler(serviceId: string, methodId: string, handler: ServerStreamingStringHandler): void {
+        this.serverStreamingHandlers.set(`${serviceId}.${methodId}`, handler);
+    }
+
+    public sendBidiStreamingRequest(responseObserver: Observer<string>): Promise<StreamingInvocationClient<string>> {
+        throw 'Not Implemented';
+    }
+
+    public sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: Observer<string>): Promise<InvocationClient> {
+        
+        const metaInfo = this.toMetaInfo(methodToInvoke);
+        const { inputMessageId, outputMessageId } = metaInfo;
+
+        const requestEncoder = this.encoderProvider.getMarshaller(inputMessageId);
+        const responseEncoder = this.encoderProvider.getMarshaller(outputMessageId);
+
+        const requestData = JSON.parse(requestJson);
+        requestEncoder.validate(requestData);
+
+        const encodedRequest = requestEncoder.encode(requestData);
+        const observer: Observer<ArrayBuffer> = {
+            next: v => responseObserver.next(JSON.stringify(responseEncoder.decode(v))),
+            complete: () => responseObserver.complete(),
+            error: e => responseObserver.error(e)
+        };
+
+        if (!this.isConsumed(methodToInvoke)) {
+            const provided = (metaInfo as DiscoveredMetaInfo).provided;
+            return this.genericClient.sendDiscoveredServerStreamingRequest(provided, encodedRequest, observer);
+        } else {
+            const consumedMetaInfo = (metaInfo as ConsumedMetaInfo);
+            return this.genericClient.sendServerStreamingRequest({
+                serviceId: consumedMetaInfo.serviceId,
+                methodId: consumedMetaInfo.methodId
+            }, encodedRequest, observer);
+        }
     }
 
     public createDefaultPayload(messageId: string): string {
         return this.defaultGenerator.generate(messageId);
     }
 
+    public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
+        return this.genericClient.discoverMethod(discoveryRequest)
+    }
 }

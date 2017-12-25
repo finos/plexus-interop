@@ -25,10 +25,7 @@ import { flatMap, Logger, LoggerFactory, Observer } from "@plexus-interop/common
 import { GenericClientWrapper } from "./GenericClientWrapper";
 import { DynamicMarshallerFactory, Marshaller } from "@plexus-interop/broker";
 import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
-
-export type UnaryStringHandler = (requestJson: string) => Promise<string>;
-export type ServerStreamingStringHandler = (request: string, invocationHostClient: StreamingInvocationClient<string>) => void;
-export type BidiStreamingStringHandler = (invocationHostClient: StreamingInvocationClient<string>) => Observer<string>;
+import { UnaryStringHandler, BidiStreamingStringHandler, ServerStreamingStringHandler } from "./StringHandlers";
 
 @Injectable()
 export class InteropClientFactory {
