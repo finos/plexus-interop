@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ClientError } from "@plexus-interop/protocol";
-import { InvocationRequestInfo } from "./generic/InvocationMetaInfo";
+import { ClientError, InvocationMetaInfo, InvocationRequestInfo } from "@plexus-interop/protocol";
 import { isString } from "@plexus-interop/common";
-import { ProvidedMethodReference } from "./api/dto/ProvidedMethodReference";
 import { UniqueId } from "@plexus-interop/transport-common";
-import { InvocationMetaInfo } from "./generic/InvocationMetaInfo";
+import { ProvidedMethodReference } from "@plexus-interop/client-api";
 
 export class ClientDtoUtils {
 

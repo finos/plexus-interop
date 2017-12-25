@@ -7,27 +7,33 @@
   "scripts": {
     "build-client": "cd ./packages/client && yarn build",
     "build-common": "cd ./packages/common && yarn build ",
+    "build-client-api": "cd ./packages/client-api && yarn build",
     "build-e2e": "cd ./packages/e2e && yarn build",
     "build-web-example": "cd ./packages/web-example && yarn build",
     "build-electron-launcher": "cd ./packages/electron-launcher && yarn build",
     "build-protocol": "cd ./packages/protocol && yarn build",
     "build-transport-common": "cd ./packages/transport-common && yarn build",
+    "build-broker": "cd ./packages/broker && yarn build",
+    "build-studio": "cd ./packages/studio && yarn build",
     "build-websocket-transport": "cd ./packages/websocket-transport && yarn build",
     "build-quickstart-viewer": "cd ./packages/ccy-pair-rate-viewer && yarn build",
     "build-quickstart-provider": "cd ./packages/ccy-pair-rate-provider && yarn build",
-    "build-core": "run-s build-common build-transport-common build-websocket-transport build-client",
-    "build-all": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
-    "build-all-win": "run-s build-all benchmarks e2e",
+    "build-core": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client-api build-client",
+    "build-all": "run-s build-core build-broker build-studio build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
+    "build-all-win": "run-s build-all benchmarks e2e-native e2e-web",
     "prebuild-all": "yarn install",
-    "e2e": "cd ./packages/e2e && yarn electron-e2e",
-    "poste2e": "yarn coverage",
+    "e2e-native": "cd ./packages/e2e && yarn e2e-native",
+    "e2e-web": "cd ./packages/e2e && yarn e2e-web",
+    "poste2e-native": "yarn coverage",
+    "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
-    "benchmarks": "cd ./packages/e2e && yarn electron-e2e-benchmarks"
+    "benchmarks": "cd ./packages/e2e && yarn e2e-native-benchmarks"
   },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
+    "@angular/compiler-cli": "^5.0.0",
     "npm-run-all": "^4.1.1",
     "yarn": "^1.1.0"
   }

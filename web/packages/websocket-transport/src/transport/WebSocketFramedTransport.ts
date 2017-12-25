@@ -15,21 +15,9 @@
  * limitations under the License.
  */
 import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults } from "@plexus-interop/transport-common";
-import { CancellationToken, Logger, LoggerFactory, Observer, LimitedBufferQueue } from "@plexus-interop/common";
-import { Queue } from "typescript-collections";
+import { CancellationToken, Logger, LoggerFactory, Observer, BufferedObserver } from "@plexus-interop/common";
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
-
-    private log: Logger;
-
-    private readonly socketOpenToken: CancellationToken = new CancellationToken();
-
-    private connectionEstablishedPromise: Promise<void>;
-
-    private dataFrame: Frame | null;
-
-    private terminateSent: boolean = false;
-    public terminateReceived: boolean = false;
 
     public static TERMINATE_MESSAGE: string = "<END>";
     public static SOCKET_CLOSE_TIMEOUT: number = 5000;
@@ -37,15 +25,28 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     public static OPEN: number = 1;
     public static CLOSING: number = 2;
     public static CLOSED: number = 3;
-    private connectionObserver: Observer<Frame> | null = null;
+
+    private log: Logger;
+
+    private readonly socketOpenToken: CancellationToken = new CancellationToken();
+
+    private connectionObserver: BufferedObserver<Frame>;
+
+    private connectionEstablishedPromise: Promise<void>;
+
+    private dataFrame: Frame | null;
+
+    private terminateSent: boolean = false;
+
+    public terminateReceived: boolean = false;
 
     constructor(
         private readonly socket: WebSocket,
         private readonly guid: UniqueId = UniqueId.generateNew(),
-        private inMessagesBuffer: Queue<Frame> = new LimitedBufferQueue<Frame>(Defaults.DEFAULT_BUFFER_SIZE),
         private messagesConverter: InternalMessagesConverter = new InternalMessagesConverter()) {
         this.socket.binaryType = "arraybuffer";
         this.log = LoggerFactory.getLogger(`WebSocketFramedTransport [${this.uuid().toString()}]`);
+        this.connectionObserver = new BufferedObserver<Frame>(Defaults.DEFAULT_BUFFER_SIZE, this.log);
         this.connectionEstablishedPromise = this.createConnectionReadyPromise();
         this.bindToSocketEvents();
         this.log.debug("Created");
@@ -72,21 +73,9 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         return this.socket.readyState === WebSocketFramedTransport.OPEN;
     }
 
-    private isSocketClosed(): boolean {
-        return this.socket.readyState === WebSocketFramedTransport.CLOSED
-            || this.socket.readyState === WebSocketFramedTransport.CLOSING;
-    }
-
     public async open(connectionObserver: Observer<Frame>): Promise<void> {
         this.throwIfNotConnectedOrDisconnectRequested();
-        /* istanbul ignore if */
-        if (this.log.isDebugEnabled()) {
-            this.log.debug(`Received connection observer, ${this.inMessagesBuffer.size()} messages in buffer`);
-        }
-        this.connectionObserver = connectionObserver;
-        while (this.inMessagesBuffer.size() > 0) {
-            this.connectionObserver.next(this.inMessagesBuffer.dequeue());
-        }
+        this.connectionObserver.setObserver(connectionObserver);
     }
 
     public async writeFrame(frame: Frame): Promise<void> {
@@ -112,18 +101,18 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         this.socket.close();
     }
 
-    private sendTerminateMessage(): void {
-        this.log.debug("Sending terminate message");
-        this.socket.send(WebSocketFramedTransport.TERMINATE_MESSAGE);
-        this.terminateSent = true;
-    }
-
     public getMaxFrameSize(): number {
-        return 60000;
+        return Defaults.DEFAULT_FRAME_SIZE;
     }
 
     public uuid(): UniqueId {
         return this.guid;
+    }
+
+    private sendTerminateMessage(): void {
+        this.log.debug("Sending terminate message");
+        this.socket.send(WebSocketFramedTransport.TERMINATE_MESSAGE);
+        this.terminateSent = true;
     }
 
     private createConnectionReadyPromise(): Promise<void> {
@@ -142,6 +131,11 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
                 }
             });
         });
+    }
+
+    private isSocketClosed(): boolean {
+        return this.socket.readyState === WebSocketFramedTransport.CLOSED
+            || this.socket.readyState === WebSocketFramedTransport.CLOSING;
     }
 
     private bindToSocketEvents(): void {
@@ -184,14 +178,12 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     private cancelConnectionAndCleanUp(reason: string = "Connection closed"): void {
         this.log.debug(`Cancelling connection with reason: ${reason}`);
         this.socketOpenToken.cancel(reason);
-        this.inMessagesBuffer.clear();
+        this.connectionObserver.clear();
     }
 
     private handleCloseEvent(socket: WebSocket, ev: CloseEvent): void {
         this.log.debug("Connection closed event received", ev);
-        if (this.connectionObserver) {
-            this.connectionObserver.complete();
-        }
+        this.connectionObserver.complete();
     }
 
     private handleMessageEvent(ev: MessageEvent): void {
@@ -215,7 +207,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             }
             if (this.dataFrame) {
                 this.dataFrame.body = data.buffer;
-                this.addToInbox(this.dataFrame);
+                this.connectionObserver.next(this.dataFrame);
                 this.dataFrame = null;
             } else {
                 const frame = this.messagesConverter.deserialize(data);
@@ -226,21 +218,9 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
                     }
                     this.dataFrame = frame;
                 } else {
-                    this.addToInbox(frame);
+                    this.connectionObserver.next(frame);
                 }
             }
-        }
-    }
-
-    private addToInbox(frame: Frame): void {
-        if (this.connectionObserver) {
-            this.connectionObserver.next(frame);
-        } else {
-            /* istanbul ignore if */
-            if (this.log.isDebugEnabled()) {
-                this.log.debug(`No connection observer adding to buffer, buffer size ${this.inMessagesBuffer.size()}`);
-            }
-            this.inMessagesBuffer.enqueue(frame);
         }
     }
 

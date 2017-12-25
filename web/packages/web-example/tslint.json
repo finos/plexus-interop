@@ -18,7 +18,7 @@
                     "private-instance-field",
                     "protected-instance-field",
                     "public-instance-field",
-                    "contructor",
+                    "constructor",
                     "public-static-method",
                     "protected-static-method",
                     "private-static-method",

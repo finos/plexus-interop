@@ -1,0 +1,15 @@
+
+html, body, .flex-fill {
+    display: flex;
+    flex: 1 1 100%;
+    height: 100%;
+    width: 100%;
+}
+
+.flex-flow-column {
+    flex-flow: column;
+}
+
+a, button {
+    cursor: pointer;
+}

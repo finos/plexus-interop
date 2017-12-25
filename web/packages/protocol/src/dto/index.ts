@@ -20,3 +20,5 @@ export * from "./Completion";
 export * from "./ErrorCompletion";
 export * from "./SuccessCompletion";
 export * from "./ClientProtocolUtils";
+export * from "./InvocationMetaInfo";
+export * from "./UniqueId";

@@ -1,0 +1,16 @@
+.header {
+    flex: 0 0 auto;
+}
+
+.app-content {
+    flex: 1 1 100%;
+}
+
+.footer {
+    flex: 0 0 auto;
+    max-height: 400px;
+}
+
+#plexusLogsArea {
+    font-size: small;
+}

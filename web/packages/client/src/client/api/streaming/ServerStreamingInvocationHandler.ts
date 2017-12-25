@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { StreamingInvocationClient } from "./StreamingInvocationClient";
-import { MethodInvocationContext } from "../MethodInvocationContext";
+import { MethodInvocationContext } from "@plexus-interop/client-api";
 
 export interface ServerStreamingInvocationHandler<Req, Res> {
 
