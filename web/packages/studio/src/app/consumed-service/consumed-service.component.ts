@@ -23,7 +23,7 @@ import * as fromRoot from '../services/ui/root-reducers';
 import { Router } from "@angular/router";
 import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { InteropRegistryService, ConsumedMethod } from "@plexus-interop/broker";
-import { DiscoveredMethod, InvocationRequestInfo } from "@plexus-interop/client";
+import { DiscoveredMethod, InvocationRequestInfo, MethodType, StreamingInvocationClient } from "@plexus-interop/client";
 import { UniqueId } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 
@@ -46,6 +46,8 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   private selectedDiscoveredMethod: DiscoveredMethod;
 
   messageContent: string;
+  messagesToSend: number = 1;
+  messagesPeriodInMillis: number = 200;
 
   constructor(
     private actions: AppActions,
@@ -69,34 +71,70 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
         this.consumedMethod = state.consumedMethod.method;
         this.createDefaultMessage();
       }));
-
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribeAll();
   }
 
-  sendRequest() {
+  handleResponse(responseJson: string) {
+    this.log.info(`Response received: ${this.format(responseJson)}`);
+  }
+
+  handleError(e: any) {
+    this.log.error(`Error received`, e);
+  }
+
+  handleCompleted() {
+    this.log.info("Invocation completed");
+  }
+
+  async sendRequest() {
+
     const handler = {
-      value: v => {
-        this.log.info(`Response received:  ${this.format(v)}`);
-      },
-      error: e => {
-        this.log.error(`Error received`, e);
-      }
+      value: v => this.handleResponse(v),
+      error: e => this.handleError(e)
     };
-    if (!!this.selectedDiscoveredMethod) {
-      this.interopClient.sendUnaryRequest(
-        this.selectedDiscoveredMethod, this.messageContent, handler)
-        .catch(e => {
-          this.log.error(`Error received`, e);
-        });
+
+    const responseObserver = {
+      next: r => this.handleResponse(r),
+      error: e => this.handleError(e),
+      complete: () => this.handleCompleted()
+    }
+
+    const method = this.selectedDiscoveredMethod || this.consumedMethod;
+
+    switch (this.consumedMethod.method.type) {
+      case MethodType.Unary:
+        this.interopClient.sendUnaryRequest(method, this.messageContent, handler)
+          .catch(e => this.handleError(e));
+        break;
+      case MethodType.ServerStreaming:
+        this.interopClient.sendServerStreamingRequest(method, this.messageContent, responseObserver);
+        break;
+      case MethodType.ClientStreaming:
+      case MethodType.DuplexStreaming:
+        try {
+          const client = await this.interopClient.sendBidiStreamingRequest(method, responseObserver);
+          this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
+        } catch (error) {
+          this.handleError(error);
+        }
+    }
+  }
+
+  isClientStreaming() {
+    return this.consumedMethod.method.type === MethodType.ClientStreaming || this.consumedMethod.method.type === MethodType.DuplexStreaming;
+  }
+
+  sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>) {
+    if (leftToSend > 0) {
+      client.next(message);
+      setTimeout(() => {
+        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client);
+      }, intervalInMillis);
     } else {
-      this.interopClient.sendUnaryRequest(
-        this.consumedMethod, this.messageContent, handler)
-        .catch(e => {
-          this.log.error(`Error received`, e);
-        });
+      client.complete();
     }
   }
 

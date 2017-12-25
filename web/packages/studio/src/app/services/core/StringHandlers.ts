@@ -11,7 +11,7 @@ export type BidiStreamingStringHandler = (invocationHostClient: StreamingInvocat
 export function wrapGenericHostClient(base: StreamingInvocationClient<ArrayBuffer>, marshaller: Marshaller<any, ArrayBuffer>): StreamingInvocationClient<string> {
     return {
         complete: () => base.complete(),
-        next: async v => base.next(marshaller.decode(JSON.parse(v))),
+        next: async v => base.next(marshaller.encode(JSON.parse(v))),
         error: e => base.error(e),
         cancel: () => base.cancel()
     };

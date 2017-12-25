@@ -1,8 +1,19 @@
+
 <div class="form-group">
-  <label for="exampleFormControlTextarea1">Enter message JSON:</label>
-  <textarea id="message-content-area" class="form-control" rows="10" [(ngModel)]="messageContent"></textarea>
+  <label for="exampleFormControlTextarea1">Enter request message JSON:</label>
+  <textarea id="message-content-area" class="form-control" rows="8" [(ngModel)]="messageContent"></textarea>
   <button id="format-content-btn" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
   <button id="default-msg-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
+</div>
+
+<div class="form-group" [hidden]="!isClientStreaming()">
+  <label for="messages-count">Enter messages number:</label>
+  <input id="messages-count" class="form-control" [(ngModel)]="messagesToSend">
+</div>
+
+<div class="form-group" [hidden]="!isClientStreaming()">
+  <label for="messages-interval">Enter interval between messages (ms):</label>
+  <input id="messages-interval" class="form-control" [(ngModel)]="messagesPeriodInMillis">
 </div>
 
 <div>
