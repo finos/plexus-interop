@@ -1,4 +1,3 @@
-import { clientProtocol } from "@plexus-interop/protocol";
 /**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -15,4 +14,6 @@ import { clientProtocol } from "@plexus-interop/protocol";
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { clientProtocol } from "@plexus-interop/protocol";
+
 export interface ProvidedServiceReference extends clientProtocol.interop.protocol.IProvidedServiceReference {}

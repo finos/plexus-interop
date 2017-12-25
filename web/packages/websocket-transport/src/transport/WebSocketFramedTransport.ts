@@ -19,6 +19,13 @@ import { CancellationToken, Logger, LoggerFactory, Observer, BufferedObserver } 
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
+    public static TERMINATE_MESSAGE: string = "<END>";
+    public static SOCKET_CLOSE_TIMEOUT: number = 5000;
+    public static CONNECTING: number = 0;
+    public static OPEN: number = 1;
+    public static CLOSING: number = 2;
+    public static CLOSED: number = 3;
+
     private log: Logger;
 
     private readonly socketOpenToken: CancellationToken = new CancellationToken();
@@ -30,14 +37,8 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     private dataFrame: Frame | null;
 
     private terminateSent: boolean = false;
-    public terminateReceived: boolean = false;
 
-    public static TERMINATE_MESSAGE: string = "<END>";
-    public static SOCKET_CLOSE_TIMEOUT: number = 5000;
-    public static CONNECTING: number = 0;
-    public static OPEN: number = 1;
-    public static CLOSING: number = 2;
-    public static CLOSED: number = 3;
+    public terminateReceived: boolean = false;
 
     constructor(
         private readonly socket: WebSocket,
@@ -72,11 +73,6 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         return this.socket.readyState === WebSocketFramedTransport.OPEN;
     }
 
-    private isSocketClosed(): boolean {
-        return this.socket.readyState === WebSocketFramedTransport.CLOSED
-            || this.socket.readyState === WebSocketFramedTransport.CLOSING;
-    }
-
     public async open(connectionObserver: Observer<Frame>): Promise<void> {
         this.throwIfNotConnectedOrDisconnectRequested();
         this.connectionObserver.setObserver(connectionObserver);
@@ -105,18 +101,18 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         this.socket.close();
     }
 
-    private sendTerminateMessage(): void {
-        this.log.debug("Sending terminate message");
-        this.socket.send(WebSocketFramedTransport.TERMINATE_MESSAGE);
-        this.terminateSent = true;
-    }
-
     public getMaxFrameSize(): number {
         return Defaults.DEFAULT_FRAME_SIZE;
     }
 
     public uuid(): UniqueId {
         return this.guid;
+    }
+
+    private sendTerminateMessage(): void {
+        this.log.debug("Sending terminate message");
+        this.socket.send(WebSocketFramedTransport.TERMINATE_MESSAGE);
+        this.terminateSent = true;
     }
 
     private createConnectionReadyPromise(): Promise<void> {
@@ -135,6 +131,11 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
                 }
             });
         });
+    }
+
+    private isSocketClosed(): boolean {
+        return this.socket.readyState === WebSocketFramedTransport.CLOSED
+            || this.socket.readyState === WebSocketFramedTransport.CLOSING;
     }
 
     private bindToSocketEvents(): void {

@@ -17,7 +17,7 @@
 import { AsyncHandler } from "../AsyncHandler";
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { Completion, ErrorCompletion, SuccessCompletion, UniqueId, ClientError } from "@plexus-interop/protocol";
+import { Completion, ErrorCompletion, ClientError } from "@plexus-interop/protocol";
 import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
 import { ClientRequestProcessor } from "./ClientRequestProcessor";
 import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
@@ -77,24 +77,31 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                     }
                 },
                 complete: async () => {
-                    log.debug(`Channel subscrition completed for connection`);
-                    try {
-                        const result = await requestsTracker.completePending();
-                        log.info(`Completed pending actions`);
-                        await connection.disconnect(result);
-                        log.info(`Diconnected`);
-                        resolve(result);
-                    } catch (e) {
-                        log.error(`Failed to complete pending requests`, e);
-                        reject(new ErrorCompletion(e));
-                    }
+                    log.debug(`Source connection completed`);
+                    this.completeAndDisconnect(connection, requestsTracker, log)
+                        .then(result => resolve(result))
+                        .catch(e => {
+                            log.error(`Failed to complete pending requests`, e);
+                            reject(new ErrorCompletion(e));
+                        });
                 },
                 error: e => {
-                    log.error(`Error received for channels subscription`, e);
+                    log.error(`Error received from source connection`, e);
+                    this.completeAndDisconnect(connection, requestsTracker, log)
+                        .catch(completeErr => log.error("Failed to complete pending requests", e))
+                        .then(() => log.debug("Pending requests completed"));
                     reject(new ErrorCompletion(e));
                 }
             });
         });
+    }
+
+    private async completeAndDisconnect(connection: TransportConnection, requestsTracker: TasksTracker, log: Logger): Promise<Completion> {
+        const result = await requestsTracker.completePending();
+        log.info(`Completed pending actions`);
+        await connection.disconnect(result);
+        log.info(`Diconnected`);
+        return result;
     }
 
 }

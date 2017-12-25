@@ -21,7 +21,6 @@ import { Message } from "../../src/metadata/interop/model/Message";
 import { Service } from "../../src/metadata/interop/model/Service";
 import { DynamicMarshallerFactory } from "../../src/io/DynamicMarshallerFactory";
 
-
 describe("DynamicMarshallerFactory", () => {
 
     const messages = new ExtendedMap<string, Message>();

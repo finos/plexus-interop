@@ -51,12 +51,13 @@ export class Broker {
         this.log.debug("Starting to listen for incoming connections");
         this.connectionFactory.acceptConnections({
             next: connection => {
+                const connectionGuid = connection.uuid().toString();
                 if (this.log.isDebugEnabled()) {
-                    this.log.debug(`Accepted new connection [${connection.uuid().toString()}]`);
+                    this.log.debug(`Accepted new connection [${connectionGuid}]`);
                 }
                 this.connectionProcessor.handle(connection)
-                    .then(() => this.log.info(`Finished processing of [${connection.uuid().toString()}] connection`))
-                    .catch(e => this.log.error(`Error while processing of [${connection.uuid().toString()}] connection`, e));
+                    .then(() => this.log.info(`Finished processing of [${connectionGuid}] connection`))
+                    .catch(e => this.log.error(`Error while processing of [${connectionGuid}] connection`, e));
             },
             error: e => this.log.error("Error on receiving new connection", e),
             complete: () => this.log.info("No more connections")

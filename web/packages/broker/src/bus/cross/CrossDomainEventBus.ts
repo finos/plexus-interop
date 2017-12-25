@@ -213,7 +213,6 @@ export class CrossDomainEventBus implements EventBus {
         }
     }
 
-
     private emit(subscription: string, value: any, complete?: boolean): void {
         this.clearRejectTimeout(subscription);
         const observer = this.emitters.get(subscription);
