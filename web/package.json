@@ -20,10 +20,12 @@
     "build-quickstart-provider": "cd ./packages/ccy-pair-rate-provider && yarn build",
     "build-core": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client-api build-client",
     "build-all": "run-s build-core build-broker build-studio build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
-    "build-all-win": "run-s build-all benchmarks e2e-native",
+    "build-all-win": "run-s build-all benchmarks e2e-native e2e-web",
     "prebuild-all": "yarn install",
     "e2e-native": "cd ./packages/e2e && yarn e2e-native",
+    "e2e-web": "cd ./packages/e2e && yarn e2e-web",
     "poste2e-native": "yarn coverage",
+    "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
     "benchmarks": "cd ./packages/e2e && yarn e2e-native-benchmarks"
   },

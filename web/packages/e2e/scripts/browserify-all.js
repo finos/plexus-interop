@@ -33,30 +33,38 @@ var testFiles = glob.sync(resultInputGlob);
 
 console.log('Processing files: ' + JSON.stringify(testFiles));
 
-
 let browserifyBundle = browserify({ 
     entries: testFiles, 
     standalone: argv.standalone 
 });
 
-if (argv.coverage) {
+const coverageIgnorePatterns =  [
+    // skip all node modules, except our
+    '**/node_modules/!(@plexus-interop)/**',
+    // skip all generated proto messages
+    '**/*-messages.js',
+    '**/*-protocol.js',
+    '**/index.js',
+    '**/bower_components/**',
+    '**/test/**',
+    '**/tests/**',
+    '**/*.json',
+    '**/*.spec.js'];
+
+if (argv.clientCoverage) {
+    // skip web broker to have better picture    
+    coverageIgnorePatterns.push('**/broker/**');
+}
+
+if (argv.clientCoverage || argv.brokerCoverage) {
     console.log('Coverage enabled, instrumenting sources');
     bundle = browserifyBundle.transform(istanbul({
-        // ignore these glob paths (the ones shown are the defaults)
-        ignore: [
-            // skip all node modules, except our
-            '**/node_modules/!(@plexus-interop)/**',
-            // skip all generated proto messages
-            '**/*-messages.js',
-            '**/*-protocol.js',
-            '**/index.js',
-            '**/bower_components/**',
-            '**/test/**',
-            '**/tests/**',
-            '**/*.json',
-            '**/*.spec.js'],
+        ignore: coverageIgnorePatterns,
         defaultIgnore: true
     }), { global: true });
+} else if (argv.broker) {
+    coverageIgnorePatterns.push('**/broker/**');
+
 }
 
 browserifyBundle.bundle()
