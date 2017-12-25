@@ -18,9 +18,9 @@ import { InteropClient } from "./InteropClient";
 import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient } from "@plexus-interop/client";
 import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { MethodDiscoveryResponse, ProvidedMethodReference } from "@plexus-interop/client-api";
-import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod } from "@plexus-interop/broker";
+import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod, Marshaller } from "@plexus-interop/broker";
 import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
-import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler } from "./StringHandlers";
+import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler, wrapGenericHostClient, toGenericObserver } from "./StringHandlers";
 import { Observer } from "@plexus-interop/common";
 
 type DiscoveredMetaInfo = {
@@ -47,6 +47,13 @@ export class GenericClientWrapper implements InteropClient {
         private readonly serverStreamingHandlers: Map<string, ServerStreamingStringHandler>,
         private readonly bidiHandlers: Map<string, BidiStreamingStringHandler>,
         private readonly defaultGenerator: DefaultMessageGenerator) {
+    }
+
+    public validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, payload: string): void {
+        const { inputMessageId } = this.toMetaInfo(methodToInvoke);
+        const requestEncoder = this.encoderProvider.getMarshaller(inputMessageId);
+        const requestData = JSON.parse(payload);
+        return requestEncoder.validate(requestData);
     }
 
     public disconnect(): Promise<void> {
@@ -91,12 +98,8 @@ export class GenericClientWrapper implements InteropClient {
         const encodedRequest = requestEncoder.encode(requestData);
 
         const internalResponseHandler = {
-            value: v => {
-                responseHandler.value(JSON.stringify(responseEncoder.decode(v)));
-            },
-            error: e => {
-                responseHandler.error(e);
-            }
+            value: v => responseHandler.value(JSON.stringify(responseEncoder.decode(v))),
+            error: e => responseHandler.error(e)
         };
 
         if (!this.isConsumed(methodToInvoke)) {
@@ -122,12 +125,32 @@ export class GenericClientWrapper implements InteropClient {
         this.serverStreamingHandlers.set(`${serviceId}.${methodId}`, handler);
     }
 
-    public sendBidiStreamingRequest(responseObserver: Observer<string>): Promise<StreamingInvocationClient<string>> {
-        throw 'Not Implemented';
+    public async sendBidiStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, responseObserver: Observer<string>): Promise<StreamingInvocationClient<string>> {
+
+        const metaInfo = this.toMetaInfo(methodToInvoke);
+        const { inputMessageId, outputMessageId } = metaInfo;
+
+        const requestEncoder = this.encoderProvider.getMarshaller(inputMessageId);
+        const responseEncoder = this.encoderProvider.getMarshaller(outputMessageId);
+
+        const observer = toGenericObserver(responseObserver, responseEncoder);
+
+        if (!this.isConsumed(methodToInvoke)) {
+            const provided = (metaInfo as DiscoveredMetaInfo).provided;
+            const baseClient = await this.genericClient.sendDiscoveredBidirectionalStreamingRequest(provided, observer);
+            return wrapGenericHostClient(baseClient, responseEncoder);
+        } else {
+            const consumedMetaInfo = (metaInfo as ConsumedMetaInfo);
+            const baseClient = await this.genericClient.sendBidirectionalStreamingRequest({
+                serviceId: consumedMetaInfo.serviceId,
+                methodId: consumedMetaInfo.methodId
+            }, observer);
+            return wrapGenericHostClient(baseClient, responseEncoder);
+        }
     }
 
     public sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: Observer<string>): Promise<InvocationClient> {
-        
+
         const metaInfo = this.toMetaInfo(methodToInvoke);
         const { inputMessageId, outputMessageId } = metaInfo;
 
@@ -138,11 +161,7 @@ export class GenericClientWrapper implements InteropClient {
         requestEncoder.validate(requestData);
 
         const encodedRequest = requestEncoder.encode(requestData);
-        const observer: Observer<ArrayBuffer> = {
-            next: v => responseObserver.next(JSON.stringify(responseEncoder.decode(v))),
-            complete: () => responseObserver.complete(),
-            error: e => responseObserver.error(e)
-        };
+        const observer = toGenericObserver(responseObserver, responseEncoder);
 
         if (!this.isConsumed(methodToInvoke)) {
             const provided = (metaInfo as DiscoveredMetaInfo).provided;

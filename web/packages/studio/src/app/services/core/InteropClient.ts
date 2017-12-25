@@ -31,6 +31,8 @@ export interface InteropClient {
 
     createDefaultPayload(messageId: string): string;
 
+    validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, payload: string): void;
+
     // unary
 
     sendUnaryRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient>;
@@ -42,11 +44,10 @@ export interface InteropClient {
     sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: Observer<string>): Promise<InvocationClient>;
 
     setServerStreamingActionHandler(serviceId: string, methodId: string, handler: ServerStreamingStringHandler): void;
-    
 
     // bidi streaming
 
-    sendBidiStreamingRequest(responseObserver: Observer<string>): Promise<StreamingInvocationClient<string>>;
+    sendBidiStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, responseObserver: Observer<string>): Promise<StreamingInvocationClient<string>>;
 
     setBidiStreamingActionHandler(serviceId: string, methodId: string, handler: BidiStreamingStringHandler): void;    
 

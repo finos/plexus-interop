@@ -25,7 +25,7 @@ import { flatMap, Logger, LoggerFactory, Observer } from "@plexus-interop/common
 import { GenericClientWrapper } from "./GenericClientWrapper";
 import { DynamicMarshallerFactory, Marshaller } from "@plexus-interop/broker";
 import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
-import { UnaryStringHandler, BidiStreamingStringHandler, ServerStreamingStringHandler } from "./StringHandlers";
+import { UnaryStringHandler, BidiStreamingStringHandler, ServerStreamingStringHandler, wrapGenericHostClient } from "./StringHandlers";
 
 @Injectable()
 export class InteropClientFactory {
@@ -99,7 +99,7 @@ export class InteropClientFactory {
 
         this.log.info(`Connected as ${appId}`);
 
-        return new GenericClientWrapper(appId, client, interopRegistryService, marshallerFactory, unaryHandlers, defaultGenerator);
+        return new GenericClientWrapper(appId, client, interopRegistryService, marshallerFactory, unaryHandlers, serverStreamingHandlers, bidiStreamingHandlers, defaultGenerator);
     }
 
     private fullName(pm: ProvidedMethod): string {
@@ -139,7 +139,7 @@ export class InteropClientFactory {
                 methodId: pm.method.name,
                 handle: (context, hostClient) => {
                     const stringHandler = handlers.get(fullName);
-                    const baseObserver = stringHandler(this.wrapHostClient(hostClient, responseMarshaller));
+                    const baseObserver = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
                     let received;
                     return {
                         next: v => { 
@@ -152,17 +152,6 @@ export class InteropClientFactory {
             }
         }
 
-    }
-
-    private wrapHostClient(base: StreamingInvocationClient<ArrayBuffer>, responseMarshaller: Marshaller<any, ArrayBuffer>): StreamingInvocationClient<string> {
-        return {
-            complete: () => base.complete(),
-            next: async v => {
-                base.next(responseMarshaller.decode(JSON.parse(v)));
-            },
-            error: e => base.error(e),
-            cancel: () => base.cancel()
-        };
     }
 
     private createServerStreamingHandler(
@@ -180,7 +169,7 @@ export class InteropClientFactory {
                 handle: async (context, request, hostClient) => {
                     const requestObj = requestMarshaller.decode(request);
                     const stringHandler = handlers.get(fullName);
-                    const stringResponse = await stringHandler(JSON.stringify(requestObj), this.wrapHostClient(hostClient, responseMarshaller));
+                    const stringResponse = await stringHandler(JSON.stringify(requestObj), wrapGenericHostClient(hostClient, responseMarshaller));
                 }
             }
         }
