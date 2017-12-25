@@ -22,6 +22,7 @@ import { ProvidedMethod } from "@plexus-interop/broker";
 import { InteropClient } from "../services/core/InteropClient";
 import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { StreamingInvocationClient, MethodType } from "@plexus-interop/client";
 
 @Component({
   selector: 'app-provided-service',
@@ -38,6 +39,8 @@ export class ProvidedServiceComponent implements OnInit {
   private interopClient: InteropClient;
 
   messageContent: string;
+  messagesToSend: number = 1;
+  messagesPeriodInMillis: number = 200;
 
   constructor(
     private actions: AppActions,
@@ -51,24 +54,84 @@ export class ProvidedServiceComponent implements OnInit {
       .subscribe(plexus => {
         this.providedMethod = plexus.providedMethod.method;
         this.interopClient = plexus.services.interopClient;
+        this.createDefaultMessage();
       }));
   }
 
+  printRequest(requestJson) {
+    this.log.info(`"Received request: ${this.format(requestJson)}`);
+  }
+
+  handleError(e: any) {
+    this.log.error(`Error received`, e);
+  }
+
+  handleCompleted() {
+    this.log.info("Invocation completed received");
+  }
+
   intercept() {
-    if (this.interopClient) {
-      this.interopClient.setUnaryActionHandler(
-        this.providedMethod.providedService.service.id,
-        this.providedMethod.method.name,
-        async requestJson => {
-          this.log.info(`"Received request: ${this.format(requestJson)}`);
-          return this.messageContent;
-        });
+
+    if (this.interopClient && this.providedMethod) {
+
+      const serviceId = this.providedMethod.providedService.service.id;
+      const methodId = this.providedMethod.method.name;
+
+      switch (this.providedMethod.method.type) {
+        case MethodType.Unary:
+          this.interopClient.setUnaryActionHandler(
+            serviceId,
+            methodId,
+            async requestJson => {
+              this.printRequest(requestJson);
+              return this.messageContent;
+            });
+          break;
+        case MethodType.ServerStreaming:
+          this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
+            this.printRequest(request);
+            this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
+          });
+          break;
+        case MethodType.ClientStreaming:
+        case MethodType.DuplexStreaming:
+          this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
+            return {
+              next: request => {
+                this.printRequest(request);
+              },
+              error: e => this.handleError(e),
+              complete: () => {
+                this.handleCompleted();
+                this.log.info(`Sending ${this.messagesToSend} messages`);
+                this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
+              }
+            };
+          });
+          break;
+      }
       this.log.info("Set interceptor");
+
     }
   }
 
   format(data) {
     return JSON.stringify(JSON.parse(data), null, 2);
+  }
+
+  sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>) {
+    if (leftToSend > 0) {
+      client.next(message);
+      setTimeout(() => {
+        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client);
+      }, intervalInMillis);
+    } else {
+      client.complete();
+    }
+  }
+
+  isServerStreaming() {
+    return this.providedMethod && (this.providedMethod.method.type === MethodType.ServerStreaming || this.providedMethod.method.type === MethodType.DuplexStreaming);
   }
 
   createDefaultMessage() {

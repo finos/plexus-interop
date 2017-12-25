@@ -73,7 +73,7 @@ export class InteropRegistryService {
             app.consumedServices);
 
         const result = consumedMethods.find(method => {
-            return this.equalsIfExist(reference.methodId, reference.methodId)
+            return this.equalsIfExist(reference.methodId, method.method.name)
                 && (!reference.consumedService
                     || (this.equalsIfExist(reference.consumedService.serviceAlias, method.consumedService.service.serviceAlias)
                         && this.equalsIfExist(reference.consumedService.serviceId, method.consumedService.service.id)));
@@ -169,6 +169,6 @@ export class InteropRegistryService {
     }
 
     private equalsIfExist(expect: any, result: any): boolean {
-        return expect !== undefined || expect === result;
+        return typeof expect === "undefined" || expect === result;
     }
 }

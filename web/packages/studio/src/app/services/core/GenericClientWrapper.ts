@@ -138,14 +138,14 @@ export class GenericClientWrapper implements InteropClient {
         if (!this.isConsumed(methodToInvoke)) {
             const provided = (metaInfo as DiscoveredMetaInfo).provided;
             const baseClient = await this.genericClient.sendDiscoveredBidirectionalStreamingRequest(provided, observer);
-            return wrapGenericHostClient(baseClient, responseEncoder);
+            return wrapGenericHostClient(baseClient, requestEncoder);
         } else {
             const consumedMetaInfo = (metaInfo as ConsumedMetaInfo);
             const baseClient = await this.genericClient.sendBidirectionalStreamingRequest({
                 serviceId: consumedMetaInfo.serviceId,
                 methodId: consumedMetaInfo.methodId
             }, observer);
-            return wrapGenericHostClient(baseClient, responseEncoder);
+            return wrapGenericHostClient(baseClient, requestEncoder);
         }
     }
 

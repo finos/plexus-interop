@@ -64,6 +64,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       consumedMethod$.subscribe(state => {
+        this.selectedDiscoveredMethod = undefined;
         this.interopClient = state.services.interopClient;
         this.discoveredMethods = state.consumedMethod.discoveredMethods.methods;
         this.interopClient = state.services.interopClient;
@@ -86,7 +87,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   handleCompleted() {
-    this.log.info("Invocation completed");
+    this.log.info("Invocation completed received");
   }
 
   async sendRequest() {
@@ -134,6 +135,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
         this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client);
       }, intervalInMillis);
     } else {
+      this.log.info("Sending invocation completion");
       client.complete();
     }
   }

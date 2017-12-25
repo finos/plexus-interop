@@ -142,7 +142,7 @@ export class InteropClientFactory {
                     const baseObserver = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
                     let received;
                     return {
-                        next: v => { 
+                        next: (v: ArrayBuffer) => { 
                             baseObserver.next(JSON.stringify(requestMarshaller.decode(v)));
                         },
                         error: e => baseObserver.error(e),
