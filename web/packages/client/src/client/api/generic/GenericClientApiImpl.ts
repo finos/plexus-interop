@@ -160,6 +160,19 @@ export class GenericClientApiImpl implements GenericClientApi {
         return this.sendServerStreamingRequest(invocationInfo, request, responseObserver);
     }
 
+    public async sendUnaryRequestInternal(
+        strInfo: string,
+        requestInvocation: () => Promise<Invocation>,
+        request: ArrayBuffer,
+        responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
+        const responseObserver: Observer<ArrayBuffer> = this.createUnaryObserver(responseHandler);
+        return this.sendServerStreamingRequestInternal(strInfo, requestInvocation, request, responseObserver);
+    }
+
+    public disconnect(completion?: Completion): Promise<void> {
+        return this.genericClient.disconnect(completion);
+    }
+
     private createUnaryObserver(responseHandler: ValueHandler<ArrayBuffer>): Observer<ArrayBuffer> {
         let result: ArrayBuffer | null = null;
         return {
@@ -181,17 +194,4 @@ export class GenericClientApiImpl implements GenericClientApi {
         };
     }
 
-    public async sendUnaryRequestInternal(
-        strInfo: string,
-        requestInvocation: () => Promise<Invocation>,
-        request: ArrayBuffer,
-        responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
-        const responseObserver: Observer<ArrayBuffer> = this.createUnaryObserver(responseHandler);
-        return this.sendServerStreamingRequestInternal(strInfo, requestInvocation, request, responseObserver);
-    }
-
-
-    public disconnect(completion?: Completion): Promise<void> {
-        return this.genericClient.disconnect(completion);
-    }
 }

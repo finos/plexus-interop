@@ -42,6 +42,19 @@ export class GenericInvocationsHost {
         this.registerHandlers();
     }
 
+    public start(): Promise<void> {
+        return this.genericClient.acceptInvocations({
+            next: (invocation: Invocation) => this.handleInvocation(invocation),
+            error: (e) => this.log.error("Error on invocations subscription", e),
+            complete: () => this.log.debug("Invocations subscription completed")
+        })
+            .then(() => this.log.debug("Started to listen invocations"))
+            .catch((e) => {
+                this.log.error("Error on opening invocations subscription", e);
+                throw e;
+            });
+    }
+    
     private registerHandlers(): void {
         this.unaryHandlers.forEach(unaryHandler =>
             this.bidiStreamingHandlers.push({
@@ -62,19 +75,6 @@ export class GenericInvocationsHost {
             this.log.trace(`Registering handler for ${hash}`);
             this.handlersRegistry.set(hash, serviceHandler.handler);
         });
-    }
-
-    public start(): Promise<void> {
-        return this.genericClient.acceptInvocations({
-            next: (invocation: Invocation) => this.handleInvocation(invocation),
-            error: (e) => this.log.error("Error on invocations subscription", e),
-            complete: () => this.log.debug("Invocations subscription completed")
-        })
-            .then(() => this.log.debug("Started to listen invocations"))
-            .catch((e) => {
-                this.log.error("Error on opening invocations subscription", e);
-                throw e;
-            });
     }
 
     private handleInvocation(invocation: Invocation): void {

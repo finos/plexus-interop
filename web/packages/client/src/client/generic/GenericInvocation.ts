@@ -36,13 +36,14 @@ export class GenericInvocation {
 
     private sendCompletionReceived: boolean = false;
 
-    public readonly readCancellationToken: CancellationToken;
 
     private sourceChannelSubscription: AnonymousSubscription;
 
     private metaInfo: InvocationMetaInfo;
 
     private log: Logger;
+
+    public readonly readCancellationToken: CancellationToken;
 
     public constructor(
         private readonly sourceChannel: Channel,
@@ -90,20 +91,6 @@ export class GenericInvocation {
         this.startInvocationInternal(() => this.sendStartDiscoveredInvocationRequest(methodReference), invocationObserver);
     }
 
-    private startInvocationInternal(sendRequest: () => Promise<void>, invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
-        this.log.debug("Invocation start requested");
-        this.stateMachine.throwIfNot(InvocationState.CREATED);
-        this.setUuid(UniqueId.generateNew());
-        const subscriptionStartedPromise = this.openSubscription(invocationObserver);
-        this.stateMachine.goAsync(InvocationState.START_REQUESTED, {
-            preHandler: async () => {
-                await subscriptionStartedPromise;
-                await sendRequest();
-            }
-        })
-        .catch(e => this.log.error("Invocation start failed", e));
-    }
-
     public acceptInvocation(invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug("Accept of invocation requested");
         this.stateMachine.throwIfNot(InvocationState.CREATED);
@@ -116,20 +103,10 @@ export class GenericInvocation {
         return this.id;
     }
 
-    private setUuid(id: UniqueId): void {
-        this.log.debug(`Set id, ${id.toString()}`);
-        this.log = LoggerFactory.getLogger(`Invocation [${id.toString()}]`);
-        this.id = id;
-    }
-
     public getMetaInfo(): InvocationMetaInfo {
         return this.metaInfo;
     }
 
-    private terminate(message: string): void {
-        this.log.error("Terminating channel");
-        this.closeChannel(new ErrorCompletion(new ClientError(message)));
-    }
 
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
         /* istanbul ignore if */
@@ -160,25 +137,6 @@ export class GenericInvocation {
         return this.closeChannel(completion);
     }
 
-    private closeChannel(completion: plexus.ICompletion): Promise<plexus.ICompletion> {
-        return this.sourceChannel.close(completion).then((channelCompletion) => {
-            this.log.debug("Channel closed");
-            this.closeInternal();
-            const result = ClientProtocolUtils.createSummarizedCompletion(completion, channelCompletion, this.checkInternalStatus());
-            if (this.log.isTraceEnabled()) {
-                this.log.trace(`Completion result ${JSON.stringify(result)}`);
-            }
-            return result;
-        }).catch((e) => {
-            /* istanbul ignore if */
-            if (this.log.isDebugEnabled()) {
-                this.log.debug("Error during channel closure", e);
-            }
-            this.closeInternal();
-            throw e;
-        });
-    }
-
     public async sendMessage(data: ArrayBuffer): Promise<void> {
         this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
         this.log.trace(`Sending message of ${data.byteLength} bytes`);
@@ -196,14 +154,6 @@ export class GenericInvocation {
         this.log.trace(`Waiting for state ${state} - DONE`);
     }
 
-    private async waitForIt(check: () => boolean): Promise<void> {
-        await AsyncHelper.waitFor(
-            check,
-            this.readCancellationToken,
-            Defaults.STATUS_CHECK_INTERVAL,
-            this.invocationTimeout);
-    }
-
     // public methods below are NOT a part of API, for unit tests only
 
     public currentState(): InvocationState {
@@ -212,6 +162,58 @@ export class GenericInvocation {
 
     public getSentMessagesCounter(): number {
         return this.sentMessagesCounter;
+    }
+
+    private setUuid(id: UniqueId): void {
+        this.log.debug(`Set id, ${id.toString()}`);
+        this.log = LoggerFactory.getLogger(`Invocation [${id.toString()}]`);
+        this.id = id;
+    }
+
+    private startInvocationInternal(sendRequest: () => Promise<void>, invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
+        this.log.debug("Invocation start requested");
+        this.stateMachine.throwIfNot(InvocationState.CREATED);
+        this.setUuid(UniqueId.generateNew());
+        const subscriptionStartedPromise = this.openSubscription(invocationObserver);
+        this.stateMachine.goAsync(InvocationState.START_REQUESTED, {
+            preHandler: async () => {
+                await subscriptionStartedPromise;
+                await sendRequest();
+            }
+        })
+            .catch(e => this.log.error("Invocation start failed", e));
+    }
+
+    private terminate(message: string): void {
+        this.log.error("Terminating channel");
+        this.closeChannel(new ErrorCompletion(new ClientError(message)));
+    }
+
+    private async waitForIt(check: () => boolean): Promise<void> {
+        await AsyncHelper.waitFor(
+            check,
+            this.readCancellationToken,
+            Defaults.STATUS_CHECK_INTERVAL,
+            this.invocationTimeout);
+    }
+
+    private closeChannel(completion: plexus.ICompletion): Promise<plexus.ICompletion> {
+        return this.sourceChannel.close(completion).then((channelCompletion) => {
+            this.log.debug("Channel closed");
+            this.closeInternal();
+            const result = ClientProtocolUtils.createSummarizedCompletion(completion, channelCompletion, this.checkInternalStatus());
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Completion result ${JSON.stringify(result)}`);
+            }
+            return result;
+        }).catch((e) => {
+            /* istanbul ignore if */
+            if (this.log.isDebugEnabled()) {
+                this.log.debug("Error during channel closure", e);
+            }
+            this.closeInternal();
+            throw e;
+        });
     }
 
     private handleRemoteSentCompleted(invocationObserver: Observer<ArrayBuffer>): void {
@@ -267,7 +269,7 @@ export class GenericInvocation {
                     this.log.debug("Remote channel closed");
                     invocationObserver.complete();
                 },
-                
+
                 error: (e) => {
                     this.log.error("Error from source channel received", e);
                     this.closeInternal();

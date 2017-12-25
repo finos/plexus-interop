@@ -25,14 +25,14 @@ import { GenericBidiStreamingInvocationHandler } from "./GenericBidiStreamingInv
 import { GenericServerStreamingInvocationHandler } from "./GenericServerStreamingInvocationHandler";
 import { MarshallerProvider } from "../io/MarshallerProvider";
 import { ProtoMarshallerProvider } from "../io/ProtoMarshallerProvider";
-import { Logger, LoggerFactory} from "@plexus-interop/common";
+import { Logger, LoggerFactory } from "@plexus-interop/common";
 
 export class GenericClientApiBuilder {
 
     private log: Logger = LoggerFactory.getLogger("GenericClientApiBuilder");
 
     private applicationInfo: ClientConnectRequest;
-    
+
     private transportConnectionProvider: () => Promise<TransportConnection>;
     private marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider();
 
@@ -70,6 +70,26 @@ export class GenericClientApiBuilder {
         return this;
     }
 
+    public connect(): Promise<GenericClientApi> {
+        return this.validateState()
+            .then(() => this.transportConnectionProvider())
+            .then(connection => {
+                this.log.info("Connection established");
+                return new GenericClientFactory(connection).createClient(this.applicationInfo);
+            })
+            .then(genericClient => {
+                const actionsHost = new GenericInvocationsHost(this.applicationInfo.applicationId, genericClient,
+                    this.bidiStreamingInvocationHandlers,
+                    this.unaryInvocationHandlers,
+                    this.serverStreamingInvocationHandlers);
+                return actionsHost.start().then(() => new GenericClientApiImpl(genericClient, this.marshallerProvider));
+            })
+            .catch(error => {
+                this.log.error("Unable to create client", error);
+                throw error;
+            });
+    }
+
     private async validateState(): Promise<void> {
         if (!this.marshallerProvider) {
             throw "Marshaller Provider is not defined";
@@ -80,26 +100,6 @@ export class GenericClientApiBuilder {
         if (!this.applicationInfo || !this.applicationInfo.applicationId) {
             throw "Application ID is not defined";
         }
-    }
-
-    public connect(): Promise<GenericClientApi> {
-        return this.validateState() 
-            .then(() => this.transportConnectionProvider())
-            .then(connection => {
-                this.log.info("Connection established");
-                return new GenericClientFactory(connection).createClient(this.applicationInfo);
-            })
-            .then(genericClient => {
-                const actionsHost = new GenericInvocationsHost(this.applicationInfo.applicationId, genericClient, 
-                    this.bidiStreamingInvocationHandlers,
-                    this.unaryInvocationHandlers,
-                    this.serverStreamingInvocationHandlers);
-                return actionsHost.start().then(() => new GenericClientApiImpl(genericClient, this.marshallerProvider));
-            })
-            .catch(error => {
-                this.log.error("Unable to create client", error);
-                throw error;
-            });
     }
 
 }
