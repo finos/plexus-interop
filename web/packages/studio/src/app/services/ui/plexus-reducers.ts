@@ -31,7 +31,7 @@ import {
 
 const mode = UrlParamsProvider.getParam("mode");
 
-const defaultUrl = UrlParamsProvider.getParam("baseUrl") || mode === "dev" ? "http://localhost:8080" : undefined;
+const defaultUrl = UrlParamsProvider.getParam("baseUrl") || (mode === "dev" ? "http://localhost:8080" : undefined);
 
 const initialState: StudioState = {
     loading: false,

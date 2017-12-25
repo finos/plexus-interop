@@ -142,7 +142,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   label(providedMethod: DiscoveredMethod): string {
     const connectionId = providedMethod.providedMethod.providedService.connectionId;
-    const guidPostfix = connectionId ? ` - ${UniqueId.fromProperties(connectionId).toString()}` : "";
+    const guidPostfix = connectionId && connectionId.hi ? ` - ${UniqueId.fromProperties(connectionId).toString()}` : "";
     return `${providedMethod.providedMethod.providedService.applicationId}${guidPostfix}`
   }
 

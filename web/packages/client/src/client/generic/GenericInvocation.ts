@@ -312,10 +312,10 @@ export class GenericInvocation {
                 // accepted invocation started
                 this.setUuid(UniqueId.generateNew());
                 this.stateMachine.go(InvocationState.OPEN);
-                invocationObserver.started(new Subscription(() => this.close()));
                 this.sourceChannel.sendMessage(modelHelper.invocationStartedMessagePayload({
                     invocationId: this.uuid()
                 }));
+                invocationObserver.started(new Subscription(() => this.close()));
             } else {
                 this.log.warn(`Unknown message received ${JSON.stringify(envelopObject)}`);
             }

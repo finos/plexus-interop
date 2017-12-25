@@ -121,11 +121,13 @@ export class ProvidedServiceComponent implements OnInit {
 
   sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>) {
     if (leftToSend > 0) {
+      this.log.info("Sending message");
       client.next(message);
       setTimeout(() => {
         this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client);
       }, intervalInMillis);
     } else {
+      this.log.info("Sending completion");      
       client.complete();
     }
   }
