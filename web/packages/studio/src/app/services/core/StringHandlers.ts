@@ -17,9 +17,9 @@ export function wrapGenericHostClient(base: StreamingInvocationClient<ArrayBuffe
     };
 }
 
-export function toGenericObserver(base: Observer<string>, dataEncoder: Marshaller<any, ArrayBuffer>): Observer<ArrayBuffer> {
+export function toGenericObserver(base: Observer<string>, decoder: Marshaller<any, ArrayBuffer>): Observer<ArrayBuffer> {
     return {
-        next: v => base.next(JSON.stringify(dataEncoder.decode(v))),
+        next: v => base.next(JSON.stringify(decoder.decode(v))),
         complete: () => base.complete(),
         error: e => base.error(e)
     };

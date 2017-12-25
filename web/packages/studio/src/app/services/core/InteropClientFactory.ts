@@ -85,7 +85,7 @@ export class InteropClientFactory {
                         bidiStreamingHandlers.set(fullName, (hostClient) => {
                             let last;
                             return {
-                                next: v => hostClient.next(v),
+                                next: v => hostClient.next(defaultResponse),
                                 complete: () => hostClient.complete(),
                                 error: e => {}
                             };
@@ -139,14 +139,14 @@ export class InteropClientFactory {
                 methodId: pm.method.name,
                 handle: (context, hostClient) => {
                     const stringHandler = handlers.get(fullName);
-                    const baseObserver = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
+                    const stringRequestObserver: Observer<string> = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
                     let received;
                     return {
                         next: (v: ArrayBuffer) => { 
-                            baseObserver.next(JSON.stringify(requestMarshaller.decode(v)));
+                            stringRequestObserver.next(JSON.stringify(requestMarshaller.decode(v)));
                         },
-                        error: e => baseObserver.error(e),
-                        complete: () => baseObserver.complete()
+                        error: e => stringRequestObserver.error(e),
+                        complete: () => stringRequestObserver.complete()
                     };
                 }
             }
