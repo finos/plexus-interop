@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { State } from './root-reducers';
+import { State } from './RootReducers';
 import { Injectable } from '@angular/core';
 import { Action } from 'redux';
 

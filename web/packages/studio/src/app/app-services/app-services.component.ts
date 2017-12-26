@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 import { Observable } from 'rxjs/Observable';
-import { StudioState } from '../services/ui/model';
+import { StudioState } from '../services/ui/AppModel';
 import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
 import { InteropClientFactory } from '../services/core/InteropClientFactory';
-import { AppActions } from '../services/ui/app.actions';
+import { AppActions } from '../services/ui/AppActions';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as fromRoot from '../services/ui/root-reducers';
+import * as fromRoot from '../services/ui/RootReducers';
 import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/observable/of';

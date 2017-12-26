@@ -18,7 +18,7 @@ import { SubscriptionsRegistry } from './../services/ui/SubscriptionsRegistry';
 import { InteropServiceFactory, RegistryUrls } from '../services/core/InteropServiceFactory';
 import { App as Application } from '@plexus-interop/broker';
 import { Subscription } from 'rxjs/Subscription';
-import { AppActions } from '../services/ui/app.actions';
+import { AppActions } from '../services/ui/AppActions';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/fromEvent';
@@ -27,7 +27,7 @@ import 'rxjs/add/operator/filter';
 import { Router } from '@angular/router';
 import { ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
-import * as fromRoot from '../services/ui/root-reducers';
+import * as fromRoot from '../services/ui/RootReducers';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({

@@ -19,9 +19,9 @@ import { OnDestroy } from '@angular/core';
 import { LoggerFactory } from '@plexus-interop/common';
 import { App as Application } from '@plexus-interop/broker';
 import { Observable } from 'rxjs/Observable';
-import { AppActions } from '../services/ui/app.actions';
+import { AppActions } from '../services/ui/AppActions';
 import { Component, OnInit } from '@angular/core';
-import * as fromRoot from '../services/ui/root-reducers';
+import * as fromRoot from '../services/ui/RootReducers';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { LoggerFactory } from '@plexus-interop/common';
-import { logger, State } from './root-reducers';
+import { logger, State } from './RootReducers';
 import { TransportConnectionFactory } from '../core/TransportConnectionFactory';
 import { App as Application, ConsumedMethod } from "@plexus-interop/broker";
 import {
@@ -25,12 +25,12 @@ import {
     PlexusConnectedActionParams,
     ServicesSnapshot,
     StudioState,
-} from './model';
+} from './AppModel';
 import { TypedAction } from './TypedAction';
 import { InteropClientFactory } from '../core/InteropClientFactory';
 import { AppRegistryService } from '@plexus-interop/broker';
 import { InteropServiceFactory } from '../core/InteropServiceFactory';
-import { AppActions } from './app.actions';
+import { AppActions } from './AppActions';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/catch';

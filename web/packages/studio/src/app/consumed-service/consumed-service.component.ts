@@ -17,9 +17,9 @@
 import { TransportConnection } from '@plexus-interop/transport-common/src/transport/TransportConnection';
 import { InteropClient } from '../services/core/InteropClient';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AppActions } from "../services/ui/app.actions";
+import { AppActions } from "../services/ui/AppActions";
 import { Store } from "@ngrx/store";
-import * as fromRoot from '../services/ui/root-reducers';
+import * as fromRoot from '../services/ui/RootReducers';
 import { Router } from "@angular/router";
 import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { InteropRegistryService, ConsumedMethod } from "@plexus-interop/broker";
