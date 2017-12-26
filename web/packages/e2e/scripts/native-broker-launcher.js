@@ -86,7 +86,7 @@ function start() {
                         process: brokerProcess
                     }));
             }
-        }, 5000);
+        }, 20000);
 
         log("Starting Broker ...");
         brokerProcess = exec(fullBrokerCmd + config.brokerArgs, {
