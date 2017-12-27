@@ -28,6 +28,7 @@ import { HostState } from "./HostState";
 import { HostMessageEvent } from "./HostMessageEvent";
 import { PublishRequest } from "../model/PublishRequest";
 import { SubscribeRequest } from "../model/SubscribeRequest";
+import { RemoteActionStatus } from "../../../peers/remote/RemoteActionStatus";
 
 export class CrossDomainHost {
 
@@ -111,9 +112,12 @@ export class CrossDomainHost {
                 const subMsg = message as IFrameHostMessage<SubscribeRequest, Event>;
                 const request = subMsg.requestPayload as SubscribeRequest;
                 this.log.trace(`Received subscribe request, [${request.topic}]`);
-                this.internalBus.subscribe(request.topic, event => {
+                const subscription = this.internalBus.subscribe(request.topic, event => {
                     if (this.log.isTraceEnabled()) {
                         this.log.trace(`Received event for [${request.topic}] topic`, event.payload);                    
+                    }
+                    if (this.isLastRemoteMessage(event)) {
+                        subscription.unsubscribe();    
                     }
                     subMsg.responsePayload = {
                         payload: event.payload
@@ -128,6 +132,11 @@ export class CrossDomainHost {
                 this.log.error(`Unsupported message type ${message.type.id}`);
                 break;
         }
+    }
+
+    private isLastRemoteMessage(event: Event): boolean {
+        const payload = event.payload;
+        return payload && (payload.status === RemoteActionStatus.COMPLETED || payload.status === RemoteActionStatus.FAILURE);
     }
 
 }
