@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { Logger, LoggerFactory, LogLevel } from "@plexus-interop/common";
-import { CrossDomainHostBuilder, JStorageEventBus } from "@plexus-interop/broker";
+import { CrossDomainHostBuilder } from "@plexus-interop/broker";
 
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 
@@ -24,7 +24,6 @@ export class TestCrossDomainHost {
     public start(): void {
         const logger: Logger = LoggerFactory.getLogger("CrossDomainHostPage");
         new CrossDomainHostBuilder()
-            .withEventBus(new JStorageEventBus())
             .withCrossDomainConfig({ whiteListedUrls: ["*"] })
             .build()
             .then(() => logger.info("Created"))

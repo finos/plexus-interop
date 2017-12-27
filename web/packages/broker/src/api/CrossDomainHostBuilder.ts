@@ -17,16 +17,14 @@
 import { EventBus } from "../bus/EventBus";
 import { CrossDomainHost } from "../bus/cross/host/CrossDomainHost";
 import { CrossDomainHostConfig } from "../bus/cross/host/CrossDomainHostConfig";
-import { JStorageEventBus } from "../bus/same/JStorageEventBus";
+import { BroadCastChannelEventBus } from "../bus/same/BroadCastChannelEventBus";
 
 export class CrossDomainHostBuilder {
 
-    private eventBus: EventBus = new JStorageEventBus();
-
     private crossDomainConfig: CrossDomainHostConfig;
 
-    public withEventBus(eventBus: EventBus): CrossDomainHostBuilder {
-        this.eventBus = eventBus;
+    public withEventBusProvider(eventBusProvider: () => Promise<EventBus>): CrossDomainHostBuilder {
+        this.eventBusProvider = eventBusProvider;
         return this;
     }
 
@@ -36,9 +34,12 @@ export class CrossDomainHostBuilder {
     }
 
     public async build(): Promise<CrossDomainHost> {
-        const crossDomainHost = new CrossDomainHost(this.eventBus, this.crossDomainConfig);
+        const eventBus = await this.eventBusProvider();
+        const crossDomainHost = new CrossDomainHost(eventBus, this.crossDomainConfig);
         await crossDomainHost.connect();
         return crossDomainHost;
     }
+
+    private eventBusProvider: () => Promise<EventBus> = async () => new BroadCastChannelEventBus().init();
 
 }

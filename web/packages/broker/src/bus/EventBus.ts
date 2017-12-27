@@ -23,4 +23,6 @@ export interface EventBus {
 
     publish(key: string, event: Event): void;
 
+    init(): Promise<EventBus>;
+
 }

@@ -88,12 +88,14 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
 
         return new Observable((invocationSubscriber: Observer<Res>) => {
 
-            this.eventBus.subscribe(responseTopic, (event) => {
+            const subscription = this.eventBus.subscribe(responseTopic, (event) => {
                 this.log.trace(`Received update for ${responseTopic}`);
                 const invocationResult = event.payload as RemoteActionResult;
                 if (isFailed(invocationResult)) {
+                    subscription.unsubscribe();                    
                     invocationSubscriber.error(invocationResult.error);
                 } else if (isCompleted(invocationResult)) {
+                    subscription.unsubscribe();                                        
                     invocationSubscriber.complete();
                 } else {
                     invocationSubscriber.next(invocationResult.payload);
@@ -106,10 +108,10 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
                 requestId: requestId.toString(),
                 senderId: this.id
             };
+            
             this.eventBus.publish(requestTopic, {
                 payload
             });
-
 
         }).subscribe(observer);
 
