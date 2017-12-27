@@ -1,0 +1,22 @@
+{
+  "apps": [
+    {
+      "id": "plexus.interop.testing.TestAppLauncher",
+      "displayName": "Test App Launcher"
+    },
+    {
+      "id": "plexus.interop.testing.EchoServer",
+      "displayName": "Test Echo Server",
+      "launcherId": "plexus.interop.testing.TestAppLauncher",
+      "launcherParams": {}
+    },
+    {
+      "id": "plexus.interop.testing.EchoClient",
+      "displayName": "Test Echo Client",
+      "launcherId": "plexus.interop.testing.TestAppLauncher",
+      "launcherParams": {
+          "url" : "http://test.domain.com"
+      }
+    }
+  ]
+}

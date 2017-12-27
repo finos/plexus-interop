@@ -18,4 +18,5 @@ export abstract class Defaults {
     public static readonly OPERATION_TIMEOUT: number = 60000;
     public static readonly STATUS_CHECK_INTERVAL: number = 0;
     public static readonly DEFAULT_BUFFER_SIZE: number = 10240;
+    public static readonly DEFAULT_FRAME_SIZE: number = 60000;
 }

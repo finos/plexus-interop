@@ -16,7 +16,7 @@
  */
 import { TransportConnection } from "@plexus-interop/transport-common";
 import { Logger } from "@plexus-interop/common";
-import { ClientProtocolHelper } from "./ClientProtocolHelper";
+import { ClientProtocolHelper } from "@plexus-interop/protocol";
 
 /**
  * Represents Single Request to Broker
@@ -33,7 +33,7 @@ export class SingleMessageRequest<R> {
                 try {
                     const channel = await this.transportConnection.createChannel();
                     channel.open({
-                        startFailed: (e) => reject(e),
+                        startFailed: e => reject(e),
                         started: () => {
                             this.log.debug("Channel is open, sending connection request");
                             channel.sendLastMessage(requestPayload)
@@ -47,7 +47,7 @@ export class SingleMessageRequest<R> {
                                     }  
                                 });
                         },
-                        next: (data) => {
+                        next: data => {
                             try {
                                 this.log.trace("Received single message response");
                                 const message = decodeFn(data);
@@ -58,7 +58,7 @@ export class SingleMessageRequest<R> {
                             }
                         },
                         complete: () => this.log.debug("Channel closed"),
-                        error: (e) => reject(e)
+                        error: e => reject(e)
                     });
                 } catch (error) {
                     this.log.error("Unable to open channel", error);

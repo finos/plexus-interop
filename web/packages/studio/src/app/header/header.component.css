@@ -1,0 +1,8 @@
+.connection-statuses {
+  flex-direction: column;
+
+}
+
+.connection-statuses .connection-status {
+  justify-content: flex-end;
+}

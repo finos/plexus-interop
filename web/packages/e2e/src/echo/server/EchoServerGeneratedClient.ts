@@ -208,7 +208,7 @@ export class EchoServerClientBuilder {
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
-    private echoServiceHandler: EchoServiceInvocationHandler;
+    private echoServiceHandler: EchoServiceInvocationHandlerInternal;
 
     public withClientDetails(clientId: ClientConnectRequest): EchoServerClientBuilder {
         this.clientDetails = clientId;

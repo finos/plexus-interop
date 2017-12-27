@@ -18,6 +18,7 @@ import { EchoClientClient, EchoClientClientBuilder } from "../../src/echo/client
 import { EchoServerClient, EchoServerClientBuilder, EchoServiceInvocationHandler } from "../../src/echo/server/EchoServerGeneratedClient";
 import { ConnectionProvider } from "./ConnectionProvider";
 import * as plexus from "../../src/echo/gen/plexus-messages";
+import { TimeUtils } from "@plexus-interop/common";
 import * as Long from "long";
 import { ConnectionSetup } from "./ConnectionSetup";
 
@@ -26,9 +27,12 @@ export class ClientsSetup {
     private clientConnectionSetup: ConnectionSetup | null = null;
     private serverConnectionSetup: ConnectionSetup | null = null;
 
+    public constructor(private readonly clientConnectionDelay: number = 0) {}
+
     public async createEchoClients(transportConnectionProvider: ConnectionProvider, serviceHandler: EchoServiceInvocationHandler): Promise<[EchoClientClient, EchoServerClient]> {
         const server = await this.createEchoServer(transportConnectionProvider, serviceHandler);
         const client = await this.createEchoClient(transportConnectionProvider);
+        await TimeUtils.timeout(this.clientConnectionDelay);        
         return [client, server];
     }
 

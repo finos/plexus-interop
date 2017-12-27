@@ -18,8 +18,7 @@ import { Invocation } from "../../client/generic/Invocation";
 import { GenericInvocation } from "./GenericInvocation";
 import { UniqueId } from "@plexus-interop/transport-common";
 import { AnonymousSubscription } from "../../client/api/AnonymousSubscription";
-import { clientProtocol as plexus } from "@plexus-interop/protocol";
-import { InvocationMetaInfo } from "../../client/generic/InvocationMetaInfo";
+import { clientProtocol as plexus, InvocationMetaInfo } from "@plexus-interop/protocol";
 import { ChannelObserver } from "@plexus-interop/transport-common";
 
 export class AcceptedInvocation implements Invocation {

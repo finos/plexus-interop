@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 export * from "./generic";
-export * from "./dto";
+export * from "@plexus-interop/client-api";
 export * from "./streaming";
 export * from "./unary";
 export * from "./InvocationClient";
-export * from "./MethodInvocationContext";
 export * from "./ValueHandler";
 export * from "./io";

@@ -27,11 +27,14 @@ export interface Logger {
     warn(msg: string, ...args: any[]): void;
 
     trace(msg: string, ...args: any[]): void;
-    
+
     getLogLevel(): LogLevel;
 
     isDebugEnabled(): boolean;
 
     isTraceEnabled(): boolean;
+}
 
+export interface LoggerDelegate {
+    log(logLevel: LogLevel, msg: string, ...args: any[]): void;
 }

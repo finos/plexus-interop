@@ -36,6 +36,7 @@ subprojects {
         exclude "**/*.g"
         exclude "**/*.xtextbin"
         exclude "**/*.tokens"
+        exclude "**/*.json"
         exclude "**/*/*._trace"
 	exclude "**/google/protobuf/*.proto"
         strictCheck true

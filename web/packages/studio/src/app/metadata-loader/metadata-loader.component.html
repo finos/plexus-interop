@@ -1,0 +1,7 @@
+<div class="input-group">
+  <span class="input-group-addon" id="basic-addon1">Enter metadata host</span>
+  <input id="metadata-url-input" type="text" class="form-control" (keyup.enter)="connect(metadataUrl)" placeholder="Enter metadata URL" aria-label="Enter metadata URL" [(ngModel)]="metadataUrl">
+  <span class="input-group-btn">
+    <button id="connect-metadata-btn" class="btn btn-primary" type="button" (click)="connect(metadataUrl)">Connect</button>
+  </span>
+</div>

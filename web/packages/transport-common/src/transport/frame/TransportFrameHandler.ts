@@ -17,35 +17,26 @@
 import { Frame, MessageFrame, ConnectionCloseFrame, ChannelOpenFrame, ChannelCloseFrame } from "./model";
 import { ConnectionOpenFrame } from "./model/ConnectionOpenFrame";
 import { Logger } from "@plexus-interop/common";
+import { TransportFrameListener } from "./TransportFrameListener";
 
-export abstract class TransportFrameHandler {
+export class TransportFrameHandler {
 
-    public handleFrame(baseFrame: Frame, log: Logger): void {
+    public handleFrame(baseFrame: Frame, log: Logger, typedFramesListener: TransportFrameListener): void {
         if (!baseFrame) {
             log.warn("Empty frame header, dropping frame");
         } else if (baseFrame.internalHeaderProperties.messageFrame) {
-            this.handleMessageFrame(baseFrame as MessageFrame);
+            typedFramesListener.handleMessageFrame(baseFrame as MessageFrame);
         } else if (baseFrame.internalHeaderProperties.close) {
-            this.handleConnectionCloseFrame(baseFrame as ConnectionCloseFrame);
+            typedFramesListener.handleConnectionCloseFrame(baseFrame as ConnectionCloseFrame);
         } else if (baseFrame.internalHeaderProperties.channelOpen) {
-            this.handleChannelOpenFrame(baseFrame as ChannelOpenFrame);
+            typedFramesListener.handleChannelOpenFrame(baseFrame as ChannelOpenFrame);
         } else if (baseFrame.internalHeaderProperties.channelClose) {
-            this.handleChannelCloseFrame(baseFrame as ChannelCloseFrame);
+            typedFramesListener.handleChannelCloseFrame(baseFrame as ChannelCloseFrame);
         } else if (baseFrame.internalHeaderProperties.open) {
-            this.handleConnectionOpenFrame(baseFrame as ConnectionOpenFrame);
+            typedFramesListener.handleConnectionOpenFrame(baseFrame as ConnectionOpenFrame);
         } else {
             throw new Error("Unsupported frame type");
         }
     }
-
-    public abstract handleConnectionCloseFrame(frame: ConnectionCloseFrame): void;
-
-    public abstract handleConnectionOpenFrame(frame: ConnectionOpenFrame): void;
-
-    public abstract handleChannelOpenFrame(frame: ChannelOpenFrame): void;
-
-    public abstract handleChannelCloseFrame(frame: ChannelCloseFrame): void;
-
-    public abstract handleMessageFrame(frame: MessageFrame): void;
 
 }
