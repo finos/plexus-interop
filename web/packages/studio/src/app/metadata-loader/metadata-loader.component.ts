@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
-import { AppActions } from '../services/ui/app.actions';
+import { AppActions } from '../services/ui/AppActions';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as fromRoot from '../services/ui/root-reducers';
+import * as fromRoot from '../services/ui/RootReducers';
 import 'rxjs/add/operator/first';
 
 @Component({

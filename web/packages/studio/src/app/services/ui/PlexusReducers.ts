@@ -18,7 +18,7 @@ import { InteropClient } from '../core/InteropClient';
 import { App as Application, ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
 import { TypedAction } from './TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
-import { AppActions } from "./app.actions";
+import { AppActions } from "./AppActions";
 import { Action } from '@ngrx/store';
 import { UrlParamsProvider } from "../core/UrlParamsProvider";
 import {
@@ -27,7 +27,7 @@ import {
     MetadataLoadActionParams,
     PlexusConnectedActionParams,
     StudioState,
-} from './model';
+} from './AppModel';
 
 const mode = UrlParamsProvider.getParam("mode");
 

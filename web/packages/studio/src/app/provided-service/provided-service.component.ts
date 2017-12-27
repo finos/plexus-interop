@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 import { Component, OnInit } from '@angular/core';
-import { AppActions } from "../services/ui/app.actions";
+import { AppActions } from "../services/ui/AppActions";
 import { Store } from "@ngrx/store";
-import * as fromRoot from '../services/ui/root-reducers';
+import * as fromRoot from '../services/ui/RootReducers';
 import { ProvidedMethod } from "@plexus-interop/broker";
 import { InteropClient } from "../services/core/InteropClient";
 import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";

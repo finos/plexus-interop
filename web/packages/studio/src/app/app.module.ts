@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CustomRouterStateSerializer } from './services/utils';
+import { CustomRouterStateSerializer } from './services/AppUtils';
 import { TransportConnectionFactory } from './services/core/TransportConnectionFactory';
 import { InteropClientFactory } from './services/core/InteropClientFactory';
 import { InteropServiceFactory } from './services/core/InteropServiceFactory';
-import { metaReducers } from './services/ui/root-reducers';
-import { AppActions } from './services/ui/app.actions';
+import { metaReducers } from './services/ui/RootReducers';
+import { AppActions } from './services/ui/AppActions';
 import { AppRoutes } from './app.routing';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -32,7 +32,7 @@ import { RouterModule } from '@angular/router';
 import { AppListComponent } from './app-list/app-list.component';
 import { HeaderComponent } from './header/header.component';
 
-import { reducers } from './services/ui/root-reducers';
+import { reducers } from './services/ui/RootReducers';
 import { AppServicesComponent } from './app-services/app-services.component';
 import { ConsumedServiceComponent } from './consumed-service/consumed-service.component';
 import { ProvidedServiceComponent } from './provided-service/provided-service.component';
@@ -40,7 +40,7 @@ import { ProvidedServiceComponent } from './provided-service/provided-service.co
 import { StoreModule } from '@ngrx/store';
 
 import { EffectsModule } from '@ngrx/effects';
-import { Effects } from './services/ui/effects';
+import { Effects } from './services/ui/AppEffects';
 import { HttpModule } from '@angular/http';
 
 import {

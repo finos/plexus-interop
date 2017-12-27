@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { StudioState } from './model';
+import { StudioState } from './AppModel';
 import {
   ActionReducerMap,
   createSelector,
@@ -25,7 +25,7 @@ import {
 import { environment } from '../../../environments/environment';
 
 import * as fromRouter from '@ngrx/router-store';
-import * as fromPlexus from './plexus-reducers';
+import * as fromPlexus from './PlexusReducers';
 
 export interface State {
   plexus: StudioState;
