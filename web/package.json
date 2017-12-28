@@ -27,7 +27,7 @@
     "poste2e-native": "yarn coverage",
     "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
-    "benchmarks": "cd ./packages/e2e && yarn e2e-native-benchmarks"
+    "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && && yarn web-broker-benchmarks"
   },
   "workspaces": [
     "packages/*"
