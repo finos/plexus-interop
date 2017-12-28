@@ -14,9 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./EventBus";
-export * from "./Event";
-export * from "./cross";
-export * from "./same/BroadCastChannelEventBus";
-export * from "./same/JStorageEventBus";
-export * from "./FallbackEventBus";
+import "core-js/es6/promise";
+import "core-js/fn/array/find";
+import "core-js/es6/symbol";
+import "core-js/es6/object";
+import "core-js/es6/function";
+import "core-js/es6/parse-int";
+import "core-js/es6/parse-float";
+import "core-js/es6/number";
+import "core-js/es6/math";
+import "core-js/es6/string";
+import "core-js/es6/date";
+import "core-js/es6/array";
+import "core-js/es6/regexp";
+import "core-js/es6/map";
+import "core-js/es6/set";
+import "core-js/es6/reflect";
+
+export * from "./CrossDomainHostBuilder";
