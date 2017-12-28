@@ -16,7 +16,7 @@
  */
 export enum TransportType {
 
-    WEB_SAME_BROADCAST = "same-broadcast",
+    WEB_SAME_BROADCAST = "web-same-broadcast",
 
     WEB_CROSS = "web-cross",
     

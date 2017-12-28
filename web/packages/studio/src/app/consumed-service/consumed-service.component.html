@@ -1,30 +1,53 @@
-
 <div class="form-group">
-  <label for="exampleFormControlTextarea1">Enter request JSON:</label>
-  <textarea id="message-content-area" class="form-control" rows="8" [(ngModel)]="messageContent"></textarea>
-  <button id="format-content-btn" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
-  <button id="default-msg-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
-</div>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div>
+          <label for="exampleFormControlTextarea1">Enter request JSON:</label>
+          <textarea id="message-content-area" class="form-control" rows="8" [(ngModel)]="messageContent"></textarea>
+          <button id="format-content-btn" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
+          <button id="default-msg-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
+        </div>
+      </div>
+      <div class="col">
+        <div>
+          <label for="exampleFormControlTextarea1">Response:</label>
+          <textarea readonly id="message-content-area" class="form-control" rows="8" [(ngModel)]="responseContent"></textarea>
+        </div>
+        <div class="container">
+          <div class="row" [hidden]="!isServerStreaming()">
+            <label class="col-sm-6">Messages Received</label>
+            <label class="col-sm-6">{{responseCounter}}</label>
+          </div>
+          <div class="row">
+            <label class="col-sm-6">Total Response Time (ms)</label>
+            <label class="col-sm-6">{{responseTime}}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="form-group" [hidden]="!isClientStreaming()">
-  <label for="messages-count">Enter messages number:</label>
-  <input id="messages-count" class="form-control" [(ngModel)]="messagesToSend">
-</div>
 
-<div class="form-group" [hidden]="!isClientStreaming()">
-  <label for="messages-interval">Enter interval between messages (ms):</label>
-  <input id="messages-interval" class="form-control" [(ngModel)]="messagesPeriodInMillis">
-</div>
+  <div class="form-group" [hidden]="!isClientStreaming()">
+    <label for="messages-count">Enter messages number:</label>
+    <input id="messages-count" class="form-control" [(ngModel)]="messagesToSend">
+  </div>
 
-<div>
-  <div class="form-group">
-    <label for="exampleSelect1">Target app:</label>
-    <select id="target-app-dropdown" class="form-control" [(ngModel)]="selectedDiscoveredMethod">
+  <div class="form-group" [hidden]="!isClientStreaming()">
+    <label for="messages-interval">Enter interval between messages (ms):</label>
+    <input id="messages-interval" class="form-control" [(ngModel)]="messagesPeriodInMillis">
+  </div>
+
+  <div>
+    <div class="form-group">
+      <label for="exampleSelect1">Target app:</label>
+      <select id="target-app-dropdown" class="form-control" [(ngModel)]="selectedDiscoveredMethod">
       <option id="target-app-option-{{discoveredMethod.providedMethod.providedService.applicationId}}" *ngFor="let discoveredMethod of discoveredMethods" [ngValue]="discoveredMethod">
         {{label(discoveredMethod)}}
       </option>
     </select>
+    </div>
   </div>
-</div>
 
-<button class="btn btn-primary" (click)="sendRequest()" type="button">Invoke</button>
+  <button class="btn btn-primary" (click)="sendRequest()" type="button">Invoke</button>
