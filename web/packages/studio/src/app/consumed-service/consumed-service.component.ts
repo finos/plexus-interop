@@ -139,6 +139,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
           this.handleError(error);
         }
     }
+    
   }
 
   isClientStreaming() {
@@ -183,14 +184,4 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     this.messageContent = this.format(this.messageContent);
   }
 
-  toInvocationRequest(discoveredMethod: DiscoveredMethod): InvocationRequestInfo {
-    const connectionId = discoveredMethod.providedMethod.providedService.connectionId ?
-      UniqueId.fromProperties(discoveredMethod.providedMethod.providedService.connectionId) : null;
-    return {
-      methodId: discoveredMethod.providedMethod.methodId,
-      serviceId: discoveredMethod.providedMethod.providedService.serviceId,
-      applicationId: discoveredMethod.providedMethod.providedService.applicationId,
-      connectionId
-    };
-  }
 }

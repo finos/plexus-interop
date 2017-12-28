@@ -18,6 +18,7 @@ import { EventBus } from "../bus/EventBus";
 import { CrossDomainHost } from "../bus/cross/host/CrossDomainHost";
 import { CrossDomainHostConfig } from "../bus/cross/host/CrossDomainHostConfig";
 import { BroadCastChannelEventBus } from "../bus/same/BroadCastChannelEventBus";
+import "core-js/es6/promise";
 
 export class CrossDomainHostBuilder {
 

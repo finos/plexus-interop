@@ -14,7 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import "core-js/es6/map";
+
 export class ExtendedMap<K, V> extends Map<K, V> {
+
+    private constructor() {
+        super();
+    }
+
+    public static create<K, V>(): ExtendedMap<K, V> {
+        const instance: any = new Map<K, V>();
+        // tslint:disable-next-line:no-string-literal
+        instance["__proto__"] = ExtendedMap.prototype;
+        return instance as ExtendedMap<K, V>;
+    }
 
     public valuesArray(): V[] {
         const res: V[] = [];

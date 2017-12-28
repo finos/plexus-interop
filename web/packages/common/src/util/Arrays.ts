@@ -84,7 +84,7 @@ export function distinct<T>(array: T[], key: (x: T) => any): T[] {
 }
 
 export function toMap<T, K, V>(array: T[], keyFn: (v: T) => K, vFn: (v: T) => V): ExtendedMap<K, V> {
-    const result = new ExtendedMap<K, V>();
+    const result = ExtendedMap.create<K, V>();
     array.forEach(v => result.set(keyFn(v), vFn(v)));
     return result;
 }
