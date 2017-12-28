@@ -26,15 +26,13 @@ import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, Clien
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";
 
-export type ChannelState = "CREATED" | "OPEN" | "CLOSED" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED";
-
-export const ChannelState = {
-    CREATED: "CREATED" as ChannelState,
-    OPEN: "OPEN" as ChannelState,
-    CLOSED: "CLOSED" as ChannelState,
-    CLOSE_RECEIVED: "CLOSE_RECEIVED" as ChannelState,
-    CLOSE_REQUESTED: "CLOSE_REQUESTED" as ChannelState
-};
+export enum ChannelState {
+    CREATED  = "CREATED",
+    OPEN = "OPEN",
+    CLOSED = "CLOSED",
+    CLOSE_RECEIVED = "CLOSE_RECEIVED",
+    CLOSE_REQUESTED = "CLOSE_REQUESTED"
+}
 
 export class FramedTransportChannel implements TransportChannel {
 
