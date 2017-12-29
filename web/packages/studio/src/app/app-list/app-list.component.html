@@ -1,0 +1,3 @@
+<div class="list-group" >
+  <a id="app-item {{app.displayName}}" class="list-group-item list-group-item-action" *ngFor="let app of apps | async" (click)="connectToApp(app)">{{app.displayName}}</a>
+</div>

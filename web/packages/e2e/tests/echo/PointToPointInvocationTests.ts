@@ -35,6 +35,57 @@ export class PointToPointInvocationTests extends BaseEchoTest {
         const echoRequest = this.clientsSetup.createRequestDto();
         return this.testMessageSentInternal(echoRequest);
     }
+    
+    public testHugeMessageSent(): Promise<void> {
+        const echoRequest = this.clientsSetup.createHugeRequestDto(10 * 65000);
+        return this.testMessageSentInternal(echoRequest);
+    }
+
+    public testHostExecutionExceptionReceived(): Promise<void> {
+        const errorText = "Host error";        
+        return this.testHostsExecutionErrorReceivedInternal(new Error(errorText), errorText, false);
+    }
+
+    public testHostsExecutionClientErrorReceived(): Promise<void> {
+        const errorText = "Host error";
+        return this.testHostsExecutionErrorReceivedInternal(new ClientError(errorText), errorText);
+    }
+
+    public testHostsExecutionErrorReceived(): Promise<void> {
+        const errorText = "Host error";
+        return this.testHostsExecutionErrorReceivedInternal(new Error(errorText), errorText);
+    }
+
+    public testHostsExecutionStringErrorReceived(): Promise<void> {
+        const errorText = "Host error";
+        return this.testHostsExecutionErrorReceivedInternal(errorText, errorText);
+    }
+    
+    public testFewMessagesSent(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        return new Promise<void>((resolve, reject) => {
+            const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => request);
+            return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+                .then(clients => {
+                    return (async () => {
+                        let echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
+                        this.assertEqual(echoRequest, echoResponse);
+                        echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
+                        this.assertEqual(echoRequest, echoResponse);
+                        echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
+                        this.assertEqual(echoRequest, echoResponse);
+                    })()
+                        .then(() => {
+                            return this.clientsSetup.disconnect(clients[0], clients[1]);
+                        });
+                })
+                .then(() => resolve())
+                .catch(error => {
+                    reject(error);
+                });
+        });
+
+    }
 
     private testMessageSentInternal(echoRequest: plexus.plexus.interop.testing.IEchoRequest): Promise<void> {
         return new Promise<void>((resolve, reject) => {
@@ -61,31 +112,6 @@ export class PointToPointInvocationTests extends BaseEchoTest {
         });
     }
 
-    public testHugeMessageSent(): Promise<void> {
-        const echoRequest = this.clientsSetup.createHugeRequestDto(10 * 65000);
-        return this.testMessageSentInternal(echoRequest);
-    }
-
-    public testHostExecutionExceptionReceived(): Promise<void> {
-        const errorText = "Host error";        
-        return this.testHostsExecutionErrorReceivedInternal(new Error(errorText), errorText, false);
-    }
-
-    public testHostsExecutionClientErrorReceived(): Promise<void> {
-        const errorText = "Host error";
-        return this.testHostsExecutionErrorReceivedInternal(new ClientError(errorText), errorText);
-    }
-
-    public testHostsExecutionErrorReceived(): Promise<void> {
-        const errorText = "Host error";
-        return this.testHostsExecutionErrorReceivedInternal(new Error(errorText), errorText);
-    }
-
-    public testHostsExecutionStringErrorReceived(): Promise<void> {
-        const errorText = "Host error";
-        return this.testHostsExecutionErrorReceivedInternal(errorText, errorText);
-    }
-
     private testHostsExecutionErrorReceivedInternal(errorObj: any, errorText: string, isPromise: boolean = true): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return new Promise<void>((resolve, reject) => {
@@ -110,32 +136,6 @@ export class PointToPointInvocationTests extends BaseEchoTest {
                 .then(() => resolve())
                 .catch(error => reject(error));
         });
-    }
-
-    public testFewMessagesSent(): Promise<void> {
-        const echoRequest = this.clientsSetup.createRequestDto();
-        return new Promise<void>((resolve, reject) => {
-            const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => request);
-            return this.clientsSetup.createEchoClients(this.connectionProvider, handler)
-                .then(clients => {
-                    return (async () => {
-                        let echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
-                        this.assertEqual(echoRequest, echoResponse);
-                        echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
-                        this.assertEqual(echoRequest, echoResponse);
-                        echoResponse = await clients[0].getEchoServiceProxy().unary(echoRequest);
-                        this.assertEqual(echoRequest, echoResponse);
-                    })()
-                        .then(() => {
-                            return this.clientsSetup.disconnect(clients[0], clients[1]);
-                        });
-                })
-                .then(() => resolve())
-                .catch(error => {
-                    reject(error);
-                });
-        });
-
     }
 
 }

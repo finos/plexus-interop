@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 import { FramedTransport, FramedTransportChannel } from "../../../src/transport/frame";
-import { UniqueId } from "../../../src/transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { TestUtils } from "./util";
-import { mock, instance, when, anything, capture } from "ts-mockito";
+import { mock, instance, when, anything } from "ts-mockito";
 import { CancellationToken, AsyncHelper } from "@plexus-interop/common";
 import { Observer } from "@plexus-interop/common";
 import { LogObserver } from "../../LogObserver";

@@ -16,8 +16,8 @@
  */
 import { GenericClientApi } from "./GenericClientApi";
 import { GenericClient } from "../../../client/generic/GenericClient";
-import { ServiceDiscoveryRequest } from "../../../client/api/dto/ServiceDiscoveryRequest";
-import { ServiceDiscoveryResponse } from "../../../client/api/dto/ServiceDiscoveryResponse";
+import { ServiceDiscoveryRequest } from "@plexus-interop/client-api";
+import { ServiceDiscoveryResponse } from "@plexus-interop/client-api";
 import { Observer } from "@plexus-interop/common";
 import { ClientDtoUtils } from "./../../ClientDtoUtils";
 import { LoggingObserver } from "./../LoggingObserver";
@@ -26,16 +26,15 @@ import { StreamingInvocationClientImpl } from "./../streaming/StreamingInvocatio
 import { InvocationClient } from "./../InvocationClient";
 import { ValueHandler } from "./../ValueHandler";
 import { ClientError } from "@plexus-interop/protocol";
-import { InvocationRequestInfo } from "../../generic/InvocationMetaInfo";
+import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory, Arrays } from "@plexus-interop/common";
-
 import { MarshallerProvider } from "../io/MarshallerProvider";
-import { Completion } from "../dto/Completion";
+import { Completion } from "@plexus-interop/client-api";
 import { DelegateChannelObserver } from "@plexus-interop/transport-common";
-import { ProvidedMethodReference } from "../dto/ProvidedMethodReference";
+import { ProvidedMethodReference } from "@plexus-interop/client-api";
 import { Invocation } from "../../generic/Invocation";
-import { MethodDiscoveryRequest } from "../dto/MethodDiscoveryRequest";
-import { MethodDiscoveryResponse } from "../dto/MethodDiscoveryResponse";
+import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
+import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
 
 export class GenericClientApiImpl implements GenericClientApi {
 
@@ -161,6 +160,19 @@ export class GenericClientApiImpl implements GenericClientApi {
         return this.sendServerStreamingRequest(invocationInfo, request, responseObserver);
     }
 
+    public async sendUnaryRequestInternal(
+        strInfo: string,
+        requestInvocation: () => Promise<Invocation>,
+        request: ArrayBuffer,
+        responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
+        const responseObserver: Observer<ArrayBuffer> = this.createUnaryObserver(responseHandler);
+        return this.sendServerStreamingRequestInternal(strInfo, requestInvocation, request, responseObserver);
+    }
+
+    public disconnect(completion?: Completion): Promise<void> {
+        return this.genericClient.disconnect(completion);
+    }
+
     private createUnaryObserver(responseHandler: ValueHandler<ArrayBuffer>): Observer<ArrayBuffer> {
         let result: ArrayBuffer | null = null;
         return {
@@ -182,17 +194,4 @@ export class GenericClientApiImpl implements GenericClientApi {
         };
     }
 
-    public async sendUnaryRequestInternal(
-        strInfo: string,
-        requestInvocation: () => Promise<Invocation>,
-        request: ArrayBuffer,
-        responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
-        const responseObserver: Observer<ArrayBuffer> = this.createUnaryObserver(responseHandler);
-        return this.sendServerStreamingRequestInternal(strInfo, requestInvocation, request, responseObserver);
-    }
-
-
-    public disconnect(completion?: Completion): Promise<void> {
-        return this.genericClient.disconnect(completion);
-    }
 }

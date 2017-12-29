@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InvocationMetaInfo } from "../../src/client/generic/InvocationMetaInfo";
+import { InvocationMetaInfo } from "@plexus-interop/protocol";
 import { UniqueId, TransportChannel, ChannelObserver } from "@plexus-interop/transport-common";
-import { RemoteInvocationInfo } from "../../src/client/api/dto/RemoteInvocationInfo";
+import { RemoteInvocationInfo } from "@plexus-interop/client-api";
 import { MarshallerProvider } from "../../src/client/api/io/MarshallerProvider";
 import { Marshaller } from "../../src/client/api/io/Marshaller";
 import { Observer } from "@plexus-interop/common";
@@ -114,7 +114,7 @@ export class BufferedChannel implements TransportChannel {
 
     public async sendLastMessage(data: ArrayBuffer): Promise<plexus.ICompletion> {
         await this.sendMessage(data);
-        return this.close;
+        return this.close();
     }
 
     public cancel(): void {
@@ -123,7 +123,6 @@ export class BufferedChannel implements TransportChannel {
 
     public async close(): Promise<SuccessCompletion> {
         this.log.info("Close requested");
-        this.cancel();
         return new SuccessCompletion();
     }
 

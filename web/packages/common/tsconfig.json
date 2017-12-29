@@ -24,9 +24,9 @@
             "es6", "dom"
         ],
         "types": [
-            "node",
             "jest",
-            "long"
+            "long",
+            "node"
         ],
         "baseUrl": "."
     },

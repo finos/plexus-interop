@@ -1,4 +1,73 @@
 {
+    "messages": [
+		    	{
+	"id": "interop.AppLaunchRequest",
+	"fields": [
+		{
+			"name": "app_id",
+			"num": 1,
+			"primitive": true,
+			"type": "string"
+		},
+		{
+			"name": "launch_params_json",
+			"num": 2,
+			"primitive": true,
+			"type": "string"
+		}
+	]
+},
+		    	{
+	"id": "interop.AppLaunchResponse",
+	"fields": [
+		{
+			"name": "app_instance_id",
+			"num": 1,
+			"primitive": false,
+			"type": "interop.UniqueId"
+		}
+	]
+},
+		    	{
+	"id": "interop.samples.GreetingRequest",
+	"fields": [
+		{
+			"name": "name",
+			"num": 1,
+			"primitive": true,
+			"type": "string"
+		}
+	]
+},
+		    	{
+	"id": "interop.samples.GreetingResponse",
+	"fields": [
+		{
+			"name": "greeting",
+			"num": 1,
+			"primitive": true,
+			"type": "string"
+		}
+	]
+},
+		    	{
+	"id": "interop.UniqueId",
+	"fields": [
+		{
+			"name": "lo",
+			"num": 1,
+			"primitive": true,
+			"type": "fixed64"
+		},
+		{
+			"name": "hi",
+			"num": 2,
+			"primitive": true,
+			"type": "fixed64"
+		}
+	]
+}
+    ],
 	"services": [
 		{
 			"id": "interop.AppLauncherService",

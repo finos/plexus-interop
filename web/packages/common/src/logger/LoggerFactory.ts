@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { LoggerDelegate } from "./index";
 import * as log from "loglevel";
 import { Logger } from "./Logger";
 import { LoggerBase } from "./LoggerBase";
+import { TimeUtils } from "../util/time/TimeUtils";
 const logPrefixer: any = require("loglevel-plugin-prefix");
 
 export enum LogLevel {
@@ -29,9 +31,20 @@ export enum LogLevel {
 }
 
 export class LoggerFactory {
+  
+  private static additionalRecipients: LoggerDelegate[] = [];
+
+  public static registerDelegate(logger: LoggerDelegate): { unregister: () => void } {
+    let newRecipientsLen = LoggerFactory.additionalRecipients.push(logger);
+    let registeredRecipientIndex = newRecipientsLen - 1;
+
+    return {
+      unregister: () => LoggerFactory.additionalRecipients = LoggerFactory.additionalRecipients.splice(registeredRecipientIndex, 1)
+    };
+  }
 
   public static getLogger(name: string = "Anonymous"): Logger {
-    return new LoggerBase(name);
+    return new LoggerBase(name, this.additionalRecipients);
   }
 
   public static setLogLevel(level: LogLevel): void {
@@ -39,9 +52,7 @@ export class LoggerFactory {
     if (level <= LogLevel.DEBUG) {
       logPrefixer.apply(log, {
         template: "%t | [%l] ",
-        timestampFormatter: (date: Date) => {
-          return `${date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.${("000" + date.getMilliseconds()).slice(-3)}`;
-        }
+        timestampFormatter: (date: Date) => TimeUtils.format(date)
       });
     }
     log.setLevel(level as any);

@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 import { StreamingInvocationClient } from "./StreamingInvocationClient";
-import { ClientError, SuccessCompletion } from "@plexus-interop/protocol";
+import { ClientError, SuccessCompletion, ClientProtocolHelper } from "@plexus-interop/protocol";
 import { Invocation } from "../../generic/Invocation";
-import { ClientProtocolHelper } from "../../generic/ClientProtocolHelper";
 import { BaseInvocationClientImpl } from "../BaseInvocationClientImpl";
 import { Logger } from "@plexus-interop/common";
 
@@ -30,7 +29,7 @@ export class StreamingInvocationClientImpl extends BaseInvocationClientImpl impl
     public next(value: ArrayBuffer): Promise<void> {
         this.log.trace(`Sending new message of ${value.byteLength} bytes`);
         return this.invocation.sendMessage(value);
-    };
+    }
 
     public async complete(): Promise<void> {
         this.log.trace(`Complete operation requested`);

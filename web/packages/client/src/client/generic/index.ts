@@ -17,6 +17,6 @@
 export * from "./GenericClientFactory";
 export * from "./GenericClient";
 export * from "./Invocation";
-export * from "./InvocationMetaInfo";
+export { InvocationMetaInfo as InvocationMetaInfo } from "@plexus-interop/protocol";
 export * from "./GenericClientFactory";
 export * from "./GenericClient";

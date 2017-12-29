@@ -22,7 +22,7 @@ import { StreamingInvocationClient } from "../../src/client/api/streaming/Stream
 import { UnaryHandlerConverter } from "../../src/client/api/unary/UnaryHandlerConverter";
 import { ServerStreamingInvocationHandler } from "../../src/client/api/streaming/ServerStreamingInvocationHandler";
 import { ServerStreamingConverter } from "../../src/client/api/streaming/ServerStreamingHandlerConveter";
-import { ServiceInfo } from "../../src/client/api/dto/ServiceInfo";
+import { ServiceInfo } from "@plexus-interop/client-api";
 import { LogObserver } from "../LogObserver";
 
 import { when, mock, instance, anything, verify, capture } from "ts-mockito";
@@ -31,7 +31,7 @@ import { Observer } from "@plexus-interop/common";
 import { clientProtocol as plexus, SuccessCompletion } from "@plexus-interop/protocol"
 import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
 import { ChannelObserver } from "@plexus-interop/transport-common";
-import { MethodInvocationContext } from "../../src/client/api/MethodInvocationContext";
+import { MethodInvocationContext } from "@plexus-interop/client-api";
 
 declare var process: any;
 
