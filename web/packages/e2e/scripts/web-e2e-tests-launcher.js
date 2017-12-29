@@ -45,9 +45,19 @@ function main() {
     });
 
     setTimeout(() => {
-        runElectronTest(proxyHostUrl);
-    }, 1000);
 
+        const browser = argv.browser;        
+        switch (browser) {
+            case 'ie':
+                runIETest(proxyHostUrl);
+                break;
+            case 'electron':
+            default:
+                runElectronTest(proxyHostUrl);
+                break;
+        }
+
+    }, 1000);
 }
 
 function killHttpServerProcess() {
@@ -58,19 +68,28 @@ function killHttpServerProcess() {
     }
 }
 
+function runIETest(path) {
+    log("Starting Karma Tests in IE ...");
+    exec(`karma start --hostPath=${path}`, {
+        cwd: process.cwd()
+    }, testsFinishedHandler);
+}
+
+function testsFinishedHandler(error, stdout, stderr) {
+    log("Tests exection process completed, killing HTTP Server");
+    if (error || stderr) {
+        console.error('Std Error:', stderr);
+        console.error('Error: ', error);
+    }
+    log('StdOut', stdout);
+    killHttpServerProcess();
+}
+
 function runElectronTest(path) {
     log("Starting Web Broker Electron Tests ...");
     exec(`electron-mocha --require scripts/coverage ${argv.file} --hostPath ${path} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
         cwd: process.cwd()
-    }, (error, stdout, stderr) => {
-        log("Electron tests stopped, killing HTTP Server");
-        if (error || stderr) {
-            console.error('Std Error:', stderr);
-            console.error('Error: ', error);
-        }
-        log('StdOut', stdout);
-        killHttpServerProcess();
-    });
+    }, testsFinishedHandler);
 }
 
 main();

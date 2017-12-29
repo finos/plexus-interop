@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+const globalObj: any = global || window;
+
 export function readEncodedConfig(): any {
     const hashValue = window.location.hash.slice(1);
     return JSON.parse(decodeURIComponent(hashValue));
@@ -26,6 +29,12 @@ export function readWsUrl(): string {
 }
 
 export function readHostUrl(): string {
+    // tslint:disable-next-line:no-string-literal
+    if (globalObj["__karma__"]) {
+        console.log(globalObj["__karma__"].config);
+        // tslint:disable-next-line:no-string-literal        
+        return globalObj["__karma__"].config.hostUrl;
+    }
     const args: string[] = readEncodedConfig().rawArgs;
     const hostUrl = args.filter(v => v.indexOf("http://") !== -1)[0];
     return hostUrl;
