@@ -7,6 +7,8 @@ module.exports = function (config) {
     client: { 
         // pass dynamic param to test
         hostPath: config.hostPath,
+        runInParent: true,
+        useIframe: false
     },
 
     basePath: '',
@@ -18,7 +20,9 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'dist/main/tests/web/*.spec.js',
+      '../../node_modules/long/dist/long.js',
+      'scripts/karma-*.js',
+      'dist/main/tests/web/*Point.spec.js',
       'dist/main/src/polyfills.js'
     ],
 
@@ -31,6 +35,7 @@ module.exports = function (config) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       'dist/main/tests/web/*.spec.js': ['browserify'],
+      'scripts/karma-*.js': ['browserify'],
       'dist/main/src/polyfills.js': ['browserify']
     },
 
