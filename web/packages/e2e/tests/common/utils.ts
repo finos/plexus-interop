@@ -31,9 +31,8 @@ export function readWsUrl(): string {
 export function readHostUrl(): string {
     // tslint:disable-next-line:no-string-literal
     if (globalObj["__karma__"]) {
-        console.log(globalObj["__karma__"].config);
         // tslint:disable-next-line:no-string-literal        
-        return globalObj["__karma__"].config.hostUrl;
+        return globalObj["__karma__"].config.hostPath;
     }
     const args: string[] = readEncodedConfig().rawArgs;
     const hostUrl = args.filter(v => v.indexOf("http://") !== -1)[0];
