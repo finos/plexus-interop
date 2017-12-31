@@ -51,6 +51,9 @@ function main() {
             case 'ie':
                 runIETest(proxyHostUrl);
                 break;
+            case 'chrome':
+                runChromeTest(proxyHostUrl);
+                break;
             case 'electron':
             default:
                 runElectronTest(proxyHostUrl);
@@ -68,9 +71,16 @@ function killHttpServerProcess() {
     }
 }
 
+function runChromeTest(path) {
+    log("Starting Web Broker Chrome Tests ...");
+    exec(`karma start --hostPath=${path} --browsers=Chrome`, {
+        cwd: process.cwd()
+    }, testsFinishedHandler);
+}
+
 function runIETest(path) {
-    log("Starting Karma Tests in IE ...");
-    exec(`karma start --hostPath=${path}`, {
+    log("Starting Web Broker IE Tests ...");
+    exec(`karma start --hostPath=${path} --browsers=IE_no_addons`, {
         cwd: process.cwd()
     }, testsFinishedHandler);
 }
