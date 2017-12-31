@@ -22,14 +22,14 @@ module.exports = function (config) {
     files: [
       '../../node_modules/long/dist/long.js',
       'scripts/karma-*.js',
-      'dist/main/tests/web/*Point.spec.js',
+      'dist/main/tests/web/*.spec.js',
       'dist/main/src/polyfills.js'
     ],
 
     // list of files to exclude
     exclude: [
+      'dist/main/tests/web/*Streaming.spec.js'
     ],
-
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
@@ -46,7 +46,8 @@ module.exports = function (config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', "mocha"],
+    // reporters: ['progress', "mocha"],
+    reporters: ['progress', 'mocha'],
 
 
     // web server port
