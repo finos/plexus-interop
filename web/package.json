@@ -23,7 +23,7 @@
     "build-all-win": "run-s build-all benchmarks e2e-native e2e-web",
     "prebuild-all": "yarn install",
     "e2e-native": "cd ./packages/e2e && yarn e2e-native",
-    "e2e-web": "cd ./packages/e2e && yarn e2e-web",
+    "e2e-web": "cd ./packages/e2e && yarn e2e-web-electron && yarn e2e-web-ie",
     "poste2e-native": "yarn coverage",
     "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",

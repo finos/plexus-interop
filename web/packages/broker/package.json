@@ -25,7 +25,7 @@
   "dependencies": {
     "@plexus-interop/client-api": "0.1.2",
     "@plexus-interop/transport-common": "0.1.2",
-    "jstorage": "^0.4.8",
+    "ya-js-storage": "0.1.2",
     "long": "^3.2.0",
     "protobufjs": "^6.8.0",
     "reflect-metadata": "^0.1.10",

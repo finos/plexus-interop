@@ -16,7 +16,7 @@
  */
 import { EventBus } from "../EventBus";
 import { Event } from "../Event";
-import "jStorage";
+import "ya-js-storage";
 import { Subscription, Logger, LoggerFactory, AnonymousSubscription } from "@plexus-interop/common";
 
 const globalObj: any = global || window;
@@ -25,7 +25,7 @@ export class JStorageEventBus implements EventBus {
 
     private readonly log: Logger;
 
-    private jStorage: JStorageStatic = globalObj.$.jStorage;
+    private yaStorage: JStorageStatic = globalObj.$.yaJsStorage;
 
     public constructor(readonly namespace: string = "plexus-bus") {
         this.log = LoggerFactory.getLogger(`JStorageEventBus [${namespace}]`);
@@ -38,13 +38,13 @@ export class JStorageEventBus implements EventBus {
     public publish(key: string, event: Event): void {
         const topic = this.internalKey(key);
         this.log.trace(`Publishing event to ${topic}`);
-        this.jStorage.publish(topic, event.payload);
+        this.yaStorage.publish(topic, event.payload);
     }
 
     public subscribe(key: string, handler: (event: Event) => void): Subscription {
         const topic = this.internalKey(key);
         this.log.trace(`Subscribing to ${topic}`);        
-        this.jStorage.subscribe(this.internalKey(key), (channel: string, value: any) => {
+        this.yaStorage.subscribe(this.internalKey(key), (channel: string, value: any) => {
             this.log.trace(`Received update for ${topic}`);
             handler({ payload: value });
         });
