@@ -17,4 +17,5 @@
 export * from "./api";
 export * from "./bus";
 export * from "./metadata";
+export * from "./launcher";
 export * from "./io";
