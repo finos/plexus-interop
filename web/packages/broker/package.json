@@ -14,12 +14,11 @@
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "pretest": "yarn lint",
-    "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/broker@0.1.2",
+    "test": "yarn unit",    
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
-    "publish-package": "npm run build && npm publish",
-    "republish": "npm run unpublish && npm i && npm run publish-package",
+    "unpublish": "npm unpublish @plexus-interop/broker@0.1.2",
+    "republish": "npm run unpublish && npm publish",
     "postrepublish": "echo 'Package republished successfully!'"
   },
   "dependencies": {

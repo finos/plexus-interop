@@ -37,8 +37,8 @@ const runSequentually = (modules, command) => {
         process.exit();
     }
     const module = modules[0];
-    console.log(`Running "npm run ${command}" for ${module}`);    
-    const fullCommand = `cd ./${module} && npm run ${command}`;
+    console.log(`Running "${command}" for ${module}`);    
+    const fullCommand = `cd ./${module} && ${command}`;
     exec(fullCommand, {
             cwd: process.cwd(),
             maxBuffer: 1024 * 1024
@@ -57,7 +57,7 @@ const runSequentually = (modules, command) => {
         });
 };
 
-const modules =  getDirectories("packages");
+const modules = getDirectories("packages");
 
 console.log(`Running "${command}" command for modules: `);
 modules.forEach(m => console.log(" - " + m));
