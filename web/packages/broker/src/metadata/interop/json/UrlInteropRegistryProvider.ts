@@ -53,9 +53,9 @@ export class UrlInteropRegistryProvider implements InteropRegistryProvider {
         this.log.debug(`Starting to load metadata from [${this.url}] with ${this.interval} interval`);
         const response = await this.urlDataLoader.fetchData(this.url);
         if (this.interval > 0) {
-            this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response);
-        } else {
             this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response, this.urlDataLoader.fetchWithInterval(this.url, this.interval));
+        } else {
+            this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response);
         }
         this.started = true;
     }
