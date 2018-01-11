@@ -43,7 +43,7 @@ import { Action, Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 import { Router } from '@angular/router';
 import { DiscoveryMode } from "@plexus-interop/client-api";
-import { UrlParamsProvider } from "../core/UrlParamsProvider";
+import { UrlParamsProvider } from "@plexus-interop/common";
 import { TransportType } from "../core/TransportType";
 
 @Injectable()
