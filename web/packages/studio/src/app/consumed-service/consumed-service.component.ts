@@ -86,9 +86,10 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   handleResponse(responseJson: string) {
     this.responseCounter++;
-    this.responseContent = responseJson;
     this.responseTime = new Date().getTime() - this.invocationStarted;
-    this.log.info(`Response received: ${this.format(responseJson)}`);
+    this.responseContent += `
+    Message number ${this.responseCounter}, received after ${this.responseTime}ms:
+    ${responseJson}`;
   }
 
   handleError(e: any) {
@@ -101,6 +102,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   resetInvocationInfo() {
     this.responseCounter = 0;
+    this.responseContent = "";
     this.responseTime = 0;
     this.invocationStarted = new Date().getTime();
   }
@@ -139,6 +141,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
           this.handleError(error);
         }
     }
+    
   }
 
   isClientStreaming() {
@@ -183,14 +186,4 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     this.messageContent = this.format(this.messageContent);
   }
 
-  toInvocationRequest(discoveredMethod: DiscoveredMethod): InvocationRequestInfo {
-    const connectionId = discoveredMethod.providedMethod.providedService.connectionId ?
-      UniqueId.fromProperties(discoveredMethod.providedMethod.providedService.connectionId) : null;
-    return {
-      methodId: discoveredMethod.providedMethod.methodId,
-      serviceId: discoveredMethod.providedMethod.providedService.serviceId,
-      applicationId: discoveredMethod.providedMethod.providedService.applicationId,
-      connectionId
-    };
-  }
 }

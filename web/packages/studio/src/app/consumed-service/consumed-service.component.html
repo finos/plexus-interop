@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col">
         <div>
-          <label for="exampleFormControlTextarea1">Enter request JSON:</label>
+          <label for="exampleFormControlTextarea1">Enter Request JSON:</label>
           <textarea id="message-content-area" class="form-control" rows="8" [(ngModel)]="messageContent"></textarea>
           <button id="format-content-btn" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
           <button id="default-msg-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
@@ -11,7 +11,7 @@
       </div>
       <div class="col">
         <div>
-          <label for="exampleFormControlTextarea1">Response:</label>
+          <label for="exampleFormControlTextarea1">Response JSON:</label>
           <textarea readonly id="message-content-area" class="form-control" rows="8" [(ngModel)]="responseContent"></textarea>
         </div>
         <div class="container">

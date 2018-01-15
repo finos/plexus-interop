@@ -21,6 +21,7 @@ import { TransportConnection } from "@plexus-interop/transport-common";
 import { InteropServiceFactory } from "./InteropServiceFactory";
 import { UrlResolver } from "./UrlResolver";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
+import { UrlParamsProvider } from "@plexus-interop/common";
 
 @Injectable()
 export class TransportConnectionFactory {
@@ -31,7 +32,7 @@ export class TransportConnectionFactory {
     public createCrossDomainWebTransportProvider(baseUrl: string): TransportConnectionProvider {
         return this.createWebTransportProvider(baseUrl, async () => {
             const eventBus = await new CrossDomainEventBusProvider(
-                async () => this.urlResolver.getProxyHostUrl(baseUrl))
+                async () => UrlParamsProvider.getParam("hostProxyUrl") || this.urlResolver.getProxyHostUrl(baseUrl))
                 .connect() as CrossDomainEventBus;
             return eventBus;
         });

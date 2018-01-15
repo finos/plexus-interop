@@ -31,7 +31,7 @@ export class InteropRegistryService {
 
     private readonly log: Logger = LoggerFactory.getLogger("RegistryService");
 
-    private appProvidedMethodsCache: ExtendedMap<string, ProvidedMethod[]> = new ExtendedMap<string, ProvidedMethod[]>();
+    private appProvidedMethodsCache: ExtendedMap<string, ProvidedMethod[]> = ExtendedMap.create<string, ProvidedMethod[]>();
 
     private registry: InteropRegistry;
 

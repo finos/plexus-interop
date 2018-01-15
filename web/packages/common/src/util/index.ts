@@ -23,3 +23,4 @@ export * from "./state";
 export * from "./types";
 export * from "./dom/DomUtils";
 export * from "./time/TimeUtils";
+export * from "./url/UrlParamsProvider";

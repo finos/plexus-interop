@@ -23,7 +23,7 @@ import { DynamicMarshallerFactory } from "../../src/io/DynamicMarshallerFactory"
 
 describe("DynamicMarshallerFactory", () => {
 
-    const messages = new ExtendedMap<string, Message>();
+    const messages = ExtendedMap.create<string, Message>();
     const messageId = "interop.testing.EchoRequest";
 
     messages.set(messageId, {
@@ -56,8 +56,8 @@ describe("DynamicMarshallerFactory", () => {
 
     const registry: InteropRegistry = {
         messages,
-        applications: new ExtendedMap<string, Application>(),
-        services: new ExtendedMap<string, Service>()
+        applications: ExtendedMap.create<string, Application>(),
+        services: ExtendedMap.create<string, Service>()
     };
 
     const sut = new DynamicMarshallerFactory(registry);
