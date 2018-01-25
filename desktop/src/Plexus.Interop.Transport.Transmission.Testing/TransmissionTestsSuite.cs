@@ -63,32 +63,39 @@ namespace Plexus.Interop.Transport.Transmission
         }
 
         [Fact]
+        public void ConcurrentConnect()
+        {
+            RunWith30SecTimeout(async () =>
+            {
+                WriteLog("Starting server");
+                using (var server = CreateServer())
+                {
+                    await server.StartAsync();
+                    WriteLog("Connecting clients");
+                    const int concurrentClientsCount = 15;
+                    var client = CreateClient();
+                    var connectTasks = Enumerable
+                        .Range(0, concurrentClientsCount)
+                        .Select(_ => TaskRunner.RunInBackground(async () => await client.ConnectAsync()));
+                    WriteLog("Accepting clients");
+                    server.In.ConsumeAsync(c => { }).IgnoreAwait();
+                    var connections = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout10Sec);
+                    WriteLog("Clients connected");                    
+                }
+            });
+        }
+
+        [Fact]
         public void CancelConnect()
         {
             RunWith10SecTimeout(async () =>
             {
-                using (var server = CreateServer())
-                {
-                    await server.StartAsync();
-                    WriteLog("Server connected");
-                    var client = CreateClient();
-                    var cancellation = new CancellationTokenSource();
-                    var connectionTask1 = client.ConnectAsync(cancellation.Token).AsTask();
-                    var connectionTask2 = client.ConnectAsync(cancellation.Token).AsTask();
-                    var connectionTask3 = client.ConnectAsync(cancellation.Token).AsTask();
-                    var connections = new[] { connectionTask1, connectionTask2, connectionTask3 };
-                    var first = await Task.WhenAny(connections);
-                    await first;
-                    WriteLog("First connected");
-                    var second = await Task.WhenAny(connections.Except(new [] { first }));
-                    await second;
-                    WriteLog("Second connected");
-                    cancellation.Cancel();
-                    var third = connections.Except(new[] {first, second}).Single();
-                    Should.Throw<TaskCanceledException>(third, Timeout1Sec);
-                    WriteLog("Third canceled");
-                    WriteLog("Disposing server");
-                }
+                var client = CreateClient();
+                var cancellation = new CancellationTokenSource();
+                var connectionTask = client.ConnectAsync(cancellation.Token).AsTask();
+                await Task.Delay(100, CancellationToken.None).ConfigureAwait(false);
+                cancellation.Cancel();
+                Should.Throw<TaskCanceledException>(connectionTask, Timeout1Sec);
             });
         }
 
