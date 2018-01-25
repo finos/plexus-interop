@@ -31,10 +31,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 
     public sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer, IWebSocketHandler
     {        
+        private const int AcceptedConnectionsBufferSize = 20;
         private const string ServerName = "ws-v1";
 
         private IWebHost _host;
-        private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(1);
+        private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
         private readonly IServerStateWriter _stateWriter;
 
         public WebSocketTransmissionServer(string workingDir)

@@ -86,16 +86,16 @@ namespace Plexus.Interop
         [Fact]
         public void ConcurrentClientConnectDisconnect()
         {
-            RunWith1MinTimeout(async () =>
+            RunWith30SecTimeout(async () =>
             {
                 using (await StartTestBrokerAsync())
                 {
-                    const int concurrentClientCount = 10;
+                    const int concurrentClientCount = 15;
                     var connectTasks = Enumerable.Range(0, concurrentClientCount)
                         .Select(_ => TaskRunner.RunInBackground(() => ConnectEchoClient()));
-                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout30Sec);
+                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout10Sec);
                     var disconnectTasks = clients.Select(c => TaskRunner.RunInBackground(c.DisconnectAsync));
-                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout30Sec);
+                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout10Sec);
                 }
             });
         }
