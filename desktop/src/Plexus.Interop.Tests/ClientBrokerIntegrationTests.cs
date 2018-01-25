@@ -84,6 +84,23 @@ namespace Plexus.Interop
         }
 
         [Fact]
+        public void ConcurrentClientConnectDisconnect()
+        {
+            RunWith1MinTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    const int concurrentClientCount = 10;
+                    var connectTasks = Enumerable.Range(0, concurrentClientCount)
+                        .Select(_ => TaskRunner.RunInBackground(() => ConnectEchoClient()));
+                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout30Sec);
+                    var disconnectTasks = clients.Select(c => TaskRunner.RunInBackground(c.DisconnectAsync));
+                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout30Sec);
+                }
+            });
+        }
+
+        [Fact]
         public void ExceptionWhenConnectingWithUnexistingAppId()
         {
             RunWith10SecTimeout(async () =>
