@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 import { TransportChannel } from "./TransportChannel";
-import { UniqueId } from "./UniqueId";
-import { CancellationToken } from "@plexus-interop/common";
+import { UniqueId } from "@plexus-interop/protocol";
+import { Observer, Subscription } from "@plexus-interop/common";
 import { clientProtocol } from "@plexus-interop/protocol"; 
 
 export interface TransportConnection {
@@ -25,11 +25,6 @@ export interface TransportConnection {
      * Creates new logical Transport Channel
      */
     createChannel(): Promise<TransportChannel>;
-
-    /**
-     * Waits for incoming Transport Channel
-     */
-    waitForChannel(cancellationToken?: CancellationToken): Promise<TransportChannel>;
 
     /**
      * Closes connection, no more communication available through this connection
@@ -42,14 +37,29 @@ export interface TransportConnection {
     getManagedChannels(): TransportChannel[];
 
     /**
+     * Gets Channel by or id, returns undefined if not found
+     */
+    getManagedChannel(id: string): TransportChannel | undefined;
+
+    /**
      * Unique connection identifier
      */
     uuid(): UniqueId;
 
     /**
+     * Checks whether connection is active
+     */
+    isConnected(): boolean;
+
+    /**
+     * Subscribe for incoming channels
+     */
+    subscribeToChannels(channelObserver: Observer<TransportChannel>): Subscription;
+
+    /**
      * Opens current connection, starting to receive incoming channels
      */
-    open(): Promise<void>;
+    connect(channelObserver?: Observer<TransportChannel>): Promise<void>;
 
 }
 

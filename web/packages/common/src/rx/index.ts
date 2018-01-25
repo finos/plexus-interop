@@ -15,4 +15,7 @@
  * limitations under the License.
  */
 export * from "./ConversionObserver";
+export * from "./BufferedObserver";
 export * from "./Observer";
+export * from "./Subscription";
+export * from "./AnonymousSubscription";

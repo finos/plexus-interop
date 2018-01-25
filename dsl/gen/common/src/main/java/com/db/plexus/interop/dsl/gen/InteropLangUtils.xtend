@@ -30,6 +30,11 @@ import com.db.plexus.interop.dsl.ProvidedMethod
 import java.util.LinkedList
 import com.db.plexus.interop.dsl.protobuf.Option
 import org.eclipse.emf.ecore.EObject
+import com.db.plexus.interop.dsl.protobuf.Message
+import com.db.plexus.interop.dsl.protobuf.Field
+import com.db.plexus.interop.dsl.protobuf.PrimitiveFieldType
+import com.db.plexus.interop.dsl.protobuf.ComplexFieldType
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 
 public class InteropLangUtils {
 
@@ -37,6 +42,57 @@ public class InteropLangUtils {
         return Arrays.stream(resources)
         .flatMap([resource | getServices(resource).stream()])
         .collect(Collectors.toList());
+    }
+
+    def static List<Message> getMessages(Resource... resources) {
+        return Arrays.stream(resources)
+        .flatMap([resource | getMessages(resource).stream()])
+        .collect(Collectors.toList());
+    }
+
+    def static String getType(Field field, IQualifiedNameProvider qualifiedNameProvider) {
+        val typeRef = field.getTypeReference();
+        switch typeRef {
+            PrimitiveFieldType: typeRef.getValue().literal.toLowerCase()
+            ComplexFieldType: getType(typeRef, qualifiedNameProvider)
+            default: "Unsupported"
+        }
+    }
+
+    def static boolean isPrimitive(Field field) {
+        val typeRef = field.getTypeReference();
+        switch typeRef {
+            PrimitiveFieldType: true
+            default: false
+        }
+    }
+
+    def static getFullName(EObject obj, IQualifiedNameProvider qualifiedNameProvider) {
+        return qualifiedNameProvider.getFullyQualifiedName(obj).skipFirst(1).toString()
+    }
+
+    def static String getType(ComplexFieldType complexFieldType, IQualifiedNameProvider nameProvider) {
+        val complexType = complexFieldType.getValue()
+        switch complexType {
+            Message: getFullName(complexType, nameProvider)
+            Enum: getFullName(complexType, nameProvider)
+            default: "Unsupported"
+        }
+    }
+
+    def static List<Field> getFields(Message message) {
+        return message.getBody()
+        .getElements()
+        .stream()
+        .filter([el | el instanceof Field])
+        .map([el | el as Field])
+        .collect(Collectors.toList());
+    }
+
+    def static List<Message> getMessages(Resource resource) {
+        return resource.allContents
+        .filter(typeof(Message))
+        .toList();
     }
 
     def static List<Service> getServices(Resource resource) {
@@ -51,10 +107,10 @@ public class InteropLangUtils {
 
     def static Service getService(Method method) {
         var obj = method as EObject
-        while (obj !== null) {
+        while(obj !== null) {
             val parent = obj.eContainer
             val service = tryGetService(parent)
-            if (service !== null) {
+            if(service !== null) {
                 return service
             }
             obj = obj.eContainer;

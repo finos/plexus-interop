@@ -27,7 +27,6 @@ class BaseCodeOutputGeneratorTest {
 
     @Inject IResourceServiceProvider.Registry rspr
     @Inject IQualifiedNameConverter converter
-    @Inject IContainer.Manager manager
 
     def void printExportedObjects(Resource resource) {
         val resServiceProvider = rspr.getResourceServiceProvider(resource.URI)

@@ -1,0 +1,130 @@
+{
+  "messages": [
+    {
+      "id": "interop.testing.EchoRequest",
+      "fields": [
+        {
+          "name": "stringField",
+          "num": 1,
+          "primitive": true,
+          "type": "string"
+        },
+        {
+          "name": "boolField",
+          "num": 2,
+          "primitive": true,
+          "type": "bool"
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "interop.testing.EchoService",
+      "methods": [
+        {
+          "name": "Unary",
+          "input": "interop.testing.EchoRequest",
+          "output": "interop.testing.EchoRequest",
+          "type": "Unary"
+        },
+        {
+          "name": "ServerStreaming",
+          "input": "interop.testing.EchoRequest",
+          "output": "interop.testing.EchoRequest",
+          "type": "ServerStreaming"
+        },
+        {
+          "name": "ClientStreaming",
+          "input": "interop.testing.EchoRequest",
+          "output": "interop.testing.EchoRequest",
+          "type": "ClientStreaming"
+        },
+        {
+          "name": "DuplexStreaming",
+          "input": "interop.testing.EchoRequest",
+          "output": "interop.testing.EchoRequest",
+          "type": "DuplexStreaming"
+        }
+      ]
+    },
+    {
+      "id": "interop.AppLauncherService",
+      "methods": [
+        {
+          "name": "Launch",
+          "input": "interop.AppLaunchRequest",
+          "output": "interop.AppLaunchResponse",
+          "type": "Unary"
+        }
+      ]
+    }
+  ],
+  "applications": [
+    {
+      "id": "interop.testing.EchoServer",
+      "launcherId": "interop.NativeAppLauncher",
+      "provides": [
+        {
+          "service": "interop.testing.EchoService",
+          "title": "Sample Echo Service",
+          "to": [ "interop.testing.*" ],
+          "methods": [
+            {
+              "name": "Unary",
+              "title": "Sample Unary Method"
+            },
+            {
+              "name": "ServerStreaming",
+              "title": "Sample Server Streaming Method"
+            },
+            {
+              "name": "ClientStreaming",
+              "title": "Sample Client Streaming Method"
+            },
+            {
+              "name": "DuplexStreaming",
+              "title": "Sample Duplex Streaming Method"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "interop.testing.EchoClient",
+      "launcherId": "interop.NativeAppLauncher",
+      "consumes": [
+        {
+          "service": "interop.testing.EchoService",
+          "from": [ "interop.testing.*" ],
+          "methods": [ "Unary", "ServerStreaming", "ClientStreaming", "DuplexStreaming" ]
+        }
+      ]
+    },
+    {
+      "id": "interop.AppLifecycleManager",
+      "consumes": [
+        {
+          "service": "interop.AppLauncherService",
+          "from": [ "*" ],
+          "methods": [ "Launch" ]
+        }
+      ]
+    },
+    {
+      "id": "interop.NativeAppLauncher",
+      "provides": [
+        {
+          "service": "interop.AppLauncherService",
+          "to": [ "interop.AppLifecycleManager" ],
+          "methods": [
+            {
+              "name": "Launch",
+              "title": "Launch app using native OS capabilities"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

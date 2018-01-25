@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId } from "../UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { Frame } from "./model";
 import { FramedTransport } from "./FramedTransport";
 import { Logger, CancellationToken } from "@plexus-interop/common";

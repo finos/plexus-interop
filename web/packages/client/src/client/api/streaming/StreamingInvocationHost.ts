@@ -19,7 +19,7 @@ import { Invocation } from "../../../client/generic/Invocation";
 import { StreamingInvocationClientImpl } from "./StreamingInvocationClientImpl";
 import { Logger, Observer, LoggerFactory, CancellationToken } from "@plexus-interop/common";
 import { ClientDtoUtils } from "../../ClientDtoUtils";
-import { MethodInvocationContext } from "../MethodInvocationContext";
+import { MethodInvocationContext } from "@plexus-interop/client-api";
 import { UniqueId } from "@plexus-interop/transport-common";
 
 export class StreamingInvocationHost<Req, Res> {

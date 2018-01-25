@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 import { Observer } from "@plexus-interop/common";
-import { ServiceDiscoveryRequest } from "../../../client/api/dto/ServiceDiscoveryRequest";
-import { ServiceDiscoveryResponse } from "../../../client/api/dto/ServiceDiscoveryResponse";
+import { ServiceDiscoveryRequest } from "@plexus-interop/client-api";
+import { ServiceDiscoveryResponse } from "@plexus-interop/client-api";
 import { StreamingInvocationClient } from "./../streaming/StreamingInvocationClient";
 import { InvocationClient } from "./../InvocationClient";
 import { ValueHandler } from "./../ValueHandler";
-import { InvocationRequestInfo } from "../../generic/InvocationMetaInfo";
-import { Completion } from "../dto/Completion";
-import { MethodDiscoveryRequest } from "../dto/MethodDiscoveryRequest";
-import { MethodDiscoveryResponse } from "../dto/MethodDiscoveryResponse";
-import { ProvidedMethodReference } from "../dto/ProvidedMethodReference";
+import { InvocationRequestInfo } from "@plexus-interop/protocol";
+import { Completion } from "@plexus-interop/client-api";
+import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
+import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
+import { ProvidedMethodReference } from "@plexus-interop/client-api";
 
 export interface GenericClientApi {
 

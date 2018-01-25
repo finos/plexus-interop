@@ -20,7 +20,7 @@ import { BidiStreamingInvocationHandler } from "./BidiStreamingInvocationHandler
 import { StreamingInvocationClient } from "./StreamingInvocationClient";
 import { ClientDtoUtils } from "../../ClientDtoUtils";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { MethodInvocationContext } from "../MethodInvocationContext";
+import { MethodInvocationContext } from "@plexus-interop/client-api";
 
 export class ServerStreamingConverter implements InvocationHandlerConverter<ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>> {
 

@@ -38,6 +38,23 @@ class MetaJsonGenerator implements CodeOutputGenerator {
         println("Generating interop meta JSON")
         '''
 		{
+		    "messages": [
+		    	«FOR message : resources.messages SEPARATOR ','»
+		    	{
+					"id": "«message.fullName»",
+					"fields": [
+						«FOR field: message.fields SEPARATOR ','»
+						{
+							"name": "«field.name»",
+							"num": «field.number»,
+							"primitive": «field.isPrimitive»,
+							"type": "«getType(field, qualifiedNameProvider)»"
+						}
+        				«ENDFOR»
+					]
+				}
+		    	«ENDFOR»
+		    ],
 			"services": [
 				«FOR service : resources.services SEPARATOR ','»
 				{

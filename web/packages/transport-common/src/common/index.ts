@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 export * from "./Channel";
-export * from "./ChannelsHolder";
-export * from "./BufferedChannelsHolder";
 export * from "./Defaults";
 export * from "./ChannelObserver";
 export * from "./DelegateChannelObserver";

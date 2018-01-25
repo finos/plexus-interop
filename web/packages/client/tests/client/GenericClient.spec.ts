@@ -18,17 +18,15 @@ import { GenericClientFactory } from "../../src/client/generic/GenericClientFact
 import { FramedTransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { when, mock, instance } from "ts-mockito";
 import { CancellationToken } from "@plexus-interop/common";
-import { ClientProtocolHelper as modelHelper } from "../../src/client/generic/ClientProtocolHelper";
+import { ClientProtocolHelper as modelHelper } from "@plexus-interop/protocol";
 import { BufferedChannel } from "./client-mocks";
 
 describe("GenericClient", () => {
 
     it("Can be created if connect request/response handshake received", async () => {
-
         const mockedConnection = mock(FramedTransportConnection);
         const cancellationToken = new CancellationToken();
         const mockChannel = new BufferedChannel(cancellationToken);
-
         const id = UniqueId.generateNew();
         when(mockedConnection.createChannel()).thenReturn(Promise.resolve(mockChannel));
         when(mockedConnection.uuid()).thenReturn(id);
@@ -44,16 +42,14 @@ describe("GenericClient", () => {
         mockChannel.addToInbox(modelHelper.connectResponsePayload({
             connectionId: UniqueId.generateNew()
         }));
-
         await clientPromise;
         cancellationToken.cancel("All done");
-
     });
 
     it("Can execute discovery operation", async () => {
         const cancellationToken = new CancellationToken();
 
-        const mockedConnection = mock(FramedTransportConnection);        
+        const mockedConnection = mock(FramedTransportConnection);
         let mockChannel = new BufferedChannel(cancellationToken);
         const id = UniqueId.generateNew();
         when(mockedConnection.createChannel()).thenReturn(Promise.resolve(mockChannel));
@@ -85,7 +81,7 @@ describe("GenericClient", () => {
         if (discoveryRequest.consumedService) {
             expect(discoveryRequest.consumedService.serviceId).toEqual("serviceId");
         } else {
-            fail("Consumed service is null")
+            fail("Consumed service is null");
         }
 
         mockChannel.addToInbox(modelHelper.discoveryResponsePayload(
@@ -94,7 +90,7 @@ describe("GenericClient", () => {
                     {
                         consumedService: {
                             serviceId: "serviceId"
-                        }, 
+                        },
                         providedService: {
                             serviceId: "serviceId"
                         }

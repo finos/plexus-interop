@@ -20,29 +20,15 @@ import { BufferedObserver } from "../../BufferedObserver";
 import { TestBufferedInMemoryFramedTransport } from "../TestBufferedInMemoryFramedTransport";
 import { AnonymousSubscription } from "rxjs/Subscription";
 import { DelegateChannelObserver } from "../../../src/common/DelegateChannelObserver";
-import { UniqueId } from "../../../src/transport/UniqueId";
+import { UniqueId } from "@plexus-interop/protocol";
 import { ChannelOpenFrame } from "../../../src/transport/frame/model/ChannelOpenFrame";
+import { TransportChannel } from "../../../src/transport/TransportChannel";
+import { AsyncHelper } from "@plexus-interop/common";
 
 describe("FramedTransportConnection", () => {
 
-    it("Doesn't add created channel to incoming channels queue", (done) => {
-        let mockFrameTransport = new TestBufferedInMemoryFramedTransport();
-        const transportConnection = new FramedTransportConnection(mockFrameTransport);
-        transportConnection
-            .open()
-            .then(() => {
-                (async () => {
-                    const channel = await transportConnection.createChannel();
-                    expect(channel).toBeDefined();
-                    expect(transportConnection.getIncomingChannelsSize()).toBe(0);
-                    await transportConnection.closeAndCleanUp();
-                    done();
-                })();
-            });
-    });
+    it("Delivers messages to different channels", async () => {
 
-    it("Delivers messages to different channels", (done) => {
-        
         let mockFrameTransport = new TestBufferedInMemoryFramedTransport();
 
         const firstChannelId = UniqueId.generateNew();
@@ -51,6 +37,7 @@ describe("FramedTransportConnection", () => {
         mockFrameTransport.next(ChannelOpenFrame.fromHeaderData({
             channelId: firstChannelId
         }));
+        
         mockFrameTransport.next(ChannelOpenFrame.fromHeaderData({
             channelId: secondChannelId
         }));
@@ -60,38 +47,40 @@ describe("FramedTransportConnection", () => {
         });
 
         const transportConnection = new FramedTransportConnection(mockFrameTransport);
+        const channels: TransportChannel[] = [];
         
-        transportConnection
-            .open()
-            .then(() => {
-                (async () => {
-                    // channels created
-                    const first = await transportConnection.waitForChannel();
-                    expect(first).toBeDefined();
-                    const second = await transportConnection.waitForChannel();
-                    expect(second).toBeDefined();
+        await transportConnection.connect({
+            next: ch => channels.push(ch),
+            complete: () => { },
+            error: e => { }
+        });
 
-                    // messages delivered
-                    const firstObserver = new BufferedObserver<ArrayBuffer>();
-                    const firstSubscription = 
-                        await new Promise<AnonymousSubscription>(
-                            (resolve, reject) => first.open(new DelegateChannelObserver(firstObserver, (s) => resolve(s))));
+        await AsyncHelper.waitFor(() => channels.length === 2);
 
-                    const secondObserver = new BufferedObserver<ArrayBuffer>();
-                    const secondSubscription = 
-                        await new Promise<AnonymousSubscription>(
-                            (resolve, reject) => second.open(new DelegateChannelObserver(secondObserver, (s) => resolve(s))));
-                    
-                    const message = await firstObserver.pullData();
-                    expect(message).toBeDefined();
-                    const secondMessage = await secondObserver.pullData();
-                    expect(secondMessage).toBeDefined();
-                    firstSubscription.unsubscribe();
-                    secondSubscription.unsubscribe();
-                    await transportConnection.closeAndCleanUp();
-                    done();
-                })();
-            });
+        // channels created
+        const first = channels[0];
+        expect(first).toBeDefined();
+        const second = channels[1];
+        expect(second).toBeDefined();
+
+        // messages delivered
+        const firstObserver = new BufferedObserver<ArrayBuffer>();
+        const firstSubscription =
+            await new Promise<AnonymousSubscription>(
+                (resolve, reject) => first.open(new DelegateChannelObserver(firstObserver, (s) => resolve(s))));
+
+        const secondObserver = new BufferedObserver<ArrayBuffer>();
+        const secondSubscription =
+            await new Promise<AnonymousSubscription>(
+                (resolve, reject) => second.open(new DelegateChannelObserver(secondObserver, (s) => resolve(s))));
+
+        const message = await firstObserver.pullData();
+        expect(message).toBeDefined();
+        const secondMessage = await secondObserver.pullData();
+        expect(secondMessage).toBeDefined();
+        firstSubscription.unsubscribe();
+        secondSubscription.unsubscribe();
+        await transportConnection.closeAndCleanUp();
 
     });
 
