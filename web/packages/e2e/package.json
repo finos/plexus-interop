@@ -30,7 +30,7 @@
     "preweb-broker-benchmarks": "node scripts/browserify-all.js --inputGlob dist/main/tests/web/benchmarks/*spec.js --outputFile dist/main/tests/web/benchmarks/RendererProcessBenchmarks.bundle.js",
     "native-broker-benchmarks": "node scripts/native-e2e-tests-launcher.js --file ./dist/main/tests/native/benchmarks/RendererProcessBenchmarks.bundle.js",
     "prenative-broker-benchmarks": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/benchmarks/*spec.js --outputFile dist/main/tests/native/benchmarks/RendererProcessBenchmarks.bundle.js",
-    "e2e-native": "npm run prepare-native-e2e-tests && node scripts/native-e2e-tests-launcher.js --file ./dist/main/tests/native/RendererProcess.bundle.js",
+    "e2e-native": "node scripts/native-e2e-tests-launcher.js --file ./dist/main/tests/native/RendererProcess.bundle.js",
     "pree2e-native": "node scripts/browserify-all.js --clientCoverage true --inputGlob dist/main/tests/native/*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
     "e2e-native-debug": "npm run build && npm run prepare-native-e2e-debug-tests && node scripts/native-e2e-tests-launcher.js --printBrokerStdout true --debug true --file ./dist/main/tests/native/RendererProcess.bundle.js"
   },
