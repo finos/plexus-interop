@@ -46,8 +46,14 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   private selectedDiscoveredMethod: DiscoveredMethod;
 
   messageContent: string;
+  responseContent: string;
+
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
+  responseCounter: number = 0;
+
+  invocationStarted: number = 0;
+  responseTime: number = 0;
 
   constructor(
     private actions: AppActions,
@@ -79,7 +85,11 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   handleResponse(responseJson: string) {
-    this.log.info(`Response received: ${this.format(responseJson)}`);
+    this.responseCounter++;
+    this.responseTime = new Date().getTime() - this.invocationStarted;
+    this.responseContent += `
+    Message number ${this.responseCounter}, received after ${this.responseTime}ms:
+    ${responseJson}`;
   }
 
   handleError(e: any) {
@@ -88,6 +98,13 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   handleCompleted() {
     this.log.info("Invocation completed received");
+  }
+
+  resetInvocationInfo() {
+    this.responseCounter = 0;
+    this.responseContent = "";
+    this.responseTime = 0;
+    this.invocationStarted = new Date().getTime();
   }
 
   async sendRequest() {
@@ -104,6 +121,8 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     }
 
     const method = this.selectedDiscoveredMethod || this.consumedMethod;
+
+    this.resetInvocationInfo();
 
     switch (this.consumedMethod.method.type) {
       case MethodType.Unary:
@@ -122,10 +141,15 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
           this.handleError(error);
         }
     }
+    
   }
 
   isClientStreaming() {
     return this.consumedMethod.method.type === MethodType.ClientStreaming || this.consumedMethod.method.type === MethodType.DuplexStreaming;
+  }
+
+  isServerStreaming() {
+    return this.consumedMethod.method.type === MethodType.ServerStreaming || this.consumedMethod.method.type === MethodType.DuplexStreaming;
   }
 
   sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>) {
@@ -162,14 +186,4 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     this.messageContent = this.format(this.messageContent);
   }
 
-  toInvocationRequest(discoveredMethod: DiscoveredMethod): InvocationRequestInfo {
-    const connectionId = discoveredMethod.providedMethod.providedService.connectionId ?
-      UniqueId.fromProperties(discoveredMethod.providedMethod.providedService.connectionId) : null;
-    return {
-      methodId: discoveredMethod.providedMethod.methodId,
-      serviceId: discoveredMethod.providedMethod.providedService.serviceId,
-      applicationId: discoveredMethod.providedMethod.providedService.applicationId,
-      connectionId
-    };
-  }
 }

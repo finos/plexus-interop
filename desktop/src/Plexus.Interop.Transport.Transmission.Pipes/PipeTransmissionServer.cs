@@ -27,13 +27,14 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
 
     public sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
     {
+        private const int AcceptedConnectionsBufferSize = 20;
         private const string ServerName = "np-v1";
 
         private readonly ILogger _log;
         private readonly IServerStateWriter _settingsWriter;
         private readonly string _pipeName = "plexus-interop-broker-" + Guid.NewGuid();
         private readonly BufferedChannel<ITransmissionConnection> _buffer 
-            = new BufferedChannel<ITransmissionConnection>(1);
+            = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
 
         public PipeTransmissionServer(string brokerWorkingDir)
         {

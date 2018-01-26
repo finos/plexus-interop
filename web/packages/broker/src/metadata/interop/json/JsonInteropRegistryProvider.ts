@@ -109,7 +109,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
     }
 
     private convertConsumedService(serviceDto: ConsumedServiceDto, application: Application, service: Service): ConsumedService {
-        const methods = new ExtendedMap<string, ConsumedMethod>();
+        const methods = ExtendedMap.create<string, ConsumedMethod>();
         const consumedService: ConsumedService = {
             service,
             application,
@@ -131,7 +131,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
     private convertProvidedService(serviceDto: ProvidedServiceDto, application: Application, service: Service): ProvidedService {
 
-        const methods = new ExtendedMap<string, ProvidedMethod>();
+        const methods = ExtendedMap.create<string, ProvidedMethod>();
 
         const providedService: ProvidedService = {
             service,
@@ -157,7 +157,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
     private convertService(messagesMap: Map<string, Message>, serviceDto: ServiceDto): Service {
         const service: Service = {
             id: serviceDto.id,
-            methods: new ExtendedMap<string, Method>()
+            methods: ExtendedMap.create<string, Method>()
         };
         service.methods = toMap(
             serviceDto.methods.map(methodDto => {

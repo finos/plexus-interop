@@ -20,7 +20,7 @@ import { TypedAction } from './TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from "./AppActions";
 import { Action } from '@ngrx/store';
-import { UrlParamsProvider } from "../core/UrlParamsProvider";
+import { UrlParamsProvider } from "@plexus-interop/common";
 import {
     AppConnectedActionParams,
     ConsumedMethodState,

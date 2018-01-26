@@ -14,7 +14,7 @@
     "postunpublish": "echo 'Unpublished'",
     "prerepublish": "echo 'Republishing started...'",
     "publish-package": "npm run build && npm publish",
-    "republish": "npm run unpublish && npm i && npm run publish-package",
+    "republish": "npm run unpublish && npm publish",
     "postrepublish": "echo 'Package republished successfully!'"
   },
   "dependencies": {

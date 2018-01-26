@@ -43,12 +43,13 @@ import { Action, Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 import { Router } from '@angular/router';
 import { DiscoveryMode } from "@plexus-interop/client-api";
-import { UrlParamsProvider } from "../core/UrlParamsProvider";
+import { UrlParamsProvider } from "@plexus-interop/common";
+import { TransportType } from "../core/TransportType";
 
 @Injectable()
 export class Effects {
-    
-    private plexusLogger = LoggerFactory.getLogger(Effects.name);
+
+    private log = LoggerFactory.getLogger(Effects.name);
 
     @Effect() autoConnectToPlexus$: Observable<Action> = this
         .actions$
@@ -74,6 +75,7 @@ export class Effects {
         .actions$
         .ofType<TypedAction<MetadataLoadActionParams>>(AppActions.METADATA_LOAD_START)
         .mergeMap(async action => {
+
             const params = action.payload;
             const baseUrl = params.baseUrl;
 
@@ -84,17 +86,26 @@ export class Effects {
                 const apps = appRegistryService.getApplications();
 
                 const wsUrl = UrlParamsProvider.getParam("wsUrl");
+                const transport = UrlParamsProvider.getParam("transport");
 
                 let сonnectionProvider;
-                if (wsUrl) {
-                    this.plexusLogger.info(`Creating Native WS Transport Provider using ${wsUrl} endpoint`);
-                    сonnectionProvider = await this.transportConnectionFactory.createWebSocketTransportProvider(wsUrl);
-                } else {
-                    this.plexusLogger.info(`Creating Web Transport Provider`);
-                    сonnectionProvider = await this.transportConnectionFactory.createWebTransportProvider(baseUrl);
+                switch (transport) {
+                    case TransportType.NATIVE_WS:
+                        const wsUrl = UrlParamsProvider.getParam("wsUrl");
+                        this.log.info("Connecting to Native WS Transport");                        
+                        сonnectionProvider = await this.transportConnectionFactory.createWebSocketTransportProvider(wsUrl);
+                        break;
+                    case TransportType.WEB_SAME_BROADCAST:
+                        this.log.info("Connecting to Same Domain Broad Cast Transport");
+                        сonnectionProvider = await this.transportConnectionFactory.createSameOriginWebTransportProvider(baseUrl);
+                        break;
+                    default:
+                        this.log.info("Connecting to Cross Domain Transport");                    
+                        сonnectionProvider = await this.transportConnectionFactory.createCrossDomainWebTransportProvider(baseUrl);
+                        break;
                 }
 
-                this.plexusLogger.info(`Successfully loaded metadata from ${baseUrl}`);
+                this.log.info(`Successfully loaded metadata from ${baseUrl}`);
 
                 return {
                     type: AppActions.METADATA_LOAD_SUCCESS,
@@ -107,9 +118,9 @@ export class Effects {
             } catch (error) {
                 const msg = `Connection not successful. Please enter correct metadata base url.`;
                 if (params.silentOnFailure) {
-                    this.plexusLogger.info(msg);
+                    this.log.info(msg);
                 } else {
-                    this.plexusLogger.error(msg);
+                    this.log.error(msg);
                     return {
                         type: AppActions.DISCONNECT_FROM_PLEXUS
                     };
@@ -121,12 +132,12 @@ export class Effects {
         .ofType(AppActions.DISCONNECT_FROM_PLEXUS)
         .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
         .mergeMap(async ([action, services]) => {
-            
+
             if (services.interopClient) {
                 await services.interopClient.disconnect();
-            } 
-            
-            this.plexusLogger.info(`Disconnect from metadata - success!`);
+            }
+
+            this.log.info(`Disconnect from metadata - success!`);
 
             this.router.navigate(['/']);
 
@@ -161,43 +172,43 @@ export class Effects {
         });
 
     @Effect() loadConsumedMethod$: Observable<TypedAction<any>> =
-        this.actions$
-            .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
-            .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
-            .mergeMap(async ([action, services]) => {
+    this.actions$
+        .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
+        .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
+        .mergeMap(async ([action, services]) => {
 
-                const method = action.payload;
-                const interopClient = services.interopClient;
+            const method = action.payload;
+            const interopClient = services.interopClient;
 
-                const discoveryRequest = {
-                    consumedMethod: {
-                        consumedService: {
-                            serviceId: method.consumedService.service.id
-                        },
-                        methodId: method.method.name
-                    }
-                };
-
-                // offline
-                const discoveredMethods = await interopClient.discoverMethod(discoveryRequest);
-                // online
-                const onlineMethods = await interopClient.discoverMethod({
-                    ...discoveryRequest,
-                    discoveryMode: DiscoveryMode.Online
-                });
-
-                if (onlineMethods && onlineMethods.methods) {
-                    onlineMethods.methods.forEach(pm => discoveredMethods.methods.push(pm));
+            const discoveryRequest = {
+                consumedMethod: {
+                    consumedService: {
+                        serviceId: method.consumedService.service.id
+                    },
+                    methodId: method.method.name
                 }
+            };
 
-                return {
-                    type: AppActions.CONSUMED_METHOD_SUCCESS,
-                    payload: {
-                        method,
-                        discoveredMethods
-                    }
-                };
+            // offline
+            const discoveredMethods = await interopClient.discoverMethod(discoveryRequest);
+            // online
+            const onlineMethods = await interopClient.discoverMethod({
+                ...discoveryRequest,
+                discoveryMode: DiscoveryMode.Online
             });
+
+            if (onlineMethods && onlineMethods.methods) {
+                onlineMethods.methods.forEach(pm => discoveredMethods.methods.push(pm));
+            }
+
+            return {
+                type: AppActions.CONSUMED_METHOD_SUCCESS,
+                payload: {
+                    method,
+                    discoveredMethods
+                }
+            };
+        });
 
     @Effect() appConnected$: Observable<Action> = this
         .actions$
@@ -241,7 +252,7 @@ export class Effects {
         .ofType(AppActions.DISCONNECT_FROM_APP_SUCCESS)
         .withLatestFrom(this.store.select(state => state.plexus.services))
         .map(_ => {
-            this.plexusLogger.info(`Disconnected from app - success!`);
+            this.log.info(`Disconnected from app - success!`);
             this.router.navigate(['/apps']);
 
             return { type: AppActions.DO_NOTHING };

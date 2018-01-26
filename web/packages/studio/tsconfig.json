@@ -7,10 +7,10 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es6",
-    "types": ["node"],
+    "target": "es5",
+    "types": ["core-js"],
     "lib": [
-      "es6", "dom"
+      "es2015", "dom"
     ]
   }
 }
