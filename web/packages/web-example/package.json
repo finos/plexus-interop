@@ -15,7 +15,8 @@
     "gen-server-ts": "pbts --force-long -o src/greeting/server/gen/plexus-messages.d.ts src/greeting/server/gen/plexus-messages.js",
     "gen-server-protocol": "npm run gen-server-js && npm run gen-server-ts",
     "prestart": "npm run build",
-    "start": "http-server ./dist -p 8001"
+    "start": "http-server ./dist -p 8001",
+    "republish": "echo 'Not implemented'"
   },
   "keywords": [
     "plexus",

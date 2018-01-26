@@ -38,6 +38,7 @@ namespace Plexus
         protected static readonly TimeSpan Timeout1Sec = TimeSpan.FromSeconds(1);
         protected static readonly TimeSpan Timeout5Sec = TimeSpan.FromSeconds(5);
         protected static readonly TimeSpan Timeout10Sec = TimeSpan.FromSeconds(10);
+        protected static readonly TimeSpan Timeout30Sec = TimeSpan.FromSeconds(30);
 
         protected ITestOutputHelper Console { get; }
 
@@ -65,6 +66,8 @@ namespace Plexus
             return disposable;
         }
 
+        protected void RunWith30SecTimeout(Func<Task> func) => RunWithTimeout(Timeout30Sec, func);
+        protected void RunWith30SecTimeout(Action action) => RunWithTimeout(Timeout30Sec, action);
         protected void RunWith10SecTimeout(Func<Task> func) => RunWithTimeout(Timeout10Sec, func);
         protected void RunWith10SecTimeout(Action action) => RunWithTimeout(Timeout10Sec, action);
         protected void RunWith5SecTimeout(Func<Task> func) => RunWithTimeout(Timeout5Sec, func);

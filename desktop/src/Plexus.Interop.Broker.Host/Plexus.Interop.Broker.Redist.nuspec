@@ -9,11 +9,12 @@
     <licenseUrl>https://github.com/symphonyoss/plexus-interop/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/symphonyoss/plexus-interop</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Plexus Interop Broker for Windows</description>
+    <description>Plexus Interop Broker Binaries</description>
     <copyright>Copyright 2017</copyright>
     <tags>plexus interop broker ipc rpc messaging interoperability</tags>
   </metadata>
   <files>
-    <file src="..\..\..\bin\win-x86\broker\" target="\tools\" />
+    <file src="..\..\..\bin\win-x86\broker\" target="\redist\$id$" />
+    <file src="Plexus.Interop.Broker.Redist.targets" target="\build\$id$.targets" />
   </files>
 </package>
