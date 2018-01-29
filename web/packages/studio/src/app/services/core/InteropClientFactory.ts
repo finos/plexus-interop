@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UrlParamsProvider } from './UrlParamsProvider';
+import { UrlParamsProvider } from "@plexus-interop/common";
 import { InteropClient } from "./InteropClient";
 import { Injectable } from "@angular/core";
 import { TransportConnectionProvider } from "../transport/TransportConnectionProvider";

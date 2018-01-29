@@ -15,32 +15,33 @@
  * limitations under the License.
  */
 import { expect } from "chai";
-import { ClientsSetup } from "../common/ClientsSetup";
-import { TransportsSetup } from "../common/TransportsSetup";
-import { readWsUrl } from "../common/utils";
-import { EchoClientBenchmark } from "../echo/EchoClientBenchmark";
+import { ClientsSetup } from "../../common/ClientsSetup";
+import { TransportsSetup } from "../../common/TransportsSetup";
+import { readHostUrl } from "../../common/utils";
+import { EchoClientBenchmark } from "../../echo/EchoClientBenchmark";
 
-describe("Web Socket Client Benchmarks", () => {
+describe("Web Broker Client Benchmarks", () => {
 
-    const clientsSetup = new ClientsSetup();
+    const clientsSetup = new ClientsSetup(500);
     const transportsSetup = new TransportsSetup();
-    const wsUrl = readWsUrl();
+
+    const proxyHost = readHostUrl();
 
     const echoServiceBenchmark = new EchoClientBenchmark(
-        transportsSetup.createWebSocketTransportProvider(wsUrl), 
+        transportsSetup.createCrossDomainTransportProvider(proxyHost), 
         clientsSetup);
 
-    it("Sends ~35 point to point requests in 1 second", function() {
-        this.timeout(5000);
+    it("Sends ~20 point to point requests in 1 second", function() {
+        this.timeout(6000);
         return (async () => {
             const result = await echoServiceBenchmark.testUnaryMessagesSentWithinPeriod(1024, 3000);
             console.log("Benchmark result:", JSON.stringify(result));
-            expect(result.messagesSent).to.be.greaterThan(100);
+            expect(result.messagesSent).to.be.greaterThan(60);
         })();
     });
 
     it("Sends ~200 streaming messages in 1 second", function() {
-        this.timeout(5000);
+        this.timeout(6000);
         return (async () => {
             const result = await echoServiceBenchmark.testStreamingEventsSentWithinPeriod(1024, 3000);
             console.log("Benchmark result:", JSON.stringify(result));

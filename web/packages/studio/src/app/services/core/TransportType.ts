@@ -14,8 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./AppLauncher";
-export * from "./UrlWebAppLauncher";
-export * from "./AppLaunchResponse";
-export * from "./LaunchInvocationContext";
-export * from "./AppLaunchRequest";
+export enum TransportType {
+
+    WEB_SAME_BROADCAST = "web-same-broadcast",
+
+    WEB_CROSS = "web-cross",
+    
+    NATIVE_WS = "native-ws"
+
+};

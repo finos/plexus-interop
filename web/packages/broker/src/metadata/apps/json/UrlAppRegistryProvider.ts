@@ -53,9 +53,9 @@ export class UrlAppRegistryProvider implements AppRegistryProvider {
         this.log.debug(`Starting to load metadata from [${this.url}] with ${this.interval} interval`);
         const response = await this.urlDataLoader.fetchData(this.url);
         if (this.interval > 0) {
-            this.jsonAppRegistryProvider = new JsonAppRegistryProvider(response);
-        } else {
             this.jsonAppRegistryProvider = new JsonAppRegistryProvider(response, this.urlDataLoader.fetchWithInterval(this.url, this.interval));
+        } else {
+            this.jsonAppRegistryProvider = new JsonAppRegistryProvider(response);
         }
         this.started = true;
     }

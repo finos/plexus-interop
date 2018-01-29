@@ -18,3 +18,5 @@ export * from "./EventBus";
 export * from "./Event";
 export * from "./cross";
 export * from "./same/BroadCastChannelEventBus";
+export * from "./same/JStorageEventBus";
+export * from "./FallbackEventBus";

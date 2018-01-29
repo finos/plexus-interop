@@ -18,7 +18,7 @@
     <LangVersion>latest</LangVersion>
     <Version>0.1.0</Version>
     <IsPackable>true</IsPackable>
-    <NuspecFile>$(MSBuildThisFileDirectory)$(MSBuildProjectName).nuspec</NuspecFile>
+    <NuspecFile>$(MSBuildThisFileDirectory)Plexus.Interop.Broker.Redist.nuspec</NuspecFile>
 
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
 
@@ -62,7 +62,7 @@
 
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);id=$(AssemblyName)-$(RuntimeIdentifier)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);id=Plexus.Interop.Broker.Redist-$(RuntimeIdentifier)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
     </PropertyGroup>
     <Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />
