@@ -51,7 +51,7 @@
     "chokidar": "^1.7.0",
     "copyfiles": "^1.2.0",
     "core-js": "^2.5.3",
-    "electron": "1.7.5",
+    "electron": "1.7.11",
     "electron-mocha": "^4.0.2",
     "glob": "^7.1.2",
     "jasmine-reporters": "^2.2.0",
