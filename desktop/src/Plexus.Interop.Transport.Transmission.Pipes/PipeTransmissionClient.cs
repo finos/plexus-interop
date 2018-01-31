@@ -94,9 +94,21 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             NamedPipeClientStream pipeClientStream,
             CancellationToken cancellationToken)
         {
-            await pipeClientStream
-                .ConnectAsync(ConnectTimeoutMs, cancellationToken)
-                .ConfigureAwait(false);
+            using (var combinedCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+            {
+                combinedCancellation.CancelAfter(ConnectTimeoutMs);
+                try
+                {
+                    await pipeClientStream
+                        .ConnectAsync(cancellationToken)
+                        .ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (combinedCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+                {
+                    throw new TimeoutException(
+                        $"Timeout {ConnectTimeoutMs} ms occured while establishing named pipe connection");
+                }
+            }
         }
 #endif
     }
