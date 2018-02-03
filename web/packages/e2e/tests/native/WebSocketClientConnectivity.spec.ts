@@ -22,6 +22,7 @@ import { ClientConnectivityTests } from "../echo/ClientConnectivityTests";
 
 describe("Web Socket Client connectivity", () => {
 
+    console.log("test!");
     const clientsSetup = new ClientsSetup();
     const transportsSetup = new TransportsSetup();
     const wsUrl = readWsUrl();
