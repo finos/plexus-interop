@@ -41,8 +41,11 @@ function killBroker() {
 
 function runElectronTest(wsUrl) {
     log("Starting Electron Tests ...");
-    exec(`electron-mocha --require scripts/coverage ${argv.file} --wsUrl ${wsUrl} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
-        cwd: process.cwd()
+    exec(`electron-mocha --require scripts/coverage ${argv.file} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
+        cwd: process.cwd(),
+        env: {
+            PLEXUS_BROKER_WEBSOCKET_URL: wsUrl
+        }
     }, (error, stdout, stderr) => {
         log("Electron tests stopped, killing Broker");
         if (error || stderr) {

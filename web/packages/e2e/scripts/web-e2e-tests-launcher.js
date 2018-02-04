@@ -97,8 +97,11 @@ function testsFinishedHandler(error, stdout, stderr) {
 
 function runElectronTest(path) {
     log("Starting Web Broker Electron Tests ...");
-    exec(`electron-mocha --require scripts/coverage ${argv.file} --hostPath ${path} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
-        cwd: process.cwd()
+    exec(`electron-mocha --require scripts/coverage ${argv.file} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
+        cwd: process.cwd(),
+        env: {
+            PLEXUS_BROKER_HOST_URL: path
+        }
     }, testsFinishedHandler);
 }
 
