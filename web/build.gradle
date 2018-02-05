@@ -29,7 +29,7 @@ tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
 task yarnBuild(type: YarnTask, dependsOn: ['yarn_install']) {
-    args = org.gradle.internal.os.OperatingSystem.current().isWindows() 
+    args = org.gradle.internal.os.OperatingSystem.current().isWindows() && System.env['PLEXUS_SKIP_WEB_E2E_TESTS'] != '1'
         ? ['build-all-win'] : ['build-all']
     doLast{
         println()
