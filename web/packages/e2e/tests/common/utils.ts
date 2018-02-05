@@ -18,23 +18,39 @@
 const globalObj: any = global || window;
 
 export function readEncodedConfig(): any {
-    const hashValue = window.location.hash.slice(1);
-    return JSON.parse(decodeURIComponent(hashValue));
-}
 
-export function readWsUrl(): string {
-    const args: string[] = readEncodedConfig().rawArgs;
-    const wsUrl = args.filter(v => v.indexOf("ws://") !== -1)[0];
-    return wsUrl;
-}
-
-export function readHostUrl(): string {
     // tslint:disable-next-line:no-string-literal
     if (globalObj["__karma__"]) {
         // tslint:disable-next-line:no-string-literal        
-        return globalObj["__karma__"].config.hostPath;
+        return globalObj["__karma__"].config;
     }
-    const args: string[] = readEncodedConfig().rawArgs;
-    const hostUrl = args.filter(v => v.indexOf("http://") !== -1)[0];
-    return hostUrl;
+
+    let env: any;
+    if (globalObj.require('is-electron-renderer')) {
+        env = globalObj.require('electron').remote.process.env;
+    } else {
+        env = process.env;
+    }
+    return {
+        wsUrl: env.PLEXUS_BROKER_WEBSOCKET_URL,
+        hostPath: env.PLEXUS_BROKER_HOST_URL
+    }
+}
+
+export function readWsUrl(): string {
+    const wsUrl = readEncodedConfig().wsUrl;
+    if (wsUrl) {
+        return wsUrl;
+    } else {
+        throw Error("wsUrl is undefined");
+    }
+}
+
+export function readHostUrl(): string {
+    const hostUrl = readEncodedConfig().hostPath;
+    if (hostUrl) {
+        return hostUrl;
+    } else {
+        throw Error("hostUrl is undefined");
+    }
 }

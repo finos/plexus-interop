@@ -41,16 +41,22 @@ function killBroker() {
 
 function runElectronTest(wsUrl) {
     log("Starting Electron Tests ...");
-    exec(`electron-mocha --require scripts/coverage ${argv.file} --wsUrl ${wsUrl} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
-        cwd: process.cwd()
+    exec(`electron-mocha --require scripts/coverage ${argv.file} ${argv.debug ? "--debug" : ""} --renderer --reporter spec --colors`, {
+        cwd: process.cwd(),
+        env: {
+            PLEXUS_BROKER_WEBSOCKET_URL: wsUrl
+        }
     }, (error, stdout, stderr) => {
+        let exitCode = 0;
         log("Electron tests stopped, killing Broker");
         if (error || stderr) {
             console.error('Std Error:', stderr);
             console.error('Error: ', error);
+            exitCode = 1;
         }
         log('StdOut', stdout);
         killBroker();
+        process.exit(exitCode);
     });
 }
 
