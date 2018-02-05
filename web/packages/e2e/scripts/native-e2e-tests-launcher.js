@@ -47,13 +47,16 @@ function runElectronTest(wsUrl) {
             PLEXUS_BROKER_WEBSOCKET_URL: wsUrl
         }
     }, (error, stdout, stderr) => {
+        let exitCode = 0;
         log("Electron tests stopped, killing Broker");
         if (error || stderr) {
             console.error('Std Error:', stderr);
             console.error('Error: ', error);
+            exitCode = 1;
         }
         log('StdOut', stdout);
         killBroker();
+        process.exit(exitCode);
     });
 }
 
