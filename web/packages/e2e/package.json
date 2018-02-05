@@ -35,10 +35,10 @@
     "e2e-native-debug": "npm run build && npm run prepare-native-e2e-debug-tests && node scripts/native-e2e-tests-launcher.js --printBrokerStdout true --debug true --file ./dist/main/tests/native/RendererProcess.bundle.js"
   },
   "dependencies": {
-    "@types/long": "^3.0.31",
-    "@plexus-interop/websocket-transport": "0.1.2",
     "@plexus-interop/broker": "0.1.2",
-    "@plexus-interop/client": "0.1.2"
+    "@plexus-interop/client": "0.1.2",
+    "@plexus-interop/websocket-transport": "0.1.2",
+    "@types/long": "^3.0.31"
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",
@@ -51,9 +51,11 @@
     "chokidar": "^1.7.0",
     "copyfiles": "^1.2.0",
     "core-js": "^2.5.3",
-    "electron": "1.7.11",
+    "electron": "1.7.12",
     "electron-mocha": "^4.0.2",
     "glob": "^7.1.2",
+    "http-server": "^0.11.1",
+    "is-electron-renderer": "^2.0.1",
     "jasmine-reporters": "^2.2.0",
     "jest": "^21.0.1",
     "karma": "^1.7.1",
