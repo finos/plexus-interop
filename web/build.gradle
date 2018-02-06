@@ -29,9 +29,7 @@ tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
 task yarnBuild(type: YarnTask, dependsOn: ['yarn_install']) {
-    args = System.env['BuildRunner'] == 'MyGet' 
-	? ['build-all-myget'] : org.gradle.internal.os.OperatingSystem.current().isWindows()
-        	? ['build-all-win'] : ['build-all']
+    args = org.gradle.internal.os.OperatingSystem.current().isWindows() && System.env['BuildRunner'] != 'MyGet' ? ['build-all-win'] : ['build-all']
     doLast{
         println()
     }
