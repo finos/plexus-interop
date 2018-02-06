@@ -21,7 +21,6 @@
     "build-core": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client-api build-client",
     "build-all": "run-s build-core build-broker build-studio build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
     "build-all-win": "run-s build-all benchmarks e2e-native e2e-web",
-    "build-all-myget": "run-s build-all e2e-web-electron e2e-native",
     "prebuild-all": "yarn install",
     "republish-all": "node scripts/run-all.js \"npm run republish\"",
     "e2e-native": "cd ./packages/e2e && yarn e2e-native",
