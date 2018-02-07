@@ -30,7 +30,7 @@
         private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(3);
 
         private static readonly string RuntimeIdentifier =
-#if NET452
+#if NET45
             "win-x86";
 #else
             RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "win-x86" : "osx-x64";
@@ -62,7 +62,7 @@
                 },
                 EnableRaisingEvents = true,
             };
-#if NET452
+#if NET45
             _process.StartInfo.EnvironmentVariables["PLEXUS_PARENT_PROCESS"] = Process.GetCurrentProcess().Id.ToString();            
 #else            
             _process.StartInfo.Environment["PLEXUS_PARENT_PROCESS"] = Process.GetCurrentProcess().Id.ToString();

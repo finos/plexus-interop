@@ -18,14 +18,15 @@ namespace Plexus
 {
     using System;
     using System.Runtime.CompilerServices;
-    using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
     public static class LogManager
     {
-        public static void ConfigureLogging(IMsLoggerFactory loggerFactory)
+#if NETSTANDARD1_3
+        public static void ConfigureLogging(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
             LogConfig.LoggerFactory.Configure(loggerFactory);
         }
+#endif
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ILogger GetLogger(string name)
