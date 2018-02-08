@@ -28,13 +28,13 @@ task downloadDotnet << {
     download {
         onlyIfNewer true
         if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            src 'https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-win-x86.zip'
+            src 'https://download.microsoft.com/download/1/1/0/11046135-4207-40D3-A795-13ECEA741B32/dotnet-sdk-2.1.4-win-x86.zip'
             dest "$buildDir/win32/sdk/dotnet.zip"
         } else if (Os.isFamily(Os.FAMILY_MAC)){
-            src 'https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-osx-x64.tar.gz'
+            src 'https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-osx-x64.tar.gz'
             dest "$buildDir/unix/sdk/dotnet.tar.gz"
         } else {
-            src 'https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-linux-x64.tar.gz'
+            src 'https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-linux-x64.tar.gz'
             dest "$buildDir/unix/sdk/dotnet.tar.gz"
         }
     }
