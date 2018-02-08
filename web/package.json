@@ -13,7 +13,7 @@
     "poste2e-native": "yarn coverage",
     "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
-    "build-win": "run-s build && e2e-native && e2e-web-electron",
+    "build-win": "run-s build e2e-native e2e-web-electron",
     "ci-build": "run-s build",
     "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
   },
