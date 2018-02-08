@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "description": "Plexus Web Interop root module",
   "scripts": {
-    
+
     "prebootstrap": "node ./scripts/replace-lock-registry.js",
     "preinstall": "node ./scripts/replace-lock-registry.js",
     "bootstrap": "lerna bootstrap",
@@ -22,11 +22,11 @@
     
     "ci-build": "run-s build",
     "preci-build": "run-s generate-npmrc",
-    "postci-build": "clean-npmrc",
+    "postci-build": "run-s clean-npmrc",
 
     "ci-publish": "run-s build publish",
     "preci-publish": "run-s generate-npmrc",
-    "postci-publish": "clean-npmrc",
+    "postci-publish": "run-s clean-npmrc",
 
     "generate-npmrc": "shx cp .ci-npmrc .npmrc && node ./scripts/replace-env-vars.js --input .npmrc && lerna exec -- node ../../scripts/copy-npmrc.js && lerna exec -- node ../../scripts/replace-env-vars.js --input .npmrc",
     "clean-npmrc": "shx rm -rf .npmrc && lerna exec -- shx rm -rf .npmrc",
