@@ -5,11 +5,7 @@ plugins {
 
 node {
     version = '8.5.0'
-    // There is an issue in 5.* NPM with auto prune of all packages
-    // not a big deal for CI, however making build longer on dev workstation
-    // let's stay on 4.* until fixed
-    // https://github.com/npm/npm/issues/16853
-    npmVersion = '4.6.1'
+    npmVersion = '5.4.2'
     nodeModulesDir = projectDir
     download = true
 }
