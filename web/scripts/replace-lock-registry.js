@@ -1,5 +1,6 @@
 
-
+const argv = require('minimist')(process.argv.slice(2));
+const backward = !!argv.backward;
 const paramName = "NPM_REGISTRY_URL";
 
 console.log(`Looking for ${paramName} env variable`);
@@ -14,7 +15,21 @@ console.log("Registry value found, replacing lock file entries");
 
 const shell = require('shelljs');
 
+let from = 'resolved "https://registry.npmjs.org';
+let to = `resolved "${value}`;
+
+if (backward) {
+    const temp = from;
+    from = to;
+    to = temp;
+}
+
+console.log(`Replacing [${from}] to [${to}]`);
+
 shell.ls('yarn.lock').forEach(file => {
-    shell.sed('-i', 'resolved "https://registry.npmjs.org', `resolved "${value}`, file);    
+    shell.sed('-i', from, to, file);    
 });
+
+console.log(`Done!`);
+
 
