@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/web-app-example",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "description": "Simple Web App examples",
   "main": "index.js",
   "private": true,
@@ -24,8 +24,8 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@plexus-interop/client": "0.1.2",
-    "@plexus-interop/websocket-transport": "0.1.2"
+    "@plexus-interop/client": "0.1.0",
+    "@plexus-interop/websocket-transport": "0.1.0"
   },
   "devDependencies": {
     "browserify": "^14.4.0",
