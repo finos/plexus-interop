@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-// Work around for 
-// https://github.com/yarnpkg/yarn/issues/3330
-// to have ability use internal registries and still have lock file in version control
+// Work around for // https://github.com/yarnpkg/yarn/issues/3330
 
 const argv = require('minimist')(process.argv.slice(2));
 const shell = require('shelljs');
