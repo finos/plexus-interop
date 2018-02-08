@@ -42,7 +42,7 @@ package-lock.json
 
 ### NPM ###
 
-**/packages/*/.npmrc
+**/*/.npmrc
 
 ### IntelliJ
 *.iml

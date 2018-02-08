@@ -26,27 +26,24 @@ console.log(`Looking for ${paramName} env variable`);
 
 const value = process.env[paramName];
 if (!value) {
-    console.log("Env variable is empty");
+    console.log(`${paramName} Env variable is empty`);
     process.exit(0);
+}
+
+const replace = (from, to, file) => {
+    console.log(`Replacing registry entries${backward ? " back" : ""} for ${file}`);
+    shell.sed('-i', from, to, file);    
 }
 
 console.log("Registry value found, replacing lock file entries");
 
-let from = 'resolved "https://registry.npmjs.org';
-let to = `resolved "${value}`;
-
+let from = 'https://registry.npmjs.org';
+let to = `${value}`;
 if (backward) {
     const temp = from;
     from = to;
     to = temp;
 }
 
-console.log(`Replacing [${from}] to [${to}]`);
-
-shell.ls('yarn.lock').forEach(file => {
-    shell.sed('-i', from, to, file);    
-});
-
-console.log(`Done!`);
-
-
+replace(from, to, "yarn.lock");
+replace(from, to, "package-lock.json");
