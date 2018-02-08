@@ -28,14 +28,24 @@ task licenseFormatTS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
 tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
-task yarnBuild(type: YarnTask, dependsOn: ['yarn_install']) {
-    args = org.gradle.internal.os.OperatingSystem.current().isWindows() && System.env['BuildRunner'] != 'MyGet' ? ['build-all-win'] : ['build-all']
+task npmBuild(type: NpmTask, dependsOn: ['npm_install']) {
+
+    ext.getArgs = { _ ->
+        def isMyGet = System.env['BuildRunner'] != 'MyGet'
+        def isWin = org.gradle.internal.os.OperatingSystem.current().isWindows()
+        println isWin
+        return isMyGet ? ['run', 'ci-build-all'] : (isWin ? ['run', 'build-all-win'] : ['run', 'build-all'])
+    }
+   
+    args = getArgs() 
+
     doLast{
         println()
     }
+
 }
 
-task buildTransport(dependsOn: yarnBuild) {
+task buildTransport(dependsOn: npmBuild) {
     outputs.dir('.')
 }
 

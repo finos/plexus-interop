@@ -5,36 +5,17 @@
   "license": "Apache-2.0",
   "description": "Plexus Web Interop root module",
   "scripts": {
-    "build-client": "cd ./packages/client && yarn build",
-    "build-common": "cd ./packages/common && yarn build ",
-    "build-client-api": "cd ./packages/client-api && yarn build",
-    "build-e2e": "cd ./packages/e2e && yarn build",
-    "build-web-example": "cd ./packages/web-example && yarn build",
-    "build-electron-launcher": "cd ./packages/electron-launcher && yarn build",
-    "build-protocol": "cd ./packages/protocol && yarn build",
-    "build-transport-common": "cd ./packages/transport-common && yarn build",
-    "build-broker": "cd ./packages/broker && yarn build",
-    "build-studio": "cd ./packages/studio && yarn build",
-    "build-websocket-transport": "cd ./packages/websocket-transport && yarn build",
-    "build-quickstart-viewer": "cd ./packages/ccy-pair-rate-viewer && yarn build",
-    "build-quickstart-provider": "cd ./packages/ccy-pair-rate-provider && yarn build",
-    "build-core": "run-s build-common build-protocol build-transport-common build-websocket-transport build-client-api build-client",
-    "build-all": "run-s build-core build-broker build-studio build-electron-launcher build-e2e build-web-example build-quickstart-viewer build-quickstart-provider",
-    "build-all-win": "run-s build-all benchmarks e2e-native e2e-web",
-    "prebuild-all": "yarn install",
-    "republish-all": "node scripts/run-all.js \"npm run republish\"",
-
-
+    "bootstrap": "lerna bootstrap",
+    "prebuild": "run-s bootstrap",
+    "build": "lerna run build --stream --toposort",
     "e2e-native": "cd ./packages/e2e && yarn e2e-native",
-    "e2e-web": "cd ./packages/e2e && yarn e2e-web-electron && yarn e2e-web-ie",
-    "e2e-web-electron": "cd ./packages/e2e && yarn e2e-web-electron",
+    "e2e-web": "cd ./packages/e2e && yarn e2e-web-electron",
     "poste2e-native": "yarn coverage",
     "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
-    "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks",
-    "bootstrap": "lerna bootstrap",
-    "build": "lerna run build --stream --toposort"
-
+    "build-all": "run-s build && e2e-native && e2e-web-electron",
+    "ci-build-all": "run-s build",
+    "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
   },
   "workspaces": [
     "packages/*"
