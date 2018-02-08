@@ -5,7 +5,11 @@ plugins {
 
 node {
     version = '8.5.0'
-    npmVersion = '5.4.2'
+    // There is an issue in 5.* NPM with auto prune of all packages
+    // not a big deal for CI, however making build longer on dev workstation
+    // let's stay on 4.* until fixed
+    // https://github.com/npm/npm/issues/16853
+    npmVersion = '4.6.1'
     nodeModulesDir = projectDir
     download = true
 }
@@ -29,20 +33,8 @@ tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
 task npmBuild(type: NpmTask, dependsOn: ['npm_install']) {
-
-    ext.getArgs = { _ ->
-        def isMyGet = System.env['BuildRunner'] != 'MyGet'
-        def isWin = org.gradle.internal.os.OperatingSystem.current().isWindows()
-        println isWin
-        return isMyGet ? ['run', 'ci-build-all'] : (isWin ? ['run', 'build-all-win'] : ['run', 'build-all'])
-    }
-   
-    args = getArgs() 
-
-    doLast{
-        println()
-    }
-
+    args = System.env['BuildRunner'] == 'MyGet' ? ['run', 'ci-build'] 
+        : (org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build-all'])
 }
 
 task buildTransport(dependsOn: npmBuild) {
