@@ -8,7 +8,7 @@
     "prebootstrap": "node ./scripts/replace-lock-registry.js",
     "preinstall": "node ./scripts/replace-lock-registry.js",
     "bootstrap": "lerna bootstrap",
-    "postinstall": "node ./scripts/replace-lock-registry.js --backward",    
+    "postinstall": "node ./scripts/replace-lock-registry.js --backward",
     "prebuild": "run-s bootstrap",
     "build": "lerna run build --stream --toposort",
     "e2e-native": "cd ./packages/e2e && yarn e2e-native",
@@ -18,6 +18,8 @@
     "coverage": "nyc report --reporter=text --reporter=html",
     "build-win": "run-s build e2e-native e2e-web-electron",
     "ci-build": "run-s build",
+    "pre-ci-build": "lerna exec -- node ../../scripts/copy-npmrc.js && lerna exec -- node ../../scripts/replace-env-vars.js --input .npmrc",
+    "post-ci-build": "lerna exec -- shx rm -rf .npmrc",
     "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
   },
   "workspaces": [
