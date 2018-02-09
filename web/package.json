@@ -25,7 +25,7 @@
     "preci-publish": "run-s generate-npmrc bump-version",
     "postci-publish": "run-s clean-npmrc",
     "bump-version": "cross-var lerna publish --repo-version $PackageVersion --skip-git --skip-npm --yes --verbose",
-    "generate-npmrc": "shx cp .ci-npmrc .npmrc && node ./scripts/replace-env-vars.js --input .npmrc && lerna exec -- node ../../scripts/copy-npmrc.js && lerna exec -- node ../../scripts/replace-env-vars.js --input .npmrc",
+    "generate-npmrc": "shx cp .ci-npmrc .npmrc && node ./scripts/replace-env-vars.js --input .npmrc && lerna exec -- cross-var shx cp $LERNA_ROOT_PATH/.npmrc .npmrc",
     "clean-npmrc": "shx rm -rf .npmrc && lerna exec -- shx rm -rf .npmrc",
     "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
   },
