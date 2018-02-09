@@ -1,9 +1,13 @@
 
-# Plexus Interop Web Components
+# Plexus Interop Web Components [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
+
+## General 
+
+Contains all JS modules and integration tests for Plexus Interop JS Client and Interop solution for stand alone browser.
 
 ## Local Build
 
-First you need to install all build dependencies with:
+Code base is splitted to multiple isolated modules, managed using [lerna](https://lernajs.io/) and [yarn](https://yarnpkg.com). So first you need to install all build dependencies including lerna with: 
 
 ```
 npm i
@@ -12,7 +16,7 @@ Then you can run
 ```
 npm run build
 ```
-Which will install dependencies and trigger build for all child modules
+Which will install dependencies for all child modules, link then between each other with symlinks and build for all of them.
 
 ## CI Build configuration
 
@@ -22,7 +26,7 @@ Build scripts rely on following Environment variables for CI build and publishin
 - NPM_AUTH_TOKEN - Auth Token value used for publishing to NPM repo
 - PackageVersion - Version used for publishing the artifacts
 
-Run build without publishing dependencies:
+Run build without publishing of artifacts:
 
 ```
 npm run ci-build
