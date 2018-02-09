@@ -22,7 +22,7 @@
 
 */
 
-const fs = require('fs')
+const fs = require('fs');
 const buildRunner = process.env['BuildRunner'];
 
 if (!!buildRunner) {
@@ -30,10 +30,13 @@ if (!!buildRunner) {
     console.log(`Running in CI mode, build runner: ${buildRunner}`);
 
     const registryVar = 'NPM_REGISTRY';
-    const autTokenVar = 'NPM_AUTH_TOKEN';
+    const authTokenVar = 'NPM_AUTH_TOKEN';
 
-    const registry = process.env[registryVar];
-    const autToken = process.env[autTokenVar];
+    const authToken = process.env[authTokenVar];
+
+    if (!!authToken) {
+        console.log(`Auth Token length ${authToken.length}`);
+    }
 
     fs.readFile('.ci-npmrc-tpl', 'utf8', function (err,data) {
 
@@ -42,7 +45,7 @@ if (!!buildRunner) {
         }
         
         let result = data.replace(`\${${registryVar}}`, process.env[registryVar]);
-        result = data.replace(`\${${autTokenVar}}`, process.env[autTokenVar]);
+        result = data.replace(`\${${authTokenVar}}`, authToken);
 
         fs.writeFile('.cli-npmrc', result, 'utf8', function (err) {
             if (err) return console.log(err);
