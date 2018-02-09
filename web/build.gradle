@@ -30,7 +30,7 @@ licenseFormat.dependsOn licenseFormatTS
 
 task npmBuild(type: NpmTask, dependsOn: ['npm_install']) {
     args = System.env['BuildRunner'] == 'MyGet' ? ['run', 'ci-build'] 
-        : (org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build-all'])
+        : (org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build'])
 }
 
 task buildTransport(dependsOn: npmBuild) {
