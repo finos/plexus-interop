@@ -38,7 +38,7 @@ const replace = (from, to, file) => {
         if (err) {
             return console.log(err);
         }
-        const result = data.replace(from, to);
+        const result = data.replace(new RegExp(from, 'g'), to);
         fs.writeFile(file, result, 'utf8', function (err) {
             if (err) return console.log(err);
         });
