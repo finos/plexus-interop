@@ -51,7 +51,7 @@ namespace Plexus.Logging.NLog
             return new Logger(NLogManager.GetLogger(name));
         }
 
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
         public void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
             global::NLog.Extensions.Logging.ConfigureExtensions.ConfigureNLog(loggerFactory, NLogManager.Configuration);
