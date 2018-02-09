@@ -28,7 +28,15 @@ task licenseFormatTS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
 tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
-task npmBuild(type: NpmTask, dependsOn: ['npm_install']) {
+task npmGenNpmrc(type: NpmTask) {
+    args = ['run', 'gen-root-npmrc'];    
+}
+
+task npmRunInstall(type: NpmTask, dependsOn: ['npmGenNpmrc']) {
+    args = ['install'];
+}
+
+task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall']) {
     args = System.env['BuildRunner'] != null ? 
         System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] : ['run', 'ci-build']
             : org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build']
