@@ -16,7 +16,7 @@ Then you can run
 ```
 npm run build
 ```
-Which will install dependencies for all child modules, link then between each other with symlinks and build all of them.
+Which will install dependencies for all child modules, link them between each other with symlinks and trigger build in topological order.
 
 ## CI Build configuration
 
