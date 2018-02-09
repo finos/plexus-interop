@@ -24,6 +24,8 @@ Build scripts rely on following Environment variables for CI build and publishin
 
 - NPM_REGISTRY - NPM Registry URL to install dependencies from/publish packages to
 - NPM_AUTH_TOKEN - Auth Token value used for publishing to NPM repo
+- BuildRunner - CI build tasks triggered during default gradle build 
+- NPM_PUBLISH - If set to "true" then CI build triggers publish to configured NPM registry
 - PackageVersion - Version used for publishing the artifacts
 
 Run build without publishing of artifacts:
