@@ -28,7 +28,7 @@ task downloadDotnet << {
     download {
         onlyIfNewer true
         if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            src 'https://download.microsoft.com/download/2/9/3/293BC432-348C-4D1C-B628-5AC8AB7FA162/dotnet-sdk-2.1.3-win-x64.zip'
+            src 'https://download.microsoft.com/download/2/9/3/293BC432-348C-4D1C-B628-5AC8AB7FA162/dotnet-sdk-2.1.3-win-x86.zip'
             dest "$buildDir/win32/sdk/dotnet.zip"
         } else if (Os.isFamily(Os.FAMILY_MAC)){
             src 'https://download.microsoft.com/download/2/9/3/293BC432-348C-4D1C-B628-5AC8AB7FA162/dotnet-sdk-2.1.3-osx-x64.tar.gz'
