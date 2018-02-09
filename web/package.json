@@ -5,7 +5,6 @@
   "license": "Apache-2.0",
   "description": "Plexus Web Interop root module",
   "scripts": {
-
     "prebootstrap": "node ./scripts/replace-lock-registry.js",
     "preinstall": "node ./scripts/replace-lock-registry.js",
     "bootstrap": "lerna bootstrap",
@@ -19,24 +18,22 @@
     "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
     "build-win": "run-s build e2e-native e2e-web-electron",
-    
     "ci-build": "run-s build",
     "preci-build": "run-s generate-npmrc",
     "postci-build": "run-s clean-npmrc",
-
     "ci-publish": "run-s build publish",
-    "preci-publish": "run-s generate-npmrc",
+    "preci-publish": "run-s generate-npmrc bump-version",
     "postci-publish": "run-s clean-npmrc",
-
+    "bump-version": "cross-var lerna publish --repo-version $PackageVersion --skip-git --skip-npm --yes --verbose",
     "generate-npmrc": "shx cp .ci-npmrc .npmrc && node ./scripts/replace-env-vars.js --input .npmrc && lerna exec -- node ../../scripts/copy-npmrc.js && lerna exec -- node ../../scripts/replace-env-vars.js --input .npmrc",
     "clean-npmrc": "shx rm -rf .npmrc && lerna exec -- shx rm -rf .npmrc",
-
     "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
   },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
+    "cross-var": "1.1.0",
     "electron": "1.7.12",
     "lerna": "2.8.0",
     "minimist": "1.2.0",
