@@ -33,9 +33,14 @@ if (!!buildRunner) {
     const authTokenVar = 'NPM_AUTH_TOKEN';
 
     const authToken = process.env[authTokenVar];
+    const registry = process.env[registryVar];
 
     if (!!authToken) {
         console.log(`Auth Token length ${authToken.length}`);
+    }
+
+    if (!!registry) {
+        console.log(`Registry value ${registry}`)
     }
 
     fs.readFile('.ci-npmrc-tpl', 'utf8', function (err,data) {
@@ -44,10 +49,10 @@ if (!!buildRunner) {
             return console.log(err);
         }
         
-        let result = data.replace(`\${${registryVar}}`, process.env[registryVar]);
-        result = data.replace(`\${${authTokenVar}}`, authToken);
+        data = data.replace(`\${${registryVar}}`, process.env[registryVar]);
+        data = data.replace(`\${${authTokenVar}}`, authToken);
 
-        fs.writeFile('.cli-npmrc', result, 'utf8', function (err) {
+        fs.writeFile('.npmrc', data, 'utf8', function (err) {
             if (err) return console.log(err);
         });
 
