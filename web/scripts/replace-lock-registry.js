@@ -17,9 +17,9 @@
 
 // Work around for // https://github.com/yarnpkg/yarn/issues/3330
 
-const argv = require('minimist')(process.argv.slice(2));
-const shell = require('shelljs');
-const backward = !!argv.backward;
+const fs = require('fs')
+
+const backward = process.argv.indexOf('--backward') !== -1;
 const paramName = "NPM_REGISTRY";
 
 console.log(`Looking for ${paramName} env variable`);
@@ -31,8 +31,18 @@ if (!value) {
 }
 
 const replace = (from, to, file) => {
+
     console.log(`Replacing registry entries${backward ? " back" : ""} for ${file}`);
-    shell.sed('-i', from, to, file);    
+
+    fs.readFile(file, 'utf8', function (err,data) {
+        if (err) {
+            return console.log(err);
+        }
+        const result = data.replace(from, to);
+        fs.writeFile(file, result, 'utf8', function (err) {
+            if (err) return console.log(err);
+        });
+    });
 }
 
 console.log("Registry value found, replacing lock file entries");
