@@ -22,9 +22,10 @@ Which will install dependencies for all child modules, link them between each ot
 
 Build scripts rely on following Environment variables for CI build and publishing of artifacts:
 
-- NPM_REGISTRY - NPM Registry URL to install dependencies from/publish packages to
-- NPM_AUTH_TOKEN - Auth Token value used for publishing to NPM repo
-- NPM_AUTH_USER - NPM user account used for publishing to registry
+- NPM_LOCK_REGISTRY (Optional) - NPM Registry URL to be used in lock files instead of 'https://registry.npmjs.org'
+- NPM_REGISTRY - Registry URL for publishing the artifacts to registry
+- NPM_AUTH_TOKEN - Auth Token used for publishing to registry
+- NPM_AUTH_USER - User Account used for publishing to registry
 - BuildRunner - CI build tasks triggered during default gradle build 
 - NPM_PUBLISH - If set to "true" then CI build triggers publish to configured NPM registry
 - PackageVersion - Version used for publishing the artifacts

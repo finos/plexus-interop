@@ -20,7 +20,7 @@
 const fs = require('fs')
 
 const backward = process.argv.indexOf('--backward') !== -1;
-const paramName = "NPM_REGISTRY";
+const paramName = "NPM_LOCK_REGISTRY";
 
 console.log(`Looking for ${paramName} env variable`);
 
