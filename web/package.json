@@ -17,7 +17,7 @@
     "poste2e-native": "yarn coverage",
     "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
-    "build-win": "run-s build e2e-native e2e-web-electron",
+    "build-win": "run-s build e2e-native e2e-web",
     "ci-build": "run-s build",
     "preci-build": "run-s gen-all-npmrc",
     "postci-build": "run-s clean-npmrc",
