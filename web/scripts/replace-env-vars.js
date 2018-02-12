@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus
-{
-    public interface ILoggerFactory
-    {
-        ILogger Create(string name);
 
-#if NETSTANDARD1_6      
-        void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory);
-#endif
+const shell = require('shelljs');
+const argv = require('minimist')(process.argv.slice(2));
+
+const input = argv.input;
+const envVars = ['NPM_REGISTRY', 'NPM_AUTH_TOKEN', 'NPM_AUTH_USER'];
+
+console.log(`Replacing all env variables for ${process.cwd()}/${input}`);
+
+envVars.forEach(k => {
+    if (!!process.env[k]) {
+        shell.sed('-i', `\\\${${k}}`, `${process.env[k]}`, `${process.cwd()}/${input}`);    
     }
-}
+});
+

@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/studio",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "license": "Apache-2.0",
   "scripts": {
     "ng": "ng",
@@ -11,7 +11,6 @@
     "e2e": "ng e2e",
     "republish": "echo 'Not implemented'"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^5.0.0",
     "@angular/common": "^5.0.0",
@@ -27,9 +26,9 @@
     "@ngrx/router-store": "^4.1.1",
     "@ngrx/store": "^4.1.1",
     "@ngrx/store-devtools": "^4.1.1",
-    "@plexus-interop/broker": "0.1.2",
-    "@plexus-interop/client": "0.1.2",
-    "@plexus-interop/websocket-transport": "0.1.2",
+    "@plexus-interop/broker": "0.1.0",
+    "@plexus-interop/client": "0.1.0",
+    "@plexus-interop/websocket-transport": "0.1.0",
     "@types/core-js": "^0.9.43",
     "bootstrap": "^4.0.0-beta.2",
     "bootswatch": "4.0.0-beta.2",
