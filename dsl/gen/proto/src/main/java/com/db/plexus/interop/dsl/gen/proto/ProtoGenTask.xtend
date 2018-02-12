@@ -16,7 +16,6 @@
  */
 package com.db.plexus.interop.dsl.gen.proto
 
-import com.db.plexus.interop.dsl.gen.GenTask
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import java.io.IOException
 import org.eclipse.xtext.resource.XtextResourceSet
@@ -28,7 +27,6 @@ import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.validation.CheckMode
 import org.eclipse.xtext.validation.Issue
 import java.util.LinkedList
-import java.nio.file.Paths
 import org.eclipse.xtext.diagnostics.Severity
 import java.util.Collections
 import com.db.plexus.interop.dsl.protobuf.Service
@@ -43,11 +41,9 @@ import java.io.File
 import java.io.FileOutputStream
 import com.db.plexus.interop.dsl.protobuf.NamedElement
 import com.db.plexus.interop.dsl.gen.util.FileUtils
+import com.db.plexus.interop.dsl.gen.BaseGenTask
 
-class ProtoGenTask implements GenTask {
-
-	@Inject
-	XtextResourceSet rs
+public class ProtoGenTask extends BaseGenTask {
 
 	@Inject
 	IResourceValidator validator
@@ -61,30 +57,18 @@ class ProtoGenTask implements GenTask {
 		customOptions
 	}
 
-	override doGen(PlexusGenConfig config) throws IOException {
+	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
 
 		println("Generating proto contract for " + config.input + " to folder " + config.outDir)
 
-		val curUri = URI.createURI(Paths.get(".").toAbsolutePath().toUri().toString())
-		var outUri = URI.createFileURI(config.outDir + "/")
-		if (outUri.relative) {
-			outUri = outUri.resolve(curUri)
-		}
-		var baseUri = URI.createFileURI(config.baseDir + "/")
-		if (baseUri.relative) {
-			baseUri = baseUri.resolve(curUri)
-		}
-		
 		val commonUri = URI.createURI(
 			ClassLoader.getSystemClassLoader().getResource("interop/Options.proto").toURI().toString())
 			
 		var resourceBaseUri = commonUri.trimSegments(2).appendSegment("");
 		System.out.println("Resource base URI: " + resourceBaseUri)		
 
-		rs.getResource(URI.createFileURI(config.input).resolve(curUri), true)
-
-		EcoreUtil2.resolveAll(rs)
-
+		rs.getResource(URI.createFileURI(config.input).resolve(baseDirUri), true)
+		
 		if (rs.resources.findFirst[r|r.URI.toString().endsWith("interop/Options.proto")] === null) {
 			rs.getResource(commonUri, true)
 		}
@@ -192,8 +176,8 @@ class ProtoGenTask implements GenTask {
 				}
 
 				var uri = r.URI				
-				if (uri.toString().startsWith(baseUri.toString())) {
-					uri = uri.deresolve(baseUri)					
+				if (uri.toString().startsWith(baseDirUri.toString())) {
+					uri = uri.deresolve(baseDirUri)					
 				} else {
 					uri = uri.deresolve(resourceBaseUri)					
 				}
@@ -201,7 +185,7 @@ class ProtoGenTask implements GenTask {
 				if (deresolvedStr.startsWith("/")) {
 					uri = URI.createURI(deresolvedStr.substring(1))						
 				}									
-				uri = uri.resolve(outUri)
+				uri = uri.resolve(outDirUri)
 
 				println("Saving " + uri)
 				var FileOutputStream fop
@@ -209,7 +193,7 @@ class ProtoGenTask implements GenTask {
 					val file = new File(uri.toFileString())
 					if (uri.lastSegment.endsWith(".proto")) {
 						protocArgs.append(' ')
-						protocArgs.append(new File(uri.deresolve(outUri).toFileString()))					
+						protocArgs.append(new File(uri.deresolve(outDirUri).toFileString()))					
 					}
 										
 					if (file.exists()) {
@@ -225,7 +209,7 @@ class ProtoGenTask implements GenTask {
 						fop.close();
 					}
 				}
-				val generateCmdPath = URI.createURI("generate.cmd").resolve(outUri).toFileString()
+				val generateCmdPath = URI.createURI("generate.cmd").resolve(outDirUri).toFileString()
 				FileUtils.writeStringToFile(new File(generateCmdPath), protocArgs.toString())
 			}
 		}

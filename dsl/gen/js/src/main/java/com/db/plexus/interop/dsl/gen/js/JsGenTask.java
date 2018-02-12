@@ -23,6 +23,7 @@ import com.db.plexus.interop.dsl.gen.PlexusGenConfig;
 import com.google.inject.Inject;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.xtext.resource.XtextResourceSet;
 
 import javax.inject.Named;
 import java.io.File;
@@ -43,7 +44,9 @@ public class JsGenTask extends BaseGenTask {
     private JsComponentApiGenerator codeOutputGenerator;
 
     @Override
-    protected void doGenWithResources(PlexusGenConfig config, EList<Resource> resources) throws IOException {
+    protected void doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
+    	
+    	EList<Resource> resources = rs.getResources();
 
         String pbJsPath = null;
 

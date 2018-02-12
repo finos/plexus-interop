@@ -30,6 +30,7 @@ import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig;
 import com.google.inject.Injector;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
@@ -40,7 +41,7 @@ public class Main {
 
     private static Logger log = Logger.getLogger("Generator");
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         final PlexusGenConfig genConfig = new ParametersParser().parse(args);

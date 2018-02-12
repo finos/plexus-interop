@@ -19,7 +19,6 @@ package com.db.plexus.interop.dsl.gen;
 import com.db.plexus.interop.dsl.gen.errors.CodeGenerationException;
 import com.db.plexus.interop.dsl.gen.util.FileUtils;
 import com.google.inject.Inject;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
@@ -32,6 +31,7 @@ import org.eclipse.xtext.validation.Issue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -52,20 +52,22 @@ public abstract class BaseGenTask implements GenTask {
 
     private URI baseUri;
     private URI outDirUri;
-
+    private URI resourceBaseUri;
+        
     protected String inputFilesGlob(PlexusGenConfig config) {
         return config.getInput();
     }
 
-    public void doGen(PlexusGenConfig config) throws IOException {
+    public void doGen(PlexusGenConfig config) throws IOException, URISyntaxException {
         this.baseUri = getBaseDirUri(config);
         this.outDirUri = getOutDirUri(config);
+        this.resourceBaseUri = getResourceBaseUri(config);
         loadResources(config);
         validateResources();
-        doGenWithResources(config, this.resourceSet.getResources());
+        doGenWithResources(config, this.resourceSet);
     }
 
-    protected abstract void doGenWithResources(PlexusGenConfig config, EList<Resource> resources) throws IOException;
+    protected abstract void doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException;
 
     protected URI getBaseDirUri() {
         return this.baseUri;
@@ -73,6 +75,10 @@ public abstract class BaseGenTask implements GenTask {
 
     protected URI getOutDirUri() {
         return outDirUri;
+    }
+    
+    protected URI getResourceBaseUri() {
+        return resourceBaseUri;
     }
 
     protected String getAbsolutePath(String relativePath) {
@@ -138,6 +144,14 @@ public abstract class BaseGenTask implements GenTask {
         final java.net.URI workingDirUri = Paths.get(".").toAbsolutePath().toUri();
         return URI.createFileURI(config.getOutDir()).resolve(
                 URI.createURI(workingDirUri.toString()));
+    }
+    
+    private URI getResourceBaseUri(PlexusGenConfig config) throws URISyntaxException {
+    	URI commonUri;
+    	commonUri = URI.createURI(
+    			ClassLoader.getSystemClassLoader().getResource("interop/Options.proto").toURI().toString());
+    	URI resourceBaseUri = commonUri.trimSegments(2).appendSegment("");
+    	return resourceBaseUri;
     }
 
     protected void writeToFile(String outPath, String content) throws IOException {

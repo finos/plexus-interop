@@ -22,16 +22,15 @@ import com.google.inject.Inject
 import com.db.plexus.interop.dsl.gen.util.FileUtils
 import java.io.File
 import com.db.plexus.interop.dsl.gen.BaseGenTask
-import org.eclipse.emf.ecore.resource.Resource
-import org.eclipse.emf.common.util.EList
-import java.util.ArrayList
+import org.eclipse.xtext.resource.XtextResourceSet
 
 class MetaJsonGenTask extends BaseGenTask {
 
     @Inject
     MetaJsonGenerator generator
 
-    override doGenWithResources(PlexusGenConfig config, EList<Resource> resources) throws IOException {
+    override doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
+    	val resources = rs.resources
         val str = generator.generate(config, resources.filter[r | !r.URI.toString().endsWith("/google/protobuf/descriptor.proto")].toList)
         FileUtils.writeStringToFile(new File(config.outDir + "/interop.json"), str)
     }
