@@ -30,7 +30,6 @@ yarn-error.log
 coverage
 **/dist
 **/target/
-yarn.lock
 package-lock.json
 
 ### VS Code ###
@@ -43,7 +42,8 @@ package-lock.json
 
 ### NPM ###
 
-.npmrc
+**/*/.npmrc
+
 
 ### IntelliJ
 *.iml

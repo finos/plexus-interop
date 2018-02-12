@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/transport-common",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "General Transport for Plexus Web Interop",
@@ -23,8 +23,8 @@
   "dependencies": {
     "@types/loglevel": "^1.4.29",
     "@types/long": "^3.0.31",
-    "@plexus-interop/common": "0.1.2",
-    "@plexus-interop/protocol": "0.1.2",
+    "@plexus-interop/common": "0.1.0",
+    "@plexus-interop/protocol": "0.1.0",
     "loglevel": "^1.4.1",
     "long": "^3.2.0",
     "protobufjs": "6.8.0",
