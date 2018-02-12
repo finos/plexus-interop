@@ -21,7 +21,7 @@
     "ci-build": "run-s build",
     "preci-build": "run-s gen-all-npmrc",
     "postci-build": "run-s clean-npmrc",
-    "ci-publish": "npm run build && lerna exec -- npm publish --userconfig .ci-npmrc",
+    "ci-publish": "npm run build && lerna exec -- npm publish",
     "preci-publish": "run-s gen-all-npmrc bump-version",
     "postci-publish": "run-s clean-npmrc",
     "bump-version": "cross-var lerna publish --repo-version $PackageVersion --skip-git --skip-npm --yes --verbose",
