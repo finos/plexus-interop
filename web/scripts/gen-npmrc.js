@@ -31,12 +31,18 @@ if (!!buildRunner) {
 
     const registryVar = 'NPM_REGISTRY';
     const authTokenVar = 'NPM_AUTH_TOKEN';
+    const authUserVar = 'NPM_AUTH_USER';
 
     const authToken = process.env[authTokenVar];
     const registry = process.env[registryVar];
+    const user = process.env[authUserVar];
 
     if (!!authToken) {
         console.log(`Auth Token length ${authToken.length}`);
+    }
+
+    if (!!user) {
+        console.log(`Auth User length ${user.length}`);
     }
 
     if (!!registry) {
@@ -51,6 +57,7 @@ if (!!buildRunner) {
         
         data = data.replace(`\${${registryVar}}`, process.env[registryVar]);
         data = data.replace(`\${${authTokenVar}}`, authToken);
+        data = data.replace(`\${${authUserVar}}`, user);
 
         fs.writeFile('.npmrc', data, 'utf8', function (err) {
             if (err) return console.log(err);
