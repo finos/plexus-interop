@@ -61,16 +61,20 @@ public class ProtoGenTask extends BaseGenTask {
 
 		println("Generating proto contract for " + config.input + " to folder " + config.outDir)
 
-		val commonUri = URI.createURI(
+		val optionsUri = URI.createURI(
 			ClassLoader.getSystemClassLoader().getResource("interop/Options.proto").toURI().toString())
 			
-		var resourceBaseUri = commonUri.trimSegments(2).appendSegment("");
-		System.out.println("Resource base URI: " + resourceBaseUri)		
+		val descriptorUri = URI.createURI(
+			ClassLoader.getSystemClassLoader().getResource("google/protobuf/descriptor.proto").toURI().toString())		
+			
+		var interopResourceBaseUri = optionsUri.trimSegments(2).appendSegment("");
+		var protoResourceBaseUri = descriptorUri.trimSegments(3).appendSegment("");
+		System.out.println("Resource base URI: " + interopResourceBaseUri)		
 
-		rs.getResource(URI.createFileURI(config.input).resolve(baseDirUri), true)
+		rs.getResource(URI.createFileURI(config.input).resolve(workingDirUri), true)
 		
 		if (rs.resources.findFirst[r|r.URI.toString().endsWith("interop/Options.proto")] === null) {
-			rs.getResource(commonUri, true)
+			rs.getResource(optionsUri, true)
 		}
 
 		EcoreUtil2.resolveAll(rs)
@@ -178,8 +182,10 @@ public class ProtoGenTask extends BaseGenTask {
 				var uri = r.URI				
 				if (uri.toString().startsWith(baseDirUri.toString())) {
 					uri = uri.deresolve(baseDirUri)					
+				} else if (uri.toString().startsWith(interopResourceBaseUri.toString())) {
+					uri = uri.deresolve(interopResourceBaseUri)					
 				} else {
-					uri = uri.deresolve(resourceBaseUri)					
+					uri = uri.deresolve(protoResourceBaseUri)
 				}
 				val deresolvedStr = uri.toString()
 				if (deresolvedStr.startsWith("/")) {

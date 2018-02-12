@@ -50,6 +50,7 @@ public abstract class BaseGenTask implements GenTask {
 
     protected Logger logger = Logger.getLogger("PlexusCodeGenerator");
 
+    private URI workingDirUri;
     private URI baseUri;
     private URI outDirUri;
     private URI resourceBaseUri;
@@ -58,7 +59,8 @@ public abstract class BaseGenTask implements GenTask {
         return config.getInput();
     }
 
-    public void doGen(PlexusGenConfig config) throws IOException, URISyntaxException {
+    public void doGen(PlexusGenConfig config) throws IOException, URISyntaxException {    	
+    	this.workingDirUri = URI.createURI(Paths.get(".").toAbsolutePath().toUri().toString());
         this.baseUri = getBaseDirUri(config);
         this.outDirUri = getOutDirUri(config);
         this.resourceBaseUri = getResourceBaseUri(config);
@@ -69,8 +71,12 @@ public abstract class BaseGenTask implements GenTask {
 
     protected abstract void doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException;
 
+    protected URI getWorkingDirUri() {
+        return workingDirUri;
+    }
+    
     protected URI getBaseDirUri() {
-        return this.baseUri;
+        return baseUri;
     }
 
     protected URI getOutDirUri() {
@@ -135,14 +141,12 @@ public abstract class BaseGenTask implements GenTask {
     }
 
     private URI getBaseDirUri(PlexusGenConfig config) {
-        final java.net.URI workingDirUri = Paths.get(".").toAbsolutePath().toUri();
-        return URI.createFileURI(config.getBaseDir()).resolve(
+        return URI.createFileURI(config.getBaseDir() + "/").resolve(
                 URI.createURI(workingDirUri.toString()));
     }
 
     private URI getOutDirUri(PlexusGenConfig config) {
-        final java.net.URI workingDirUri = Paths.get(".").toAbsolutePath().toUri();
-        return URI.createFileURI(config.getOutDir()).resolve(
+        return URI.createFileURI(config.getOutDir() + "/").resolve(
                 URI.createURI(workingDirUri.toString()));
     }
     
