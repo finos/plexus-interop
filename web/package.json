@@ -10,7 +10,7 @@
     "bootstrap": "lerna bootstrap",
     "postinstall": "node ./scripts/replace-lock-registry.js --backward",
     "prebuild": "run-s bootstrap",
-    "build": "lerna run build --stream",
+    "build": "lerna run build --stream --concurrency 1",
     "publish": "lerna exec -- npm publish",
     "e2e-native": "cd ./packages/e2e && yarn e2e-native",
     "e2e-web": "cd ./packages/e2e && yarn e2e-web-electron",
