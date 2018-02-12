@@ -16,6 +16,8 @@
  */
 namespace Plexus.Interop.Client.Marshalling.Protobuf
 {
+    using System.IO;
+    using Google.Protobuf.WellKnownTypes;
     using Shouldly;
     using Xunit;
 
@@ -26,8 +28,20 @@ namespace Plexus.Interop.Client.Marshalling.Protobuf
         [Fact]
         public void CanGetMarshallerForWellKnownType()
         {
-            var marshaller = _sut.GetMarshaller<Google.Protobuf.WellKnownTypes.UInt64Value>();
+            var marshaller = _sut.GetMarshaller<UInt64Value>();
+            var encodedValue = new UInt64Value
+            {
+                Value = ulong.MaxValue
+            };
+            UInt64Value decodedValue;
+            using (var stream = new MemoryStream())
+            {
+                marshaller.Encode(encodedValue, stream);
+                stream.Seek(0, SeekOrigin.Begin);
+                decodedValue = marshaller.Decode(stream);                
+            }
             marshaller.MessageId.ShouldBe("google.protobuf.UInt64Value");
+            decodedValue.ShouldBe(encodedValue);
         }
     }
 }
