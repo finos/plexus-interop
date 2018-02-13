@@ -23,7 +23,7 @@ namespace Plexus
 {
     public class Promise<T>
     {
-#if NET452
+#if NET45
         private readonly TaskCompletionSource<T> _completion = new TaskCompletionSource<T>(TaskCreationOptions.None);
 
         private int _isCompleted;
@@ -32,7 +32,7 @@ namespace Plexus
 
         public bool TryComplete(T result)
         {
-            var completed = false;
+            bool completed;
             if (Interlocked.Exchange(ref _isCompleted, 1) == 0)
             {
                 TaskRunner.RunInBackground(() => _completion.SetResult(result));
@@ -48,7 +48,7 @@ namespace Plexus
 
         public bool TryCancel()
         {
-            var completed = false;
+            bool completed;
             if (Interlocked.Exchange(ref _isCompleted, 1) == 0)
             {
                 TaskRunner.RunInBackground(() => _completion.SetCanceled());
@@ -75,7 +75,7 @@ namespace Plexus
             {
                 return TryCancel();
             }
-            var completed = false;
+            bool completed;
             if (Interlocked.Exchange(ref _isCompleted, 1) == 0)
             {
                 TaskRunner.RunInBackground(() => _completion.SetException(error));
@@ -98,7 +98,7 @@ namespace Plexus
 
         public bool TryFail(IEnumerable<Exception> errors)
         {
-            var completed = false;
+            bool completed;
             if (Interlocked.Exchange(ref _isCompleted, 1) == 0)
             {
                 TaskRunner.RunInBackground(() => _completion.SetException(errors));
