@@ -28,6 +28,7 @@ Build scripts rely on following Environment variables for CI build and publishin
 - NPM_AUTH_USER - User Account used for publishing to registry
 - BuildRunner - CI build tasks triggered during default gradle build 
 - NPM_PUBLISH - If set to "true" then CI build triggers publish to configured NPM registry
+- NPM_INSTALL_AUTH - If set to "true" then auth credentials used for install operations, default settings used instead
 - PackageVersion - Version used for publishing the artifacts
 
 Run build without publishing of artifacts:

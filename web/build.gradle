@@ -28,7 +28,7 @@ tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
 task npmGenNpmrc(type: NpmTask) {
-    args = System.env['NPM_AUTH_USER'] != null ? ['run', 'gen-root-npmrc'] : ['-v'];    
+    args = System.env['NPM_INSTALL_AUTH'] == "true" ? ['run', 'gen-root-npmrc'] : ['-v'];    
 }
 
 task npmRunInstall(type: NpmTask, dependsOn: ['npmGenNpmrc']) {
@@ -37,7 +37,7 @@ task npmRunInstall(type: NpmTask, dependsOn: ['npmGenNpmrc']) {
 
 task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall']) {
     args = System.env['BuildRunner'] != null ? 
-        System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] : (System.env['NPM_AUTH_USER'] != null ?  ['run', 'ci-build'] : ['run', 'build'])
+        System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] : (System.env['NPM_INSTALL_AUTH'] == "true" ?  ['run', 'ci-build'] : ['run', 'build'])
             : org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build']
 }
 
