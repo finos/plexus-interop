@@ -24,7 +24,8 @@ const paramName = "NPM_LOCK_REGISTRY";
 
 console.log(`Looking for ${paramName} env variable`);
 
-const value = process.env[paramName];
+const value = process.env["NPM_REGISTRY_INSTALL"] || process.env["NPM_REGISTRY"];
+
 if (!value) {
     console.log(`${paramName} Env variable is empty`);
     process.exit(0);
