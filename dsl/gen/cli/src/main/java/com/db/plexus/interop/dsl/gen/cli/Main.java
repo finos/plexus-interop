@@ -46,9 +46,9 @@ public class Main {
                 "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         final PlexusGenConfig genConfig = new ParametersParser().parse(args);
         log.info("Running generator with parameters: " + genConfig.toString());
-        Path workDirPath = Paths.get(".").toAbsolutePath();
-        URI workDir = URI.createURI(workDirPath.toAbsolutePath().toUri().toString());
-        URI baseDir = URI.createFileURI(genConfig.getBaseDir() + "/").resolve(workDir);
+        Path workDirPath = Paths.get("").toAbsolutePath();
+        URI workDir = URI.createFileURI(workDirPath.toString()).appendSegment("");
+        URI baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
         ProtoLangConfig config = new ProtoLangConfig();
         config.getBaseURIs().add(baseDir);
         final Injector injector = new InteropLangStandaloneSetup(config).createInjectorAndDoEMFRegistration();

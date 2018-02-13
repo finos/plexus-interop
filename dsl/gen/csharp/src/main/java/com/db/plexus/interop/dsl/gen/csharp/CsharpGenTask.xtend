@@ -16,76 +16,147 @@
  */
 package com.db.plexus.interop.dsl.gen.csharp
 
-import com.db.plexus.interop.dsl.gen.GenTask
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
-import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask
 import com.db.plexus.interop.dsl.gen.util.FileUtils
 import com.google.inject.Inject
 import java.io.File
 import java.io.IOException
-import java.util.LinkedList
-import java.lang.ProcessBuilder.Redirect
-import com.db.plexus.interop.dsl.gen.proto.ProtoOption
+import com.db.plexus.interop.dsl.gen.BaseGenTask
+import org.eclipse.xtext.resource.XtextResourceSet
+import org.eclipse.xtext.resource.XtextResource
+import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import com.db.plexus.interop.dsl.protobuf.Option
+import static extension com.db.plexus.interop.dsl.gen.InteropLangUtils.*
+import com.db.plexus.interop.dsl.protobuf.Proto
+import com.db.plexus.interop.dsl.protobuf.Message
+import com.db.plexus.interop.dsl.protobuf.Service
+import com.db.plexus.interop.dsl.protobuf.Method
 
-class CsharpGenTask implements GenTask {
-
+class CsharpGenTask extends BaseGenTask {
+	
 	@Inject
-	ProtoGenTask protoGenTask
+	IQualifiedNameProvider qualifiedNameProvider
 
-	override doGen(PlexusGenConfig config) throws IOException {
-
-		println("Generating C# code for " + config.input)
-
-		val temp = File.createTempFile("proto", Long.toString(System.nanoTime()));
-		temp.delete()
-		temp.mkdir();
-
-		try {
-			val protoConfig = new PlexusGenConfig()
-			protoConfig.baseDir = config.baseDir
-			protoConfig.input = config.input
-			protoConfig.outDir = temp.toString
-
-			if (config.namespace !== null) {
-				protoGenTask.customOptions.add(new ProtoOption("csharp_namespace", config.namespace))
+	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException {
+		
+		println("Generating C# code for " + config.input + " from " + baseDirUri.toFileString + " to " + outDirUri.toFileString)
+		
+		val resources = resourceSet.resources
+		
+		for (resource: resources) {			
+			var newUri = resource.URI.resolve(workingDirUri);
+			if (newUri.toString().startsWith(baseDirUri.toString())) {
+				newUri = newUri.deresolve(baseDirUri).resolve(outDirUri)
+			} else {
+				newUri = newUri.deresolve(resourceBaseUri).resolve(outDirUri)
 			}
-
-			protoGenTask.doGen(protoConfig)
-
-			var out = config.outDir
-			if (out.startsWith("internal_access:")) {
-				out = out.substring("internal_access:".length)
-			}
-			val outPath = new File(out)
-			outPath.delete
-			outPath.mkdirs
-
-			val args = new LinkedList<String>()
-			args.add(config.protocPath)
-			args.add("--csharp_out=" + config.outDir)
-			args.add("--proto_path=" + protoConfig.outDir)
-			FileUtils.processFiles(protoConfig.outDir, "*.proto", [ f |
-				if(!f.endsWith("google/protobuf/descriptor.proto")) args.add(f.toString())
-			])
-
-			val procBuilder = new ProcessBuilder(args)
-			procBuilder.inheritIO()
-			println("Launching " + String.join(" ", procBuilder.command))
-			var Process proc = null			
-			try {
-				proc = procBuilder.start()						
-			}
-			catch (Exception e) {
-				throw new IOException("Cannot start Protobuf compiler: " + config.protocPath +
-					". Probably the path is wrong. You can change it using command-line argument --protoc=<path>.", e)				
-			}
-			var exitCode = proc.waitFor;
-			if (exitCode != 0) {
-				throw new IOException("protoc process exited with non-zero exit code: " + exitCode)
-			}
-			println("C# code generated successfully to " + config.outDir)
-		} finally {
-			temp.delete()
+			var path = newUri.toFileString
+			val file = new File(path + ".g.cs");			
+			println("Generating " + file.path);	
+			FileUtils.writeStringToFile(file, gen(resource as XtextResource))				
+		}			
+	}
+	
+	def String gen(XtextResource resource) {		
+		'''		
+		namespace «resource.csharpNamespace» {
+			
+			using global::Plexus;
+			using global::Plexus.Interop;
+			using global::System.Threading.Tasks;
+			
+			«FOR service : resource.services SEPARATOR '\n'»
+				«gen(service)»
+			«ENDFOR»
 		}
+		'''
+	}
+	
+	def String gen(Service service) {
+		'''
+		public class «service.name» : IProxy {
+
+			«FOR method : service.methods»				
+				«genMethodDescriptor(method)»
+			«ENDFOR»
+
+			public interface IProxy«IF service.methods.length > 0»:«ENDIF»
+				«FOR method : service.methods SEPARATOR ','»
+					I«method.name»Proxy
+				«ENDFOR»
+			{ }
+			
+			public interface IImpl«IF service.methods.length > 0»:«ENDIF»
+				«FOR method : service.methods SEPARATOR ','»
+					I«method.name»Impl
+				«ENDFOR»
+			{ }
+
+			«FOR method : service.methods SEPARATOR '\n'»
+			public interface I«method.name»Proxy {
+				Task<«method.response.message.csharpFullName»> «method.name»(«method.request.message.csharpFullName» request);
+			}
+			«ENDFOR»
+			
+			«FOR method : service.methods SEPARATOR '\n'»
+			public interface I«method.name»Impl {
+				Task<«method.response.message.csharpFullName»> «method.name»(«method.request.message.csharpFullName» request, MethodCallContext context);
+			}
+			«ENDFOR»
+
+			private readonly IClientCallInvoker _callInvoker;
+			private readonly Maybe<string> _alias;
+			
+			public «service.name»(IClientCallInvoker callInvoker) : this(callInvoker, Maybe<string>.Nothing) {
+				_callInvoker = callInvoker;
+				_alias = alias; 
+			}
+
+			public «service.name»(IClientCallInvoker callInvoker, Maybe<string> alias) {
+				_callInvoker = callInvoker;
+				_alias = alias;
+				«FOR method : service.methods SEPARATOR '\n'»
+					_«method.name» = Method<
+				public interface I«method.name»Impl {
+					Task<«method.response.message.csharpFullName»> «method.name»(«method.request.message.csharpFullName» request, MethodCallContext context);
+				} 
+				«ENDFOR»
+			}
+		}
+		'''
+	}
+	
+	def String genMethodDescriptor(Method method, String name) {
+		val serviceName = method.service.getFullName(qualifiedNameProvider);
+		val requestName = method.request.message.csharpFullName
+		val responseName = method.response.message.csharpFullName
+		var methodType = "Unary"		
+		if (method.pointToPoint) {
+			methodType = "Unary"
+		} else if (method.serverStreaming) {
+			methodType = "ServerStreaming"
+		} else if (method.bidiStreaming) {
+			methodType = "DuplexStreaming"
+		} else if (method.clientStreaming) {
+			methodType = "ClientStreaming"
+		}
+		'''
+		public static readonly «methodType»Method<«requestName», «responseName»> «name» = Method.«methodType»<«requestName», «responseName»>("«serviceName»", "«method.name»");
+		'''
+	}
+	
+	def getCsharpNamespace(Resource resource) {
+		val package = resource.allContents.filter(typeof(Proto)).findFirst[x | true]									
+		var ns = package.getFullName(qualifiedNameProvider)		
+		val option = package.eContents.filter(typeof(Option)).findFirst[o | o.name.equals("csharp_namespace")]
+		if (option !== null) {
+			ns = option.value.substring(1, option.value.length - 1)
+		}
+		return ns
+	}	
+	
+	def getCsharpFullName(Message obj) {
+		return "global::" + getCsharpNamespace(obj.eResource) + "." + obj.name
 	}
 }

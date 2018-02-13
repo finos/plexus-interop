@@ -51,7 +51,7 @@ public abstract class BaseGenTask implements GenTask {
     protected Logger logger = Logger.getLogger("PlexusCodeGenerator");
 
     private URI workingDirUri;
-    private URI baseUri;
+    private URI baseDirUri;
     private URI outDirUri;
     private URI resourceBaseUri;
         
@@ -60,8 +60,9 @@ public abstract class BaseGenTask implements GenTask {
     }
 
     public void doGen(PlexusGenConfig config) throws IOException, URISyntaxException {    	
-    	this.workingDirUri = URI.createURI(Paths.get(".").toAbsolutePath().toUri().toString());
-        this.baseUri = getBaseDirUri(config);
+    	    	
+    	this.workingDirUri = URI.createFileURI(Paths.get("").toAbsolutePath().toString()).appendSegment("");
+        this.baseDirUri = getBaseDirUri(config);
         this.outDirUri = getOutDirUri(config);
         this.resourceBaseUri = getResourceBaseUri(config);
         loadResources(config);
@@ -76,7 +77,7 @@ public abstract class BaseGenTask implements GenTask {
     }
     
     protected URI getBaseDirUri() {
-        return baseUri;
+        return baseDirUri;
     }
 
     protected URI getOutDirUri() {
@@ -130,24 +131,24 @@ public abstract class BaseGenTask implements GenTask {
 
     protected void loadResources(PlexusGenConfig config) throws IOException {
         FileUtils.processFiles(
-                config.getBaseDir(),
+                new File(this.getBaseDirUri().toFileString()).getPath(),
                 this.inputFilesGlob(config),
                 (path) -> loadResource(path));
         EcoreUtil2.resolveAll(resourceSet);
     }
     
     private void loadResource(Path path) {
-    	resourceSet.getResource(URI.createFileURI(path.toString()), true);
+    	URI uri = URI.createFileURI(path.toString());
+    	this.logger.info("Loading file: " + uri);
+    	resourceSet.getResource(uri, true);
     }
 
     private URI getBaseDirUri(PlexusGenConfig config) {
-        return URI.createFileURI(config.getBaseDir() + "/").resolve(
-                URI.createURI(workingDirUri.toString()));
+        return URI.createFileURI(config.getBaseDir()).resolve(workingDirUri).appendSegment("");
     }
 
     private URI getOutDirUri(PlexusGenConfig config) {
-        return URI.createFileURI(config.getOutDir() + "/").resolve(
-                URI.createURI(workingDirUri.toString()));
+        return URI.createFileURI(config.getOutDir()).resolve(workingDirUri).appendSegment("");
     }
     
     private URI getResourceBaseUri(PlexusGenConfig config) throws URISyntaxException {
