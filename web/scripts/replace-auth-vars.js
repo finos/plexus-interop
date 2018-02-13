@@ -70,7 +70,7 @@ if (!!buildRunner) {
             if (err) {
                 return console.log(err);
             }
-            data = data.replace(`\${${registryVar}}`, process.env[registryVar]);
+            data = data.replace(`\${${registryVar}}`, registry);
             data = data.replace(`\${${authTokenVar}}`, authToken);
             data = data.replace(`\${${authUserVar}}`, user);
             fs.writeFile('.npmrc', data, 'utf8', function (err) {
