@@ -23,6 +23,13 @@
 */
 
 const fs = require('fs');
+
+const install = process.argv.indexOf('--install') !== -1;
+
+console.log(`Preparing .npmrc file for ${install ? "install" : "publish"}`)
+
+const postfix = install ? "_INSTALL" : "_PUBLISH";
+
 const buildRunner = process.env['BuildRunner'];
 
 if (!!buildRunner) {
@@ -33,9 +40,9 @@ if (!!buildRunner) {
     const authTokenVar = 'NPM_AUTH_TOKEN';
     const authUserVar = 'NPM_AUTH_USER';
 
-    const authToken = process.env[authTokenVar];
-    const registry = process.env[registryVar];
-    const user = process.env[authUserVar];
+    const authToken = process.env[`${authTokenVar}${postfix}`] || process.env[authTokenVar];
+    const registry = process.env[`${registryVar}${postfix}`] || process.env[registryVar];
+    const user = process.env[`${authUserVar}${postfix}`] || process.env[authUserVar];
 
     if (!!authToken) {
         console.log(`Auth Token length ${authToken.length}`);
@@ -49,21 +56,29 @@ if (!!buildRunner) {
         console.log(`Registry value ${registry}`)
     }
 
-    fs.readFile('.ci-npmrc-tpl', 'utf8', function (err,data) {
+    if (!authToken || !registry || !user) {
 
-        if (err) {
-            return console.log(err);
-        }
+        console.log("Not all auth variables provided");
         
-        data = data.replace(`\${${registryVar}}`, process.env[registryVar]);
-        data = data.replace(`\${${authTokenVar}}`, authToken);
-        data = data.replace(`\${${authUserVar}}`, user);
-
-        fs.writeFile('.npmrc', data, 'utf8', function (err) {
+        fs.writeFile('.npmrc', "# Auto generated during CI build", 'utf8', function (err) {
             if (err) return console.log(err);
         });
 
-    });
+    } else {
+
+        fs.readFile('.ci-npmrc-tpl', 'utf8', function (err,data) {
+            if (err) {
+                return console.log(err);
+            }
+            data = data.replace(`\${${registryVar}}`, process.env[registryVar]);
+            data = data.replace(`\${${authTokenVar}}`, authToken);
+            data = data.replace(`\${${authUserVar}}`, user);
+            fs.writeFile('.npmrc', data, 'utf8', function (err) {
+                if (err) return console.log(err);
+            });
+        });
+
+    }
 
 } else {
     console.log("Dev mode, .npmrc generation skipped");
