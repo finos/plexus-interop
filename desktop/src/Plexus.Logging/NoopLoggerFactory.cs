@@ -28,9 +28,11 @@ namespace Plexus
             return NoopLogger.Instance;
         }
 
+#if NETSTANDARD1_6       
         public void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
         }
+#endif
 
         public void Dispose()
         {

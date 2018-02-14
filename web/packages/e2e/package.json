@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/e2e",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "private": true,
@@ -35,9 +35,9 @@
     "e2e-native-debug": "npm run build && npm run prepare-native-e2e-debug-tests && node scripts/native-e2e-tests-launcher.js --printBrokerStdout true --debug true --file ./dist/main/tests/native/RendererProcess.bundle.js"
   },
   "dependencies": {
-    "@plexus-interop/broker": "0.1.2",
-    "@plexus-interop/client": "0.1.2",
-    "@plexus-interop/websocket-transport": "0.1.2",
+    "@plexus-interop/broker": "0.1.0",
+    "@plexus-interop/client": "0.1.0",
+    "@plexus-interop/websocket-transport": "0.1.0",
     "@types/long": "^3.0.31"
   },
   "devDependencies": {

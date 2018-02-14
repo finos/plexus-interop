@@ -101,7 +101,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             return pipeServerStream;
         }
 
-#if NET452
+#if NET45
         private static async Task WaitForConnectionAsync(
             NamedPipeServerStream pipeServerStream,
             CancellationToken cancellationToken)

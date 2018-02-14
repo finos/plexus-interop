@@ -47,7 +47,7 @@
 
             var appInstanceId = UniqueId.Generate();
 
-#if NETSTANDARD1_5
+#if NETSTANDARD1_6
             process.StartInfo.Environment["PLEXUS_PARENT_PROCESS"] = _curPid;
             process.StartInfo.Environment["PLEXUS_BROKER_WORKING_DIR"] = Directory.GetCurrentDirectory();
             process.StartInfo.Environment["PLEXUS_APP_INSTANCE_ID"] = appInstanceId.ToString();

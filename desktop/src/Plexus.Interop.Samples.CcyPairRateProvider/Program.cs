@@ -63,7 +63,7 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
             Console.WriteLine("Disconnected.");
         }
 
-        private async Task<CcyPairRate> GetRateAsync(CcyPair request, MethodCallContext context)
+        private Task<CcyPairRate> GetRateAsync(CcyPair request, MethodCallContext context)
         {
             Console.WriteLine("Received request: {0}", request);
             CcyPairRate response;
@@ -87,7 +87,7 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
                     throw new ArgumentOutOfRangeException($"Unknown currency pair: {request.CcyPairName}");
             }
             Console.WriteLine("Sending response: {0}", response);
-            return response;
+            return Task.FromResult(response);
         }
     }
 }

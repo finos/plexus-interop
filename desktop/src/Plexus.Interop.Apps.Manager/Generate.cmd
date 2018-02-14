@@ -3,7 +3,7 @@ set INTEROP_METADATA_PATH=..\..\..\dsl\interop-lang\src\main\resources
 if not defined NUGET_PACKAGES (
   set NUGET_PACKAGES=%USERPROFILE%\.nuget\packages
 )
-set PROTOC_PATH=%NUGET_PACKAGES%\google.protobuf.tools\3.4.0\tools\windows_x86\protoc.exe
+set PROTOC_PATH=%NUGET_PACKAGES%\google.protobuf.tools\3.5.1\tools\windows_x86\protoc.exe
 
 set INTEROP_MANIFEST_PATH=interop\AppLifecycleManager.interop
 set CSHARP_NAMESPACE=Plexus.Interop.Apps.Internal.Generated

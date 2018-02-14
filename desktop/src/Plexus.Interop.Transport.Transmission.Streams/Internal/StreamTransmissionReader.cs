@@ -90,7 +90,7 @@
 
         private async Task<int> ReadLengthAsync()
         {
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
             var length = await _stream.ReadAsync(_lengthBuffer, 0, 2, _cancellationToken).ConfigureAwait(false);
 #else
             var length = await _stream.ReadAsync(_lengthBuffer, 0, 2, _cancellationToken).WithCancellation(_cancellationToken).ConfigureAwait(false);

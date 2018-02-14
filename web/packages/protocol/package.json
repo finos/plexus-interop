@@ -1,6 +1,6 @@
 {
   "name": "@plexus-interop/protocol",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "Plexus Internal Protocol",

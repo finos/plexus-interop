@@ -42,7 +42,7 @@ namespace Plexus
 
         protected ITestOutputHelper Console { get; }
 
-#if NET452
+#if NET45
         static TestsSuite()
         {
             // For .NET 4.5 increasing min threads count to avoid starvation and slow running in the cases 

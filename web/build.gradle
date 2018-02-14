@@ -5,7 +5,6 @@ plugins {
 
 node {
     version = '8.5.0'
-    npmVersion = '5.4.2'
     nodeModulesDir = projectDir
     download = true
 }
@@ -28,14 +27,17 @@ task licenseFormatTS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
 tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
-task yarnBuild(type: YarnTask, dependsOn: ['yarn_install']) {
-    args = org.gradle.internal.os.OperatingSystem.current().isWindows() && System.env['BuildRunner'] != 'MyGet' ? ['build-all-win'] : ['build-all']
-    doLast{
-        println()
-    }
+task npmRunInstall(type: NpmTask) {
+    args = ['install'];
 }
 
-task buildTransport(dependsOn: yarnBuild) {
+task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall']) {
+    args = System.env['BuildRunner'] != null ? 
+        System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] :  ['run', 'ci-build']
+            : org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build']
+}
+
+task buildTransport(dependsOn: npmBuild) {
     outputs.dir('.')
 }
 
