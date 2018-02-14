@@ -63,11 +63,21 @@ class CsharpCodeGenerator  {
 	
 	def String gen(Application application) {
 		'''
-			public sealed class «application.name.toFirstUpper» {
+			public sealed class «application.name.toFirstUpper»: ClientBase {
 				
 				public const string Id = "«getFullName(application, qualifiedNameProvider)»";
 				
 				«IF application.providedServices.length > 0»
+				
+				private static ClientOptions CreateClientOptions(«application.name.toFirstUpper».Impl impl) {
+					ClientOptionsBuilder builder = new ClientOptionsBuilder().WithApplicationId(Id).WithDefaultConfiguration();
+					impl.Configure(builder);
+					return builder.Build();					
+				}
+				
+				public «application.name.toFirstUpper»(«application.name.toFirstUpper».Impl impl): base(CreateClientOptions(impl)) {
+				}
+				
 				public sealed class Impl {
 														
 					public Impl(					
@@ -167,6 +177,13 @@ class CsharpCodeGenerator  {
 						«ENDFOR»						
 					}
 				«ENDFOR»
+				«ELSE»
+					private static ClientOptions CreateClientOptions() {
+						ClientOptionsBuilder builder = new ClientOptionsBuilder().WithApplicationId(Id).WithDefaultConfiguration();									
+						return builder.Build();					
+					}
+					
+					public «application.name.toFirstUpper»(): base(CreateClientOptions()) { }
 				«ENDIF»
 			}
 		'''		
