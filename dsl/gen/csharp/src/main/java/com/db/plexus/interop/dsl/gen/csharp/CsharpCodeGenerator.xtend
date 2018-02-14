@@ -76,7 +76,7 @@ class CsharpCodeGenerator  {
 						«ENDFOR»
 					) {
 						«FOR providedService: application.providedServices SEPARATOR ','»
-							«providedService.aliasOrName» = «providedService.aliasOrName.toFirstLower»Impl
+							«providedService.aliasOrName» = «providedService.aliasOrName.toFirstLower»Impl;
 						«ENDFOR»
 					}
 					
@@ -113,7 +113,7 @@ class CsharpCodeGenerator  {
 								«ENDFOR»
 							«ENDIF»
 						{
-							return Create(new «providedService.aliasOrName»Impl<T>(impl));
+							return Create((I«providedService.aliasOrName»Impl)new «providedService.aliasOrName»Impl<T>(impl));
 						}
 						
 						private readonly I«providedService.aliasOrName»Impl _impl;
@@ -133,13 +133,13 @@ class CsharpCodeGenerator  {
 						private ProvidedServiceDefinition.Builder Configure(ProvidedServiceDefinition.Builder builder) {
 							«FOR providedMethod : providedService.methods»
 								«IF providedMethod.method.isPointToPoint»
-								builder = builder.WithUnaryMethod("«providedMethod.method.name»", _impl.«providedMethod.method.name.toFirstUpper»);
+								builder = builder.WithUnaryMethod«providedMethod.method.genericArgs»("«providedMethod.method.name»", _impl.«providedMethod.method.name.toFirstUpper»);
 								«ELSEIF providedMethod.method.serverStreaming»
-								builder = builder.WithServerStreamingMethod("«providedMethod.method.name»", _impl.«providedMethod.method.name.toFirstUpper»);
+								builder = builder.WithServerStreamingMethod«providedMethod.method.genericArgs»("«providedMethod.method.name»", _impl.«providedMethod.method.name.toFirstUpper»);
 								«ELSEIF providedMethod.method.clientStreaming»
-								builder = builder.WithClientStreamingMethod("«providedMethod.method.name»", _impl.«providedMethod.method.name.toFirstUpper»);
+								builder = builder.WithClientStreamingMethod«providedMethod.method.genericArgs»("«providedMethod.method.name»", _impl.«providedMethod.method.name.toFirstUpper»);
 								«ELSEIF providedMethod.method.bidiStreaming»
-								builder = builder.WithDuplexStreamingMethod("«providedMethod.method.name»", _impl.«providedMethod.method.name.toFirstUpper»);
+								builder = builder.WithDuplexStreamingMethod«providedMethod.method.genericArgs»("«providedMethod.method.name»", _impl.«providedMethod.method.name.toFirstUpper»);
 								«ENDIF»														
 							«ENDFOR»
 							return builder; 							
@@ -190,7 +190,7 @@ class CsharpCodeGenerator  {
 
 	def String gen(Service service) {
 		'''
-			public sealed class «service.name.toFirstUpper» : IProxy {
+			public sealed class «service.name.toFirstUpper» : «service.name.toFirstUpper».IProxy {
 			
 				«FOR method : service.methods»				
 					«genMethodDescriptorStaticDeclaration(method)»
@@ -229,14 +229,14 @@ class CsharpCodeGenerator  {
 				public «service.name.toFirstUpper»(IClientCallInvoker callInvoker) {
 					_callInvoker = callInvoker;				
 					«FOR method : service.methods»
-						«genMethodDescriptorDeclaration(method, method.privateVarName)»;
+						«method.privateVarName» = «genMethodDescriptorDeclaration(method)»;
 					«ENDFOR»
 				}
 			
 				public «service.name.toFirstUpper»(IClientCallInvoker callInvoker, string alias) {
 					_callInvoker = callInvoker;				
 					«FOR method : service.methods»
-						«genMethodDescriptorDeclaration(method, "alias", method.privateVarName)»;
+						«method.privateVarName» = «genMethodDescriptorDeclaration(method, "alias")»;
 					«ENDFOR»
 				}
 				
@@ -282,19 +282,19 @@ class CsharpCodeGenerator  {
 	}
 
 	def String genMethodDescriptorStaticDeclaration(Method method) {
-		'''public static readonly «genMethodDescriptorDeclaration(method, method.name.toFirstUpper)»;'''
+		'''public static readonly «method.getCsharpTypeDeclaration» «method.name.toFirstUpper»Method = «genMethodDescriptorDeclaration(method)»;'''
 	}
 
-	def String genMethodDescriptorDeclaration(Method method, String name) {
+	def String genMethodDescriptorDeclaration(Method method) {
 		val serviceName = method.service.getFullName(qualifiedNameProvider);
 		val type = method.type
-		'''«name» = Method.«type»«method.genericArgs»("«serviceName»", "«method.name»")'''
+		'''Method.«type»«method.genericArgs»("«serviceName»", "«method.name»")'''
 	}
 
-	def String genMethodDescriptorDeclaration(Method method, String aliasVar, String name) {
+	def String genMethodDescriptorDeclaration(Method method, String aliasVar) {
 		val serviceName = method.service.getFullName(qualifiedNameProvider);
 		val type = method.type
-		'''«name» = Method.«type»«method.genericArgs»("«serviceName»", «aliasVar», "«method.name»")'''
+		'''Method.«type»«method.genericArgs»("«serviceName»", «aliasVar», "«method.name»")'''
 	}
 
 	def String getGenericArgs(Method method) {
