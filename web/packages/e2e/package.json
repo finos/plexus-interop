@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
-  "private": true,
   "description": "Integration tests for Plexus Web Interop",
   "license": "Apache-2.0",
   "scripts": {
