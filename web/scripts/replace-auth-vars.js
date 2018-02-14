@@ -41,8 +41,9 @@ if (!!buildRunner) {
     const authUserVar = 'NPM_AUTH_USER';
 
     const authToken = process.env[`${authTokenVar}${postfix}`] || process.env[authTokenVar];
-    const registry = process.env[`${registryVar}${postfix}`] || process.env[registryVar];
+    let registry = process.env[`${registryVar}${postfix}`] || process.env[registryVar];
     const user = process.env[`${authUserVar}${postfix}`] || process.env[authUserVar];
+    const templateFile = install ? '.ci-npmrc-tpl' : '.ci-publish-npmrc-tpl';
 
     if (!!authToken) {
         console.log(`Auth Token length ${authToken.length}`);
@@ -53,7 +54,7 @@ if (!!buildRunner) {
     }
 
     if (!!registry) {
-        console.log(`Registry value ${registry}`)
+        console.log(`Registry value ${registry}`);
     }
 
     if (!authToken || !registry || !user) {
@@ -66,11 +67,17 @@ if (!!buildRunner) {
 
     } else {
 
-        fs.readFile('.ci-npmrc-tpl', 'utf8', function (err,data) {
+        if (!install) {
+            // clear http/https for publish
+            registry = registry.replace("https:", "");
+            registry = registry.replace("http:", "");
+        }
+
+        fs.readFile(templateFile, 'utf8', function (err,data) {
             if (err) {
                 return console.log(err);
             }
-            data = data.replace(`\${${registryVar}}`, registry);
+            data = data.replace(new RegExp(`\\\${${registryVar}}`, 'g'), registry);
             data = data.replace(`\${${authTokenVar}}`, authToken);
             data = data.replace(`\${${authUserVar}}`, user);
             fs.writeFile('.npmrc', data, 'utf8', function (err) {
