@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "Simple Web App examples",
   "main": "index.js",
-  "private": true,
   "scripts": {
     "prebuild": "trash dist",
     "compile": "tsc -p tsconfig.json",
