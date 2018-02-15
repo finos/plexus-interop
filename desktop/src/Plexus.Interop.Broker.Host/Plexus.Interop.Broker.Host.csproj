@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="0.1.0-e171010-1" />
+    <PackageReference Include="System.CommandLine" Version="0.1.0-preview2-180215-2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -72,6 +72,12 @@ public class Main {
                 protoGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.CSHARP:
+                GenTask preProcessTask = injector.getInstance(CsharpProtoGenTask.class);
+                preProcessTask.doGen(genConfig);                
+                genConfig.setBaseDir(genConfig.getOutDir());
+                config.getBaseURIs().remove(baseDir);                
+                baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
+                config.getBaseURIs().add(baseDir);
                 GenTask cSharpGenTask = injector.getInstance(CsharpGenTask.class);
                 cSharpGenTask.doGen(genConfig);
                 break;

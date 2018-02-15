@@ -56,9 +56,9 @@ class CsharpGenTask extends BaseGenTask {
 				newUri = newUri.deresolve(baseDirUri).resolve(outDirUri)
 			} else {
 				newUri = newUri.deresolve(resourceBaseUri).resolve(outDirUri)
-			}			
-			if (path.endsWith(".proto") && !path.endsWith("google/protobuf/descriptor.proto")) {
-				val newPath = newUri.toFileString
+			}
+			if (newUri.toString.endsWith(".proto") && !newUri.toString.endsWith("google/protobuf/descriptor.proto")) {
+				val newPath = newUri.toFileString				
 				val args = new LinkedList<String>()
 				args.add(config.protocPath)
 				args.add("--proto_path=" + baseDirUri.toFileString)

@@ -76,7 +76,7 @@ class CsharpCodeGenerator  {
 	
 	def String gen(Application application) {
 		'''
-			«accessModifier» sealed class «application.name.toFirstUpper»: ClientBase {
+			«accessModifier» sealed partial class «application.name.toFirstUpper»: ClientBase {
 				
 				public const string Id = "«getFullName(application, qualifiedNameProvider)»";
 				
@@ -109,7 +109,7 @@ class CsharpCodeGenerator  {
 					«ENDFOR»
 				}
 				
-				public sealed class ServiceBinder {
+				public sealed partial class ServiceBinder {
 														
 					public ServiceBinder(					
 						«FOR providedService: application.providedServices SEPARATOR ','»
@@ -134,13 +134,13 @@ class CsharpCodeGenerator  {
 				}				
 				
 				«FOR providedService: application.providedServices SEPARATOR '\n'»
-					public interface I«providedService.aliasOrName»Impl«IF providedService.methods.length > 0»:«ENDIF»
+					public partial interface I«providedService.aliasOrName»Impl«IF providedService.methods.length > 0»:«ENDIF»
 						«FOR providedMethod : providedService.methods SEPARATOR ','»
 							«providedService.service.csharpFullName».I«providedMethod.method.name.toFirstUpper»Impl
 						«ENDFOR»
 					{ }
 					
-					public sealed class «providedService.aliasOrName»Binder {
+					public sealed partial class «providedService.aliasOrName»Binder {
 						
 						public static «providedService.aliasOrName»Binder Create(I«providedService.aliasOrName»Impl impl) {
 							return new «providedService.aliasOrName»Binder(impl);
@@ -187,7 +187,7 @@ class CsharpCodeGenerator  {
 						}
 					}
 					
-					public sealed class «providedService.aliasOrName»Impl<T>: I«providedService.aliasOrName»Impl
+					public sealed partial class «providedService.aliasOrName»Impl<T>: I«providedService.aliasOrName»Impl
 						«IF providedService.methods.length > 0»
 							where T:
 							«FOR providedMethod : providedService.methods SEPARATOR ','»
@@ -226,13 +226,13 @@ class CsharpCodeGenerator  {
 				«ENDIF»
 				
 				«FOR consumedService: application.consumedServices SEPARATOR '\n'»					
-					public interface I«consumedService.aliasOrName»Proxy«IF consumedService.methods.length > 0»:«ENDIF»
+					public partial interface I«consumedService.aliasOrName»Proxy«IF consumedService.methods.length > 0»:«ENDIF»
 						«FOR consumedMethod : consumedService.methods SEPARATOR ','»
 							«consumedService.service.csharpFullName».I«consumedMethod.method.name.toFirstUpper»Proxy
 						«ENDFOR»						
 					{ }
 					
-					public sealed class «consumedService.aliasOrName»Proxy: I«consumedService.aliasOrName»Proxy {
+					public sealed partial class «consumedService.aliasOrName»Proxy: I«consumedService.aliasOrName»Proxy {
 						
 						«IF consumedService.alias === null»
 						public static «consumedService.service.csharpFullName».Descriptor Descriptor = «consumedService.service.csharpFullName».DefaultDescriptor;
@@ -285,7 +285,7 @@ class CsharpCodeGenerator  {
 
 	def String gen(Service service) {
 		'''
-			«accessModifier» sealed class «service.name.toFirstUpper» {
+			«accessModifier» sealed partial class «service.name.toFirstUpper» {
 				
 				public const string Id = "«getFullName(service, qualifiedNameProvider)»";			
 				«FOR method : service.methods»
@@ -303,18 +303,18 @@ class CsharpCodeGenerator  {
 				}				
 			
 				«FOR method : service.methods SEPARATOR '\n'»
-				public interface I«method.name.toFirstUpper»Proxy {
+				public partial interface I«method.name.toFirstUpper»Proxy {
 					«genProxySignature(method, "request")»;
 				}
 				«ENDFOR»
 				
 				«FOR method : service.methods SEPARATOR '\n'»
-				public interface I«method.name.toFirstUpper»Impl {
+				public partial interface I«method.name.toFirstUpper»Impl {
 					«genImplSignature(method)»;
 				}
 				«ENDFOR»
 				
-				public sealed class Descriptor {
+				public sealed partial class Descriptor {
 				
 					«FOR method : service.methods»
 					public «method.csharpTypeDeclaration» «method.name.toFirstUpper»Method {get; private set; }

@@ -25,12 +25,12 @@ import org.eclipse.xtext.resource.XtextResourceSet
 class CsharpProtoGenTask extends ProtoGenTask {
 	
 	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException {
-			
+		var namespace = config.namespace;
 		if (config.namespace !== null) {
-			if (config.namespace.startsWith("internal_access:")) {
-				config.namespace = config.namespace.substring("internal_access:".length)
+			if (namespace.startsWith("internal_access:")) {
+				namespace = namespace.substring("internal_access:".length)
 			}
-			super.customOptions.add(new ProtoOption("csharp_namespace", config.namespace))		
+			super.customOptions.add(new ProtoOption("csharp_namespace", namespace))		
 		}
 
 		super.doGenWithResources(config, resourceSet)
