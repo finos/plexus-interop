@@ -62,7 +62,10 @@ class CsharpGenTask extends BaseGenTask {
 				val args = new LinkedList<String>()
 				args.add(config.protocPath)
 				args.add("--proto_path=" + baseDirUri.toFileString)
-				args.add("--proto_path=" + resourceBaseUri.toFileString)
+				val resourceBasePath = resourceBaseUri.toFileString
+				if (resourceBasePath !== null) { 				
+					args.add("--proto_path=" + resourceBaseUri.toFileString)				
+				}
 				args.add("--csharp_out=" + internalAccessArg + Paths.get(newPath).parent)
 				args.add("--csharp_opt=file_extension=.msg.g.cs")
 				args.add(path)

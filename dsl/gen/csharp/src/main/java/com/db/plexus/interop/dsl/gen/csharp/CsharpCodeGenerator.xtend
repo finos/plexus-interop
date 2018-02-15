@@ -76,7 +76,13 @@ class CsharpCodeGenerator  {
 	
 	def String gen(Application application) {
 		'''
-			«accessModifier» sealed partial class «application.name.toFirstUpper»: ClientBase {
+			«accessModifier» partial interface I«application.name.toFirstUpper»: IClient {
+				«FOR consumedService: application.consumedServices SEPARATOR '\n'»										
+					public «application.name.toFirstUpper».I«consumedService.aliasOrName»Proxy «consumedService.aliasOrName» { get; }
+				«ENDFOR»				
+			}
+
+			«accessModifier» sealed partial class «application.name.toFirstUpper»: ClientBase, I«application.name.toFirstUpper» {
 				
 				public const string Id = "«getFullName(application, qualifiedNameProvider)»";
 				

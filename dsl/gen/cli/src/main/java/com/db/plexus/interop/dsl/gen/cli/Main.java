@@ -30,6 +30,7 @@ import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask;
 import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig;
 import com.google.inject.Injector;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -73,8 +74,14 @@ public class Main {
                 break;
             case CodeOutputGenerator.CSHARP:
                 GenTask preProcessTask = injector.getInstance(CsharpProtoGenTask.class);
+                File temp = File.createTempFile("proto", Long.toString(System.nanoTime()));
+        		temp.delete();
+        		temp.mkdir();
+        		String outDir = genConfig.getOutDir();
+        		genConfig.setOutDir(temp.getPath());
                 preProcessTask.doGen(genConfig);                
-                genConfig.setBaseDir(genConfig.getOutDir());
+                genConfig.setBaseDir(temp.getPath());
+                genConfig.setOutDir(outDir);
                 config.getBaseURIs().remove(baseDir);                
                 baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
                 config.getBaseURIs().add(baseDir);
