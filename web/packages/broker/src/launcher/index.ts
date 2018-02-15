@@ -19,3 +19,4 @@ export * from "./UrlWebAppLauncher";
 export * from "./AppLaunchResponse";
 export * from "./LaunchInvocationContext";
 export * from "./AppLaunchRequest";
+export * from "./AppLauncherRegistry";
