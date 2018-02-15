@@ -37,7 +37,7 @@ class CsharpGenTask extends BaseGenTask {
 
 		logger.info(String.format("Generating C# code for %s from %s to %s", config.input, baseDirUri.toFileString, outDirUri.toFileString))
 		
-		var generator = new CsharpCodeGenerator(config, qualifiedNameProvider)
+		var generator = new CsharpCodeGenerator(config, qualifiedNameProvider, baseDirUri)
 
 		val resources = resourceSet.resources
 
