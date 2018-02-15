@@ -26,6 +26,8 @@ public interface CodeOutputGenerator {
     
     String PROTO = "proto";
     
+    String PROTO_CSHARP = "proto_csharp";
+    
     String CSHARP = "csharp";
 
     String generate(PlexusGenConfig genConfig, List<Resource> resources);

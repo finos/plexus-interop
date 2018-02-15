@@ -41,9 +41,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public abstract class BaseGenTask implements GenTask {
-
-    @Inject
-    private XtextResourceSet resourceSet;
+    
+    private XtextResourceSet resourceSet = new XtextResourceSet();
 
     @Inject
     protected IResourceValidator validator;
@@ -59,8 +58,7 @@ public abstract class BaseGenTask implements GenTask {
         return config.getInput();
     }
 
-    public void doGen(PlexusGenConfig config) throws IOException, URISyntaxException {    	
-    	    	
+    public void doGen(PlexusGenConfig config) throws IOException, URISyntaxException {    	    	
     	this.workingDirUri = URI.createFileURI(Paths.get("").toAbsolutePath().toString()).appendSegment("");
         this.baseDirUri = getBaseDirUri(config);
         this.outDirUri = getOutDirUri(config);

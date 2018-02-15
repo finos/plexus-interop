@@ -23,6 +23,7 @@ import com.db.plexus.interop.dsl.gen.GenTask;
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig;
 import com.db.plexus.interop.dsl.gen.js.JsGenTask;
 import com.db.plexus.interop.dsl.gen.csharp.CsharpGenTask;
+import com.db.plexus.interop.dsl.gen.csharp.CsharpProtoGenTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenTask;
 import com.db.plexus.interop.dsl.gen.ts.TsGenTask;
 import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask;
@@ -73,6 +74,10 @@ public class Main {
             case CodeOutputGenerator.CSHARP:
                 GenTask cSharpGenTask = injector.getInstance(CsharpGenTask.class);
                 cSharpGenTask.doGen(genConfig);
+                break;
+            case CodeOutputGenerator.PROTO_CSHARP:
+                GenTask protoCSharpGenTask = injector.getInstance(CsharpProtoGenTask.class);
+                protoCSharpGenTask.doGen(genConfig);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type " + type);

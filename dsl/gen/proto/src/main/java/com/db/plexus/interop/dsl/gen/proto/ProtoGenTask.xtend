@@ -16,32 +16,31 @@
  */
 package com.db.plexus.interop.dsl.gen.proto
 
+import com.db.plexus.interop.dsl.gen.BaseGenTask
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
-import java.io.IOException
-import org.eclipse.xtext.resource.XtextResourceSet
-import com.google.inject.Inject
-import org.eclipse.emf.common.util.URI
-import org.eclipse.xtext.EcoreUtil2
-import org.eclipse.xtext.validation.IResourceValidator
-import org.eclipse.xtext.util.CancelIndicator
-import org.eclipse.xtext.validation.CheckMode
-import org.eclipse.xtext.validation.Issue
-import java.util.LinkedList
-import org.eclipse.xtext.diagnostics.Severity
-import java.util.Collections
-import com.db.plexus.interop.dsl.protobuf.Service
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import com.db.plexus.interop.dsl.protobuf.ProtobufFactory
-import com.db.plexus.interop.dsl.protobuf.Message
-import com.db.plexus.interop.dsl.protobuf.Option
 import com.db.plexus.interop.dsl.protobuf.Import
+import com.db.plexus.interop.dsl.protobuf.Message
+import com.db.plexus.interop.dsl.protobuf.NamedElement
+import com.db.plexus.interop.dsl.protobuf.Option
 import com.db.plexus.interop.dsl.protobuf.Proto
-import org.eclipse.emf.ecore.resource.Resource
+import com.db.plexus.interop.dsl.protobuf.ProtobufFactory
+import com.db.plexus.interop.dsl.protobuf.Service
+import com.google.inject.Inject
 import java.io.File
 import java.io.FileOutputStream
-import com.db.plexus.interop.dsl.protobuf.NamedElement
-import com.db.plexus.interop.dsl.gen.util.FileUtils
-import com.db.plexus.interop.dsl.gen.BaseGenTask
+import java.io.IOException
+import java.util.Collections
+import java.util.LinkedList
+import org.eclipse.emf.common.util.URI
+import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.diagnostics.Severity
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.resource.XtextResourceSet
+import org.eclipse.xtext.util.CancelIndicator
+import org.eclipse.xtext.validation.CheckMode
+import org.eclipse.xtext.validation.IResourceValidator
+import org.eclipse.xtext.validation.Issue
 
 public class ProtoGenTask extends BaseGenTask {
 
@@ -51,7 +50,7 @@ public class ProtoGenTask extends BaseGenTask {
 	@Inject
 	IQualifiedNameProvider qualifiedNameProvider
 
-	private val customOptions = new LinkedList<ProtoOption>
+	protected val customOptions = new LinkedList<ProtoOption>
 
 	public def getCustomOptions() {
 		customOptions
@@ -59,7 +58,7 @@ public class ProtoGenTask extends BaseGenTask {
 
 	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
 
-		println("Generating proto contract for " + config.input + " to folder " + config.outDir)
+		logger.info("Generating proto contract for " + config.input + " to folder " + config.outDir)
 
 		val optionsUri = URI.createURI(
 			ClassLoader.getSystemClassLoader().getResource("interop/Options.proto").toURI().toString())
@@ -69,9 +68,6 @@ public class ProtoGenTask extends BaseGenTask {
 			
 		var interopResourceBaseUri = optionsUri.trimSegments(2).appendSegment("");
 		var protoResourceBaseUri = descriptorUri.trimSegments(3).appendSegment("");
-		System.out.println("Resource base URI: " + interopResourceBaseUri)		
-
-		rs.getResource(URI.createFileURI(config.input).resolve(workingDirUri), true)
 		
 		if (rs.resources.findFirst[r|r.URI.toString().endsWith("interop/Options.proto")] === null) {
 			rs.getResource(optionsUri, true)
@@ -81,18 +77,18 @@ public class ProtoGenTask extends BaseGenTask {
 
 		val allIssues = new LinkedList<Issue>()
 		for (resource : rs.resources) {
-			System.out.println("Loaded resource: " + resource.URI)
+			logger.info("Loaded resource: " + resource.URI)
 			val issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl)
 			allIssues.addAll(issues)
 		}
 		var errors = allIssues.filter[x|x.severity == Severity.ERROR].toList()
 		var otherIssues = allIssues.filter[x|x.severity != Severity.ERROR]
 		for (issue : otherIssues) {
-			System.out.println(issue)
+			logger.warning(issue.toString)
 		}
 		if (errors.length > 0) {
 			for (issue : errors) {
-				System.err.println(issue)
+				logger.severe(issue.toString)				
 			}
 			throw new IOException("Errors found in the loaded resources")
 		}
@@ -100,21 +96,17 @@ public class ProtoGenTask extends BaseGenTask {
 		val oldResources = new LinkedList<Resource>
 		oldResources.addAll(rs.resources)
 
-		val protocArgs = new StringBuilder()
-		protocArgs.append("\"" + config.protocPath + "\"")
-		protocArgs.append(" %* ")
-
 		for (r : oldResources) {
 
 			if (r.contents.length > 0) {
 
-				println("Processing " + r.URI)
+				logger.info("Processing " + r.URI)
 
 				val uriStr = r.URI.toString()
 				val isProto = uriStr.endsWith(".proto")
 				val isDescriptorProto = isProto && uriStr.endsWith("google/protobuf/descriptor.proto")
-				val needAddCustomOptions = isProto && !isDescriptorProto
-				val needAddPlexusOptions = isProto && !isDescriptorProto && !uriStr.endsWith("interop/Options.proto")
+				val needAddCustomOptions = !isDescriptorProto
+				val needAddPlexusOptions = !isDescriptorProto && !uriStr.endsWith("interop/Options.proto")
 
 				val root = r.contents.get(0) as Proto
 				val firstDefinition = root.elements.findFirst[x|x instanceof NamedElement]
@@ -193,14 +185,10 @@ public class ProtoGenTask extends BaseGenTask {
 				}									
 				uri = uri.resolve(outDirUri)
 
-				println("Saving " + uri)
+				logger.info("Saving " + uri)
 				var FileOutputStream fop
 				try {
 					val file = new File(uri.toFileString())
-					if (uri.lastSegment.endsWith(".proto")) {
-						protocArgs.append(' ')
-						protocArgs.append(new File(uri.deresolve(outDirUri).toFileString()))					
-					}
 										
 					if (file.exists()) {
 						file.delete()
@@ -215,8 +203,6 @@ public class ProtoGenTask extends BaseGenTask {
 						fop.close();
 					}
 				}
-				val generateCmdPath = URI.createURI("generate.cmd").resolve(outDirUri).toFileString()
-				FileUtils.writeStringToFile(new File(generateCmdPath), protocArgs.toString())
 			}
 		}
 	}
