@@ -23,7 +23,7 @@
 
     public sealed class ClientFactory : IClientFactory
     {
-        public static readonly ClientFactory Instance = new ClientFactory();
+        public static readonly IClientFactory Instance = new ClientFactory();
 
         public IClient Create(ClientOptions options)
         {
