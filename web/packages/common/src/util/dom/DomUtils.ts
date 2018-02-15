@@ -44,6 +44,9 @@ export class DomUtils {
     }
 
     public static getOrigin(url: string): string {
+        if (url.startsWith("/")) {
+            return window.location.origin;
+        }
         const parts = url.split("/");
         if (parts.length > 2 && parts[0].indexOf("http") === 0) {
             return parts[0] + "//" + parts[2];
