@@ -62,7 +62,7 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer
                 }
                 // Requesting ccy pair rate from another app
                 var request = new CcyPair {CcyPairName = ccyPairName};                
-                var response = await client.Call(GetRateMethod, request);
+                var response = await client.CallInvoker.Call(GetRateMethod, request);
                 Console.WriteLine("Response received: " + response);
             }
 

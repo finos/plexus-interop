@@ -225,7 +225,7 @@ namespace Plexus.Interop.Apps
             var launchMethodReference =
                 ProvidedMethodReference.Create("interop.AppLauncherService", "Launch", appDto.LauncherId);
 
-            var response = await _client
+            var response = await _client.CallInvoker
                 .CallUnary<AppLaunchRequest, AppLaunchResponse>(
                     launchMethodReference.CallDescriptor,
                     new AppLaunchRequest

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,29 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
-    using System;
-    using System.Threading.Tasks;
+    using System.IO;
 
-    public interface IClient : IDisposable
+    public sealed class NothingMarshaller : IMarshaller<Nothing>
     {
-        IClientCallInvoker CallInvoker { get; }
+        private static readonly byte[] Buffer = new byte[64];
 
-        IClientDiscoveryInvoker DiscoveryInvoker { get; }
+        public static readonly IMarshaller<Nothing> Instance = new NothingMarshaller();
 
-        string ApplicationId { get; }
+        private NothingMarshaller()
+        {
+        }
 
-        UniqueId ApplicationInstanceId { get; }
+        public string MessageId { get; } = "interop.Nothing";
 
-        UniqueId ConnectionId { get; }
+        public void Encode(Nothing obj, Stream stream)
+        {
+        }
 
-        Task Completion { get; }        
-
-        Task ConnectAsync();
-
-        void Disconnect();
-
-        Task DisconnectAsync();
+        public Nothing Decode(Stream stream)
+        {
+            while (stream.Read(Buffer, 0, Buffer.Length) > 0)
+            {
+            }
+            return Nothing.Instance;
+        }
     }
 }

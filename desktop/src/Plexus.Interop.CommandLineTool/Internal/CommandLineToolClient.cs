@@ -49,7 +49,7 @@
 
         public async Task<ActivateAppResponse> ActivateAppAsync(string appId)
         {
-            var response = await _client.Call(ActivateAppMethood, new ActivateAppRequest {AppId = appId});
+            var response = await _client.CallInvoker.Call(ActivateAppMethood, new ActivateAppRequest {AppId = appId});
             return response;
         }
     }

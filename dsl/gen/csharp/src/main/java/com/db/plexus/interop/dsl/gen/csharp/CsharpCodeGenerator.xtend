@@ -78,7 +78,7 @@ class CsharpCodeGenerator  {
 		'''
 			«accessModifier» partial interface I«application.name.toFirstUpper»: IClient {
 				«FOR consumedService: application.consumedServices SEPARATOR '\n'»										
-					public «application.name.toFirstUpper».I«consumedService.aliasOrName»Proxy «consumedService.aliasOrName» { get; }
+					«application.name.toFirstUpper».I«consumedService.aliasOrName»Proxy «consumedService.aliasOrName» { get; }
 				«ENDFOR»				
 			}
 
@@ -111,7 +111,7 @@ class CsharpCodeGenerator  {
 				public «application.name.toFirstUpper»(«application.name.toFirstUpper».ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
 				{
 					«FOR consumedService : application.consumedServices»
-					«consumedService.aliasOrName» = new «application.name.toFirstUpper».«consumedService.aliasOrName»Proxy(this);
+					«consumedService.aliasOrName» = new «application.name.toFirstUpper».«consumedService.aliasOrName»Proxy(this.CallInvoker);
 					«ENDFOR»
 				}
 				
@@ -226,7 +226,7 @@ class CsharpCodeGenerator  {
 					public «application.name.toFirstUpper»(Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(setup)) 
 					{ 
 						«FOR consumedService : application.consumedServices»
-						«consumedService.aliasOrName» = new «application.name.toFirstUpper».«consumedService.aliasOrName»Proxy(this);
+						«consumedService.aliasOrName» = new «application.name.toFirstUpper».«consumedService.aliasOrName»Proxy(this.CallInvoker);
 						«ENDFOR»						
 					}
 				«ENDIF»
@@ -269,26 +269,6 @@ class CsharpCodeGenerator  {
 		'''		
 	}
 	
-	def String genImplCallCode(Method method, String varName) {
-		if (method.pointToPoint) {
-			'''«varName».«method.name.toFirstUpper»(request, context)'''
-		} else if (method.serverStreaming) {
-			'''«varName».«method.name.toFirstUpper»(request, responseStream, context)'''
-		} else if (method.clientStreaming) {
-			'''«varName».«method.name.toFirstUpper»(requestStream, context)'''
-		} else if (method.bidiStreaming) {			
-			'''«varName».«method.name.toFirstUpper»(requestStream, responseStream, context)'''
-		}
-	}	
-	
-	def String getAliasOrName(ProvidedService providedService) {
-		if (providedService.alias !== null) providedService.alias.toFirstUpper else providedService.service.name.toFirstUpper 
-	}
-	
-	def String getAliasOrName(ConsumedService consumedService) {
-		if (consumedService.alias !== null) consumedService.alias.toFirstUpper else consumedService.service.name.toFirstUpper 
-	}
-
 	def String gen(Service service) {
 		'''
 			«accessModifier» sealed partial class «service.name.toFirstUpper» {
@@ -428,4 +408,24 @@ class CsharpCodeGenerator  {
 	def getCsharpFullName(Service obj) {
 		return "global::" + getCsharpNamespace(obj.eResource) + "." + obj.name.toFirstUpper
 	}
+	
+	def String genImplCallCode(Method method, String varName) {
+		if (method.pointToPoint) {
+			'''«varName».«method.name.toFirstUpper»(request, context)'''
+		} else if (method.serverStreaming) {
+			'''«varName».«method.name.toFirstUpper»(request, responseStream, context)'''
+		} else if (method.clientStreaming) {
+			'''«varName».«method.name.toFirstUpper»(requestStream, context)'''
+		} else if (method.bidiStreaming) {			
+			'''«varName».«method.name.toFirstUpper»(requestStream, responseStream, context)'''
+		}
+	}	
+	
+	def String getAliasOrName(ProvidedService providedService) {
+		if (providedService.alias !== null) providedService.alias.toFirstUpper else providedService.service.name.toFirstUpper 
+	}
+	
+	def String getAliasOrName(ConsumedService consumedService) {
+		if (consumedService.alias !== null) consumedService.alias.toFirstUpper else consumedService.service.name.toFirstUpper 
+	}	
 }

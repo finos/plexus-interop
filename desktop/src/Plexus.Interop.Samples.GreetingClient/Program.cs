@@ -183,7 +183,7 @@ namespace Plexus.Interop.Samples.GreetingClient
         internal static async Task DiscoveryExampleAsync(IGreetingClient client)
         {            
             Console.WriteLine("Calling discovery for method {0}", GreetingService.DefaultDescriptor.UnaryMethod);
-            var discoveredProviders = (await client.DiscoverAsync(GreetingService.DefaultDescriptor.UnaryMethod)).ToArray();
+            var discoveredProviders = (await client.DiscoveryInvoker.DiscoverAsync(GreetingService.DefaultDescriptor.UnaryMethod)).ToArray();
             Console.WriteLine("Discovered {0} actions:", discoveredProviders.Length);
             for (var i=0; i<discoveredProviders.Length; i++)
             {                       
@@ -207,7 +207,7 @@ namespace Plexus.Interop.Samples.GreetingClient
                 var name = Console.ReadLine();
                 var request = new GreetingRequest { Name = name };
                 Console.WriteLine("Sending: {0}", name);
-                var response = await client.Call(provider, request);
+                var response = await client.CallInvoker.Call(provider, request);
                 Console.WriteLine("Received: {0}", response.Greeting);
                 break;
             }

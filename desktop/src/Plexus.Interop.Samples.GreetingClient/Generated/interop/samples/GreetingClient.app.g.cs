@@ -14,7 +14,7 @@ namespace Plexus.Interop.Samples.GreetingClient.Generated {
 					
 					
 	internal partial interface IGreetingClient: IClient {
-		public GreetingClient.IGreetingServiceProxy GreetingService { get; }
+		GreetingClient.IGreetingServiceProxy GreetingService { get; }
 	}
 	
 	internal sealed partial class GreetingClient: ClientBase, IGreetingClient {
@@ -31,7 +31,7 @@ namespace Plexus.Interop.Samples.GreetingClient.Generated {
 		
 		public GreetingClient(Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(setup)) 
 		{ 
-			GreetingService = new GreetingClient.GreetingServiceProxy(this);
+			GreetingService = new GreetingClient.GreetingServiceProxy(this.CallInvoker);
 		}
 		
 		public partial interface IGreetingServiceProxy:

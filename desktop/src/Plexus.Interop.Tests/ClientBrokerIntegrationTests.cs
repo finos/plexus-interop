@@ -122,7 +122,7 @@ namespace Plexus.Interop
                     var client = ConnectEchoClient();
                     await broker.StopAsync();
                     client.Completion.ShouldCompleteIn(Timeout1Sec);
-                    client.Call(EchoUnaryMethod, new EchoRequest())
+                    client.CallInvoker.Call(EchoUnaryMethod, new EchoRequest())
                         .AsTask()
                         .ShouldThrow<TaskCanceledException>(Timeout1Sec);
                 }
@@ -156,7 +156,7 @@ namespace Plexus.Interop
                     );
                     var sentRequest = CreateTestRequest();
                     Console.WriteLine("Starting call");
-                    var response = await client.Call(EchoUnaryMethod, sentRequest);
+                    var response = await client.CallInvoker.Call(EchoUnaryMethod, sentRequest);
                     Console.WriteLine("Response received");
                     receivedRequest.ShouldBe(sentRequest);
                     response.ShouldBe(sentRequest);
@@ -216,7 +216,7 @@ namespace Plexus.Interop
                         )
                     );
                     Console.WriteLine("Starting call");
-                    Should.Throw<Exception>(() => client.Call(EchoUnaryMethod, new EchoRequest()).AsTask());
+                    Should.Throw<Exception>(() => client.CallInvoker.Call(EchoUnaryMethod, new EchoRequest()).AsTask());
                     Console.WriteLine("Response received");
                 }
             });
@@ -243,7 +243,7 @@ namespace Plexus.Interop
                         )
                     );
                     Console.WriteLine("Starting call");
-                    var ex = Should.Throw<Exception>(() => client.Call(EchoUnaryMethod, new EchoRequest()).AsTask());
+                    var ex = Should.Throw<Exception>(() => client.CallInvoker.Call(EchoUnaryMethod, new EchoRequest()).AsTask());
                     Console.WriteLine("Exception received: {0}", ex.FormatToString());
                 }
             });
@@ -264,7 +264,7 @@ namespace Plexus.Interop
                         )
                     );
                     Console.WriteLine("Starting call");
-                    Should.Throw<Exception>(() => client.Call(EchoUnaryMethod, new EchoRequest()).AsTask());
+                    Should.Throw<Exception>(() => client.CallInvoker.Call(EchoUnaryMethod, new EchoRequest()).AsTask());
                     Console.WriteLine("Response received");
                 }
             });
@@ -300,7 +300,7 @@ namespace Plexus.Interop
                         )
                     );                    
                     Console.WriteLine("Starting call");
-                    var call = client.Call(EchoServerStreamingMethod, sentRequest);                    
+                    var call = client.CallInvoker.Call(EchoServerStreamingMethod, sentRequest);                    
                     while (await call.ResponseStream.WaitReadAvailableAsync())
                     {
                         while (call.ResponseStream.TryRead(out var item))
@@ -350,7 +350,7 @@ namespace Plexus.Interop
                         )
                     );
                     WriteLog("Starting call");
-                    var call = client.Call(EchoServerStreamingMethod, sentRequest);
+                    var call = client.CallInvoker.Call(EchoServerStreamingMethod, sentRequest);
                     await call.ResponseStream.ReadAsync();
                     WriteLog("Cancelling call");
                     call.CancelAsync().ShouldCompleteIn(Timeout5Sec);
@@ -393,7 +393,7 @@ namespace Plexus.Interop
                     );
                     var sentRequest = CreateTestRequest();
                     Console.WriteLine("Starting call");
-                    var call = client.Call(EchoClientStreamingMethod);
+                    var call = client.CallInvoker.Call(EchoClientStreamingMethod);
                     for (var i = 0; i < 3; i++)
                     {
                         await call.RequestStream.WriteAsync(sentRequest).ConfigureAwait(false);
@@ -446,7 +446,7 @@ namespace Plexus.Interop
                     var sentRequest = CreateTestRequest();
                     Console.WriteLine("Starting call");
                     var responses = new List<EchoRequest>();
-                    var call = client.Call(EchoDuplexStreamingMethod);
+                    var call = client.CallInvoker.Call(EchoDuplexStreamingMethod);
                     for (var i = 0; i < 3; i++)
                     {
                         await call.RequestStream.WriteAsync(sentRequest);
@@ -482,7 +482,7 @@ namespace Plexus.Interop
                 using (await StartTestBrokerAsync())
                 {
                     var client = ConnectEchoClient();
-                    var discoveryResults = await client.DiscoverAsync(EchoUnaryMethod);
+                    var discoveryResults = await client.DiscoveryInvoker.DiscoverAsync(EchoUnaryMethod);
                     discoveryResults.Count.ShouldBe(1);
                     var discoveryResult = discoveryResults.Single();
                     discoveryResult.Title.ShouldBe("Sample Unary Method");
@@ -498,6 +498,29 @@ namespace Plexus.Interop
         }
 
         [Fact]
+        public void DiscoveryByMethodWithNoResponse()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var client = ConnectEchoClient();
+                    var discoveryResults = await client.DiscoveryInvoker.DiscoverAsync(EchoUnaryMethod);
+                    discoveryResults.Count.ShouldBe(1);
+                    var discoveryResult = discoveryResults.Single();
+                    discoveryResult.Title.ShouldBe("Sample Unary Method");
+                    discoveryResult.ProvidedMethod.ProvidedService.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                    discoveryResult.ProvidedMethod.ProvidedService.ServiceAlias.HasValue.ShouldBeFalse();
+                    discoveryResult.ProvidedMethod.ProvidedService.ApplicationId.ShouldBe("plexus.interop.testing.EchoServer");
+                    discoveryResult.ProvidedMethod.Name.ShouldBe("Unary");
+                    discoveryResult.InputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
+                    discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
+                    discoveryResult.Type.ShouldBe(MethodType.Unary);
+                }
+            });
+        }
+
+        [Fact]
         public void DiscoveryByService()
         {
             RunWith10SecTimeout(async () =>
@@ -507,7 +530,7 @@ namespace Plexus.Interop
                     ConnectEchoServer();
                     ConnectEchoServer();
                     var client = ConnectEchoClient();
-                    var discoveryResults = await client.DiscoverAsync(ServiceDiscoveryQuery.Create(EchoUnaryMethod.Reference.Service));
+                    var discoveryResults = await client.DiscoveryInvoker.DiscoverAsync(ServiceDiscoveryQuery.Create(EchoUnaryMethod.Reference.Service));
                     discoveryResults.Count.ShouldBe(1);
                     foreach (var discoveryResult in discoveryResults)
                     {
@@ -535,7 +558,7 @@ namespace Plexus.Interop
                     var server1 = ConnectEchoServer();
                     var server2 = ConnectEchoServer();
                     var client = ConnectEchoClient();
-                    var discoveryResults = await client.DiscoverOnlineAsync(EchoUnaryMethod);
+                    var discoveryResults = await client.DiscoveryInvoker.DiscoverOnlineAsync(EchoUnaryMethod);
                     discoveryResults.Count.ShouldBe(2);
                     foreach (var discoveryResult in discoveryResults)
                     {
@@ -564,7 +587,7 @@ namespace Plexus.Interop
                     var server1 = ConnectEchoServer();
                     var server2 = ConnectEchoServer();
                     var client = ConnectEchoClient();
-                    var discoveryResults = await client.DiscoverOnlineAsync(ServiceDiscoveryQuery.Create(EchoUnaryMethod.Reference.Service));
+                    var discoveryResults = await client.DiscoveryInvoker.DiscoverOnlineAsync(ServiceDiscoveryQuery.Create(EchoUnaryMethod.Reference.Service));
                     discoveryResults.Count.ShouldBe(2);
                     foreach (var discoveryResult in discoveryResults)
                     {
@@ -601,9 +624,9 @@ namespace Plexus.Interop
                             s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
                         )
                     );
-                    var discoveryResult = (await client.DiscoverAsync(EchoUnaryMethod)).Single();
+                    var discoveryResult = (await client.DiscoveryInvoker.DiscoverAsync(EchoUnaryMethod)).Single();
                     var request = CreateTestRequest();
-                    var response = await client.Call(discoveryResult, request).ConfigureAwait(false);
+                    var response = await client.CallInvoker.Call(discoveryResult, request).ConfigureAwait(false);
                     response.ShouldBe(request);
                 }                
             });
@@ -617,7 +640,7 @@ namespace Plexus.Interop
                 using (await StartTestBrokerAsync())
                 {
                     var client = ConnectEchoClient();
-                    var discoveryResults = await client.DiscoverAsync<EchoRequest>();
+                    var discoveryResults = await client.DiscoveryInvoker.DiscoverAsync<EchoRequest>();
                     discoveryResults.Count.ShouldBe(4);
                     var unary = discoveryResults.Single(x => string.Equals(x.ProvidedMethod.Name, "Unary"));
                     unary.Type.ShouldBe(MethodType.Unary);
@@ -635,7 +658,7 @@ namespace Plexus.Interop
                 using (await StartTestBrokerAsync())
                 {
                     var client = ConnectEchoClient();
-                    Should.Throw<Exception>(async () => await client.Call(EchoUnaryMethod, new EchoRequest()), Timeout5Sec);
+                    Should.Throw<Exception>(async () => await client.CallInvoker.Call(EchoUnaryMethod, new EchoRequest()), Timeout5Sec);
                 }
             });
         }
@@ -665,7 +688,7 @@ namespace Plexus.Interop
                     await appLauncher.StartAsync();
                     var client = ConnectEchoClient();
                     var request = CreateTestRequest();
-                    var response = await client.Call(EchoUnaryMethod, request);
+                    var response = await client.CallInvoker.Call(EchoUnaryMethod, request);
                     response.ShouldBe(request);
                     receivedRequest.ShouldBe(request);
                 }
