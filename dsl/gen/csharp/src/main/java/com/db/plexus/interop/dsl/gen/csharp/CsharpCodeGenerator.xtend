@@ -98,13 +98,13 @@ class CsharpCodeGenerator  {
 				
 				public «application.name.toFirstUpper»(
 					«FOR providedService: application.providedServices»
-						«providedService.aliasOrName»Binder «providedService.aliasOrName.toFirstLower»Binder,
+						«application.name.toFirstUpper».I«providedService.aliasOrName»Impl «providedService.aliasOrName.toFirstLower»,
 					«ENDFOR»
 					Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null
 				)
 				:this(new «application.name.toFirstUpper».ServiceBinder(
 					«FOR providedService: application.providedServices SEPARATOR ','»
-						«providedService.aliasOrName.toFirstLower»Binder
+						«providedService.aliasOrName.toFirstLower»
 					«ENDFOR»					
 				), setup) { }
 				
@@ -114,31 +114,31 @@ class CsharpCodeGenerator  {
 					«consumedService.aliasOrName» = new «application.name.toFirstUpper».«consumedService.aliasOrName»Proxy(this.CallInvoker);
 					«ENDFOR»
 				}
-				
+
 				public sealed partial class ServiceBinder {
-														
-					public ServiceBinder(					
+					
+					public ServiceBinder(
 						«FOR providedService: application.providedServices SEPARATOR ','»
-							«providedService.aliasOrName»Binder «providedService.aliasOrName.toFirstLower»Binder
+							«application.name.toFirstUpper».I«providedService.aliasOrName»Impl «providedService.aliasOrName.toFirstLower»
 						«ENDFOR»
 					) {
 						«FOR providedService: application.providedServices SEPARATOR ','»
-							«providedService.aliasOrName»Binder = «providedService.aliasOrName.toFirstLower»Binder;
+							_«providedService.aliasOrName.toFirstLower»Binder = new «application.name.toFirstUpper».«providedService.aliasOrName»Binder(«providedService.aliasOrName.toFirstLower»);
 						«ENDFOR»
 					}
 					
 					«FOR providedService: application.providedServices»
-						public «providedService.aliasOrName»Binder «providedService.aliasOrName»Binder { get; private set; }
+						private «providedService.aliasOrName»Binder _«providedService.aliasOrName.toFirstLower»Binder;
 					«ENDFOR»
 					
 					public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
 						«FOR providedService: application.providedServices»
-							builder = «providedService.aliasOrName»Binder.Bind(builder);
+							builder = _«providedService.aliasOrName.toFirstLower»Binder.Bind(builder);
 						«ENDFOR»
 						return builder;
 					}
-				}				
-				
+				}
+
 				«FOR providedService: application.providedServices SEPARATOR '\n'»
 					public partial interface I«providedService.aliasOrName»Impl«IF providedService.methods.length > 0»:«ENDIF»
 						«FOR providedMethod : providedService.methods SEPARATOR ','»
@@ -146,34 +146,23 @@ class CsharpCodeGenerator  {
 						«ENDFOR»
 					{ }
 					
-					public sealed partial class «providedService.aliasOrName»Binder {
+					private sealed partial class «providedService.aliasOrName»Binder {
 						
-						public static «providedService.aliasOrName»Binder Create(I«providedService.aliasOrName»Impl impl) {
-							return new «providedService.aliasOrName»Binder(impl);
-						}
-						
-						public static «providedService.aliasOrName»Binder Create<T>(T impl)
-							«IF providedService.methods.length > 0»
-								where T:
-								«FOR providedMethod : providedService.methods SEPARATOR ','»
-									«providedService.service.csharpFullName».I«providedMethod.method.name.toFirstUpper»Impl
-								«ENDFOR»
-							«ENDIF»
-						{
-							return Create((I«providedService.aliasOrName»Impl)new «providedService.aliasOrName»Impl<T>(impl));
-						}
+						«IF providedService.alias !== null»
+						public const string Alias = "«providedService.alias»";
+						«ENDIF»
 						
 						private readonly I«providedService.aliasOrName»Impl _impl;
 						
-						private «providedService.aliasOrName»Binder(I«providedService.aliasOrName»Impl impl) {
+						public «providedService.aliasOrName»Binder(I«providedService.aliasOrName»Impl impl) {
 							_impl = impl;
 						}
 						
 						public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
 							«IF providedService.alias === null»
-							return builder.WithProvidedService("«getFullName(providedService.service, qualifiedNameProvider)»", Bind);
+							return builder.WithProvidedService(«providedService.service.getCsharpFullName()».Id, Bind);
 							«ELSE»
-							return builder.WithProvidedService("«getFullName(providedService.service, qualifiedNameProvider)»", "«providedService.alias»", Bind);
+							return builder.WithProvidedService(«providedService.service.getCsharpFullName()».Id, Alias, Bind);
 							«ENDIF»							
 						}
 						
@@ -243,7 +232,9 @@ class CsharpCodeGenerator  {
 						«IF consumedService.alias === null»
 						public static «consumedService.service.csharpFullName».Descriptor Descriptor = «consumedService.service.csharpFullName».DefaultDescriptor;
 						«ELSE»
-						public static «consumedService.service.csharpFullName».Descriptor Descriptor = «consumedService.service.csharpFullName».CreateDescriptor("«consumedService.alias»");
+						public const string Alias = "«consumedService.alias»";
+						
+						public static «consumedService.service.csharpFullName».Descriptor Descriptor = «consumedService.service.csharpFullName».CreateDescriptor(Alias);
 						«ENDIF»
 						
 						private readonly IClientCallInvoker _callInvoker;
@@ -271,7 +262,7 @@ class CsharpCodeGenerator  {
 	
 	def String gen(Service service) {
 		'''
-			«accessModifier» sealed partial class «service.name.toFirstUpper» {
+			«accessModifier» static partial class «service.name.toFirstUpper» {
 				
 				public const string Id = "«getFullName(service, qualifiedNameProvider)»";			
 				«FOR method : service.methods»

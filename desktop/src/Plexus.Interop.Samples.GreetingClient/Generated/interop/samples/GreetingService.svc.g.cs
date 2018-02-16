@@ -12,7 +12,7 @@ namespace Plexus.Interop.Samples.GreetingClient.Generated {
 	using global::Plexus.Interop;
 	using global::System.Threading.Tasks;
 					
-	internal sealed partial class GreetingService {
+	internal static partial class GreetingService {
 		
 		public const string Id = "interop.samples.GreetingService";			
 		public const string UnaryMethodId = "Unary";
