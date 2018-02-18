@@ -1,0 +1,7 @@
+<AnalyzeParams>
+  <TargetExecutable>C:\Program Files (x86)\dotnet\dotnet.exe</TargetExecutable>
+  <TargetArguments>test Plexus.Interop.sln</TargetArguments>
+  <TargetWorkingDir>src</TargetWorkingDir>
+  <Output>dotCover.html</Output>
+  <ReportType>html</ReportType> 
+</AnalyzeParams>

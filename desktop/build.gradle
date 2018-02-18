@@ -52,32 +52,81 @@ task downloadAndUnzipDotnet << {
         }
     }
 }
+
 downloadAndUnzipDotnet.dependsOn(downloadDotnet)
 
-task build(type:Exec) {	
+task compile(type:Exec) {
     workingDir projectDir    
-    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-        environment "PATH", "$buildDir/win32/sdk/dotnet/"
-        commandLine 'cmd', '/c', 'build-netcore-only.cmd'
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        if (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null) {
+           commandLine 'cmd', '/c', 'build.cmd'
+	} else {
+           commandLine 'cmd', '/c', 'build-netcore-only.cmd'
+        }
     } else {
-        environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
         commandLine "$projectDir/build-netcore-only.sh"
     }
 }
-build.dependsOn(downloadAndUnzipDotnet)
-build.dependsOn('license')
 
-task test(dependsOn: build, type:Exec) {
+compile.dependsOn('license')
+
+task test(dependsOn: compile, type:Exec) {
     workingDir projectDir    
-    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-        environment "PATH", "$buildDir/win32/sdk/dotnet/"
-        commandLine 'cmd', '/c', 'tests.cmd'
+    ignoreExitValue true
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        if (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null) {
+            commandLine 'cmd', '/c', 'tests.cmd'
+        } else {
+            commandLine 'cmd', '/c', 'tests-netcore-only.cmd'
+        }
     } else {
-        environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"  
-        commandLine './tests.sh'
+        commandLine "$projectDir/tests-netcore-only.sh"
     }
+}
+
+task build {}
+if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet") {
+    build.dependsOn(test)
+} else {
+    println "Skipping tests because current platform is not Windows or running in MyGet"
+    build.dependsOn(compile)
 }
 
 task clean {
     delete fileTree(dir: 'src').include("**/bin/*").include("**/obj/*")
+}
+
+def dotnetVersion = new ByteArrayOutputStream()
+exec{    
+    commandLine "dotnet", "--version"
+    ignoreExitValue true
+    standardOutput = dotnetVersion;
+}
+
+println "Full dotnet build: " + (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null)
+println "dotnet --version:\n$dotnetVersion";
+
+if ("$dotnetVersion".trim() != "2.1.4") {
+	println "Dotnet SDK is not installed"
+        build.doFirst {
+	   println "Adding dotnet SDK to path"
+           if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+              environment "PATH", "$buildDir/win32/sdk/dotnet/"
+           } else {
+              environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
+           }
+	}
+	build.dependsOn(downloadAndUnzipDotnet)
+
+	test.dependsOn(downloadAndUnzipDotnet)
+        test.doFirst {
+	   println "Adding dotnet SDK to path"
+           if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+              environment "PATH", "$buildDir/win32/sdk/dotnet/"
+           } else {
+              environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
+           }
+	}
+} else {
+	println "Dotnet SDK is already installed"
 }
