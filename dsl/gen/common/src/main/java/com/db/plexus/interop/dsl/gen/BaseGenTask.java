@@ -142,11 +142,19 @@ public abstract class BaseGenTask implements GenTask {
     }
 
     private URI getBaseDirUri(PlexusGenConfig config) {
-        return URI.createFileURI(config.getBaseDir()).resolve(workingDirUri).appendSegment("");
+        URI uri = URI.createFileURI(config.getBaseDir()).resolve(workingDirUri);
+        if (!uri.lastSegment().equals("")) {
+        	uri = uri.appendSegment("");
+        }
+        return uri;
     }
 
     private URI getOutDirUri(PlexusGenConfig config) {
-        return URI.createFileURI(config.getOutDir()).resolve(workingDirUri).appendSegment("");
+        URI uri = URI.createFileURI(config.getOutDir()).resolve(workingDirUri);
+        if (!uri.lastSegment().equals("")) {
+        	uri = uri.appendSegment("");
+        }
+        return uri;
     }
     
     private URI getResourceBaseUri(PlexusGenConfig config) throws URISyntaxException {

@@ -24,7 +24,7 @@ namespace Plexus.Interop.Samples.GreetingServer
     using System.IO;
     using System.Threading.Tasks;
 
-    internal sealed class Program : GreetingServer.IGreetingServiceImpl
+    internal sealed class Program : GreetingServerClient.IGreetingServiceImpl
     {
         public static async Task Main(string[] args)
         {
@@ -39,7 +39,7 @@ namespace Plexus.Interop.Samples.GreetingServer
                           Directory.GetCurrentDirectory();
                     Environment.SetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR", brokerPath, EnvironmentVariableTarget.Process);
                     Console.WriteLine("Connecting to broker {0}", brokerPath);
-                    var client = new GreetingServer(new Program());
+                    var client = new GreetingServerClient(new Program());
                     Console.CancelKeyPress += (sender, eventArgs) =>
                     {
                         eventArgs.Cancel = true;

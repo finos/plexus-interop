@@ -29,14 +29,14 @@ namespace Plexus.Interop.Samples.GreetingServer.Generated {
 	using global::System.Threading.Tasks;
 					
 					
-	internal partial interface IGreetingServer: IClient {
+	internal partial interface IGreetingServerClient: IClient {
 	}
 	
-	internal sealed partial class GreetingServer: ClientBase, IGreetingServer {
+	internal sealed partial class GreetingServerClient: ClientBase, IGreetingServerClient {
 		
 		public const string Id = "interop.samples.GreetingServer";
 		
-		private static ClientOptions CreateClientOptions(GreetingServer.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null) {
+		private static ClientOptions CreateClientOptions(GreetingServerClient.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null) {
 			ClientOptionsBuilder builder = new ClientOptionsBuilder().WithApplicationId(Id).WithDefaultConfiguration();
 			serviceBinder.Bind(builder);
 			if (setup != null) {
@@ -45,24 +45,24 @@ namespace Plexus.Interop.Samples.GreetingServer.Generated {
 			return builder.Build();
 		}
 		
-		public GreetingServer(
-			GreetingServer.IGreetingServiceImpl greetingService,
+		public GreetingServerClient(
+			GreetingServerClient.IGreetingServiceImpl greetingService,
 			Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null
 		)
-		:this(new GreetingServer.ServiceBinder(
+		:this(new GreetingServerClient.ServiceBinder(
 			greetingService
 		), setup) { }
 		
-		public GreetingServer(GreetingServer.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
+		public GreetingServerClient(GreetingServerClient.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
 		{
 		}
 	
 		public sealed partial class ServiceBinder {
 			
 			public ServiceBinder(
-				GreetingServer.IGreetingServiceImpl greetingService
+				GreetingServerClient.IGreetingServiceImpl greetingService
 			) {
-				_greetingServiceBinder = new GreetingServer.GreetingServiceBinder(greetingService);
+				_greetingServiceBinder = new GreetingServerClient.GreetingServiceBinder(greetingService);
 			}
 			
 			private GreetingServiceBinder _greetingServiceBinder;
@@ -101,6 +101,42 @@ namespace Plexus.Interop.Samples.GreetingServer.Generated {
 				return builder; 							
 			}
 		}
+		
+		public sealed partial class GreetingServiceImpl: IGreetingServiceImpl
+		{
+			private readonly UnaryMethodHandler<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest, global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> _unaryHandler;
+			private readonly ServerStreamingMethodHandler<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest, global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> _serverStreamingHandler;
+			private readonly ClientStreamingMethodHandler<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest, global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> _clientStreamingHandler;
+			private readonly DuplexStreamingMethodHandler<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest, global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> _duplexStreamingHandler;
+			
+			public GreetingServiceImpl(
+				UnaryMethodHandler<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest, global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> unaryHandler,
+				ServerStreamingMethodHandler<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest, global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> serverStreamingHandler,
+				ClientStreamingMethodHandler<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest, global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> clientStreamingHandler,
+				DuplexStreamingMethodHandler<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest, global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> duplexStreamingHandler
+			) {
+				_unaryHandler = unaryHandler;
+				_serverStreamingHandler = serverStreamingHandler;
+				_clientStreamingHandler = clientStreamingHandler;
+				_duplexStreamingHandler = duplexStreamingHandler;
+			}
+			
+			public Task<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> Unary(global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest request, MethodCallContext context) {
+				return _unaryHandler(request, context);
+			}
+			
+			public Task ServerStreaming(global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest request, IWritableChannel<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> responseStream, MethodCallContext context) {
+				return _serverStreamingHandler(request, responseStream, context);
+			}
+			
+			public Task<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> ClientStreaming(IReadableChannel<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest> requestStream, MethodCallContext context) {
+				return _clientStreamingHandler(requestStream, context);
+			}
+			
+			public Task DuplexStreaming(IReadableChannel<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingRequest> requestStream, IWritableChannel<global::Plexus.Interop.Samples.GreetingServer.Generated.GreetingResponse> responseStream, MethodCallContext context) {
+				return _duplexStreamingHandler(requestStream, responseStream, context);
+			}
+		}					
 		
 		public sealed partial class GreetingServiceImpl<T>: IGreetingServiceImpl
 			where T:

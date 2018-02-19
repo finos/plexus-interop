@@ -76,18 +76,18 @@ class CsharpCodeGenerator  {
 	
 	def String gen(Application application) {
 		'''
-			«accessModifier» partial interface I«application.name.toFirstUpper»: IClient {
+			«accessModifier» partial interface I«application.clientName»: IClient {
 				«FOR consumedService: application.consumedServices SEPARATOR '\n'»										
-					«application.name.toFirstUpper».I«consumedService.aliasOrName»Proxy «consumedService.aliasOrName» { get; }
+					«application.clientName».I«consumedService.aliasOrName»Proxy «consumedService.aliasOrName» { get; }
 				«ENDFOR»				
 			}
 
-			«accessModifier» sealed partial class «application.name.toFirstUpper»: ClientBase, I«application.name.toFirstUpper» {
+			«accessModifier» sealed partial class «application.clientName»: ClientBase, I«application.clientName» {
 				
 				public const string Id = "«getFullName(application, qualifiedNameProvider)»";
 				
 				«IF application.providedServices.length > 0»				
-				private static ClientOptions CreateClientOptions(«application.name.toFirstUpper».ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null) {
+				private static ClientOptions CreateClientOptions(«application.clientName».ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null) {
 					ClientOptionsBuilder builder = new ClientOptionsBuilder().WithApplicationId(Id).WithDefaultConfiguration();
 					serviceBinder.Bind(builder);
 					if (setup != null) {
@@ -96,22 +96,22 @@ class CsharpCodeGenerator  {
 					return builder.Build();
 				}
 				
-				public «application.name.toFirstUpper»(
+				public «application.clientName»(
 					«FOR providedService: application.providedServices»
-						«application.name.toFirstUpper».I«providedService.aliasOrName»Impl «providedService.aliasOrName.toFirstLower»,
+						«application.clientName».I«providedService.aliasOrName»Impl «providedService.aliasOrName.toFirstLower»,
 					«ENDFOR»
 					Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null
 				)
-				:this(new «application.name.toFirstUpper».ServiceBinder(
+				:this(new «application.clientName».ServiceBinder(
 					«FOR providedService: application.providedServices SEPARATOR ','»
 						«providedService.aliasOrName.toFirstLower»
 					«ENDFOR»					
 				), setup) { }
 				
-				public «application.name.toFirstUpper»(«application.name.toFirstUpper».ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
+				public «application.clientName»(«application.clientName».ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
 				{
 					«FOR consumedService : application.consumedServices»
-					«consumedService.aliasOrName» = new «application.name.toFirstUpper».«consumedService.aliasOrName»Proxy(this.CallInvoker);
+					«consumedService.aliasOrName» = new «application.clientName».«consumedService.aliasOrName»Proxy(this.CallInvoker);
 					«ENDFOR»
 				}
 
@@ -119,11 +119,11 @@ class CsharpCodeGenerator  {
 					
 					public ServiceBinder(
 						«FOR providedService: application.providedServices SEPARATOR ','»
-							«application.name.toFirstUpper».I«providedService.aliasOrName»Impl «providedService.aliasOrName.toFirstLower»
+							«application.clientName».I«providedService.aliasOrName»Impl «providedService.aliasOrName.toFirstLower»
 						«ENDFOR»
 					) {
 						«FOR providedService: application.providedServices SEPARATOR ','»
-							_«providedService.aliasOrName.toFirstLower»Binder = new «application.name.toFirstUpper».«providedService.aliasOrName»Binder(«providedService.aliasOrName.toFirstLower»);
+							_«providedService.aliasOrName.toFirstLower»Binder = new «application.clientName».«providedService.aliasOrName»Binder(«providedService.aliasOrName.toFirstLower»);
 						«ENDFOR»
 					}
 					
@@ -182,6 +182,29 @@ class CsharpCodeGenerator  {
 						}
 					}
 					
+					public sealed partial class «providedService.aliasOrName»Impl: I«providedService.aliasOrName»Impl
+					{
+						«FOR providedMethod : providedService.methods»
+							private readonly «providedMethod.method.genHandlerSignature» _«providedMethod.method.name.toFirstLower»Handler;
+						«ENDFOR»
+						
+						public «providedService.aliasOrName»Impl(
+							«FOR providedMethod : providedService.methods SEPARATOR ','»
+								«providedMethod.method.genHandlerSignature» «providedMethod.method.name.toFirstLower»Handler
+							«ENDFOR»
+						) {
+							«FOR providedMethod : providedService.methods»
+								_«providedMethod.method.name.toFirstLower»Handler = «providedMethod.method.name.toFirstLower»Handler;
+							«ENDFOR»
+						}
+						
+						«FOR providedMethod : providedService.methods SEPARATOR '\n'»
+							public «genImplSignature(providedMethod.method)» {
+								return _«providedMethod.method.name.toFirstLower»Handler«genCallCode(providedMethod.method)»;
+							}
+						«ENDFOR»						
+					}					
+					
 					public sealed partial class «providedService.aliasOrName»Impl<T>: I«providedService.aliasOrName»Impl
 						«IF providedService.methods.length > 0»
 							where T:
@@ -212,10 +235,10 @@ class CsharpCodeGenerator  {
 						return builder.Build();					
 					}
 					
-					public «application.name.toFirstUpper»(Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(setup)) 
+					public «application.clientName»(Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(setup)) 
 					{ 
 						«FOR consumedService : application.consumedServices»
-						«consumedService.aliasOrName» = new «application.name.toFirstUpper».«consumedService.aliasOrName»Proxy(this.CallInvoker);
+						«consumedService.aliasOrName» = new «application.clientName».«consumedService.aliasOrName»Proxy(this.CallInvoker);
 						«ENDFOR»						
 					}
 				«ENDIF»
@@ -336,6 +359,11 @@ class CsharpCodeGenerator  {
 			'''Task «method.name.toFirstUpper»(IReadableChannel<«method.request.message.csharpFullName»> requestStream, IWritableChannel<«method.response.message.csharpFullName»> responseStream, MethodCallContext context)'''
 		}
 	}
+	
+	def String genHandlerSignature(Method method) {
+		return '''«method.type»MethodHandler«method.genericArgs»'''
+	}	
+	
 
 	def String genMethodDescriptorStaticDeclaration(Method method) {
 		'''public static readonly «method.getCsharpTypeDeclaration» «method.name.toFirstUpper»Method = «genMethodDescriptorDeclaration(method)»;'''
@@ -400,15 +428,27 @@ class CsharpCodeGenerator  {
 		return "global::" + getCsharpNamespace(obj.eResource) + "." + obj.name.toFirstUpper
 	}
 	
+	def String genCallCode(Method method) {
+		if (method.pointToPoint) {
+			'''(request, context)'''
+		} else if (method.serverStreaming) {
+			'''(request, responseStream, context)'''
+		} else if (method.clientStreaming) {
+			'''(requestStream, context)'''
+		} else if (method.bidiStreaming) {			
+			'''(requestStream, responseStream, context)'''
+		}
+	}	
+	
 	def String genImplCallCode(Method method, String varName) {
 		if (method.pointToPoint) {
-			'''«varName».«method.name.toFirstUpper»(request, context)'''
+			'''«varName».«method.name.toFirstUpper»«method.genCallCode»'''
 		} else if (method.serverStreaming) {
-			'''«varName».«method.name.toFirstUpper»(request, responseStream, context)'''
+			'''«varName».«method.name.toFirstUpper»«method.genCallCode»'''
 		} else if (method.clientStreaming) {
-			'''«varName».«method.name.toFirstUpper»(requestStream, context)'''
+			'''«varName».«method.name.toFirstUpper»«method.genCallCode»'''
 		} else if (method.bidiStreaming) {			
-			'''«varName».«method.name.toFirstUpper»(requestStream, responseStream, context)'''
+			'''«varName».«method.name.toFirstUpper»«method.genCallCode»'''
 		}
 	}	
 	
@@ -418,5 +458,13 @@ class CsharpCodeGenerator  {
 	
 	def String getAliasOrName(ConsumedService consumedService) {
 		if (consumedService.alias !== null) consumedService.alias.toFirstUpper else consumedService.service.name.toFirstUpper 
+	}
+	
+	def getClientName(Application app) {
+		if (app.name.endsWith("Client")) {
+			return app.name.toFirstUpper
+		} else {
+			return '''«app.name.toFirstUpper»Client'''
+		}		
 	}	
 }

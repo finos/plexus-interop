@@ -76,7 +76,7 @@ public class Main {
                 GenTask preProcessTask = injector.getInstance(CsharpProtoGenTask.class);
                 File temp = File.createTempFile("proto", Long.toString(System.nanoTime()));
         		temp.delete();
-        		temp.mkdir();
+        		temp.mkdirs();
         		String outDir = genConfig.getOutDir();
         		genConfig.setOutDir(temp.getPath());
                 preProcessTask.doGen(genConfig);                
