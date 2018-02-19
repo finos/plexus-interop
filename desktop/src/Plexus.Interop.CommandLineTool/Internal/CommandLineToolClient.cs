@@ -32,8 +32,9 @@
         {
             var options =
                 new ClientOptionsBuilder()
+                    .WithBrokerWorkingDir(Directory.GetCurrentDirectory())
                     .WithApplicationId("interop.CommandLineTool")
-                    .WithDefaultConfiguration(Directory.GetCurrentDirectory())
+                    .WithDefaultConfiguration()
                     .Build();
             _client = ClientFactory.Instance.Create(options);
             OnStop(_client.Disconnect);

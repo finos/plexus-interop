@@ -29,12 +29,12 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
 
         protected override ITransmissionServer CreateServer()
         {
-            return new WebSocketTransmissionServer(Directory.GetCurrentDirectory());
+            return new WebSocketTransmissionServer(BrokerWorkingDir);
         }
 
         protected override ITransmissionClient CreateClient()
         {
-            return new WebSocketTransmissionClient(Directory.GetCurrentDirectory());
+            return new WebSocketTransmissionClient();
         }
     }
 }

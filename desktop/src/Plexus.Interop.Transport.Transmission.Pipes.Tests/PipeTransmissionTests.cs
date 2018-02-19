@@ -16,7 +16,6 @@
  */
  namespace Plexus.Interop.Transport.Transmission.Pipes
 {
-    using System.IO;
     using Xunit.Abstractions;
 
     public sealed class PipeTransmissionTests : TransmissionTestsSuite
@@ -27,12 +26,12 @@
 
         protected override ITransmissionClient CreateClient()
         {
-            return new PipeTransmissionClient(Directory.GetCurrentDirectory());
+            return new PipeTransmissionClient();
         }
 
         protected override ITransmissionServer CreateServer()
         {
-            return RegisterDisposable(new PipeTransmissionServer(Directory.GetCurrentDirectory()));
+            return RegisterDisposable(new PipeTransmissionServer(BrokerWorkingDir));
         }
     }
 }

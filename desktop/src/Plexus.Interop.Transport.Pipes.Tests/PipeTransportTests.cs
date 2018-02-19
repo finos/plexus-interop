@@ -16,6 +16,7 @@
  */
 namespace Plexus.Interop.Transport.Pipes
 {
+    using System;
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
     using System.IO;
@@ -26,15 +27,15 @@ namespace Plexus.Interop.Transport.Pipes
         public PipeTransportTests(ITestOutputHelper output) : base(output)
         {
             Server = RegisterDisposable(new TransportServer(
-                new PipeTransmissionServer(Directory.GetCurrentDirectory()),
+                new PipeTransmissionServer(BrokerWorkingDir),
                 new ProtobufTransportProtocolSerializationProvider()));
             Client = new TransportClient(
-                new PipeTransmissionClient(Directory.GetCurrentDirectory()),
+                new PipeTransmissionClient(),
                 new ProtobufTransportProtocolSerializationProvider());
         }
 
         protected override ITransportServer Server { get; }
 
-        protected override ITransportClient Client { get; }
+        protected override ITransportClient Client { get; }        
     }
 }

@@ -63,9 +63,9 @@
                 EnableRaisingEvents = true,
             };
 #if NET45
-            _process.StartInfo.EnvironmentVariables["PLEXUS_PARENT_PROCESS"] = Process.GetCurrentProcess().Id.ToString();            
+            _process.StartInfo.EnvironmentVariables[EnvironmentHelper.ParentProcessIdVarName] = Process.GetCurrentProcess().Id.ToString();            
 #else            
-            _process.StartInfo.Environment["PLEXUS_PARENT_PROCESS"] = Process.GetCurrentProcess().Id.ToString();
+            _process.StartInfo.Environment[EnvironmentHelper.ParentProcessIdVarName] = Process.GetCurrentProcess().Id.ToString();
 #endif
             _process.Exited += (x, y) =>
             {

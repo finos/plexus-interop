@@ -33,13 +33,11 @@ namespace Plexus.Interop.Samples.GreetingServer
                 var log = LogManager.GetLogger<Program>();
                 try
                 {
-                    var brokerPath = args.Length > 0
+                    var brokerWorkingDir = args.Length > 0
                         ? args[0]
-                        : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ??
-                          Directory.GetCurrentDirectory();
-                    Environment.SetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR", brokerPath, EnvironmentVariableTarget.Process);
-                    Console.WriteLine("Connecting to broker {0}", brokerPath);
-                    var client = new GreetingServerClient(new Program());
+                        : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
+                    Console.WriteLine("Connecting to broker {0}", brokerWorkingDir);
+                    var client = new GreetingServerClient(new Program(), x => x.WithBrokerWorkingDir(brokerWorkingDir));
                     Console.CancelKeyPress += (sender, eventArgs) =>
                     {
                         eventArgs.Cancel = true;

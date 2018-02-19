@@ -36,14 +36,16 @@ namespace Plexus.Interop.Transport.Protocol
         private static readonly ITransportProtocolSerializationProvider SerializationProvider 
             = new ProtobufTransportProtocolSerializationProvider();
 
+        private static readonly string BrokerWorkingDir = Directory.GetCurrentDirectory();
+
         private readonly ITransmissionServer _server;
-        private readonly ITransmissionClient _client;
+        private readonly ITransmissionClient _client;        
 
         public MessagingTests()
         {
-            _server = RegisterDisposable(new PipeTransmissionServer(Directory.GetCurrentDirectory()));
+            _server = RegisterDisposable(new PipeTransmissionServer(BrokerWorkingDir));
             _server.StartAsync().GetResult();
-            _client = new PipeTransmissionClient(Directory.GetCurrentDirectory());
+            _client = new PipeTransmissionClient();
         }
 
         private static IEnumerable<TransportMessage> GenerateAllTransportMessages()
@@ -69,7 +71,7 @@ namespace Plexus.Interop.Transport.Protocol
         {
             RunWith10SecTimeout(async () =>
             {
-                using (var clientConnection = await _client.ConnectAsync())
+                using (var clientConnection = await _client.ConnectAsync(BrokerWorkingDir))
                 using (var serverConnection = await _server.In.ReadAsync())
                 {
                     var clientSender = new MessagingSendProcessor(clientConnection, SerializationProvider.GetSerializer());
@@ -112,7 +114,7 @@ namespace Plexus.Interop.Transport.Protocol
 
             var testMessages = GenerateAllTransportMessages().ToArray();
 
-            var clientTask = RunSenderTaskAsync(() => _client.ConnectAsync(), async sender =>
+            var clientTask = RunSenderTaskAsync(() => _client.ConnectAsync(BrokerWorkingDir), async sender =>
             {
                 foreach (var transportMessage in testMessages)
                 {
@@ -166,7 +168,7 @@ namespace Plexus.Interop.Transport.Protocol
             var senderTask = TaskRunner.RunInBackground(async () =>
             {
                 MessagingSendProcessor sender;
-                using (var clientStream = await _client.ConnectAsync().ConfigureAwait(false))
+                using (var clientStream = await _client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false))
                 {
                     sender = new MessagingSendProcessor(clientStream, SerializationProvider.GetSerializer());
                     var result = true;

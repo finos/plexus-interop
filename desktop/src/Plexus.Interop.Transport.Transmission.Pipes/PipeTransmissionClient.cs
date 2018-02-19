@@ -27,41 +27,35 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
     {
         private const int ConnectTimeoutMs = 10000;
         private const string ServerName = "np-v1";
+
         private static readonly TimeSpan MaxServerInitializationTime = TimeSpan.FromSeconds(10);
+        private static readonly ILogger Log = LogManager.GetLogger<PipeTransmissionClient>();
 
-        private readonly ILogger _log;
-        private readonly IServerStateReader _serverStateReader;
-
-        public PipeTransmissionClient(string brokerWorkingDir)
-        {
-            _log = LogManager.GetLogger<PipeTransmissionClient>();
-            _serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
-        }
-
-        public async ValueTask<ITransmissionConnection> ConnectAsync(CancellationToken cancellationToken)
+        public async ValueTask<ITransmissionConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken)
         {
             var connection = await StreamTransmissionConnection.CreateAsync(
                 UniqueId.Generate(),
-                () => ConnectStreamAsync(cancellationToken));
-            _log.Trace("Created connection {0}", connection);
+                () => ConnectStreamAsync(brokerWorkingDir, cancellationToken));
+            Log.Trace("Created connection {0}", connection);
             return connection;
         }
 
-        private async ValueTask<Stream> ConnectStreamAsync(CancellationToken cancellationToken)
+        private async ValueTask<Stream> ConnectStreamAsync(string brokerWorkingDir, CancellationToken cancellationToken)
         {
-            if (!await _serverStateReader
+            var serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
+            if (!await serverStateReader
                 .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
                 .ConfigureAwait(false))
             {
                 throw new TimeoutException(
                     $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
             }
-            var pipeName = _serverStateReader.ReadSetting("address");
+            var pipeName = serverStateReader.ReadSetting("address");
             if (string.IsNullOrEmpty(pipeName))
             {
                 throw new InvalidOperationException("Cannot find pipe name to connect");
             }
-            _log.Trace("Connecting to pipe");
+            Log.Trace("Connecting to pipe");
             var pipeClientStream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
             try
             {
@@ -69,12 +63,12 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             }
             catch (Exception ex)
             {
-                _log.Trace("Connection to pipe terminated: {0}", ex.FormatTypeAndMessage());
+                Log.Trace("Connection to pipe terminated: {0}", ex.FormatTypeAndMessage());
                 pipeClientStream.Dispose();
                 cancellationToken.ThrowIfCancellationRequested();
                 throw;
             }
-            _log.Trace("Connected to pipe");
+            Log.Trace("Connected to pipe");
             return pipeClientStream;
         }
 

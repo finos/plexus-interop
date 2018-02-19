@@ -679,7 +679,8 @@ namespace Plexus.Interop
                 using (await StartTestBrokerAsync())
                 {
                     var serverOptionsBuilder = new ClientOptionsBuilder()
-                        .WithDefaultConfiguration("TestBroker")
+                        .WithBrokerWorkingDir("TestBroker")
+                        .WithDefaultConfiguration()
                         .WithProvidedService(
                             "plexus.interop.testing.EchoService",
                             x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
@@ -698,7 +699,8 @@ namespace Plexus.Interop
         private IClient ConnectEchoClient()
         {
             var clientOptions = new ClientOptionsBuilder()
-                .WithDefaultConfiguration("TestBroker")
+                .WithBrokerWorkingDir("TestBroker")
+                .WithDefaultConfiguration()
                 .WithApplicationId("plexus.interop.testing.EchoClient")
                 .Build();
             var client = RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
@@ -709,7 +711,8 @@ namespace Plexus.Interop
         private IClient ConnectClient(string appId)
         {
             var clientOptions = new ClientOptionsBuilder()
-                .WithDefaultConfiguration("TestBroker")
+                .WithBrokerWorkingDir("TestBroker")
+                .WithDefaultConfiguration()
                 .WithApplicationId(appId)
                 .Build();
             var client = RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
@@ -720,7 +723,8 @@ namespace Plexus.Interop
         private IClient ConnectEchoServer(Action<ClientOptionsBuilder> setup = null)
         {
             var clientOptionsBuilder = new ClientOptionsBuilder()
-                .WithDefaultConfiguration("TestBroker")
+                .WithBrokerWorkingDir("TestBroker")
+                .WithDefaultConfiguration()
                 .WithApplicationId("plexus.interop.testing.EchoServer");
             setup?.Invoke(clientOptionsBuilder);
             var clientOptions = clientOptionsBuilder.Build();

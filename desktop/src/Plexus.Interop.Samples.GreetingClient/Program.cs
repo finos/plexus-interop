@@ -33,13 +33,12 @@ namespace Plexus.Interop.Samples.GreetingClient
                 var log = LogManager.GetLogger<Program>();
                 try
                 {
-                    var brokerPath = args.Length > 0
+                    var brokerWorkingDir = args.Length > 0
                         ? args[0]
-                        : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ??
-                          Directory.GetCurrentDirectory();
-                    Environment.SetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR", brokerPath, EnvironmentVariableTarget.Process);
-                    var client = new GreetingClient();
-                    Console.WriteLine("Connecting to {0}", brokerPath);
+                        : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
+                    Console.WriteLine("Connecting to broker {0}", brokerWorkingDir);
+                    var client = new GreetingClient(x => x.WithBrokerWorkingDir(brokerWorkingDir));
+                    Console.WriteLine("Connecting to {0}", brokerWorkingDir);
                     await client.ConnectAsync();
                     Console.WriteLine("Connected");
                     var nextCase = true;

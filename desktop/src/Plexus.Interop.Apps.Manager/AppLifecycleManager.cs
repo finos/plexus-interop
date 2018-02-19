@@ -50,7 +50,8 @@ namespace Plexus.Interop.Apps
             _appsDto = AppsDto.Load(Path.Combine(metadataDir, "apps.json"));
             _client = ClientFactory.Instance.Create(
                 new ClientOptionsBuilder()
-                    .WithDefaultConfiguration(Directory.GetCurrentDirectory())
+                    .WithBrokerWorkingDir(Directory.GetCurrentDirectory())
+                    .WithDefaultConfiguration()
                     .WithApplicationId("interop.AppLifecycleManager")
                     .WithProvidedService("interop.AppLifecycleService",
                         s => s.WithUnaryMethod<ActivateAppRequest, ActivateAppResponse>("ActivateApp", ActivateAppAsync))

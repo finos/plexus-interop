@@ -48,13 +48,13 @@
             var appInstanceId = UniqueId.Generate();
 
 #if NETSTANDARD1_6
-            process.StartInfo.Environment["PLEXUS_PARENT_PROCESS"] = _curPid;
-            process.StartInfo.Environment["PLEXUS_BROKER_WORKING_DIR"] = Directory.GetCurrentDirectory();
-            process.StartInfo.Environment["PLEXUS_APP_INSTANCE_ID"] = appInstanceId.ToString();
+            process.StartInfo.Environment[EnvironmentHelper.ParentProcessIdVarName] = _curPid;
+            process.StartInfo.Environment[EnvironmentHelper.BrokerWorkingDirVarName] = Directory.GetCurrentDirectory();
+            process.StartInfo.Environment[EnvironmentHelper.AppInstanceIdVarName] = appInstanceId.ToString();
 #else
-            process.StartInfo.EnvironmentVariables["PLEXUS_PARENT_PROCESS"] = _curPid;
-            process.StartInfo.EnvironmentVariables["PLEXUS_BROKER_WORKING_DIR"] = Directory.GetCurrentDirectory();
-            process.StartInfo.EnvironmentVariables["PLEXUS_APP_INSTANCE_ID"] = appInstanceId.ToString();
+            process.StartInfo.EnvironmentVariables[EnvironmentHelper.ParentProcessIdVarName] = _curPid;
+            process.StartInfo.EnvironmentVariables[EnvironmentHelper.BrokerWorkingDirVarName] = Directory.GetCurrentDirectory();
+            process.StartInfo.EnvironmentVariables[EnvironmentHelper.AppInstanceIdVarName] = appInstanceId.ToString();
 #endif
 
             if (!process.Start())
