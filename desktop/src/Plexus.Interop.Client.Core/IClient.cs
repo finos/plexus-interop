@@ -19,8 +19,12 @@
     using System;
     using System.Threading.Tasks;
 
-    public interface IClient : IClientCallInvoker, IClientDiscoveryInvoker, IDisposable
+    public interface IClient : IDisposable
     {
+        IClientCallInvoker CallInvoker { get; }
+
+        IClientDiscoveryInvoker DiscoveryInvoker { get; }
+
         string ApplicationId { get; }
 
         UniqueId ApplicationInstanceId { get; }

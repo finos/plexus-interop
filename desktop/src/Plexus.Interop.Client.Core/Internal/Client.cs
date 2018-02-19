@@ -30,7 +30,7 @@ namespace Plexus.Interop.Internal
     using System.Linq;
     using System.Threading.Tasks;
 
-    internal sealed class Client : ProcessBase, IClient
+    internal sealed class Client : ProcessBase, IClient, IClientCallInvoker, IClientDiscoveryInvoker
     {        
         private readonly ClientOptions _options;
         private readonly BrokerToClientRequestHandler<Task, ITransportChannel> _incomingRequestHandler;
@@ -47,6 +47,10 @@ namespace Plexus.Interop.Internal
             _options = options;
             _incomingRequestHandler = new BrokerToClientRequestHandler<Task, ITransportChannel>(HandleInvocationStartRequestAsync);            
         }
+
+        public IClientCallInvoker CallInvoker => this;
+
+        public IClientDiscoveryInvoker DiscoveryInvoker => this;
 
         public string ApplicationId => _options.ApplicationId;
 

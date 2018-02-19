@@ -23,13 +23,16 @@ import com.db.plexus.interop.dsl.gen.GenTask;
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig;
 import com.db.plexus.interop.dsl.gen.js.JsGenTask;
 import com.db.plexus.interop.dsl.gen.csharp.CsharpGenTask;
+import com.db.plexus.interop.dsl.gen.csharp.CsharpProtoGenTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenTask;
 import com.db.plexus.interop.dsl.gen.ts.TsGenTask;
 import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask;
 import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig;
 import com.google.inject.Injector;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
@@ -40,14 +43,14 @@ public class Main {
 
     private static Logger log = Logger.getLogger("Generator");
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         final PlexusGenConfig genConfig = new ParametersParser().parse(args);
         log.info("Running generator with parameters: " + genConfig.toString());
-        Path workDirPath = Paths.get(".").toAbsolutePath();
-        URI workDir = URI.createURI(workDirPath.toAbsolutePath().toUri().toString());
-        URI baseDir = URI.createFileURI(genConfig.getBaseDir() + "/").resolve(workDir);
+        Path workDirPath = Paths.get("").toAbsolutePath();
+        URI workDir = URI.createFileURI(workDirPath.toString()).appendSegment("");
+        URI baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
         ProtoLangConfig config = new ProtoLangConfig();
         config.getBaseURIs().add(baseDir);
         final Injector injector = new InteropLangStandaloneSetup(config).createInjectorAndDoEMFRegistration();
@@ -70,8 +73,24 @@ public class Main {
                 protoGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.CSHARP:
+                GenTask preProcessTask = injector.getInstance(CsharpProtoGenTask.class);
+                File temp = File.createTempFile("proto", Long.toString(System.nanoTime()));
+        		temp.delete();
+        		temp.mkdirs();
+        		String outDir = genConfig.getOutDir();
+        		genConfig.setOutDir(temp.getPath());
+                preProcessTask.doGen(genConfig);                
+                genConfig.setBaseDir(temp.getPath());
+                genConfig.setOutDir(outDir);
+                config.getBaseURIs().remove(baseDir);                
+                baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
+                config.getBaseURIs().add(baseDir);
                 GenTask cSharpGenTask = injector.getInstance(CsharpGenTask.class);
                 cSharpGenTask.doGen(genConfig);
+                break;
+            case CodeOutputGenerator.PROTO_CSHARP:
+                GenTask protoCSharpGenTask = injector.getInstance(CsharpProtoGenTask.class);
+                protoCSharpGenTask.doGen(genConfig);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type " + type);

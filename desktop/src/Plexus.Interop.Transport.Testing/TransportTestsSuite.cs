@@ -20,6 +20,7 @@ namespace Plexus.Interop.Transport
     using Shouldly;
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Threading.Tasks;
     using Xunit;
     using Xunit.Abstractions;
@@ -29,6 +30,8 @@ namespace Plexus.Interop.Transport
         protected abstract ITransportServer Server { get; }
 
         protected abstract ITransportClient Client { get; }
+
+        protected string BrokerWorkingDir { get; } = Directory.GetCurrentDirectory();
 
         protected TransportTestsSuite(ITestOutputHelper output) : base(output)
         {
@@ -73,7 +76,7 @@ namespace Plexus.Interop.Transport
             RunWith10SecTimeout(async () =>
             {
                 await Server.StartAsync();
-                using (var clientConnection = await Client.ConnectAsync())
+                using (var clientConnection = await Client.ConnectAsync(BrokerWorkingDir))
                 using (var serverConnection = await Server.In.ReadAsync())
                 {
                     serverConnection.Dispose();
@@ -90,7 +93,7 @@ namespace Plexus.Interop.Transport
             RunWith10SecTimeout(async () =>
             {
                 await Server.StartAsync();
-                using (var clientConnection = await Client.ConnectAsync())
+                using (var clientConnection = await Client.ConnectAsync(BrokerWorkingDir))
                 using (var serverConnection = await Server.In.ReadAsync())
                 {
                     clientConnection.Dispose();
@@ -107,7 +110,7 @@ namespace Plexus.Interop.Transport
             RunWith10SecTimeout(async () =>
             {
                 await Server.StartAsync();
-                using (var clientConnection = await Client.ConnectAsync())
+                using (var clientConnection = await Client.ConnectAsync(BrokerWorkingDir))
                 using (var serverConnection = await Server.In.ReadAsync())
                 {
                     clientConnection.TryTerminate();
@@ -125,7 +128,7 @@ namespace Plexus.Interop.Transport
             RunWith10SecTimeout(async () =>
             {
                 await Server.StartAsync();
-                using (var clientConnection = await Client.ConnectAsync())
+                using (var clientConnection = await Client.ConnectAsync(BrokerWorkingDir))
                 using (var serverConnection = await Server.In.ReadAsync())
                 {
                     serverConnection.TryTerminate();
@@ -144,7 +147,7 @@ namespace Plexus.Interop.Transport
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);
-                    using (var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false)))
+                    using (var clientConnection = RegisterDisposable(await Client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false)))
                     using (var serverConnection = RegisterDisposable(await Server.In.ReadAsync().ConfigureAwait(false)))
                     {
                         var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
@@ -168,7 +171,7 @@ namespace Plexus.Interop.Transport
                 {
                     await Server.StartAsync().ConfigureAwait(false);
                     var serverConnectionTask = Server.In.ReadAsync();
-                    var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
+                    var clientConnection = RegisterDisposable(await Client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false));
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     var clientChannel = await clientConnection.CreateChannelAsync().ConfigureAwait(false);
                     var serverChannel = await serverConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
@@ -186,7 +189,7 @@ namespace Plexus.Interop.Transport
                 {
                     await Server.StartAsync();
                     var serverConnectionTask = Server.In.ReadAsync();
-                    var clientConnection = RegisterDisposable(await Client.ConnectAsync().ConfigureAwait(false));
+                    var clientConnection = RegisterDisposable(await Client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false));
                     var serverConnection = RegisterDisposable(await serverConnectionTask.ConfigureAwait(false));
                     serverConnection.TryTerminate();
                     Should.Throw<OperationCanceledException>(clientConnection.Completion, Timeout1Sec);
@@ -201,7 +204,7 @@ namespace Plexus.Interop.Transport
                 async () =>
                 {
                     await Server.StartAsync().ConfigureAwait(false);                    
-                    var clientConnection = await Client.ConnectAsync();
+                    var clientConnection = await Client.ConnectAsync(BrokerWorkingDir);
                     var serverConnection = await Server.In.ReadAsync();
                     clientConnection.TryTerminate();
                     Should.Throw<OperationCanceledException>(clientConnection.CreateChannelAsync().AsTask(), Timeout1Sec);
@@ -326,7 +329,7 @@ namespace Plexus.Interop.Transport
             var clientTask = TaskRunner.RunInBackground(
                 async () =>
                 {
-                    clientConnection = await Client.ConnectAsync().ConfigureAwait(false);
+                    clientConnection = await Client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false);
                     Log.Info("Client connection created");
                     var channelTasks = new List<Task>();
                     foreach (var channelExchange in cases)
