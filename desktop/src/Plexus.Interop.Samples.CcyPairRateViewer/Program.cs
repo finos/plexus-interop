@@ -35,15 +35,16 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer
         {
             // Read broker working dir specified either in the first
             // command line argument or in environment variable, or just use current working directory
-            var brokerLocation = args.Length > 0
+            var brokerWorkingDir = args.Length > 0
                 ? args[0]
-                : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ?? Directory.GetCurrentDirectory();
+                : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
 
-            Console.WriteLine("Connecting to broker {0}.", brokerLocation);
+            Console.WriteLine("Connecting to broker {0}", brokerWorkingDir);
 
             // Defining client options
             var clientOptions = new ClientOptionsBuilder()
-                .WithDefaultConfiguration(brokerLocation)
+                .WithBrokerWorkingDir(brokerWorkingDir)
+                .WithDefaultConfiguration()
                 .WithApplicationId("vendorB.fx.CcyPairRateViewer")
                 .Build();
 
@@ -62,7 +63,7 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer
                 }
                 // Requesting ccy pair rate from another app
                 var request = new CcyPair {CcyPairName = ccyPairName};                
-                var response = await client.Call(GetRateMethod, request);
+                var response = await client.CallInvoker.Call(GetRateMethod, request);
                 Console.WriteLine("Response received: " + response);
             }
 

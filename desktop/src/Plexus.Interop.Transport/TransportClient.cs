@@ -38,9 +38,9 @@ namespace Plexus.Interop.Transport
             _connectionFactory = new TransportConnectionFactory(serializationProvider);
         }
 
-        public async ValueTask<ITransportConnection> ConnectAsync(CancellationToken cancellationToken)
+        public async ValueTask<ITransportConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken)
         {
-            var transmissionConnection = await _transmissionClient.ConnectAsync(cancellationToken).ConfigureAwait(false);
+            var transmissionConnection = await _transmissionClient.ConnectAsync(brokerWorkingDir, cancellationToken).ConfigureAwait(false);
             try
             {
                 return _connectionFactory.Create(transmissionConnection);

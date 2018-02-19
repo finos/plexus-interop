@@ -22,10 +22,14 @@ namespace Plexus.Interop
     using System;
     using System.Collections.Generic;
 
-    public class ClientOptionsBuilder
+    public sealed class ClientOptionsBuilder
     {
+        private static readonly ILogger Log = LogManager.GetLogger<ClientOptionsBuilder>();
+
         private readonly List<(string Name, Maybe<string> Alias, Func<ProvidedServiceDefinition.Builder, ProvidedServiceDefinition.Builder> Setup)> _serviceFactories
             = new List<(string, Maybe<string>, Func<ProvidedServiceDefinition.Builder, ProvidedServiceDefinition.Builder>)>();
+
+        public string BrokerWorkingDir { get; private set; }
 
         public string ApplicationId { get; private set; }
 
@@ -36,6 +40,12 @@ namespace Plexus.Interop
         public IProtocolImplementation Protocol { get; private set; }
 
         public IMarshallerProvider Marshaller { get; private set; }
+
+        public ClientOptionsBuilder WithBrokerWorkingDir(string brokerWorkingDir)
+        {
+            BrokerWorkingDir = brokerWorkingDir;
+            return this;
+        }
 
         public ClientOptionsBuilder WithApplicationId(string applicationId)
         {
@@ -81,40 +91,50 @@ namespace Plexus.Interop
 
         public ClientOptions Build()
         {
+            if (BrokerWorkingDir == null)
+            {
+                BrokerWorkingDir = EnvironmentHelper.GetBrokerWorkingDir();
+                if (BrokerWorkingDir == null)
+                {
+                    throw new ArgumentException($"Broker working directory must be specified either explicitly or through environment variable {EnvironmentHelper.BrokerWorkingDirVarName}");
+                }
+            }
             if (string.IsNullOrEmpty(ApplicationId))
             {
-                throw new ArgumentException("Application name required");
+                throw new ArgumentException("Application ID must be specified");
             }
             if (Transport == null)
             {
-                throw new ArgumentException("Transport required");
+                throw new ArgumentException("Transport implementation must be specified");
             }
             if (Protocol == null)
             {
-                throw new ArgumentException("Protocol required");
+                throw new ArgumentException("Protocol implementation must be specified");
             }
             if (Marshaller == null)
             {
-                throw new ArgumentException("Marshaller required");
+                throw new ArgumentException("Marshaller implementation must be specified");
             }
             if (ApplicationInstanceId == default)
             {
                 try
                 {
-                    var instanceIdVar = Environment.GetEnvironmentVariable("PLEXUS_APP_INSTANCE_ID");
-                    ApplicationInstanceId = string.IsNullOrEmpty(instanceIdVar)
+                    var instanceIdVar = EnvironmentHelper.GetAppInstanceId();
+                    ApplicationInstanceId = instanceIdVar == null
                         ? UniqueId.Generate()
                         : UniqueId.FromString(instanceIdVar);
                 }
-                catch
+                catch (Exception exception)
                 {
+                    Log.Warn(exception, "Exception while reading app instance id from environment variable {0}. Generating new unique id as fallback...", EnvironmentHelper.AppInstanceIdVarName);
                     ApplicationInstanceId = UniqueId.Generate();
                 }
             }
             var incomingInvocationFactory = new IncomingInvocationFactory(Protocol, Marshaller);
             return new ClientOptions(
+                BrokerWorkingDir,
                 ApplicationId,
-                ApplicationInstanceId == default ? UniqueId.Generate() : ApplicationInstanceId,
+                ApplicationInstanceId,
                 Transport,
                 Protocol,
                 Marshaller,

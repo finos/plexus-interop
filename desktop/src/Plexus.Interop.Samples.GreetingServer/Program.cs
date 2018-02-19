@@ -24,7 +24,7 @@ namespace Plexus.Interop.Samples.GreetingServer
     using System.IO;
     using System.Threading.Tasks;
 
-    public class Program
+    internal sealed class Program : GreetingServerClient.IGreetingServiceImpl
     {
         public static async Task Main(string[] args)
         {
@@ -33,27 +33,11 @@ namespace Plexus.Interop.Samples.GreetingServer
                 var log = LogManager.GetLogger<Program>();
                 try
                 {
-                    var brokerPath = args.Length > 0
+                    var brokerWorkingDir = args.Length > 0
                         ? args[0]
-                        : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ??
-                          Directory.GetCurrentDirectory();
-                    Console.WriteLine("Connecting to broker {0}", brokerPath);
-                    var client = ClientFactory.Instance.Create(
-                        new ClientOptionsBuilder()
-                            .WithDefaultConfiguration(brokerPath)
-                            .WithApplicationId("interop.samples.GreetingServer")
-                            .WithProvidedService(
-                                "interop.samples.GreetingService",
-                                s => s
-                                    .WithUnaryMethod<GreetingRequest, GreetingResponse>("Unary", GreetingUnary)
-                                    .WithServerStreamingMethod<GreetingRequest, GreetingResponse>("ServerStreaming",
-                                        GreetingServerStreaming)
-                                    .WithClientStreamingMethod<GreetingRequest, GreetingResponse>("ClientStreaming",
-                                        GreetingClientStreaming)
-                                    .WithDuplexStreamingMethod<GreetingRequest, GreetingResponse>("DuplexStreaming",
-                                        GreetingDuplexStreaming)
-                            )
-                            .Build());
+                        : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
+                    Console.WriteLine("Connecting to broker {0}", brokerWorkingDir);
+                    var client = new GreetingServerClient(new Program(), x => x.WithBrokerWorkingDir(brokerWorkingDir));
                     Console.CancelKeyPress += (sender, eventArgs) =>
                     {
                         eventArgs.Cancel = true;
@@ -76,9 +60,7 @@ namespace Plexus.Interop.Samples.GreetingServer
             Console.ReadKey();
         }
 
-        private static Task<GreetingResponse> GreetingUnary(
-            GreetingRequest request,
-            MethodCallContext context)
+        public Task<GreetingResponse> Unary(GreetingRequest request, MethodCallContext context)
         {
             Console.WriteLine("Received unary request from {{{0}}}", context);
             Console.WriteLine("Received: {0}", request.Name);
@@ -87,17 +69,50 @@ namespace Plexus.Interop.Samples.GreetingServer
             return Task.FromResult(new GreetingResponse { Greeting = greeting });
         }
 
-        private static async Task GreetingDuplexStreaming(
-            IReadableChannel<GreetingRequest> requestStream, 
-            IWritableChannel<GreetingResponse> responseStream, 
-            MethodCallContext context)
+        public async Task ServerStreaming(GreetingRequest request, IWritableChannel<GreetingResponse> responseStream, MethodCallContext context)
+        {
+            Console.WriteLine("Received server streaming request from {{{0}}}", context);
+            Console.WriteLine("Received: {0}", request.Name);
+            var greeting = $"Hello, {request.Name}!";
+            await responseStream
+                .WriteAsync(new GreetingResponse { Greeting = greeting })
+                .ConfigureAwait(false);
+            Console.WriteLine("Sent: {0}", greeting);
+            await Task.Delay(500).ConfigureAwait(false);
+            greeting = $"Hello again, {request.Name}!";
+            await responseStream
+                .WriteAsync(new GreetingResponse { Greeting = greeting })
+                .ConfigureAwait(false);
+            Console.WriteLine("Sent: {0}", greeting);
+            Console.WriteLine("Completed");
+        }
+
+        public async Task<GreetingResponse> ClientStreaming(IReadableChannel<GreetingRequest> requestStream, MethodCallContext context)
+        {
+            Console.WriteLine("Received client streaming request from {{{0}}}", context);
+            var names = new List<string>();
+            while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false))
+            {
+                while (requestStream.TryRead(out var request))
+                {
+                    Console.WriteLine("Received: {0}", request.Name);
+                    names.Add(request.Name);
+                }
+            }
+            Console.WriteLine("Request stream completed");
+            var greeting = $"Hello, {string.Join(", ", names)}!";
+            Console.WriteLine("Sending response: {0}", greeting);
+            return new GreetingResponse { Greeting = greeting };
+        }
+        
+        public async Task DuplexStreaming(IReadableChannel<GreetingRequest> requestStream, IWritableChannel<GreetingResponse> responseStream, MethodCallContext context)
         {
             Console.WriteLine("Received duplex streaming request from {{{0}}}", context);
-            var greeting = "Hello!";            
-            await responseStream.WriteAsync(new GreetingResponse {Greeting = greeting}).ConfigureAwait(false);
+            var greeting = "Hello!";
+            await responseStream.WriteAsync(new GreetingResponse { Greeting = greeting }).ConfigureAwait(false);
             Console.WriteLine("Sent: {0}", greeting);
             while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false))
-            {                
+            {
                 while (requestStream.TryRead(out var request))
                 {
                     Console.WriteLine("Received: {0}", request.Name);
@@ -115,47 +130,6 @@ namespace Plexus.Interop.Samples.GreetingServer
                 .ConfigureAwait(false);
             Console.WriteLine("Sent: {0}", greeting);
             greeting = "See you again!";
-            await responseStream
-                .WriteAsync(new GreetingResponse { Greeting = greeting })
-                .ConfigureAwait(false);
-            Console.WriteLine("Sent: {0}", greeting);
-            Console.WriteLine("Completed");
-        }
-
-        private static async Task<GreetingResponse> GreetingClientStreaming(
-            IReadableChannel<GreetingRequest> requeststream, 
-            MethodCallContext context)
-        {
-            Console.WriteLine("Received client streaming request from {{{0}}}", context);
-            var names = new List<string>();
-            while (await requeststream.WaitReadAvailableAsync().ConfigureAwait(false))
-            {
-                while (requeststream.TryRead(out var request))
-                {
-                    Console.WriteLine("Received: {0}", request.Name);
-                    names.Add(request.Name);
-                }
-            }
-            Console.WriteLine("Request stream completed");
-            var greeting = $"Hello, {string.Join(", ", names)}!";
-            Console.WriteLine("Sending response: {0}", greeting);
-            return new GreetingResponse { Greeting = greeting };
-        }
-
-        private static async Task GreetingServerStreaming(
-            GreetingRequest request, 
-            IWritableChannel<GreetingResponse> responseStream,
-            MethodCallContext context)
-        {
-            Console.WriteLine("Received server streaming request from {{{0}}}", context);
-            Console.WriteLine("Received: {0}", request.Name);
-            var greeting = $"Hello, {request.Name}!";
-            await responseStream
-                .WriteAsync(new GreetingResponse { Greeting = greeting })
-                .ConfigureAwait(false);
-            Console.WriteLine("Sent: {0}", greeting);
-            await Task.Delay(500).ConfigureAwait(false);
-            greeting = $"Hello again, {request.Name}!";
             await responseStream
                 .WriteAsync(new GreetingResponse { Greeting = greeting })
                 .ConfigureAwait(false);

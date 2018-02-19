@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,24 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Transport.Transmission.Pipes
+﻿namespace Plexus.Interop
 {
-    using Xunit.Abstractions;
+    using System;
+    using Plexus.Interop.Protocol;
+    using Plexus.Interop.Transport;
 
-    public sealed class PipeTransmissionTests : TransmissionTestsSuite
+    public interface IClientFactory
     {
-        public PipeTransmissionTests(ITestOutputHelper output) : base(output)
-        {
-        }
+        IClient Create(ClientOptions options);
 
-        protected override ITransmissionClient CreateClient()
-        {
-            return new PipeTransmissionClient();
-        }
-
-        protected override ITransmissionServer CreateServer()
-        {
-            return RegisterDisposable(new PipeTransmissionServer(BrokerWorkingDir));
-        }
+        IClient Create(
+            string appId, 
+            ITransportClient transport, 
+            IProtocolImplementation protocol, 
+            IMarshallerProvider marshaller, 
+            Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null);
     }
 }

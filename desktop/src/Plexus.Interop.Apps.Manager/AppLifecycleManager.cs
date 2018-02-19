@@ -50,7 +50,8 @@ namespace Plexus.Interop.Apps
             _appsDto = AppsDto.Load(Path.Combine(metadataDir, "apps.json"));
             _client = ClientFactory.Instance.Create(
                 new ClientOptionsBuilder()
-                    .WithDefaultConfiguration(Directory.GetCurrentDirectory())
+                    .WithBrokerWorkingDir(Directory.GetCurrentDirectory())
+                    .WithDefaultConfiguration()
                     .WithApplicationId("interop.AppLifecycleManager")
                     .WithProvidedService("interop.AppLifecycleService",
                         s => s.WithUnaryMethod<ActivateAppRequest, ActivateAppResponse>("ActivateApp", ActivateAppAsync))
@@ -225,7 +226,7 @@ namespace Plexus.Interop.Apps
             var launchMethodReference =
                 ProvidedMethodReference.Create("interop.AppLauncherService", "Launch", appDto.LauncherId);
 
-            var response = await _client
+            var response = await _client.CallInvoker
                 .CallUnary<AppLaunchRequest, AppLaunchResponse>(
                     launchMethodReference.CallDescriptor,
                     new AppLaunchRequest

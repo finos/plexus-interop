@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using Google.Protobuf;
     using Google.Protobuf.Reflection;
@@ -24,20 +24,22 @@
 
     public sealed class ProtobufMarshallerProvider : IMarshallerProvider
     {
+        private const int MessageIdFieldNum = 9650;
+        private const string DescriptorPropertyName = "Descriptor";
         private static readonly TypeInfo ProtobufMessageType = typeof(IMessage).GetTypeInfo();
 
         public IMarshaller<T> GetMarshaller<T>()
         {
-            var type = typeof(T).GetTypeInfo();
-            if (!ProtobufMessageType.IsAssignableFrom(type))
+            var typeInfo = typeof(T).GetTypeInfo();
+            if (!ProtobufMessageType.IsAssignableFrom(typeInfo))
             {
-                throw new InvalidOperationException($"Provided type {type} is not a protobuf message");
+                throw new InvalidOperationException($"Provided type {typeInfo} is not a protobuf message");
             }
-            var descriptorProperty = type.GetDeclaredProperty("Descriptor");
+            var descriptorProperty = typeInfo.GetDeclaredProperty(DescriptorPropertyName);
             var messageDescriptor = (MessageDescriptor)descriptorProperty.GetValue(null);
-            if (!messageDescriptor.CustomOptions.TryGetString(9650, out var id))
+            if (!messageDescriptor.CustomOptions.TryGetString(MessageIdFieldNum, out var id))
             {
-                throw new InvalidOperationException($"Required option 'plexus.interop.id' not defined on protobuf message {type}");
+                id = messageDescriptor.FullName;
             }
             return new Marshaller<T>(id, Encode, Decode<T>);
         }

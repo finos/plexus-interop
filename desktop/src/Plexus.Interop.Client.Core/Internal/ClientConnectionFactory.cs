@@ -34,7 +34,7 @@ namespace Plexus.Interop.Internal
             ITransportConnection transportConnection = null;            
             try
             {
-                transportConnection = await options.Transport.ConnectAsync(cancellationToken).ConfigureAwait(false);
+                transportConnection = await options.Transport.ConnectAsync(options.BrokerWorkingDir, cancellationToken).ConfigureAwait(false);
                 using (cancellationToken.Register(() => transportConnection.TryTerminate()))
                 {
                     Log.Debug("Connection {0} established. Performing handshake: {1}", transportConnection.Id, options);

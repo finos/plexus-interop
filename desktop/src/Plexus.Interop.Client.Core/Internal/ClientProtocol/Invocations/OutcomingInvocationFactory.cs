@@ -61,8 +61,8 @@
                 descriptor,
                 channel,
                 _protocol,
-                _marshaller.GetMarshaller<TRequest>(),
-                _marshaller.GetMarshaller<TResponse>());
+                GetMarshaller<TRequest>(),
+                GetMarshaller<TResponse>());
             invocation.Start();
             if (request.HasValue)
             {
@@ -70,6 +70,13 @@
                 invocation.Out.TryComplete();
             }
             return invocation;
+        }
+
+        private IMarshaller<T> GetMarshaller<T>()
+        {
+            return typeof(T) == typeof(Nothing)
+                ? (IMarshaller<T>) NothingMarshaller.Instance
+                : _marshaller.GetMarshaller<T>();
         }
     }
 }

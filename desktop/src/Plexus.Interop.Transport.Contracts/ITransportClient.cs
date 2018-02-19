@@ -21,6 +21,6 @@ namespace Plexus.Interop.Transport
 
     public interface ITransportClient
     {
-        ValueTask<ITransportConnection> ConnectAsync(CancellationToken cancellationToken = default);
+        ValueTask<ITransportConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken = default);
     }
 }

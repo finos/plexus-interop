@@ -17,8 +17,9 @@
 package com.db.plexus.interop.dsl.gen;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public interface GenTask {
 
-    void doGen(PlexusGenConfig plexusGenConfig) throws IOException;
+    void doGen(PlexusGenConfig plexusGenConfig) throws IOException, URISyntaxException;
 }

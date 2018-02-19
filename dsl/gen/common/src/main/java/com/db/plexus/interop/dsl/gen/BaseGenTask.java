@@ -19,7 +19,6 @@ package com.db.plexus.interop.dsl.gen;
 import com.db.plexus.interop.dsl.gen.errors.CodeGenerationException;
 import com.db.plexus.interop.dsl.gen.util.FileUtils;
 import com.google.inject.Inject;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
@@ -32,6 +31,7 @@ import org.eclipse.xtext.validation.Issue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -41,38 +41,49 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public abstract class BaseGenTask implements GenTask {
-
-    @Inject
-    private XtextResourceSet resourceSet;
+    
+    private XtextResourceSet resourceSet = new XtextResourceSet();
 
     @Inject
     protected IResourceValidator validator;
 
     protected Logger logger = Logger.getLogger("PlexusCodeGenerator");
 
-    private URI baseUri;
+    private URI workingDirUri;
+    private URI baseDirUri;
     private URI outDirUri;
-
+    private URI resourceBaseUri;
+        
     protected String inputFilesGlob(PlexusGenConfig config) {
         return config.getInput();
     }
 
-    public void doGen(PlexusGenConfig config) throws IOException {
-        this.baseUri = getBaseDirUri(config);
+    public void doGen(PlexusGenConfig config) throws IOException, URISyntaxException {    	    	
+    	this.workingDirUri = URI.createFileURI(Paths.get("").toAbsolutePath().toString()).appendSegment("");
+        this.baseDirUri = getBaseDirUri(config);
         this.outDirUri = getOutDirUri(config);
+        this.resourceBaseUri = getResourceBaseUri(config);
         loadResources(config);
         validateResources();
-        doGenWithResources(config, this.resourceSet.getResources());
+        doGenWithResources(config, this.resourceSet);
     }
 
-    protected abstract void doGenWithResources(PlexusGenConfig config, EList<Resource> resources) throws IOException;
+    protected abstract void doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException;
 
+    protected URI getWorkingDirUri() {
+        return workingDirUri;
+    }
+    
     protected URI getBaseDirUri() {
-        return this.baseUri;
+        return baseDirUri;
     }
 
     protected URI getOutDirUri() {
         return outDirUri;
+    }
+    
+    protected URI getResourceBaseUri() {
+        return resourceBaseUri;
     }
 
     protected String getAbsolutePath(String relativePath) {
@@ -118,26 +129,40 @@ public abstract class BaseGenTask implements GenTask {
 
     protected void loadResources(PlexusGenConfig config) throws IOException {
         FileUtils.processFiles(
-                config.getBaseDir(),
+                new File(this.getBaseDirUri().toFileString()).getPath(),
                 this.inputFilesGlob(config),
                 (path) -> loadResource(path));
         EcoreUtil2.resolveAll(resourceSet);
     }
     
     private void loadResource(Path path) {
-    	resourceSet.getResource(URI.createFileURI(path.toString()), true);
+    	URI uri = URI.createFileURI(path.toString());
+    	this.logger.info("Loading file: " + uri);
+    	resourceSet.getResource(uri, true);
     }
 
     private URI getBaseDirUri(PlexusGenConfig config) {
-        final java.net.URI workingDirUri = Paths.get(".").toAbsolutePath().toUri();
-        return URI.createFileURI(config.getBaseDir()).resolve(
-                URI.createURI(workingDirUri.toString()));
+        URI uri = URI.createFileURI(config.getBaseDir()).resolve(workingDirUri);
+        if (!uri.lastSegment().equals("")) {
+        	uri = uri.appendSegment("");
+        }
+        return uri;
     }
 
     private URI getOutDirUri(PlexusGenConfig config) {
-        final java.net.URI workingDirUri = Paths.get(".").toAbsolutePath().toUri();
-        return URI.createFileURI(config.getOutDir()).resolve(
-                URI.createURI(workingDirUri.toString()));
+        URI uri = URI.createFileURI(config.getOutDir()).resolve(workingDirUri);
+        if (!uri.lastSegment().equals("")) {
+        	uri = uri.appendSegment("");
+        }
+        return uri;
+    }
+    
+    private URI getResourceBaseUri(PlexusGenConfig config) throws URISyntaxException {
+    	URI commonUri;
+    	commonUri = URI.createURI(
+    			ClassLoader.getSystemClassLoader().getResource("interop/Options.proto").toURI().toString());
+    	URI resourceBaseUri = commonUri.trimSegments(2).appendSegment("");
+    	return resourceBaseUri;
     }
 
     protected void writeToFile(String outPath, String content) throws IOException {
