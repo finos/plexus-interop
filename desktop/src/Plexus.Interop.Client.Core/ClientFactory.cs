@@ -16,20 +16,37 @@
  */
 ﻿namespace Plexus.Interop
 {
+    using System;
     using Plexus.Interop.Internal;
+    using Plexus.Interop.Protocol;
+    using Plexus.Interop.Transport;
 
-    public sealed class ClientFactory
+    public sealed class ClientFactory : IClientFactory
     {
-        public static readonly ClientFactory Instance = new ClientFactory();
+        public static readonly IClientFactory Instance = new ClientFactory();
 
         public IClient Create(ClientOptions options)
         {
             return new Client(options);
         }
 
-        public ClientOptionsBuilder GetBuilder()
+        public IClient Create(
+            string appId, 
+            ITransportClient transport, 
+            IProtocolImplementation protocol,
+            IMarshallerProvider marshaller, 
+            Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = default)
         {
-            return new ClientOptionsBuilder();
+            var builder = new ClientOptionsBuilder()
+                .WithApplicationId(appId)
+                .WithMarshaller(marshaller)
+                .WithProtocol(protocol)
+                .WithTransport(transport);
+            if (setup != default)
+            {
+                builder = setup(builder);
+            }
+            return new Client(builder.Build());
         }
     }
 }

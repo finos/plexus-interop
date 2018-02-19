@@ -47,7 +47,8 @@ namespace Plexus.Interop.Apps.Internal
         protected override async Task<Task> StartCoreAsync()
         {
             var options = new ClientOptionsBuilder()
-                .WithDefaultConfiguration(Directory.GetCurrentDirectory())
+                .WithBrokerWorkingDir(Directory.GetCurrentDirectory())
+                .WithDefaultConfiguration()
                 .WithApplicationId("interop.NativeAppLauncher")
                 .WithAppInstanceId(Id)
                 .WithProvidedService(

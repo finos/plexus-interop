@@ -19,7 +19,6 @@ namespace Plexus.Interop.Transport.WebSockets
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.WebSockets.Client;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
-    using System.IO;
     using Xunit.Abstractions;
 
     public sealed class WebSocketTransportTests : TransportTestsSuite
@@ -27,10 +26,10 @@ namespace Plexus.Interop.Transport.WebSockets
         public WebSocketTransportTests(ITestOutputHelper output) : base(output)
         {
             Server = RegisterDisposable(new TransportServer(
-                new WebSocketTransmissionServer(Directory.GetCurrentDirectory()),
+                new WebSocketTransmissionServer(BrokerWorkingDir),
                 new ProtobufTransportProtocolSerializationProvider()));
             Client = new TransportClient(
-                new WebSocketTransmissionClient(Directory.GetCurrentDirectory()),
+                new WebSocketTransmissionClient(),
                 new ProtobufTransportProtocolSerializationProvider());
         }
 

@@ -21,6 +21,7 @@ namespace Plexus.Interop.Transport.Transmission
     using Shouldly;
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace Plexus.Interop.Transport.Transmission
     {
         protected abstract ITransmissionServer CreateServer();
         protected abstract ITransmissionClient CreateClient();
+        protected string BrokerWorkingDir { get; } = Directory.GetCurrentDirectory();
 
         protected TransmissionTestsSuite(ITestOutputHelper output) : base(output)
         {
@@ -48,7 +50,7 @@ namespace Plexus.Interop.Transport.Transmission
                     var serverConnectionTask = server.In.ReadAsync();
                     WriteLog("Connecting client");
                     var client = CreateClient();
-                    using (await client.ConnectAsync())
+                    using (await client.ConnectAsync(BrokerWorkingDir))
                     {
                         WriteLog("Client connected");
                         using (await serverConnectionTask)
@@ -76,7 +78,7 @@ namespace Plexus.Interop.Transport.Transmission
                     var client = CreateClient();
                     var connectTasks = Enumerable
                         .Range(0, concurrentClientsCount)
-                        .Select(_ => TaskRunner.RunInBackground(async () => await client.ConnectAsync()));
+                        .Select(_ => TaskRunner.RunInBackground(async () => await client.ConnectAsync(BrokerWorkingDir)));
                     WriteLog("Accepting clients");
                     server.In.ConsumeAsync(c => { }).IgnoreAwait();
                     var connections = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout10Sec);
@@ -92,7 +94,7 @@ namespace Plexus.Interop.Transport.Transmission
             {
                 var client = CreateClient();
                 var cancellation = new CancellationTokenSource();
-                var connectionTask = client.ConnectAsync(cancellation.Token).AsTask();
+                var connectionTask = client.ConnectAsync(BrokerWorkingDir, cancellation.Token).AsTask();
                 await Task.Delay(100, CancellationToken.None).ConfigureAwait(false);
                 cancellation.Cancel();
                 Should.Throw<TaskCanceledException>(connectionTask, Timeout1Sec);
@@ -113,7 +115,7 @@ namespace Plexus.Interop.Transport.Transmission
                     var serverConnectionTask = server.In.ReadAsync();
                     WriteLog("Connecting client");
                     var client = CreateClient();
-                    using (var clientConnection = await client.ConnectAsync())
+                    using (var clientConnection = await client.ConnectAsync(BrokerWorkingDir))
                     {
                         WriteLog("Client connected");                        
                         await clientConnection.Out.WriteAsync(PooledBuffer.Get(testMsg));
@@ -144,7 +146,7 @@ namespace Plexus.Interop.Transport.Transmission
                     var serverConnectionTask = server.In.ReadAsync();
                     WriteLog("Connecting client");
                     var client = CreateClient();
-                    using (var clientConnection = await client.ConnectAsync())
+                    using (var clientConnection = await client.ConnectAsync(BrokerWorkingDir))
                     {
                         WriteLog("Client connected");                        
                         using (var serverConection = await serverConnectionTask)
@@ -256,7 +258,7 @@ namespace Plexus.Interop.Transport.Transmission
             {
                 var clientFactory = CreateClient();
                 Log.Trace("Connecting client");
-                using (var connection = RegisterDisposable(await clientFactory.ConnectAsync().ConfigureAwait(false)))
+                using (var connection = RegisterDisposable(await clientFactory.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false)))
                 {
                     var receiveTask = TaskRunner.RunInBackground(async () =>
                     {

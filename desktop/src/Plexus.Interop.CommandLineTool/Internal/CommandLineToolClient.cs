@@ -32,8 +32,9 @@
         {
             var options =
                 new ClientOptionsBuilder()
+                    .WithBrokerWorkingDir(Directory.GetCurrentDirectory())
                     .WithApplicationId("interop.CommandLineTool")
-                    .WithDefaultConfiguration(Directory.GetCurrentDirectory())
+                    .WithDefaultConfiguration()
                     .Build();
             _client = ClientFactory.Instance.Create(options);
             OnStop(_client.Disconnect);
@@ -49,7 +50,7 @@
 
         public async Task<ActivateAppResponse> ActivateAppAsync(string appId)
         {
-            var response = await _client.Call(ActivateAppMethood, new ActivateAppRequest {AppId = appId});
+            var response = await _client.CallInvoker.Call(ActivateAppMethood, new ActivateAppRequest {AppId = appId});
             return response;
         }
     }

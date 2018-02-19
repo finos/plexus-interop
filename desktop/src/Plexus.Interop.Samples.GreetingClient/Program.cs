@@ -33,20 +33,14 @@ namespace Plexus.Interop.Samples.GreetingClient
                 var log = LogManager.GetLogger<Program>();
                 try
                 {
-                    var brokerPath = args.Length > 0
+                    var brokerWorkingDir = args.Length > 0
                         ? args[0]
-                        : Environment.GetEnvironmentVariable("PLEXUS_BROKER_WORKING_DIR") ??
-                          Directory.GetCurrentDirectory();
-                    Console.WriteLine("Connecting to {0}", brokerPath);
-                    var client = ClientFactory.Instance.Create(
-                        new ClientOptionsBuilder()
-                            .WithDefaultConfiguration(brokerPath)
-                            .WithApplicationId("interop.samples.GreetingClient")
-                            .Build());
-
+                        : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
+                    Console.WriteLine("Connecting to broker {0}", brokerWorkingDir);
+                    var client = new GreetingClient(x => x.WithBrokerWorkingDir(brokerWorkingDir));
+                    Console.WriteLine("Connecting to {0}", brokerWorkingDir);
                     await client.ConnectAsync();
                     Console.WriteLine("Connected");
-
                     var nextCase = true;
                     while (nextCase)
                     {
@@ -85,8 +79,7 @@ namespace Plexus.Interop.Samples.GreetingClient
                         }
                     }
                     Console.WriteLine("Disconnecting");
-                    client.Disconnect();
-                    await client.Completion;
+                    await client.DisconnectAsync();
                     Console.WriteLine("Disconnected");
                 }
                 catch (Exception ex)
@@ -102,30 +95,23 @@ namespace Plexus.Interop.Samples.GreetingClient
             Console.ReadKey();
         }
 
-        public static Task UnaryRequestExampleAsync(IClient client)
-        {
-            var unaryMethod = Method.Unary<GreetingRequest, GreetingResponse>("interop.samples.GreetingService", "Unary");
-            return UnaryRequestExampleAsync(client, unaryMethod);
-        }
-
-        private static async Task UnaryRequestExampleAsync(IClient client, IUnaryMethod<GreetingRequest, GreetingResponse> unaryMethod)
+        internal static async Task UnaryRequestExampleAsync(IGreetingClient client)
         {
             Console.Write("> Enter name to send: ");
             var name = Console.ReadLine();
             var request = new GreetingRequest { Name = name };
             Console.WriteLine("Sending: {0}", name);
-            var response = await client.Call(unaryMethod, request);
+            var response = await client.GreetingService.Unary(request);
             Console.WriteLine("Received: {0}", response.Greeting);
         }
 
-        public static async Task ServerStreamingRequestExampleAsync(IClient client)
+        internal static async Task ServerStreamingRequestExampleAsync(IGreetingClient client)
         {
-            var serverStreaming = Method.ServerStreaming<GreetingRequest, GreetingResponse>("interop.samples.GreetingService", "ServerStreaming");
             Console.Write("> Enter name to send: ");
             var name = Console.ReadLine();
             var request = new GreetingRequest { Name = name };
             Console.WriteLine("Sending: {0}", name);
-            var responseStream = client.Call(serverStreaming, request).ResponseStream;
+            var responseStream = client.GreetingService.ServerStreaming(request).ResponseStream;
             while (await responseStream.WaitReadAvailableAsync())
             {
                 while (responseStream.TryRead(out var response))
@@ -136,11 +122,10 @@ namespace Plexus.Interop.Samples.GreetingClient
             Console.WriteLine("Server stream completed");
         }
 
-        public static async Task ClientStreamingRequestExampleAsync(IClient client)
+        internal static async Task ClientStreamingRequestExampleAsync(IGreetingClient client)
         {
             Console.WriteLine("Calling client streaming");
-            var clientStreaming = Method.ClientStreaming<GreetingRequest, GreetingResponse>("interop.samples.GreetingService", "ClientStreaming");
-            var call = client.Call(clientStreaming);
+            var call = client.GreetingService.ClientStreaming();
             var requestStream = call.RequestStream;
             while (true)
             {
@@ -160,11 +145,10 @@ namespace Plexus.Interop.Samples.GreetingClient
             Console.WriteLine("Received response: {0}", response.Greeting);
         }
 
-        public static async Task DuplexStreamingRequestExampleAsync(IClient client)
+        internal static async Task DuplexStreamingRequestExampleAsync(IGreetingClient client)
         {
             Console.WriteLine("Calling duplex streaming");
-            var duplexStreaming = Method.DuplexStreaming<GreetingRequest, GreetingResponse>("interop.samples.GreetingService", "DuplexStreaming");
-            var call = client.Call(duplexStreaming);
+            var call = client.GreetingService.DuplexStreaming();
             var requestStream = call.RequestStream;
             var responseStream = call.ResponseStream;
             var response = await responseStream.ReadAsync();
@@ -195,12 +179,10 @@ namespace Plexus.Interop.Samples.GreetingClient
             Console.WriteLine("Response stream completed");
         }
 
-        public static async Task DiscoveryExampleAsync(IClient client)
+        internal static async Task DiscoveryExampleAsync(IGreetingClient client)
         {            
-            var greetingMethod =
-                Method.Unary<GreetingRequest, GreetingResponse>("interop.samples.GreetingService", "Unary");
-            Console.WriteLine("Calling discovery for method {0}", greetingMethod);
-            var discoveredProviders = (await client.DiscoverAsync(greetingMethod)).ToArray();
+            Console.WriteLine("Calling discovery for method {0}", GreetingService.DefaultDescriptor.UnaryMethod);
+            var discoveredProviders = (await client.DiscoveryInvoker.DiscoverAsync(GreetingService.DefaultDescriptor.UnaryMethod)).ToArray();
             Console.WriteLine("Discovered {0} actions:", discoveredProviders.Length);
             for (var i=0; i<discoveredProviders.Length; i++)
             {                       
@@ -220,7 +202,12 @@ namespace Plexus.Interop.Samples.GreetingClient
                 }
                 var provider = discoveredProviders[index];
                 Console.WriteLine("Invoking {0} ({1})", provider.Title, provider.ProvidedMethod.ProvidedService.ApplicationId);
-                await UnaryRequestExampleAsync(client, provider);
+                Console.Write("> Enter name to send: ");
+                var name = Console.ReadLine();
+                var request = new GreetingRequest { Name = name };
+                Console.WriteLine("Sending: {0}", name);
+                var response = await client.CallInvoker.Call(provider, request);
+                Console.WriteLine("Received: {0}", response.Greeting);
                 break;
             }
         }

@@ -14,24 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Transport.Transmission.Pipes
+namespace Plexus.Interop
 {
-    using Xunit.Abstractions;
+    using System.IO;
 
-    public sealed class PipeTransmissionTests : TransmissionTestsSuite
+    public sealed class NothingMarshaller : IMarshaller<Nothing>
     {
-        public PipeTransmissionTests(ITestOutputHelper output) : base(output)
+        private static readonly byte[] Buffer = new byte[64];
+
+        public static readonly IMarshaller<Nothing> Instance = new NothingMarshaller();
+
+        private NothingMarshaller()
         {
         }
 
-        protected override ITransmissionClient CreateClient()
+        public string MessageId { get; } = "interop.Nothing";
+
+        public void Encode(Nothing obj, Stream stream)
         {
-            return new PipeTransmissionClient();
         }
 
-        protected override ITransmissionServer CreateServer()
+        public Nothing Decode(Stream stream)
         {
-            return RegisterDisposable(new PipeTransmissionServer(BrokerWorkingDir));
+            while (stream.Read(Buffer, 0, Buffer.Length) > 0)
+            {
+            }
+            return Nothing.Instance;
         }
     }
 }

@@ -28,23 +28,17 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
 
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
 
-        private readonly IServerStateReader _serverStateReader;
-
-        public WebSocketTransmissionClient(string brokerWorkingDir)
+        public async ValueTask<ITransmissionConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken = default)
         {
-            _serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
-        }
-
-        public async ValueTask<ITransmissionConnection> ConnectAsync(CancellationToken cancellationToken = default)
-        {
-            if (!await _serverStateReader
+            var serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
+            if (!await serverStateReader
                 .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
                 .ConfigureAwait(false))
             {
                 throw new TimeoutException(
                     $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
             }
-            var url = _serverStateReader.ReadSetting("address");
+            var url = serverStateReader.ReadSetting("address");
             if (string.IsNullOrEmpty(url))
             {
                 throw new InvalidOperationException("Cannot find url to connect");

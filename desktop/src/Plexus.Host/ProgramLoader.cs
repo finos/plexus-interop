@@ -80,7 +80,7 @@
                     }
                 }
 
-                var parentProcessVar = Environment.GetEnvironmentVariable("PLEXUS_PARENT_PROCESS");
+                var parentProcessVar = Environment.GetEnvironmentVariable(EnvironmentHelper.ParentProcessIdVarName);
                 if (!string.IsNullOrWhiteSpace(parentProcessVar) && int.TryParse(parentProcessVar, out var parentPid))
                 {
                     var parentProcess = Process.GetProcessById(parentPid);

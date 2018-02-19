@@ -33,7 +33,8 @@
         {
             _clients = clients?.ToDictionary(x => x.ApplicationId, x => x) ?? new Dictionary<string, ClientOptionsBuilder>();
             var options = new ClientOptionsBuilder()
-                .WithDefaultConfiguration("TestBroker")
+                .WithBrokerWorkingDir("TestBroker")
+                .WithDefaultConfiguration()
                 .WithApplicationId("plexus.interop.testing.TestAppLauncher")
                 .WithProvidedService(
                     "interop.AppLauncherService",

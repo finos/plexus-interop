@@ -24,6 +24,7 @@
     public sealed class ClientOptions
     {
         internal ClientOptions(
+            string brokerWorkingDir,
             string applicationId,
             UniqueId applicationInstanceId,
             ITransportClient transport,
@@ -31,6 +32,7 @@
             IMarshallerProvider marshaller,
             IEnumerable<ProvidedServiceDefinition> services)
         {
+            BrokerWorkingDir = brokerWorkingDir;
             ApplicationId = applicationId;
             ApplicationInstanceId = applicationInstanceId;
             Transport = transport;
@@ -39,6 +41,8 @@
             Services = new List<ProvidedServiceDefinition>(services);
             ServicesDictionary = Services.ToDictionary(x => (x.Id, x.Alias), x => x);
         }
+
+        public string BrokerWorkingDir { get; }
 
         public string ApplicationId { get; }
 
@@ -56,7 +60,7 @@
 
         public override string ToString()
         {
-            return $"{nameof(ApplicationId)}: {ApplicationId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}, {nameof(Transport)}: {Transport}, {nameof(Protocol)}: {Protocol}, {nameof(Marshaller)}: {Marshaller}, {nameof(Services)}: {Services.FormatEnumerableObjects()}";
+            return $"{nameof(BrokerWorkingDir)}: {BrokerWorkingDir}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}, {nameof(Transport)}: {Transport}, {nameof(Protocol)}: {Protocol}, {nameof(Marshaller)}: {Marshaller}, {nameof(Services)}: {Services.FormatEnumerableObjects()}";
         }
     }
 }
