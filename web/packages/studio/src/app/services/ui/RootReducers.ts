@@ -41,8 +41,8 @@ const log = LoggerFactory.getLogger("StateLogger");
 export function logger(reducer: ActionReducer<State>): ActionReducer<State> {
   return function (state: State, action: any): State {
     let result = reducer(state, action);
-    log.debug(`Action - ${action}`);
-    log.debug('State: ', result);  
+    log.debug('Action:', action);
+    log.debug('State:', result);  
     return result;
   };
 }
