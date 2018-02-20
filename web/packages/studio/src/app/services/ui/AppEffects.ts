@@ -86,7 +86,7 @@ export class Effects {
                 const apps = appRegistryService.getApplications();
                 this.log.info(`Successfully loaded metadata from ${baseUrl}`);
 
-                const connectionProvider = await this.transportConnectionFactory.getConnectionProvider(baseUrl);
+                const сonnectionProvider = await this.transportConnectionFactory.getConnectionProvider(baseUrl);
                 this.log.info(`Connection provider created`);
 
                 return {
@@ -94,7 +94,7 @@ export class Effects {
                     payload: {
                         apps,
                         interopRegistryService,
-                        connectionProvider
+                        сonnectionProvider
                     }
                 };
             } catch (error) {
