@@ -9,7 +9,6 @@
     "bootstrap": "lerna bootstrap",
     "postbootstrap": "node ./scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
     "preinstall": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
-    "postinstall": "node ./scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
     "prebuild": "run-s bootstrap",
     "build": "lerna run build --stream --concurrency 1",
     "prepublish-all": "node ./scripts/replace-auth-vars.js --publish && lerna exec -- cross-var shx cp $LERNA_ROOT_PATH/.npmrc .npmrc",

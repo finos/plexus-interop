@@ -84,35 +84,17 @@ export class Effects {
                 const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(baseUrl);
                 const appRegistryService = await this.interopServiceFactory.getAppRegistryService(baseUrl);
                 const apps = appRegistryService.getApplications();
-
-                const wsUrl = UrlParamsProvider.getParam("wsUrl");
-                const transport = UrlParamsProvider.getParam("transport");
-
-                let сonnectionProvider;
-                switch (transport) {
-                    case TransportType.NATIVE_WS:
-                        const wsUrl = UrlParamsProvider.getParam("wsUrl");
-                        this.log.info("Connecting to Native WS Transport");                        
-                        сonnectionProvider = await this.transportConnectionFactory.createWebSocketTransportProvider(wsUrl);
-                        break;
-                    case TransportType.WEB_SAME_BROADCAST:
-                        this.log.info("Connecting to Same Domain Broad Cast Transport");
-                        сonnectionProvider = await this.transportConnectionFactory.createSameOriginWebTransportProvider(baseUrl);
-                        break;
-                    default:
-                        this.log.info("Connecting to Cross Domain Transport");                    
-                        сonnectionProvider = await this.transportConnectionFactory.createCrossDomainWebTransportProvider(baseUrl);
-                        break;
-                }
-
                 this.log.info(`Successfully loaded metadata from ${baseUrl}`);
+
+                const connectionProvider = await this.transportConnectionFactory.getConnectionProvider(baseUrl);
+                this.log.info(`Connection provider created`);
 
                 return {
                     type: AppActions.METADATA_LOAD_SUCCESS,
                     payload: {
                         apps,
                         interopRegistryService,
-                        сonnectionProvider
+                        connectionProvider
                     }
                 };
             } catch (error) {
