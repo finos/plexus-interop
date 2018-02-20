@@ -20,9 +20,8 @@
 const fs = require('fs')
 
 const backward = process.argv.indexOf('--backward') !== -1;
-const paramName = "NPM_LOCK_REGISTRY";
 
-console.log(`Looking for ${paramName} env variable`);
+console.log(`Looking for install registry env variable`);
 
 const value = process.env["NPM_REGISTRY_INSTALL"] || process.env["NPM_REGISTRY"];
 
