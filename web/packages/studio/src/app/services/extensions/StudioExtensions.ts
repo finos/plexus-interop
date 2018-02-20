@@ -19,13 +19,31 @@ import { TransportConnectionProvider } from '../transport/TransportConnectionPro
 export class StudioExtensions {
 
     private static connectionProvider?: TransportConnectionProvider;
+    private static proxyHostUrlProvider?: () => Promise<string>;
+    private static metadataUrlProvider?: () => Promise<string>;
+
+    public static setMetadataUrlProvider(provider: () => Promise<string>): void {
+        StudioExtensions.metadataUrlProvider = provider;
+    }
 
     public static setConnectionProvider(connectionProvider: TransportConnectionProvider): void {
         StudioExtensions.connectionProvider = connectionProvider;
     }
 
+    public static setProxyHostUrlProvider(provider: () => Promise<string>): void {
+        StudioExtensions.proxyHostUrlProvider = provider;
+    }
+
     public static async getConnectionProvider(): Promise<TransportConnectionProvider> {
         return StudioExtensions.connectionProvider || Promise.reject("Not provided");
+    }
+
+    public static async getProxyHostUrl(): Promise<string> {
+        return StudioExtensions.proxyHostUrlProvider ? StudioExtensions.proxyHostUrlProvider() : Promise.reject("Not provider");
+    }
+
+    public static async getMetadataUrl(): Promise<string> {
+        return StudioExtensions.metadataUrlProvider ? StudioExtensions.metadataUrlProvider() : Promise.reject("Not provided");
     }
 
 }

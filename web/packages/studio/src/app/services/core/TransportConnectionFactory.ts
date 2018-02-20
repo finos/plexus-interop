@@ -22,7 +22,7 @@ import { InteropServiceFactory } from "./InteropServiceFactory";
 import { UrlResolver } from "./UrlResolver";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 import { UrlParamsProvider, LoggerFactory } from '@plexus-interop/common';
-import { StudioExtensions } from "../extensions/StudioExtensions";
+import { StudioExtensions } from '../extensions/StudioExtensions';
 import { TransportType } from "./TransportType";
 
 @Injectable()
@@ -65,10 +65,18 @@ export class TransportConnectionFactory {
     private createCrossDomainWebTransportProvider(baseUrl: string): TransportConnectionProvider {
         return this.createWebTransportProvider(baseUrl, async () => {
             const eventBus = await new CrossDomainEventBusProvider(
-                async () => UrlParamsProvider.getParam("hostProxyUrl") || this.urlResolver.getProxyHostUrl(baseUrl))
+                () => this.getProxyHostUrl(baseUrl))
                 .connect() as CrossDomainEventBus;
             return eventBus;
         });
+    }
+
+    private async getProxyHostUrl(baseUrl: string): Promise<string> {
+        return StudioExtensions.getProxyHostUrl()
+            .catch(e => {
+                this.log.debug("Proxy Host Extension is not provided");
+                return UrlParamsProvider.getParam("hostProxyUrl") || this.urlResolver.getProxyHostUrl(baseUrl)                
+            });
     }
 
     private createSameOriginWebTransportProvider(baseUrl: string): TransportConnectionProvider {

@@ -45,6 +45,7 @@ import { Router } from '@angular/router';
 import { DiscoveryMode } from "@plexus-interop/client-api";
 import { UrlParamsProvider } from "@plexus-interop/common";
 import { TransportType } from "../core/TransportType";
+import { StudioExtensions } from '../extensions/StudioExtensions';
 
 @Injectable()
 export class Effects {
@@ -56,10 +57,16 @@ export class Effects {
         .ofType(AppActions.AUTO_CONNECT)
         .withLatestFrom(this.store.select(state => state.plexus))
         .mergeMap(async ([action, state]) => {
-
-            if (state.metadataUrl) {
+            let metadataUrl;
+            try {
+                metadataUrl = await StudioExtensions.getMetadataUrl();
+            } catch (error) {
+                this.log.debug("Metadata URL extension not provided");
+                metadataUrl = state.metadataUrl;
+            }
+            if (metadataUrl) {
                 const payload: MetadataLoadActionParams = {
-                    baseUrl: state.metadataUrl,
+                    baseUrl: metadataUrl,
                     silentOnFailure: true
                 };
                 return {
@@ -154,50 +161,49 @@ export class Effects {
         });
 
     @Effect() loadConsumedMethod$: Observable<TypedAction<any>> =
-    this.actions$
-        .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
-        .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
-        .mergeMap(async ([action, services]) => {
+        this.actions$
+            .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
+            .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
+            .mergeMap(async ([action, services]) => {
 
-            const method = action.payload;
-            const interopClient = services.interopClient;
+                const method = action.payload;
+                const interopClient = services.interopClient;
 
-            const discoveryRequest = {
-                consumedMethod: {
-                    consumedService: {
-                        serviceId: method.consumedService.service.id
-                    },
-                    methodId: method.method.name
+                const discoveryRequest = {
+                    consumedMethod: {
+                        consumedService: {
+                            serviceId: method.consumedService.service.id
+                        },
+                        methodId: method.method.name
+                    }
+                };
+
+                // offline
+                const discoveredMethods = await interopClient.discoverMethod(discoveryRequest);
+                // online
+                const onlineMethods = await interopClient.discoverMethod({
+                    ...discoveryRequest,
+                    discoveryMode: DiscoveryMode.Online
+                });
+
+                if (onlineMethods && onlineMethods.methods) {
+                    onlineMethods.methods.forEach(pm => discoveredMethods.methods.push(pm));
                 }
-            };
 
-            // offline
-            const discoveredMethods = await interopClient.discoverMethod(discoveryRequest);
-            // online
-            const onlineMethods = await interopClient.discoverMethod({
-                ...discoveryRequest,
-                discoveryMode: DiscoveryMode.Online
+                return {
+                    type: AppActions.CONSUMED_METHOD_SUCCESS,
+                    payload: {
+                        method,
+                        discoveredMethods
+                    }
+                };
             });
-
-            if (onlineMethods && onlineMethods.methods) {
-                onlineMethods.methods.forEach(pm => discoveredMethods.methods.push(pm));
-            }
-
-            return {
-                type: AppActions.CONSUMED_METHOD_SUCCESS,
-                payload: {
-                    method,
-                    discoveredMethods
-                }
-            };
-        });
 
     @Effect() appConnected$: Observable<Action> = this
         .actions$
         .ofType(AppActions.CONNECT_TO_APP_SUCCESS)
         .map(_ => {
             this.router.navigate(['/app'], { queryParamsHandling: 'merge' });
-
             return { type: AppActions.DO_NOTHING };
         });
 
@@ -215,7 +221,6 @@ export class Effects {
         .ofType(AppActions.CONNECT_TO_APP_FAILED)
         .map(_ => {
             this.router.navigate(['/apps']);
-
             return { type: AppActions.DO_NOTHING };
         });
 
