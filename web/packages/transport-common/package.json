@@ -60,7 +60,7 @@
     "tslint": "^4.5.1",
     "typescript": "2.6.1",
     "watchify": "^3.9.0",
-    "yarn": "^1.1.0"
+    "yarn": "1.4.0"
   },
   "jest": {
     "testEnvironment": "node",

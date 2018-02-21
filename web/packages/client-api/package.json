@@ -31,7 +31,7 @@
     "trash-cli": "^1.4.0",
     "tslint": "^4.5.1",
     "typescript": "2.6.1",
-    "yarn": "^1.1.0"
+    "yarn": "1.4.0"
   },
   "jest": {
     "moduleFileExtensions": [

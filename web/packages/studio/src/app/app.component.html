@@ -1,14 +1,14 @@
 <div class="container p-lg-3 flex-fill flex-flow-column">
+
   <app-header class="header"></app-header>
   
   <div class="pt-lg-3 app-content">
     <router-outlet></router-outlet>
-  </div>
-  <hr>
-
-  <div class="form-group footer">
-    <label for="plexus-logs-area">Plexus Logs:</label>
-    <textarea id="plexus-logs-area" disabled="disabled" class="form-control" rows="12" [(ngModel)]="plexusLogs"></textarea>
-    <button id="clear-plexus-logs-btn" class="btn btn-link" type="button" (click)="clearLogs()">Clear</button>
+    <hr>
+    <div class="form-group footer">
+        <label for="plexus-logs-area">Plexus Logs:</label>
+        <textarea id="plexus-logs-area" disabled="disabled" class="form-control" rows="12" [(ngModel)]="plexusLogs"></textarea>
+        <button id="clear-plexus-logs-btn" class="btn btn-link" type="button" (click)="clearLogs()">Clear</button>
+    </div>    
   </div>
 </div>

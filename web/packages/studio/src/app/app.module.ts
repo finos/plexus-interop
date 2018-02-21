@@ -48,6 +48,7 @@ import {
   RouterStateSerializer,
 } from '@ngrx/router-store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -72,7 +73,11 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     AppActions,
     InteropServiceFactory,
     InteropClientFactory,
-    TransportConnectionFactory
+    TransportConnectionFactory,
+    {
+      provide: LocationStrategy,
+      useClass: HashLocationStrategy
+    }
   ],
   bootstrap: [AppComponent]
 })
