@@ -23,6 +23,7 @@ import { Routes } from '@angular/router';
 
 export const AppRoutes: Routes = [
   { path: '', component: MetadataLoaderComponent },
+  { path: 'index.html', component: MetadataLoaderComponent },
   { path: 'apps', component: AppListComponent, resolve: [] },
   { path: 'app', component: AppServicesComponent },
   { path: 'consumed', component: ConsumedServiceComponent },
