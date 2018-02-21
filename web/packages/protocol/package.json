@@ -33,7 +33,7 @@
   "devDependencies": {
     "trash-cli": "^1.4.0",
     "typescript": "2.6.1",
-    "yarn": "^1.1.0",
+    "yarn": "1.4.0",
     "copyfiles": "^1.2.0",
     "espree": "^3.4.3"
   }
