@@ -26,7 +26,7 @@ console.log(`Looking for install registry env variable`);
 const value = process.env["NPM_REGISTRY_INSTALL"] || process.env["NPM_REGISTRY"];
 
 if (!value) {
-    console.log(`${paramName} Env variable is empty`);
+    console.log("Custom registry not specified");
     process.exit(0);
 }
 
