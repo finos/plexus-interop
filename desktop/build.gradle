@@ -80,7 +80,8 @@ task test(dependsOn: compile, type:Exec) {
             commandLine 'cmd', '/c', 'tests-netcore-only.cmd'
         }
     } else {
-        commandLine "$projectDir/tests-netcore-only.sh"
+  	// For now tests can only run on Windows
+        // commandLine "$projectDir/tests-netcore-only.sh"
     }
 }
 
