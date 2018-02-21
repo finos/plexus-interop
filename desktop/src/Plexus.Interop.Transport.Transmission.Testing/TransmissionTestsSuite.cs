@@ -294,8 +294,8 @@ namespace Plexus.Interop.Transport.Transmission
                 }
             });
 
-            Should.CompleteIn(Task.WhenAny(serverTask, clientTask).Unwrap(), TimeSpan.FromSeconds(10));
-            Should.CompleteIn(Task.WhenAll(serverTask, clientTask), TimeSpan.FromSeconds(10));
+            Should.CompleteIn(Task.WhenAny(serverTask, clientTask).Unwrap(), TimeoutConstants.Timeout10Sec);
+            Should.CompleteIn(Task.WhenAll(serverTask, clientTask), TimeoutConstants.Timeout10Sec);
 
             serverRecevied.Count.ShouldBe(clientMessages.Length);
             clientReceived.Count.ShouldBe(serverMessages.Length);

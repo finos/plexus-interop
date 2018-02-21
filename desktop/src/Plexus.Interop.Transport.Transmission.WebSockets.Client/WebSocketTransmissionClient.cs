@@ -24,7 +24,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
     public sealed class WebSocketTransmissionClient : ITransmissionClient
     {
         private const string ServerName = "ws-v1";
-        private static readonly TimeSpan MaxServerInitializationTime = TimeSpan.FromSeconds(20);
+
+        private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout20Sec;
 
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
 

@@ -35,10 +35,10 @@ namespace Plexus
 
         protected static readonly MD5 Md5 = MD5.Create();
 
-        protected static readonly TimeSpan Timeout1Sec = TimeSpan.FromSeconds(1);
-        protected static readonly TimeSpan Timeout5Sec = TimeSpan.FromSeconds(5);
-        protected static readonly TimeSpan Timeout10Sec = TimeSpan.FromSeconds(10);
-        protected static readonly TimeSpan Timeout30Sec = TimeSpan.FromSeconds(30);
+        protected static readonly TimeSpan Timeout1Sec = TimeoutConstants.Timeout1Sec;
+        protected static readonly TimeSpan Timeout5Sec = TimeoutConstants.Timeout5Sec;
+        protected static readonly TimeSpan Timeout10Sec = TimeoutConstants.Timeout10Sec;
+        protected static readonly TimeSpan Timeout30Sec = TimeoutConstants.Timeout30Sec;
 
         protected ITestOutputHelper Console { get; }
 

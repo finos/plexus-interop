@@ -27,7 +27,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 
     internal sealed class WebSocketClientTransmissionConnection : ProcessBase, ITransmissionConnection
     {
-        private static readonly TimeSpan ConnectionTimeout = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan ConnectionTimeout = TimeoutConstants.Timeout5Sec;
 
         private readonly ILogger _log;
         private readonly WebSocket _webSocket;
