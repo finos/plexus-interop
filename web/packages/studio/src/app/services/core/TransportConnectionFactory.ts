@@ -21,28 +21,69 @@ import { TransportConnection } from "@plexus-interop/transport-common";
 import { InteropServiceFactory } from "./InteropServiceFactory";
 import { UrlResolver } from "./UrlResolver";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
-import { UrlParamsProvider } from "@plexus-interop/common";
+import { UrlParamsProvider, LoggerFactory } from '@plexus-interop/common';
+import { StudioExtensions } from '../extensions/StudioExtensions';
+import { TransportType } from "./TransportType";
 
 @Injectable()
 export class TransportConnectionFactory {
 
     private readonly serviceFactory: InteropServiceFactory = new InteropServiceFactory();
     private readonly urlResolver: UrlResolver = new UrlResolver();
+    private readonly log = LoggerFactory.getLogger("TransportConnectionFactory");
 
-    public createCrossDomainWebTransportProvider(baseUrl: string): TransportConnectionProvider {
+    public async getConnectionProvider(baseUrl: string): Promise<TransportConnectionProvider> {
+        return StudioExtensions
+            .getConnectionProvider()
+            .then(cp => {
+                this.log.info("Received Connection Provider from extension");
+                return cp;
+            })
+            .catch(() => {
+                this.log.info("Could't get connection from extension");
+                return this.lookupProviderFromRequestParams(baseUrl);
+            });
+    }
+
+    private async lookupProviderFromRequestParams(baseUrl: string): Promise<TransportConnectionProvider> {
+        const wsUrl = UrlParamsProvider.getParam("wsUrl");
+        const transport = UrlParamsProvider.getParam("transport");
+        switch (transport) {
+            case TransportType.NATIVE_WS:
+                const wsUrl = UrlParamsProvider.getParam("wsUrl");
+                this.log.info("Connecting to Native WS Transport");                        
+                return this.createWebSocketTransportProvider(wsUrl);
+            case TransportType.WEB_SAME_BROADCAST:
+                this.log.info("Connecting to Same Domain Broad Cast Transport");
+                return this.createSameOriginWebTransportProvider(baseUrl);
+            default:
+                this.log.info("Connecting to Cross Domain Transport");                    
+                return this.createCrossDomainWebTransportProvider(baseUrl);
+        }
+    }
+
+    private createCrossDomainWebTransportProvider(baseUrl: string): TransportConnectionProvider {
         return this.createWebTransportProvider(baseUrl, async () => {
             const eventBus = await new CrossDomainEventBusProvider(
-                async () => UrlParamsProvider.getParam("hostProxyUrl") || this.urlResolver.getProxyHostUrl(baseUrl))
+                () => this.getProxyHostUrl(baseUrl))
                 .connect() as CrossDomainEventBus;
             return eventBus;
         });
     }
 
-    public createSameOriginWebTransportProvider(baseUrl: string): TransportConnectionProvider {
+    private async getProxyHostUrl(baseUrl: string): Promise<string> {
+        return StudioExtensions.getProxyHostUrl()
+            .catch(e => {
+                this.log.debug("Proxy Host Extension is not provided");
+                return UrlParamsProvider.getParam("hostProxyUrl") || this.urlResolver.getProxyHostUrl(baseUrl)                
+            });
+    }
+
+    private createSameOriginWebTransportProvider(baseUrl: string): TransportConnectionProvider {
         return this.createWebTransportProvider(baseUrl, async () => new BroadCastChannelEventBus().init());
     }
 
-    public createWebTransportProvider(baseUrl: string, eventBusProvider: () => Promise<EventBus>): TransportConnectionProvider {
+    private createWebTransportProvider(baseUrl: string, eventBusProvider: () => Promise<EventBus>): TransportConnectionProvider {
         return async () => {
             let eventBus: CrossDomainEventBus;
             const connection: TransportConnection = await new WebBrokerConnectionBuilder()
@@ -54,7 +95,7 @@ export class TransportConnectionFactory {
         };
     }
 
-    public createWebSocketTransportProvider(wsUrl: string): TransportConnectionProvider {
+    private createWebSocketTransportProvider(wsUrl: string): TransportConnectionProvider {
         return () => new WebSocketConnectionFactory(new WebSocket(wsUrl)).connect();
     }
 

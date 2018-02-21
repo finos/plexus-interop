@@ -20,20 +20,19 @@
 const fs = require('fs')
 
 const backward = process.argv.indexOf('--backward') !== -1;
-const paramName = "NPM_LOCK_REGISTRY";
 
-console.log(`Looking for ${paramName} env variable`);
+console.log(`Looking for install registry env variable`);
 
 const value = process.env["NPM_REGISTRY_INSTALL"] || process.env["NPM_REGISTRY"];
 
 if (!value) {
-    console.log(`${paramName} Env variable is empty`);
+    console.log("Custom registry not specified");
     process.exit(0);
 }
 
 const replace = (from, to, file) => {
 
-    console.log(`Replacing registry entries${backward ? " back" : ""} for ${file}`);
+    console.log(`Replacing registry entries from ${from} to ${to} for ${file}`);
 
     fs.readFile(file, 'utf8', function (err,data) {
         if (err) {
