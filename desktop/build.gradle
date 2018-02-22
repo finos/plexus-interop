@@ -70,7 +70,7 @@ task compile(type:Exec) {
 
 compile.dependsOn('license')
 
-if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet") {
+if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] == null) {
     task test(dependsOn: compile, type:Exec) {
         workingDir projectDir    
     	ignoreExitValue false    
