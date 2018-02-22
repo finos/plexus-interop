@@ -70,21 +70,23 @@ task compile(type:Exec) {
 
 compile.dependsOn('license')
 
-task test(dependsOn: compile, type:Exec) {
-    workingDir projectDir    
-    ignoreExitValue false
-    if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet") {
+if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet") {
+    task test(dependsOn: compile, type:Exec) {
+        workingDir projectDir    
+    	ignoreExitValue false    
         if (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null) {
-            commandLine 'cmd', '/c', 'tests.cmd'
+           commandLine 'cmd', '/c', 'tests.cmd'
         } else {
-            commandLine 'cmd', '/c', 'tests-netcore-only.cmd'
+           commandLine 'cmd', '/c', 'tests-netcore-only.cmd'
         }
-    } else {
+        // For now tests can only run on Windows
+        // commandLine "$projectDir/tests-netcore-only.sh"
+    }
+} else {
+    task test(dependsOn: compile) {
         doLast {
             println "Skipping tests because current platform is not Windows or running in MyGet"
         }
-  	// For now tests can only run on Windows
-        // commandLine "$projectDir/tests-netcore-only.sh"
     }
 }
 
