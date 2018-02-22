@@ -70,7 +70,24 @@ task compile(type:Exec) {
 
 compile.dependsOn('license')
 
-if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] == null) {
+def dotnetVersion = new ByteArrayOutputStream()
+exec{    
+    ignoreExitValue true
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        commandLine 'cmd', '/c', 'dotnet.cmd', "--version"
+    } else {
+        commandLine '$projectDir/dotnet.sh', "--version"
+    }
+    standardOutput = dotnetVersion;
+}
+
+println "Full dotnet build: " + (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null)
+println "dotnet --version:\n$dotnetVersion"
+
+def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] == null
+println "Tests enabled: $testsEnabled"
+
+if (testsEnabled) {
     task test(dependsOn: compile, type:Exec) {
         workingDir projectDir    
     	ignoreExitValue false    
@@ -90,22 +107,10 @@ if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && Sy
     }
 }
 
-def dotnetVersion = new ByteArrayOutputStream()
-exec{    
-    ignoreExitValue true
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        commandLine 'cmd', '/c', 'dotnet.cmd', "--version"
-    } else {
-        commandLine '$projectDir/dotnet.sh', "--version"
-    }
-    standardOutput = dotnetVersion;
-}
-
-println "Full dotnet build: " + (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null)
-println "dotnet --version:\n$dotnetVersion";
-
 if ("$dotnetVersion".trim() != "2.1.4") {
 	println "Dotnet SDK is not installed"
+	compile.dependsOn(downloadAndUnzipDotnet)
+   	test.dependsOn(downloadAndUnzipDotnet)
         compile.doFirst {
 	   println "Adding dotnet SDK to path"
            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -114,17 +119,16 @@ if ("$dotnetVersion".trim() != "2.1.4") {
               environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
            }
 	}
-	compile.dependsOn(downloadAndUnzipDotnet)
-
-        test.doFirst {
-	   println "Adding dotnet SDK to path"
-           if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-              environment "PATH", "$buildDir/win32/sdk/dotnet/"
-           } else {
-              environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
+        if (testsEnabled) {
+           test.doFirst {
+	       println "Adding dotnet SDK to path"
+               if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                  environment "PATH", "$buildDir/win32/sdk/dotnet/"
+               } else {
+                  environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
+               }
            }
 	}
-	test.dependsOn(downloadAndUnzipDotnet)
 } else {
 	println "Dotnet SDK is already installed"
 }
