@@ -14,7 +14,7 @@ if not defined NUGET_PACKAGES (
 
 if not exist ..\bin\test-reports mkdir ..\bin\test-reports
 
-CALL dotnet restore src\Plexus.Interop.sln && SET PLEXUS_TIMEOUT_MULTIPLIER=10 ^
+CALL dotnet restore src\Plexus.Interop.sln && dotnet build src\Plexus.Interop.sln -c debug /p:DebugType=Full && SET PLEXUS_TIMEOUT_MULTIPLIER=10 ^
   && %NUGET_PACKAGES%\OpenCover\4.6.519\tools\OpenCover.Console.exe -oldStyle -returntargetcode -register:user -output:..\bin\test-reports\dotnet-coverage.xml ^
   -filter:"+[Plexus.*]* -[*.Tests]* -[*.IntegrationTests]* -[*.Testing]* -[Plexus.Interop.Samples.*]* -[Plexus.*]*.Generated.*" -excludebyfile:*.proto.cs -skipautoprops ^
   -targetdir:src -target:dotnet.exe -targetargs:"test Plexus.Interop.Tests.sln /p:DebugType=Full --test-adapter-path:. --logger:%LOGGER% --verbosity quiet"
