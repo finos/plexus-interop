@@ -60,9 +60,9 @@ export abstract class ExampleServiceProxy {
 
     public abstract serverStreaming(request: plexus.com.plexus.model.IRequest, responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<InvocationClient>;
 
-    public abstract clientToServer(responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IResponse>>;
+    public abstract clientToServer(responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IRequest>>;
 
-    public abstract bidiStreaming(responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IResponse>>;
+    public abstract bidiStreaming(responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IRequest>>;
 
 }
 
@@ -111,7 +111,7 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
             new ConversionObserver<plexus.com.plexus.model.IResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter));
     }
 
-    public clientToServer(responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IResponse>> {
+    public clientToServer(responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IRequest>> {
         const requestToBinaryConverter = (from: plexus.com.plexus.model.IRequest) => Arrays.toArrayBuffer(plexus.com.plexus.model.Request.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.com.plexus.model.Response.decode(new Uint8Array(from));
@@ -134,7 +134,7 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
             });
     }
 
-    public bidiStreaming(responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IResponse>> {
+    public bidiStreaming(responseObserver: Observer<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IRequest>> {
         const requestToBinaryConverter = (from: plexus.com.plexus.model.IRequest) => Arrays.toArrayBuffer(plexus.com.plexus.model.Request.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.com.plexus.model.Response.decode(new Uint8Array(from));
