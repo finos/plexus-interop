@@ -93,9 +93,9 @@ namespace Plexus.Interop
                     const int concurrentClientCount = 15;
                     var connectTasks = Enumerable.Range(0, concurrentClientCount)
                         .Select(_ => TaskRunner.RunInBackground(() => ConnectEchoClient()));
-                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout10Sec);
+                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout30Sec);
                     var disconnectTasks = clients.Select(c => TaskRunner.RunInBackground(c.DisconnectAsync));
-                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout10Sec);
+                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout30Sec);
                 }
             });
         }
