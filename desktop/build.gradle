@@ -99,8 +99,12 @@ task clean {
 
 def dotnetVersion = new ByteArrayOutputStream()
 exec{    
-    commandLine "dotnet", "--version"
     ignoreExitValue true
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        commandLine 'cmd', '/c', 'dotnet.cmd', "--version"
+    } else {
+        commandLine '$projectDir/dotnet.sh', "--version"
+    }
     standardOutput = dotnetVersion;
 }
 
