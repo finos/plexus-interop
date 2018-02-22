@@ -7,4 +7,4 @@ if defined APPVEYOR (
 ) else (
 	SET LOGGER=xunit
 )
-dotnet test src\Plexus.Interop.Tests.sln --test-adapter-path:. --logger:%LOGGER% --verbosity quiet --no-build --no-restore
+dotnet test src\Plexus.Interop.Tests.sln --test-adapter-path:. --logger:%LOGGER% --verbosity quiet
