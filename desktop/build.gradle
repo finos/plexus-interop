@@ -113,7 +113,7 @@ println "dotnet --version:\n$dotnetVersion";
 
 if ("$dotnetVersion".trim() != "2.1.4") {
 	println "Dotnet SDK is not installed"
-        build.doFirst {
+        compile.doFirst {
 	   println "Adding dotnet SDK to path"
            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
               environment "PATH", "$buildDir/win32/sdk/dotnet/"
@@ -121,9 +121,8 @@ if ("$dotnetVersion".trim() != "2.1.4") {
               environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
            }
 	}
-	build.dependsOn(downloadAndUnzipDotnet)
+	compile.dependsOn(downloadAndUnzipDotnet)
 
-	test.dependsOn(downloadAndUnzipDotnet)
         test.doFirst {
 	   println "Adding dotnet SDK to path"
            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -132,6 +131,7 @@ if ("$dotnetVersion".trim() != "2.1.4") {
               environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildDir/unix/sdk/dotnet/"
            }
 	}
+	test.dependsOn(downloadAndUnzipDotnet)
 } else {
 	println "Dotnet SDK is already installed"
 }
