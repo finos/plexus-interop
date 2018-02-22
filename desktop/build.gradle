@@ -72,29 +72,20 @@ compile.dependsOn('license')
 
 task test(dependsOn: compile, type:Exec) {
     workingDir projectDir    
-    ignoreExitValue true
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    ignoreExitValue false
+    if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet") {
         if (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null) {
             commandLine 'cmd', '/c', 'tests.cmd'
         } else {
             commandLine 'cmd', '/c', 'tests-netcore-only.cmd'
         }
     } else {
+        doLast {
+            println "Skipping tests because current platform is not Windows or running in MyGet"
+        }
   	// For now tests can only run on Windows
         // commandLine "$projectDir/tests-netcore-only.sh"
     }
-}
-
-task build {}
-if (Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet") {
-    build.dependsOn(test)
-} else {
-    println "Skipping tests because current platform is not Windows or running in MyGet"
-    build.dependsOn(compile)
-}
-
-task clean {
-    delete fileTree(dir: 'src').include("**/bin/*").include("**/obj/*")
 }
 
 def dotnetVersion = new ByteArrayOutputStream()
@@ -135,3 +126,9 @@ if ("$dotnetVersion".trim() != "2.1.4") {
 } else {
 	println "Dotnet SDK is already installed"
 }
+
+task clean {
+    delete fileTree(dir: 'src').include("**/bin/*").include("**/obj/*")
+}
+
+task build (dependsOn: [compile, test]) {}
