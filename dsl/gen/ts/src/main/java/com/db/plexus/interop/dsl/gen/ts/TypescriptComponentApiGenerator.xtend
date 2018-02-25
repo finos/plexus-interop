@@ -305,7 +305,7 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         switch (rpcMethod) {
             case rpcMethod.isPointToPoint: '''«rpcMethod.name.toFirstLower»(request: «requestType(rpcMethod, genConfig)»): Promise<«responseType(rpcMethod, genConfig)»>'''
             case rpcMethod.isBidiStreaming
-                    || rpcMethod.isClientStreaming: '''«rpcMethod.name.toFirstLower»(responseObserver: Observer<«responseType(rpcMethod, genConfig)»>): Promise<StreamingInvocationClient<«responseType(rpcMethod, genConfig)»>>'''
+                    || rpcMethod.isClientStreaming: '''«rpcMethod.name.toFirstLower»(responseObserver: Observer<«responseType(rpcMethod, genConfig)»>): Promise<StreamingInvocationClient<«requestType(rpcMethod, genConfig)»>>'''
             case rpcMethod.isServerStreaming: '''«rpcMethod.name.toFirstLower»(request: «requestType(rpcMethod, genConfig)», responseObserver: Observer<«responseType(rpcMethod, genConfig)»>): Promise<InvocationClient>'''
         }
     }
