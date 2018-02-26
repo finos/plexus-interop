@@ -78,7 +78,7 @@
         {
             try
             {
-                await _receiveBuffer.Out.WriteAsync(new TransportMessageFrame(message.Payload.Value, header.HasMore));
+                await _receiveBuffer.Out.WriteAsync(new TransportMessageFrame(message.Payload.Value, header.HasMore)).ConfigureAwait(false);
             }
             catch
             {

@@ -730,6 +730,69 @@ namespace Plexus.Interop
             });
         }
 
+        [Fact]
+        public void DuplexStreamingStressTest()
+        {
+            async Task HandleAsync(
+                IReadableChannel<EchoRequest> requestStream,
+                IWritableChannel<EchoRequest> responseStream,
+                MethodCallContext context)
+            {
+                do
+                {
+                    while (requestStream.TryRead(out var item))
+                    {
+                        await responseStream.WriteAsync(item).ConfigureAwait(false);
+                        await responseStream.WriteAsync(item).ConfigureAwait(false);
+                    }
+                } while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false));
+            }
+
+            RunWith30SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync().ConfigureAwait(false))
+                {
+                    ConnectEchoServer(x => x
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            s => s.WithDuplexStreamingMethod<EchoRequest, EchoRequest>("DuplexStreaming", HandleAsync)
+                        )
+                    );
+                    var client = ConnectEchoClient();
+                    var call = client.CallInvoker.Call(EchoDuplexStreamingMethod);
+                    const int iterations = 100;
+                    var request = CreateTestRequest();
+                    var receivedCount = 0;
+                    var sendWorker = TaskRunner.RunInBackground(async () =>
+                    {                        
+                        for (var i = 0; i < iterations; i++)
+                        {
+                            await call.RequestStream.WriteAsync(request).ConfigureAwait(false);
+                        }
+                        await call.RequestStream.CompleteAsync().ConfigureAwait(false);
+                    });
+                    var receiveWorker = TaskRunner.RunInBackground(async () =>
+                    {
+                        while (await call.ResponseStream.WaitReadAvailableAsync().ConfigureAwait(false))
+                        {
+                            var i = 0;
+                            while (call.ResponseStream.TryRead(out _))
+                            {
+                                receivedCount++;
+                                i = (i + 1) % 10;
+                                if (i == 0)
+                                {
+                                    await Task.Yield();
+                                }
+                            }
+                        }
+                    });
+                    await Task.WhenAll(sendWorker, receiveWorker).ConfigureAwait(false);
+                    receivedCount.ShouldBe(iterations * 2);
+                }
+            });
+        }
+
         private IClient ConnectEchoClient()
         {
             var clientOptions = new ClientOptionsBuilder()
@@ -768,3 +831,4 @@ namespace Plexus.Interop
         }
     }
 }
+
