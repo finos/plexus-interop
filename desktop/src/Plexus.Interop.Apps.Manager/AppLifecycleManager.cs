@@ -138,12 +138,13 @@ namespace Plexus.Interop.Apps
             return await connectionPromise.Task.ConfigureAwait(false);
         }
 
-        public ValueTask<IAppConnection> GetOrSpawnConnectionAsync(IReadOnlyCollection<string> appIds)
+        public ValueTask<IAppConnection> GetOrSpawnConnectionAsync(IAppConnection source, IReadOnlyCollection<string> appIds)
         {
             lock (_connections)
             {
                 var targetConnection =
                     _connections.Values
+                        .Where(x => x.Id != source.Id)
                         .Join(appIds, x => x.Info.ApplicationId, y => y, (x, y) => x)
                         .FirstOrDefault();
                 if (targetConnection != null)
