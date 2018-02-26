@@ -200,11 +200,11 @@ class EchoClientClientImpl implements EchoClientClient {
         return this.genericClient.disconnect(completion);
     }
 
-    public sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
+    public sendUnaryRequest(invocationInfo: InvocationRequestInfo | ProvidedMethodReference, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
         return this.genericClient.sendDynamicUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
     }
 
-    public sendStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
+    public sendStreamingRequest(invocationInfo: InvocationRequestInfo | ProvidedMethodReference, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
         return this.genericClient.sendDynamicBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
     }
 

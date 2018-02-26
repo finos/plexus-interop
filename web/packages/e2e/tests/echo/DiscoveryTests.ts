@@ -221,19 +221,6 @@ export class DiscoveryTests extends BaseEchoTest {
         await this.clientsSetup.disconnect(client, server);
     }
 
-    private assertDiscoveredMethodValid(discoveredMethod: DiscoveredMethod) {
-        expect(discoveredMethod.providedMethod).to.not.be.undefined;
-        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-    }
-
-    private assertDiscoveredServiceMethodValid(discoveredMethod: DiscoveredServiceMethod) {
-        expect(discoveredMethod.methodId).to.not.be.undefined;
-        expect(discoveredMethod.methodTitle).to.not.be.undefined;
-        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-    }
-
     public async testMethodDiscoveredByOutputMessageId(): Promise<void> {
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
         const discoveryResponse = await client.discoverMethod({ outputMessageId: "plexus.interop.testing.EchoRequest" });
@@ -265,6 +252,19 @@ export class DiscoveryTests extends BaseEchoTest {
             throw "Empty response";
         }
         await this.clientsSetup.disconnect(client, server);
+    }
+    
+    private assertDiscoveredMethodValid(discoveredMethod: DiscoveredMethod) {
+        expect(discoveredMethod.providedMethod).to.not.be.undefined;
+        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+    }
+
+    private assertDiscoveredServiceMethodValid(discoveredMethod: DiscoveredServiceMethod) {
+        expect(discoveredMethod.methodId).to.not.be.undefined;
+        expect(discoveredMethod.methodTitle).to.not.be.undefined;
+        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
     }
 
 }
