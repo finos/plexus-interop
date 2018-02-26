@@ -350,6 +350,16 @@ export class ComponentAClientBuilder {
         return this;
     }
 
+    public withAppInstanceId(appInstanceId: UniqueId): ComponentAClientBuilder {
+        this.clientDetails.applicationInstanceId = appInstanceId;
+        return this;
+    }
+
+    public withAppId(appId: string): ComponentAClientBuilder {
+        this.clientDetails.applicationId = appId;
+        return this;
+    }
+
     public withExampleServiceInvocationsHandler(invocationsHandler: ExampleServiceInvocationHandler): ComponentAClientBuilder {
         this.exampleServiceHandler = new ExampleServiceInvocationHandlerInternal(invocationsHandler);
         return this;
