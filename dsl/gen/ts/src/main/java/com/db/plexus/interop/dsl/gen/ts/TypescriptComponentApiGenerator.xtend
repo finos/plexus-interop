@@ -225,6 +225,16 @@ export class «app.name»ClientBuilder {
         return this;
     }
 
+    public withAppInstanceId(appInstanceId: UniqueId): «app.name»ClientBuilder {
+        this.clientDetails.applicationInstanceId = appInstanceId;
+        return this;
+    }
+
+    public withAppId(appId: string): «app.name»ClientBuilder {
+        this.clientDetails.applicationId = appId;
+        return this;
+    }
+
     «FOR providedMethod : providedServices SEPARATOR '\n' »
     public with«providedMethod.service.name»InvocationsHandler(invocationsHandler: «providedMethod.service.name»InvocationHandler): «app.name»ClientBuilder {
         this.«providedMethod.service.name.toFirstLower»Handler = new «providedMethod.service.name»InvocationHandlerInternal(invocationsHandler);
