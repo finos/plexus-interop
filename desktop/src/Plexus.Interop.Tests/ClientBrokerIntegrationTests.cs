@@ -93,9 +93,9 @@ namespace Plexus.Interop
                     const int concurrentClientCount = 15;
                     var connectTasks = Enumerable.Range(0, concurrentClientCount)
                         .Select(_ => TaskRunner.RunInBackground(() => ConnectEchoClient()));
-                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout10Sec);
+                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout30Sec);
                     var disconnectTasks = clients.Select(c => TaskRunner.RunInBackground(c.DisconnectAsync));
-                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout10Sec);
+                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout30Sec);
                 }
             });
         }
@@ -692,6 +692,40 @@ namespace Plexus.Interop
                     var response = await client.CallInvoker.Call(EchoUnaryMethod, request);
                     response.ShouldBe(request);
                     receivedRequest.ShouldBe(request);
+                }
+            });
+        }
+
+        [Fact]
+        public void InvocationShouldBeRoutedToAnotherInstanceEvenIfSourceAppCanHandleIt()
+        {
+            MethodCallContext receivedRequestContext = null;
+
+            Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
+            {
+                receivedRequestContext = context;
+                return Task.FromResult(request);
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var optionsBuilder = new ClientOptionsBuilder()
+                        .WithBrokerWorkingDir("TestBroker")
+                        .WithDefaultConfiguration()
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
+                        .WithApplicationId("plexus.interop.testing.EchoServer");
+                    var appLauncher = RegisterDisposable(new TestAppLauncher(new[] { optionsBuilder }));
+                    await appLauncher.StartAsync();
+                    var server = ConnectEchoServer();
+                    var request = CreateTestRequest();
+                    var response = await server.CallInvoker.Call(EchoUnaryMethod, request);
+                    response.ShouldBe(request);
+                    receivedRequestContext.ShouldNotBeNull();
+                    receivedRequestContext.ConsumerConnectionId.ShouldBe(server.ConnectionId);
                 }
             });
         }

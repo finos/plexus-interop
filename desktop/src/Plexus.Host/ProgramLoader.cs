@@ -28,7 +28,7 @@
 
     internal sealed class ProgramLoader : IDisposable
     {
-        private static readonly TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan ShutdownTimeout = TimeoutConstants.Timeout5Sec;
 
         private readonly string[] _args;
         private readonly LoggingInitializer _loggingInitializer;
@@ -97,6 +97,7 @@
                 try
                 {
                     _program = (IProgram) Activator.CreateInstance(programType);
+                    _log.Info("Program {0} created", programType);
                     var task = await _program.StartAsync(_args).ConfigureAwait(false);
                     _log.Info("Program {0} started", programType);
                     await task.ConfigureAwait(false);

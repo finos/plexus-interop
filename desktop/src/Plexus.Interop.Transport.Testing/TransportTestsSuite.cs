@@ -345,7 +345,7 @@ namespace Plexus.Interop.Transport
                     await Task.WhenAll(channelTasks).ConfigureAwait(false);
                 });
 
-            Should.CompleteIn(Task.WhenAll(serverTask, clientTask), TimeSpan.FromSeconds(10));
+            Should.CompleteIn(Task.WhenAll(serverTask, clientTask), Timeout30Sec);
             Should.CompleteIn(clientConnection.CompleteAsync(), Timeout1Sec);
             Should.CompleteIn(serverConnection.CompleteAsync(), Timeout1Sec);
 

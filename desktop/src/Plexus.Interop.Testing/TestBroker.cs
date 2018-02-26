@@ -27,7 +27,7 @@
 
     public sealed class TestBroker : ProcessBase
     {
-        private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(3);
+        private static readonly TimeSpan StopTimeout = TimeoutConstants.Timeout3Sec;
 
         private static readonly string RuntimeIdentifier =
 #if NET45

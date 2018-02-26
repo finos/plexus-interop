@@ -69,12 +69,12 @@ namespace Plexus.Channels
         public void WriteAsyncCompletesWhenThereIsBufferSpaceAvailable()
         {
             var sut = new BufferedChannel<int>(1);
-            Should.CompleteIn(sut.WriteAsync(1), TimeSpan.FromSeconds(1));
+            Should.CompleteIn(sut.WriteAsync(1), Timeout1Sec);
             var writeTask = sut.WriteAsync(2);
             writeTask.IsCompleted.ShouldBe(false);
             sut.TryRead(out var item).ShouldBe(true);
             item.ShouldBe(1);
-            Should.CompleteIn(writeTask, TimeSpan.FromSeconds(1));
+            Should.CompleteIn(writeTask, Timeout1Sec);
             sut.TryRead(out item).ShouldBe(true);
             item.ShouldBe(2);
         }
@@ -175,8 +175,8 @@ namespace Plexus.Channels
             var writeTask1 = sut.WriteAsync(1);
             var writeTask2 = sut.WriteAsync(2);
             sut.Complete();
-            Should.Throw<TaskCanceledException>(() => writeTask1, TimeSpan.FromSeconds(1));
-            Should.Throw<TaskCanceledException>(() => writeTask2, TimeSpan.FromSeconds(1));
+            Should.Throw<TaskCanceledException>(() => writeTask1, Timeout1Sec);
+            Should.Throw<TaskCanceledException>(() => writeTask2, Timeout1Sec);
         }
 
         [Fact]
@@ -186,8 +186,8 @@ namespace Plexus.Channels
             var readTask1 = sut.ReadAsync();
             var readTask2 = sut.ReadAsync();
             sut.Complete();
-            Should.Throw<TaskCanceledException>(() => readTask1.AsTask(), TimeSpan.FromSeconds(1));
-            Should.Throw<TaskCanceledException>(() => readTask2.AsTask(), TimeSpan.FromSeconds(1));
+            Should.Throw<TaskCanceledException>(() => readTask1.AsTask(), Timeout1Sec);
+            Should.Throw<TaskCanceledException>(() => readTask2.AsTask(), Timeout1Sec);
         }
 
         [Fact]
@@ -258,7 +258,7 @@ namespace Plexus.Channels
             sut.Completion.IsCompleted.ShouldBe(false);
             sut.TryRead(out int _).ShouldBe(true);
             sut.TryRead(out int _).ShouldBe(true);
-            Should.Throw<InvalidOperationException>(() => sut.TryReadAsync().AsTask(), TimeSpan.FromSeconds(1));
+            Should.Throw<InvalidOperationException>(() => sut.TryReadAsync().AsTask(), Timeout1Sec);
             sut.Completion.IsFaulted.ShouldBeTrue();
         }
 

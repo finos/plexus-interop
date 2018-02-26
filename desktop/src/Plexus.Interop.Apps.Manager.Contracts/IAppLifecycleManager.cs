@@ -30,7 +30,7 @@
 
         Task<IAppConnection> SpawnConnectionAsync(string appId);
 
-        ValueTask<IAppConnection> GetOrSpawnConnectionAsync(IReadOnlyCollection<string> appId);
+        ValueTask<IAppConnection> GetOrSpawnConnectionAsync(IAppConnection source, IReadOnlyCollection<string> appId);
 
         IReadOnlyCollection<IAppConnection> GetOnlineConnections();
     }

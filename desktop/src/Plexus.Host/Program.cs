@@ -29,7 +29,7 @@ namespace Plexus.Host
 
     public sealed class Program
     {
-        private static readonly TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan ShutdownTimeout = TimeoutConstants.Timeout5Sec;
 
         public static int Main(string[] args)
         {

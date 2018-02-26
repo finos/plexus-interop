@@ -24,11 +24,11 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
     using System.Threading.Tasks;
 
     public sealed class PipeTransmissionClient : ITransmissionClient
-    {
-        private const int ConnectTimeoutMs = 10000;
+    {        
         private const string ServerName = "np-v1";
 
-        private static readonly TimeSpan MaxServerInitializationTime = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan ConnectTimeoutMs = TimeoutConstants.Timeout10Sec;
+        private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout10Sec;
         private static readonly ILogger Log = LogManager.GetLogger<PipeTransmissionClient>();
 
         public async ValueTask<ITransmissionConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken)
@@ -78,7 +78,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes
             CancellationToken cancellationToken)
         {
             await TaskRunner
-                .RunInBackground(() => pipeClientStream.Connect(ConnectTimeoutMs), cancellationToken)
+                .RunInBackground(() => pipeClientStream.Connect((int)ConnectTimeoutMs.TotalMilliseconds), cancellationToken)
                 .WithCancellation(cancellationToken, _ => pipeClientStream.Dispose())
                 .ConfigureAwait(false);
             pipeClientStream.ReadMode = PipeTransmissionMode.Byte;
