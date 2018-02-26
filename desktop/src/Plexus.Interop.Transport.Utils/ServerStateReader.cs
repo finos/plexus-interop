@@ -60,8 +60,8 @@
 
         private static async Task<bool> FromWaitHandle(WaitHandle handle, TimeSpan timeout, CancellationToken cancellationToken)
         {
-            var alreadySignalled = handle.WaitOne(0);
-            if (alreadySignalled)
+            var alreadySignaled = handle.WaitOne(0);
+            if (alreadySignaled)
             {
                 return true;
             }

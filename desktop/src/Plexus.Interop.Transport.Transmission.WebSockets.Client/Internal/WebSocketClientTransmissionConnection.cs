@@ -27,7 +27,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
 
     internal sealed class WebSocketClientTransmissionConnection : ProcessBase, ITransmissionConnection
     {
-        private static readonly TimeSpan ConnectionTimeout = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan ConnectionTimeout = TimeoutConstants.Timeout5Sec;
 
         private readonly ILogger _log;
         private readonly WebSocket _webSocket;
@@ -44,6 +44,10 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
             _webSocket.Opened += OnOpened;
             _webSocket.Closed += OnClosed;
             _webSocket.Error += OnError;
+            _webSocket.NoDelay = true;
+            _webSocket.EnableAutoSendPing = true;
+            _webSocket.AutoSendPingInterval = 5000;
+            _webSocket.ReceiveBufferSize = PooledBuffer.MaxSize;
 
             _reader = new WebSocketClientTransmissionReader(Id, _webSocket, CancellationToken);
             _writer = new WebSocketClientTransmissionWriter(Id, _webSocket, CancellationToken);

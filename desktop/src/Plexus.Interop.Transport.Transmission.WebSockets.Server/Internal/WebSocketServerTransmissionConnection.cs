@@ -16,6 +16,7 @@
  */
 namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
+    using System;
     using Plexus.Channels;
     using Plexus.Pools;
     using System.Net.WebSockets;
@@ -77,9 +78,16 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 }
                 await Task.WhenAll(_writer.Completion, _reader.Completion).IgnoreAnyCancellation().ConfigureAwait(false);
                 _log.Trace("Closing websocket");
-                await _webSocket
-                    .CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, _cancellation.Token)
-                    .ConfigureAwait(false);
+                try
+                {
+                    await _webSocket
+                        .CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None)
+                        .ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _log.Warn(ex, "Exception while closing websocket");
+                }
                 _log.Trace("Disposing websocket");
             }
         }
