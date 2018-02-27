@@ -69,6 +69,15 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
         protected override Task<Task> StartCoreAsync()
         {
             return Task.FromResult(ProcessAsync());
+        }        
+
+        private async Task ProcessAsync()
+        {
+            _responses.Out.PropagateCompletionFrom(_buffer.ConsumeAsync(HandleResponseMessageAsync, CancellationToken));
+            await Task.WhenAll(
+                    ProcessMessagesAsync(),
+                    ResponseCompletion)
+                .ConfigureAwait(false);
         }
 
         private async Task HandleResponseMessageAsync(TResponse msg)
@@ -76,7 +85,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             var header = _protocol.MessageFactory.CreateInvocationMessageReceived();
             if (!_sender.TryWrite(header))
             {
-                await _sender.WriteOrDisposeAsync(header, CancellationToken).ConfigureAwait(false);                
+                await _sender.WriteOrDisposeAsync(header, CancellationToken).ConfigureAwait(false);
             }
             Log.Debug("Sent confirmation about received response of type {0}", msg.GetType().Name);
             if (!_responses.TryWrite(msg))
@@ -86,13 +95,22 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
             Log.Debug("Consumed response of type {0}", msg.GetType().Name);
         }
 
-        private async Task ProcessAsync()
+        private async Task ProcessMessagesAsync()
         {
-            _responses.Out.PropagateCompletionFrom(_buffer.ConsumeAsync(HandleResponseMessageAsync, CancellationToken));
-            await Task.WhenAll(
-                    _transport.ConsumeAsync(HandleIncomingFrameAsync, CancellationToken),
-                    _responses.Out.Completion)
-                .ConfigureAwait(false);
+            try
+            {
+                await _transport.ConsumeAsync(HandleIncomingFrameAsync, CancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _buffer.Out.TryTerminate(ex);
+                _buffer.In.ConsumeBufferedItems(_ => { });
+                throw;
+            }
+            finally
+            {
+                await _buffer.In.Completion.ConfigureAwait(false);
+            }
         }
 
         private async Task HandleIncomingFrameAsync(TransportMessageFrame frame)

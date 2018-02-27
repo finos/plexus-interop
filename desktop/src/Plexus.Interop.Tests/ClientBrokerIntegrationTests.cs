@@ -230,11 +230,12 @@ namespace Plexus.Interop
             {
                 async Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
                 {
-                    await Task.Yield();
+                    WriteLog("Handling request by throwing exception");
+                    await Task.Yield();                    
                     throw new ArgumentException();
                 }
 
-                using (await StartTestBrokerAsync())
+                using (await StartTestBrokerAsync().ConfigureAwait(false))
                 {
                     var client = ConnectEchoClient();
                     ConnectEchoServer(x => x
@@ -243,9 +244,9 @@ namespace Plexus.Interop
                             s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
                         )
                     );
-                    Console.WriteLine("Starting call");
-                    var ex = Should.Throw<Exception>(() => client.CallInvoker.Call(EchoUnaryMethod, new EchoRequest()).AsTask());
-                    Console.WriteLine("Exception received: {0}", ex.FormatToString());
+                    WriteLog("Starting call");
+                    var ex = Should.Throw<Exception>(client.CallInvoker.Call(EchoUnaryMethod, CreateTestRequest()).AsTask(), Timeout5Sec);
+                    WriteLog($"Exception received: {ex.FormatTypeAndMessage()}");
                 }
             });
         }

@@ -71,10 +71,10 @@ namespace Plexus.Interop.Internal.Calls
                 _response = default;
                 Log.Trace("Reading response");
                 await invocation.In.ConsumeAsync(x => _response = x, CancellationToken).ConfigureAwait(false);
+                Log.Trace("Response stream completed");
             }
             catch (Exception ex)
             {
-
                 invocation.Out.TryTerminate(ex);
                 await invocation.In.ConsumeAsync(_ => { }).IgnoreExceptions().ConfigureAwait(false);
                 throw;
