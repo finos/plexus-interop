@@ -64,24 +64,14 @@
         {
             try
             {
-                _log.Trace("Received message {0}", message);
-                using (message.Header)
-                {
-                    await message.Header.Handle(_incomingMessageHandler, message).ConfigureAwait(false);
-                }
+                _log.Trace("Handling incoming message {0}", message);
+                await message.Header.Handle(_incomingMessageHandler, message).ConfigureAwait(false);
             }
             catch (Exception ex)
             {                
                 _log.Error(ex, "Exception while handling incoming message");
-                try
-                {
-                    ex.RethrowToKeepStackTrace();
-                }
-                catch (Exception wex)
-                {
-                    _sendProcessor.Out.TryTerminate(wex);
-                    _receiveBuffer.Out.TryTerminate(wex);
-                }
+                _sendProcessor.Out.TryTerminate(ex);
+                _receiveBuffer.Out.TryTerminate(ex);
             }
             finally
             {
