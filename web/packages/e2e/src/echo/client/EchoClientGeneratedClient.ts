@@ -94,7 +94,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
             new ConversionObserver<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-            .then(baseClient =>  {
+            .then(baseClient => {
                 return {
                     next: (request: plexus.plexus.interop.testing.IEchoRequest) => baseClient.next(requestToBinaryConverter(request)),
                     error: baseClient.error.bind(baseClient),
@@ -117,7 +117,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
             new ConversionObserver<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-            .then(baseClient =>  {
+            .then(baseClient => {
                 return {
                     next: (request: plexus.plexus.interop.testing.IEchoRequest) => baseClient.next(requestToBinaryConverter(request)),
                     error: baseClient.error.bind(baseClient),
@@ -138,18 +138,18 @@ export abstract class EchoClientClient {
     public abstract getEchoServiceProxy(): EchoServiceProxy;
 
     public abstract sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestMarshaller: any, responseType: any): Promise<InvocationClient>;
-    
+
     public abstract sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
-    
+
     public abstract sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient>;
-    
+
     public abstract sendRawServerStreamingRequest(
         invocationInfo: InvocationRequestInfo,
         request: ArrayBuffer,
         responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
 
     public abstract sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
-    
+
     public abstract sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
 
     public abstract discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse>;
@@ -174,7 +174,7 @@ class EchoClientClientImpl implements EchoClientClient {
     public getEchoServiceProxy(): EchoServiceProxy {
         return this.echoServiceProxy;
     }
-    
+
     public sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
         return this.genericClient.sendUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
     }
@@ -234,7 +234,6 @@ export class EchoClientClientBuilder {
         return this;
     }
 
-
     public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): EchoClientClientBuilder {
         this.transportConnectionProvider = provider;
         return this;
@@ -248,6 +247,6 @@ export class EchoClientClientBuilder {
             .then(genericClient => new EchoClientClientImpl(
                 genericClient,
                 new EchoServiceProxyImpl(genericClient)
-                ));
+            ));
     }
 }
