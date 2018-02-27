@@ -16,8 +16,6 @@
  */
 package com.db.plexus.interop.dsl.gen.ts
 
-import com.db.plexus.interop.dsl.gen.CodeOutputGenerator
-import com.db.plexus.interop.dsl.gen.EntryPoint
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import com.db.plexus.interop.dsl.Application
 import java.util.List
@@ -49,8 +47,6 @@ class TypescriptApplicationApiGenerator implements ApplicationCodeGenerator {
 
         val consumedServices = app.getConsumedServices
         val providedServices = app.getProvidedServices
-
-        val namespace = genConfig.namespace
 
         '''
 «imports(genConfig)»

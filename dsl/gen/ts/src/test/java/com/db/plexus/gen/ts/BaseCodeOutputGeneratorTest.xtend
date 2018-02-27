@@ -21,7 +21,6 @@ import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.resource.IResourceServiceProvider
 import com.google.inject.Inject
 import org.eclipse.emf.ecore.resource.Resource
-import org.eclipse.xtext.resource.IContainer
 
 class BaseCodeOutputGeneratorTest {
 
