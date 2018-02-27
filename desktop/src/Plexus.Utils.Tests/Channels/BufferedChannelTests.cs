@@ -272,7 +272,7 @@ namespace Plexus.Channels
         [Fact]
         public void TerminatesOnWriteTimeout()
         {
-            var sut = BufferedChannel.Create<int>(1, Timeout100Ms);
+            var sut = new BufferedChannel<int>(1, Timeout100Ms);
             Should.NotThrow(sut.WriteAsync(1), Timeout1Sec);
             sut.TryWrite(1).ShouldBe(false);
             Should.Throw<ChannelWriteTimeoutException>(sut.WaitWriteAvailableAsync(), Timeout1Sec);
@@ -284,7 +284,7 @@ namespace Plexus.Channels
         [Fact]
         public async Task SlidesWriteTimeoutAfterWriteAvailable()
         {
-            var sut = BufferedChannel.Create<int>(1, Timeout50Ms);
+            var sut = new BufferedChannel<int>(1, Timeout50Ms);
             sut.TryWrite(1).ShouldBe(true);
             await Task.Delay(Timeout10Ms).ConfigureAwait(false);
             sut.TryRead(out _).ShouldBe(true);

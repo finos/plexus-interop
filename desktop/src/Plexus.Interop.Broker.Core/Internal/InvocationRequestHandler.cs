@@ -184,13 +184,20 @@
                     {
                         break;
                     }
+
+                    Log.Debug("Propagating");
                     await channel2.WriteAsync(result.Value).ConfigureAwait(false);
                 }
+
                 channel2.TryComplete();
             }
             catch (Exception ex)
             {
                 channel2.TryTerminate(ex);
+            }
+            finally
+            {
+                Log.Debug("Completed!");
             }
         }
     }

@@ -24,6 +24,7 @@ namespace Plexus.Interop
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
     using Xunit;
@@ -730,22 +731,43 @@ namespace Plexus.Interop
             });
         }
 
-        [Fact]
-        public void DuplexStreamingStressTest()
+        [Theory]
+        [InlineData(0, 0)]
+        [InlineData(1, 0)]
+        [InlineData(1, 1)]
+        [InlineData(1, 10)]
+        [InlineData(10, 0)]
+        [InlineData(10, 1)]        
+        [InlineData(10, 10)]
+        [InlineData(100, 10)]
+        public void DuplexStreamingStress(int requestsCount, int responsesPerRequest)
         {
             async Task HandleAsync(
                 IReadableChannel<EchoRequest> requestStream,
                 IWritableChannel<EchoRequest> responseStream,
                 MethodCallContext context)
-            {
+            {                
+                WriteLog("Provider: Started request");
+                var x = 0;
                 do
                 {
                     while (requestStream.TryRead(out var item))
                     {
-                        await responseStream.WriteAsync(item).ConfigureAwait(false);
-                        await responseStream.WriteAsync(item).ConfigureAwait(false);
+                        var stopwatch = new Stopwatch();
+                        WriteLog($"Provider: request {x} received");                        
+                        for (var i = 0; i < responsesPerRequest; i++)
+                        {
+                            var y = x * responsesPerRequest + i;
+                            WriteLog($"Provider: sending response {y}");
+                            stopwatch.Restart();
+                            await responseStream.WriteAsync(item).ConfigureAwait(false);
+                            stopwatch.Stop();
+                            WriteLog($"Provider: response {y} sent in {stopwatch.ElapsedMilliseconds}ms");
+                        }
+                        x++;
                     }
                 } while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false));
+                WriteLog("Provider: completed request");
             }
 
             RunWith30SecTimeout(async () =>
@@ -759,36 +781,37 @@ namespace Plexus.Interop
                         )
                     );
                     var client = ConnectEchoClient();
-                    var call = client.CallInvoker.Call(EchoDuplexStreamingMethod);
-                    const int iterations = 100;
+                    var call = client.CallInvoker.Call(EchoDuplexStreamingMethod);                    
                     var request = CreateTestRequest();
-                    var receivedCount = 0;
+                    var receivedResponsesCount = 0;
                     var sendWorker = TaskRunner.RunInBackground(async () =>
-                    {                        
-                        for (var i = 0; i < iterations; i++)
+                    {
+                        var stopwatch = new Stopwatch();
+                        for (var i = 0; i < requestsCount; i++)
                         {
+                            stopwatch.Restart();
                             await call.RequestStream.WriteAsync(request).ConfigureAwait(false);
+                            stopwatch.Stop();
+                            WriteLog($"Consumer: request {i} sent in {stopwatch.ElapsedMilliseconds}ms");
                         }
+                        WriteLog("Consumer: completing request stream");
                         await call.RequestStream.CompleteAsync().ConfigureAwait(false);
                     });
                     var receiveWorker = TaskRunner.RunInBackground(async () =>
                     {
-                        while (await call.ResponseStream.WaitReadAvailableAsync().ConfigureAwait(false))
+                        do
                         {
-                            var i = 0;
                             while (call.ResponseStream.TryRead(out _))
-                            {
-                                receivedCount++;
-                                i = (i + 1) % 10;
-                                if (i == 0)
-                                {
-                                    await Task.Yield();
-                                }
+                            {                                
+                                WriteLog($"Consumer: response {receivedResponsesCount} received");
+                                receivedResponsesCount++;
                             }
-                        }
-                    });
+                        } while (await call.ResponseStream.WaitReadAvailableAsync().ConfigureAwait(false));
+                        WriteLog("Consumer: response stream completed");
+                    });                    
                     await Task.WhenAll(sendWorker, receiveWorker).ConfigureAwait(false);
-                    receivedCount.ShouldBe(iterations * 2);
+                    await call.Completion.ConfigureAwait(false);
+                    receivedResponsesCount.ShouldBe(requestsCount * responsesPerRequest);
                 }
             });
         }

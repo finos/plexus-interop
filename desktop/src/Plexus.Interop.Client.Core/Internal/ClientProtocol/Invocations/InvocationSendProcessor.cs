@@ -23,6 +23,7 @@
     using Plexus.Pools;
     using Plexus.Processes;
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
@@ -36,13 +37,14 @@
         private readonly BufferedChannel<TRequest> _requestBuffer = new BufferedChannel<TRequest>(1);
 
         private readonly BufferedChannel<(IInvocationMessage Header, Maybe<TRequest> Body)> _buffer
-            = new BufferedChannel<(IInvocationMessage, Maybe<TRequest>)>(3);
+            = new BufferedChannel<(IInvocationMessage, Maybe<TRequest>)>(10);
 
         private readonly IWritableChannel<TransportMessageFrame> _transport;
         private readonly IMarshaller<TRequest> _marshaller;
         private readonly InvocationState _invocationState;
         private readonly IProtocolImplementation _protocol;
         private readonly Promise _requestCompletion = new Promise();
+        private readonly Stopwatch _sendWaitTimer = new Stopwatch();
 
         public InvocationSendProcessor(
             UniqueId id,
@@ -114,10 +116,20 @@
 
         private async Task SendRequestAsync(TRequest request)
         {
+            var task = _invocationState.OnBeforeMessageSendAsync();
+            if (!task.IsCompleted)
+            {                
+                Log.Debug("Waiting until send allowed");
+                _sendWaitTimer.Restart();
+                await task.ConfigureAwait(false);
+                _sendWaitTimer.Stop();
+                Log.Debug("Proceeding with sending after waiting {0}ms", _sendWaitTimer.ElapsedMilliseconds);
+            }
+            Log.Trace("Sending message: {0}", _invocationState);
             var header = _protocol.MessageFactory.CreateInvocationMessageHeader();
             try
             {
-                await _buffer.Out.WriteAsync((header, request), CancellationToken);
+                await _buffer.Out.WriteAsync((header, request), CancellationToken).ConfigureAwait(false);
             }
             catch
             {
@@ -174,9 +186,7 @@
                 sentBytes += frameLength;
             } while (!isLastFrameInMessage);
             _curOutcomingMessage.Position = 0;
-            _curOutcomingMessage.SetLength(0);
-
-            _invocationState.OnMessageSent();
+            _curOutcomingMessage.SetLength(0);            
 
             _log.Debug("Sent message of type {0}", msg.GetType().Name);
         }

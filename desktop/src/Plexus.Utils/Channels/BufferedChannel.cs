@@ -22,13 +22,6 @@ namespace Plexus.Channels
     using System.Threading;
     using System.Threading.Tasks;
 
-    public static class BufferedChannel {
-
-        public static readonly TimeSpan DefaultWriteTimeout = TimeoutConstants.Timeout10Sec;
-
-        public static BufferedChannel<T> Create<T>(int bufferSize, TimeSpan writeTimeout = default) => new BufferedChannel<T>(bufferSize, writeTimeout);
-    }
-
     public sealed class BufferedChannel<T> : IChannel<T>, IReadableChannel<T>, ITerminatableWritableChannel<T>
     {        
         private readonly object _sync = new object();
@@ -50,7 +43,7 @@ namespace Plexus.Channels
                 throw new ArgumentOutOfRangeException(nameof(bufferSize), bufferSize, "Buffer size must be non-negative");
             }
             _bufferSize = bufferSize;
-            _writeTimeout = writeTimeout == default ? BufferedChannel.DefaultWriteTimeout : writeTimeout;
+            _writeTimeout = writeTimeout == default ? Timeout.InfiniteTimeSpan : writeTimeout;
             _writeTimeoutTracker = new Timer(OnWriteTimeout, null, _writeTimeout, Timeout.InfiniteTimeSpan);
             OnBalanceChanged();
         }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Internal.ClientProtocol.Invocations
+namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol;
@@ -33,7 +33,8 @@
         private readonly IProtocolImplementation _protocol;
         private readonly MemoryStream _curIncomingMessage = new MemoryStream();
         private readonly IMarshaller<TResponse> _marshaller;
-        private readonly BufferedChannel<TResponse> _buffer = new BufferedChannel<TResponse>(1);
+        private readonly BufferedChannel<TResponse> _responses = new BufferedChannel<TResponse>(1);
+        private readonly BufferedChannel<TResponse> _buffer = new BufferedChannel<TResponse>(5);
         private readonly InvocationState _invocationState;
         private readonly IWritableChannel<IInvocationMessage> _sender;
 
@@ -56,24 +57,42 @@
             _incomingHandler = new InvocationMessageHandler<Nothing, Nothing>(
                 HandleIncomingMessageHeader,
                 HandleIncomingConfirmation,
-                HandleIncomingCompletion);
-            _buffer.Out.PropagateCompletionFrom(Completion);
+                HandleIncomingCompletion);            
         }
 
         protected override ILogger Log => _log;
 
-        public IReadableChannel<TResponse> ResponseStream => _buffer.In;
+        public IReadableChannel<TResponse> ResponseStream => _responses.In;
 
-        public Task ResponseCompletion => _buffer.Out.Completion;
+        public Task ResponseCompletion => _responses.Out.Completion;
 
         protected override Task<Task> StartCoreAsync()
         {
             return Task.FromResult(ProcessAsync());
         }
 
+        private async Task HandleResponseMessageAsync(TResponse msg)
+        {
+            var header = _protocol.MessageFactory.CreateInvocationMessageReceived();
+            if (!_sender.TryWrite(header))
+            {
+                await _sender.WriteOrDisposeAsync(header, CancellationToken).ConfigureAwait(false);                
+            }
+            Log.Debug("Sent confirmation about received response of type {0}", msg.GetType().Name);
+            if (!_responses.TryWrite(msg))
+            {
+                await _responses.WriteAsync(msg, CancellationToken).ConfigureAwait(false);
+            }
+            Log.Debug("Consumed response of type {0}", msg.GetType().Name);
+        }
+
         private async Task ProcessAsync()
         {
-            await _transport.ConsumeAsync(HandleIncomingFrameAsync, CancellationToken).ConfigureAwait(false);
+            _responses.Out.PropagateCompletionFrom(_buffer.ConsumeAsync(HandleResponseMessageAsync, CancellationToken));
+            await Task.WhenAll(
+                    _transport.ConsumeAsync(HandleIncomingFrameAsync, CancellationToken),
+                    _responses.Out.Completion)
+                .ConfigureAwait(false);
         }
 
         private async Task HandleIncomingFrameAsync(TransportMessageFrame frame)
@@ -107,17 +126,20 @@
         {
             _log.Trace("Consuming message frame: {0}", frame);
             _curIncomingMessage.Write(frame.Payload.Array, frame.Payload.Offset, frame.Payload.Count);
-            if (!frame.HasMore)
+            if (frame.HasMore)
+            {
+                _log.Trace("Consumed message frame {0}", frame);
+            }
+            else
             {
                 _curIncomingMessage.Position = 0;
-                var msg = _marshaller.Decode(_curIncomingMessage);                
-                await _buffer.Out.WriteAsync(msg, CancellationToken).ConfigureAwait(false);
+                var msg = _marshaller.Decode(_curIncomingMessage);
                 _log.Debug("Received message of type {0} with length {1}", msg.GetType().Name, _curIncomingMessage.Length);
+                await _buffer.Out.WriteAsync(msg, CancellationToken).ConfigureAwait(false);
+                _log.Debug("Received message added to response buffer: type {0} with length {1}", msg.GetType().Name, _curIncomingMessage.Length);
                 _curIncomingMessage.Position = 0;
                 _curIncomingMessage.SetLength(0);
                 _incomingStreamState = IncomingStreamState.Open;
-                var header = _protocol.MessageFactory.CreateInvocationMessageReceived();
-                await _sender.WriteOrDisposeAsync(header, CancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -130,8 +152,7 @@
                     _incomingStreamState = IncomingStreamState.Completed;
                     _buffer.Out.TryComplete();
                     break;
-                case IncomingStreamState.ReceivingMessage:
-                case IncomingStreamState.Completed:
+                default:
                     throw new InvalidOperationException($"Received unexpected message when in state {_incomingStreamState}: {completion}");
             }
             return Nothing.Instance;
@@ -144,8 +165,9 @@
                 case IncomingStreamState.Open:
                 case IncomingStreamState.Completed:
                     _invocationState.OnConfirmationReceived();
+                    Log.Trace("Confirmation received: {0}", _invocationState);
                     break;
-                case IncomingStreamState.ReceivingMessage:                
+                default:
                     throw new InvalidOperationException(
                         $"Received unexpected message when in state {_incomingStreamState}: {confirmation}");
             }
@@ -159,8 +181,7 @@
                 case IncomingStreamState.Open:
                     _incomingStreamState = IncomingStreamState.ReceivingMessage;
                     break;
-                case IncomingStreamState.ReceivingMessage:
-                case IncomingStreamState.Completed:
+                default:
                     throw new InvalidOperationException($"Received unexpected message when in state {_incomingStreamState}: {header}");
             }
             return Nothing.Instance;
