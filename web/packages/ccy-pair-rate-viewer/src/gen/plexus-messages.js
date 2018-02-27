@@ -40,13 +40,14 @@ $root.fx = (function() {
          * Properties of a CcyPair.
          * @memberof fx
          * @interface ICcyPair
-         * @property {string} [ccyPairName] CcyPair ccyPairName
+         * @property {string|null} [ccyPairName] CcyPair ccyPairName
          */
 
         /**
          * Constructs a new CcyPair.
          * @memberof fx
          * @classdesc Represents a CcyPair.
+         * @implements ICcyPair
          * @constructor
          * @param {fx.ICcyPair=} [properties] Properties to set
          */
@@ -59,7 +60,7 @@ $root.fx = (function() {
 
         /**
          * CcyPair ccyPairName.
-         * @member {string}ccyPairName
+         * @member {string} ccyPairName
          * @memberof fx.CcyPair
          * @instance
          */
@@ -226,14 +227,15 @@ $root.fx = (function() {
          * Properties of a CcyPairRate.
          * @memberof fx
          * @interface ICcyPairRate
-         * @property {string} [ccyPairName] CcyPairRate ccyPairName
-         * @property {number} [rate] CcyPairRate rate
+         * @property {string|null} [ccyPairName] CcyPairRate ccyPairName
+         * @property {number|null} [rate] CcyPairRate rate
          */
 
         /**
          * Constructs a new CcyPairRate.
          * @memberof fx
          * @classdesc Represents a CcyPairRate.
+         * @implements ICcyPairRate
          * @constructor
          * @param {fx.ICcyPairRate=} [properties] Properties to set
          */
@@ -246,7 +248,7 @@ $root.fx = (function() {
 
         /**
          * CcyPairRate ccyPairName.
-         * @member {string}ccyPairName
+         * @member {string} ccyPairName
          * @memberof fx.CcyPairRate
          * @instance
          */
@@ -254,7 +256,7 @@ $root.fx = (function() {
 
         /**
          * CcyPairRate rate.
-         * @member {number}rate
+         * @member {number} rate
          * @memberof fx.CcyPairRate
          * @instance
          */
@@ -472,7 +474,7 @@ $root.fx = (function() {
 
         /**
          * Calls GetRate.
-         * @function .getRate
+         * @function getRate
          * @memberof fx.CcyPairRateService
          * @instance
          * @param {fx.ICcyPair} request CcyPair message or plain object

@@ -36,11 +36,11 @@ export abstract class WebGreetingServerClient {
 
     public abstract discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
 
-    public abstract sendDiscoveredUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
+    public abstract sendRawUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
 
-    public abstract sendDiscoveredBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
+    public abstract sendRawBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
 
-    public abstract sendDiscoveredServerStreamingRequest(
+    public abstract sendRawServerStreamingRequest(
         methodReference: ProvidedMethodReference,
         request: ArrayBuffer,
         responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
@@ -68,19 +68,19 @@ class WebGreetingServerClientImpl implements WebGreetingServerClient {
         return this.genericClient.discoverMethod(discoveryRequest);
     }
 
-    public sendDiscoveredUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
-        return this.genericClient.sendDiscoveredUnaryRequest(methodReference, request, responseHandler);
+    public sendRawUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
+        return this.genericClient.sendRawUnaryRequest(methodReference, request, responseHandler);
     }
 
-    public sendDiscoveredBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
-        return this.genericClient.sendDiscoveredBidirectionalStreamingRequest(methodReference, responseObserver);
+    public sendRawBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
+        return this.genericClient.sendRawBidirectionalStreamingRequest(methodReference, responseObserver);
     }
 
-    public sendDiscoveredServerStreamingRequest(
+    public sendRawServerStreamingRequest(
         methodReference: ProvidedMethodReference,
         request: ArrayBuffer,
         responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
-        return this.genericClient.sendDiscoveredServerStreamingRequest(methodReference, request, responseObserver);
+        return this.genericClient.sendRawServerStreamingRequest(methodReference, request, responseObserver);
     }
 
     public disconnect(completion?: Completion): Promise<void> {
@@ -88,11 +88,11 @@ class WebGreetingServerClientImpl implements WebGreetingServerClient {
     }
 
     public sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
-        return this.genericClient.sendDynamicUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
+        return this.genericClient.sendUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
     }
 
     public sendStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
-        return this.genericClient.sendDynamicBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
+        return this.genericClient.sendBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
     }
 
 }
