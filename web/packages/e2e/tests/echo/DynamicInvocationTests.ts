@@ -65,7 +65,7 @@ export class DynamicInvocationTests extends BaseEchoTest {
         });
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         return new Promise<void>(async (resolve, reject) => {
-            const invocationClient = await client.sendStreamingRequest({
+            const invocationClient = await client.sendBidirectionalStreamingRequest({
                 methodId: "DuplexStreaming",
                 serviceId: "plexus.interop.testing.EchoService"
             }, {

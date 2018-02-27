@@ -123,7 +123,7 @@ export class DiscoveryTests extends BaseEchoTest {
             }
             let receivedResponse: plexus.plexus.interop.testing.IEchoRequest | null = null;
             return new Promise<void>((resolve, reject) => {
-                client.sendDiscoveredServerStreamingRequest(method.providedMethod as ProvidedMethodReference, this.encodeRequestDto(echoRequest), {
+                client.sendRawServerStreamingRequest(method.providedMethod as ProvidedMethodReference, this.encodeRequestDto(echoRequest), {
                     next: (response) => {
                         receivedResponse = this.decodeRequestDto(response);
                     },
@@ -168,7 +168,7 @@ export class DiscoveryTests extends BaseEchoTest {
                 throw new Error("Provided method is empty");
             }
             return new Promise<void>(async (resolve, reject) => {
-                const streamingClient = await client.sendDiscoveredBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
+                const streamingClient = await client.sendRawBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
                     next: (serverResponse) => {},
                     error: (e) => {
                         reject(e);
@@ -204,7 +204,7 @@ export class DiscoveryTests extends BaseEchoTest {
             this.assertDiscoveredMethodValid(method);
             // invoke discovered
             await new Promise((invocationResolve, invocationReject) => {
-                client.sendDiscoveredUnaryRequest(
+                client.sendRawUnaryRequest(
                     method.providedMethod as ProvidedMethodReference,
                     this.encodeRequestDto(echoRequest), {
                         value: (response: ArrayBuffer) => {
