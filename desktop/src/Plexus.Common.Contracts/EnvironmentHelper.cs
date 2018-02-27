@@ -46,9 +46,9 @@
             return Environment.GetEnvironmentVariable(ParentProcessIdVarName);
         }
 
-        public static int GetPlexusTimeoutMultiplier()
+        public static double GetPlexusTimeoutMultiplier()
         {
-            return int.TryParse(Environment.GetEnvironmentVariable(PlexusTimeoutMultiplier), out var multiplier)
+            return double.TryParse(Environment.GetEnvironmentVariable(PlexusTimeoutMultiplier), out var multiplier)
                 ? multiplier
                 : 1;
         }

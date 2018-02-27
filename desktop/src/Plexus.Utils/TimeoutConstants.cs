@@ -20,7 +20,7 @@ namespace Plexus
 
     public static class TimeoutConstants
     {
-        public static readonly int TimeoutMultiplier = EnvironmentHelper.GetPlexusTimeoutMultiplier();
+        public static readonly double TimeoutMultiplier = EnvironmentHelper.GetPlexusTimeoutMultiplier();
 
         public static readonly TimeSpan Timeout10Ms = TimeSpan.FromMilliseconds(10 * TimeoutMultiplier);
         public static readonly TimeSpan Timeout50Ms = TimeSpan.FromMilliseconds(50 * TimeoutMultiplier);
