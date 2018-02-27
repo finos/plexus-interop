@@ -39,6 +39,7 @@ if (!!buildRunner) {
     const registryVar = 'NPM_REGISTRY';
     const authTokenVar = 'NPM_AUTH_TOKEN';
     const authUserVar = 'NPM_AUTH_USER';
+    const strictSsl = 'NPM_STRICT_SSL';
 
     const authToken = process.env[`${authTokenVar}${postfix}`] || process.env[authTokenVar];
     let registry = process.env[`${registryVar}${postfix}`] || process.env[registryVar];
@@ -80,6 +81,9 @@ if (!!buildRunner) {
             data = data.replace(new RegExp(`\\\${${registryVar}}`, 'g'), registry);
             data = data.replace(`\${${authTokenVar}}`, authToken);
             data = data.replace(`\${${authUserVar}}`, user);
+            const ssl = process.env[strictSsl] || 'true';
+            data = data.replace(`\${${strictSsl}}`, ssl);
+            
             fs.writeFile('.npmrc', data, 'utf8', function (err) {
                 if (err) return console.log(err);
             });

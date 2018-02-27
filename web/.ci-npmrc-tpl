@@ -1,5 +1,5 @@
 # Placeholders to be replaced with env variables
-strict-ssl=false
+strict-ssl=${NPM_STRICT_SSL}
 registry=${NPM_REGISTRY}
 _auth=${NPM_AUTH_TOKEN}
 email=${NPM_AUTH_USER}
