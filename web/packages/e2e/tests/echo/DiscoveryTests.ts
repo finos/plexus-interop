@@ -186,7 +186,7 @@ export class DiscoveryTests extends BaseEchoTest {
         }
     }
 
-    public async testClientCanInvokeDiscoveredMethod(): Promise<void> {
+    public async testClientCanInvokeDiscoveredMethodPassingRawData(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         const handler = new UnaryServiceHandler(async (context, request) => request);
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
@@ -214,6 +214,42 @@ export class DiscoveryTests extends BaseEchoTest {
                         },
                         error: (e) => invocationReject(e)
                     });
+            });
+        } else {
+            throw "Empty response";
+        }
+        await this.clientsSetup.disconnect(client, server);
+    }
+
+    public async testClientCanInvokeDiscoveredMethodPassingObject(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        const handler = new UnaryServiceHandler(async (context, request) => request);
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const discoveryResponse = await client.discoverMethod({
+            consumedMethod: {
+                consumedService: {
+                    serviceId: "plexus.interop.testing.EchoService"
+                },
+                methodId: "Unary"
+            }
+        });
+        if (discoveryResponse.methods) {
+            expect(discoveryResponse.methods.length).to.be.eq(1);
+            const method = discoveryResponse.methods[0];
+            this.assertDiscoveredMethodValid(method);
+            // invoke discovered
+            await new Promise((invocationResolve, invocationReject) => {
+                client.sendUnaryRequest(
+                    method.providedMethod as ProvidedMethodReference,
+                    echoRequest, {
+                        value: response => {
+                            this.assertEqual(echoRequest, response);
+                            invocationResolve();
+                        },
+                        error: (e) => invocationReject(e)
+                    }, 
+                    plexus.plexus.interop.testing.EchoRequest, 
+                    plexus.plexus.interop.testing.EchoRequest);
             });
         } else {
             throw "Empty response";
