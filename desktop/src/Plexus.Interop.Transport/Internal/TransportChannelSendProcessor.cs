@@ -26,7 +26,7 @@
     internal sealed class TransportChannelSendProcessor
     {
         private readonly ILogger _log;
-        private readonly IChannel<TransportMessageFrame> _buffer = new BufferedChannel<TransportMessageFrame>(3);
+        private readonly IChannel<TransportMessageFrame> _buffer = new BufferedChannel<TransportMessageFrame>(3, TimeoutConstants.Timeout10Sec);
         private readonly IWritableChannel<ChannelMessage> _out;
         private readonly IChannelHeaderFactory _headerFactory;
         private readonly Promise _initialized = new Promise();

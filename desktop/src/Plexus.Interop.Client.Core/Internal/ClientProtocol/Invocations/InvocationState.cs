@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,33 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal.ClientProtocol.Invocations
+ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
     using System;
+    using System.Threading.Tasks;
+    using Plexus.Channels;
 
     internal sealed class InvocationState
     {
+        private const int MaxPendingConfirmations = 3;
+
+        private readonly BufferedChannel<Nothing> _pendingConfirmations = new BufferedChannel<Nothing>(MaxPendingConfirmations);
+
         public long SentCount { get; private set; }
 
         public long ConfirmationsCount { get; private set; }
 
         public bool ConfirmationsCompleted { get; private set; }
 
-        public void OnMessageSent()
+        public async Task OnBeforeMessageSendAsync()
         {
-            SentCount++;
-            if (ConfirmationsCompleted && SentCount > ConfirmationsCount)
+            if (ConfirmationsCompleted)
             {
-                throw new InvalidOperationException($"Received confirmations count {ConfirmationsCount} < sent messages count {SentCount}");
+                throw new InvalidOperationException("Cannot send when confirmations response stream completed");
             }
+
+            if (!_pendingConfirmations.Out.TryWrite(Nothing.Instance))
+            {
+                await _pendingConfirmations.Out.WriteAsync(Nothing.Instance).ConfigureAwait(false);
+            }
+
+            if (ConfirmationsCompleted)
+            {
+                throw new InvalidOperationException("Cannot send when confirmations response stream completed");
+            }
+
+            SentCount++;
         }
 
         public void OnConfirmationReceived()
         {
             ConfirmationsCount++;
-            if (ConfirmationsCount > SentCount)
+            if (!_pendingConfirmations.In.TryRead(out _))
             {
-                throw new InvalidOperationException($"Received confirmations count {ConfirmationsCount} > sent messages count {SentCount}");
+                throw new InvalidOperationException(
+                    $"Unexpected confirmation received: confirmations count {ConfirmationsCount}, sent messages count {SentCount}");
             }
         }
 
@@ -49,8 +67,14 @@
             ConfirmationsCompleted = true;
             if (ConfirmationsCount != SentCount)
             {
-                throw new InvalidOperationException($"Received confirmations count {ConfirmationsCount} != sent messages count {SentCount}");
+                throw new InvalidOperationException(
+                    $"Received confirmations count {ConfirmationsCount} != sent messages count {SentCount}");
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(SentCount)}: {SentCount}, {nameof(ConfirmationsCount)}: {ConfirmationsCount}, {nameof(ConfirmationsCompleted)}: {ConfirmationsCompleted}";
         }
     }
 }

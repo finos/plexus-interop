@@ -23,7 +23,7 @@ namespace Plexus.Channels
     using System.Threading.Tasks;
 
     public sealed class BufferedChannel<T> : IChannel<T>, IReadableChannel<T>, ITerminatableWritableChannel<T>
-    {
+    {        
         private readonly object _sync = new object();
         private readonly Queue<T> _buffer = new Queue<T>();        
         private readonly Promise _readCompletion = new Promise();
@@ -33,13 +33,18 @@ namespace Plexus.Channels
         private Promise<bool> _readAvailable = new Promise<bool>();
         private Promise<bool> _writeAvailable = new Promise<bool>();
 
-        public BufferedChannel(int bufferSize)
+        private readonly Timer _writeTimeoutTracker;
+        private readonly TimeSpan _writeTimeout;
+
+        public BufferedChannel(int bufferSize, TimeSpan writeTimeout = default)
         {
             if (bufferSize < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(bufferSize), bufferSize, "Buffer size must be non-negative");
             }
             _bufferSize = bufferSize;
+            _writeTimeout = writeTimeout == default ? Timeout.InfiniteTimeSpan : writeTimeout;
+            _writeTimeoutTracker = new Timer(OnWriteTimeout, null, _writeTimeout, Timeout.InfiniteTimeSpan);
             OnBalanceChanged();
         }
 
@@ -134,10 +139,12 @@ namespace Plexus.Channels
             else if (_buffer.Count < _bufferSize)
             {
                 _writeAvailable.TryComplete(true);
+                _writeTimeoutTracker.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
             }
             else if (_writeAvailable.Task.IsCompleted && _writeAvailable.Task.Result)
             {
                 _writeAvailable = new Promise<bool>();
+                _writeTimeoutTracker.Change(_writeTimeout, Timeout.InfiniteTimeSpan);
             }
 
             TryCompleteRead();
@@ -211,6 +218,11 @@ namespace Plexus.Channels
             {
                 _readCompletion.TryComplete();
             }            
+        }
+
+        private void OnWriteTimeout(object state)
+        {
+            TryTerminate(new ChannelWriteTimeoutException(_writeTimeout));
         }
     }
 }

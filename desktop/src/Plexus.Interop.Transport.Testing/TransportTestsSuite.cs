@@ -238,6 +238,8 @@ namespace Plexus.Interop.Transport
                     new ChannelExchange[] { new ChannelExchange(new int[] { 65001 }, new int [] { 65001 }) },
                     new ChannelExchange[] { new ChannelExchange(new int[] { 1024*1024*5 }, new int [] { }) },
                     new ChannelExchange[] { new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }) },
+                    new ChannelExchange[] { new ChannelExchange(CreateArray(100, 64), CreateArray(200, 64)) },
+                    new ChannelExchange[] { new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }) },
                     new ChannelExchange[] {
                         new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
                         new ChannelExchange(new int[] { 1024*1024*5, 65001, 0, 65001 }, new int [] { 1024 * 1024 * 5, 65001, 0, 65001 }),
@@ -291,7 +293,7 @@ namespace Plexus.Interop.Transport
                         });
                 foreach (var length in send)
                 {
-                    var msg = Random.GetRandomBytes(length);
+                    var msg = TestsSuite.Random.GetRandomBytes(length);
                     await c.SendMessageAsync(msg).ConfigureAwait(false);
                     lock (Md5)
                     {
@@ -370,6 +372,16 @@ namespace Plexus.Interop.Transport
                     clientReceivedMessageHashes[i][j].ShouldBe(serverSentMessageHashes[i][j]);
                 }
             }
+        }
+
+        private static int[] CreateArray(int count, int value)
+        {
+            var a = new int[count];
+            for (var i = 0; i < count; i++)
+            {
+                a[i] = value;
+            }
+            return a;
         }
     }
 }
