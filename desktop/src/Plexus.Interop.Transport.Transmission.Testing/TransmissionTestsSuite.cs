@@ -90,19 +90,20 @@ namespace Plexus.Interop.Transport.Transmission
         [Fact]
         public void CancelConnect()
         {
-            for (var i = 0; i < 10; i++)
+            RunWith10SecTimeout(async () =>
             {
-                RunWith10SecTimeout(async () =>
+                // iterating to try cancel connections on different stages
+                for (var i = 0; i < 10; i++)
                 {
-                    var timeout = 20 * i;
+                    var timeoutMs = 40 * i;
                     var client = CreateClient();
                     var cancellation = new CancellationTokenSource();
                     var connectionTask = client.ConnectAsync(BrokerWorkingDir, cancellation.Token).AsTask();
-                    await Task.Delay(timeout, CancellationToken.None).ConfigureAwait(false);
+                    await Task.Delay(timeoutMs, CancellationToken.None).ConfigureAwait(false);
                     cancellation.Cancel();
                     Should.Throw<TaskCanceledException>(connectionTask, Timeout1Sec);
-                });
-            }
+                }
+            });
         }
 
         [Fact]
