@@ -57,7 +57,7 @@
     "trash": "^4.0.1",
     "trash-cli": "^1.4.0",
     "ts-mockito": "2.0.2",
-    "tslint": "5.6.0",
+    "tslint": "5.8.0",
     "typescript": "2.6.1",
     "watchify": "^3.9.0",
     "yarn": "1.4.0"

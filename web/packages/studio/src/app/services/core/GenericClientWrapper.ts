@@ -104,13 +104,13 @@ export class GenericClientWrapper implements InteropClient {
 
         if (!this.isConsumed(methodToInvoke)) {
             const provided = (metaInfo as DiscoveredMetaInfo).provided;
-            return await this.genericClient.sendDiscoveredUnaryRequest(
+            return await this.genericClient.sendRawUnaryRequest(
                 provided,
                 encodedRequest,
                 internalResponseHandler);
         } else {
             const consumedMetaInfo = (metaInfo as ConsumedMetaInfo);
-            return await this.genericClient.sendUnaryRequest({
+            return await this.genericClient.sendRawUnaryRequest({
                 serviceId: consumedMetaInfo.serviceId,
                 methodId: consumedMetaInfo.methodId
             }, encodedRequest, internalResponseHandler);
@@ -137,11 +137,11 @@ export class GenericClientWrapper implements InteropClient {
 
         if (!this.isConsumed(methodToInvoke)) {
             const provided = (metaInfo as DiscoveredMetaInfo).provided;
-            const baseClient = await this.genericClient.sendDiscoveredBidirectionalStreamingRequest(provided, observer);
+            const baseClient = await this.genericClient.sendRawBidirectionalStreamingRequest(provided, observer);
             return wrapGenericHostClient(baseClient, requestEncoder);
         } else {
             const consumedMetaInfo = (metaInfo as ConsumedMetaInfo);
-            const baseClient = await this.genericClient.sendBidirectionalStreamingRequest({
+            const baseClient = await this.genericClient.sendRawBidirectionalStreamingRequest({
                 serviceId: consumedMetaInfo.serviceId,
                 methodId: consumedMetaInfo.methodId
             }, observer);
@@ -165,10 +165,10 @@ export class GenericClientWrapper implements InteropClient {
 
         if (!this.isConsumed(methodToInvoke)) {
             const provided = (metaInfo as DiscoveredMetaInfo).provided;
-            return this.genericClient.sendDiscoveredServerStreamingRequest(provided, encodedRequest, observer);
+            return this.genericClient.sendRawServerStreamingRequest(provided, encodedRequest, observer);
         } else {
             const consumedMetaInfo = (metaInfo as ConsumedMetaInfo);
-            return this.genericClient.sendServerStreamingRequest({
+            return this.genericClient.sendRawServerStreamingRequest({
                 serviceId: consumedMetaInfo.serviceId,
                 methodId: consumedMetaInfo.methodId
             }, encodedRequest, observer);
