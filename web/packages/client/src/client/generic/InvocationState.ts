@@ -23,4 +23,4 @@ export enum InvocationState {
     OPEN = "OPEN",
     COMPLETION_RECEIVED = "COMPLETION_RECEIVED",
     COMPLETED = "COMPLETED"
-};
+}

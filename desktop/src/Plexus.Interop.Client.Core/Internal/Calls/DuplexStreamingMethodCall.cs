@@ -49,8 +49,8 @@ namespace Plexus.Interop.Internal.Calls
             await invocation.StartCompletion.ConfigureAwait(false);            
             var processRequestsAsync = TaskRunner.RunInBackground(() => ProcessRequestsAsync(invocation));
             var processResponseAsync = TaskRunner.RunInBackground(() => ProcessResponsesAsync(invocation));
-            _requestStream.Out.PropagateCompletionFrom(invocation.Completion);
-            _responseStream.Out.PropagateCompletionFrom(invocation.In.Completion);
+            _requestStream.Out.PropagateCompletionFrom(processRequestsAsync);
+            _responseStream.Out.PropagateCompletionFrom(processResponseAsync);
             return Task
                 .WhenAll(processRequestsAsync, processResponseAsync)
                 .IgnoreExceptions()

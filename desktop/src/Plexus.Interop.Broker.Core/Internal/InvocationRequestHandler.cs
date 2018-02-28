@@ -136,7 +136,7 @@
                 }
                 return new ValueTask<IAppConnection>(connection);
             }
-            return _appLifecycleManager.GetOrSpawnConnectionAsync(new[] {method.ProvidedService.ApplicationId});
+            return _appLifecycleManager.GetOrSpawnConnectionAsync(source, new[] {method.ProvidedService.ApplicationId});
         }
 
         private ValueTask<IAppConnection> ResolveTargetConnectionAsync(
@@ -145,7 +145,7 @@
         {
             var targetMethods = _registryService.GetMatchingProvidedMethods(source.Info.ApplicationId, method);
             var targetApps = targetMethods.Select(x => x.ProvidedService.Application.Id).ToList();
-            return _appLifecycleManager.GetOrSpawnConnectionAsync(targetApps);
+            return _appLifecycleManager.GetOrSpawnConnectionAsync(source, targetApps);
         }
 
         private IInvocationStartRequested CreateInvocationTarget(IProvidedMethodReference reference, IAppConnection sourceConnection)
@@ -186,6 +186,7 @@
                     }
                     await channel2.WriteAsync(result.Value).ConfigureAwait(false);
                 }
+
                 channel2.TryComplete();
             }
             catch (Exception ex)

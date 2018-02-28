@@ -79,7 +79,7 @@ export class BufferedObserver<T> implements Observer<T> {
         } else {
             this.completed = true;
         }
-    };
+    }
 
     public clear(): void {
         this.buffer.clear();

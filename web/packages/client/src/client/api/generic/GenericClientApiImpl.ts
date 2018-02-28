@@ -35,6 +35,7 @@ import { ProvidedMethodReference } from "@plexus-interop/client-api";
 import { Invocation } from "../../generic/Invocation";
 import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
 import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
+import { GenericRequest } from "@plexus-interop/client-api";
 
 export class GenericClientApiImpl implements GenericClientApi {
 
@@ -54,40 +55,74 @@ export class GenericClientApiImpl implements GenericClientApi {
         return this.genericClient.discoverMethod(discoveryRequest);
     }
 
-    public sendDiscoveredUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
+    public sendRawUnaryRequest(genericRequest: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
         return this.sendUnaryRequestInternal(
-            ClientDtoUtils.targetInvocationHash(ClientDtoUtils.providedMethodToInvocationInfo(methodReference)),
-            () => this.genericClient.requestDiscoveredInvocation(methodReference),
+            this.toInvocationHash(genericRequest),
+            this.requestInvocation(genericRequest),
             request, responseHandler
         );
     }
 
-    public sendDiscoveredServerStreamingRequest(
-        methodReference: ProvidedMethodReference,
+    public async sendUnaryRequest(genericRequest: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
+        const requestMarshaller = this.marshallerProvider.getMarshaller(requestType);
+        const responseMarshaller = this.marshallerProvider.getMarshaller(responseType);
+        return this.sendRawUnaryRequest(genericRequest,
+            Arrays.toArrayBuffer(requestMarshaller.encode(request)),
+            {
+                value: (responsePayload: ArrayBuffer) => responseHandler.value(responseMarshaller.decode(new Uint8Array(responsePayload))),
+                error: responseHandler.error
+            });
+    }
+
+    public sendRawServerStreamingRequest(
+        genericRequest: GenericRequest,
         request: ArrayBuffer,
         responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
         return this.sendServerStreamingRequestInternal(
-            ClientDtoUtils.targetInvocationHash(ClientDtoUtils.providedMethodToInvocationInfo(methodReference)),
-            () => this.genericClient.requestDiscoveredInvocation(methodReference),
+            this.toInvocationHash(genericRequest),
+            this.requestInvocation(genericRequest),
             request,
             responseObserver
         );
     }
 
-    public sendDiscoveredBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
+    public async sendServerStreamingRequest(
+        genericRequest: GenericRequest,
+        request: any,
+        responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient> {
+        const requestMarshaller = this.marshallerProvider.getMarshaller(requestType);
+        const responseMarshaller = this.marshallerProvider.getMarshaller(responseType);
+        const encoded = Arrays.toArrayBuffer(requestMarshaller.encode(request));
+        return this.sendRawServerStreamingRequest(genericRequest, encoded, {
+            next: res => responseObserver.next(responseMarshaller.decode(new Uint8Array(res))),
+            complete: () => responseObserver.complete(),
+            error: e => responseObserver.error(e)
+        });
+    }
+
+    public sendRawBidirectionalStreamingRequest(request: GenericRequest, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {        
         return this.sendBidirectionalStreamingRequestInternal(
-            ClientDtoUtils.targetInvocationHash(ClientDtoUtils.providedMethodToInvocationInfo(methodReference)),
-            () => this.genericClient.requestDiscoveredInvocation(methodReference),
+            this.toInvocationHash(request),
+            this.requestInvocation(request),
             responseObserver
         );
     }
 
-    public sendBidirectionalStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
-        return this.sendBidirectionalStreamingRequestInternal(
-            ClientDtoUtils.targetInvocationHash(invocationInfo),
-            () => this.genericClient.requestInvocation(invocationInfo),
-            responseObserver
+    public async sendBidirectionalStreamingRequest(genericRequest: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
+        const requestMarshaller = this.marshallerProvider.getMarshaller(requestType);
+        const responseMarshaller = this.marshallerProvider.getMarshaller(responseType);
+        const baseClient: StreamingInvocationClient<ArrayBuffer> = await this.sendRawBidirectionalStreamingRequest(genericRequest, {
+            next: (responsePayload: ArrayBuffer) => responseObserver.next(responseMarshaller.decode(new Uint8Array(responsePayload))),
+            error: responseObserver.error.bind(responseObserver),
+            complete: responseObserver.complete.bind(responseObserver)
+        }
         );
+        return {
+            error: baseClient.error.bind(baseClient),
+            cancel: baseClient.cancel.bind(baseClient),
+            next: (request: any) => baseClient.next(Arrays.toArrayBuffer(requestMarshaller.encode(request))),
+            complete: baseClient.complete.bind(baseClient)
+        };
     }
 
     public async sendBidirectionalStreamingRequestInternal(strInfo: string, requestInvocation: () => Promise<Invocation>, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
@@ -105,17 +140,6 @@ export class GenericClientApiImpl implements GenericClientApi {
         return new StreamingInvocationClientImpl(invocation, logger);
     }
 
-    public async sendServerStreamingRequest(
-        invocationInfo: InvocationRequestInfo,
-        request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
-        return this.sendServerStreamingRequestInternal(
-            ClientDtoUtils.targetInvocationHash(invocationInfo),
-            () => this.genericClient.requestInvocation(invocationInfo),
-            request,
-            responseObserver);
-    }
-
     public async sendServerStreamingRequestInternal(
         strInfo: string,
         requestInvocation: () => Promise<Invocation>,
@@ -125,39 +149,6 @@ export class GenericClientApiImpl implements GenericClientApi {
         await streamingClient.next(request);
         streamingClient.complete().catch(e => responseObserver.error(e));
         return streamingClient;
-    }
-
-    public async sendDynamicUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
-        const requestMarshaller = this.marshallerProvider.getMarshaller(requestType);
-        const responseMarshaller = this.marshallerProvider.getMarshaller(responseType);
-        return this.sendUnaryRequest(invocationInfo,
-            Arrays.toArrayBuffer(requestMarshaller.encode(request)),
-            {
-                value: (responsePayload: ArrayBuffer) => responseHandler.value(responseMarshaller.decode(new Uint8Array(responsePayload))),
-                error: responseHandler.error
-            });
-    }
-
-    public async sendDynamicBidirectionalStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
-        const requestMarshaller = this.marshallerProvider.getMarshaller(requestType);
-        const responseMarshaller = this.marshallerProvider.getMarshaller(responseType);
-        const baseClient: StreamingInvocationClient<ArrayBuffer> = await this.sendBidirectionalStreamingRequest(invocationInfo, {
-            next: (responsePayload: ArrayBuffer) => responseObserver.next(responseMarshaller.decode(new Uint8Array(responsePayload))),
-            error: responseObserver.error.bind(responseObserver),
-            complete: responseObserver.complete.bind(responseObserver)
-        }
-        );
-        return {
-            error: baseClient.error.bind(baseClient),
-            cancel: baseClient.cancel.bind(baseClient),
-            next: (request: any) => baseClient.next(Arrays.toArrayBuffer(requestMarshaller.encode(request))),
-            complete: baseClient.complete.bind(baseClient)
-        };
-    }
-
-    public async sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
-        const responseObserver: Observer<ArrayBuffer> = this.createUnaryObserver(responseHandler);
-        return this.sendServerStreamingRequest(invocationInfo, request, responseObserver);
     }
 
     public async sendUnaryRequestInternal(
@@ -171,6 +162,22 @@ export class GenericClientApiImpl implements GenericClientApi {
 
     public disconnect(completion?: Completion): Promise<void> {
         return this.genericClient.disconnect(completion);
+    }
+
+    private isDiscovered(request: InvocationRequestInfo | ProvidedMethodReference): request is ProvidedMethodReference  {
+        return !!(request as ProvidedMethodReference).providedService;
+    }
+
+    private toInvocationHash(request: InvocationRequestInfo | ProvidedMethodReference): string {
+        return this.isDiscovered(request) ? 
+            ClientDtoUtils.targetInvocationHash(ClientDtoUtils.providedMethodToInvocationInfo(request))
+            : ClientDtoUtils.targetInvocationHash(request);
+    }
+
+    private requestInvocation(request: InvocationRequestInfo | ProvidedMethodReference): () => Promise<Invocation> {
+        return this.isDiscovered(request) ? 
+            () => this.genericClient.requestDiscoveredInvocation(request) 
+                : () => this.genericClient.requestInvocation(request);
     }
 
     private createUnaryObserver(responseHandler: ValueHandler<ArrayBuffer>): Observer<ArrayBuffer> {

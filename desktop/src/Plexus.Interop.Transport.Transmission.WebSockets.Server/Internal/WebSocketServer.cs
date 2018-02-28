@@ -23,6 +23,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Pools;
     using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
     internal sealed class WebSocketServer
@@ -59,7 +60,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(5)});
+            app.UseWebSockets(new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromSeconds(5),
+                ReceiveBufferSize = PooledBuffer.MaxSize
+            });
 
             app.Use(async (context, next) =>
             {

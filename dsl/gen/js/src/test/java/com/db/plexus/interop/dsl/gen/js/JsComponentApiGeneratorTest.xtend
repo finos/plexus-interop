@@ -21,9 +21,6 @@ import org.eclipse.xtext.junit4.InjectWith
 import org.junit.runner.RunWith
 import com.google.inject.Inject
 import org.junit.Test
-import com.google.inject.name.Named
-import java.nio.file.Files
-import java.io.File
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.emf.common.util.URI

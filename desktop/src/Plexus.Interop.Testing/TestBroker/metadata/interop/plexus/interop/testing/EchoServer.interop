@@ -21,6 +21,8 @@ package plexus.interop.testing;
 
 application EchoServer {
 
+    consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
+
 	provides plexus.interop.testing.EchoService to plexus.interop.testing.* {
 		option service_title = "Sample Echo Service";
 		Unary [method_title = "Sample Unary Method"]; 

@@ -35,10 +35,14 @@ namespace Plexus
 
         protected static readonly MD5 Md5 = MD5.Create();
 
-        protected static readonly TimeSpan Timeout1Sec = TimeSpan.FromSeconds(1);
-        protected static readonly TimeSpan Timeout5Sec = TimeSpan.FromSeconds(5);
-        protected static readonly TimeSpan Timeout10Sec = TimeSpan.FromSeconds(10);
-        protected static readonly TimeSpan Timeout30Sec = TimeSpan.FromSeconds(30);
+        protected static readonly TimeSpan Timeout10Ms = TimeoutConstants.Timeout10Ms;
+        protected static readonly TimeSpan Timeout50Ms = TimeoutConstants.Timeout50Ms;
+        protected static readonly TimeSpan Timeout100Ms = TimeoutConstants.Timeout100Ms;
+        protected static readonly TimeSpan Timeout1Sec = TimeoutConstants.Timeout1Sec;
+        protected static readonly TimeSpan Timeout5Sec = TimeoutConstants.Timeout5Sec;
+        protected static readonly TimeSpan Timeout10Sec = TimeoutConstants.Timeout10Sec;
+        protected static readonly TimeSpan Timeout20Sec = TimeoutConstants.Timeout20Sec;
+        protected static readonly TimeSpan Timeout30Sec = TimeoutConstants.Timeout30Sec;
 
         protected ITestOutputHelper Console { get; }
 
@@ -78,6 +82,8 @@ namespace Plexus
 
         protected void RunWith30SecTimeout(Func<Task> func) => RunWithTimeout(Timeout30Sec, func);
         protected void RunWith30SecTimeout(Action action) => RunWithTimeout(Timeout30Sec, action);
+        protected void RunWith20SecTimeout(Func<Task> func) => RunWithTimeout(Timeout20Sec, func);
+        protected void RunWith20SecTimeout(Action action) => RunWithTimeout(Timeout20Sec, action);
         protected void RunWith10SecTimeout(Func<Task> func) => RunWithTimeout(Timeout10Sec, func);
         protected void RunWith10SecTimeout(Action action) => RunWithTimeout(Timeout10Sec, action);
         protected void RunWith5SecTimeout(Func<Task> func) => RunWithTimeout(Timeout5Sec, func);

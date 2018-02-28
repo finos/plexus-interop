@@ -34,7 +34,13 @@ function main() {
 function killBroker() {
     if (brokerProcess) {
         log("Killing broker process ...");
-        kill(brokerProcess.pid);
+        kill(brokerProcess.pid, "SIGTERM", error => {
+            if (error) {
+                log("Error on stopping of broker", error);
+            } else {
+                log("Broker stopped without error");
+            }
+        });
         log("Kill signal sent");
     }
 }
@@ -56,7 +62,7 @@ function runElectronTest(wsUrl) {
         }
         log('StdOut', stdout);
         killBroker();
-        process.exit(exitCode);
+        setTimeout(() => process.exit(exitCode), 3000);
     });
 }
 

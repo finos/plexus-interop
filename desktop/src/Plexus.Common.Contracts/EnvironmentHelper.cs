@@ -23,6 +23,7 @@
         public const string BrokerWorkingDirVarName = "PLEXUS_BROKER_WORKING_DIR";
         public const string AppInstanceIdVarName = "PLEXUS_APP_INSTANCE_ID";
         public const string ParentProcessIdVarName = "PLEXUS_PARENT_PROCESS_ID";
+        public const string PlexusTimeoutMultiplier = "PLEXUS_TIMEOUT_MULTIPLIER";
 
         public static string GetBrokerWorkingDir()
         {
@@ -43,6 +44,13 @@
         public static string GetParentProcessId()
         {
             return Environment.GetEnvironmentVariable(ParentProcessIdVarName);
+        }
+
+        public static double GetPlexusTimeoutMultiplier()
+        {
+            return double.TryParse(Environment.GetEnvironmentVariable(PlexusTimeoutMultiplier), out var multiplier)
+                ? multiplier
+                : 1;
         }
     }
 }

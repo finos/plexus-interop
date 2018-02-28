@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {TransportConnection} from "./TransportConnection";
+import { TransportConnection } from "./TransportConnection";
 import { ConnectionDetails } from "./ConnectionDetails";
 
 export interface ClientConnectionFactory {

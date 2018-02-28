@@ -24,6 +24,7 @@ namespace Plexus.Interop
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
     using Xunit;
@@ -93,9 +94,9 @@ namespace Plexus.Interop
                     const int concurrentClientCount = 15;
                     var connectTasks = Enumerable.Range(0, concurrentClientCount)
                         .Select(_ => TaskRunner.RunInBackground(() => ConnectEchoClient()));
-                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout10Sec);
+                    var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout30Sec);
                     var disconnectTasks = clients.Select(c => TaskRunner.RunInBackground(c.DisconnectAsync));
-                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout10Sec);
+                    Task.WhenAll(disconnectTasks).ShouldCompleteIn(Timeout30Sec);
                 }
             });
         }
@@ -229,11 +230,12 @@ namespace Plexus.Interop
             {
                 async Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
                 {
-                    await Task.Yield();
+                    WriteLog("Handling request by throwing exception");
+                    await Task.Yield();                    
                     throw new ArgumentException();
                 }
 
-                using (await StartTestBrokerAsync())
+                using (await StartTestBrokerAsync().ConfigureAwait(false))
                 {
                     var client = ConnectEchoClient();
                     ConnectEchoServer(x => x
@@ -242,9 +244,9 @@ namespace Plexus.Interop
                             s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
                         )
                     );
-                    Console.WriteLine("Starting call");
-                    var ex = Should.Throw<Exception>(() => client.CallInvoker.Call(EchoUnaryMethod, new EchoRequest()).AsTask());
-                    Console.WriteLine("Exception received: {0}", ex.FormatToString());
+                    WriteLog("Starting call");
+                    var ex = Should.Throw<Exception>(client.CallInvoker.Call(EchoUnaryMethod, CreateTestRequest()).AsTask(), Timeout5Sec);
+                    WriteLog($"Exception received: {ex.FormatTypeAndMessage()}");
                 }
             });
         }
@@ -696,6 +698,125 @@ namespace Plexus.Interop
             });
         }
 
+        [Fact]
+        public void InvocationShouldBeRoutedToAnotherInstanceEvenIfSourceAppCanHandleIt()
+        {
+            MethodCallContext receivedRequestContext = null;
+
+            Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
+            {
+                receivedRequestContext = context;
+                return Task.FromResult(request);
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync())
+                {
+                    var optionsBuilder = new ClientOptionsBuilder()
+                        .WithBrokerWorkingDir("TestBroker")
+                        .WithDefaultConfiguration()
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
+                        .WithApplicationId("plexus.interop.testing.EchoServer");
+                    var appLauncher = RegisterDisposable(new TestAppLauncher(new[] { optionsBuilder }));
+                    await appLauncher.StartAsync();
+                    var server = ConnectEchoServer();
+                    var request = CreateTestRequest();
+                    var response = await server.CallInvoker.Call(EchoUnaryMethod, request);
+                    response.ShouldBe(request);
+                    receivedRequestContext.ShouldNotBeNull();
+                    receivedRequestContext.ConsumerConnectionId.ShouldBe(server.ConnectionId);
+                }
+            });
+        }
+
+        [Theory]
+        [InlineData(0, 0)]
+        [InlineData(1, 0)]
+        [InlineData(1, 1)]
+        [InlineData(1, 10)]
+        [InlineData(10, 0)]
+        [InlineData(10, 1)]        
+        [InlineData(10, 10)]
+        [InlineData(100, 10)]
+        public void DuplexStreamingStress(int requestsCount, int responsesPerRequest)
+        {
+            async Task HandleAsync(
+                IReadableChannel<EchoRequest> requestStream,
+                IWritableChannel<EchoRequest> responseStream,
+                MethodCallContext context)
+            {                
+                WriteLog("Provider: Started request");
+                var x = 0;
+                do
+                {
+                    while (requestStream.TryRead(out var item))
+                    {
+                        var stopwatch = new Stopwatch();
+                        WriteLog($"Provider: request {x} received");                        
+                        for (var i = 0; i < responsesPerRequest; i++)
+                        {
+                            var y = x * responsesPerRequest + i;
+                            WriteLog($"Provider: sending response {y}");
+                            stopwatch.Restart();
+                            await responseStream.WriteAsync(item).ConfigureAwait(false);
+                            stopwatch.Stop();
+                            WriteLog($"Provider: response {y} sent in {stopwatch.ElapsedMilliseconds}ms");
+                        }
+                        x++;
+                    }
+                } while (await requestStream.WaitReadAvailableAsync().ConfigureAwait(false));
+                WriteLog("Provider: completed request");
+            }
+
+            RunWith30SecTimeout(async () =>
+            {
+                using (await StartTestBrokerAsync().ConfigureAwait(false))
+                {
+                    ConnectEchoServer(x => x
+                        .WithProvidedService(
+                            "plexus.interop.testing.EchoService",
+                            s => s.WithDuplexStreamingMethod<EchoRequest, EchoRequest>("DuplexStreaming", HandleAsync)
+                        )
+                    );
+                    var client = ConnectEchoClient();
+                    var call = client.CallInvoker.Call(EchoDuplexStreamingMethod);                    
+                    var request = CreateTestRequest();
+                    var receivedResponsesCount = 0;
+                    var sendWorker = TaskRunner.RunInBackground(async () =>
+                    {
+                        var stopwatch = new Stopwatch();
+                        for (var i = 0; i < requestsCount; i++)
+                        {
+                            stopwatch.Restart();
+                            await call.RequestStream.WriteAsync(request).ConfigureAwait(false);
+                            stopwatch.Stop();
+                            WriteLog($"Consumer: request {i} sent in {stopwatch.ElapsedMilliseconds}ms");
+                        }
+                        WriteLog("Consumer: completing request stream");
+                        await call.RequestStream.CompleteAsync().ConfigureAwait(false);
+                    });
+                    var receiveWorker = TaskRunner.RunInBackground(async () =>
+                    {
+                        do
+                        {
+                            while (call.ResponseStream.TryRead(out _))
+                            {                                
+                                WriteLog($"Consumer: response {receivedResponsesCount} received");
+                                receivedResponsesCount++;
+                            }
+                        } while (await call.ResponseStream.WaitReadAvailableAsync().ConfigureAwait(false));
+                        WriteLog("Consumer: response stream completed");
+                    });                    
+                    await Task.WhenAll(sendWorker, receiveWorker).ConfigureAwait(false);
+                    await call.Completion.ConfigureAwait(false);
+                    receivedResponsesCount.ShouldBe(requestsCount * responsesPerRequest);
+                }
+            });
+        }
+
         private IClient ConnectEchoClient()
         {
             var clientOptions = new ClientOptionsBuilder()
@@ -734,3 +855,4 @@ namespace Plexus.Interop
         }
     }
 }
+

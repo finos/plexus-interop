@@ -32,3 +32,4 @@ export * from "./ProvidedServiceReference";
 export * from "./DiscoveredService";
 export * from "./MethodType";
 export * from "./DiscoveryMode";
+export * from "./GenericRequest";
