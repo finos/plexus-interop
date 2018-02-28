@@ -10233,7 +10233,7 @@ tslint@5.8.0:
 
 tsutils@^2.12.1:
   version "2.21.2"
-  resolved ""https://registry.npmjs.org/tsutils/-/tsutils-2.21.2.tgz#902aa5987e1440c47673543d96752df8d44ab9c7"
+  resolved "https://registry.npmjs.org/tsutils/-/tsutils-2.21.2.tgz#902aa5987e1440c47673543d96752df8d44ab9c7"
   dependencies:
     tslib "^1.8.1"
 
