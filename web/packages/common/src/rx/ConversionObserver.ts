@@ -34,7 +34,6 @@ export class ConversionObserver<S, D> implements Observer<D> {
 
     public complete(): void {
         this.source.complete();
-    };
-
+    }
 
 }

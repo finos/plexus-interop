@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { transportProtocol as plexus } from "@plexus-interop/protocol";
-import {ServiceFrame} from "./ServiceFrame";
+import { ServiceFrame } from "./ServiceFrame";
 
 export class ConnectionOpenFrame extends ServiceFrame<plexus.interop.transport.protocol.IConnectionOpenHeader> {
 
@@ -28,16 +28,16 @@ export class ConnectionOpenFrame extends ServiceFrame<plexus.interop.transport.p
         return new ConnectionOpenFrame({
             open: headerData
         });
-    } 
+    }
 
-     public getInternalHeader(): plexus.interop.transport.protocol.Header {
-         return plexus.interop.transport.protocol.Header.create({
-             open: this.getHeaderData()
-         });
-     }
+    public getInternalHeader(): plexus.interop.transport.protocol.Header {
+        return plexus.interop.transport.protocol.Header.create({
+            open: this.getHeaderData()
+        });
+    }
 
-     public getHeaderData(): plexus.interop.transport.protocol.IConnectionOpenHeader {
-         return this._header.open as plexus.interop.transport.protocol.IConnectionOpenHeader;
-     } 
-        
+    public getHeaderData(): plexus.interop.transport.protocol.IConnectionOpenHeader {
+        return this._header.open as plexus.interop.transport.protocol.IConnectionOpenHeader;
+    }
+
 }

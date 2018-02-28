@@ -21,7 +21,7 @@ import { AsyncHelper } from "../async/AsyncHelper";
 export abstract class BlockingQueue<T> {
     public abstract async blockingDequeue(cancellationToken?: CancellationToken): Promise<T>;
     public abstract async enqueue(el: T): Promise<void>;
-    public abstract size(): number
+    public abstract size(): number;
     public abstract clear(): void;
     public abstract peek(): T;
     public abstract dequeue(): T;
