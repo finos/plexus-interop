@@ -69,13 +69,13 @@
             {
                 return false;
             }
-            var tcs = new TaskCompletionSource<bool>();            
-                var threadPoolRegistration = ThreadPool.RegisterWaitForSingleObject(
+            var tcs = new TaskCompletionSource<bool>();
+            var threadPoolRegistration = ThreadPool.RegisterWaitForSingleObject(
                 handle,
-                (state, timedOut) => ((TaskCompletionSource<bool>)state).TrySetResult(!timedOut),
+                (state, timedOut) => ((TaskCompletionSource<bool>) state).TrySetResult(!timedOut),
                 tcs,
                 timeout,
-                true);            
+                true);
             tcs.Task.ContinueWith(_ =>
             {
                 threadPoolRegistration.Unregister(handle);
