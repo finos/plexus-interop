@@ -21,13 +21,11 @@ import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.resource.IResourceServiceProvider
 import com.google.inject.Inject
 import org.eclipse.emf.ecore.resource.Resource
-import org.eclipse.xtext.resource.IContainer
 
 class BaseCodeOutputGeneratorTest {
 
     @Inject IResourceServiceProvider.Registry rspr
     @Inject IQualifiedNameConverter converter
-    @Inject IContainer.Manager manager
 
     def void printExportedObjects(Resource resource) {
         val resServiceProvider = rspr.getResourceServiceProvider(resource.URI)

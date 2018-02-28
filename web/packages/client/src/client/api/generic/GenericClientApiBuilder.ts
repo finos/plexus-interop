@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { GenericClientApi } from "./GenericClientApi";
-import { TransportConnection } from "@plexus-interop/transport-common";
+import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { GenericClientFactory } from "../../generic/GenericClientFactory";
 import { ClientConnectRequest } from "@plexus-interop/client-api";
 import { GenericClientApiImpl } from "./GenericClientApiImpl";
@@ -31,7 +31,8 @@ export class GenericClientApiBuilder {
 
     private log: Logger = LoggerFactory.getLogger("GenericClientApiBuilder");
 
-    private applicationInfo: ClientConnectRequest;
+    private applicationId: string;
+    private applicationInstanceId?: UniqueId;
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
     private marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider();
@@ -45,8 +46,19 @@ export class GenericClientApiBuilder {
         return this;
     }
 
+    public withApplicationId(appId: string): GenericClientApiBuilder {
+        this.applicationId = appId;
+        return this;
+    }
+
+    public withAppInstanceId(instanceId: UniqueId): GenericClientApiBuilder {
+        this.applicationInstanceId = instanceId;
+        return this;
+    }
+
     public withClientDetails(clientId: ClientConnectRequest): GenericClientApiBuilder {
-        this.applicationInfo = clientId;
+        this.applicationId = clientId.applicationId;
+        this.applicationInstanceId = clientId.applicationInstanceId;
         return this;
     }
 
@@ -71,14 +83,18 @@ export class GenericClientApiBuilder {
     }
 
     public connect(): Promise<GenericClientApi> {
+        const appInfo = {
+            applicationId: this.applicationId,
+            applicationInstanceId: this.applicationInstanceId
+        };
         return this.validateState()
             .then(() => this.transportConnectionProvider())
             .then(connection => {
                 this.log.info("Connection established");
-                return new GenericClientFactory(connection).createClient(this.applicationInfo);
+                return new GenericClientFactory(connection).createClient(appInfo);
             })
             .then(genericClient => {
-                const actionsHost = new GenericInvocationsHost(this.applicationInfo.applicationId, genericClient,
+                const actionsHost = new GenericInvocationsHost(appInfo.applicationId, genericClient,
                     this.bidiStreamingInvocationHandlers,
                     this.unaryInvocationHandlers,
                     this.serverStreamingInvocationHandlers);
@@ -97,7 +113,7 @@ export class GenericClientApiBuilder {
         if (!this.transportConnectionProvider) {
             throw "Transport Connection Provider is not defined";
         }
-        if (!this.applicationInfo || !this.applicationInfo.applicationId) {
+        if (!this.applicationId || !this.applicationInstanceId) {
             throw "Application ID is not defined";
         }
     }

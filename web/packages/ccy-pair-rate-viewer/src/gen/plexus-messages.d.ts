@@ -23,11 +23,11 @@ export namespace fx {
     interface ICcyPair {
 
         /** CcyPair ccyPairName */
-        ccyPairName?: string;
+        ccyPairName?: (string|null);
     }
 
     /** Represents a CcyPair. */
-    class CcyPair {
+    class CcyPair implements ICcyPair {
 
         /**
          * Constructs a new CcyPair.
@@ -113,14 +113,14 @@ export namespace fx {
     interface ICcyPairRate {
 
         /** CcyPairRate ccyPairName */
-        ccyPairName?: string;
+        ccyPairName?: (string|null);
 
         /** CcyPairRate rate */
-        rate?: number;
+        rate?: (number|null);
     }
 
     /** Represents a CcyPairRate. */
-    class CcyPairRate {
+    class CcyPairRate implements ICcyPairRate {
 
         /**
          * Constructs a new CcyPairRate.

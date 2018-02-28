@@ -123,7 +123,7 @@ export class DiscoveryTests extends BaseEchoTest {
             }
             let receivedResponse: plexus.plexus.interop.testing.IEchoRequest | null = null;
             return new Promise<void>((resolve, reject) => {
-                client.sendDiscoveredServerStreamingRequest(method.providedMethod as ProvidedMethodReference, this.encodeRequestDto(echoRequest), {
+                client.sendRawServerStreamingRequest(method.providedMethod as ProvidedMethodReference, this.encodeRequestDto(echoRequest), {
                     next: (response) => {
                         receivedResponse = this.decodeRequestDto(response);
                     },
@@ -168,7 +168,7 @@ export class DiscoveryTests extends BaseEchoTest {
                 throw new Error("Provided method is empty");
             }
             return new Promise<void>(async (resolve, reject) => {
-                const streamingClient = await client.sendDiscoveredBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
+                const streamingClient = await client.sendRawBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
                     next: (serverResponse) => {},
                     error: (e) => {
                         reject(e);
@@ -186,7 +186,7 @@ export class DiscoveryTests extends BaseEchoTest {
         }
     }
 
-    public async testClientCanInvokeDiscoveredMethod(): Promise<void> {
+    public async testClientCanInvokeDiscoveredMethodPassingRawData(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         const handler = new UnaryServiceHandler(async (context, request) => request);
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
@@ -204,7 +204,7 @@ export class DiscoveryTests extends BaseEchoTest {
             this.assertDiscoveredMethodValid(method);
             // invoke discovered
             await new Promise((invocationResolve, invocationReject) => {
-                client.sendDiscoveredUnaryRequest(
+                client.sendRawUnaryRequest(
                     method.providedMethod as ProvidedMethodReference,
                     this.encodeRequestDto(echoRequest), {
                         value: (response: ArrayBuffer) => {
@@ -221,17 +221,40 @@ export class DiscoveryTests extends BaseEchoTest {
         await this.clientsSetup.disconnect(client, server);
     }
 
-    private assertDiscoveredMethodValid(discoveredMethod: DiscoveredMethod) {
-        expect(discoveredMethod.providedMethod).to.not.be.undefined;
-        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-    }
-
-    private assertDiscoveredServiceMethodValid(discoveredMethod: DiscoveredServiceMethod) {
-        expect(discoveredMethod.methodId).to.not.be.undefined;
-        expect(discoveredMethod.methodTitle).to.not.be.undefined;
-        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+    public async testClientCanInvokeDiscoveredMethodPassingObject(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        const handler = new UnaryServiceHandler(async (context, request) => request);
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const discoveryResponse = await client.discoverMethod({
+            consumedMethod: {
+                consumedService: {
+                    serviceId: "plexus.interop.testing.EchoService"
+                },
+                methodId: "Unary"
+            }
+        });
+        if (discoveryResponse.methods) {
+            expect(discoveryResponse.methods.length).to.be.eq(1);
+            const method = discoveryResponse.methods[0];
+            this.assertDiscoveredMethodValid(method);
+            // invoke discovered
+            await new Promise((invocationResolve, invocationReject) => {
+                client.sendUnaryRequest(
+                    method.providedMethod as ProvidedMethodReference,
+                    echoRequest, {
+                        value: response => {
+                            this.assertEqual(echoRequest, response);
+                            invocationResolve();
+                        },
+                        error: (e) => invocationReject(e)
+                    }, 
+                    plexus.plexus.interop.testing.EchoRequest, 
+                    plexus.plexus.interop.testing.EchoRequest);
+            });
+        } else {
+            throw "Empty response";
+        }
+        await this.clientsSetup.disconnect(client, server);
     }
 
     public async testMethodDiscoveredByOutputMessageId(): Promise<void> {
@@ -265,6 +288,19 @@ export class DiscoveryTests extends BaseEchoTest {
             throw "Empty response";
         }
         await this.clientsSetup.disconnect(client, server);
+    }
+    
+    private assertDiscoveredMethodValid(discoveredMethod: DiscoveredMethod) {
+        expect(discoveredMethod.providedMethod).to.not.be.undefined;
+        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+    }
+
+    private assertDiscoveredServiceMethodValid(discoveredMethod: DiscoveredServiceMethod) {
+        expect(discoveredMethod.methodId).to.not.be.undefined;
+        expect(discoveredMethod.methodTitle).to.not.be.undefined;
+        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
     }
 
 }

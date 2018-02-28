@@ -26,7 +26,7 @@ const fs = require('fs');
 
 const install = process.argv.indexOf('--install') !== -1;
 
-console.log(`Preparing .npmrc file for ${install ? "install" : "publish"}`)
+console.log(`Preparing .npmrc file for ${install ? "install" : "publish"}`);
 
 const postfix = install ? "_INSTALL" : "_PUBLISH";
 
@@ -73,6 +73,8 @@ if (!!buildRunner) {
             registry = registry.replace("http:", "");
         }
 
+        const disableStrictSsl = process.env['NPM_STRICT_SSL'] === 'false';
+
         fs.readFile(templateFile, 'utf8', function (err,data) {
             if (err) {
                 return console.log(err);
@@ -80,10 +82,30 @@ if (!!buildRunner) {
             data = data.replace(new RegExp(`\\\${${registryVar}}`, 'g'), registry);
             data = data.replace(`\${${authTokenVar}}`, authToken);
             data = data.replace(`\${${authUserVar}}`, user);
+
+            if (disableStrictSsl) {
+                console.log('Updating strict ssl setting');
+                data += `\nstrict-ssl=false`;
+            }
+            
             fs.writeFile('.npmrc', data, 'utf8', function (err) {
                 if (err) return console.log(err);
             });
         });
+
+        if (disableStrictSsl) {
+            console.log('Generating .yarnrc');
+            fs.readFile('.yarnrc', 'utf8', function (err,data) {
+                if (err) {
+                    return console.log(err);
+                }    
+                data = 'workspaces-experimental true';
+                data += `\nstrict-ssl false`;
+                fs.writeFile('.yarnrc', data, 'utf8', function (err) {
+                    if (err) return console.log(err);
+                });
+            });
+        }
 
     }
 

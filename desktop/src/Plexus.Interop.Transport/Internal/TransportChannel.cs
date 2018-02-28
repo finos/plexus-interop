@@ -26,7 +26,7 @@
     {
         private readonly ILogger _log;
         private readonly TransportChannelSendProcessor _sendProcessor;
-        private readonly IChannel<TransportMessageFrame> _receiveBuffer = new BufferedChannel<TransportMessageFrame>(3);
+        private readonly IChannel<TransportMessageFrame> _receiveBuffer = new BufferedChannel<TransportMessageFrame>(3, TimeoutConstants.Timeout10Sec);
         private readonly TransportChannelHeaderHandler<Task, ChannelMessage> _incomingMessageHandler;        
 
         public TransportChannel(
@@ -62,10 +62,20 @@
 
         public async Task HandleIncomingAsync(ChannelMessage message)
         {
-            _log.Trace("Received message {0}", message);
-            using (message.Header)
+            try
             {
+                _log.Trace("Handling incoming message {0}", message);
                 await message.Header.Handle(_incomingMessageHandler, message).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {                
+                _log.Error(ex, "Exception while handling incoming message");
+                _sendProcessor.Out.TryTerminate(ex);
+                _receiveBuffer.Out.TryTerminate(ex);
+            }
+            finally
+            {
+                message.Header.Dispose();
             }
         }
 
@@ -78,7 +88,7 @@
         {
             try
             {
-                await _receiveBuffer.Out.WriteAsync(new TransportMessageFrame(message.Payload.Value, header.HasMore));
+                await _receiveBuffer.Out.WriteAsync(new TransportMessageFrame(message.Payload.Value, header.HasMore)).ConfigureAwait(false);
             }
             catch
             {

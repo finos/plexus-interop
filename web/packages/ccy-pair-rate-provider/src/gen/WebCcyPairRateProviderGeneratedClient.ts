@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -30,22 +30,24 @@ import * as plexus from "./plexus-messages";
 export abstract class WebCcyPairRateProviderClient {
 
 
-    public abstract sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient>;
+    public abstract sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestMarshaller: any, responseType: any): Promise<InvocationClient>;
 
-    public abstract sendStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
+    public abstract sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
+
+    public abstract sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient>;
+
+    public abstract sendRawServerStreamingRequest(
+        invocationInfo: InvocationRequestInfo,
+        request: ArrayBuffer,
+        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
+
+    public abstract sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
+
+    public abstract sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
 
     public abstract discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse>;
 
     public abstract discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
-
-    public abstract sendDiscoveredUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
-
-    public abstract sendDiscoveredBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
-
-    public abstract sendDiscoveredServerStreamingRequest(
-        methodReference: ProvidedMethodReference,
-        request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
 
     public abstract disconnect(completion?: Completion): Promise<void>;
 
@@ -62,6 +64,33 @@ class WebCcyPairRateProviderClientImpl implements WebCcyPairRateProviderClient {
     ) { }
 
 
+    public sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
+        return this.genericClient.sendUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
+    }
+
+    public sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
+        return this.genericClient.sendRawUnaryRequest(invocationInfo, request, responseHandler);
+    }
+
+    public sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient> {
+        return this.genericClient.sendServerStreamingRequest(invocationInfo, request, responseObserver, requestType, responseType);
+    }
+
+    public sendRawServerStreamingRequest(
+        invocationInfo: GenericRequest,
+        request: ArrayBuffer,
+        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
+        return this.genericClient.sendRawServerStreamingRequest(invocationInfo, request, responseObserver);
+    }
+
+    public sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
+        return this.genericClient.sendBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
+    }
+
+    public sendRawBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
+        return this.genericClient.sendRawBidirectionalStreamingRequest(methodReference, responseObserver);
+    }
+
     public discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse> {
         return this.genericClient.discoverService(discoveryRequest);
     }
@@ -70,31 +99,8 @@ class WebCcyPairRateProviderClientImpl implements WebCcyPairRateProviderClient {
         return this.genericClient.discoverMethod(discoveryRequest);
     }
 
-    public sendDiscoveredUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
-        return this.genericClient.sendDiscoveredUnaryRequest(methodReference, request, responseHandler);
-    }
-
-    public sendDiscoveredBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
-        return this.genericClient.sendDiscoveredBidirectionalStreamingRequest(methodReference, responseObserver);
-    }
-
-    public sendDiscoveredServerStreamingRequest(
-        methodReference: ProvidedMethodReference,
-        request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
-        return this.genericClient.sendDiscoveredServerStreamingRequest(methodReference, request, responseObserver);
-    }
-
     public disconnect(completion?: Completion): Promise<void> {
         return this.genericClient.disconnect(completion);
-    }
-
-    public sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
-        return this.genericClient.sendDynamicUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
-    }
-
-    public sendStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
-        return this.genericClient.sendDynamicBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
     }
 
 }
@@ -146,6 +152,16 @@ export class WebCcyPairRateProviderClientBuilder {
 
     public withClientDetails(clientId: ClientConnectRequest): WebCcyPairRateProviderClientBuilder {
         this.clientDetails = clientId;
+        return this;
+    }
+
+    public withAppInstanceId(appInstanceId: UniqueId): WebCcyPairRateProviderClientBuilder {
+        this.clientDetails.applicationInstanceId = appInstanceId;
+        return this;
+    }
+
+    public withAppId(appId: string): WebCcyPairRateProviderClientBuilder {
+        this.clientDetails.applicationId = appId;
         return this;
     }
 

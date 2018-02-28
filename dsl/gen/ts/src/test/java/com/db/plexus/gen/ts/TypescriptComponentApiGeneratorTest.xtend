@@ -20,26 +20,13 @@ import org.eclipse.xtext.junit4.XtextRunner
 import org.eclipse.xtext.junit4.InjectWith
 import org.junit.runner.RunWith
 import com.google.inject.Inject
-import org.eclipse.xtext.junit4.util.ParseHelper
 import org.junit.Test
-import static org.junit.Assert.*;
-import com.google.inject.name.Named
-import org.eclipse.xtext.resource.IResourceServiceProvider
-import org.eclipse.xtext.naming.IQualifiedNameConverter
-import org.eclipse.emf.ecore.resource.Resource
-import java.nio.file.Files
-import java.io.File
-import com.db.plexus.interop.dsl.gen.CodeOutputGenerator
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
-import com.db.plexus.interop.dsl.gen.ApplicationCodeGenerator
 import com.db.plexus.interop.dsl.gen.ts.TypescriptApplicationApiGenerator
 import java.util.Arrays
 import com.db.plexus.interop.dsl.gen.InteropLangUtils
 import org.eclipse.xtext.resource.XtextResourceSet
-import java.nio.file.Paths
 import org.eclipse.emf.common.util.URI
-import com.db.plexus.interop.dsl.gen.util.FileUtils
-import org.eclipse.xtext.EcoreUtil2
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))
