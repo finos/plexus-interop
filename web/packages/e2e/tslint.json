@@ -1,4 +1,11 @@
 {
+    "linterOptions": {
+      "exclude": [
+          "bin",
+          "src/**/gen/*.ts",
+          "src/**/*Generated*.ts"
+      ]
+    },
     "rules": {
         "adjacent-overload-signatures": true,
         "member-access": true,
