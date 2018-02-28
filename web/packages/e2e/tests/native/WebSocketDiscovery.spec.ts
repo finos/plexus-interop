@@ -49,7 +49,12 @@ describe("Client: Web Socket Discovery", () => {
 
     it("Can invoke discovered unary method passing serialized data", function() {
         this.timeout(3000);
-        return discoveryTests.testClientCanInvokeDiscoveredMethod();
+        return discoveryTests.testClientCanInvokeDiscoveredMethodPassingRawData();
+    });
+
+    it("Can invoke discovered unary method passing plain object", function() {
+        this.timeout(3000);
+        return discoveryTests.testClientCanInvokeDiscoveredMethodPassingObject();
     });
 
     it("Can invoke discovered server streaming method passing serialized data", function() {

@@ -24,19 +24,21 @@ import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { Completion } from "@plexus-interop/client-api";
 import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
 import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
-import { ProvidedMethodReference } from "@plexus-interop/client-api";
+import { GenericRequest } from "@plexus-interop/client-api";
 
 export interface GenericClientApi {
 
-    sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
+    sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient>;
+    
+    sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
 
-    sendDynamicUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient>;
-
-    sendBidirectionalStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
-
-    sendDynamicBidirectionalStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
-
-    sendServerStreamingRequest(
+    sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
+    
+    sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
+    
+    sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient>;
+    
+    sendRawServerStreamingRequest(
         invocationInfo: InvocationRequestInfo,
         request: ArrayBuffer,
         responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
@@ -44,15 +46,6 @@ export interface GenericClientApi {
     discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse>;
 
     discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
-
-    sendDiscoveredUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
-
-    sendDiscoveredBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;    
-
-    sendDiscoveredServerStreamingRequest(
-        methodReference: ProvidedMethodReference,
-        request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
 
     disconnect(completion?: Completion): Promise<void>;
 

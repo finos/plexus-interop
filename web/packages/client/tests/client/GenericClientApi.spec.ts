@@ -20,7 +20,7 @@ import { GenericClientImpl } from "../../src/client/generic/GenericClientImpl";
 import { RequestedInvocation } from "../../src/client/generic/RequestedInvocation";
 import { Observer } from "@plexus-interop/common";
 import { createRemoteInvocationInfo, MockMarshallerProvider } from "./client-mocks";
-import { clientProtocol as plexus, Completion, ErrorCompletion, SuccessCompletion } from "@plexus-interop/protocol"
+import { clientProtocol as plexus, Completion, ErrorCompletion, SuccessCompletion } from "@plexus-interop/protocol";
 import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
 import { ChannelObserver } from "@plexus-interop/transport-common";
 
@@ -45,7 +45,7 @@ describe("GenericClientApi", () => {
             .thenReturn(Promise.resolve(instance(mockInvocation)));
 
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
-        await clientApi.sendUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
+        await clientApi.sendRawUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
             value: (v) => {
                 expect(v).toEqual(responsePayload);
                 done();
@@ -77,7 +77,7 @@ describe("GenericClientApi", () => {
 
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
 
-        clientApi.sendUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
+        clientApi.sendRawUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
             value: (v) => { },
             error: () => done()
         });
@@ -104,7 +104,7 @@ describe("GenericClientApi", () => {
 
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
 
-        clientApi.sendUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
+        clientApi.sendRawUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
             value: (v) => { },
             error: () => done()
         });
@@ -129,7 +129,7 @@ describe("GenericClientApi", () => {
             .thenReturn(Promise.resolve(instance(mockInvocation)));
 
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
-        clientApi.sendUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
+        clientApi.sendRawUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
             value: (v) => { },
             error: () => { }
         }).catch(() => done());
@@ -144,7 +144,7 @@ describe("GenericClientApi", () => {
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
         const requestPayload = new Uint8Array([1, 2, 3]).buffer;
 
-        clientApi.sendUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
+        clientApi.sendRawUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
             value: (v) => { },
             error: () => { }
         }).catch(() => done());
@@ -167,7 +167,7 @@ describe("GenericClientApi", () => {
             .thenReturn(Promise.resolve(instance(mockInvocation)));
 
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
-        const invocationClient = await clientApi.sendUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
+        const invocationClient = await clientApi.sendRawUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
             value: (v) => {
                 fail("Not expected");
             },
@@ -201,7 +201,7 @@ describe("GenericClientApi", () => {
             .thenReturn(Promise.resolve(instance(mockInvocation)));
 
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
-        const streamingInvocationClient = await clientApi.sendBidirectionalStreamingRequest(createRemoteInvocationInfo(), {
+        const streamingInvocationClient = await clientApi.sendRawBidirectionalStreamingRequest(createRemoteInvocationInfo(), {
             next: (v) => {
                 fail("Not expected");
             },
@@ -244,7 +244,7 @@ describe("GenericClientApi", () => {
 
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
         let count = 0;
-        const streamingInvocationClient = await clientApi.sendBidirectionalStreamingRequest(createRemoteInvocationInfo(), {
+        const streamingInvocationClient = await clientApi.sendRawBidirectionalStreamingRequest(createRemoteInvocationInfo(), {
             next: (v) => {
                 expect(v).toBe(responsePayload);
                 count++;
