@@ -122,7 +122,7 @@ class CsharpCodeGenerator  {
 							«application.clientName».I«providedService.aliasOrName»Impl «providedService.aliasOrName.toFirstLower»
 						«ENDFOR»
 					) {
-						«FOR providedService: application.providedServices SEPARATOR ','»
+						«FOR providedService: application.providedServices»
 							_«providedService.aliasOrName.toFirstLower»Binder = new «application.clientName».«providedService.aliasOrName»Binder(«providedService.aliasOrName.toFirstLower»);
 						«ENDFOR»
 					}
