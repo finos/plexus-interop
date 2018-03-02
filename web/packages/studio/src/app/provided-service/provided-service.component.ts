@@ -55,11 +55,12 @@ export class ProvidedServiceComponent implements OnInit {
         this.providedMethod = plexus.providedMethod.method;
         this.interopClient = plexus.services.interopClient;
         this.createDefaultMessage();
+        this.intercept();
       }));
   }
 
   printRequest(requestJson) {
-    this.log.info(`"Received request: ${this.format(requestJson)}`);
+    this.log.info(`Received request: ${this.format(requestJson)}`);
   }
 
   handleError(e: any) {
@@ -70,7 +71,7 @@ export class ProvidedServiceComponent implements OnInit {
     this.log.info("Invocation completed received");
   }
 
-  intercept() {
+  updateResponse(contentJson: string, messagesToSend: number, messagesPeriodInMillis: number): void {
 
     if (this.interopClient && this.providedMethod) {
 
@@ -84,20 +85,20 @@ export class ProvidedServiceComponent implements OnInit {
             methodId,
             async requestJson => {
               this.printRequest(requestJson);
-              return this.messageContent;
+              return contentJson;
             });
           break;
         case MethodType.ServerStreaming:
           this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
             this.printRequest(request);
-            this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
+            this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client);
           });
           break;
         case MethodType.ClientStreaming:
         case MethodType.DuplexStreaming:
           this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
-            this.log.info(`Sending ${this.messagesToSend} messages`);
-            this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
+            this.log.info(`Sending ${messagesToSend} messages`);
+            this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client);
             return {
               next: request => {
                 this.printRequest(request);
@@ -110,9 +111,12 @@ export class ProvidedServiceComponent implements OnInit {
           });
           break;
       }
-      this.log.info("Set interceptor");
-
+      this.log.info("Response updated");
     }
+  }
+
+  intercept() {
+    this.updateResponse(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis);
   }
 
   format(data) {
@@ -127,7 +131,7 @@ export class ProvidedServiceComponent implements OnInit {
         this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client);
       }, intervalInMillis);
     } else {
-      this.log.info("Sending completion");      
+      this.log.info("Sending completion");
       client.complete();
     }
   }
