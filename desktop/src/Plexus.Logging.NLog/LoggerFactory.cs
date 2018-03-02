@@ -22,6 +22,9 @@ namespace Plexus.Logging.NLog
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using NLogManager = global::NLog.LogManager;
+#if NETSTANDARD1_6
+    using global::NLog.Extensions.Logging;
+#endif
 
     internal sealed class LoggerFactory : ILoggerFactory
     {
@@ -54,7 +57,8 @@ namespace Plexus.Logging.NLog
 #if NETSTANDARD1_6
         public void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
-            global::NLog.Extensions.Logging.ConfigureExtensions.ConfigureNLog(loggerFactory, NLogManager.Configuration);
+            loggerFactory.ConfigureNLog(NLogManager.Configuration);
+            loggerFactory.AddNLog();
         }
 #endif
 

@@ -11,6 +11,7 @@
     <None Include="Internal\Client.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
     <ProjectReference Include="..\Plexus.Common.Contracts\Plexus.Common.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Client.Marshalling.Contracts\Plexus.Interop.Client.Marshalling.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Protocol.Contracts\Plexus.Interop.Protocol.Contracts.csproj" />
