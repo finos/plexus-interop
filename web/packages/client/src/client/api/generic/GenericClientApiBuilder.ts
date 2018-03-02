@@ -98,7 +98,8 @@ export class GenericClientApiBuilder {
                     this.bidiStreamingInvocationHandlers,
                     this.unaryInvocationHandlers,
                     this.serverStreamingInvocationHandlers);
-                return actionsHost.start().then(() => new GenericClientApiImpl(genericClient, this.marshallerProvider));
+                return actionsHost.start()
+                    .then(() => new GenericClientApiImpl(genericClient, this.marshallerProvider));
             })
             .catch(error => {
                 this.log.error("Unable to create client", error);
