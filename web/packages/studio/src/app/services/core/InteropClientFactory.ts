@@ -20,7 +20,7 @@ import { Injectable } from "@angular/core";
 import { TransportConnectionProvider } from "../transport/TransportConnectionProvider";
 import { InteropRegistryService, ProvidedMethod, ProvidedService } from "@plexus-interop/broker";
 import { GenericClientApiBuilder, MethodType, GenericUnaryInvocationHandler, StreamingInvocationClient, GenericServerStreamingInvocationHandler, GenericBidiStreamingInvocationHandler } from "@plexus-interop/client";
-import { UniqueId } from "@plexus-interop/protocol";
+import { UniqueId, ClientError } from '@plexus-interop/protocol';
 import { flatMap, Logger, LoggerFactory, Observer } from "@plexus-interop/common";
 import { GenericClientWrapper } from "./GenericClientWrapper";
 import { DynamicMarshallerFactory, Marshaller } from "@plexus-interop/broker";
@@ -61,7 +61,8 @@ export class InteropClientFactory {
 
         const marshallerFactory = new DynamicMarshallerFactory(interopRegistryService.getRegistry());
         const defaultGenerator = new DefaultMessageGenerator(interopRegistryService);
-
+        const notInterceptedMsg = "Plexus Studio: Not intercepted";
+        const notInterceptedError: Error = new Error(notInterceptedMsg);
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .forEach(pm => {
                 const fullName = this.fullName(pm);
@@ -70,24 +71,23 @@ export class InteropClientFactory {
                 const responseMarshaller = marshallerFactory.getMarshaller(pm.method.outputMessage.id);
                 switch (pm.method.type) {
                     case MethodType.Unary:
-                        unaryHandlers.set(fullName, async requestJson => defaultResponse);
+                        unaryHandlers.set(fullName, async requestJson => Promise.reject(notInterceptedError));
                         genericClientBuilder.withUnaryInvocationHandler(this.createUnaryHandler(pm, requestMarshaller, responseMarshaller, unaryHandlers));
                         break;
                     case MethodType.ServerStreaming:
-                        serverStreamingHandlers.set(fullName, (request, hostClient) => {
-                            hostClient.next(defaultResponse);
-                            hostClient.complete();
-                        });
+                        serverStreamingHandlers.set(fullName, (request, hostClient) => hostClient.error(new ClientError(notInterceptedMsg)));
                         genericClientBuilder.withServerStreamingInvocationHandler(this.createServerStreamingHandler(pm, requestMarshaller, responseMarshaller, serverStreamingHandlers));
                         break;
                     case MethodType.DuplexStreaming:
                     case MethodType.ClientStreaming:
-                        bidiStreamingHandlers.set(fullName, (hostClient) => {
-                            let last;
+                        bidiStreamingHandlers.set(fullName, hostClient => {
                             return {
-                                next: v => hostClient.next(defaultResponse),
-                                complete: () => hostClient.complete(),
-                                error: e => {}
+                                next: v => {
+                                    hostClient.error(new ClientError(notInterceptedMsg));
+                                    hostClient.complete();                            
+                                },
+                                complete: () => {},
+                                error: e => console.log("Unexpected error from remote", e)
                             };
                         });
                         genericClientBuilder.withBidiStreamingInvocationHandler(this.createBidiStreamingHandlers(pm, requestMarshaller, responseMarshaller, bidiStreamingHandlers));
