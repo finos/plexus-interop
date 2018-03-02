@@ -7,7 +7,7 @@
     <hr>
     <div class="form-group footer">
         <label for="plexus-logs-area">Plexus Logs:</label>
-        <textarea id="plexus-logs-area" disabled="disabled" class="form-control" rows="12" [(ngModel)]="plexusLogs"></textarea>
+        <textarea #plexusLogsArea id="plexus-logs-area" disabled="disabled" class="form-control" rows="12" [(ngModel)]="plexusLogs"></textarea>
         <button id="clear-plexus-logs-btn" class="btn btn-link" type="button" (click)="clearLogs()">Clear</button>
     </div>    
   </div>

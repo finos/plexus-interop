@@ -20,41 +20,46 @@ import { LoggerFactory, LogLevel, Logger, TimeUtils } from '@plexus-interop/comm
 import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { ElementRef, Renderer2 } from '@angular/core';
 import { State } from './services/ui/RootReducers';
+import { AfterViewChecked, AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, OnDestroy {
-  
+export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit {
+
+  @ViewChild('plexusLogsArea') logsTextArea: ElementRef;
+
   title = 'Plexus Studio';
   plexusLogs = '';
-  
-  constructor(private store: Store<State>) {}
+
+  constructor(private store: Store<State>) { }
 
   private loggerDelegateRegistration: { unregister: () => void };
-  
+
   private logger: Logger;
 
   public ngOnInit(): void {
 
     LoggerFactory.setLogLevel(LogLevel.DEBUG);
-    
+
     this.loggerDelegateRegistration = LoggerFactory.registerDelegate({
       log: (logLevel: LogLevel, msg: string, args: any[]) => {
+
         if (logLevel <= LogLevel.DEBUG) {
           // Too many logs in output
           return;
         }
 
         let message = `[${TimeUtils.format(new Date())}] ${LogLevel[logLevel]} ${msg}`;
+
         if (args && args.length > 0) {
           message += '| args: ' + args;
         }
 
         if (this.plexusLogs) {
-          this.plexusLogs = `${message}\n${this.plexusLogs}`;
+          this.plexusLogs = `${this.plexusLogs}\n${message}`;
         } else {
           this.plexusLogs = message;
         }
@@ -68,11 +73,26 @@ export class AppComponent implements OnInit, OnDestroy {
     this.store.dispatch({
       type: AppActions.AUTO_CONNECT
     });
-    
+
+  }
+
+  public ngAfterViewInit(): void {
+  }
+
+  public ngAfterViewChecked(): void {
+    this.scrollLogsBottom();
   }
 
   public ngOnDestroy(): void {
     this.loggerDelegateRegistration.unregister();
+  }
+
+  public scrollLogsBottom(): void {
+    try {
+      this.logsTextArea.nativeElement.scrollTop = this.logsTextArea.nativeElement.scrollHeight;
+    } catch (e) {
+      console.log("Unable to scroll", e);
+    }
   }
 
   public clearLogs(): void {
