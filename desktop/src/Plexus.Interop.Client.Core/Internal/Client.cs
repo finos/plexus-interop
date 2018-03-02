@@ -318,7 +318,7 @@ namespace Plexus.Interop.Internal
             {
                 _log.Debug("Service discovery {0}", query);
                 var response = await _discoveryService.DiscoverAsync(query, online).ConfigureAwait(false);
-                _log.Debug("Service discovery response: {0}", response);
+                _log.Debug("Service discovery response: {0}", response.FormatEnumerable());
                 return response;
             });
             _runningTasks[task] = Nothing.Instance;
