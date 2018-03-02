@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
 
-namespace Plexus.Logging.NLog
+namespace Plexus.Logging.CommonLogging
 {
+    using System;
+
     public sealed class LoggingInitializer : IDisposable
     {
         private readonly LoggerFactory _loggerFactory = new LoggerFactory();
@@ -27,13 +28,12 @@ namespace Plexus.Logging.NLog
         {
             LogConfig.LoggerFactory = _loggerFactory;
             _logger = LogManager.GetLogger<LoggingInitializer>();
-            _logger.Info("---------- NLog Logging initialized ----------");
+            _logger.Info("---------- Common Logging initialized ----------");
         }
 
         public void Dispose()
         {
-            _loggerFactory.Flush();
-            _logger.Info("---------- NLog Logging uninitialized---------");
+            _logger.Info("---------- Common Logging uninitialized---------");
             LogConfig.LoggerFactory = null;
         }
     }

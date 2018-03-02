@@ -44,7 +44,7 @@ namespace Plexus.Logging.NLog
         public void Log(LogLevel logLevel, Exception exception, string message)
         {
             var level = ConvertLevel(logLevel);
-            if (_logger.IsEnabled(level))
+            if (IsLogLevelEnabled(logLevel))
             {                
                 _logger.Log(level, exception, message, EmptyArgs);
             }
