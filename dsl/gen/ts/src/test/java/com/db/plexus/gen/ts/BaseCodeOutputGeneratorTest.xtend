@@ -164,7 +164,7 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
  */
 export interface ComponentAClient extends GenericClientApi {
 
-    public abstract getExampleServiceProxy(): ExampleServiceProxy;
+    getExampleServiceProxy(): ExampleServiceProxy;
 
 }
 

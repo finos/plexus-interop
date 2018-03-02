@@ -88,7 +88,7 @@ class TypescriptApplicationApiGenerator implements ApplicationCodeGenerator {
 export interface «app.name»Client extends GenericClientApi  {
 
     «FOR consumedService : consumedServices »
-    public abstract get«consumedService.service.name»Proxy(): «consumedService.service.name»Proxy;
+    get«consumedService.service.name»Proxy(): «consumedService.service.name»Proxy;
     «ENDFOR»
 
 }
