@@ -23,6 +23,7 @@ import { InteropClient } from "../services/core/InteropClient";
 import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { StreamingInvocationClient, MethodType } from "@plexus-interop/client";
+import { createInvocationLogger } from '../services/core/invocation-utils';
 
 @Component({
   selector: 'app-provided-service',
@@ -41,6 +42,7 @@ export class ProvidedServiceComponent implements OnInit {
   messageContent: string;
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
+  requesId: number = 0;
 
   constructor(
     private actions: AppActions,
@@ -60,16 +62,16 @@ export class ProvidedServiceComponent implements OnInit {
       }));
   }
 
-  printRequest(requestJson) {
-    this.log.info(`Received request: ${this.format(requestJson)}`);
+  printRequest(requestJson, log) {
+    log.info(`Received request: ${this.format(requestJson)}`);
   }
 
-  handleError(e: any) {
-    this.log.error(`Error received`, e);
+  handleError(e: any, log) {
+    log.error(`Error received`, e);
   }
 
-  handleCompleted() {
-    this.log.info("Invocation completed received");
+  handleCompleted(log) {
+    log.info("Invocation completed received");
   }
 
   updateResponse(contentJson: string, messagesToSend: number, messagesPeriodInMillis: number): void {
@@ -83,28 +85,30 @@ export class ProvidedServiceComponent implements OnInit {
           serviceId,
           methodId,
           async requestJson => {
-            this.printRequest(requestJson);
+            const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);            
+            this.printRequest(requestJson, invocationLogger);
             return contentJson;
           });
         break;
       case MethodType.ServerStreaming:
         this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
-          this.printRequest(request);
-          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client);
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);                      
+          this.printRequest(request, invocationLogger);
+          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
         });
         break;
       case MethodType.ClientStreaming:
       case MethodType.DuplexStreaming:
         this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
-          this.log.info(`Sending ${messagesToSend} messages`);
-          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client);
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);                      
+          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
           return {
             next: request => {
-              this.printRequest(request);
+              this.printRequest(request, invocationLogger);
             },
-            error: e => this.handleError(e),
+            error: e => this.handleError(e, invocationLogger),
             complete: () => {
-              this.handleCompleted();
+              this.handleCompleted(invocationLogger);
             }
           };
         });
@@ -121,15 +125,15 @@ export class ProvidedServiceComponent implements OnInit {
     return JSON.stringify(JSON.parse(data), null, 2);
   }
 
-  sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>) {
+  sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>, logger: Logger) {
     if (leftToSend > 0) {
-      this.log.info("Sending message");
+      logger.info(`Sending message:\n${message}`);
       client.next(message);
       setTimeout(() => {
-        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client);
+        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client, logger);
       }, intervalInMillis);
     } else {
-      this.log.info("Sending completion");
+      logger.info("Sending completion");
       client.complete();
     }
   }

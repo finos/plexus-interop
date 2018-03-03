@@ -178,6 +178,10 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     this.spamStarted = false;
   }
 
+  isUnary() {
+    return this.consumedMethod.method.type === MethodType.Unary;
+  }
+
   isClientStreaming() {
     return this.consumedMethod.method.type === MethodType.ClientStreaming || this.consumedMethod.method.type === MethodType.DuplexStreaming;
   }

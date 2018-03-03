@@ -51,6 +51,6 @@
   </div>
 
   <button class="btn btn-primary" id="consumedInvokeBtn" (click)="sendRequest()" type="button">Send</button>
-  <button class="btn btn-primary" id="consumedStartUnarSpamBtn" [disabled]="spamStarted" [hidden]="isClientStreaming()" (click)="startUnarySpam()" type="button">Start Spam</button>
-  <button class="btn btn-primary" id="consumedStopUnarSpamBtn" [disabled]="!spamStarted" [hidden]="isClientStreaming()" (click)="stopUnarySpam()" type="button">Stop Spam</button>
+  <button class="btn btn-primary" id="consumedStartUnarSpamBtn" [disabled]="spamStarted" [hidden]="!isUnary()" (click)="startUnarySpam()" type="button">Start Spam</button>
+  <button class="btn btn-primary" id="consumedStopUnarSpamBtn" [disabled]="!spamStarted" [hidden]="!isUnary()" (click)="stopUnarySpam()" type="button">Stop Spam</button>
   <button class="btn btn-primary" id="consumedDiscoverBtn" (click)="discoverMethods()" type="button">Discover</button>
