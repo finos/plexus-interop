@@ -62,7 +62,7 @@ export abstract class GenericClientApiBase implements GenericClientApi {
     }
 
     public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
-        return this.discoverMethod(discoveryRequest);
+        return this.client.discoverMethod(discoveryRequest);
     }
 
     public disconnect(completion?: Completion | undefined): Promise<void> {

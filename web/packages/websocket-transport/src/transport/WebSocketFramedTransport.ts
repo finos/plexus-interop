@@ -61,12 +61,14 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             this.log.warn("Already disconnected");
             return Promise.resolve();
         }
-        if (!this.isSocketClosed()) {
+        if (this.isSocketClosed()) {
             this.log.warn("Socket is CLOSED, cancelling connection");
             this.cancelConnectionAndCleanUp();
+            return Promise.resolve();
+        } else {
+            this.throwIfNotConnectedOrDisconnectRequested();
+            return this.closeConnectionInternal();
         }
-        this.throwIfNotConnectedOrDisconnectRequested();
-        return this.closeConnectionInternal();
     }
 
     public connected(): boolean {
