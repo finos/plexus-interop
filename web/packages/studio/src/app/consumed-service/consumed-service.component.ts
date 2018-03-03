@@ -123,7 +123,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   async sendRequest() {
 
     const method = this.selectedDiscoveredMethod || this.consumedMethod;
-    const invocationLogger = createInvocationLogger(this.consumedMethod.method.type, ++this.requestId, this.log);
+    const invocationLogger = createInvocationLogger(this.consumedMethod.method.type, ++this.requestId, this.log, this.selectedDiscoveredMethod);
 
     const handler = {
       value: v => this.handleResponse(v, invocationLogger),
