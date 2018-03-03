@@ -107,6 +107,11 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     this.invocationStarted = new Date().getTime();
   }
 
+  async discoverMethods() {
+    const discovered = await this.interopClient.discoverAllMethods(this.consumedMethod);  
+    this.store.dispatch({type: AppActions.DISCOVER_METHODS_SUCCESS, payload: discovered});
+  }
+
   async sendRequest() {
 
     const handler = {
@@ -175,7 +180,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   createDefaultMessage() {
-    if (this.consumedMethod && this.interopClient) {
+    if (!this.messageContent && this.consumedMethod && this.interopClient) {
       const method = this.consumedMethod.method;
       this.messageContent = this.interopClient.createDefaultPayload(method.inputMessage.id);
       this.formatAndUpdateArea();

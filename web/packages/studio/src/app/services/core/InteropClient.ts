@@ -20,12 +20,16 @@ import { ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
 import { Observer } from "@plexus-interop/common";
 import { ServerStreamingStringHandler, UnaryStringHandler, BidiStreamingStringHandler } from "./StringHandlers";
+import { clientProtocol as plexus } from "@plexus-interop/protocol";
+
 
 export interface InteropClient {
 
     // core
 
     discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
+
+    discoverAllMethods(consumedMethod: ConsumedMethod): Promise<MethodDiscoveryResponse>;
 
     disconnect(): Promise<void>;
 
