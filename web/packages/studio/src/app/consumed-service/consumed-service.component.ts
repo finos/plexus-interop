@@ -200,7 +200,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
         this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client, logger);
       }, intervalInMillis);
     } else {
-      this.log.info("Sending invocation completion");
+      logger.info("Sending invocation completion");
       client.complete();
     }
   }
