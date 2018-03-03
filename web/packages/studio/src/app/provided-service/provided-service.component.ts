@@ -51,11 +51,12 @@ export class ProvidedServiceComponent implements OnInit {
     this.subscriptions.add(this.store
       .filter(state => !!state.plexus.providedMethod)
       .map(state => state.plexus)
+      .filter(plexus => !!plexus.services.interopClient && !!plexus.providedMethod)
       .subscribe(plexus => {
         this.providedMethod = plexus.providedMethod.method;
         this.interopClient = plexus.services.interopClient;
         this.createDefaultMessage();
-        this.intercept();
+        this.updateResponse(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis);
       }));
   }
 
@@ -73,50 +74,47 @@ export class ProvidedServiceComponent implements OnInit {
 
   updateResponse(contentJson: string, messagesToSend: number, messagesPeriodInMillis: number): void {
 
-    if (this.interopClient && this.providedMethod) {
+    const serviceId = this.providedMethod.providedService.service.id;
+    const methodId = this.providedMethod.method.name;
 
-      const serviceId = this.providedMethod.providedService.service.id;
-      const methodId = this.providedMethod.method.name;
-
-      switch (this.providedMethod.method.type) {
-        case MethodType.Unary:
-          this.interopClient.setUnaryActionHandler(
-            serviceId,
-            methodId,
-            async requestJson => {
-              this.printRequest(requestJson);
-              return contentJson;
-            });
-          break;
-        case MethodType.ServerStreaming:
-          this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
-            this.printRequest(request);
-            this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client);
+    switch (this.providedMethod.method.type) {
+      case MethodType.Unary:
+        this.interopClient.setUnaryActionHandler(
+          serviceId,
+          methodId,
+          async requestJson => {
+            this.printRequest(requestJson);
+            return contentJson;
           });
-          break;
-        case MethodType.ClientStreaming:
-        case MethodType.DuplexStreaming:
-          this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
-            this.log.info(`Sending ${messagesToSend} messages`);
-            this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client);
-            return {
-              next: request => {
-                this.printRequest(request);
-              },
-              error: e => this.handleError(e),
-              complete: () => {
-                this.handleCompleted();
-              }
-            };
-          });
-          break;
-      }
-      this.log.info("Response updated");
+        break;
+      case MethodType.ServerStreaming:
+        this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
+          this.printRequest(request);
+          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client);
+        });
+        break;
+      case MethodType.ClientStreaming:
+      case MethodType.DuplexStreaming:
+        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
+          this.log.info(`Sending ${messagesToSend} messages`);
+          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client);
+          return {
+            next: request => {
+              this.printRequest(request);
+            },
+            error: e => this.handleError(e),
+            complete: () => {
+              this.handleCompleted();
+            }
+          };
+        });
+        break;
     }
   }
 
   intercept() {
     this.updateResponse(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis);
+    this.log.info("Response updated");
   }
 
   format(data) {
@@ -141,11 +139,9 @@ export class ProvidedServiceComponent implements OnInit {
   }
 
   createDefaultMessage() {
-    if (this.providedMethod) {
-      const method = this.providedMethod.method;
-      this.messageContent = this.interopClient.createDefaultPayload(method.outputMessage.id);
-      this.formatAndUpdateArea();
-    }
+    const method = this.providedMethod.method;
+    this.messageContent = this.interopClient.createDefaultPayload(method.outputMessage.id);
+    this.formatAndUpdateArea();
   }
 
   formatAndUpdateArea() {
