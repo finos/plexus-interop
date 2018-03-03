@@ -58,7 +58,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.metadataUrl$ = this.store.select(state => state.plexus.metadataUrl);
     this.application$ = this.store.select(state => state.plexus.connectedApp);
     this.connected$ = this.store.select(state => state.plexus.connected);
-    this.connectionId$ = this.store.select(state => state.plexus.services.interopClient.getConnectionStrId());
+    this.connectionId$ = this.store.select(state => state.plexus.services.interopClient).map(client => client ? client.getConnectionStrId() : "NOT CONNECTED");
     this.subscriptions.add(this.application$.subscribe(app => this.currentApp = app));
     this.subscriptions.add(this.metadataUrl$.combineLatest(this.connected$.filter(i => i)).subscribe(([metadata, _]) => {
       this.metadataUrls = this.interopServiceFactory.getMetadataUrls(metadata);
