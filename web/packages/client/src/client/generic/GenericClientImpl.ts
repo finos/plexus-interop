@@ -135,7 +135,7 @@ export class GenericClientImpl implements GenericClient {
                 }
             },
             complete: () => {
-                this.log.debug("Channels subscription complted");
+                this.log.debug("Channels subscription completed");
                 observer.complete();
             },
             error: e => {

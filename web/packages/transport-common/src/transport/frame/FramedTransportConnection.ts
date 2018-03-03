@@ -139,7 +139,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
     
     public closeAndCleanUp(): void {
         if (this.stateMachine.is(ConnectionState.CLOSED)) {
-            this.log.warn("Already closed");
+            this.log.debug("Already closed");
             return;
         }
         /* istanbul ignore if */
