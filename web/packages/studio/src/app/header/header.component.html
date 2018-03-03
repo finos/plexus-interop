@@ -6,16 +6,16 @@
   <div class="connection-statuses">
     <div class="form-inline connection-status" *ngIf="connected$ | async">
       <span class="navbar-text mr-2">Metadata loaded from:</span>
-      <a id="open-metadata-details-btn" title="Click to see more details" target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
-      <a id="disconnect-from-metdata-btn" title="Click to reset metadata URL" class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
+      <a id="open-metadata-details-btn" title="See more details" target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
+      <a id="disconnect-from-metdata-btn" title="Reset metadata URL" class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
     </div>
 
     <div class="form-inline connection-status" *ngIf="!!currentApp">
-      <span class="navbar-text mr-2">Application:</span>
-      <a id="open-current-app-btn" href="javascript:" (click)="openCurrentApp()">{{currentApp?.displayName}}</a>
-      <a id="disconnect-from-app-btn" class="nav-link" href="javascript:" (click)="disconnectFromApp()">
+      <span class="navbar-text mr-2">Application: </span>
+      <a id="open-current-app-btn" title="Go to App home page" href="javascript:" (click)="openCurrentApp()">{{currentApp?.displayName}} - {{connectionId$ | async}}</a>
+      <a id="disconnect-from-app-btn" title="Disconnect from current App" class="nav-link" href="javascript:" (click)="disconnectFromApp()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
     </div>
