@@ -163,6 +163,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   startUnarySpam() {
     const delay = 200;
+    this.spamStarted = true;
     this.log.info(`Starting Unary Spam with ${delay}ms between messages`);
     const intervalId = setInterval(() => {
       if (!this.spamStarted) {
