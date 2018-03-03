@@ -33,6 +33,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterV
 
   title = 'Plexus Studio';
   plexusLogs = '';
+  autoScrollEnabled: boolean = true;
+  logsEnabled: boolean = true;
 
   constructor(private store: Store<State>) { }
 
@@ -46,6 +48,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterV
 
     this.loggerDelegateRegistration = LoggerFactory.registerDelegate({
       log: (logLevel: LogLevel, msg: string, args: any[]) => {
+
+        if (!this.logsEnabled) {
+          return;
+        }
 
         if (logLevel <= LogLevel.DEBUG) {
           // Too many logs in output
@@ -80,7 +86,9 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterV
   }
 
   public ngAfterViewChecked(): void {
-    this.scrollLogsBottom();
+    if (this.autoScrollEnabled) {
+      this.scrollLogsBottom();
+    }
   }
 
   public ngOnDestroy(): void {
