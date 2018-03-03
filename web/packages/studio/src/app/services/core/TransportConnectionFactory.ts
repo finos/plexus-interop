@@ -40,7 +40,7 @@ export class TransportConnectionFactory {
                 return cp;
             })
             .catch(() => {
-                this.log.info("Could't get connection from extension");
+                this.log.debug("Could't get connection from extension");
                 return this.lookupProviderFromRequestParams(baseUrl);
             });
     }

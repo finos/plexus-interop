@@ -33,8 +33,7 @@ const argv = require("minimist")(process.argv.slice(1));
 
 import { app } from "electron";
 import { FileLogger } from "./logger/FileLogger";
-import { PrefixedLogger } from "./logger/PrefixedLogger";
-import { LoggerFactory, LogLevel } from "@plexus-interop/common";
+import { LoggerFactory, LogLevel, PrefixedLogger } from "@plexus-interop/common";
 
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 let log = new FileLogger(LoggerFactory.getLogger("ElectronLauncherMain"));
@@ -47,7 +46,7 @@ import { ElectronAppLauncher } from "./ElectronAppLauncher";
 log.info("Started");
 
 const appsToLaunch = argv.apps ? argv.apps.split(";") : [];
-const brokerDefaultDir = argv.brokerDir ||  "../..";
+const brokerDefaultDir = argv.brokerDir || "../..";
 
 app.on("ready", () => {
     log.info("Connecting to Broker");

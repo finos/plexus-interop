@@ -26,6 +26,7 @@ import { InteropRegistryService, ConsumedMethod } from "@plexus-interop/broker";
 import { DiscoveredMethod, InvocationRequestInfo, MethodType, StreamingInvocationClient } from "@plexus-interop/client";
 import { UniqueId } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { createInvocationLogger } from '../services/core/invocation-utils';
 
 @Component({
   selector: 'app-consumed-service',
@@ -54,6 +55,9 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   invocationStarted: number = 0;
   responseTime: number = 0;
+  spamStarted: boolean = false;
+
+  requestId: number = 0;
 
   constructor(
     private actions: AppActions,
@@ -69,35 +73,39 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
       .map(state => state.plexus);
 
     this.subscriptions.add(
-      consumedMethod$.subscribe(state => {
-        this.selectedDiscoveredMethod = undefined;
-        this.interopClient = state.services.interopClient;
-        this.discoveredMethods = state.consumedMethod.discoveredMethods.methods;
-        this.interopClient = state.services.interopClient;
-        this.registryService = state.services.interopRegistryService;
-        this.consumedMethod = state.consumedMethod.method;
-        this.createDefaultMessage();
-      }));
+      consumedMethod$
+        .filter(state => !!state.consumedMethod && !!state.services.interopClient)
+        .subscribe(state => {
+          this.selectedDiscoveredMethod = undefined;
+          this.spamStarted = false;
+          this.interopClient = state.services.interopClient;
+          this.discoveredMethods = state.consumedMethod.discoveredMethods.methods;
+          this.interopClient = state.services.interopClient;
+          this.registryService = state.services.interopRegistryService;
+          this.consumedMethod = state.consumedMethod.method;
+          this.createDefaultMessage();
+        }));
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribeAll();
   }
 
-  handleResponse(responseJson: string) {
+  handleResponse(responseJson: string, logger: Logger) {
     this.responseCounter++;
     this.responseTime = new Date().getTime() - this.invocationStarted;
     this.responseContent += `
     Message number ${this.responseCounter}, received after ${this.responseTime}ms:
     ${responseJson}`;
+    logger.info(`Received:\n${responseJson}`);
   }
 
-  handleError(e: any) {
-    this.log.error(`Error received`, e);
+  handleError(e: any, logger: Logger) {
+    logger.error('Error received', e);
   }
 
-  handleCompleted() {
-    this.log.info("Invocation completed received");
+  handleCompleted(logger: Logger) {
+    logger.info('Invocation completed received');
   }
 
   resetInvocationInfo() {
@@ -108,45 +116,65 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   async discoverMethods() {
-    const discovered = await this.interopClient.discoverAllMethods(this.consumedMethod);  
-    this.store.dispatch({type: AppActions.DISCOVER_METHODS_SUCCESS, payload: discovered});
+    const discovered = await this.interopClient.discoverAllMethods(this.consumedMethod);
+    this.store.dispatch({ type: AppActions.DISCOVER_METHODS_SUCCESS, payload: discovered });
   }
 
   async sendRequest() {
 
+    const method = this.selectedDiscoveredMethod || this.consumedMethod;
+    const invocationLogger = createInvocationLogger(this.consumedMethod.method.type, ++this.requestId, this.log);
+
     const handler = {
-      value: v => this.handleResponse(v),
-      error: e => this.handleError(e)
+      value: v => this.handleResponse(v, invocationLogger),
+      error: e => this.handleError(e, invocationLogger)
     };
 
     const responseObserver = {
-      next: r => this.handleResponse(r),
-      error: e => this.handleError(e),
-      complete: () => this.handleCompleted()
+      next: r => this.handleResponse(r, invocationLogger),
+      error: e => this.handleError(e, invocationLogger),
+      complete: () => this.handleCompleted(invocationLogger)
     }
-
-    const method = this.selectedDiscoveredMethod || this.consumedMethod;
 
     this.resetInvocationInfo();
 
     switch (this.consumedMethod.method.type) {
       case MethodType.Unary:
+        invocationLogger.info(`Sending:\n${this.messageContent}`);
         this.interopClient.sendUnaryRequest(method, this.messageContent, handler)
-          .catch(e => this.handleError(e));
+          .catch(e => this.handleError(e, invocationLogger));
         break;
       case MethodType.ServerStreaming:
+        invocationLogger.info(`Sending:\n${this.messageContent}`);
         this.interopClient.sendServerStreamingRequest(method, this.messageContent, responseObserver);
         break;
       case MethodType.ClientStreaming:
       case MethodType.DuplexStreaming:
         try {
+          invocationLogger.info('Starting invocation');
           const client = await this.interopClient.sendBidiStreamingRequest(method, responseObserver);
-          this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
+          this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client, invocationLogger);
         } catch (error) {
-          this.handleError(error);
+          this.handleError(error, invocationLogger);
         }
     }
-    
+
+  }
+
+  startUnarySpam() {
+    const delay = 200;
+    this.log.info(`Starting Unary Spam with ${delay}ms between messages`);
+    const intervalId = setInterval(() => {
+      if (!this.spamStarted) {
+        clearInterval(intervalId);
+      } else {
+        this.sendRequest();
+      }
+    }, delay);
+  }
+
+  stopUnarySpam() {
+    this.spamStarted = false;
   }
 
   isClientStreaming() {
@@ -157,11 +185,18 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     return this.consumedMethod.method.type === MethodType.ServerStreaming || this.consumedMethod.method.type === MethodType.DuplexStreaming;
   }
 
-  sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>) {
+  sendAndSchedule(
+    message: string,
+    leftToSend: number,
+    intervalInMillis: number,
+    client: StreamingInvocationClient<string>,
+    logger: Logger) {
+
     if (leftToSend > 0) {
+      logger.info(`Sending:\n${message}`);
       client.next(message);
       setTimeout(() => {
-        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client);
+        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client, logger);
       }, intervalInMillis);
     } else {
       this.log.info("Sending invocation completion");
@@ -180,7 +215,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   createDefaultMessage() {
-    if (!this.messageContent && this.consumedMethod && this.interopClient) {
+    if (!this.messageContent) {
       const method = this.consumedMethod.method;
       this.messageContent = this.interopClient.createDefaultPayload(method.inputMessage.id);
       this.formatAndUpdateArea();

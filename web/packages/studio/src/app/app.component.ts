@@ -53,9 +53,9 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterV
         }
 
         let message = `[${TimeUtils.format(new Date())}] ${LogLevel[logLevel]} ${msg}`;
-
-        if (args && args.length > 0) {
-          message += '| args: ' + args;
+        args = this.filterEmptyArgs(args);
+        if (args.length > 0) {
+          message += '\nArguments: ' + JSON.stringify(args);
         }
 
         if (this.plexusLogs) {
@@ -97,5 +97,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterV
 
   public clearLogs(): void {
     this.plexusLogs = "";
+  }
+
+  private filterEmptyArgs(arr: any[]): any[] {
+    arr = arr || [];
+    return arr.filter(el => !!el && !(Array.isArray(el) && el.length === 0));
   }
 }
