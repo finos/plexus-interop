@@ -5,9 +5,9 @@
 
   <div class="connection-statuses">
     <div class="form-inline connection-status" *ngIf="connected$ | async">
-      <span class="navbar-text mr-2">Connected to:</span>
-      <a id="open-metadata-details-btn" target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
-      <a id="disconnect-from-metdata-btn" class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
+      <span class="navbar-text mr-2">Metadata loaded from:</span>
+      <a id="open-metadata-details-btn" title="Click to see more details" target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
+      <a id="disconnect-from-metdata-btn" title="Click to reset metadata URL" class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
     </div>
@@ -32,12 +32,12 @@
   <div class="modal-body container-fluid">
     <div class="row">
       <span class="col-sm-2"> Apps: </span>
-      <a id="apps-json-link" class="col-sm-10" target="_blank" href="{{metadataUrls?.apps}}">{{metadataUrls?.apps}}</a>
+      <a id="apps-json-link" class="col-sm-10" title="{{metadataUrls?.apps}}" target="_blank" href="{{metadataUrls?.apps}}">{{metadataUrls?.apps}}</a>
     </div>
 
     <div class="row">
       <span class="col-sm-2"> Interop: </span>
-      <a id="interop-json-link" class="col-sm-10" target="_blank" href="{{metadataUrls?.interop}}">{{metadataUrls?.interop}}</a>
+      <a id="interop-json-link" class="col-sm-10" title="{{metadataUrls?.interop}}" target="_blank" href="{{metadataUrls?.interop}}">{{metadataUrls?.interop}}</a>
     </div>
   </div>
   <div class="modal-footer">

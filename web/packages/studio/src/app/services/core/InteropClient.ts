@@ -27,6 +27,8 @@ export interface InteropClient {
 
     // core
 
+    getConnectionStrId(): string; 
+
     discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
 
     discoverAllMethods(consumedMethod: ConsumedMethod): Promise<MethodDiscoveryResponse>;

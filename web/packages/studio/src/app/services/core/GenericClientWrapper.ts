@@ -50,6 +50,10 @@ export class GenericClientWrapper implements InteropClient {
         private readonly defaultGenerator: DefaultMessageGenerator) {
     }
 
+    public getConnectionStrId(): string {
+        return this.genericClient.getConnectionId().toString();
+    }
+
     public validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, payload: string): void {
         const { inputMessageId } = this.toMetaInfo(methodToInvoke);
         const requestEncoder = this.encoderProvider.getMarshaller(inputMessageId);
