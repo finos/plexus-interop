@@ -14,14 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+syntax = "proto3";
+
 package plexus.interop.testing;
 
-import "plexus/interop/testing/EchoService.proto";
-import "plexus/interop/testing/GreetingService.proto";
+service GreetingService {
+	rpc Hello (GreetingRequest) returns (GreetingResponse);
+}
 
-application EchoClient {
-	
-	consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
+message GreetingRequest {
+	string name = 1;
+}
 
-	consumes plexus.interop.testing.GreetingService from plexus.interop.testing.* { Hello; } 
+message GreetingResponse {
+	string greeting = 1;
 }
