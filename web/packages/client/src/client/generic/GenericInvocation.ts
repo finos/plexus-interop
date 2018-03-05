@@ -219,8 +219,8 @@ export class GenericInvocation {
 
     private handleRemoteSentCompleted(invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug("Source channel subscription completed");
-        this.sendCompletionReceived = true;
         invocationObserver.streamCompleted();                
+        this.sendCompletionReceived = true;
         switch (this.stateMachine.getCurrent()) {
             case InvocationState.OPEN:
                 this.log.debug("Open state, switching to COMPLETION_RECEIVED");

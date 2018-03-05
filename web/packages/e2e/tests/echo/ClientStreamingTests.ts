@@ -46,17 +46,19 @@ export class ClientStreamingTests extends BaseEchoTest {
                 };
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+            let remoteCompleted = false;
             const streamingClient = await client.getEchoServiceProxy().clientStreaming({
                 next: (serverResponse) => { },
                 error: (e) => {
                     console.error("Error received by client", e);
                     reject(e);
                 },
-                complete: async () => { },
+                complete: async () => remoteCompleted = true,
                 streamCompleted: () => { }
             });
             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
             await streamingClient.complete();
+            if (!remoteCompleted) { reject("Server stream not completed"); }            
             await this.clientsSetup.disconnect(client, server);
             resolve();
         });
@@ -86,13 +88,13 @@ export class ClientStreamingTests extends BaseEchoTest {
             const streamingClient = await client.getEchoServiceProxy().clientStreaming({
                 next: serverResponse => { },
                 error: e => reject(e),
-                complete: async () => { },
-                streamCompleted: () => { }
+                complete: async () => serverCompleted = true,
+                streamCompleted: () => serverStreamCompleted = true
             });
             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
             await streamingClient.complete();
-            expect(serverCompleted).to.be.true;
-            expect(serverStreamCompleted).to.be.true;
+            if (!serverCompleted) { reject("Server not completed"); }
+            if (!serverStreamCompleted) { reject("Server stream not completed"); }
             await this.clientsSetup.disconnect(client, server);
             resolve();
         });
