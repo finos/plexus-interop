@@ -20,6 +20,7 @@ import { BaseEchoTest } from "./BaseEchoTest";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientStreamingHandler } from "./ClientStreamingHandler";
 import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
+import { expect } from "chai";
 
 export class ClientStreamingTests extends BaseEchoTest {
 
@@ -33,14 +34,15 @@ export class ClientStreamingTests extends BaseEchoTest {
         return new Promise<void>(async (resolve, reject) => {
             const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
-                    next: async (clientRequest) => {
+                    next: async clientRequest => {
                         hostClient.next(clientRequest);
                         hostClient.complete();
                     },
                     complete: () => { },
                     error: (e) => {
                         reject(e);
-                    }
+                    },
+                    streamCompleted: () => { }
                 };
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
@@ -50,13 +52,13 @@ export class ClientStreamingTests extends BaseEchoTest {
                     console.error("Error received by client", e);
                     reject(e);
                 },
-                complete: async () => {
-                    await this.clientsSetup.disconnect(client, server);
-                    resolve();
-                }
+                complete: async () => { },
+                streamCompleted: () => { }
             });
             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
-            streamingClient.complete();
+            await streamingClient.complete();
+            await this.clientsSetup.disconnect(client, server);
+            resolve();
         });
     }
 
@@ -66,25 +68,31 @@ export class ClientStreamingTests extends BaseEchoTest {
                 let lastRequest: plexus.plexus.interop.testing.IEchoRequest | null = null;
                 return {
                     next: async clientRequest => lastRequest = clientRequest,
-                    complete: () => {
+                    complete: () => { },
+                    error: e => reject(e),
+                    streamCompleted: () => {
                         if (!lastRequest) {
                             reject("Request not received");
                         } else {
                             hostClient.next(lastRequest);
-                            hostClient.complete();                            
+                            hostClient.complete();
                         }
-                    },
-                    error: e => reject(e)
+                    }
                 };
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+            let serverCompleted = false;
+            let serverStreamCompleted = false;
             const streamingClient = await client.getEchoServiceProxy().clientStreaming({
                 next: serverResponse => { },
                 error: e => reject(e),
-                complete: async () => {}
+                complete: async () => { },
+                streamCompleted: () => { }
             });
             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
             await streamingClient.complete();
+            expect(serverCompleted).to.be.true;
+            expect(serverStreamCompleted).to.be.true;
             await this.clientsSetup.disconnect(client, server);
             resolve();
         });

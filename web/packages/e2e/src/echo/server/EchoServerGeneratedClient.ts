@@ -20,6 +20,7 @@ import { TransportConnection, UniqueId } from "@plexus-interop/transport-common"
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
 
 import * as plexus from "../gen/plexus-messages";
+import { InvocationObserver } from "@plexus-interop/client";
 
 /**
  * Main client API
@@ -31,16 +32,16 @@ export abstract class EchoServerClient {
     
     public abstract sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
     
-    public abstract sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient>;
+    public abstract sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<InvocationClient>;
     
     public abstract sendRawServerStreamingRequest(
         invocationInfo: InvocationRequestInfo,
         request: ArrayBuffer,
         responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
 
-    public abstract sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
+    public abstract sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
     
-    public abstract sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
+    public abstract sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
 
     public abstract discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse>;
 
@@ -68,22 +69,22 @@ class EchoServerClientImpl implements EchoServerClient {
         return this.genericClient.sendRawUnaryRequest(invocationInfo, request, responseHandler);
     }
 
-    public sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient> {
+    public sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<InvocationClient> {
         return this.genericClient.sendServerStreamingRequest(invocationInfo, request, responseObserver, requestType, responseType);
     }
 
     public sendRawServerStreamingRequest(
         invocationInfo: GenericRequest,
         request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
+        responseObserver: InvocationObserver<ArrayBuffer>): Promise<InvocationClient> {
         return this.genericClient.sendRawServerStreamingRequest(invocationInfo, request, responseObserver);
     }
 
-    public sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
+    public sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
         return this.genericClient.sendBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
     }
 
-    public sendRawBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
+    public sendRawBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
         return this.genericClient.sendRawBidirectionalStreamingRequest(methodReference, responseObserver);
     }
 
@@ -111,9 +112,9 @@ export abstract class EchoServiceInvocationHandler {
 
     public abstract onServerStreaming(invocationContext: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): void;
 
-    public abstract onClientStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): Observer<plexus.plexus.interop.testing.IEchoRequest>;
+    public abstract onClientStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>;
 
-    public abstract onDuplexStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): Observer<plexus.plexus.interop.testing.IEchoRequest>;
+    public abstract onDuplexStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>;
 
 }
 
@@ -151,7 +152,7 @@ class EchoServiceInvocationHandlerInternal {
             });
     }
     
-    public onClientStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer> {
+    public onClientStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): InvocationObserver<ArrayBuffer> {
         const responseToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
@@ -167,11 +168,12 @@ class EchoServiceInvocationHandlerInternal {
         return {
             next: (value) => baseObserver.next(requestFromBinaryConverter(value)),
             complete: baseObserver.complete.bind(baseObserver),
-            error: baseObserver.error.bind(baseObserver)
+            error: baseObserver.error.bind(baseObserver),
+            streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
         };
     }
     
-    public onDuplexStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer> {
+    public onDuplexStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): InvocationObserver<ArrayBuffer> {
         const responseToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
@@ -187,7 +189,8 @@ class EchoServiceInvocationHandlerInternal {
         return {
             next: (value) => baseObserver.next(requestFromBinaryConverter(value)),
             complete: baseObserver.complete.bind(baseObserver),
-            error: baseObserver.error.bind(baseObserver)
+            error: baseObserver.error.bind(baseObserver),
+            streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
         };
     }
 }

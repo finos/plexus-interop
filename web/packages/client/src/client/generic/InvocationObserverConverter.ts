@@ -14,12 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseChannel } from "@plexus-interop/transport-common";
-import { InvocationMetaInfo } from "@plexus-interop/protocol";
-import { AnonymousSubscription } from "@plexus-interop/common";
 import { InvocationObserver } from "./InvocationObserver";
-import { InvocationChannelObserver } from "./InvocationChannelObserver";
+import { ConversionObserver } from "@plexus-interop/common";
 
-export interface Invocation extends BaseChannel<InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>> {
-    getMetaInfo(): InvocationMetaInfo;
+export class InvocationObserverConverter<S, D> extends ConversionObserver<S, D> implements InvocationObserver<D>  {
+
+    private baseSource: InvocationObserver<S>;
+
+    constructor(
+        source: InvocationObserver<S>,
+        converter: (from: D) => S) {
+        super(source, converter);
+        this.baseSource = source;
+    }
+
+    public streamCompleted(): void {
+        return this.baseSource.streamCompleted();
+    }
+
 }

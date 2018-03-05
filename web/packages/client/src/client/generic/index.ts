@@ -22,3 +22,4 @@ export * from "./GenericClientFactory";
 export * from "./GenericClient";
 export * from "./InvocationObserver";
 export * from "./InvocationChannelObserver";
+export * from "./InvocationObserverConverter";
