@@ -18,7 +18,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
 {
     using Plexus.Interop.Transport.Transmission.WebSockets.Client;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
-    using System.IO;
     using Xunit.Abstractions;
 
     public sealed class WebSocketTransmissionTests : TransmissionTestsSuite
@@ -29,7 +28,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
 
         protected override ITransmissionServer CreateServer()
         {
-            return new WebSocketTransmissionServer(BrokerWorkingDir);
+            return WebSocketTransmissionServerFactory.Instance.Create(BrokerWorkingDir);
         }
 
         protected override ITransmissionClient CreateClient()

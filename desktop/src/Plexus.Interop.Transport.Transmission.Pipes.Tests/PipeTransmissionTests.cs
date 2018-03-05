@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Transport.Transmission.Pipes
+namespace Plexus.Interop.Transport.Transmission.Pipes
 {
     using Xunit.Abstractions;
 
@@ -26,12 +26,12 @@
 
         protected override ITransmissionClient CreateClient()
         {
-            return new PipeTransmissionClient();
+            return PipeTransmissionClientFactory.Instance.Create();
         }
 
         protected override ITransmissionServer CreateServer()
         {
-            return RegisterDisposable(new PipeTransmissionServer(BrokerWorkingDir));
+            return RegisterDisposable(PipeTransmissionServerFactory.Instance.Create(BrokerWorkingDir));
         }
     }
 }

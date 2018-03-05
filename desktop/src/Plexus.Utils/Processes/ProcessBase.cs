@@ -21,7 +21,7 @@ namespace Plexus.Processes
     using System.Threading;
     using System.Threading.Tasks;
 
-    public abstract class ProcessBase : IDisposable
+    internal abstract class ProcessBase : IDisposable
     {
         private readonly Latch _started = new Latch();
         private readonly Latch _stopped = new Latch();

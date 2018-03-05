@@ -21,7 +21,7 @@ namespace Plexus
     using System.Runtime.CompilerServices;
     using System.Runtime.ExceptionServices;
 
-    public static class ExceptionHelper
+    internal static class ExceptionHelper
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception ExtractInner(this AggregateException exception)

@@ -15,13 +15,13 @@ using JetBrains.Annotations;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-
 namespace Plexus
 {
-    public static class TaskLoggingExtensions
+    using System;
+    using System.Runtime.CompilerServices;
+    using System.Threading.Tasks;
+
+    internal static class TaskLoggingExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void IgnoreAwait(this Task task, ILogger log = null)

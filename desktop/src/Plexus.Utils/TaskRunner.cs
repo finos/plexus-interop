@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Plexus
 {
-    public static class TaskRunner
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    internal static class TaskRunner
     {
         public static TaskScheduler BackgroundScheduler { get; set; } = TaskScheduler.Default;
 

@@ -14,9 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Broker
+namespace Plexus.Interop.Internal
 {
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Plexus.Interop.Apps;
+    using Plexus.Interop.Broker;
     using Plexus.Interop.Metamodel;
     using Plexus.Interop.Metamodel.Json;
     using Plexus.Interop.Protocol.Protobuf;
@@ -25,14 +30,10 @@ namespace Plexus.Interop.Broker
     using Plexus.Interop.Transport.Transmission.Pipes;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using Plexus.Processes;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
 
-    public sealed class BrokerRunner : ProcessBase
+    internal sealed class Broker : ProcessBase, IBroker
     {
         private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider 
             = new ProtobufTransportProtocolSerializationProvider();
@@ -42,29 +43,29 @@ namespace Plexus.Interop.Broker
 
         private readonly string _workingDir;
         private readonly ServerConnectionListener _connectionListener;
-        private readonly BrokerProcessor _brokerProcessor;
+        private readonly IBrokerProcessor _brokerProcessor;
         private readonly IReadOnlyCollection<ITransportServer> _transportServers;
-        private readonly AppLifecycleManager _connectionTracker;
+        private readonly IAppLifecycleManager _appLifecycleManager;
 
-        protected override ILogger Log { get; } = LogManager.GetLogger<BrokerRunner>();
+        protected override ILogger Log { get; } = LogManager.GetLogger<Broker>();
 
-        public BrokerRunner(string metadataDir = null, IRegistryProvider registryProvider = null)
+        public Broker(string metadataDir = null, IRegistryProvider registryProvider = null)
         {
             _workingDir = Directory.GetCurrentDirectory();
             metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");            
-            _transportServers = new ITransportServer[]
+            _transportServers = new[]
             {
-                new TransportServer(new PipeTransmissionServer(_workingDir), DefaultTransportSerializationProvider),
-                new TransportServer(new WebSocketTransmissionServer(_workingDir), DefaultTransportSerializationProvider)
+                TransportServerFactory.Instance.Create(PipeTransmissionServerFactory.Instance.Create(_workingDir), DefaultTransportSerializationProvider),
+                TransportServerFactory.Instance.Create(WebSocketTransmissionServerFactory.Instance.Create(_workingDir), DefaultTransportSerializationProvider)
             };
             _connectionListener = new ServerConnectionListener(_transportServers);
             registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
-            _connectionTracker = new AppLifecycleManager(metadataDir);
-            _brokerProcessor = new BrokerProcessor(
+            _appLifecycleManager = AppLifecycleManagerFactory.Instance.Create(metadataDir);
+            _brokerProcessor = BrokerProcessorFactory.Instance.Create(
                 _connectionListener.In,
                 registryProvider,
                 DefaultProtocolSerializationProvider,
-                _connectionTracker);
+                _appLifecycleManager);
             OnStop(_connectionListener.Stop);
         }
 
@@ -75,7 +76,7 @@ namespace Plexus.Interop.Broker
                 .WhenAll(
                     _connectionListener.StartAsync(),
                     _brokerProcessor.StartAsync(),
-                    _connectionTracker.StartAsync())
+                    _appLifecycleManager.StartAsync())
                 .ConfigureAwait(false);
             Log.Info("Broker started in directory {0}", _workingDir);
             return ProcessAsync();
@@ -89,7 +90,7 @@ namespace Plexus.Interop.Broker
             }
             finally
             {
-                await _connectionTracker.StopAsync().IgnoreExceptions();
+                await _appLifecycleManager.StopAsync().IgnoreExceptions().ConfigureAwait(false);
                 await Task.WhenAll(_transportServers.Select(x => x.StopAsync())).ConfigureAwait(false);
             }
         }

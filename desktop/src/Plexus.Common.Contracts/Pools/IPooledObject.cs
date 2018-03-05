@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-
-namespace Plexus.Pools
+﻿namespace Plexus.Pools
 {
+    using System;
+
     public interface IPooledObject : IDisposable
     {
         void Retain();

@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading;
-
 namespace Plexus
 {
-    public sealed class Latch
+    using System.Threading;
+
+    internal sealed class Latch
     {
         private volatile int _entered;
 
