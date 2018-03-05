@@ -269,6 +269,32 @@ namespace Plexus.Channels
             Should.Throw<ArgumentOutOfRangeException>(() => new BufferedChannel<int>(-1));
         }
 
+        [Fact]
+        public void TerminatesOnWriteTimeout()
+        {
+            var sut = new BufferedChannel<int>(1, Timeout100Ms);
+            Should.NotThrow(sut.WriteAsync(1), Timeout1Sec);
+            sut.TryWrite(1).ShouldBe(false);
+            Should.Throw<ChannelWriteTimeoutException>(sut.WaitWriteAvailableAsync(), Timeout1Sec);
+            Should.Throw<ChannelWriteTimeoutException>(sut.Out.Completion, Timeout1Sec);
+            sut.TryRead(out _).ShouldBe(true);
+            Should.Throw<Exception>(sut.Completion, Timeout1Sec);
+        }
+
+        [Fact]
+        public async Task SlidesWriteTimeoutAfterWriteAvailable()
+        {
+            var sut = new BufferedChannel<int>(1, Timeout50Ms);
+            sut.TryWrite(1).ShouldBe(true);
+            await Task.Delay(Timeout10Ms).ConfigureAwait(false);
+            sut.TryRead(out _).ShouldBe(true);
+            await Task.Delay(Timeout100Ms).ConfigureAwait(false);
+            sut.Out.Completion.IsCompleted.ShouldBeFalse();
+            Should.NotThrow(() => sut.WriteAsync(1), Timeout1Sec);
+            await Task.Delay(Timeout10Ms).ConfigureAwait(false);
+            sut.TryRead(out _).ShouldBe(true);
+        }
+
         [Theory]
         [InlineData(1, 1, 1)]
         [InlineData(1, 1, 3)]

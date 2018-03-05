@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,27 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
-
-namespace Plexus.Logging.NLog
+namespace Plexus.Channels
 {
-    public sealed class LoggingInitializer : IDisposable
+    using System;
+
+    public sealed class ChannelWriteTimeoutException : Exception
     {
-        private readonly LoggerFactory _loggerFactory = new LoggerFactory();
-        private readonly ILogger _logger;
-
-        public LoggingInitializer()
+        public ChannelWriteTimeoutException(TimeSpan timeout) : base(
+            $"Timeout {timeout.TotalSeconds}sec on writing to channel")
         {
-            LogConfig.LoggerFactory = _loggerFactory;
-            _logger = LogManager.GetLogger<LoggingInitializer>();
-            _logger.Info("---------- NLog Logging initialized ----------");
-        }
-
-        public void Dispose()
-        {
-            _loggerFactory.Flush();
-            _logger.Info("---------- NLog Logging uninitialized---------");
-            LogConfig.LoggerFactory = null;
         }
     }
 }
