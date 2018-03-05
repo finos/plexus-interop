@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { InteropClient } from "./InteropClient";
-import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient } from "@plexus-interop/client";
+import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient, InvocationObserver } from '@plexus-interop/client';
 import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { MethodDiscoveryResponse, ProvidedMethodReference, DiscoveryMode } from '@plexus-interop/client-api';
 import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod, Marshaller } from "@plexus-interop/broker";
@@ -130,7 +130,7 @@ export class GenericClientWrapper implements InteropClient {
         this.serverStreamingHandlers.set(`${serviceId}.${methodId}`, handler);
     }
 
-    public async sendBidiStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, responseObserver: Observer<string>): Promise<StreamingInvocationClient<string>> {
+    public async sendBidiStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, responseObserver: InvocationObserver<string>): Promise<StreamingInvocationClient<string>> {
 
         const metaInfo = this.toMetaInfo(methodToInvoke);
         const { inputMessageId, outputMessageId } = metaInfo;
@@ -154,7 +154,7 @@ export class GenericClientWrapper implements InteropClient {
         }
     }
 
-    public sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: Observer<string>): Promise<InvocationClient> {
+    public sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: InvocationObserver<string>): Promise<InvocationClient> {
 
         const metaInfo = this.toMetaInfo(methodToInvoke);
         const { inputMessageId, outputMessageId } = metaInfo;
