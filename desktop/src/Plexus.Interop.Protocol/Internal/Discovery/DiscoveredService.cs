@@ -49,7 +49,7 @@
 
         public override string ToString()
         {
-            return $"{nameof(ConsumedService)}: {{{ConsumedService}}}, {nameof(ProvidedService)}: {{{ProvidedService}}}, {nameof(ServiceTitle)}: {ServiceTitle}, {nameof(Methods)}: {Methods}";
+            return $"{nameof(ConsumedService)}: {{{ConsumedService}}}, {nameof(ProvidedService)}: {{{ProvidedService}}}, {nameof(ServiceTitle)}: {ServiceTitle}, {nameof(Methods)}: {Methods.FormatEnumerableObjects()}";
         }
 
         private bool Equals(DiscoveredService other)

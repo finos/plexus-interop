@@ -19,6 +19,7 @@ namespace Plexus
     using Shouldly;
     using System;
     using System.Collections.Concurrent;
+    using System.Diagnostics;
     using System.Security.Cryptography;
     using System.Threading;
     using System.Threading.Tasks;
@@ -93,6 +94,11 @@ namespace Plexus
 
         protected void RunWithTimeout(TimeSpan timeout, Func<Task> func)
         {
+            if (Debugger.IsAttached)
+            {
+                TaskRunner.RunInBackground(func).GetResult();
+                return;
+            }
             using (var cancellation = new CancellationTokenSource(timeout))
             {
                 try
