@@ -24,8 +24,11 @@ import { clientProtocol } from "@plexus-interop/protocol";
 import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
 import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
+import { UniqueId } from "@plexus-interop/transport-common";
 
 export interface GenericClient {
+
+    getConnectionId(): UniqueId;
 
     requestInvocation(invocationInfo: InvocationMetaInfo): Promise<Invocation>;
 

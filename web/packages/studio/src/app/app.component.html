@@ -1,14 +1,30 @@
 <div class="container p-lg-3 flex-fill flex-flow-column">
 
   <app-header class="header"></app-header>
-  
+
   <div class="pt-lg-3 app-content">
     <router-outlet></router-outlet>
     <hr>
     <div class="form-group footer">
-        <label for="plexus-logs-area">Plexus Logs:</label>
-        <textarea id="plexus-logs-area" disabled="disabled" class="form-control" rows="12" [(ngModel)]="plexusLogs"></textarea>
-        <button id="clear-plexus-logs-btn" class="btn btn-link" type="button" (click)="clearLogs()">Clear</button>
-    </div>    
+      <div class="row">
+        <div class="form-group col-sm-12">
+          <label for="plexus-logs-area">Plexus Logs:</label>
+          <textarea #plexusLogsArea id="plexus-logs-area" disabled="disabled" class="form-control" rows="12" [(ngModel)]="plexusLogs"></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-2">
+          <button id="clear-plexus-logs-btn" class="btn btn-link" type="button" (click)="clearLogs()">Clear</button>
+        </div>
+        <div class="form-group col-sm-2">
+          <input type="checkbox" class="form-check-input" id="autoScrollCheckBox" [(ngModel)]="autoScrollEnabled">          
+          <label class="form-check-label" for="autoScrollCheckBox">Auto-Scroll Logs</label>
+        </div>
+        <div class="form-group col-sm-2">
+            <input type="checkbox" class="form-check-input" id="logsCheckBox" [(ngModel)]="logsEnabled">          
+            <label class="form-check-label" for="logsCheckBox">Enable Logs</label>
+          </div>
+      </div>
+    </div>
   </div>
 </div>

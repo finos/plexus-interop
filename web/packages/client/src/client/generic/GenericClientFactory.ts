@@ -20,7 +20,7 @@ import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { GenericClientImpl } from "./GenericClientImpl";
 import { SingleMessageRequest } from "./SingleMessageRequst";
 import { ClientConnectRequest } from "@plexus-interop/client-api";
-import { clientProtocol as plexus, ClientProtocolHelper } from "@plexus-interop/protocol";
+import { clientProtocol as plexus, ClientProtocolHelper, UniqueId } from "@plexus-interop/protocol";
 
 export class GenericClientFactory {
 
@@ -35,7 +35,9 @@ export class GenericClientFactory {
             .execute(requestPayload, (responsePayload) => ClientProtocolHelper.decodeConnectResponse(responsePayload))
             .then(response => {
                 this.log.info("Client connected");
-                return new GenericClientImpl(this.transportConnection);
+                return new GenericClientImpl(
+                    UniqueId.fromProperties(response.connectionId as plexus.IUniqueId),
+                    this.transportConnection);
             });
     }
 }

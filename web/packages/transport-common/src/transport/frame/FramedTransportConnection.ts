@@ -139,7 +139,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
     
     public closeAndCleanUp(): void {
         if (this.stateMachine.is(ConnectionState.CLOSED)) {
-            this.log.warn("Already closed");
+            this.log.debug("Already closed");
             return;
         }
         /* istanbul ignore if */
@@ -194,7 +194,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
         if (!this.channelsHolder.has(channelId.toString())) {
             this.createInChannel(channelId);
         } else {
-            this.log.warn(`Channel ${channelId.toString()} already exist`);
+            this.log.debug(`Channel ${channelId.toString()} already exist`);
         }
     }
 

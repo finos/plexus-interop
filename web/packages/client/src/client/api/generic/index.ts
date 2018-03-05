@@ -17,6 +17,7 @@
 export * from "./GenericClientApiBuilder";
 export * from "./GenericClientApi";
 export * from "./GenericClientApiImpl";
+export * from "./GenericClientApiBase";
 export * from "./GenericInvocationsHost";
 export * from "./GenericUnaryInvocationHandler";
 export * from "./GenericServerStreamingInvocationHandler";

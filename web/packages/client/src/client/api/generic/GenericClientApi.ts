@@ -25,8 +25,11 @@ import { Completion } from "@plexus-interop/client-api";
 import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
 import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
 import { GenericRequest } from "@plexus-interop/client-api";
+import { UniqueId } from "@plexus-interop/transport-common";
 
 export interface GenericClientApi {
+
+    getConnectionId(): UniqueId;
 
     sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient>;
     

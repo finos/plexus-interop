@@ -23,6 +23,7 @@ import { InteropClient } from "../services/core/InteropClient";
 import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { StreamingInvocationClient, MethodType } from "@plexus-interop/client";
+import { createInvocationLogger } from '../services/core/invocation-utils';
 
 @Component({
   selector: 'app-provided-service',
@@ -41,6 +42,7 @@ export class ProvidedServiceComponent implements OnInit {
   messageContent: string;
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
+  requesId: number = 0;
 
   constructor(
     private actions: AppActions,
@@ -51,83 +53,87 @@ export class ProvidedServiceComponent implements OnInit {
     this.subscriptions.add(this.store
       .filter(state => !!state.plexus.providedMethod)
       .map(state => state.plexus)
+      .filter(plexus => !!plexus.services.interopClient && !!plexus.providedMethod)
       .subscribe(plexus => {
         this.providedMethod = plexus.providedMethod.method;
         this.interopClient = plexus.services.interopClient;
         this.createDefaultMessage();
+        this.updateResponse(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis);
       }));
   }
 
-  printRequest(requestJson) {
-    this.log.info(`"Received request: ${this.format(requestJson)}`);
+  printRequest(requestJson, log) {
+    log.info(`Received request: ${this.format(requestJson)}`);
   }
 
-  handleError(e: any) {
-    this.log.error(`Error received`, e);
+  handleError(e: any, log) {
+    log.error(`Error received`, e);
   }
 
-  handleCompleted() {
-    this.log.info("Invocation completed received");
+  handleCompleted(log) {
+    log.info("Invocation completed received");
+  }
+
+  updateResponse(contentJson: string, messagesToSend: number, messagesPeriodInMillis: number): void {
+
+    const serviceId = this.providedMethod.providedService.service.id;
+    const methodId = this.providedMethod.method.name;
+
+    switch (this.providedMethod.method.type) {
+      case MethodType.Unary:
+        this.interopClient.setUnaryActionHandler(
+          serviceId,
+          methodId,
+          async requestJson => {
+            const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);            
+            this.printRequest(requestJson, invocationLogger);
+            return contentJson;
+          });
+        break;
+      case MethodType.ServerStreaming:
+        this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);                      
+          this.printRequest(request, invocationLogger);
+          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
+        });
+        break;
+      case MethodType.ClientStreaming:
+      case MethodType.DuplexStreaming:
+        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);                      
+          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
+          return {
+            next: request => {
+              this.printRequest(request, invocationLogger);
+            },
+            error: e => this.handleError(e, invocationLogger),
+            complete: () => {
+              this.handleCompleted(invocationLogger);
+            }
+          };
+        });
+        break;
+    }
   }
 
   intercept() {
-
-    if (this.interopClient && this.providedMethod) {
-
-      const serviceId = this.providedMethod.providedService.service.id;
-      const methodId = this.providedMethod.method.name;
-
-      switch (this.providedMethod.method.type) {
-        case MethodType.Unary:
-          this.interopClient.setUnaryActionHandler(
-            serviceId,
-            methodId,
-            async requestJson => {
-              this.printRequest(requestJson);
-              return this.messageContent;
-            });
-          break;
-        case MethodType.ServerStreaming:
-          this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
-            this.printRequest(request);
-            this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
-          });
-          break;
-        case MethodType.ClientStreaming:
-        case MethodType.DuplexStreaming:
-          this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
-            this.log.info(`Sending ${this.messagesToSend} messages`);
-            this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client);
-            return {
-              next: request => {
-                this.printRequest(request);
-              },
-              error: e => this.handleError(e),
-              complete: () => {
-                this.handleCompleted();
-              }
-            };
-          });
-          break;
-      }
-      this.log.info("Set interceptor");
-
-    }
+    this.updateResponse(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis);
+    this.log.info("Response updated");
   }
 
   format(data) {
     return JSON.stringify(JSON.parse(data), null, 2);
   }
 
-  sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>) {
+  sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>, logger: Logger) {
     if (leftToSend > 0) {
-      this.log.info("Sending message");
+      logger.info(`Sending message:\n${message}`);
       client.next(message);
       setTimeout(() => {
-        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client);
+        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client, logger);
       }, intervalInMillis);
     } else {
-      this.log.info("Sending completion");      
+      logger.info("Sending completion");
       client.complete();
     }
   }
@@ -137,11 +143,9 @@ export class ProvidedServiceComponent implements OnInit {
   }
 
   createDefaultMessage() {
-    if (this.providedMethod) {
-      const method = this.providedMethod.method;
-      this.messageContent = this.interopClient.createDefaultPayload(method.outputMessage.id);
-      this.formatAndUpdateArea();
-    }
+    const method = this.providedMethod.method;
+    this.messageContent = this.interopClient.createDefaultPayload(method.outputMessage.id);
+    this.formatAndUpdateArea();
   }
 
   formatAndUpdateArea() {

@@ -165,31 +165,9 @@ export class Effects {
             .ofType<TypedAction<ConsumedMethod>>(AppActions.SELECT_CONSUMED_METHOD)
             .withLatestFrom(this.store.select(state => state.plexus.services).filter(services => !!services))
             .mergeMap(async ([action, services]) => {
-
                 const method = action.payload;
                 const interopClient = services.interopClient;
-
-                const discoveryRequest = {
-                    consumedMethod: {
-                        consumedService: {
-                            serviceId: method.consumedService.service.id
-                        },
-                        methodId: method.method.name
-                    }
-                };
-
-                // offline
-                const discoveredMethods = await interopClient.discoverMethod(discoveryRequest);
-                // online
-                const onlineMethods = await interopClient.discoverMethod({
-                    ...discoveryRequest,
-                    discoveryMode: DiscoveryMode.Online
-                });
-
-                if (onlineMethods && onlineMethods.methods) {
-                    onlineMethods.methods.forEach(pm => discoveredMethods.methods.push(pm));
-                }
-
+                const discoveredMethods = await interopClient.discoverAllMethods(method);
                 return {
                     type: AppActions.CONSUMED_METHOD_SUCCESS,
                     payload: {
@@ -212,7 +190,6 @@ export class Effects {
         .ofType(AppActions.CONSUMED_METHOD_SUCCESS)
         .map(_ => {
             this.router.navigate(['/consumed'], { queryParamsHandling: 'merge' });
-
             return { type: AppActions.DO_NOTHING };
         });
 
@@ -230,7 +207,6 @@ export class Effects {
         .withLatestFrom(this.store.select(state => state.plexus.services))
         .mergeMap(async ([action, services]) => {
             const disconnected = await services.interopClient.disconnect();
-
             return { type: AppActions.DISCONNECT_FROM_APP_SUCCESS };
         });
 

@@ -56,14 +56,11 @@ export class AppServicesComponent implements OnInit {
         if (!state.connectedApp) {
           return [];
         }
-
         const services = state.services;
         const app = state.connectedApp;
         const consumed = services.interopRegistryService.getConsumedServices(app.id);
-
         return consumed;
       });
-
     this.providedServices = this.store
       .select(state => state.plexus)
       .map(state => {

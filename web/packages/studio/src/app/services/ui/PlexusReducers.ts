@@ -18,9 +18,10 @@ import { InteropClient } from '../core/InteropClient';
 import { App as Application, ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
 import { TypedAction } from './TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
-import { AppActions } from "./AppActions";
+import { AppActions } from './AppActions';
 import { Action } from '@ngrx/store';
 import { UrlParamsProvider } from "@plexus-interop/common";
+import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
 import {
     AppConnectedActionParams,
     ConsumedMethodState,
@@ -115,6 +116,14 @@ export function reducer(
                 services: {
                     ...state.services,
                     interopClient: getPayload<AppConnectedActionParams>(action).interopClient
+                }
+            };
+        case AppActions.DISCOVER_METHODS_SUCCESS:
+            return {
+                ...state,
+                consumedMethod: {
+                    ...state.consumedMethod,
+                    discoveredMethods: getPayload<MethodDiscoveryResponse>(action)
                 }
             };
         case AppActions.CONSUMED_METHOD_SUCCESS:

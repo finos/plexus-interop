@@ -1,0 +1,1 @@
+java -jar ../../../bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=../../../samples/quick-start/registry --input=WebCcyPairRateProvider.interop --out=./src/gen
