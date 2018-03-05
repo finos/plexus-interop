@@ -30,7 +30,7 @@ import { InvocationRequestInfo } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory, Arrays } from "@plexus-interop/common";
 import { MarshallerProvider } from "../io/MarshallerProvider";
 import { Completion } from "@plexus-interop/client-api";
-import { DelegateChannelObserver } from "@plexus-interop/transport-common";
+import { DelegateChannelObserver, UniqueId } from "@plexus-interop/transport-common";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
 import { Invocation } from "../../generic/Invocation";
 import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
@@ -38,13 +38,17 @@ import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
 import { GenericRequest } from "@plexus-interop/client-api";
 
 export class GenericClientApiImpl implements GenericClientApi {
-
+    
     private readonly log: Logger = LoggerFactory.getLogger("GenericClientApi");
 
     constructor(
         private readonly genericClient: GenericClient,
         private readonly marshallerProvider: MarshallerProvider) { }
 
+    public getConnectionId(): UniqueId {
+        return this.genericClient.getConnectionId();
+    }
+    
     public discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse> {
         this.log.debug("Service Discovery request");
         return this.genericClient.discoverService(discoveryRequest);

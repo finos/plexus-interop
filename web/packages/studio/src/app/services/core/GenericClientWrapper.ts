@@ -17,11 +17,12 @@
 import { InteropClient } from "./InteropClient";
 import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient } from "@plexus-interop/client";
 import { InvocationRequestInfo } from "@plexus-interop/protocol";
-import { MethodDiscoveryResponse, ProvidedMethodReference } from "@plexus-interop/client-api";
+import { MethodDiscoveryResponse, ProvidedMethodReference, DiscoveryMode } from '@plexus-interop/client-api';
 import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod, Marshaller } from "@plexus-interop/broker";
 import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
 import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler, wrapGenericHostClient, toGenericObserver } from "./StringHandlers";
 import { Observer } from "@plexus-interop/common";
+import { clientProtocol as plexus } from "@plexus-interop/protocol";
 
 type DiscoveredMetaInfo = {
     inputMessageId: string,
@@ -47,6 +48,10 @@ export class GenericClientWrapper implements InteropClient {
         private readonly serverStreamingHandlers: Map<string, ServerStreamingStringHandler>,
         private readonly bidiHandlers: Map<string, BidiStreamingStringHandler>,
         private readonly defaultGenerator: DefaultMessageGenerator) {
+    }
+
+    public getConnectionStrId(): string {
+        return this.genericClient.getConnectionId().toString();
     }
 
     public validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, payload: string): void {
@@ -181,5 +186,24 @@ export class GenericClientWrapper implements InteropClient {
 
     public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
         return this.genericClient.discoverMethod(discoveryRequest)
+    }
+
+    public async discoverAllMethods(method: ConsumedMethod): Promise<MethodDiscoveryResponse> {
+        const consumedMethod = {
+            consumedService: {
+                serviceId: method.consumedService.service.id
+            },
+            methodId: method.method.name
+        };
+        const discoveryRequest = {consumedMethod};
+        const discoveredMethods = await this.discoverMethod(discoveryRequest);
+        const onlineMethods = await this.discoverMethod({
+            ...discoveryRequest,
+            discoveryMode: DiscoveryMode.Online
+        });
+        if (onlineMethods && onlineMethods.methods) {
+            onlineMethods.methods.forEach(pm => discoveredMethods.methods.push(pm));
+        }
+        return discoveredMethods;
     }
 }

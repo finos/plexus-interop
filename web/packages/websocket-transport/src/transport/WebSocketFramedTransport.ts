@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults } from "@plexus-interop/transport-common";
-import { CancellationToken, Logger, LoggerFactory, Observer, BufferedObserver } from "@plexus-interop/common";
+import { CancellationToken, Logger, LoggerFactory, Observer, BufferedObserver, AsyncHelper } from "@plexus-interop/common";
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     public static TERMINATE_MESSAGE: string = "<END>";
     public static SOCKET_CLOSE_TIMEOUT: number = 5000;
+    public static TERMINATE_MESSAGE_RECEIVED_TIMEOUT: number = 10000;
+    public static TERMINATE_MESSAGE_CHECK_TIMEOUT: number = 300;
     public static CONNECTING: number = 0;
     public static OPEN: number = 1;
     public static CLOSING: number = 2;
@@ -61,12 +63,14 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
             this.log.warn("Already disconnected");
             return Promise.resolve();
         }
-        if (!this.isSocketClosed()) {
+        if (this.isSocketClosed()) {
             this.log.warn("Socket is CLOSED, cancelling connection");
             this.cancelConnectionAndCleanUp();
+            return Promise.resolve();
+        } else {
+            this.throwIfNotConnected();
+            return this.closeConnectionInternal();
         }
-        this.throwIfNotConnectedOrDisconnectRequested();
-        return this.closeConnectionInternal();
     }
 
     public connected(): boolean {
@@ -150,12 +154,27 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         if (this.terminateSent && this.terminateReceived) {
             this.scheduleSocketDisconnect();
         } else if (this.terminateSent) {
-            this.log.debug("Server terminate event not received, not closing the socket");
+            this.log.debug("Server terminate event not received, waiting to close connection gracefully");
+            await this.waitForTerminateMessage();
         } else if (this.terminateReceived) {
             this.sendTerminateMessage();
             this.scheduleSocketDisconnect();
         } else {
             this.sendTerminateMessage();
+        }
+    }
+
+    private async waitForTerminateMessage(): Promise<void> {
+        try {
+            await AsyncHelper.waitFor(
+                () => this.terminateReceived,
+                new CancellationToken(),
+                WebSocketFramedTransport.TERMINATE_MESSAGE_CHECK_TIMEOUT,
+                WebSocketFramedTransport.TERMINATE_MESSAGE_RECEIVED_TIMEOUT);
+        } catch (error) {
+            const errorMsg = `WebSocket Terminate message not received within ${WebSocketFramedTransport.TERMINATE_MESSAGE_RECEIVED_TIMEOUT}ms`;
+            this.log.error(errorMsg, error);
+            throw new Error(errorMsg);
         }
     }
 
@@ -269,9 +288,16 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         this.log.debug("Connection opened");
     }
 
+    private throwIfNotConnected(): void {
+        if (!this.connected()) {
+            throw new Error("Web Socket is not connected");
+        }
+    }
+
     private throwIfNotConnectedOrDisconnectRequested(): void {
-        if (!this.connected() || this.terminateSent) {
-            throw new Error("Web Socket is not connected or terminate requested");
+        this.throwIfNotConnected();
+        if (this.terminateSent) {
+            throw new Error("Terminate socket requested");
         }
     }
 }

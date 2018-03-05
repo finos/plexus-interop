@@ -26,7 +26,7 @@ import { Observer } from "@plexus-interop/common";
 import { ServiceDiscoveryRequest } from "@plexus-interop/client-api";
 import { ServiceDiscoveryResponse } from "@plexus-interop/client-api";
 import { SingleMessageRequest } from "./SingleMessageRequst";
-import { ClientProtocolHelper as modelHelper } from "@plexus-interop/protocol";
+import { ClientProtocolHelper as modelHelper, UniqueId } from "@plexus-interop/protocol";
 import { clientProtocol as plexus, SuccessCompletion, InvocationRequestInfo } from "@plexus-interop/protocol";
 import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
 import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
@@ -45,7 +45,9 @@ export class GenericClientImpl implements GenericClient {
     private log: Logger;
     private cancellationToken: CancellationToken = new CancellationToken();
 
-    constructor(private readonly transportConnection: TransportConnection) {
+    constructor(
+        private readonly connectionId: UniqueId,
+        private readonly transportConnection: TransportConnection) {
         this.log = LoggerFactory.getLogger("GenericClient");
         this.state = new StateMaschineBase(ClientState.CREATED, [
             {
@@ -59,6 +61,10 @@ export class GenericClientImpl implements GenericClient {
             }
         ], this.log);
         this.log.trace("Created");
+    }
+
+    public getConnectionId(): UniqueId {
+        return this.connectionId;
     }
 
     public async requestInvocation(invocationInfo: InvocationRequestInfo): Promise<Invocation> {
@@ -129,7 +135,7 @@ export class GenericClientImpl implements GenericClient {
                 }
             },
             complete: () => {
-                this.log.debug("Channels subscription complted");
+                this.log.debug("Channels subscription completed");
                 observer.complete();
             },
             error: e => {
