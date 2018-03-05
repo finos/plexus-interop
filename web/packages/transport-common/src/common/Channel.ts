@@ -18,15 +18,7 @@ import { UniqueId } from "@plexus-interop/protocol";
 import { AnonymousSubscription } from "rxjs/Subscription";
 import { clientProtocol as plexus } from "@plexus-interop/protocol";
 import { ChannelObserver } from "./ChannelObserver";
+import { BaseChannel } from "./BaseChannel";
 
-export interface Channel {
-
-    uuid(): UniqueId;
-
-    sendMessage(data: ArrayBuffer): Promise<void>;
-
-    open(observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void;
-
-    close(completion?: plexus.ICompletion): Promise<plexus.ICompletion>;
-
+export interface Channel extends BaseChannel<ChannelObserver<AnonymousSubscription, ArrayBuffer>> {
 }

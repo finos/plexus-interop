@@ -129,6 +129,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
                             reject("Should not happen");
                         })
                         .catch(error => {
+                            debugger;
                             expect(error.message).to.eq(errorText);
                             return this.clientsSetup.disconnect(clients[0], clients[1]);
                         });

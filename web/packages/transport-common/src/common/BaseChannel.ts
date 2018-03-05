@@ -14,26 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Observer } from "@plexus-interop/common";
-import { UniqueId } from "@plexus-interop/transport-common";
+import { UniqueId } from "@plexus-interop/protocol";
+import { AnonymousSubscription } from "rxjs/Subscription";
+import { clientProtocol as plexus } from "@plexus-interop/protocol";
+import { ChannelObserver } from "./ChannelObserver";
 
-export class LogObserver<T> implements Observer<T> {
+export interface BaseChannel<ObserverType> {
 
-    constructor(private _next?: (data: T) => void, private id: UniqueId = UniqueId.generateNew()) {}
+    uuid(): UniqueId;
 
-    public complete(): void {
-        console.log(`${this.id.toString()} - Complete`);
-    }
+    sendMessage(data: ArrayBuffer): Promise<void>;
 
-    public next(data: T): void {
-        console.log(`${this.id.toString()} - Next`, data);        
-        if (this._next) {
-            this._next(data);
-        }
-    }
+    open(observer: ObserverType): void;
 
-    public error(error: any) {
-        console.log(`${this.id.toString()} - Error`);
-    }
+    close(completion?: plexus.ICompletion): Promise<plexus.ICompletion>;
 
 }

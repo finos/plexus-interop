@@ -16,10 +16,16 @@
  */
 import { Observer } from "@plexus-interop/common";
 import { Logger } from "@plexus-interop/common";
+import { InvocationObserver } from "../generic";
 
-export class LoggingObserver implements Observer<ArrayBuffer> {
+export class LoggingInvocationObserver implements InvocationObserver<ArrayBuffer> {
 
-    constructor(private readonly baseObserver: Observer<ArrayBuffer>, private readonly log: Logger) { }
+    constructor(private readonly baseObserver: InvocationObserver<ArrayBuffer>, private readonly log: Logger) { }
+
+    public streamCompleted(): void {
+        this.log.trace("Stream completed");
+        this.baseObserver.streamCompleted();
+    }
 
     public next(payload: ArrayBuffer): void {
         this.log.trace(`Response payload of ${payload.byteLength} received`);

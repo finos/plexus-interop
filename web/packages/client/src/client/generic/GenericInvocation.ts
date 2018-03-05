@@ -23,6 +23,7 @@ import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
 import { StateMaschine, CancellationToken, Logger, LoggerFactory, StateMaschineBase, AsyncHelper } from "@plexus-interop/common";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
 import { ClientDtoUtils } from "../ClientDtoUtils";
+import { InvocationChannelObserver } from "./InvocationChannelObserver";
 
 export class GenericInvocation {
 
@@ -77,7 +78,7 @@ export class GenericInvocation {
         ]);
     }
 
-    public start(metaInfo: InvocationMetaInfo, invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
+    public start(metaInfo: InvocationMetaInfo, invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.metaInfo = metaInfo;
         this.log.trace("Start basic invocation");
         this.startInvocationInternal(() => this.sendStartInvocationRequest(metaInfo), invocationObserver);
@@ -85,13 +86,13 @@ export class GenericInvocation {
 
     public startDiscovered(
         methodReference: ProvidedMethodReference,
-        invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
+        invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.trace("Start discovered invocation");
         this.metaInfo = ClientDtoUtils.providedMethodToInvocationInfo(methodReference);
         this.startInvocationInternal(() => this.sendStartDiscoveredInvocationRequest(methodReference), invocationObserver);
     }
 
-    public acceptInvocation(invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
+    public acceptInvocation(invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug("Accept of invocation requested");
         this.stateMachine.throwIfNot(InvocationState.CREATED);
         this.stateMachine.go(InvocationState.ACCEPTING_INVOCATION_INFO);
@@ -170,7 +171,7 @@ export class GenericInvocation {
         this.id = id;
     }
 
-    private startInvocationInternal(sendRequest: () => Promise<void>, invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
+    private startInvocationInternal(sendRequest: () => Promise<void>, invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug("Invocation start requested");
         this.stateMachine.throwIfNot(InvocationState.CREATED);
         this.setUuid(UniqueId.generateNew());
@@ -216,9 +217,10 @@ export class GenericInvocation {
         });
     }
 
-    private handleRemoteSentCompleted(invocationObserver: Observer<ArrayBuffer>): void {
+    private handleRemoteSentCompleted(invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug("Source channel subscription completed");
         this.sendCompletionReceived = true;
+        invocationObserver.streamCompleted();                
         switch (this.stateMachine.getCurrent()) {
             case InvocationState.OPEN:
                 this.log.debug("Open state, switching to COMPLETION_RECEIVED");
@@ -237,24 +239,24 @@ export class GenericInvocation {
     }
 
     private openSubscription(
-        invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): Promise<AnonymousSubscription> {
+        invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): Promise<AnonymousSubscription> {
         this.log.trace(`Starting listening of incoming messages`);
         return new Promise<AnonymousSubscription>((resolve, reject) => {
             this.sourceChannel.open({
 
-                started: (sourceSubscription) => {
+                started: sourceSubscription => {
                     this.log.debug("Source channel subscription started");
                     this.sourceChannelSubscription = sourceSubscription;
                     resolve(sourceSubscription);
                 },
 
-                startFailed: (error) => {
+                startFailed: error => {
                     this.log.error("Unable to open source channel", error);
                     invocationObserver.startFailed(error);
                     reject(error);
                 },
 
-                next: (message) => {
+                next: message => {
                     try {
                         this.handleIncomingMessage(message, invocationObserver);
                     } catch (e) {
@@ -281,7 +283,7 @@ export class GenericInvocation {
 
     }
 
-    private handleIncomingMessage(data: ArrayBuffer, invocationObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
+    private handleIncomingMessage(data: ArrayBuffer, invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.trace(`Received message of ${data.byteLength} bytes`);
         if (this.readCancellationToken.isCancelled()) {
             this.log.warn(`Read cancelled with '${this.readCancellationToken.getReason()}', drop message`);

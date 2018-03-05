@@ -21,7 +21,7 @@ import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientStreamingHandler } from "./ClientStreamingHandler";
 import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
 
-export class ClientInvocationTests extends BaseEchoTest {
+export class ClientStreamingTests extends BaseEchoTest {
 
     public constructor(
         private connectionProvider: ConnectionProvider,
@@ -57,6 +57,36 @@ export class ClientInvocationTests extends BaseEchoTest {
             });
             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
             streamingClient.complete();
+        });
+    }
+
+    public testServerReceivesClientCompletionBeforeResponse(): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
+                let lastRequest: plexus.plexus.interop.testing.IEchoRequest | null = null;
+                return {
+                    next: async clientRequest => lastRequest = clientRequest,
+                    complete: () => {
+                        if (!lastRequest) {
+                            reject("Request not received");
+                        } else {
+                            hostClient.next(lastRequest);
+                            hostClient.complete();                            
+                        }
+                    },
+                    error: e => reject(e)
+                };
+            });
+            const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+            const streamingClient = await client.getEchoServiceProxy().clientStreaming({
+                next: serverResponse => { },
+                error: e => reject(e),
+                complete: async () => {}
+            });
+            streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
+            await streamingClient.complete();
+            await this.clientsSetup.disconnect(client, server);
+            resolve();
         });
     }
 
