@@ -15,25 +15,29 @@
  * limitations under the License.
  */
 import { Observer } from "@plexus-interop/common";
-import { Logger } from "@plexus-interop/common";
+import { UniqueId } from "@plexus-interop/transport-common";
 
-export class LoggingObserver implements Observer<ArrayBuffer> {
+export class LogInvocationObserver<T> implements Observer<T> {
 
-    constructor(private readonly baseObserver: Observer<ArrayBuffer>, private readonly log: Logger) { }
+    constructor(private _next?: (data: T) => void, private id: UniqueId = UniqueId.generateNew()) {}
 
-    public next(payload: ArrayBuffer): void {
-        this.log.trace(`Response payload of ${payload.byteLength} received`);
-        this.baseObserver.next(payload);
-    }
-
-    public error(e: any): void {
-        this.log.error(`Error received`, e);
-        this.baseObserver.error(e);
+    public streamCompleted(): void {
+        console.log("Stream completed");
     }
 
     public complete(): void {
-        this.log.trace(`Completion received`);
-        this.baseObserver.complete();
+        console.log(`${this.id.toString()} - Complete`);
+    }
+
+    public next(data: T): void {
+        console.log(`${this.id.toString()} - Next`, data);        
+        if (this._next) {
+            this._next(data);
+        }
+    }
+
+    public error(error: any) {
+        console.log(`${this.id.toString()} - Error`);
     }
 
 }

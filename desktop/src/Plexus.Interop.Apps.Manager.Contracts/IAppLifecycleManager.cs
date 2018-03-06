@@ -22,6 +22,10 @@
 
     public interface IAppLifecycleManager
     {
+        Task StartAsync();
+
+        Task StopAsync();
+
         IAppConnection AcceptConnection(
             ITransportConnection connection,
             AppConnectionDescriptor info);

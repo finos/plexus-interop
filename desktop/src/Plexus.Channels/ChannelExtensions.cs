@@ -78,7 +78,7 @@ namespace Plexus.Channels
                 {
                     return true;
                 }
-            } while (await channel.WaitWriteAvailableAsync(cancellationToken));
+            } while (await channel.WaitWriteAvailableAsync(cancellationToken).ConfigureAwait(false));
             return false;
         }
 

@@ -26,6 +26,7 @@ import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
 import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
 import { GenericRequest } from "@plexus-interop/client-api";
 import { UniqueId } from "@plexus-interop/transport-common";
+import { InvocationObserver } from "../../generic";
 
 export interface GenericClientApi {
 
@@ -35,16 +36,16 @@ export interface GenericClientApi {
     
     sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
 
-    sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
+    sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
     
-    sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
+    sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
     
-    sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient>;
+    sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<InvocationClient>;
     
     sendRawServerStreamingRequest(
         invocationInfo: InvocationRequestInfo,
         request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
+        responseObserver: InvocationObserver<ArrayBuffer>): Promise<InvocationClient>;
 
     discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse>;
 

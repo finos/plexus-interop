@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.Pipes
+namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
 {
-    using Plexus.Channels;
-    using Plexus.Interop.Transport.Transmission.Streams;
-    using Plexus.Processes;
     using System;
     using System.IO;
     using System.IO.Pipes;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Channels;
+    using Plexus.Interop.Transport.Transmission.Streams;
+    using Plexus.Processes;
 
-    public sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
+    internal sealed class PipeTransmissionServer : ProcessBase, ITransmissionServer
     {
         private const int AcceptedConnectionsBufferSize = 20;
         private const string ServerName = "np-v1";

@@ -14,21 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Apps
+namespace Plexus.Interop.Apps.Internal
 {
-    using Newtonsoft.Json;
-    using Plexus.Interop.Apps.Internal;
-    using Plexus.Interop.Apps.Internal.Generated;
-    using Plexus.Interop.Transport;
-    using Plexus.Processes;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using Newtonsoft.Json;
+    using Plexus.Interop.Apps.Internal.Generated;
+    using Plexus.Interop.Transport;
+    using Plexus.Processes;
     using UniqueId = Plexus.UniqueId;
 
-    public sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager
+    internal sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager
     {        
         private readonly Dictionary<UniqueId, IAppConnection> _connections
             = new Dictionary<UniqueId, IAppConnection>();

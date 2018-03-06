@@ -23,19 +23,21 @@ import { UnaryHandlerConverter } from "../../src/client/api/unary/UnaryHandlerCo
 import { ServerStreamingInvocationHandler } from "../../src/client/api/streaming/ServerStreamingInvocationHandler";
 import { ServerStreamingConverter } from "../../src/client/api/streaming/ServerStreamingHandlerConveter";
 import { ServiceInfo } from "@plexus-interop/client-api";
-import { LogObserver } from "../LogObserver";
 
 import { when, mock, instance, anything, verify, capture } from "ts-mockito";
 import { GenericClientImpl } from "../../src/client/generic/GenericClientImpl";
 import { Observer } from "@plexus-interop/common";
-import { clientProtocol as plexus, SuccessCompletion } from "@plexus-interop/protocol"
+import { clientProtocol as plexus, SuccessCompletion } from "@plexus-interop/protocol";
 import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
 import { ChannelObserver } from "@plexus-interop/transport-common";
 import { MethodInvocationContext } from "@plexus-interop/client-api";
+import { LogInvocationObserver } from "../LogInvocationObserver";
+import { InvocationObserver } from "../../src/client";
 
 declare var process: any;
 
 process.on("unhandledRejection", (reason: any, p: any) => {
+    // tslint:disable-next-line:no-console
     console.log("Unhandled Rejection at: Promise", p, "reason:", reason);
 });
 
@@ -57,11 +59,11 @@ describe("GenericInvocationHost", () => {
                     handler: {
                         methodId: "1",
                         handle: (context: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
-                            return new LogObserver<ArrayBuffer>();
+                            return new LogInvocationObserver<ArrayBuffer>();
                         }
                     }
                 }
-            ], 
+            ],
             // unary
             [
                 {
@@ -73,7 +75,7 @@ describe("GenericInvocationHost", () => {
                         }
                     }
                 }
-            ], 
+            ],
             // server streaming
             [
                 {
@@ -99,6 +101,7 @@ describe("GenericInvocationHost", () => {
             done();
             return new SuccessCompletion();
         }, async (context: MethodInvocationContext, request: ArrayBuffer) => {
+            // tslint:disable-next-line:no-console
             console.log("Doing important stuff ...");
             return responsePayload;
         }, (invocation) => {
@@ -144,7 +147,7 @@ describe("GenericInvocationHost", () => {
         }, (context: MethodInvocationContext, client) => {
             let count = 0;
             return {
-                next: (request) => {
+                next: request => {
                     expect(request).toBe(requestPayload);
                     count++;
                     client.next(responsePayload);
@@ -152,8 +155,9 @@ describe("GenericInvocationHost", () => {
                         client.complete();
                     }
                 },
-                error: (e) => { },
-                complete: () => { }
+                error: e => { },
+                complete: () => { },
+                streamCompleted: () => { }
             };
         }, (invocation) => {
         }, 3);
@@ -175,17 +179,17 @@ describe("GenericInvocationHost", () => {
         };
 
         setupServerStreamingHostedInvocation(
-            
-            requestPayload, 
-            
-            (completion: plexus.ICompletion) => Promise.resolve(new SuccessCompletion()), 
-            
-            streamingHandler, 
-            
+
+            requestPayload,
+
+            (completion: plexus.ICompletion) => Promise.resolve(new SuccessCompletion()),
+
+            streamingHandler,
+
             (invocation: Invocation) => {
                 verify(invocation.sendMessage(responsePayload)).twice();
                 verify(invocation.close(anything())).called();
-                done();                
+                done();
             });
     });
 
@@ -219,7 +223,7 @@ function setupServerStreamingHostedInvocation(
 function setupHostedInvocation(
     requestPayload: ArrayBuffer,
     invocationCloseHandler: (x: plexus.ICompletion) => Promise<plexus.ICompletion>,
-    hostedAction: (context: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => Observer<ArrayBuffer>,
+    hostedAction: (context: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => InvocationObserver<ArrayBuffer>,
     postHandler?: (invocation: Invocation) => void,
     requestMessagesCount: number = 1): void {
 
@@ -235,7 +239,7 @@ function setupHostedInvocation(
         invocationCloseHandler(completion);
         return Promise.resolve(new SuccessCompletion());
     });
-    
+
     let requestObserver = null;
     when(mockInvocation.open(anything())).thenCall((observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>) => {
         setTimeout(() => {

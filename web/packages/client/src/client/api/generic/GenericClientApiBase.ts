@@ -20,6 +20,7 @@ import { GenericRequest, ServiceDiscoveryRequest, MethodDiscoveryRequest, Method
 import { Observer } from "@plexus-interop/common";
 import { ValueHandler, InvocationClient } from "../";
 import { StreamingInvocationClient } from "../streaming/StreamingInvocationClient";
+import { InvocationObserver } from "../../generic";
 
 /**
  * Base class for all generated clients
@@ -41,19 +42,19 @@ export abstract class GenericClientApiBase implements GenericClientApi {
         return this.client.sendRawUnaryRequest(invocationInfo, request, responseHandler);
     }
 
-    public sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
+    public sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
         return this.client.sendBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
     }
 
-    public sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
+    public sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
         return this.client.sendRawBidirectionalStreamingRequest(invocationInfo, responseObserver);
     }
 
-    public sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<InvocationClient> {
+    public sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<InvocationClient> {
         return this.client.sendServerStreamingRequest(invocationInfo, request, responseObserver, requestType, responseType);
     }
 
-    public sendRawServerStreamingRequest(invocationInfo: InvocationRequestInfo, request: ArrayBuffer, responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
+    public sendRawServerStreamingRequest(invocationInfo: InvocationRequestInfo, request: ArrayBuffer, responseObserver: InvocationObserver<ArrayBuffer>): Promise<InvocationClient> {
         return this.client.sendRawServerStreamingRequest(invocationInfo, request, responseObserver);
     }
 

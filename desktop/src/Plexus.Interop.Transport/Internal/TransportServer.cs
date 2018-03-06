@@ -14,16 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Transport.Internal
 {
+    using System.Threading.Tasks;
     using Plexus.Channels;
-    using Plexus.Interop.Transport.Internal;
     using Plexus.Interop.Transport.Protocol.Serialization;
     using Plexus.Interop.Transport.Transmission;
     using Plexus.Processes;
-    using System.Threading.Tasks;
 
-    public sealed class TransportServer : ProcessBase, ITransportServer
+    internal sealed class TransportServer : ProcessBase, ITransportServer
     {
         private readonly ITransmissionServer _transmissionServer;
         private readonly TransportConnectionFactory _connectionFactory;

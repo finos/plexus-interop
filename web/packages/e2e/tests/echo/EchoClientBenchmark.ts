@@ -69,7 +69,7 @@ export class EchoClientBenchmark extends BaseEchoTest {
                 } else {
                     hostClient.complete();   
                 }
-            };
+            }
             sendMessages();
         });              
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
@@ -79,7 +79,7 @@ export class EchoClientBenchmark extends BaseEchoTest {
             let sentMessagesCount = 0;
             let lastReceived = 0;      
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: (response) => {
+                next: response => {
                     if (cancellationToken.isCancelled()) {
                         return;
                     }
@@ -101,7 +101,8 @@ export class EchoClientBenchmark extends BaseEchoTest {
                 },
                 error: (e) => {
                     reject(e);
-                }
+                },
+                streamCompleted: () => {}
             });
         });
         

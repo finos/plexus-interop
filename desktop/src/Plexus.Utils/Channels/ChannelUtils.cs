@@ -19,7 +19,7 @@ namespace Plexus.Channels
     using System;
     using System.Threading.Tasks;
 
-    public static class ChannelUtils
+    internal static class ChannelUtils
     {
         public static void PropagateTerminationFrom(this ITerminatableChannel channel, Task completion)
         {

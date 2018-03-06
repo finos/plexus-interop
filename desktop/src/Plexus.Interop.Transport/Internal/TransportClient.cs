@@ -14,16 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Transport.Internal
 {
-    using Plexus.Interop.Transport.Internal;
-    using Plexus.Interop.Transport.Protocol.Serialization;
-    using Plexus.Interop.Transport.Transmission;
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
 
-    public sealed class TransportClient : ITransportClient
+    internal sealed class TransportClient : ITransportClient
     {
         private static readonly ILogger Log = LogManager.GetLogger<TransportClient>();
 

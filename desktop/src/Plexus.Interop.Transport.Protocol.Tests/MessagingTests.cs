@@ -43,9 +43,9 @@ namespace Plexus.Interop.Transport.Protocol
 
         public MessagingTests()
         {
-            _server = RegisterDisposable(new PipeTransmissionServer(BrokerWorkingDir));
+            _server = RegisterDisposable(PipeTransmissionServerFactory.Instance.Create(BrokerWorkingDir));
             _server.StartAsync().GetResult();
-            _client = new PipeTransmissionClient();
+            _client = PipeTransmissionClientFactory.Instance.Create();
         }
 
         private static IEnumerable<TransportMessage> GenerateAllTransportMessages()

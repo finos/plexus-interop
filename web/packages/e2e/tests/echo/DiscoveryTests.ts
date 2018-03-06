@@ -70,6 +70,7 @@ export class DiscoveryTests extends BaseEchoTest {
             }
             if (serviceRef.providedService) {
                 expect(serviceRef.providedService.applicationId).to.eq("plexus.interop.testing.EchoServer");
+                // tslint:disable-next-line:no-unused-expression
                 expect(serviceRef.providedService.connectionId).to.not.be.undefined;
                 expect(serviceRef.providedService.serviceId).to.eq(serviceId);
             } else {
@@ -106,7 +107,7 @@ export class DiscoveryTests extends BaseEchoTest {
             hostClient.next(echoRequest);
             hostClient.complete();
         });
-        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {
@@ -134,7 +135,8 @@ export class DiscoveryTests extends BaseEchoTest {
                     },
                     error: (e) => {
                         reject(e);
-                    }
+                    },
+                    streamCompleted: () => {}
                 });
             });
 
@@ -147,12 +149,14 @@ export class DiscoveryTests extends BaseEchoTest {
         const echoRequest = this.clientsSetup.createRequestDto();
         const handler = new ClientStreamingHandler((context, hostClient) => {
                 return {
-                    next: (clientRequest) => hostClient.complete(),
+                    next: clientRequest => hostClient.complete(),
                     complete: () => {},
-                    error: (e) => console.error("Error received by server", e)
-                }
+                    // tslint:disable-next-line:no-console
+                    error: (e) => console.error("Error received by server", e),
+                    streamCompleted: () => {}
+                };
             });
-        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {
@@ -169,14 +173,15 @@ export class DiscoveryTests extends BaseEchoTest {
             }
             return new Promise<void>(async (resolve, reject) => {
                 const streamingClient = await client.sendRawBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
-                    next: (serverResponse) => {},
+                    next: serverResponse => {},
                     error: (e) => {
                         reject(e);
                     },
                     complete: async () => {
                         await this.clientsSetup.disconnect(client, server);
                         resolve();                        
-                    }
+                    },
+                    streamCompleted: () => {}
                 });
                 streamingClient.next(this.encodeRequestDto(echoRequest));
                 streamingClient.complete();
@@ -189,7 +194,7 @@ export class DiscoveryTests extends BaseEchoTest {
     public async testClientCanInvokeDiscoveredMethodPassingRawData(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         const handler = new UnaryServiceHandler(async (context, request) => request);
-        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {
@@ -224,7 +229,7 @@ export class DiscoveryTests extends BaseEchoTest {
     public async testClientCanInvokeDiscoveredMethodPassingObject(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         const handler = new UnaryServiceHandler(async (context, request) => request);
-        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler)
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {

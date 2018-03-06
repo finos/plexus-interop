@@ -25,10 +25,10 @@ namespace Plexus.Interop.Transport.WebSockets
     {
         public WebSocketTransportTests(ITestOutputHelper output) : base(output)
         {
-            Server = RegisterDisposable(new TransportServer(
-                new WebSocketTransmissionServer(BrokerWorkingDir),
+            Server = RegisterDisposable(TransportServerFactory.Instance.Create(
+                WebSocketTransmissionServerFactory.Instance.Create(BrokerWorkingDir),
                 new ProtobufTransportProtocolSerializationProvider()));
-            Client = new TransportClient(
+            Client = TransportClientFactory.Instance.Create(
                 new WebSocketTransmissionClient(),
                 new ProtobufTransportProtocolSerializationProvider());
         }

@@ -20,8 +20,9 @@ import { BaseEchoTest } from "./BaseEchoTest";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientStreamingHandler } from "./ClientStreamingHandler";
 import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
+import { expect } from "chai";
 
-export class ClientInvocationTests extends BaseEchoTest {
+export class ClientStreamingTests extends BaseEchoTest {
 
     public constructor(
         private connectionProvider: ConnectionProvider,
@@ -33,30 +34,69 @@ export class ClientInvocationTests extends BaseEchoTest {
         return new Promise<void>(async (resolve, reject) => {
             const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
                 return {
-                    next: async (clientRequest) => {
+                    next: async clientRequest => {
                         hostClient.next(clientRequest);
                         hostClient.complete();
                     },
                     complete: () => { },
                     error: (e) => {
                         reject(e);
-                    }
+                    },
+                    streamCompleted: () => { }
                 };
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+            let remoteCompleted = false;
             const streamingClient = await client.getEchoServiceProxy().clientStreaming({
                 next: (serverResponse) => { },
                 error: (e) => {
                     console.error("Error received by client", e);
                     reject(e);
                 },
-                complete: async () => {
-                    await this.clientsSetup.disconnect(client, server);
-                    resolve();
-                }
+                complete: async () => remoteCompleted = true,
+                streamCompleted: () => { }
             });
             streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
-            streamingClient.complete();
+            await streamingClient.complete();
+            if (!remoteCompleted) { reject("Server stream not completed"); }            
+            await this.clientsSetup.disconnect(client, server);
+            resolve();
+        });
+    }
+
+    public testServerReceivesClientCompletionBeforeResponse(): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            const serverHandler = new ClientStreamingHandler((context: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>) => {
+                let lastRequest: plexus.plexus.interop.testing.IEchoRequest | null = null;
+                return {
+                    next: async clientRequest => lastRequest = clientRequest,
+                    complete: () => { },
+                    error: e => reject(e),
+                    streamCompleted: () => {
+                        if (!lastRequest) {
+                            reject("Request not received");
+                        } else {
+                            hostClient.next(lastRequest);
+                            hostClient.complete();
+                        }
+                    }
+                };
+            });
+            const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
+            let serverCompleted = false;
+            let serverStreamCompleted = false;
+            const streamingClient = await client.getEchoServiceProxy().clientStreaming({
+                next: serverResponse => { },
+                error: e => reject(e),
+                complete: async () => serverCompleted = true,
+                streamCompleted: () => serverStreamCompleted = true
+            });
+            streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
+            await streamingClient.complete();
+            if (!serverCompleted) { reject("Server not completed"); }
+            if (!serverStreamCompleted) { reject("Server stream not completed"); }
+            await this.clientsSetup.disconnect(client, server);
+            resolve();
         });
     }
 

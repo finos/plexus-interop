@@ -14,12 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
-{
-    using System.Threading;
+import { InvocationObserver } from "./InvocationObserver";
+import { ConversionObserver } from "@plexus-interop/common";
 
-    public interface ITransportClientFactory
-    {
-        ITransportClient Create(string brokerWorkingDir, CancellationToken cancellationToken);
+export class InvocationObserverConverter<S, D> extends ConversionObserver<S, D> implements InvocationObserver<D>  {
+
+    private baseSource: InvocationObserver<S>;
+
+    constructor(
+        source: InvocationObserver<S>,
+        converter: (from: D) => S) {
+        super(source, converter);
+        this.baseSource = source;
     }
+
+    public streamCompleted(): void {
+        return this.baseSource.streamCompleted();
+    }
+
 }

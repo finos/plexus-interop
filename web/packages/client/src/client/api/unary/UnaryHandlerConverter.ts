@@ -49,12 +49,9 @@ export class UnaryHandlerConverter implements InvocationHandlerConverter<SimpleU
                             invocationHostClient.error(ClientDtoUtils.toError(executionError));
                         }
                     },
-                    error: (e) => {
-                        this.log.error("Error received", e);
-                    },
-                    complete: () => {
-                        this.log.debug("Invocation completed");
-                    }
+                    streamCompleted: () => this.log.debug("Stream completed"),
+                    error: e => this.log.error("Error received", e),
+                    complete: () => this.log.debug("Invocation completed")
                 };
             }
         };

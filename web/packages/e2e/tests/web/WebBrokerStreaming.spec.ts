@@ -19,7 +19,7 @@ import { TransportsSetup } from "../common/TransportsSetup";
 import { readHostUrl } from "../common/utils";
 import { ServerStreamingInvocationTests } from "../echo/ServerStreamingInvocationTests";
 import { BidiStreamingInvocationTests } from "../echo/BidiStreamingTests";
-import { ClientInvocationTests } from "../echo/ClientStreamingTests";
+import { ClientStreamingTests } from "../echo/ClientStreamingTests";
 
 describe("Web Broker: Streaming invocations", () => {
 
@@ -36,7 +36,7 @@ describe("Web Broker: Streaming invocations", () => {
         transportsSetup.createCrossDomainTransportProvider(proxyHost),
         clientsSetup);
 
-    const clientStreamingTests = new ClientInvocationTests(transportsSetup.createCrossDomainTransportProvider(proxyHost),
+    const clientStreamingTests = new ClientStreamingTests(transportsSetup.createCrossDomainTransportProvider(proxyHost),
         clientsSetup);
 
     it("Sends streaming response from server using serverStreaming invocation", function () {

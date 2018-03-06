@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- using System;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Plexus
 {
-    public static class TaskExtensions
+    using System;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    internal static class TaskExtensions
     {
         private static readonly ILogger Log = LogManager.GetLogger(typeof(TaskExtensions));
 
