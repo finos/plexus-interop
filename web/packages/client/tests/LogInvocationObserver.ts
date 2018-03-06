@@ -14,21 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { LogObserver } from "./LogObserver";
-import { BlockingQueueBase, CancellationToken } from "@plexus-interop/common";
+import { Observer } from "@plexus-interop/common";
+import { UniqueId } from "@plexus-interop/transport-common";
 
-export class BufferedObserver<T> extends LogObserver<T> {
+export class LogInvocationObserver<T> implements Observer<T> {
 
-    constructor(private cancellationToken?: CancellationToken, private buffer: BlockingQueueBase<T> = new BlockingQueueBase<T>()) {
-        super();
+    constructor(private _next?: (data: T) => void, private id: UniqueId = UniqueId.generateNew()) {}
+
+    public streamCompleted(): void {
+        console.log("Stream completed");
+    }
+
+    public complete(): void {
+        console.log(`${this.id.toString()} - Complete`);
     }
 
     public next(data: T): void {
-        super.next(data);
-        this.buffer.enqueue(data);
+        console.log(`${this.id.toString()} - Next`, data);        
+        if (this._next) {
+            this._next(data);
+        }
     }
 
-    public pullData(): Promise<T> {
-        return this.buffer.blockingDequeue(this.cancellationToken);
+    public error(error: any) {
+        console.log(`${this.id.toString()} - Error`);
     }
+
 }

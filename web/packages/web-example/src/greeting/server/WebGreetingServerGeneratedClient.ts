@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -14,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, GenericClientApiBase, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
@@ -27,73 +28,20 @@ import * as plexus from "./gen/plexus-messages";
  */
 export abstract class WebGreetingServerClient {
 
-
-    public abstract sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient>;
-
-    public abstract sendStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
-
-    public abstract discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse>;
-
-    public abstract discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
-
-    public abstract sendRawUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
-
-    public abstract sendRawBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
-
-    public abstract sendRawServerStreamingRequest(
-        methodReference: ProvidedMethodReference,
-        request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
-
-    public abstract disconnect(completion?: Completion): Promise<void>;
-
 }
 
 /**
  * Client's API internal implementation
  *
  */
-class WebGreetingServerClientImpl implements WebGreetingServerClient {
+class WebGreetingServerClientImpl extends GenericClientApiBase implements WebGreetingServerClient {
 
     public constructor(
-        private readonly genericClient: GenericClientApi,
-    ) { }
-
-
-    public discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse> {
-        return this.genericClient.discoverService(discoveryRequest);
+        private readonly genericClient: GenericClientApi
+    ) {
+        super(genericClient);
     }
 
-    public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
-        return this.genericClient.discoverMethod(discoveryRequest);
-    }
-
-    public sendRawUnaryRequest(methodReference: ProvidedMethodReference, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
-        return this.genericClient.sendRawUnaryRequest(methodReference, request, responseHandler);
-    }
-
-    public sendRawBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: Observer<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
-        return this.genericClient.sendRawBidirectionalStreamingRequest(methodReference, responseObserver);
-    }
-
-    public sendRawServerStreamingRequest(
-        methodReference: ProvidedMethodReference,
-        request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient> {
-        return this.genericClient.sendRawServerStreamingRequest(methodReference, request, responseObserver);
-    }
-
-    public disconnect(completion?: Completion): Promise<void> {
-        return this.genericClient.disconnect(completion);
-    }
-
-    public sendUnaryRequest(invocationInfo: InvocationRequestInfo, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
-        return this.genericClient.sendUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
-    }
-
-    public sendStreamingRequest(invocationInfo: InvocationRequestInfo, responseObserver: Observer<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
-        return this.genericClient.sendBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
-    }
 
 }
 

@@ -22,30 +22,32 @@ import { UniqueId, DelegateChannelObserver } from "@plexus-interop/transport-com
 import { ClientProtocolHelper as modelHelper } from "@plexus-interop/protocol";
 import { randomPayload } from "../utils";
 import { AsyncHelper, Observer } from "@plexus-interop/common";
-import { LogObserver } from "../LogObserver";
-import { BufferedObserver } from "../BufferedObserver";
 import { CancellationToken } from "@plexus-interop/common";
 import { createInvocationInfo } from "./client-mocks";
 import { BufferedChannel } from "./client-mocks";
+import { DelegateInvocationObserver } from "../../src/index";
+import { LogInvocationObserver } from "../LogInvocationObserver";
+import { BufferedInvocationObserver } from "../BufferedInvocationObserver";
+import { InvocationObserver } from "../../src/client";
 
 describe("Invocation", () => {
 
     let mockChannel: BufferedChannel;
     let invocationInfo: InvocationMetaInfo;
     let invocation: GenericInvocation;
-    let inMessagesObserver: BufferedObserver<ArrayBuffer>;
+    let inMessagesObserver: BufferedInvocationObserver<ArrayBuffer>;
 
     beforeEach(() => {
         invocationInfo = createInvocationInfo();
         const token = new CancellationToken();
         mockChannel = new BufferedChannel(token);
         invocation = new GenericInvocation(mockChannel, token);
-        inMessagesObserver = new BufferedObserver<ArrayBuffer>(token);
+        inMessagesObserver = new BufferedInvocationObserver<ArrayBuffer>(token);
     });
 
     it("Should request invocation start and go to STARTED state only when confirmation received", async () => {
 
-        await prepareRequestedInvocation(new LogObserver());
+        await prepareRequestedInvocation(new LogInvocationObserver());
 
         expect(invocation.currentState()).toEqual(InvocationState.OPEN);
 
@@ -56,7 +58,7 @@ describe("Invocation", () => {
     it("Should accept incoming invocation request and send confirmation", async () => {
 
         const invocationAccepted = new Promise((resolve, reject) => {
-            invocation.acceptInvocation(new DelegateChannelObserver(new LogObserver(),
+            invocation.acceptInvocation(new DelegateInvocationObserver(new LogInvocationObserver(),
                 (s) => resolve(s),
                 (e) => reject(e)));
         });
@@ -83,7 +85,7 @@ describe("Invocation", () => {
 
     it("Should send message as header with length and body to channel", async () => {
 
-        await prepareRequestedInvocation(new LogObserver());
+        await prepareRequestedInvocation(new LogInvocationObserver());
 
         const data = randomPayload(10);
         await invocation.sendMessage(data);
@@ -102,7 +104,7 @@ describe("Invocation", () => {
 
     it("Should receive confirmations and decrease counter", async () => {
 
-        const invocationId = await prepareRequestedInvocation(new LogObserver());
+        const invocationId = await prepareRequestedInvocation(new LogInvocationObserver());
 
         await invocation.sendMessage(randomPayload());
         await invocation.sendMessage(randomPayload());
@@ -149,7 +151,7 @@ describe("Invocation", () => {
 
     it("Should send 'Send completion' message before closing channel", async () => {
 
-        await prepareRequestedInvocation(new LogObserver());
+        await prepareRequestedInvocation(new LogInvocationObserver());
 
         expect(invocation.currentState()).toEqual(InvocationState.OPEN);
 
@@ -183,17 +185,18 @@ describe("Invocation", () => {
     }
 
     async function closeInvocation(): Promise<void> {
+        // tslint:disable-next-line:no-console
         console.log("Cancelling invocation");
         const closePromise = invocation.close();
         addToInbox(modelHelper.sendCompletionPayload({}));
         await closePromise;
     }
 
-    async function prepareRequestedInvocation(observer: Observer<ArrayBuffer> = new LogObserver<ArrayBuffer>()): Promise<UniqueId> {
+    async function prepareRequestedInvocation(observer: InvocationObserver<ArrayBuffer> = new LogInvocationObserver<ArrayBuffer>()): Promise<UniqueId> {
 
         const startedPromise = new Promise((resolve, reject) => {
             invocation.start(invocationInfo,
-                new DelegateChannelObserver(observer,
+                new DelegateInvocationObserver(observer,
                     (s) => resolve(s),
                     (e) => reject(e)));
         });

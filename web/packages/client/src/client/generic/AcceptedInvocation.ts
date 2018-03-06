@@ -20,6 +20,7 @@ import { UniqueId } from "@plexus-interop/transport-common";
 import { AnonymousSubscription } from "../../client/api/AnonymousSubscription";
 import { clientProtocol as plexus, InvocationMetaInfo } from "@plexus-interop/protocol";
 import { ChannelObserver } from "@plexus-interop/transport-common";
+import { InvocationChannelObserver } from "./InvocationChannelObserver";
 
 export class AcceptedInvocation implements Invocation {
 
@@ -33,7 +34,7 @@ export class AcceptedInvocation implements Invocation {
         return this.genericInvocation.sendMessage(data);
     }
 
-    public open(observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
+    public open(observer: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.genericInvocation.acceptInvocation(observer);
     }
 

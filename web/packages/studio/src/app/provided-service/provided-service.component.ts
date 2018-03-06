@@ -71,7 +71,11 @@ export class ProvidedServiceComponent implements OnInit {
   }
 
   handleCompleted(log) {
-    log.info("Invocation completed received");
+    log.info("Invocation completed");
+  }
+
+  handleStreamCompleted(log) {
+    log.info("Remote stream completed");
   }
 
   updateResponse(contentJson: string, messagesToSend: number, messagesPeriodInMillis: number): void {
@@ -107,9 +111,8 @@ export class ProvidedServiceComponent implements OnInit {
               this.printRequest(request, invocationLogger);
             },
             error: e => this.handleError(e, invocationLogger),
-            complete: () => {
-              this.handleCompleted(invocationLogger);
-            }
+            complete: () => this.handleCompleted(invocationLogger),
+            streamCompleted: () => this.handleStreamCompleted(invocationLogger)
           };
         });
         break;

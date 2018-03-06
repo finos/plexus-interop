@@ -19,7 +19,7 @@ import { InteropClient } from "./InteropClient";
 import { Injectable } from "@angular/core";
 import { TransportConnectionProvider } from "../transport/TransportConnectionProvider";
 import { InteropRegistryService, ProvidedMethod, ProvidedService } from "@plexus-interop/broker";
-import { GenericClientApiBuilder, MethodType, GenericUnaryInvocationHandler, StreamingInvocationClient, GenericServerStreamingInvocationHandler, GenericBidiStreamingInvocationHandler } from "@plexus-interop/client";
+import { GenericClientApiBuilder, MethodType, GenericUnaryInvocationHandler, StreamingInvocationClient, GenericServerStreamingInvocationHandler, GenericBidiStreamingInvocationHandler, InvocationObserver } from '@plexus-interop/client';
 import { UniqueId, ClientError } from '@plexus-interop/protocol';
 import { flatMap, Logger, LoggerFactory, Observer } from "@plexus-interop/common";
 import { GenericClientWrapper } from "./GenericClientWrapper";
@@ -84,10 +84,11 @@ export class InteropClientFactory {
                             return {
                                 next: v => {
                                     hostClient.error(new ClientError(notInterceptedMsg));
-                                    hostClient.complete();                            
+                                    hostClient.complete();
                                 },
-                                complete: () => {},
-                                error: e => console.log("Unexpected error from remote", e)
+                                complete: () => { },
+                                error: e => console.log("Unexpected error from remote", e),
+                                streamCompleted: () => { }
                             };
                         });
                         genericClientBuilder.withBidiStreamingInvocationHandler(this.createBidiStreamingHandlers(pm, requestMarshaller, responseMarshaller, bidiStreamingHandlers));
@@ -139,14 +140,15 @@ export class InteropClientFactory {
                 methodId: pm.method.name,
                 handle: (context, hostClient) => {
                     const stringHandler = handlers.get(fullName);
-                    const stringRequestObserver: Observer<string> = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
+                    const stringRequestObserver: InvocationObserver<string> = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
                     let received;
                     return {
-                        next: (v: ArrayBuffer) => { 
+                        next: (v: ArrayBuffer) => {
                             stringRequestObserver.next(JSON.stringify(requestMarshaller.decode(v)));
                         },
                         error: e => stringRequestObserver.error(e),
-                        complete: () => stringRequestObserver.complete()
+                        complete: () => stringRequestObserver.complete(),
+                        streamCompleted: () => stringRequestObserver.streamCompleted()
                     };
                 }
             }

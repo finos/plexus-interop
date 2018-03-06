@@ -19,7 +19,7 @@ import { TransportsSetup } from "../common/TransportsSetup";
 import { readWsUrl } from "../common/utils";
 import { ServerStreamingInvocationTests } from "../echo/ServerStreamingInvocationTests";
 import { BidiStreamingInvocationTests } from "../echo/BidiStreamingTests";
-import { ClientInvocationTests } from "../echo/ClientStreamingTests";
+import { ClientStreamingTests } from "../echo/ClientStreamingTests";
 
 describe("Client: Web Socket Streaming invocation", () => {
 
@@ -36,7 +36,7 @@ describe("Client: Web Socket Streaming invocation", () => {
         transportsSetup.createWebSocketTransportProvider(wsUrl),
         clientsSetup);
 
-    const clientStreamingTests = new ClientInvocationTests(transportsSetup.createWebSocketTransportProvider(wsUrl),
+    const clientStreamingTests = new ClientStreamingTests(transportsSetup.createWebSocketTransportProvider(wsUrl),
         clientsSetup);
 
     it("Sends streaming response from server using serverStreaming invocation", function () {
@@ -62,6 +62,10 @@ describe("Client: Web Socket Streaming invocation", () => {
 
     it("Sends client stream messages to server", function () {
         return clientStreamingTests.testClientCanSendStreamToServer();
+    });
+
+    it("Server receives client's completion before response for Client Streaming", function () {
+        return clientStreamingTests.testServerReceivesClientCompletionBeforeResponse();
     });
 
     it("Client can cancel invocation", function() {

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 export * from "./Channel";
+export * from "./BaseChannel";
 export * from "./Defaults";
 export * from "./ChannelObserver";
 export * from "./DelegateChannelObserver";

@@ -60,7 +60,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
     }
 
     private async testRemoteSideReceivedErrorWhenConnectionDropped(isDroppedByClient: boolean): Promise<void> {
-        
+
         const echoRequest = this.clientsSetup.createRequestDto();
         let client: EchoClientClient | null = null;
         let server: EchoServerClient | null = null;
@@ -84,7 +84,8 @@ export class ClientConnectivityTests extends BaseEchoTest {
                         complete: () => clientErrorReject("Complete not expected"),
                         error: (e) => {
                             clientErrorResolve();
-                        }
+                        },
+                        streamCompleted: () => { }
                     });
                 });
             });
@@ -95,7 +96,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
             if (isDroppedByClient) {
                 this.clientsSetup.getClientConnectionSetup().dropConnection();
             } else {
-                this.clientsSetup.getServerConnectionSetup().dropConnection();                
+                this.clientsSetup.getServerConnectionSetup().dropConnection();
             }
 
             // server's context must be cancelled
@@ -139,7 +140,8 @@ export class ClientConnectivityTests extends BaseEchoTest {
                         complete: () => { },
                         error: (e) => {
                             clientErrorResolve();
-                        }
+                        },
+                        streamCompleted: () => { }
                     });
                 });
             });

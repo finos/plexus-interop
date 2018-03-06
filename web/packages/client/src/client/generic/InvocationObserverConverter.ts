@@ -14,26 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Observer } from "@plexus-interop/common";
-import { UniqueId } from "@plexus-interop/transport-common";
+import { InvocationObserver } from "./InvocationObserver";
+import { ConversionObserver } from "@plexus-interop/common";
 
-export class LogObserver<T> implements Observer<T> {
+export class InvocationObserverConverter<S, D> extends ConversionObserver<S, D> implements InvocationObserver<D>  {
 
-    constructor(private _next?: (data: T) => void, private id: UniqueId = UniqueId.generateNew()) {}
+    private baseSource: InvocationObserver<S>;
 
-    public complete(): void {
-        console.log(`${this.id.toString()} - Complete`);
+    constructor(
+        source: InvocationObserver<S>,
+        converter: (from: D) => S) {
+        super(source, converter);
+        this.baseSource = source;
     }
 
-    public next(data: T): void {
-        console.log(`${this.id.toString()} - Next`, data);        
-        if (this._next) {
-            this._next(data);
-        }
-    }
-
-    public error(error: any) {
-        console.log(`${this.id.toString()} - Error`);
+    public streamCompleted(): void {
+        return this.baseSource.streamCompleted();
     }
 
 }

@@ -14,12 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseChannel } from "@plexus-interop/transport-common";
-import { InvocationMetaInfo } from "@plexus-interop/protocol";
-import { AnonymousSubscription } from "@plexus-interop/common";
-import { InvocationObserver } from "./InvocationObserver";
-import { InvocationChannelObserver } from "./InvocationChannelObserver";
+import { UniqueId } from "@plexus-interop/protocol";
+import { AnonymousSubscription } from "rxjs/Subscription";
+import { clientProtocol as plexus } from "@plexus-interop/protocol";
+import { ChannelObserver } from "./ChannelObserver";
 
-export interface Invocation extends BaseChannel<InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>> {
-    getMetaInfo(): InvocationMetaInfo;
+export interface BaseChannel<ObserverType> {
+
+    uuid(): UniqueId;
+
+    sendMessage(data: ArrayBuffer): Promise<void>;
+
+    open(observer: ObserverType): void;
+
+    close(completion?: plexus.ICompletion): Promise<plexus.ICompletion>;
+
 }

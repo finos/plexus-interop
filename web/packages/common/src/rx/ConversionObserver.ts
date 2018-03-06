@@ -19,9 +19,8 @@ import { Observer } from "./Observer";
 export class ConversionObserver<S, D> implements Observer<D> {
 
     constructor(
-        private readonly source: Observer<S>, 
-        private readonly converter: (from: D) => S) {}
-
+        protected readonly source: Observer<S>, 
+        protected readonly converter: (from: D) => S) {}
 
     public next(value: D): void {
         const after: S = this.converter(value);

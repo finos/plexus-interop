@@ -21,6 +21,7 @@ import { Logger, Observer, LoggerFactory, CancellationToken } from "@plexus-inte
 import { ClientDtoUtils } from "../../ClientDtoUtils";
 import { MethodInvocationContext } from "@plexus-interop/client-api";
 import { UniqueId } from "@plexus-interop/transport-common";
+import { InvocationObserver } from "../../generic/InvocationObserver";
 
 export class StreamingInvocationHost<Req, Res> {
 
@@ -31,7 +32,7 @@ export class StreamingInvocationHost<Req, Res> {
         private readonly invocation: Invocation) { }
 
     public execute(): void {
-        
+
         this.logger.debug("Handling invocation started");
         let baseRequestObserver: null | Observer<ArrayBuffer> = null;
         const invocationCancellationToken = new CancellationToken();
@@ -50,7 +51,7 @@ export class StreamingInvocationHost<Req, Res> {
                     this.logger.error(`No handler found for hash [${hash}]`);
                 }
             },
-            
+
             startFailed: (e) => this.logger.error("Could not open invocation", e),
 
             next: (requestPayload: ArrayBuffer) => {
@@ -61,6 +62,11 @@ export class StreamingInvocationHost<Req, Res> {
             complete: () => {
                 this.logger.trace("Received remote completion");
                 this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<ArrayBuffer>).complete());
+            },
+
+            streamCompleted: () => {
+                this.logger.trace("Received remote stream completion");
+                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as InvocationObserver<ArrayBuffer>).streamCompleted());
             },
 
             error: (invocationError) => {

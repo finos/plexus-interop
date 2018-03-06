@@ -14,12 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseChannel } from "@plexus-interop/transport-common";
-import { InvocationMetaInfo } from "@plexus-interop/protocol";
-import { AnonymousSubscription } from "@plexus-interop/common";
-import { InvocationObserver } from "./InvocationObserver";
-import { InvocationChannelObserver } from "./InvocationChannelObserver";
+import { BlockingQueueBase, CancellationToken } from "@plexus-interop/common";
+import { LogInvocationObserver } from "./LogInvocationObserver";
 
-export interface Invocation extends BaseChannel<InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>> {
-    getMetaInfo(): InvocationMetaInfo;
+export class BufferedInvocationObserver<T> extends LogInvocationObserver<T> {
+
+    constructor(private cancellationToken?: CancellationToken, private buffer: BlockingQueueBase<T> = new BlockingQueueBase<T>()) {
+        super();
+    }
+
+    public next(data: T): void {
+        super.next(data);
+        this.buffer.enqueue(data);
+    }
+
+    public pullData(): Promise<T> {
+        return this.buffer.blockingDequeue(this.cancellationToken);
+    }
 }

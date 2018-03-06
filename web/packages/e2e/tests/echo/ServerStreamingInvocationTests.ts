@@ -60,7 +60,8 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                 },
                 error: (e) => {
                     reject(e);
-                }
+                },
+                streamCompleted: () => { }
             });
         });
     }
@@ -79,15 +80,16 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: (response) => {
+                next: response => {
                 },
                 complete: async () => {
                     reject("Not expected to be completed");
                 },
-                error: async (e) => {
+                error: async e => {
                     await this.clientsSetup.disconnect(client, server);
                     resolve();
-                }
+                },
+                streamCompleted: () => { }
             });
         });
     }
@@ -100,17 +102,18 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
             client.getEchoServiceProxy().serverStreaming(this.clientsSetup.createRequestDto(), {
-                next: (response) => {
+                next: response => {
                     reject("Not expected to receive update");
                 },
                 complete: async () => {
                     reject("Not expected to be completed");
                 },
-                error: async (e) => {
+                error: async e => {
                     expect(e.message).to.eq(errorText);
                     await this.clientsSetup.disconnect(client, server);
                     resolve();
-                }
+                },
+                streamCompleted: () => { }
             });
         });
     }
@@ -138,7 +141,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             // first
             const firstResponses: plexus.plexus.interop.testing.IEchoRequest[] = [];
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: (response) => firstResponses.push(response),
+                next: response => firstResponses.push(response),
                 complete: async () => {
                     firstCompleted = true;
                     expect(firstResponses.length).is.eq(3);
@@ -148,13 +151,14 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                         resolve();
                     }
                 },
-                error: (e) => reject(e)
+                error: e => reject(e),
+                streamCompleted: () => { }
             });
 
             // second
             const secondResponses: plexus.plexus.interop.testing.IEchoRequest[] = [];
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: (response) => secondResponses.push(response),
+                next: response => secondResponses.push(response),
                 complete: async () => {
                     secondCompleted = true;
                     expect(secondResponses.length).is.eq(3);
@@ -164,7 +168,8 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                         resolve();
                     }
                 },
-                error: (e) => reject(e)
+                error: e => reject(e),
+                streamCompleted: () => { }
             });
         });
     }
@@ -183,15 +188,16 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
 
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: (response) => {
+                next: response => {
                 },
                 complete: async () => {
                     reject("Not expected to be completed");
                 },
-                error: async (e) => {
+                error: async e => {
                     await this.clientsSetup.disconnect(client, server);
                     resolve();
-                }
+                },
+                streamCompleted: () => { }
             });
         });
     }
