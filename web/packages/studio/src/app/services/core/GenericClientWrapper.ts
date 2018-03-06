@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 import { InteropClient } from "./InteropClient";
-import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient, InvocationObserver } from '@plexus-interop/client';
-import { InvocationRequestInfo } from "@plexus-interop/protocol";
+import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient, InvocationObserver, MethodType } from '@plexus-interop/client';
+import { InvocationRequestInfo, ClientError } from '@plexus-interop/protocol';
 import { MethodDiscoveryResponse, ProvidedMethodReference, DiscoveryMode } from '@plexus-interop/client-api';
-import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod, Marshaller } from "@plexus-interop/broker";
+import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod, Marshaller, ProvidedService } from "@plexus-interop/broker";
 import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
 import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler, wrapGenericHostClient, toGenericObserver } from "./StringHandlers";
-import { Observer } from "@plexus-interop/common";
+import { Observer, flatMap } from "@plexus-interop/common";
 import { clientProtocol as plexus } from "@plexus-interop/protocol";
 
 type DiscoveredMetaInfo = {
@@ -178,6 +178,38 @@ export class GenericClientWrapper implements InteropClient {
                 methodId: consumedMetaInfo.methodId
             }, encodedRequest, observer);
         }
+    }
+
+    public resetInvocationHandlers(): void {
+        const providedServices = this.interopRegistryService.getProvidedServices(this.appId);
+        const notInterceptedMsg = "Plexus Studio: Not intercepted";
+        const notInterceptedError: Error = new Error(notInterceptedMsg);
+        const fullName = (pm: ProvidedMethod) => `${pm.providedService.service.id}.${pm.method.name}`;
+        flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
+            .forEach(pm => {
+                const pmFullName = fullName(pm);
+                const defaultResponse = this.defaultGenerator.generate(pm.method.outputMessage.id);
+                switch (pm.method.type) {
+                    case MethodType.Unary:
+                        this.unaryHandlers.set(pmFullName, async requestJson => Promise.reject(notInterceptedError));
+                        break;
+                    case MethodType.ServerStreaming:
+                        this.serverStreamingHandlers.set(pmFullName, (request, hostClient) => hostClient.error(new ClientError(notInterceptedMsg)));
+                        break;
+                    case MethodType.DuplexStreaming:
+                    case MethodType.ClientStreaming:
+                        this.bidiHandlers.set(pmFullName, hostClient => {
+                            hostClient.error(new ClientError(notInterceptedMsg));
+                            return {
+                                next: v => {},
+                                complete: () => { },
+                                error: e => {},
+                                streamCompleted: () => { }
+                            };
+                        });
+                        break;
+                }
+            });
     }
 
     public createDefaultPayload(messageId: string): string {

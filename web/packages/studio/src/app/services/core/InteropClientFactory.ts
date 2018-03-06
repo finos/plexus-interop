@@ -60,47 +60,34 @@ export class InteropClientFactory {
         const bidiStreamingHandlers = new Map<string, BidiStreamingStringHandler>();
 
         const marshallerFactory = new DynamicMarshallerFactory(interopRegistryService.getRegistry());
-        const defaultGenerator = new DefaultMessageGenerator(interopRegistryService);
-        const notInterceptedMsg = "Plexus Studio: Not intercepted";
-        const notInterceptedError: Error = new Error(notInterceptedMsg);
+
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .forEach(pm => {
                 const fullName = this.fullName(pm);
-                const defaultResponse = defaultGenerator.generate(pm.method.outputMessage.id);
                 const requestMarshaller = marshallerFactory.getMarshaller(pm.method.inputMessage.id);
                 const responseMarshaller = marshallerFactory.getMarshaller(pm.method.outputMessage.id);
                 switch (pm.method.type) {
                     case MethodType.Unary:
-                        unaryHandlers.set(fullName, async requestJson => Promise.reject(notInterceptedError));
                         genericClientBuilder.withUnaryInvocationHandler(this.createUnaryHandler(pm, requestMarshaller, responseMarshaller, unaryHandlers));
                         break;
                     case MethodType.ServerStreaming:
-                        serverStreamingHandlers.set(fullName, (request, hostClient) => hostClient.error(new ClientError(notInterceptedMsg)));
                         genericClientBuilder.withServerStreamingInvocationHandler(this.createServerStreamingHandler(pm, requestMarshaller, responseMarshaller, serverStreamingHandlers));
                         break;
                     case MethodType.DuplexStreaming:
                     case MethodType.ClientStreaming:
-                        bidiStreamingHandlers.set(fullName, hostClient => {
-                            return {
-                                next: v => {
-                                    hostClient.error(new ClientError(notInterceptedMsg));
-                                    hostClient.complete();
-                                },
-                                complete: () => { },
-                                error: e => console.log("Unexpected error from remote", e),
-                                streamCompleted: () => { }
-                            };
-                        });
                         genericClientBuilder.withBidiStreamingInvocationHandler(this.createBidiStreamingHandlers(pm, requestMarshaller, responseMarshaller, bidiStreamingHandlers));
+                        break;
                 }
-
             });
 
         const client = await genericClientBuilder.connect();
 
         this.log.info(`Connected as ${appId}`);
 
-        return new GenericClientWrapper(appId, client, interopRegistryService, marshallerFactory, unaryHandlers, serverStreamingHandlers, bidiStreamingHandlers, defaultGenerator);
+        const clientWrapper = new GenericClientWrapper(appId, client, interopRegistryService, marshallerFactory, unaryHandlers, serverStreamingHandlers, bidiStreamingHandlers, new DefaultMessageGenerator(interopRegistryService));
+        clientWrapper.resetInvocationHandlers();
+
+        return clientWrapper;
     }
 
     private fullName(pm: ProvidedMethod): string {
