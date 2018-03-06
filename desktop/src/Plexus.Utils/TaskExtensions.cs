@@ -98,6 +98,20 @@ namespace Plexus
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T2> ContinueWithSynchronously<T1, T2>(this Task<T1> task, Func<Task<T1>, object, T2> func, object state,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            return task.ContinueWith(func, state, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskRunner.BackgroundScheduler);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T2> ContinueWithSynchronously<T1, T2>(this Task<T1> task, Func<Task<T1>, object, Task<T2>> func, object state,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            return task.ContinueWith(func, state, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskRunner.BackgroundScheduler).Unwrap();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task ContinueWithSynchronously(this Task task, Func<Task, object, Task> func, object state,
             CancellationToken cancellationToken = new CancellationToken())
         {
@@ -224,10 +238,7 @@ namespace Plexus
                 return true;
             }
 
-            if (task.IsFaulted)
-            {
-                task.Exception.Handle(HandleException);
-            }
+            task.Exception?.Handle(HandleException);
         }
 
         private static void IgnoreCancellationOnCompletedTask(this Task task, CancellationToken cancellationToken)
@@ -415,28 +426,10 @@ namespace Plexus
             if (cancellationToken.IsCancellationRequested)
             {
                 return TaskConstants<T>.Canceled;
-            }
+            }            
 
-            async Task<T> WithCancellationAsync()
-            {
-                var completedTask = await Task.WhenAny(task, cancellationToken.AsTask<T>()).ConfigureAwait(false);
-                if (completedTask == task)
-                {
-                    return completedTask.GetResult();
-                }
-                if (disposeAction != null)
-                {
-                    task.ContinueWithSynchronously(disposeAction, CancellationToken.None).IgnoreAwait(Log);
-                }
-                else
-                {
-                    task.IgnoreAwait(Log);
-                }
-                return await completedTask.ConfigureAwait(false);
-            }
-
-            return WithCancellationAsync();
-        }
+            return WithCancellationAsync(task, cancellationToken, disposeAction);
+        }        
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task WithCancellation(
@@ -453,9 +446,31 @@ namespace Plexus
                 return TaskConstants.Canceled;
             }
 
-            async Task WithCancellationAsync()
+            return task.ToNothingTask().WithCancellation(cancellationToken);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<Nothing> ToNothingTask(this Task task)
+        {
+            return task.ContinueWithSynchronously((Func<Task, Nothing>)ReturnNothingOnCompletion);
+        }
+
+        private static Nothing ReturnNothingOnCompletion(Task task)
+        {
+            if (task.Status != TaskStatus.RanToCompletion)
             {
-                var completedTask = await Task.WhenAny(task, cancellationToken.AsTask()).ConfigureAwait(false);
+                task.GetResult();
+            }            
+            return Nothing.Instance;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static async Task<T> WithCancellationAsync<T>(Task<T> task, CancellationToken cancellationToken, Action<Task<T>> disposeAction = null)
+        {
+            var cancellationPromise = new Promise<T>();
+            using (cancellationPromise.AssignCancellationToken(cancellationToken))
+            {
+                var completedTask = await Task.WhenAny(task, cancellationPromise.Task).ConfigureAwait(false);
                 if (completedTask != task)
                 {
                     if (disposeAction != null)
@@ -467,10 +482,8 @@ namespace Plexus
                         task.IgnoreAwait(Log);
                     }
                 }
-                completedTask.GetResult();
+                return completedTask.GetResult();
             }
-
-            return WithCancellationAsync();
         }
     }
 }

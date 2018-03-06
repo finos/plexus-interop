@@ -150,19 +150,33 @@ namespace Plexus
             task.PropagateCompletionToPromise(this);
         }
 
-        public void AssignCancellationToken(CancellationToken cancellationToken)
+        public CancellationTokenRegistration AssignCancellationToken(CancellationToken cancellationToken)
         {
             if (!cancellationToken.CanBeCanceled)
             {
-                return;
+                return default;
             }
             if (cancellationToken.IsCancellationRequested)
             {
                 TryCancel();
-                return;
+                return default;
             }
-            var registration = cancellationToken.Register(() => TryCancel());
-            Task.ContinueWithSynchronously(_ => registration.Dispose(), CancellationToken.None);
+            var registration = cancellationToken.Register(CancelPromiseOnCancellationRequested, this);
+            Task.ContinueWithSynchronously(DisposeCancellationRegistrationOnPromiseCompleted, registration, CancellationToken.None);
+            return registration;
+        }
+
+        private static Task<TResult> DisposeCancellationRegistrationOnPromiseCompleted<TResult>(Task<TResult> task, object state)
+        {
+            var r = (CancellationTokenRegistration) state;
+            r.Dispose();
+            return task;
+        }
+
+        private static void CancelPromiseOnCancellationRequested(object obj)
+        {
+            var p = (Promise<T>) obj;
+            p.TryCancel();
         }
     }
 }

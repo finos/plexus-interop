@@ -21,12 +21,10 @@ namespace Plexus
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal static class TaskHelper
+    internal static class AsyncHelper
     {
-        private static readonly ILogger Log = LogManager.GetLogger(typeof(TaskHelper));
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<T> FromException<T>(Exception exception)
+        public static Task<T> ToAwaitable<T>(this Exception exception)
         {
             if (exception is AggregateException aggrEx)
             {
@@ -38,27 +36,15 @@ namespace Plexus
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<T> AsTask<T>(this CancellationToken cancellationToken)
+        public static AwaitableCancellationToken<T> ToAwaitable<T>(this CancellationToken cancellationToken)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return TaskConstants<T>.Canceled;
-            }
-            if (!cancellationToken.CanBeCanceled)
-            {
-                return TaskConstants<T>.Infinite;
-            }
-            var promise = new Promise<T>();
-            var registration = cancellationToken.Register(() => promise.TryCancel());
-            var task = promise.Task;
-            task.ContinueWithInBackground(t => registration.Dispose(), CancellationToken.None).IgnoreAwait(Log);
-            return task;
+            return new AwaitableCancellationToken<T>(cancellationToken);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task AsTask(this CancellationToken cancellationToken)
+        public static AwaitableCancellationToken<Nothing> ToAwaitable(this CancellationToken cancellationToken)
         {
-            return cancellationToken.AsTask<Nothing>();
+            return new AwaitableCancellationToken<Nothing>(cancellationToken);
         }
     }
 }
