@@ -83,6 +83,9 @@ export class GenericClientApiBuilder {
     }
 
     public connect(): Promise<GenericClientApi> {
+        if (!this.applicationInstanceId) {
+            this.applicationInstanceId = UniqueId.generateNew();
+        }        
         const appInfo = {
             applicationId: this.applicationId,
             applicationInstanceId: this.applicationInstanceId
