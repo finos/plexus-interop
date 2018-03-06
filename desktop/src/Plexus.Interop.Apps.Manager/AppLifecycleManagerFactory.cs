@@ -14,20 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus
+﻿namespace Plexus.Interop.Apps
 {
-    using System.Threading.Tasks;
+    using Plexus.Interop.Apps.Internal;
 
-    internal static class TaskConstants
-    {           
-        public static readonly Task Completed = TaskConstants<Nothing>.Completed;
+    public sealed class AppLifecycleManagerFactory
+    {
+        public static AppLifecycleManagerFactory Instance = new AppLifecycleManagerFactory();
 
-        public static readonly Task Canceled = TaskConstants<Nothing>.Canceled;
-
-        public static readonly Task<bool> True = Task.FromResult(true);
-
-        public static readonly Task<bool> False = Task.FromResult(false);
-
-        public static readonly Task Infinite = TaskConstants<Nothing>.Infinite;
+        public IAppLifecycleManager Create(string metadataDir)
+        {
+            return new AppLifecycleManager(metadataDir);
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace Plexus
 {
     using System;
 
-    public static class TimeoutConstants
+    internal static class TimeoutConstants
     {
         public static readonly double TimeoutMultiplier = EnvironmentHelper.GetPlexusTimeoutMultiplier();
 

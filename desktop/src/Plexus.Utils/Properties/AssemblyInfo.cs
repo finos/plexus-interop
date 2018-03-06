@@ -14,8 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Plexus.Utils.Tests")]
+[assembly: InternalsVisibleTo("Plexus.Utils.Testing")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Pipes")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Protocol")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Protocol.Protobuf")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Protocol.Tests")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Testing")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.Pipes")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.Streams")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.Testing")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.WebSockets.Client")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.WebSockets.Server")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Utils")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Protobuf")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Protocol")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Protocol.Protobuf")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Testing")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Tests")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Client")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Client.Core")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Client.Marshalling.Protobuf")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Client.Marshalling.Protobuf.Tests")]
+[assembly: InternalsVisibleTo("plexus")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Apps.Manager")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Broker")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Broker.Core")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Broker.Host")]
+[assembly: InternalsVisibleTo("Plexus.Interop.CommandLineTool")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Metamodel")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Metamodel.Json")]

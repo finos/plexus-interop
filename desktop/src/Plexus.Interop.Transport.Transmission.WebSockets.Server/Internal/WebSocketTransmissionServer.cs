@@ -14,22 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
+namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Hosting.Server.Features;
-    using Microsoft.Extensions.DependencyInjection;
-    using Plexus.Channels;
-    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
-    using Plexus.Processes;
     using System.IO;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Net.WebSockets;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Hosting.Server.Features;
+    using Microsoft.Extensions.DependencyInjection;
+    using Plexus.Channels;
+    using Plexus.Processes;
 
-    public sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer, IWebSocketHandler
+    internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer, IWebSocketHandler
     {        
         private const int AcceptedConnectionsBufferSize = 20;
         private const string ServerName = "ws-v1";

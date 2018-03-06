@@ -34,8 +34,8 @@ namespace Plexus.Interop
                         ProtocolMessagePool.Instance,
                         new ProtobufProtocolSerializerFactory()))
                 .WithTransport(
-                    new TransportClient(
-                        new PipeTransmissionClient(),
+                    TransportClientFactory.Instance.Create(
+                        PipeTransmissionClientFactory.Instance.Create(),
                         new ProtobufTransportProtocolSerializationProvider()));
         }
     }

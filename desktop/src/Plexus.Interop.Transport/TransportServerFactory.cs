@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,20 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus
+namespace Plexus.Interop.Transport
 {
-    using System.Threading.Tasks;
+    using Plexus.Interop.Transport.Internal;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
 
-    internal static class TaskConstants
-    {           
-        public static readonly Task Completed = TaskConstants<Nothing>.Completed;
+    public sealed class TransportServerFactory
+    {
+        public static TransportServerFactory Instance = new TransportServerFactory();
 
-        public static readonly Task Canceled = TaskConstants<Nothing>.Canceled;
-
-        public static readonly Task<bool> True = Task.FromResult(true);
-
-        public static readonly Task<bool> False = Task.FromResult(false);
-
-        public static readonly Task Infinite = TaskConstants<Nothing>.Infinite;
+        public ITransportServer Create(ITransmissionServer transmissionServer, ITransportProtocolSerializationProvider serializationProvider)
+        {
+            return new TransportServer(transmissionServer, serializationProvider);
+        }
     }
 }

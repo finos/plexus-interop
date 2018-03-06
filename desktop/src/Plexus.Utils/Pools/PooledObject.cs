@@ -25,7 +25,7 @@
         public static long Counter;
     }
 
-    public abstract class PooledObject<T> : IPooledObject
+    internal abstract class PooledObject<T> : IPooledObject
         where T : PooledObject<T>, new()
     {
         private static readonly ILogger Log = LogManager.GetLogger<PooledObject<T>>();
@@ -47,7 +47,7 @@
             var obj = Pool.GetObject();
             if (obj._isSuspended)
             {
-                obj.Resurect();                
+                obj.Resurrect();                
             }
             else
             {
@@ -65,11 +65,11 @@
             Log.Trace("Init {0}. Current ref count: {1}", _id, _refCount);
         }
 
-        private void Resurect()
+        private void Resurrect()
         {
             _isSuspended = false;
             var refCount = Interlocked.Exchange(ref _refCount, 1);            
-            Log.Trace("Resurect {0}. Current ref count: {1}", _id, _refCount);
+            Log.Trace("Resurrect {0}. Current ref count: {1}", _id, _refCount);
             if (refCount != 0)
             {
                 if (Log.IsWarnEnabled())
@@ -77,7 +77,7 @@
                     Log.Warn("Invalid ref count after dispose {0}: {1}\n{2}", _id, refCount, Environment.StackTrace);
                 }
 #if DEBUG
-                throw new InvalidOperationException($"Invalid ref count {refCount} after resurecting pooled object {_id} of type {GetType()}");
+                throw new InvalidOperationException($"Invalid ref count {refCount} after resurrecting pooled object {_id} of type {GetType()}");
 #endif
             }
         }

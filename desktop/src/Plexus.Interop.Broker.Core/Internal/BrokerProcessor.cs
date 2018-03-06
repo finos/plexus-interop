@@ -14,21 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Broker
+namespace Plexus.Interop.Broker.Internal
 {
-    using Plexus.Channels;
-    using Plexus.Interop.Apps;
-    using Plexus.Interop.Broker.Internal;
-    using Plexus.Interop.Metamodel;
-    using Plexus.Interop.Protocol;
-    using Plexus.Interop.Transport;
-    using Plexus.Processes;
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Threading.Tasks;
+    using Plexus.Channels;
+    using Plexus.Interop.Apps;
+    using Plexus.Interop.Metamodel;
+    using Plexus.Interop.Protocol;
+    using Plexus.Interop.Transport;
+    using Plexus.Processes;
 
-    public sealed class BrokerProcessor : ProcessBase
+    internal sealed class BrokerProcessor : ProcessBase, IBrokerProcessor
     {        
         private static readonly IProtocolMessageFactory DefaultProtocolMessageFactory = ProtocolMessagePool.Instance;
 

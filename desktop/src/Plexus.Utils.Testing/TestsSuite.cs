@@ -16,7 +16,6 @@
  */
 namespace Plexus
 {
-    using Shouldly;
     using System;
     using System.Collections.Concurrent;
     using System.Diagnostics;

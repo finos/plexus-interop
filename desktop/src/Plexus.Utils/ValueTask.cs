@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading.Tasks;
-
 namespace Plexus
 {
-    public static class ValueTask
+    using System.Threading.Tasks;
+
+    internal static class ValueTask
     {
         public static ValueTask<T> FromResult<T>(T result)
         {

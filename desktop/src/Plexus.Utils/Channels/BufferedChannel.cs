@@ -22,7 +22,7 @@ namespace Plexus.Channels
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class BufferedChannel<T> : IChannel<T>, IReadableChannel<T>, ITerminatableWritableChannel<T>
+    internal sealed class BufferedChannel<T> : IChannel<T>, IReadableChannel<T>, ITerminatableWritableChannel<T>
     {        
         private readonly object _sync = new object();
         private readonly Queue<T> _buffer = new Queue<T>();        

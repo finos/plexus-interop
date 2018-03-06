@@ -24,7 +24,7 @@
     using Plexus.Processes;
     using UniqueId = Plexus.UniqueId;
 
-    public sealed class TestAppLauncher : ProcessBase
+    internal sealed class TestAppLauncher : ProcessBase
     {
         private readonly Dictionary<string, ClientOptionsBuilder> _clients;
         private readonly IClient _client;

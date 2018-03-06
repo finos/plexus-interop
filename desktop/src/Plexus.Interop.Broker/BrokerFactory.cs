@@ -14,20 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus
+﻿namespace Plexus.Interop
 {
-    using System.Threading.Tasks;
+    using Plexus.Interop.Metamodel;
 
-    internal static class TaskConstants
-    {           
-        public static readonly Task Completed = TaskConstants<Nothing>.Completed;
+    public sealed class BrokerFactory
+    {
+        public static BrokerFactory Instance = new BrokerFactory();
 
-        public static readonly Task Canceled = TaskConstants<Nothing>.Canceled;
-
-        public static readonly Task<bool> True = Task.FromResult(true);
-
-        public static readonly Task<bool> False = Task.FromResult(false);
-
-        public static readonly Task Infinite = TaskConstants<Nothing>.Infinite;
+        public IBroker Create(string metadataDir = null, IRegistryProvider registryProvider = null)
+        {
+            return new Internal.Broker(metadataDir, registryProvider);
+        }
     }
 }

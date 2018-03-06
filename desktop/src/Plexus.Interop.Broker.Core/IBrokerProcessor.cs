@@ -14,20 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus
+﻿namespace Plexus.Interop.Broker
 {
     using System.Threading.Tasks;
 
-    internal static class TaskConstants
-    {           
-        public static readonly Task Completed = TaskConstants<Nothing>.Completed;
+    public interface IBrokerProcessor
+    {
+        Task Completion { get; }
 
-        public static readonly Task Canceled = TaskConstants<Nothing>.Canceled;
-
-        public static readonly Task<bool> True = Task.FromResult(true);
-
-        public static readonly Task<bool> False = Task.FromResult(false);
-
-        public static readonly Task Infinite = TaskConstants<Nothing>.Infinite;
+        Task StartAsync();
     }
 }

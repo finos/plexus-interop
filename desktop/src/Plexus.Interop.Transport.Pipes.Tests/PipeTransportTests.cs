@@ -16,21 +16,19 @@
  */
 namespace Plexus.Interop.Transport.Pipes
 {
-    using System;
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.Pipes;
-    using System.IO;
     using Xunit.Abstractions;
 
     public sealed class PipeTransportTests : TransportTestsSuite
     {
         public PipeTransportTests(ITestOutputHelper output) : base(output)
         {
-            Server = RegisterDisposable(new TransportServer(
-                new PipeTransmissionServer(BrokerWorkingDir),
+            Server = RegisterDisposable(TransportServerFactory.Instance.Create(
+                PipeTransmissionServerFactory.Instance.Create(BrokerWorkingDir),
                 new ProtobufTransportProtocolSerializationProvider()));
-            Client = new TransportClient(
-                new PipeTransmissionClient(),
+            Client = TransportClientFactory.Instance.Create(
+                PipeTransmissionClientFactory.Instance.Create(),
                 new ProtobufTransportProtocolSerializationProvider());
         }
 
