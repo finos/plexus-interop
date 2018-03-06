@@ -18,4 +18,5 @@ import { ConnectionDetails } from "./ConnectionDetails";
 
 export interface ConnectionDetailsService {
     getConnectionDetails(): Promise<ConnectionDetails>;
+    
 }
