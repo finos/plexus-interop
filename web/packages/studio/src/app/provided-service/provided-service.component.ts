@@ -89,22 +89,35 @@ export class ProvidedServiceComponent implements OnInit {
           serviceId,
           methodId,
           async requestJson => {
-            const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);            
+            const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
             this.printRequest(requestJson, invocationLogger);
             return contentJson;
           });
         break;
       case MethodType.ServerStreaming:
         this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
-          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);                      
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
           this.printRequest(request, invocationLogger);
           this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
         });
         break;
       case MethodType.ClientStreaming:
+        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
+          return {
+            next: request => this.printRequest(request, invocationLogger),
+            error: e => this.handleError(e, invocationLogger),
+            complete: () => this.handleCompleted(invocationLogger),
+            streamCompleted: () => {
+              this.handleStreamCompleted(invocationLogger);
+              this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
+            }
+          };
+        });
+        break;
       case MethodType.DuplexStreaming:
         this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
-          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);                      
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
           this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
           return {
             next: request => {
