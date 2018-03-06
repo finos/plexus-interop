@@ -91,6 +91,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
           async requestJson => {
             const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
             this.printRequest(requestJson, invocationLogger);
+            invocationLogger.info(`Sending message:\n${contentJson}`);
             return contentJson;
           });
         break;
