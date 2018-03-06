@@ -94,16 +94,8 @@
                         online ? DiscoveryMode.Online : DiscoveryMode.Offline))
                 {
                     var serializedRequest = _protocol.Serializer.Serialize(msg);
-                    try
-                    {
-                        await channel.Out.WriteAsync(new TransportMessageFrame(serializedRequest)).ConfigureAwait(false);
-                        channel.Out.TryComplete();
-                    }
-                    catch
-                    {
-                        serializedRequest.Dispose();
-                        throw;
-                    }
+                    await channel.Out.WriteOrDisposeAsync(new TransportMessageFrame(serializedRequest)).ConfigureAwait(false);
+                    channel.Out.TryComplete();
                     using (var serializedResponse = (await channel.In.ReadAsync().ConfigureAwait(false)).Payload)
                     {
                         var discoveryResponse = _protocol.Serializer.DeserializeServiceDiscoveryResponse(serializedResponse);
@@ -154,7 +146,7 @@
 
         private Maybe<IConsumedServiceReference> Convert(Maybe<ServiceReference> consumedService)
         {
-            if (consumedService == null)
+            if (!consumedService.HasValue)
             {
                 return Maybe<IConsumedServiceReference>.Nothing;
             }

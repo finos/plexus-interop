@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Plexus
 {
-    public static class StreamExtensions
+    using System;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    internal static class StreamExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task WriteAsync(this Stream stream, ArraySegment<byte> buffer)

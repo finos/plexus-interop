@@ -379,7 +379,7 @@
 
         private static ConsumedServiceReference ConvertToProto(Maybe<IConsumedServiceReference> obj)
         {
-            if (obj.HasValue)
+            if (!obj.HasValue)
             {
                 return null;
             }

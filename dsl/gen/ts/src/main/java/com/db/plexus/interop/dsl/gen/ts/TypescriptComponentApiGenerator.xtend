@@ -246,7 +246,8 @@ export class «app.name»ClientBuilder {
 import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
+import { Arrays, Observer } from "@plexus-interop/common";
+import { InvocationObserver, InvocationObserverConverter } from "@plexus-interop/client";
 
 import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
     '''
@@ -259,8 +260,8 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         switch (rpcMethod) {
             case rpcMethod.isPointToPoint: '''«rpcMethod.name.toFirstLower»(request: «requestType(rpcMethod, genConfig)»): Promise<«responseType(rpcMethod, genConfig)»>'''
             case rpcMethod.isBidiStreaming
-                    || rpcMethod.isClientStreaming: '''«rpcMethod.name.toFirstLower»(responseObserver: Observer<«responseType(rpcMethod, genConfig)»>): Promise<StreamingInvocationClient<«requestType(rpcMethod, genConfig)»>>'''
-            case rpcMethod.isServerStreaming: '''«rpcMethod.name.toFirstLower»(request: «requestType(rpcMethod, genConfig)», responseObserver: Observer<«responseType(rpcMethod, genConfig)»>): Promise<InvocationClient>'''
+                    || rpcMethod.isClientStreaming: '''«rpcMethod.name.toFirstLower»(responseObserver: InvocationObserver<«responseType(rpcMethod, genConfig)»>): Promise<StreamingInvocationClient<«requestType(rpcMethod, genConfig)»>>'''
+            case rpcMethod.isServerStreaming: '''«rpcMethod.name.toFirstLower»(request: «requestType(rpcMethod, genConfig)», responseObserver: InvocationObserver<«responseType(rpcMethod, genConfig)»>): Promise<InvocationClient>'''
         }
     }
 
@@ -305,7 +306,7 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         «clientInvocationInfo(rpcMethod, genConfig)»
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
-            new ConversionObserver<«responseType(rpcMethod, genConfig)», ArrayBuffer>(responseObserver, responseFromBinaryConverter))
+            new InvocationObserverConverter<«responseType(rpcMethod, genConfig)», ArrayBuffer>(responseObserver, responseFromBinaryConverter))
             .then(baseClient =>  {
                 return {
                     next: (request: «requestType(rpcMethod, genConfig)») => baseClient.next(requestToBinaryConverter(request)),
@@ -322,7 +323,7 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         return this.genericClient.sendRawServerStreamingRequest(
             invocationInfo,
             requestToBinaryConverter(request),
-            new ConversionObserver<«responseType(rpcMethod, genConfig)», ArrayBuffer>(responseObserver, responseFromBinaryConverter));
+            new InvocationObserverConverter<«responseType(rpcMethod, genConfig)», ArrayBuffer>(responseObserver, responseFromBinaryConverter));
     '''
 
     def clientConverters(Method rpcMethod, PlexusGenConfig genConfig) '''
@@ -344,7 +345,7 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         switch (rpcMethod) {
             case rpcMethod.isPointToPoint: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, request: «requestType(rpcMethod, genConfig)»): Promise<«responseType(rpcMethod, genConfig)»>'''
             case rpcMethod.isBidiStreaming
-                    || rpcMethod.isClientStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<«responseType(rpcMethod, genConfig)»>): Observer<«requestType(rpcMethod, genConfig)»>'''
+                    || rpcMethod.isClientStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<«responseType(rpcMethod, genConfig)»>): InvocationObserver<«requestType(rpcMethod, genConfig)»>'''
             case rpcMethod.isServerStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, request: «requestType(rpcMethod, genConfig)», hostClient: StreamingInvocationClient<«responseType(rpcMethod, genConfig)»>): void'''
         }
     }
@@ -353,7 +354,7 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         switch (rpcMethod) {
             case rpcMethod.isPointToPoint: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer>'''
             case rpcMethod.isBidiStreaming
-                    || rpcMethod.isClientStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): Observer<ArrayBuffer>'''
+                    || rpcMethod.isClientStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): InvocationObserver<ArrayBuffer>'''
             case rpcMethod.isServerStreaming: '''on«rpcMethod.name»(invocationContext: MethodInvocationContext, request: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>): void'''
         }
     }
@@ -386,7 +387,8 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         return {
             next: (value) => baseObserver.next(requestFromBinaryConverter(value)),
             complete: baseObserver.complete.bind(baseObserver),
-            error: baseObserver.error.bind(baseObserver)
+            error: baseObserver.error.bind(baseObserver),
+            streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
         };
     '''
 

@@ -31,6 +31,8 @@ namespace Plexus.Interop.Testing.Generated {
 					
 	public partial interface IEchoClient: IClient {
 		EchoClient.IEchoServiceProxy EchoService { get; }
+		
+		EchoClient.IGreetingServiceProxy GreetingService { get; }
 	}
 	
 	public sealed partial class EchoClient: ClientBase, IEchoClient {
@@ -48,6 +50,7 @@ namespace Plexus.Interop.Testing.Generated {
 		public EchoClient(Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(setup)) 
 		{ 
 			EchoService = new EchoClient.EchoServiceProxy(this.CallInvoker);
+			GreetingService = new EchoClient.GreetingServiceProxy(this.CallInvoker);
 		}
 		
 		public partial interface IEchoServiceProxy:
@@ -85,6 +88,27 @@ namespace Plexus.Interop.Testing.Generated {
 		}
 		
 		public IEchoServiceProxy EchoService { get; private set; }
+		
+		public partial interface IGreetingServiceProxy:
+			global::Plexus.Interop.Testing.Generated.GreetingService.IHelloProxy
+		{ }
+		
+		public sealed partial class GreetingServiceProxy: IGreetingServiceProxy {
+			
+			public static global::Plexus.Interop.Testing.Generated.GreetingService.Descriptor Descriptor = global::Plexus.Interop.Testing.Generated.GreetingService.DefaultDescriptor;
+			
+			private readonly IClientCallInvoker _callInvoker;
+									
+			public GreetingServiceProxy(IClientCallInvoker callInvoker) {
+				_callInvoker = callInvoker;
+			}						
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.GreetingResponse> Hello(global::Plexus.Interop.Testing.Generated.GreetingRequest request) {
+				return _callInvoker.Call(Descriptor.HelloMethod, request);
+			}
+		}
+		
+		public IGreetingServiceProxy GreetingService { get; private set; }
 	}
 }
 #endregion Designer generated code

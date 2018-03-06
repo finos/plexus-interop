@@ -14,21 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { LogObserver } from "./LogObserver";
-import { BlockingQueueBase, CancellationToken } from "@plexus-interop/common";
+using System.Runtime.CompilerServices;
 
-export class BufferedObserver<T> extends LogObserver<T> {
-
-    constructor(private cancellationToken?: CancellationToken, private buffer: BlockingQueueBase<T> = new BlockingQueueBase<T>()) {
-        super();
-    }
-
-    public next(data: T): void {
-        super.next(data);
-        this.buffer.enqueue(data);
-    }
-
-    public pullData(): Promise<T> {
-        return this.buffer.blockingDequeue(this.cancellationToken);
-    }
-}
+[assembly: InternalsVisibleTo("Plexus.Interop.Tests")]

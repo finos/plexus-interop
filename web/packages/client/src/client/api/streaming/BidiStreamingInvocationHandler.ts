@@ -17,11 +17,12 @@
 import { StreamingInvocationClient } from "./StreamingInvocationClient";
 import { Observer } from "@plexus-interop/common";
 import { MethodInvocationContext } from "@plexus-interop/client-api";
+import { InvocationObserver } from "../../generic";
 
 export interface BidiStreamingInvocationHandler<Req, Res> {
 
     methodId: string;
 
-    handle(invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<Res>): Observer<Req>;
+    handle(invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<Res>): InvocationObserver<Req>;
 
 }

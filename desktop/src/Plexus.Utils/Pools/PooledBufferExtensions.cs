@@ -18,7 +18,7 @@
 {
     using System;
 
-    public static class PooledBufferExtensions
+    internal static class PooledBufferExtensions
     {
         public static byte[] ToArray(this IPooledBuffer data)
         {

@@ -31,6 +31,8 @@ namespace Plexus.Interop.Testing.Generated {
 					
 	public partial interface IEchoServerClient: IClient {
 		EchoServerClient.IEchoServiceProxy EchoService { get; }
+		
+		EchoServerClient.IGreetingServiceProxy GreetingService { get; }
 	}
 	
 	public sealed partial class EchoServerClient: ClientBase, IEchoServerClient {
@@ -48,29 +50,36 @@ namespace Plexus.Interop.Testing.Generated {
 		
 		public EchoServerClient(
 			EchoServerClient.IEchoServiceImpl echoService,
+			EchoServerClient.IGreetingServiceImpl greetingService,
 			Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null
 		)
 		:this(new EchoServerClient.ServiceBinder(
-			echoService
+			echoService,
+			greetingService
 		), setup) { }
 		
 		public EchoServerClient(EchoServerClient.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
 		{
 			EchoService = new EchoServerClient.EchoServiceProxy(this.CallInvoker);
+			GreetingService = new EchoServerClient.GreetingServiceProxy(this.CallInvoker);
 		}
 	
 		public sealed partial class ServiceBinder {
 			
 			public ServiceBinder(
-				EchoServerClient.IEchoServiceImpl echoService
+				EchoServerClient.IEchoServiceImpl echoService,
+				EchoServerClient.IGreetingServiceImpl greetingService
 			) {
 				_echoServiceBinder = new EchoServerClient.EchoServiceBinder(echoService);
+				_greetingServiceBinder = new EchoServerClient.GreetingServiceBinder(greetingService);
 			}
 			
 			private EchoServiceBinder _echoServiceBinder;
+			private GreetingServiceBinder _greetingServiceBinder;
 			
 			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
 				builder = _echoServiceBinder.Bind(builder);
+				builder = _greetingServiceBinder.Bind(builder);
 				return builder;
 			}
 		}
@@ -170,6 +179,59 @@ namespace Plexus.Interop.Testing.Generated {
 			}
 		}
 		
+		public partial interface IGreetingServiceImpl:
+			global::Plexus.Interop.Testing.Generated.GreetingService.IHelloImpl
+		{ }
+		
+		private sealed partial class GreetingServiceBinder {
+			
+			
+			private readonly IGreetingServiceImpl _impl;
+			
+			public GreetingServiceBinder(IGreetingServiceImpl impl) {
+				_impl = impl;
+			}
+			
+			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
+				return builder.WithProvidedService(global::Plexus.Interop.Testing.Generated.GreetingService.Id, Bind);
+			}
+			
+			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
+				builder = builder.WithUnaryMethod<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse>(global::Plexus.Interop.Testing.Generated.GreetingService.HelloMethodId, _impl.Hello);
+				return builder; 							
+			}
+		}
+		
+		public sealed partial class GreetingServiceImpl: IGreetingServiceImpl
+		{
+			private readonly UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse> _helloHandler;
+			
+			public GreetingServiceImpl(
+				UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse> helloHandler
+			) {
+				_helloHandler = helloHandler;
+			}
+			
+			public Task<global::Plexus.Interop.Testing.Generated.GreetingResponse> Hello(global::Plexus.Interop.Testing.Generated.GreetingRequest request, MethodCallContext context) {
+				return _helloHandler(request, context);
+			}
+		}					
+		
+		public sealed partial class GreetingServiceImpl<T>: IGreetingServiceImpl
+			where T:
+			global::Plexus.Interop.Testing.Generated.GreetingService.IHelloImpl
+		{
+			private readonly T _impl;
+			
+			public GreetingServiceImpl(T impl) {
+				_impl = impl;
+			}
+			
+			public Task<global::Plexus.Interop.Testing.Generated.GreetingResponse> Hello(global::Plexus.Interop.Testing.Generated.GreetingRequest request, MethodCallContext context) {
+				return _impl.Hello(request, context);
+			}
+		}
+		
 		public partial interface IEchoServiceProxy:
 			global::Plexus.Interop.Testing.Generated.EchoService.IUnaryProxy,
 			global::Plexus.Interop.Testing.Generated.EchoService.IServerStreamingProxy,
@@ -205,6 +267,27 @@ namespace Plexus.Interop.Testing.Generated {
 		}
 		
 		public IEchoServiceProxy EchoService { get; private set; }
+		
+		public partial interface IGreetingServiceProxy:
+			global::Plexus.Interop.Testing.Generated.GreetingService.IHelloProxy
+		{ }
+		
+		public sealed partial class GreetingServiceProxy: IGreetingServiceProxy {
+			
+			public static global::Plexus.Interop.Testing.Generated.GreetingService.Descriptor Descriptor = global::Plexus.Interop.Testing.Generated.GreetingService.DefaultDescriptor;
+			
+			private readonly IClientCallInvoker _callInvoker;
+									
+			public GreetingServiceProxy(IClientCallInvoker callInvoker) {
+				_callInvoker = callInvoker;
+			}						
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.GreetingResponse> Hello(global::Plexus.Interop.Testing.Generated.GreetingRequest request) {
+				return _callInvoker.Call(Descriptor.HelloMethod, request);
+			}
+		}
+		
+		public IGreetingServiceProxy GreetingService { get; private set; }
 	}
 }
 #endregion Designer generated code

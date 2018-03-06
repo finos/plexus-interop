@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using Plexus.Channels;
-using Plexus.Pools;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace Plexus.Interop.Transport
+﻿namespace Plexus.Interop.Transport
 {
+    using Plexus.Channels;
+    using Plexus.Pools;
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
     public static class TransportChannelUtils
     {
         public static async Task<bool> TrySendAsync(this ITransportChannel channel, Stream content, long length)
@@ -63,7 +63,7 @@ namespace Plexus.Interop.Transport
         public static async ValueTask<Maybe<long>> TryReceiveAsync(this ITransportChannel channel, Stream content)
         {
             long length = 0;
-            var hasMoreFrames = false;
+            bool hasMoreFrames;
             do
             {
                 var result = await channel.In.TryReadAsync().ConfigureAwait(false);

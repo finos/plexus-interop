@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
+import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase, InvocationObserverConverter } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
+import { Arrays, Observer } from "@plexus-interop/common";
 
 import * as plexus from "../gen/plexus-messages";
+import { InvocationObserver } from "@plexus-interop/client";
 
 /**
  *  Proxy interface of EchoService service, to be consumed by Client API
@@ -28,11 +29,11 @@ export abstract class EchoServiceProxy {
 
     public abstract unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
 
-    public abstract serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: Observer<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient>;
+    public abstract serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient>;
 
-    public abstract clientStreaming(responseObserver: Observer<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>>;
+    public abstract clientStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>>;
 
-    public abstract duplexStreaming(responseObserver: Observer<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>>;
+    public abstract duplexStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>>;
 
 }
 
@@ -65,7 +66,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
         });
     }
 
-    public serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: Observer<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient> {
+    public serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient> {
         const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
@@ -78,10 +79,10 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
         return this.genericClient.sendRawServerStreamingRequest(
             invocationInfo,
             requestToBinaryConverter(request),
-            new ConversionObserver<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter));
+            new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter));
     }
 
-    public clientStreaming(responseObserver: Observer<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
+    public clientStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
         const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
@@ -93,7 +94,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
         };
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
-            new ConversionObserver<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
+            new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
             .then(baseClient => {
                 return {
                     next: (request: plexus.plexus.interop.testing.IEchoRequest) => baseClient.next(requestToBinaryConverter(request)),
@@ -104,7 +105,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
             });
     }
 
-    public duplexStreaming(responseObserver: Observer<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
+    public duplexStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
         const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
             const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
@@ -116,7 +117,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
         };
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
-            new ConversionObserver<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
+            new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
             .then(baseClient => {
                 return {
                     next: (request: plexus.plexus.interop.testing.IEchoRequest) => baseClient.next(requestToBinaryConverter(request)),

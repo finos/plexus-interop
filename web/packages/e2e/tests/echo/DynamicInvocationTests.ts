@@ -20,6 +20,7 @@ import { ClientsSetup } from "../common/ClientsSetup";
 import { UnaryServiceHandler } from "./UnaryServiceHandler";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientStreamingHandler } from "./ClientStreamingHandler";
+import { expect } from "chai";
 
 export class DynamicInvocationTests extends BaseEchoTest {
 
@@ -38,14 +39,12 @@ export class DynamicInvocationTests extends BaseEchoTest {
                 methodId: "Unary",
                 serviceId: "plexus.interop.testing.EchoService"
             }, echoRequest, {
-                    value: async (response) => {
+                    value: async response => {
                         this.assertEqual(echoRequest, response);
                         await this.clientsSetup.disconnect(client, server);
                         resolve();
                     },
-                    error: (e) => {
-                        reject(e);
-                    }
+                    error: (e) => reject(e)
                 }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
         });
     }
@@ -54,39 +53,42 @@ export class DynamicInvocationTests extends BaseEchoTest {
         const echoRequest = this.clientsSetup.createRequestDto();
         const handler = new ClientStreamingHandler((context, hostClient) => {
             return {
-                next: async (clientRequest) => {
-                    this.assertEqual(echoRequest, clientRequest);                    
+                next: async clientRequest => {
+                    this.assertEqual(echoRequest, clientRequest);
                     hostClient.next(clientRequest);
                     hostClient.complete();
                 },
                 complete: () => { },
-                error: (e) => { }
+                error: (e) => { },
+                streamCompleted: () => { }
             };
         });
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         return new Promise<void>(async (resolve, reject) => {
+            let remoteCompleted = false;
+            let remoteStreamCompleted = false;
             const invocationClient = await client.sendBidirectionalStreamingRequest({
                 methodId: "DuplexStreaming",
                 serviceId: "plexus.interop.testing.EchoService"
             }, {
-                next: (serverResponse) => {
+                next: serverResponse => {
                     try {
                         this.assertEqual(echoRequest, serverResponse);
-                    } catch (error) {   
+                    } catch (error) {
                         reject(error);
                     }
                 },
-                error: (e) => {
-                    reject(e);
-                },
-                complete: async () => {
-                    await this.clientsSetup.disconnect(client, server);
-                    resolve();
-                }
+                error: e => reject(e),
+                complete: () => remoteCompleted = true,
+                streamCompleted: () => remoteStreamCompleted = true
             }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
 
             invocationClient.next(echoRequest);
-            invocationClient.complete();            
+            await invocationClient.complete();
+            expect(remoteCompleted).to.be.true;
+            expect(remoteStreamCompleted).to.be.true;
+            await this.clientsSetup.disconnect(client, server);
+            resolve();
         });
     }
 

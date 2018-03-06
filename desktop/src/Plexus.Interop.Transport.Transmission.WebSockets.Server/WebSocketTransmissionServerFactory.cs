@@ -14,26 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Observer } from "@plexus-interop/common";
-import { UniqueId } from "@plexus-interop/transport-common";
+﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
+{
+    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
 
-export class LogObserver<T> implements Observer<T> {
+    public sealed class WebSocketTransmissionServerFactory
+    {
+        public static WebSocketTransmissionServerFactory Instance = new WebSocketTransmissionServerFactory();
 
-    constructor(private _next?: (data: T) => void, private id: UniqueId = UniqueId.generateNew()) {}
-
-    public complete(): void {
-        console.log(`${this.id.toString()} - Complete`);
-    }
-
-    public next(data: T): void {
-        console.log(`${this.id.toString()} - Next`, data);        
-        if (this._next) {
-            this._next(data);
+        public ITransmissionServer Create(string workingDir)
+        {
+            return new WebSocketTransmissionServer(workingDir);
         }
     }
-
-    public error(error: any) {
-        console.log(`${this.id.toString()} - Error`);
-    }
-
 }

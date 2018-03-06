@@ -19,7 +19,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public static class FormattingUtils
+    internal static class FormattingUtils
     {
         public static string FormatEnumerableObjects<T>(this IEnumerable<T> enumerable)
         {

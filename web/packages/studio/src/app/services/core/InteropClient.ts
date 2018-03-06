@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericClientApi, StreamingInvocationClient, ValueHandler, InvocationClient, MethodDiscoveryResponse, MethodDiscoveryRequest, DiscoveredMethod } from "@plexus-interop/client";
+import { GenericClientApi, StreamingInvocationClient, ValueHandler, InvocationClient, MethodDiscoveryResponse, MethodDiscoveryRequest, DiscoveredMethod, InvocationObserver } from '@plexus-interop/client';
 import { InvocationRequestInfo, Completion } from "@plexus-interop/protocol";
 import { ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
@@ -47,13 +47,13 @@ export interface InteropClient {
 
     // server streaming
 
-    sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: Observer<string>): Promise<InvocationClient>;
+    sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: InvocationObserver<string>): Promise<InvocationClient>;
 
     setServerStreamingActionHandler(serviceId: string, methodId: string, handler: ServerStreamingStringHandler): void;
 
     // bidi streaming
 
-    sendBidiStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, responseObserver: Observer<string>): Promise<StreamingInvocationClient<string>>;
+    sendBidiStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, responseObserver: InvocationObserver<string>): Promise<StreamingInvocationClient<string>>;
 
     setBidiStreamingActionHandler(serviceId: string, methodId: string, handler: BidiStreamingStringHandler): void;    
 

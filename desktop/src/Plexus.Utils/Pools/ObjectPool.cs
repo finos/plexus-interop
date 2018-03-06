@@ -19,7 +19,7 @@
     using System;
     using System.Collections.Concurrent;
 
-    public static class ObjectPool
+    internal static class ObjectPool
     {
         public static ObjectPool<T> Create<T>(Func<T> objectGenerator, int maxRetainedObjects = default)
         {
@@ -32,7 +32,7 @@
         }
     }
 
-    public sealed class ObjectPool<T>
+    internal sealed class ObjectPool<T>
     {
         private readonly ConcurrentBag<T> _objects;
         private readonly Func<T> _objectGenerator;

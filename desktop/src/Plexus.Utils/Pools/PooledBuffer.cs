@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System;
-using System.Buffers;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Plexus.Pools
 {
-    public sealed class PooledBuffer : PooledObject<PooledBuffer>, IPooledBuffer
+    using System;
+    using System.Buffers;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    internal sealed class PooledBuffer : PooledObject<PooledBuffer>, IPooledBuffer
     {
         public const int MaxSize = 65000;
 

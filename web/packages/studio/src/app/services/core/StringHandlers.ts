@@ -16,13 +16,13 @@
  */
 
 
-import { StreamingInvocationClient } from "@plexus-interop/client";
+import { StreamingInvocationClient, InvocationObserver } from '@plexus-interop/client';
 import { Observer } from "@plexus-interop/common";
 import { Marshaller } from "@plexus-interop/broker";
 
 export type UnaryStringHandler = (requestJson: string) => Promise<string>;
 export type ServerStreamingStringHandler = (request: string, invocationHostClient: StreamingInvocationClient<string>) => void;
-export type BidiStreamingStringHandler = (invocationHostClient: StreamingInvocationClient<string>) => Observer<string>;
+export type BidiStreamingStringHandler = (invocationHostClient: StreamingInvocationClient<string>) => InvocationObserver<string>;
 
 export function wrapGenericHostClient(base: StreamingInvocationClient<ArrayBuffer>, marshaller: Marshaller<any, ArrayBuffer>): StreamingInvocationClient<string> {
     return {
@@ -33,10 +33,11 @@ export function wrapGenericHostClient(base: StreamingInvocationClient<ArrayBuffe
     };
 }
 
-export function toGenericObserver(base: Observer<string>, decoder: Marshaller<any, ArrayBuffer>): Observer<ArrayBuffer> {
+export function toGenericObserver(base: InvocationObserver<string>, decoder: Marshaller<any, ArrayBuffer>): InvocationObserver<ArrayBuffer> {
     return {
         next: v => base.next(JSON.stringify(decoder.decode(v))),
         complete: () => base.complete(),
-        error: e => base.error(e)
+        error: e => base.error(e),
+        streamCompleted: () => base.streamCompleted()
     };
 }

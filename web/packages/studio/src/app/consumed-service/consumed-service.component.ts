@@ -108,6 +108,10 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     logger.info('Invocation completed received');
   }
 
+  handleStreamCompleted(logger: Logger) {
+    logger.info('Remote stream completed received');
+  }
+
   resetInvocationInfo() {
     this.responseCounter = 0;
     this.responseContent = "";
@@ -133,7 +137,8 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     const responseObserver = {
       next: r => this.handleResponse(r, invocationLogger),
       error: e => this.handleError(e, invocationLogger),
-      complete: () => this.handleCompleted(invocationLogger)
+      complete: () => this.handleCompleted(invocationLogger),
+      streamCompleted: () => this.handleStreamCompleted(invocationLogger)
     }
 
     this.resetInvocationInfo();

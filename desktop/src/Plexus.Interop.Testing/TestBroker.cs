@@ -25,7 +25,7 @@
     using Plexus.Processes;
     using Process = System.Diagnostics.Process;
 
-    public sealed class TestBroker : ProcessBase
+    internal sealed class TestBroker : ProcessBase
     {
         private static readonly TimeSpan StopTimeout = TimeoutConstants.Timeout3Sec;
 

@@ -206,7 +206,8 @@ describe("GenericClientApi", () => {
                 fail("Not expected");
             },
             complete: () => { },
-            error: () => { }
+            error: () => { },
+            streamCompleted: () => {}
         });
 
         await streamingInvocationClient.next(first);
@@ -258,7 +259,8 @@ describe("GenericClientApi", () => {
                     fail("Error not expected");
                 });
             },
-            error: () => fail("Not expected")
+            error: () => fail("Not expected"),
+            streamCompleted: () => {}
         });
         
     });

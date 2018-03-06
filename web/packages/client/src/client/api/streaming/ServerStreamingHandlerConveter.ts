@@ -39,12 +39,9 @@ export class ServerStreamingConverter implements InvocationHandlerConverter<Serv
                             invocationHostClient.error(ClientDtoUtils.toError(executionError));
                         }
                     },
-                    error: (e) => {
-                        this.log.error("Error received", e);
-                    },
-                    complete: () => {
-                        this.log.debug("Invocation completed");
-                    }
+                    streamCompleted: () => this.log.debug("Messages stream completed"),
+                    error: e => this.log.error("Error received", e),
+                    complete: () => this.log.debug("Invocation completed")
                 };
             }
         };

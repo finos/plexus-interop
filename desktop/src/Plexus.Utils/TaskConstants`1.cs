@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Threading.Tasks;
-
 namespace Plexus
 {
-    public static class TaskConstants<T>
+    using System.Threading.Tasks;
+
+    internal static class TaskConstants<T>
     {
         public static readonly Task<T> Canceled;
 

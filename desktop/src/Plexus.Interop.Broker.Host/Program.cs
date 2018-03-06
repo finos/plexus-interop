@@ -24,29 +24,29 @@ namespace Plexus.Interop.Broker.Host
     {
         private static readonly ILogger Log = LogManager.GetLogger<Program>();
 
-        private int _stoped;
-        private BrokerRunner _brokerRunner;
+        private int _stopped;
+        private IBroker _broker;
 
         public async Task<Task> StartAsync(string[] args)
         {
             var brokerArgs = BrokerArguments.Parse(args);
-            _brokerRunner = new BrokerRunner(brokerArgs.MetadataDir);
-            if (_stoped == 1)
+            _broker = BrokerFactory.Instance.Create(brokerArgs.MetadataDir);
+            if (_stopped == 1)
             {
                 return Task.FromResult(0);
             }
-            await _brokerRunner.StartAsync().ConfigureAwait(false);
+            await _broker.StartAsync().ConfigureAwait(false);
             Log.Debug("Broker process started");
-            return _brokerRunner.Completion;
+            return _broker.Completion;
         }
 
         public async Task ShutdownAsync()
         {
-            if (Interlocked.Exchange(ref _stoped, 1) == 0 && _brokerRunner != null)
+            if (Interlocked.Exchange(ref _stopped, 1) == 0 && _broker != null)
             {
                 Log.Debug("Shutting down");
-                _brokerRunner.Stop();
-                await _brokerRunner.Completion.ConfigureAwait(false);
+                _broker.Stop();
+                await _broker.Completion.ConfigureAwait(false);
             }
         }
     }

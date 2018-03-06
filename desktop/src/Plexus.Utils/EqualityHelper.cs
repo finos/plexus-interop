@@ -18,7 +18,7 @@
 {
     using System.Collections.Generic;
 
-    public static class EqualityHelper
+    internal static class EqualityHelper
     {
         public static int GetEnumerableHashCode<T>(this IEnumerable<T> enumerable)
         {

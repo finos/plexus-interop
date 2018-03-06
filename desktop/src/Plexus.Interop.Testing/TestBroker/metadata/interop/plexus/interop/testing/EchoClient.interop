@@ -15,11 +15,14 @@
 // limitations under the License.
 //
 
-import "plexus/interop/testing/EchoService.proto";
-
 package plexus.interop.testing;
+
+import "plexus/interop/testing/EchoService.proto";
+import "plexus/interop/testing/GreetingService.proto";
 
 application EchoClient {
 	
 	consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
+
+	consumes plexus.interop.testing.GreetingService from plexus.interop.testing.* { Hello; } 
 }

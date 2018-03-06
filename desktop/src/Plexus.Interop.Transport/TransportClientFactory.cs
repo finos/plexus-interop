@@ -16,13 +16,17 @@
  */
 ﻿namespace Plexus.Interop.Transport
 {
-    using System.Threading;
+    using Plexus.Interop.Transport.Internal;
+    using Plexus.Interop.Transport.Protocol.Serialization;
+    using Plexus.Interop.Transport.Transmission;
 
-    public sealed class TransportClientFactory : ITransportClientFactory
+    public sealed class TransportClientFactory
     {
-        public ITransportClient Create(string brokerWorkingDir, CancellationToken cancellationToken)
+        public static TransportClientFactory Instance = new TransportClientFactory();
+
+        public ITransportClient Create(ITransmissionClient transmissionClient, ITransportProtocolSerializationProvider serializationProvider)
         {
-            throw new System.NotImplementedException();
+            return new TransportClient(transmissionClient, serializationProvider);
         }
     }
 }

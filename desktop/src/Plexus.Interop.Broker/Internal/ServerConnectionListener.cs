@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Internal
 {
-    using Plexus.Channels;
-    using Plexus.Processes;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Plexus.Channels;
+    using Plexus.Interop.Transport;
+    using Plexus.Processes;
 
-    public sealed class ServerConnectionListener : ProcessBase
+    internal sealed class ServerConnectionListener : ProcessBase
     {
         private readonly IReadOnlyCollection<ITransportServer> _servers;
         private readonly IChannel<ITransportConnection> _buffer = new BufferedChannel<ITransportConnection>(3);
@@ -63,7 +64,7 @@ namespace Plexus.Interop.Transport
 
         private async Task ProcessAsync(IEnumerable<ITransportServer> servers)
         {
-            await Task.WhenAll(servers.Select(ProcessAsync)).IgnoreExceptions();
+            await Task.WhenAll(servers.Select(ProcessAsync)).IgnoreExceptions().ConfigureAwait(false);
             Log.Debug("All servers stopped");
             _buffer.Out.TryComplete();
         }

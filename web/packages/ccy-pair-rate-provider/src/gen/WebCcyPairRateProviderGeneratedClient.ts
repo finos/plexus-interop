@@ -17,7 +17,8 @@
 import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
+import { Arrays, Observer } from "@plexus-interop/common";
+import { InvocationObserver, InvocationObserverConverter } from "@plexus-interop/client";
 
 import * as plexus from "./plexus-messages";
 
