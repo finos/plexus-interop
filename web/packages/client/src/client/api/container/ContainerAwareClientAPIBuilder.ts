@@ -28,7 +28,7 @@ export class ContainerAwareClientAPIBuilder extends GenericClientApiBuilder {
     }
 
     public async connect(): Promise<GenericClientApi> {
-        if (!(this.applicationInstanceId || !this.transportConnectionProvider)) {
+        if (!this.applicationInstanceId || !this.transportConnectionProvider) {
             try {
                 const details = await this.connectionDetailsService.getConnectionDetails();
                 if (!this.applicationInstanceId && details.appInstanceId) {
