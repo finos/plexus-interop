@@ -333,7 +333,7 @@ namespace Plexus.Interop
                         WriteLog("Server handling invocation");
                         await responseStream.WriteAsync(request).ConfigureAwait(false);
                         WriteLog("Server waiting for cancellation");
-                        await context.CancellationToken.AsTask();
+                        await context.CancellationToken.ToAwaitable();
                     }
                     catch (Exception ex)
                     {

@@ -161,7 +161,7 @@ namespace Plexus
                 TryCancel();
                 return default;
             }
-            var registration = cancellationToken.Register(CancelPromiseOnCancellationRequested, this);
+            var registration = cancellationToken.Register(CancelPromiseOnCancellationRequested, this, false);
             Task.ContinueWithSynchronously(DisposeCancellationRegistrationOnPromiseCompleted, registration, CancellationToken.None);
             return registration;
         }

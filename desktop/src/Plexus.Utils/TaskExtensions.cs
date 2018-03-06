@@ -354,7 +354,7 @@ namespace Plexus
         {
             var timeoutPromise = new Promise();
             using (var cancellation = new CancellationTokenSource(timeout))
-            using (cancellation.Token.Register(() => timeoutPromise.TryCancel()))
+            using (cancellation.Token.Register(() => timeoutPromise.TryCancel(), false))
             {
                 var completed = await Task.WhenAny(task, timeoutPromise.Task).ConfigureAwait(false);
                 if (completed == task)

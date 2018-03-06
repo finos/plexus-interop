@@ -185,7 +185,7 @@ namespace Plexus.Interop.Internal
 
         private async Task ProcessAsync()
         {
-            using (CancellationToken.Register(() => _connection.TryComplete()))
+            using (CancellationToken.Register(() => _connection.TryComplete(), false))
             {
                 try
                 {
