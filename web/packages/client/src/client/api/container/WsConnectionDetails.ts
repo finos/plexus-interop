@@ -15,5 +15,5 @@
  * limitations under the License.
  */
 export interface WsConnectionDetails {
-    wsPort: number;
+    port: number;
 }

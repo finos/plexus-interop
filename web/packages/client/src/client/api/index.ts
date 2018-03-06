@@ -22,3 +22,4 @@ export * from "./InvocationClient";
 export * from "./ValueHandler";
 export * from "./io";
 export * from "./DelegateInvocationObserver";
+export * from "./container";
