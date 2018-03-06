@@ -181,8 +181,7 @@ export class Effects {
         .actions$
         .ofType(AppActions.CONNECT_TO_APP_SUCCESS)
         .map(_ => {
-            this.router.navigate(['/app'], { queryParamsHandling: 'merge' });
-            return { type: AppActions.DO_NOTHING };
+            return { type: AppActions.NAVIGATE_TO_APP };
         });
 
     @Effect() consumedActionLoaded$: Observable<Action> = this
@@ -198,6 +197,16 @@ export class Effects {
         .ofType(AppActions.CONNECT_TO_APP_FAILED)
         .map(_ => {
             this.router.navigate(['/apps']);
+            return { type: AppActions.DO_NOTHING };
+        });
+
+    @Effect() navigateToApp$: Observable<Action> = this
+        .actions$
+        .ofType(AppActions.NAVIGATE_TO_APP)
+        .withLatestFrom(this.store.select(state => state.plexus.services))
+        .mergeMap(async ([action, services]) => {
+            services.interopClient.resetInvocationHandlers();
+            this.router.navigate(['/app'], { queryParamsHandling: 'merge' });
             return { type: AppActions.DO_NOTHING };
         });
 

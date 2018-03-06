@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppActions } from "../services/ui/AppActions";
 import { Store } from "@ngrx/store";
 import * as fromRoot from '../services/ui/RootReducers';
@@ -31,7 +31,7 @@ import { createInvocationLogger } from '../services/core/invocation-utils';
   styleUrls: ['./provided-service.component.css'],
   providers: [SubscriptionsRegistry]
 })
-export class ProvidedServiceComponent implements OnInit {
+export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
   private readonly log: Logger = LoggerFactory.getLogger("ProvidedServiceComponent");
 
@@ -166,6 +166,10 @@ export class ProvidedServiceComponent implements OnInit {
 
   formatAndUpdateArea() {
     this.messageContent = this.format(this.messageContent);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribeAll();
   }
 
 }
