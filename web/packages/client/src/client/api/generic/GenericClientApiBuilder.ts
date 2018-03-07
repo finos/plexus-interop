@@ -29,17 +29,17 @@ import { Logger, LoggerFactory } from "@plexus-interop/common";
 
 export class GenericClientApiBuilder {
 
-    private log: Logger = LoggerFactory.getLogger("GenericClientApiBuilder");
+    protected log: Logger = LoggerFactory.getLogger("GenericClientApiBuilder");
 
-    private applicationId: string;
-    private applicationInstanceId?: UniqueId;
+    protected applicationId: string;
+    protected applicationInstanceId?: UniqueId;
 
-    private transportConnectionProvider: () => Promise<TransportConnection>;
-    private marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider();
+    protected transportConnectionProvider: () => Promise<TransportConnection>;
+    protected marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider();
 
-    private readonly bidiStreamingInvocationHandlers: GenericBidiStreamingInvocationHandler[] = [];
-    private readonly unaryInvocationHandlers: GenericUnaryInvocationHandler[] = [];
-    private readonly serverStreamingInvocationHandlers: GenericServerStreamingInvocationHandler[] = [];
+    protected readonly bidiStreamingInvocationHandlers: GenericBidiStreamingInvocationHandler[] = [];
+    protected readonly unaryInvocationHandlers: GenericUnaryInvocationHandler[] = [];
+    protected readonly serverStreamingInvocationHandlers: GenericServerStreamingInvocationHandler[] = [];
 
     public withMarshallerProvider(marshallerProvider: MarshallerProvider): GenericClientApiBuilder {
         this.marshallerProvider = marshallerProvider;
@@ -83,6 +83,9 @@ export class GenericClientApiBuilder {
     }
 
     public connect(): Promise<GenericClientApi> {
+        if (!this.applicationInstanceId) {
+            this.applicationInstanceId = UniqueId.generateNew();
+        }        
         const appInfo = {
             applicationId: this.applicationId,
             applicationInstanceId: this.applicationInstanceId

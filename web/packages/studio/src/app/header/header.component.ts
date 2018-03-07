@@ -79,7 +79,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   openCurrentApp() {
     if (this.currentApp) {
-      this.router.navigate(['/app']);
+      this.store.dispatch({ type: AppActions.NAVIGATE_TO_APP });
     }
   }
 

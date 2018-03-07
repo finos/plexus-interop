@@ -53,7 +53,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
             LogManager.ConfigureLogging(loggerFactory);
 
-            lifetime.ApplicationStarted.Register(_handler.OnListeningStarted);
+            lifetime.ApplicationStarted.Register(_handler.OnListeningStarted, false);
 
             if (env.IsDevelopment())
             {

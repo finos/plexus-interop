@@ -40,7 +40,7 @@ namespace Plexus
             task.PropagateCompletionToPromise(this);
         }
 
-        public void AssignCancellationToken(CancellationToken cancellationToken) =>
+        public CancellationTokenRegistration AssignCancellationToken(CancellationToken cancellationToken) =>
             _inner.AssignCancellationToken(cancellationToken);
     }
 }

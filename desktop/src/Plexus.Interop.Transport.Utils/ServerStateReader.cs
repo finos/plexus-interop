@@ -80,7 +80,7 @@
             {
                 threadPoolRegistration.Unregister(handle);
             }, TaskScheduler.Default).IgnoreAwait(Log);
-            using (cancellationToken.Register(() => tcs.TrySetCanceled()))
+            using (cancellationToken.Register(() => tcs.TrySetCanceled(), false))
             {
                 return await tcs.Task.ConfigureAwait(false);
             }

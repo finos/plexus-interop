@@ -57,7 +57,7 @@ namespace Plexus.Processes
 
         protected void OnStop(Action action)
         {
-            _registrations.Add(CancellationToken.Register(action));
+            _registrations.Add(CancellationToken.Register(action, false));
         }
 
         protected virtual Task OnCompletedAsync(Task completion)

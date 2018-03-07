@@ -50,7 +50,7 @@
 
         private async Task ProcessAsync()
         {
-            using (_cancellationToken.Register(() => _buffer.Out.TryTerminate()))
+            using (_cancellationToken.Register(() => _buffer.Out.TryTerminate(), false))
             {
                 try
                 {
