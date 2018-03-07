@@ -26,9 +26,9 @@ namespace Plexus
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<T> ToAwaitable<T>(this Exception exception)
         {
-            if (exception is AggregateException aggrEx)
+            if (exception is AggregateException aggregateException)
             {
-                exception = aggrEx.ExtractInner();
+                exception = aggregateException.ExtractInner();
             }
             var tcs = new TaskCompletionSource<T>();
             tcs.SetException(exception);
