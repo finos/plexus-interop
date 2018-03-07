@@ -51,7 +51,7 @@
         {
             try
             {
-                using (_cancellationToken.Register(() => _buffer.Out.TryTerminate()))
+                using (_cancellationToken.Register(() => _buffer.Out.TryTerminate(), false))
                 {
                     var curMessageLength = 0;
                     while (!_buffer.Out.IsCompleted())

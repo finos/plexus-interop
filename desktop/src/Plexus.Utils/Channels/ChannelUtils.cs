@@ -21,11 +21,11 @@ namespace Plexus.Channels
 
     internal static class ChannelUtils
     {
-        public static void PropagateTerminationFrom(this ITerminatableChannel channel, Task completion)
+        public static void PropagateTerminationFrom<T>(this ITerminatableWritableChannel<T> channel, Task completion)
         {
             void OnCompleted(Task task, object state)
             {
-                var c = (ITerminatableChannel)state;
+                var c = (ITerminatableWritableChannel<T>)state;
                 if (task.IsFaulted)
                 {
                     c.TryTerminate(task.Exception.ExtractInner());
@@ -35,8 +35,8 @@ namespace Plexus.Channels
                     c.TryTerminate();
                 }
             }
-
-            completion.ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
+            
+            Task.WhenAny(channel.Completion, completion).Unwrap().ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
         }
 
         public static void PropagateCompletionFrom<T>(this ITerminatableWritableChannel<T> channel, Task completion)
@@ -58,7 +58,7 @@ namespace Plexus.Channels
                 }
             }
 
-            Task.WhenAny(completion, channel.Completion).Unwrap().ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
+            Task.WhenAny(channel.Completion, completion).Unwrap().ContinueWithSynchronously((Action<Task, object>)OnCompleted, channel);
         }
 
         public static void PropagateExceptionFrom<T>(this ITerminatableWritableChannel<T> channel, Task completion)

@@ -86,7 +86,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
         public async Task ConnectAsync(CancellationToken cancellationToken)
         {
             using (var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-            using (cancellation.Token.Register(Stop))
+            using (cancellation.Token.Register(Stop, false))
             {
                 cancellation.CancelAfter(ConnectionTimeout);
                 try

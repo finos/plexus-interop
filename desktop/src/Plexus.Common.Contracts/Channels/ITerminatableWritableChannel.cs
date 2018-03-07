@@ -16,7 +16,12 @@
  */
 ﻿namespace Plexus.Channels
 {
-    public interface ITerminatableWritableChannel<in T> : IWritableChannel<T>, ITerminatableChannel
-    {                
+    using System;
+
+    public interface ITerminatableWritableChannel<in T> : IWritableChannel<T>
+    {
+        bool TryComplete();
+
+        bool TryTerminate(Exception error = null);
     }
 }

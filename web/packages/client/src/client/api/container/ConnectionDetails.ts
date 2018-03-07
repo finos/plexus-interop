@@ -14,12 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./generic";
-export * from "@plexus-interop/client-api";
-export * from "./streaming";
-export * from "./unary";
-export * from "./InvocationClient";
-export * from "./ValueHandler";
-export * from "./io";
-export * from "./DelegateInvocationObserver";
-export * from "./container";
+import { WsConnectionDetails } from "./WsConnectionDetails";
+
+export interface ConnectionDetails {
+    ws: WsConnectionDetails;
+    appInstanceId?: string;
+}

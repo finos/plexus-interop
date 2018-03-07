@@ -154,8 +154,7 @@ class «app.name»ClientImpl extends GenericClientApiBase implements «app.name�
 export class «app.name»ClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "«app.fullName»",
-        applicationInstanceId: UniqueId.generateNew()
+        applicationId: "«app.fullName»"
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
@@ -192,7 +191,7 @@ export class «app.name»ClientBuilder {
     }
 
     public connect(): Promise<«app.name»Client> {
-        return new GenericClientApiBuilder()
+        return new ContainerAwareClientAPIBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
             «FOR providedService : providedServices »
@@ -247,7 +246,7 @@ import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInv
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer } from "@plexus-interop/common";
-import { InvocationObserver, InvocationObserverConverter } from "@plexus-interop/client";
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
 
 import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
     '''

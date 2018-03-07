@@ -39,6 +39,8 @@ export interface InteropClient {
 
     validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, payload: string): void;
 
+    resetInvocationHandlers(): void;
+
     // unary
 
     sendUnaryRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient>;
