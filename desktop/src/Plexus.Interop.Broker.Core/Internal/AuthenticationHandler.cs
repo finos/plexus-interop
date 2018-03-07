@@ -43,7 +43,7 @@
             _registryService = registryService;
         }
 
-        public async Task<IAppConnection> HandleAsync(ITransportConnection connection)
+        public async Task<AppConnectionDescriptor> AuthenticateAsync(ITransportConnection connection)
         {
             Log.Trace("Accepting new connection {0}", connection.Id);
             var channel = await connection.IncomingChannels.ReadAsync().ConfigureAwait(false);
@@ -70,14 +70,10 @@
                     }
                     channel.Out.TryComplete();
                     await channel.Completion.ConfigureAwait(false);
-                    var info =
-                        new AppConnectionDescriptor(
-                            connectResponse.ConnectionId,
-                            connectRequest.ApplicationId,
-                            connectRequest.ApplicationInstanceId);
-                    var clientConnection = _connectionTracker.AcceptConnection(connection, info);
-                    Log.Info("New connection accepted: {0}", clientConnection);
-                    return clientConnection;
+                    return new AppConnectionDescriptor(
+                        connectResponse.ConnectionId,
+                        connectRequest.ApplicationId,
+                        connectRequest.ApplicationInstanceId);
                 }
             }
         }

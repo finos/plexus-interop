@@ -8,16 +8,20 @@
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.6|AnyCPU'">
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <None Remove="TestBroker\metadata\apps.json" />
-    <None Remove="TestBroker\metadata\interop.json" />
+    <None Remove="TestBrokerConfig\metadata\apps.json" />
+    <None Remove="TestBrokerConfig\metadata\interop.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TestBroker\metadata\apps.json">
+    <EmbeddedResource Include="TestBrokerConfig\metadata\apps.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="TestBroker\metadata\interop.json">
+    <EmbeddedResource Include="TestBrokerConfig\metadata\interop.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -34,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Interop.Client\Plexus.Interop.Client.csproj" />
+    <ProjectReference Include="..\Plexus.Utils.Testing\Plexus.Utils.Testing.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
   </ItemGroup>
 
@@ -41,7 +46,7 @@
     <None Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TestBroker\nlog.config">
+    <None Update="TestBrokerConfig\NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

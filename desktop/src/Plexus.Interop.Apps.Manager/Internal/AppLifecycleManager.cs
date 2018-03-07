@@ -76,13 +76,14 @@ namespace Plexus.Interop.Apps.Internal
             ITransportConnection connection,
             AppConnectionDescriptor info)
         {
-            var clientConnection = new AppConnection(connection, info);
             lock (_connections)
             {
+                var clientConnection = new AppConnection(connection, info);
                 if (_connections.ContainsKey(clientConnection.Id))
                 {
                     throw new InvalidOperationException($"Connection id already exists: {clientConnection.Id}");
                 }
+
                 _connections[clientConnection.Id] = clientConnection;
                 var appInstanceId = clientConnection.Info.ApplicationInstanceId;
                 if (!_appInstanceConnections.TryGetValue(appInstanceId, out var connectionList))
@@ -90,17 +91,33 @@ namespace Plexus.Interop.Apps.Internal
                     connectionList = new List<IAppConnection>();
                     _appInstanceConnections[appInstanceId] = connectionList;
                 }
+
                 connectionList.Add(clientConnection);
-                clientConnection.Completion
-                    .ContinueWithSynchronously((Action<Task, object>)OnClientConnectionCompleted, clientConnection)
-                    .IgnoreAwait(Log);
                 if (_connectionWaiters.TryGetValue(appInstanceId, out var waiter))
                 {
                     waiter.TryComplete(clientConnection);
                 }
+
                 _connectionWaiters.Remove(info.ApplicationInstanceId);
+                return clientConnection;
             }
-            return clientConnection;
+        }
+
+        public void RemoveConnection(IAppConnection connection)
+        {
+            lock (_connections)
+            {
+                _connections.Remove(connection.Id);
+                var appInstanceId = connection.Info.ApplicationInstanceId;
+                if (_appInstanceConnections.TryGetValue(connection.Info.ApplicationInstanceId, out var list))
+                {
+                    list.Remove(connection);
+                    if (list.Count == 0)
+                    {
+                        _appInstanceConnections.Remove(appInstanceId);
+                    }
+                }
+            }
         }
 
         public bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection)
