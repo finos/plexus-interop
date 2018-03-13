@@ -109,7 +109,7 @@ if (testsEnabled) {
     }
 }
 
-if ("$dotnetVersion".trim() != "2.1.5") {
+if ("$dotnetVersion".trim() != "2.1.4") {
 	println "Dotnet SDK is not installed"
 	compile.dependsOn(downloadAndUnzipDotnet)
    	test.dependsOn(downloadAndUnzipDotnet)
