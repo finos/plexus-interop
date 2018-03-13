@@ -19,7 +19,6 @@ namespace Plexus.Interop.Transport.Transmission
     using Plexus.Channels;
     using Plexus.Pools;
     using Shouldly;
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -98,11 +97,12 @@ namespace Plexus.Interop.Transport.Transmission
                     var timeoutMs = 40 * i;
                     WriteLog($"Testing cancel after {timeoutMs}ms");
                     var client = CreateClient();
-                    var cancellation = new CancellationTokenSource();
-                    var connectionTask = client.ConnectAsync(BrokerWorkingDir, cancellation.Token).AsTask();
-                    await Task.Delay(timeoutMs, CancellationToken.None).ConfigureAwait(false);
-                    cancellation.Cancel();
-                    Should.Throw<TaskCanceledException>(connectionTask, Timeout1Sec);
+                    using (var cancellation = new CancellationTokenSource(timeoutMs))
+                    {
+                        await client.ConnectAsync(BrokerWorkingDir, cancellation.Token)
+                            .AsTask()
+                            .IgnoreCancellation(cancellation.Token);
+                    }
                 }
             });
         }
