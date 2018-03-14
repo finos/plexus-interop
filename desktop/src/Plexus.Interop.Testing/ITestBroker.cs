@@ -14,28 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps
+﻿namespace Plexus.Interop.Testing
 {
-    using System.Collections.Generic;
+    using System;
     using System.Threading.Tasks;
-    using Plexus.Interop.Transport;
 
-    public interface IAppLifecycleManager
+    public interface ITestBroker : IDisposable
     {
+        string WorkingDir { get; }
+
+        Task Completion { get; }
+
         Task StartAsync();
 
-        Task StopAsync();
-
-        IAppConnection AcceptConnection(ITransportConnection connection, AppConnectionDescriptor info);
-
-        void RemoveConnection(IAppConnection connection);
-
-        bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection);
-
-        Task<IAppConnection> SpawnConnectionAsync(string appId);
-
-        ValueTask<IAppConnection> GetOrSpawnConnectionAsync(IAppConnection source, IReadOnlyCollection<string> appId);
-
-        IReadOnlyCollection<IAppConnection> GetOnlineConnections();
+        Task StopAsync();        
     }
 }

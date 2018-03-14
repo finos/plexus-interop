@@ -29,11 +29,11 @@
         private readonly Dictionary<string, ClientOptionsBuilder> _clients;
         private readonly IClient _client;
 
-        public TestAppLauncher(IEnumerable<ClientOptionsBuilder> clients = null)
+        public TestAppLauncher(ITestBroker broker, IEnumerable<ClientOptionsBuilder> clients = null)
         {
             _clients = clients?.ToDictionary(x => x.ApplicationId, x => x) ?? new Dictionary<string, ClientOptionsBuilder>();
             var options = new ClientOptionsBuilder()
-                .WithBrokerWorkingDir("TestBroker")
+                .WithBrokerWorkingDir(broker.WorkingDir)
                 .WithDefaultConfiguration()
                 .WithApplicationId("plexus.interop.testing.TestAppLauncher")
                 .WithProvidedService(
@@ -58,6 +58,7 @@
             }
             var instanceId = UniqueId.Generate();
             var client = ClientFactory.Instance.Create(clientOptions.WithAppInstanceId(instanceId).Build());
+            OnStop(client.Disconnect);
             await client.ConnectAsync().ConfigureAwait(false);
             return new AppLaunchResponse
             {

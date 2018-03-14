@@ -35,6 +35,7 @@ namespace Plexus.Interop.Broker.Internal
             = new ConcurrentDictionary<UniqueId, ITransportConnection>();
 
         private readonly IReadableChannel<ITransportConnection> _incomingConnections;
+        private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly AuthenticationHandler _authenticationHandler;
         private readonly ClientRequestHandler _clientRequestHandler;
 
@@ -42,13 +43,14 @@ namespace Plexus.Interop.Broker.Internal
             IReadableChannel<ITransportConnection> incomingConnections,
             IRegistryProvider registryProvider,
             IProtocolSerializerFactory serializerFactory,
-            IAppLifecycleManager connectionTracker)
+            IAppLifecycleManager appLifecycleManager)
         {
             _incomingConnections = incomingConnections;
+            _appLifecycleManager = appLifecycleManager;
             var registryService = new RegistryService(registryProvider);
             var protocol = new ProtocolImplementation(DefaultProtocolMessageFactory, serializerFactory);
-            _authenticationHandler = new AuthenticationHandler(connectionTracker, protocol, registryService);
-            _clientRequestHandler = new ClientRequestHandler(connectionTracker, protocol, registryService);
+            _authenticationHandler = new AuthenticationHandler(appLifecycleManager, protocol, registryService);
+            _clientRequestHandler = new ClientRequestHandler(appLifecycleManager, protocol, registryService);
         }
 
         protected override ILogger Log { get; } = LogManager.GetLogger<BrokerProcessor>();
@@ -111,12 +113,22 @@ namespace Plexus.Interop.Broker.Internal
 
         private async Task ProcessConnectionAsync(object state)
         {
-            var transportConnection = (ITransportConnection)state;
+            var transportConnection = (ITransportConnection) state;
             Log.Debug("Accepting new incoming connection {0}", transportConnection.Id);
-            var clientConnection = await _authenticationHandler.HandleAsync(transportConnection).ConfigureAwait(false);
-            Log.Debug("Incoming connection accepted: {0}", clientConnection);
-            var clientConnectionProcessor = new AppConnectionProcessor(clientConnection, _clientRequestHandler);
-            await clientConnectionProcessor.Completion.ConfigureAwait(false);
+            var appConnectionDescriptor =
+                await _authenticationHandler.AuthenticateAsync(transportConnection).ConfigureAwait(false);
+            Log.Debug("New connection authenticated: {0}", appConnectionDescriptor);
+            var clientConnection = _appLifecycleManager.AcceptConnection(transportConnection, appConnectionDescriptor);
+            try
+            {
+                Log.Info("New connection accepted: {0}", clientConnection);
+                var clientConnectionProcessor = new AppConnectionProcessor(clientConnection, _clientRequestHandler);
+                await clientConnectionProcessor.Completion.ConfigureAwait(false);
+            }
+            finally
+            {
+                _appLifecycleManager.RemoveConnection(clientConnection);
+            }
         }
 
         private void OnConnectionProcessed(Task completion, object state)

@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Testing
+namespace Plexus.Interop.Testing
 {
+    using Plexus.Processes;
     using System;
     using System.Diagnostics;
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Processes;
     using Process = System.Diagnostics.Process;
 
-    internal sealed class TestBroker : ProcessBase
+    internal sealed class TestBroker : ProcessBase, ITestBroker
     {
         private static readonly TimeSpan StopTimeout = TimeoutConstants.Timeout3Sec;
 
@@ -40,19 +40,21 @@
             Path.GetFullPath(Path.Combine(
                 Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "..", "bin", RuntimeIdentifier, "broker",
                 "plexus"));
-
-        private readonly string _workingDir;
+        
         private readonly Promise _processExited = new Promise();
         private readonly Process _process;
 
-        public TestBroker(string workingDir = null)
+        public TestBroker(string id)
         {
-            _workingDir = Path.GetFullPath(workingDir ?? Path.Combine(Directory.GetCurrentDirectory(), "TestBroker"));
+            var testBrokerConfigDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "TestBrokerConfig"));
+            WorkingDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "TestBroker", id));
+            FileSystemUtils.DeleteDir(WorkingDir);
+            FileSystemUtils.CopyDir(testBrokerConfigDir, WorkingDir);
             _process = new Process
             {
                 StartInfo = new ProcessStartInfo(_exePath)
                 {
-                    WorkingDirectory = _workingDir,
+                    WorkingDirectory = WorkingDir,
                     Arguments = "broker metadata",
                     RedirectStandardOutput = false,
                     RedirectStandardInput = false,
@@ -84,16 +86,18 @@
             OnStop(SendShutdownEvent);
         }
 
+        public string WorkingDir { get; }
+
         protected override ILogger Log { get; } = LogManager.GetLogger<TestBroker>();
 
         protected override Task<Task> StartCoreAsync()
         {
-            Log.Info("Starting test broker in directory {0}", _workingDir);
+            Log.Info("Starting test broker in directory {0}", WorkingDir);
             if (!_process.Start())
             {
                 throw new InvalidOperationException("Broker failed to start");
             }
-            Log.Info("Test broker started in directory {0}", _workingDir);
+            Log.Info("Test broker started in directory {0}", WorkingDir);
             return Task.FromResult(_processExited.Task);
         }
 
