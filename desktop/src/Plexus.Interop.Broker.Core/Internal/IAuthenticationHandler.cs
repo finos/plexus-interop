@@ -22,6 +22,6 @@
 
     internal interface IAuthenticationHandler
     {
-        Task<IAppConnection> HandleAsync(ITransportConnection connection);
+        Task<AppConnectionDescriptor> AuthenticateAsync(ITransportConnection connection);
     }
 }
