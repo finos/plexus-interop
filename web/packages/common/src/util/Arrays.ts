@@ -18,11 +18,15 @@ import { ExtendedMap } from "./collections/ExtendedMap";
 
 export class Arrays {
 
-    public static concatenateBuffers(first: ArrayBuffer, second: ArrayBuffer): ArrayBuffer {
-        return Arrays.concatTypesArrays(
-            new Uint8Array(first),
-            new Uint8Array(second)
-        ).buffer;
+    public static concatenateBuffers(...buffers: ArrayBuffer[]): ArrayBuffer {
+        const totalLength = buffers.reduce((acc, b) => acc + b.byteLength, 0);
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        buffers.forEach(b => {
+            result.set(new Uint8Array(b), offset);
+            offset += b.byteLength;
+        });
+        return result.buffer;
     }
 
     public static concatTypesArrays(first: Uint8Array, second: Uint8Array): Uint8Array {
