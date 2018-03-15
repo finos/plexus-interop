@@ -48,6 +48,7 @@ export class FramedTransportChannel implements TransportChannel {
     private channelObserver: Observer<ArrayBuffer>;
 
     private writeExecutor: SequencedExecutor;
+    private inMessageBuffer: ArrayBuffer = new ArrayBuffer(0);
 
     private onCloseHandler: ((completion?: plexus.ICompletion) => void) | null;
 
@@ -212,11 +213,10 @@ export class FramedTransportChannel implements TransportChannel {
     }
 
     private async subscribeToMessages(channelObserver: Observer<ArrayBuffer>): Promise<void> {
-        let resultBuffer = new ArrayBuffer(0);
         this.framedTransport.open({
 
             next: (frame: Frame) => {
-                resultBuffer = this.handleIncomingFrame(channelObserver, frame, resultBuffer);
+                this.inMessageBuffer = this.handleIncomingFrame(channelObserver, frame, this.inMessageBuffer);
             },
 
             complete: () => this.log.debug("Received complete from transport"),
@@ -253,7 +253,7 @@ export class FramedTransportChannel implements TransportChannel {
             if (this.log.isTraceEnabled()) {
                 this.log.trace(`Received ${isLast ? "last" : ""} message frame, ${messageFrame.body.byteLength} bytes`);
             }
-            resultBuffer = Arrays.concatenateBuffers(resultBuffer, messageFrame.body);
+            resultBuffer = Arrays.concatenateBuffers(resultBuffer, messageFrame.body);    
             if (isLast) {
                 /* istanbul ignore if */
                 if (this.log.isTraceEnabled()) {
