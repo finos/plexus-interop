@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
 
@@ -15,11 +17,8 @@
     <SamplesDir>$(ArtifactsDir)samples/greeting/</SamplesDir>
     <PublishDir>$(SamplesDir)apps/GreetingServer/</PublishDir>
 
-    <LangVersion>latest</LangVersion>
-
     <AssemblyName>GreetingServer</AssemblyName>
 
-    <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
     
   </PropertyGroup>

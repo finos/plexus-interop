@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.0;net45;net46</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.0</TargetFrameworks>
@@ -7,8 +9,6 @@
     <PlatformTarget Condition=" '$(OS)' == 'Windows_NT'">x86</PlatformTarget>
     <PlatformTarget Condition=" '$(OS)' != 'Windows_NT'">x64</PlatformTarget>
     
-    <LangVersion>latest</LangVersion>
-    <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
 
     <RootNamespace>Plexus.Interop.Transport.Transmission.Pipes</RootNamespace>

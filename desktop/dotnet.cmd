@@ -1,2 +1,2 @@
 @ECHO OFF
-dotnet.exe %*
+%PLEXUS_BUILD_DOTNET_DIR%dotnet.exe %*

@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net45;net46</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
     <AssemblyName>Plexus.Utils</AssemblyName>
     <PackageId>Plexus.Utils</PackageId>
     <RootNamespace>Plexus</RootNamespace>
-    <LangVersion>latest</LangVersion>
-    <Version>0.1.0</Version>
   </PropertyGroup>
-
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
