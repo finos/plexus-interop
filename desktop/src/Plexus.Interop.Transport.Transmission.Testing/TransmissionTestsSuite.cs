@@ -73,7 +73,7 @@ namespace Plexus.Interop.Transport.Transmission
                 {
                     await server.StartAsync();
                     WriteLog("Connecting clients");
-                    const int concurrentClientsCount = 15;
+                    const int concurrentClientsCount = 5;
                     var client = CreateClient();
                     var connectTasks = Enumerable
                         .Range(0, concurrentClientsCount)

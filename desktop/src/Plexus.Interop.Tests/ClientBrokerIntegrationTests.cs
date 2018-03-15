@@ -72,7 +72,7 @@ namespace Plexus.Interop
         {
             RunWith30SecTimeout(() =>
             {
-                const int concurrentClientCount = 10;
+                const int concurrentClientCount = 5;
                 var connectTasks = Enumerable.Range(0, concurrentClientCount)
                     .Select(_ => TaskRunner.RunInBackground(() => ConnectEchoClient()));
                 var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout30Sec);
