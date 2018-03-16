@@ -72,7 +72,7 @@ namespace Plexus.Interop
         {
             RunWith30SecTimeout(() =>
             {
-                const int concurrentClientCount = 15;
+                const int concurrentClientCount = 5;
                 var connectTasks = Enumerable.Range(0, concurrentClientCount)
                     .Select(_ => TaskRunner.RunInBackground(() => ConnectEchoClient()));
                 var clients = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout30Sec);
@@ -768,7 +768,7 @@ namespace Plexus.Interop
                 .WithApplicationId("plexus.interop.testing.EchoClient")
                 .Build();
             var client = RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
-            client.ConnectAsync().ShouldCompleteIn(Timeout5Sec);
+            client.ConnectAsync().ShouldCompleteIn(Timeout10Sec);
             return client;
         }
 
@@ -781,7 +781,7 @@ namespace Plexus.Interop
                 .WithApplicationId(appId)
                 .Build();
             var client = RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
-            client.ConnectAsync().ShouldCompleteIn(Timeout5Sec);
+            client.ConnectAsync().ShouldCompleteIn(Timeout10Sec);
             return client;
         }
 
@@ -795,7 +795,7 @@ namespace Plexus.Interop
             setup?.Invoke(clientOptionsBuilder);
             var clientOptions = clientOptionsBuilder.Build();
             var client = RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
-            client.ConnectAsync().ShouldCompleteIn(Timeout5Sec);
+            client.ConnectAsync().ShouldCompleteIn(Timeout10Sec);
             return client;
         }
     }

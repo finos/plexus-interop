@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
 
@@ -8,7 +10,6 @@
 
     <RootNamespace>Plexus.Interop.Transport.WebSockets</RootNamespace>
 
-    <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
 
   </PropertyGroup>

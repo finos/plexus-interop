@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
 
@@ -15,8 +17,6 @@
     <ArtifactsSamplesDir>$(ArtifactsDir)samples/greeting/</ArtifactsSamplesDir>
     <QuickStartSamplesDir>$(ArtifactsDir)samples/quick-start/</QuickStartSamplesDir>
     
-    <LangVersion>latest</LangVersion>
-    <Version>0.1.0</Version>
     <IsPackable>true</IsPackable>
     <NuspecFile>$(MSBuildThisFileDirectory)Plexus.Interop.Broker.Redist.nuspec</NuspecFile>
 

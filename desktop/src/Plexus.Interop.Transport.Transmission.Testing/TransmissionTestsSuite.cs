@@ -73,21 +73,21 @@ namespace Plexus.Interop.Transport.Transmission
                 {
                     await server.StartAsync();
                     WriteLog("Connecting clients");
-                    const int concurrentClientsCount = 15;
+                    const int concurrentClientsCount = 5;
                     var client = CreateClient();
                     var connectTasks = Enumerable
                         .Range(0, concurrentClientsCount)
                         .Select(_ => TaskRunner.RunInBackground(async () => await client.ConnectAsync(BrokerWorkingDir)));
                     WriteLog("Accepting clients");
                     server.In.ConsumeAsync(c => { }).IgnoreAwait();
-                    var connections = Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout10Sec);
+                    Task.WhenAll(connectTasks).ShouldCompleteIn(Timeout10Sec);
                     WriteLog("Clients connected");                    
                 }
             });
         }
 
         [Fact]
-        public void CancelConnect() => RunWith10SecTimeout(async () =>
+        public void CancelConnect() => RunWith10SecTimeout(() =>
         {
             // iterating to try cancel connections on different stages
             for (var i = 0; i < 10; i++)
@@ -100,7 +100,7 @@ namespace Plexus.Interop.Transport.Transmission
                     client.ConnectAsync(BrokerWorkingDir, cancellation.Token)
                         .AsTask()
                         .IgnoreCancellation(cancellation.Token)
-                        .ShouldCompleteIn(Timeout1Sec);
+                        .ShouldCompleteIn(Timeout5Sec);
                 }
             }
         });

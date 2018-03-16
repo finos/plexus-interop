@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
 
@@ -12,6 +14,7 @@
     <RepoRootDir>../../../</RepoRootDir>
     <ArtifactsDir>$(RepoRootDir)bin/$(RuntimeIdentifier)/</ArtifactsDir>
     <PublishDir>$(ArtifactsDir)broker/</PublishDir>
+    <IsPackable>false</IsPackable>
 
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
     

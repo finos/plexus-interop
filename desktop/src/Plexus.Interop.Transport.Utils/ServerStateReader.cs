@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Transport
 {
     using System;
     using System.IO;
@@ -47,14 +47,12 @@
 
         public string ReadSetting(string key)
         {
-            using (var waitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, _eventName))
-            {
-                if (!waitHandle.WaitOne(0))
-                {
-                    return null;
-                }
-            }
             var file = Path.Combine(_settingsDir, key);
+            var repeat = 10;
+            while (!File.Exists(file) && repeat-- > 0)
+            {
+                Task.Delay(100).GetResult();
+            }
             return File.Exists(file) ? File.ReadAllText(file, Encoding.UTF8) : null;
         }
 
@@ -70,19 +68,22 @@
                 return false;
             }
             var tcs = new TaskCompletionSource<bool>();
-            var threadPoolRegistration = ThreadPool.RegisterWaitForSingleObject(
-                handle,
-                (state, timedOut) => ((TaskCompletionSource<bool>) state).TrySetResult(!timedOut),
-                tcs,
-                timeout,
-                true);
-            tcs.Task.ContinueWith(_ =>
-            {
-                threadPoolRegistration.Unregister(handle);
-            }, TaskScheduler.Default).IgnoreAwait(Log);
             using (cancellationToken.Register(() => tcs.TrySetCanceled(), false))
             {
-                return await tcs.Task.ConfigureAwait(false);
+                var threadPoolRegistration = ThreadPool.RegisterWaitForSingleObject(
+                    handle,
+                    (state, timedOut) => ((TaskCompletionSource<bool>) state).TrySetResult(!timedOut),
+                    tcs,
+                    timeout,
+                    true);
+                try
+                {
+                    return await tcs.Task.ConfigureAwait(false);
+                }
+                finally
+                {
+                    threadPoolRegistration.Unregister(handle);
+                }
             }
         }
     }
