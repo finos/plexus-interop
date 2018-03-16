@@ -1,23 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net45</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
     <IsPackable>false</IsPackable>
-    <Version>0.1.0</Version>
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TestBroker\metadata\apps.json" />
-    <None Remove="TestBroker\metadata\interop.json" />
+    <None Remove="TestBrokerConfig\metadata\apps.json" />
+    <None Remove="TestBrokerConfig\metadata\interop.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TestBroker\metadata\apps.json">
+    <EmbeddedResource Include="TestBrokerConfig\metadata\apps.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="TestBroker\metadata\interop.json">
+    <EmbeddedResource Include="TestBrokerConfig\metadata\interop.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -34,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Interop.Client\Plexus.Interop.Client.csproj" />
+    <ProjectReference Include="..\Plexus.Utils.Testing\Plexus.Utils.Testing.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
   </ItemGroup>
 
@@ -41,7 +43,7 @@
     <None Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TestBroker\nlog.config">
+    <None Update="TestBrokerConfig\NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

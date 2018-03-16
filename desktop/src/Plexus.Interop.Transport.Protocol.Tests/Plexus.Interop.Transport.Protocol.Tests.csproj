@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.0;net45;net46</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.0</TargetFrameworks>
@@ -9,7 +11,6 @@
     
     <RootNamespace>Plexus.Interop.Transport.Protocol</RootNamespace>
 
-    <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
 
   </PropertyGroup>

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,14 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Channels
+﻿namespace Plexus.Interop.Testing
 {
     using System;
+    using System.Threading.Tasks;
 
-    public interface ITerminatableChannel
+    public interface ITestBroker : IDisposable
     {
-        bool TryComplete();
+        string WorkingDir { get; }
 
-        bool TryTerminate(Exception error = null);
+        Task Completion { get; }
+
+        Task StartAsync();
+
+        Task StopAsync();        
     }
 }

@@ -26,9 +26,9 @@
 
         Task StopAsync();
 
-        IAppConnection AcceptConnection(
-            ITransportConnection connection,
-            AppConnectionDescriptor info);
+        IAppConnection AcceptConnection(ITransportConnection connection, AppConnectionDescriptor info);
+
+        void RemoveConnection(IAppConnection connection);
 
         bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection);
 

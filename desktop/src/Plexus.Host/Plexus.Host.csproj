@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Common.csproj" />
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
 
@@ -13,10 +15,7 @@
 
     <PublishDir>../../../bin/$(RuntimeIdentifier)/broker</PublishDir>
 
-    <LangVersion>latest</LangVersion>
-
     <AssemblyName>plexus</AssemblyName>
-    <Version>0.1.0</Version>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   

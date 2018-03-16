@@ -22,6 +22,8 @@
     "build-win": "run-s build e2e-native e2e-web",
     "ci-build": "run-s build",
     "ci-publish": "run-s bump-version build publish-all",
+    "appveyor-release": "run-s bump-release-version build publish-all",
+    "bump-release-version": "cross-var lerna publish --repo-version $APPVEYOR_REPO_TAG_NAME --skip-git --skip-npm --yes --verbose",
     "bump-version": "cross-var lerna publish --repo-version $PackageVersion --skip-git --skip-npm --yes --verbose",
     "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
   },
