@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -19,13 +19,14 @@ import { FrameHeader } from "./FrameHeader";
 import { TransportChannel } from "../TransportChannel";
 import { FramedTransport } from "./FramedTransport";
 import { UniqueId } from "@plexus-interop/protocol";
-import { Observer, ReadWriteCancellationToken } from "@plexus-interop/common";
+import { Observer, ReadWriteCancellationToken, AsyncHelper } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
 import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, StateMaschine, SequencedExecutor } from "@plexus-interop/common";
 import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ClientError, ErrorCompletion } from "@plexus-interop/protocol";
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";
 import { SafeMessageBuffer } from "./SafeMessageBuffer";
+import { Defaults } from "../../common/Defaults";
 
 export enum ChannelState {
     CREATED = "CREATED",
@@ -49,7 +50,7 @@ export class FramedTransportChannel implements TransportChannel {
     private channelObserver: Observer<ArrayBuffer>;
 
     private writeExecutor: SequencedExecutor;
-    private inMessageBuffer: ArrayBuffer = new ArrayBuffer(0);
+    private safeMessagesBuffer: SafeMessageBuffer;
 
     private onCloseHandler: ((completion?: plexus.ICompletion) => void) | null;
 
@@ -151,6 +152,12 @@ export class FramedTransportChannel implements TransportChannel {
         if (this.remoteCompletion && this.log.isDebugEnabled()) {
             this.log.debug(`Remote completed with ${JSON.stringify(this.remoteCompletion)}`);
         }
+        if (this.safeMessagesBuffer !== null && this.safeMessagesBuffer.hasPendingChunks()) {
+            await AsyncHelper.waitFor(() => !this.safeMessagesBuffer.hasPendingChunks(), 
+                new CancellationToken(), 
+                Defaults.STATUS_CHECK_INTERVAL, 
+                Defaults.OPERATION_TIMEOUT);
+        }
         if (!ClientProtocolUtils.isSuccessCompletion(this.remoteCompletion)) {
             // channel closed with error, report error and close
             const error = this.remoteCompletionToError(this.remoteCompletion);
@@ -219,9 +226,9 @@ export class FramedTransportChannel implements TransportChannel {
             channelObserver.next(m);
         };
         const errorHandler = (e: any) => channelObserver.error(e);
-        const safeBuffer = new SafeMessageBuffer(messageHandler, errorHandler);
+        this.safeMessagesBuffer = new SafeMessageBuffer(messageHandler, errorHandler);
         this.framedTransport.open({
-            next: (frame: Frame) => this.handleIncomingFrame(channelObserver, frame, safeBuffer),
+            next: (frame: Frame) => this.handleIncomingFrame(channelObserver, frame, this.safeMessagesBuffer as SafeMessageBuffer),
             complete: () => this.log.debug("Received complete from transport"),
             error: (e: any) => this.handleConnectionError(channelObserver, e)
         })

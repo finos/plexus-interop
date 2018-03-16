@@ -70,6 +70,10 @@ export class SafeMessageBuffer {
         }
     }
 
+    public hasPendingChunks(): boolean {
+        return !this.chunksQueue.isEmpty();
+    }
+
     private scheduleFlush(): void {
         if (!this.syncTimeoutId) {
             this.syncTimeoutId = globalObj.setTimeout(() => {
