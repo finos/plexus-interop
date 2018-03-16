@@ -44,7 +44,7 @@ describe("SafeMessagesBuffer", () => {
             expect(new Uint32Array(message))
                 .toEqual(new Uint32Array([1, 2, 3, 5, 6, 7]));
             done();
-        }, 1, 10);
+        }, () => {}, 1, 10);
 
         safeBuffer.addChunk(first.buffer, false);
         safeBuffer.addChunk(second.buffer, true);
