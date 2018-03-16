@@ -41,7 +41,7 @@ export class SafeMessageBuffer {
         private readonly onMessage: (b: ArrayBuffer) => void,
         private readonly onError: (e: any) => void = () => { },
         private readonly syncSizeThreshold: number = 1024 * 1024,
-        private readonly throttlingPeriod: number = 700,
+        private readonly throttlingPeriod: number = 500,
         private readonly batchSize: number = 50) { }
 
     public getCurrentBuffer(): ArrayBuffer {
