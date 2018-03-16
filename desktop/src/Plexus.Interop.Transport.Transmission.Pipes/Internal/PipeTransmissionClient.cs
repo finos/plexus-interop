@@ -28,7 +28,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
         private const string ServerName = "np-v1";
 
         private static readonly TimeSpan ConnectTimeoutMs = TimeoutConstants.Timeout10Sec;
-        private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout10Sec;
+        private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout30Sec;
         private static readonly ILogger Log = LogManager.GetLogger<PipeTransmissionClient>();
 
         public async ValueTask<ITransmissionConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken)

@@ -33,8 +33,8 @@ task npmRunInstall(type: NpmTask) {
 
 task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall']) {
     args = System.env['BuildRunner'] != null ? 
-        System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] :  ['run', 'ci-build']
-            : org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build']
+            System.env['APPVEYOR_REPO_TAG'] == "true" ? ['run', 'appveyor-release'] : System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] :  ['run', 'ci-build']
+                : org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build']
 }
 
 task buildTransport(dependsOn: npmBuild) {

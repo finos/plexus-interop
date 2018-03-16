@@ -5,7 +5,15 @@ plugins {
     id "de.undercouch.download" version "3.2.0"
 }
 
-def buildCache = System.getenv("PLEXUS_BUILD_CACHE_FOLDER") ?: new File("${rootDir}/build").absolutePath
+def dotnetSdkVersion = "2.1.4"
+def buildCache = System.getenv("PLEXUS_BUILD_CACHE_DIR") ?: new File("${rootDir}/build").absolutePath
+def fullDotNetBuild = System.env['PLEXUS_BUILD_FULL_DOTNET'] == 'true' && Os.isFamily(Os.FAMILY_WINDOWS)
+def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] != 'true'
+def nugetVersion = System.getenv("PLEXUS_BUILD_NUGET_VERSION") ?: System.getenv("APPVEYOR_REPO_TAG_NAME")
+def dotnetParams = nugetVersion == null ? " " : "/p:Version=$nugetVersion"
+if (!fullDotNetBuild) {
+    dotnetParams += " /p:CORE_ONLY=true"
+}
 
 license {
     header file("${rootDir}/LICENSE_HEADER")
@@ -26,80 +34,90 @@ task licenseFormatCS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
 tasks["license"].dependsOn licenseFormatCS
 licenseFormat.dependsOn licenseFormatCS
 
-task downloadDotnet << {
-    download {
-        onlyIfNewer true
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            src 'https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-win-x86.zip'
-            dest "$buildCache/win32/sdk/dotnet.zip"
-        } else if (Os.isFamily(Os.FAMILY_MAC)){
-            src 'https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-osx-x64.tar.gz'
-            dest "$buildCache/unix/sdk/dotnet.tar.gz"
+task prepareDotnet {
+    doLast {
+
+        println "Full dotnet: $fullDotNetBuild"
+	println "Tests enabled: $testsEnabled"
+
+        def dotnetVersion = new ByteArrayOutputStream()
+        exec {
+            ignoreExitValue true
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "$projectDir/dotnet.cmd", "--version"
+            } else {
+                commandLine "$projectDir/dotnet.sh", "--version"
+            }
+            standardOutput = dotnetVersion;
+        }
+        dotnetVersion = "$dotnetVersion".trim()
+
+        if (dotnetVersion == dotnetSdkVersion) {
+            println "Dotnet SDK $dotnetSdkVersion is already installed, skipping downloading"
         } else {
-            src 'https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-linux-x64.tar.gz'
-            dest "$buildCache/unix/sdk/dotnet.tar.gz"
+            println "Dotnet SDK $dotnetSdkVersion is not installed on the current machine. Downloading it to $buildCache."
+
+            download {
+                onlyIfNewer true
+                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                    src 'https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-win-x86.zip'
+                    dest "$buildCache/win32/sdk/dotnet.zip"
+                } else if (Os.isFamily(Os.FAMILY_MAC)){
+                    src 'https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-osx-x64.tar.gz'
+                    dest "$buildCache/unix/sdk/dotnet.tar.gz"
+                } else {
+                    src 'https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-linux-x64.tar.gz'
+                    dest "$buildCache/unix/sdk/dotnet.tar.gz"
+                }
+            }
+
+            copy {
+                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                    from zipTree("$buildCache/win32/sdk/dotnet.zip")
+                    into "$buildCache/win32/sdk/dotnet"
+                } else {
+                    from tarTree(resources.gzip("$buildCache/unix/sdk/dotnet.tar.gz"))
+                    into "$buildCache/unix/sdk/dotnet"
+                }
+            }
+
+            tasks.withType(Exec) {
+                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                    environment "PATH", "$buildCache/win32/sdk/dotnet/"
+                    environment "PLEXUS_BUILD_DOTNET_DIR", "$buildCache/win32/sdk/dotnet/"
+                } else {
+                    environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildCache/unix/sdk/dotnet/"
+                    environment "PLEXUS_BUILD_DOTNET_DIR", "$buildCache/unix/sdk/dotnet/"
+                }
+	        }
         }
     }
 }
-
-task downloadAndUnzipDotnet << {
-
-    copy {
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            from zipTree("$buildCache/win32/sdk/dotnet.zip")
-            into "$buildCache/win32/sdk/dotnet"
-        } else {
-            from tarTree(resources.gzip("$buildCache/unix/sdk/dotnet.tar.gz"))
-            into "$buildCache/unix/sdk/dotnet"
-        }
-    }
-}
-
-downloadAndUnzipDotnet.dependsOn(downloadDotnet)
 
 task compile(type:Exec) {
-    workingDir projectDir    
+    dependsOn 'license'
+    dependsOn prepareDotnet
+    workingDir projectDir
+    environment "PLEXUS_BUILD_DOTNET_PARAMS", dotnetParams
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        if (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null) {
-           commandLine 'cmd', '/c', 'build.cmd'
-	} else {
-           commandLine 'cmd', '/c', 'build-netcore-only.cmd'
-        }
+        commandLine "$projectDir/build.cmd"
     } else {
-        commandLine "$projectDir/build-netcore-only.sh"
+        commandLine "$projectDir/build.sh"
     }
 }
-
-compile.dependsOn('license')
-
-def dotnetVersion = new ByteArrayOutputStream()
-exec{    
-    ignoreExitValue true
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        commandLine 'cmd', '/c', 'dotnet.cmd', "--version"
-    } else {
-        commandLine '$projectDir/dotnet.sh', "--version"
-    }
-    standardOutput = dotnetVersion;
-}
-
-println "Full dotnet build: " + (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null)
-println "dotnet --version:\n$dotnetVersion"
-
-def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] == null
-println "Tests enabled: $testsEnabled"
 
 if (testsEnabled) {
     task test(dependsOn: compile, type:Exec) {
-        workingDir projectDir    
-    	ignoreExitValue false    
-        if (System.env['PLEXUS_BUILD_FULL_DOTNET'] != null) {
-           commandLine 'cmd', '/c', 'tests.cmd'
+        dependsOn prepareDotnet
+        workingDir projectDir
+    	ignoreExitValue false
+        environment "PLEXUS_BUILD_DOTNET_PARAMS", dotnetParams
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+           commandLine "$projectDir/tests.cmd"
         } else {
-           commandLine 'cmd', '/c', 'tests-netcore-only.cmd'
+           // For now tests can only run on Windows
+           // commandLine "$projectDir/tests.sh"
         }
-        // For now tests can only run on Windows
-        // commandLine "$projectDir/tests-netcore-only.sh"
     }
 } else {
     task test(dependsOn: compile) {
@@ -109,34 +127,26 @@ if (testsEnabled) {
     }
 }
 
-if ("$dotnetVersion".trim() != "2.1.4") {
-	println "Dotnet SDK is not installed"
-	compile.dependsOn(downloadAndUnzipDotnet)
-   	test.dependsOn(downloadAndUnzipDotnet)
-        compile.doFirst {
-	   println "Adding dotnet SDK to path"
-           if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-              environment "PATH", "$buildCache/win32/sdk/dotnet/"
-           } else {
-              environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildCache/unix/sdk/dotnet/"
-           }
-	}
-        if (testsEnabled) {
-           test.doFirst {
-	       println "Adding dotnet SDK to path"
-               if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                  environment "PATH", "$buildCache/win32/sdk/dotnet/"
-               } else {
-                  environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildCache/unix/sdk/dotnet/"
-               }
-           }
-	}
+if (nugetVersion != null) {
+    task push(dependsOn: test, type:Exec) {
+        dependsOn prepareDotnet
+        workingDir projectDir
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            commandLine "$projectDir/push.cmd"
+        } else {
+            commandLine "$projectDir/push.sh"
+        }
+    }    
 } else {
-	println "Dotnet SDK is already installed"
+   task push(dependsOn: test) {
+        doLast {
+            println "Skipping push because nuget version is not specified"
+        }
+    }
 }
 
 task clean {
     delete fileTree(dir: 'src').include("**/bin/*").include("**/obj/*")
 }
 
-task build (dependsOn: [compile, test]) {}
+task build (dependsOn: [compile, test, push]) {}
