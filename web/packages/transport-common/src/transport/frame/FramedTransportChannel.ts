@@ -152,7 +152,7 @@ export class FramedTransportChannel implements TransportChannel {
         if (this.remoteCompletion && this.log.isDebugEnabled()) {
             this.log.debug(`Remote completed with ${JSON.stringify(this.remoteCompletion)}`);
         }
-        if (this.safeMessagesBuffer !== null && this.safeMessagesBuffer.hasPendingChunks()) {
+        if (this.safeMessagesBuffer && this.safeMessagesBuffer.hasPendingChunks()) {
             await AsyncHelper.waitFor(() => !this.safeMessagesBuffer.hasPendingChunks(), 
                 new CancellationToken(), 
                 Defaults.STATUS_CHECK_INTERVAL, 
