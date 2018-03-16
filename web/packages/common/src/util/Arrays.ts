@@ -29,13 +29,6 @@ export class Arrays {
         return result.buffer;
     }
 
-    public static concatTypesArrays(first: Uint8Array, second: Uint8Array): Uint8Array {
-        const full = new Uint8Array(first.length + second.length);
-        full.set(first, 0);
-        full.set(second, first.length);
-        return full;
-    }
-
     public static toArrayBuffer(typedArray: Uint8Array): ArrayBuffer {
         return new Uint8Array(typedArray).buffer;
     }

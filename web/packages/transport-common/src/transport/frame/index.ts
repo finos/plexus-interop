@@ -19,3 +19,4 @@ export * from "./FramedTransport";
 export * from "./ConnectableFramedTransport";
 export * from "./FramedTransportChannel";
 export * from "./FramedTransportConnection";
+export * from "./SafeMessageBuffer";

@@ -25,9 +25,10 @@ import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, St
 import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ClientError, ErrorCompletion } from "@plexus-interop/protocol";
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";
+import { SafeMessageBuffer } from "./SafeMessageBuffer";
 
 export enum ChannelState {
-    CREATED  = "CREATED",
+    CREATED = "CREATED",
     OPEN = "OPEN",
     CLOSED = "CLOSED",
     CLOSE_RECEIVED = "CLOSE_RECEIVED",
@@ -213,10 +214,15 @@ export class FramedTransportChannel implements TransportChannel {
     }
 
     private async subscribeToMessages(channelObserver: Observer<ArrayBuffer>): Promise<void> {
+
         this.framedTransport.open({
 
             next: (frame: Frame) => {
-                this.inMessageBuffer = this.handleIncomingFrame(channelObserver, frame, this.inMessageBuffer);
+                const messageHandler = (m: ArrayBuffer) => {
+                    this.log.trace(`Received message of ${m.byteLength} bytes`);
+                    channelObserver.next(m);
+                };
+                this.handleIncomingFrame(channelObserver, frame, new SafeMessageBuffer(messageHandler));
             },
 
             complete: () => this.log.debug("Received complete from transport"),
@@ -239,10 +245,10 @@ export class FramedTransportChannel implements TransportChannel {
         });
     }
 
-    private handleIncomingFrame(channelObserver: Observer<ArrayBuffer>, frame: Frame, resultBuffer: ArrayBuffer): ArrayBuffer {
+    private handleIncomingFrame(channelObserver: Observer<ArrayBuffer>, frame: Frame, safeBuffer: SafeMessageBuffer): void {
         if (this.channelCancellationToken.isReadCancelled()) {
             this.log.warn("Read cancelled, dropping frame");
-            return resultBuffer;
+            return;
         }
         if (!frame) {
             this.log.warn("Empty frame, dropping it");
@@ -253,21 +259,12 @@ export class FramedTransportChannel implements TransportChannel {
             if (this.log.isTraceEnabled()) {
                 this.log.trace(`Received ${isLast ? "last" : ""} message frame, ${messageFrame.body.byteLength} bytes`);
             }
-            resultBuffer = Arrays.concatenateBuffers(resultBuffer, messageFrame.body);    
-            if (isLast) {
-                /* istanbul ignore if */
-                if (this.log.isTraceEnabled()) {
-                    this.log.trace(`Received message of ${resultBuffer.byteLength} bytes`);
-                }
-                channelObserver.next(resultBuffer);
-                resultBuffer = new ArrayBuffer(0);
-            }
+            safeBuffer.addChunk(messageFrame.body, isLast);
         } else if (frame.internalHeaderProperties.channelClose) {
             this.onChannelClose(frame as ChannelCloseFrame);
         } else {
             this.log.warn("Unknown frame received", frame);
         }
-        return resultBuffer;
     }
 
     private remoteCompletionToError(completion: plexus.ICompletion): plexus.IError {
