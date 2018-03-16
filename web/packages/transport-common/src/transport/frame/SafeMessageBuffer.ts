@@ -24,19 +24,15 @@ type Chunk = {
     buffer: ArrayBuffer
 };
 
-const emptyBuffer: ArrayBuffer = new ArrayBuffer(0);
-
 /**
- * There is an issue 
- * 
+ * To mitigate browser issues with concatenating of multiple small chunks into huge one
  */
 export class SafeMessageBuffer {
 
     private readonly log: Logger = LoggerFactory.getLogger("SafeMessageBuffer");
 
-    private readonly batchSize: number = 50;
-    private readonly maxChunksQueueSize: number = 100 * 1024;
-    private buffer: ArrayBuffer = emptyBuffer;
+    private readonly maxChunksQueueSize: number = 10 * 1024;
+    private buffer: ArrayBuffer = new ArrayBuffer(0);
     private chunksQueue: Queue<Chunk> = new LimitedBufferQueue(this.maxChunksQueueSize);
     private syncTimeoutId: number | null = null;
     private failure: any = null;
@@ -45,10 +41,11 @@ export class SafeMessageBuffer {
         private readonly onMessage: (b: ArrayBuffer) => void,
         private readonly onError: (e: any) => void = () => { },
         private readonly syncSizeThreshold: number = 1024 * 1024,
-        private readonly throttlingPeriod: number = 500) { }
+        private readonly throttlingPeriod: number = 700,
+        private readonly batchSize: number = 50) { }
 
     public getCurrentBuffer(): ArrayBuffer {
-        return this.buffer || emptyBuffer;
+        return this.buffer;
     }
 
     public addChunk(buffer: ArrayBuffer, isLast: boolean): void {
@@ -94,11 +91,14 @@ export class SafeMessageBuffer {
     private flushChunks(resultBuffer: ArrayBuffer, chunksQueue: Queue<Chunk>, batchSize: number): ArrayBuffer {
         let chunksBuffer = new ArrayBuffer(0);
         let last = false;
-        while (!last && !chunksQueue.isEmpty() && --batchSize > 0) {
+        // concatenate small chunks together first
+        while (!last && !chunksQueue.isEmpty() && batchSize > 0) {
             const { buffer, isLast } = chunksQueue.dequeue();
             last = isLast;
             chunksBuffer = Arrays.concatenateBuffers(chunksBuffer, buffer);
+            batchSize--;
         }
+        // now we can append to result buffer
         if (last) {
             this.onMessage(Arrays.concatenateBuffers(resultBuffer, chunksBuffer));
             return new ArrayBuffer(0);
@@ -109,10 +109,9 @@ export class SafeMessageBuffer {
     }
 
     private handleError(e: any): void {
-        debugger;
+        this.log.error("Failed on updating the buffer", e);
         this.failure = e;
         this.buffer = new ArrayBuffer(0);
-        this.log.error("Failed on updating the buffer", e);
         this.onError(e);
     }
 

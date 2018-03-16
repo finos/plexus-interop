@@ -214,23 +214,18 @@ export class FramedTransportChannel implements TransportChannel {
     }
 
     private async subscribeToMessages(channelObserver: Observer<ArrayBuffer>): Promise<void> {
-
+        const messageHandler = (m: ArrayBuffer) => {
+            this.log.trace(`Received message of ${m.byteLength} bytes`);
+            channelObserver.next(m);
+        };
+        const errorHandler = (e: any) => channelObserver.error(e);
+        const safeBuffer = new SafeMessageBuffer(messageHandler, errorHandler);
         this.framedTransport.open({
-
-            next: (frame: Frame) => {
-                const messageHandler = (m: ArrayBuffer) => {
-                    this.log.trace(`Received message of ${m.byteLength} bytes`);
-                    channelObserver.next(m);
-                };
-                this.handleIncomingFrame(channelObserver, frame, new SafeMessageBuffer(messageHandler));
-            },
-
+            next: (frame: Frame) => this.handleIncomingFrame(channelObserver, frame, safeBuffer),
             complete: () => this.log.debug("Received complete from transport"),
-
-            error: (transportError) => this.handleConnectionError(channelObserver, transportError)
-
+            error: (e: any) => this.handleConnectionError(channelObserver, e)
         })
-            .catch(connectionError => channelObserver.error(connectionError));
+        .catch(connectionError => channelObserver.error(connectionError));
     }
 
     private async sendChannelClosedRequest(completion: plexus.ICompletion = new SuccessCompletion()): Promise<void> {
