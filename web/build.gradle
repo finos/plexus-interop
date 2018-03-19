@@ -32,9 +32,14 @@ task npmRunInstall(type: NpmTask) {
 }
 
 task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall']) {
-    args = System.env['BuildRunner'] != null ? 
-            System.env['APPVEYOR_REPO_TAG'] == "true" ? ['run', 'appveyor-release'] : System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] :  ['run', 'ci-build']
-                : org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build']
+    // if App Veyour launched build for tag - then launch release build
+    args = System.env['APPVEYOR_REPO_TAG'] == "true" ? 
+                ['run', 'appveyor-release'] : 
+                    // elseif BuildRunner specified - then launch CI build/CI publish with (e2e tests disabled, custom registry support)
+                    System.env['BuildRunner'] != null ? 
+                        System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] : ['run', 'ci-build']
+                        // else run full build on target platform
+                        : org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build']
 }
 
 task buildTransport(dependsOn: npmBuild) {
