@@ -6,7 +6,7 @@ plugins {
 node {
     version = '8.5.0'
     nodeModulesDir = projectDir
-    download = true,
+    download = true
     npmVersion = '5.7.1'
 }
 
