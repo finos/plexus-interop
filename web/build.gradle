@@ -6,7 +6,8 @@ plugins {
 node {
     version = '8.5.0'
     nodeModulesDir = projectDir
-    download = true
+    download = true,
+    npmVersion = '5.7.1'
 }
 
 license {
@@ -28,7 +29,7 @@ tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
 task npmRunInstall(type: NpmTask) {
-    args = ['install'];
+    args = ['install', '--no-package-lock'];
 }
 
 task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall']) {
