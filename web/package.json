@@ -6,7 +6,7 @@
   "description": "Plexus Web Interop root module",
   "scripts": {
     "prebootstrap": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "yarn install --check-files && lerna bootstrap",
     "postbootstrap": "node ./scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
     "preinstall": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
     "prebuild": "run-s bootstrap",

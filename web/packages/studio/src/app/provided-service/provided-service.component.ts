@@ -34,7 +34,7 @@ import { createInvocationLogger } from '../services/core/invocation-utils';
 export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
   private readonly log: Logger = LoggerFactory.getLogger("ProvidedServiceComponent");
-
+  private readonly maxPrintedContent: number = 1024;
   private providedMethod: ProvidedMethod;
 
   private interopClient: InteropClient;
@@ -62,8 +62,13 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
       }));
   }
 
-  printRequest(requestJson, log) {
-    log.info(`Received request: ${this.format(requestJson)}`);
+  printRequest(requestJson: string, log) {
+    if (requestJson.length > this.maxPrintedContent) {
+      requestJson = `${requestJson.substring(0, this.maxPrintedContent)}...`;
+    } else {
+      requestJson = this.format(requestJson);
+    }
+    log.info(`Received request: ${requestJson}`);
   }
 
   handleError(e: any, log) {
