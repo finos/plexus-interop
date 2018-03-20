@@ -41,15 +41,20 @@ task npmRunInstall(type: NpmTask) {
 task preNpmBuild {
     doLast {
         println "NPM version: $npmVersion"
-	    println "e2e Tests enabled: $e2eTestsEnabled"
+	    println "CI Publish: $ciPublishBuild"
+	    println "CI Full: $ciFullBuild"
+	    println "CI Build: $ciBuild"
     }
 }
 
 task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
-    environment "PLEXUS_BUILD_NPM_VERSION", npmVersion
+    // https://github.com/srs/gradle-node-plugin/issues/128
+    environment = [
+        'PLEXUS_BUILD_NPM_VERSION': npmVersion
+    ]
     args =  ciPublishBuild ? ['run', 'ci-publish'] :
             ciFullBuild ? ['run', 'ci-build-e2e'] : 
-            ciBuild ? ['run', 'ci-build'],
+            ciBuild ? ['run', 'ci-build'] :
             isWindows ? ['run', 'build-win'] : ['run', 'build']
 }
 
@@ -59,4 +64,5 @@ task buildTransport(dependsOn: npmBuild) {
 
 task build(dependsOn: buildTransport) {
 }
+
 build.dependsOn('license')
