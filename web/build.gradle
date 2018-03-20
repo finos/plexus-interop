@@ -3,6 +3,13 @@ plugins {
     id "com.github.hierynomus.license" version"0.14.0"
 }
 
+def ciBuild = System.env['BuildRunner'] != null
+def ciPublishBuild = ciBuild && (System.env['APPVEYOR_REPO_TAG'] == "true" || System.env['NPM_PUBLISH'] == "true")
+def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows();
+def e2eTestsEnabled = isWindows && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_WEB_TESTS'] != 'true'
+def ciFullBuild = ciBuild && e2eTestsEnabled
+def npmVersion = System.getenv("PLEXUS_BUILD_NPM_VERSION") ?: (System.getenv("APPVEYOR_REPO_TAG_NAME") ?: System.getenv("PackageVersion")) 
+
 node {
     version = '8.5.0'
     nodeModulesDir = projectDir
@@ -31,15 +38,19 @@ task npmRunInstall(type: NpmTask) {
     args = ['install'];
 }
 
-task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall']) {
-    // if App Veyour launched build for tag - then launch release build
-    args = System.env['APPVEYOR_REPO_TAG'] == "true" ? 
-                ['run', 'appveyor-release'] : 
-                    // elseif BuildRunner specified - then launch CI build/CI publish with (e2e tests disabled, custom registry support)
-                    System.env['BuildRunner'] != null ? 
-                        System.env['NPM_PUBLISH'] == "true" ? ['run', 'ci-publish'] : ['run', 'ci-build']
-                        // else run full build on target platform
-                        : org.gradle.internal.os.OperatingSystem.current().isWindows() ? ['run', 'build-win'] : ['run', 'build']
+task preNpmBuild {
+    doLast {
+        println "NPM version: $npmVersion"
+	    println "e2e Tests enabled: $e2eTestsEnabled"
+    }
+}
+
+task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
+    environment "PLEXUS_BUILD_NPM_VERSION", npmVersion
+    args =  ciPublishBuild ? ['run', 'ci-publish'] :
+            ciFullBuild ? ['run', 'ci-build-e2e'] : 
+            ciBuild ? ['run', 'ci-build'],
+            isWindows ? ['run', 'build-win'] : ['run', 'build']
 }
 
 task buildTransport(dependsOn: npmBuild) {
