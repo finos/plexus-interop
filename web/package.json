@@ -23,8 +23,8 @@
     "ci-build": "run-s build",
     "ci-publish": "run-s bump-version build publish-all",
     "appveyor-release": "run-s bump-release-version build publish-all",
-    "bump-release-version": "cross-var lerna publish --repo-version $APPVEYOR_REPO_TAG_NAME --skip-git --skip-npm --yes --verbose --force-publish='@plexus-interop/*'",
-    "bump-version": "cross-var lerna publish --repo-version $PackageVersion --skip-git --skip-npm --yes --verbose --force-publish='@plexus-interop/*'",
+    "bump-release-version": "cross-var lerna publish --repo-version $APPVEYOR_REPO_TAG_NAME --skip-git --skip-npm --yes --verbose --force-publish='*'",
+    "bump-version": "cross-var lerna publish --repo-version $PackageVersion --skip-git --skip-npm --yes --verbose --force-publish='*'",
     "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
   },
   "workspaces": [
