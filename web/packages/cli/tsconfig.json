@@ -19,15 +19,14 @@
         "noImplicitThis": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "removeComments": false,
         "pretty": true,
+        "removeComments": false,
         "lib": [
-            "es6", "dom"
+            "es6"
         ],
         "types": [
-            "jest",
-            "long",
-            "node"
+            "node",
+            "jest"
         ],
         "baseUrl": "."
     },

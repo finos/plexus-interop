@@ -69,9 +69,6 @@
         "no-switch-case-fall-through": true,
         "no-unsafe-finally": true,
         "no-unused-expression": true,
-        "no-unused-new": true,
-        "no-unused-variable": [true],
-        "no-use-before-declare": true,
         "no-var-keyword": true,
         "radix": true,
         "restrict-plus-operands": false,
@@ -153,5 +150,11 @@
             "check-module",
             "check-typecast"
         ]
+    },
+    "linterOptions": {
+      "exclude": [
+          "../packages/**/*Generated*.ts",
+          "../packages/**/gen/*.ts"
+      ]
     }
 }
