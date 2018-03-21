@@ -13,12 +13,7 @@
     "build:watch": "tsc -w -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
-    "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/common@0.1.2",
-    "postunpublish": "echo 'Unpublished'",
-    "prerepublish": "echo 'Republishing started...'",
-    "republish": "npm run unpublish && npm publish",
-    "postrepublish": "echo 'Package republished successfully!'"
+    "test": "yarn unit"
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",
@@ -52,7 +47,7 @@
     "testEnvironment": "node",
     "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine.js",
     "transform": {
-      ".(ts|tsx)": "<rootDir>/preprocessor.js"
+      ".(ts|tsx)": "<rootDir>/../../configs/jest-preprocessor.js"
     },
     "moduleFileExtensions": [
       "ts",

@@ -51,7 +51,7 @@
     "testEnvironment": "node",
     "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine.js",
     "transform": {
-      ".(ts|tsx)": "<rootDir>/preprocessor.js"
+      ".(ts|tsx)": "<rootDir>/../../configs/jest-preprocessor.js"
     },
     "moduleFileExtensions": [
       "ts",
