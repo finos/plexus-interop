@@ -58,4 +58,8 @@ export abstract class BaseCommand implements Command {
         }
     }
 
+    public log(msg: string, args?: any[]): void {
+        console.log(msg, args);
+    }
+
 }
