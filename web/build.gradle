@@ -44,6 +44,7 @@ task preNpmBuild {
 	    println "CI Publish: $ciPublishBuild"
 	    println "CI Full: $ciFullBuild"
 	    println "CI Build: $ciBuild"
+	    println "Integration tests: $e2eTestsEnabled"
     }
 }
 
@@ -55,7 +56,7 @@ task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
     args =  ciPublishBuild ? ['run', 'ci-publish'] :
             ciFullBuild ? ['run', 'ci-build-e2e'] : 
             ciBuild ? ['run', 'ci-build'] :
-            isWindows ? ['run', 'build-win'] : ['run', 'build']
+            e2eTestsEnabled ? ['run', 'build-e2e'] : ['run', 'build']
 }
 
 task buildTransport(dependsOn: npmBuild) {
