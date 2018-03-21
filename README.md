@@ -63,18 +63,18 @@ Please adjust following Environment varibles:
 
 | Name | Value/Example | Description |
 | --- | --- | --- | --- |
-| `HTTP_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port 
-| `HTTPS_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port 
-| `NO_PROXY` | `127.0.0.1,localhost,.acme.com` | List of Intranet hosts to exclude from accessing through proxy
-| `ELECTRON_MIRROR` | `https://mirrow.host/electron/` | Host to download Electron binaries from, intstead of default Github releases site
-| `SASS_BINARY_SITE` | `https://mirrow.host/node-sass/` | Host to download Saas binaries from, intstead of default Github releases site
+| `HTTP_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port. 
+| `HTTPS_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port. 
+| `NO_PROXY` | `127.0.0.1,localhost,.acme.com` | List of Intranet hosts to exclude from accessing through proxy.
+| `ELECTRON_MIRROR` | `https://mirrow.host/electron/` | Host to download Electron binaries from, intstead of default Github releases site.
+| `SASS_BINARY_SITE` | `https://mirrow.host/node-sass/` | Host to download Saas binaries from, intstead of default Github releases site.
 
 There are also few recommended/optional variables to improve your build/development experience:
 
 | Name | Value/Example | Description |
 | --- | --- | --- | --- |
-| `PLEXUS_BUILD_SKIP_DOTNET_TESTS` | `true` | Disable integration tests for .Net components to descrease build time
-| `PLEXUS_BUILD_SKIP_WEB_TESTS` | `true` | Disable integration tests for Javascript components to descrease build time
+| `PLEXUS_BUILD_SKIP_DOTNET_TESTS` | `true` | Disable integration tests for .Net components to descrease build time.
+| `PLEXUS_BUILD_SKIP_WEB_TESTS` | `true` | Disable integration tests for Javascript components to descrease build time.
 | `GRADLE_USER_HOME` | `C:\Home\Gradle` | Gradle stores cached packages in `%USERPROFILE%\.gradle` by default, often pointing to Roaming Profile. So it worth to use some local folder instead. Please also copy existing Gradle settings to new folder.
 | `NUGET_PACKAGES` | `C:\Home\NuGetGlobalPackages` | Nuget stores cached binaries in `%USERPROFILE%\.nuget` by defailt, often pointing to Roaming Profile. So it worth to use some local folder instead.
 | `NPM_REGISTRY_INSTALL` | `https://npm.registry.acme.com` | Can be used to replace default `https://registry.npmjs.org` with another registry/mirror to download NPM dependencies from. 
