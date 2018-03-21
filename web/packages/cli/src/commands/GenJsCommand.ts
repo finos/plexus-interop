@@ -1,8 +1,5 @@
 import { Command } from 'src/commands/Command';
 import * as commander from 'commander';
-import { Logger, LoggerFactory } from '@plexus-interop/common';
-
-// const logger: Logger = LoggerFactory.getLogger('gen-js');
 
 export class GenJsCommand implements Command {
 
