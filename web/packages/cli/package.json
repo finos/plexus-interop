@@ -1,22 +1,27 @@
 {
     "name": "@plexus-interop/cli",
     "version": "0.1.0",
-    "types": "dist/main/src/index.d.ts",
-    "main": "dist/main/src/index.js",
+    "main": "index.js",
     "description": "Plexus Interop CLI tools",
     "license": "Apache-2.0",
+    "preferGlobal": true,
+    "bin": {
+      "plexus": "./cli.js"
+    },
     "scripts": {
       "prebuild": "yarn lint && trash dist",
       "build": "yarn build:main",
       "postbuild": "yarn test",
       "build:main": "tsc -p tsconfig.json",
       "build:watch": "tsc -w -p tsconfig.json",
-      "lint_x": "tslint src/**/*.ts",
+      "lint": "tslint src/**/*.ts",
       "unit": "jest --coverage",
       "test": "yarn unit"
     },
     "dependencies": {
-      "@plexus-interop/common": "0.1.0"
+      "@plexus-interop/common": "0.1.0",
+      "commander": "2.15.1",
+      "protobufjs": "6.8.0"
     },
     "devDependencies": {
       "@types/chai": "^4.0.2",
