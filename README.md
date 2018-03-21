@@ -62,7 +62,7 @@ systemProp.http.nonProxyHosts=*.acme.com|localhost
 Please adjust following Environment variables:
 
  Name | Value/Example | Description 
- --- | --- | --- | --- 
+ --- | --- | ---
  `HTTP_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port. 
  `HTTPS_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port. 
 `NO_PROXY` | `127.0.0.1,localhost,.acme.com` | List of Intranet hosts to exclude from accessing through proxy.
@@ -72,7 +72,7 @@ Please adjust following Environment variables:
 There are also few recommended/optional variables to improve your build/development experience:
 
 Name | Value/Example | Description
---- | --- | --- | ---
+--- | --- | ---
 `PLEXUS_BUILD_SKIP_DOTNET_TESTS` | `true` | Disable integration tests for .Net components to decrease build time.
 `PLEXUS_BUILD_SKIP_WEB_TESTS` | `true` | Disable integration tests for Javascript components to decrease build time.
 `GRADLE_USER_HOME` | `C:\Home\Gradle` | Gradle stores cached packages in `%USERPROFILE%\.gradle` by default, often pointing to Roaming Profile. So it worth to use some local folder instead. Please also copy existing Gradle settings to new folder.
