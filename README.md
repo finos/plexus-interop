@@ -42,7 +42,7 @@ Build produces artifacts into folder "bin"; the first run can take 10 minutes or
 
 ### Build in retricted environment
 
-Build configuration should work fine on stadard setup, with access to Internet. However it is quite often to have Dev setup behind corporate proxy. To run build successfully you'll need to adjust few configuration items shown below:
+Build configuration should work fine on standard setup, with access to Internet. However it is quite often to have Dev setup behind corporate proxy. To run build successfully you'll need to adjust few configuration items shown below:
 
 #### Gradle Proxy Settings
 
@@ -66,8 +66,8 @@ Please adjust following Environment variables:
 | `HTTP_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port. 
 | `HTTPS_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port. 
 | `NO_PROXY` | `127.0.0.1,localhost,.acme.com` | List of Intranet hosts to exclude from accessing through proxy.
-| `ELECTRON_MIRROR` | `https://mirrow.host/electron/` | Host to download Electron binaries from, instead of default Github releases site.
-| `SASS_BINARY_SITE` | `https://mirrow.host/node-sass/` | Host to download Saas binaries from, instead of default Github releases site.
+| `ELECTRON_MIRROR` | `https://mirror.host/electron/` | Host to download Electron binaries from, instead of default Github releases site.
+| `SASS_BINARY_SITE` | `https://mirror.host/node-sass/` | Host to download Saas binaries from, instead of default Github releases site.
 
 There are also few recommended/optional variables to improve your build/development experience:
 
