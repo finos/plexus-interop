@@ -6,7 +6,7 @@
   "description": "Plexus Web Interop root module",
   "scripts": {
     "prebootstrap": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "yarn install --check-files && lerna bootstrap",
     "postbootstrap": "node ./scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
     "preinstall": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
     "prebuild": "run-s bootstrap",
@@ -19,7 +19,7 @@
     "e2e-web": "cd ./packages/e2e && yarn e2e-web-electron",
     "poste2e-web": "yarn coverage",
     "coverage": "nyc report --reporter=text --reporter=html",
-    "build-win": "run-s build e2e-native e2e-web",
+    "build-e2e": "run-s build e2e-native e2e-web",
     "ci-build": "run-s build",
     "ci-build-e2e": "run-s build e2e-native e2e-web",
     "ci-publish": "run-s bump-version build publish-all",
