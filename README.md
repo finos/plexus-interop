@@ -77,7 +77,7 @@ There are also few recommended/optional variables to improve your build/developm
 | `PLEXUS_BUILD_SKIP_WEB_TESTS` | `true` | Disable integration tests for Javascript components to descrease build time
 | `GRADLE_USER_HOME` | `C:\Home\Gradle` | Gradle stores cached packages in `%USERPROFILE%\.gradle` by default, often pointing to Roaming Profile. So it worth to use some local folder instead. Please also copy existing Gradle settings to new folder.
 | `NUGET_PACKAGES` | `C:\Home\NuGetGlobalPackages` | Nuget stores cached binaries in `%USERPROFILE%\.nuget` by defailt, often pointing to Roaming Profile. So it worth to use some local folder instead.
-| `NPM_REGISTRY_INSTALL` | `https://npm.registry.acme.com` | Can be used to replace default `https://registry.npmjs.org` to another registry/mirror to download NPM dependencies from. 
+| `NPM_REGISTRY_INSTALL` | `https://npm.registry.acme.com` | Can be used to replace default `https://registry.npmjs.org` with another registry/mirror to download NPM dependencies from. 
 
 ### Using OSX
 
