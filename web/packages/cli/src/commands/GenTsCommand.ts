@@ -12,7 +12,7 @@ export class GenTsCommand extends BaseCommand {
             defaultValue: process.cwd()
         },
         {
-            flags: '-i, --input <input>', 
+            flags: '-i, --input', 
             description: 'file containing Plexus Component\'s entry point, e.g. RateProvider.interop'
         },
         {
@@ -22,10 +22,8 @@ export class GenTsCommand extends BaseCommand {
         }
     ];
 
-    public action = (opts: any) => {
-        if (!opts.input) {
-            this.exit(new Error('input is not provided'));
-        }
+    public action(opts: any): void {
+        
     }
 
     public usageExamples = () => ` $ plexus ${this.name()} -b ./metadata -i RateProvider.interop -o ./src/gen`

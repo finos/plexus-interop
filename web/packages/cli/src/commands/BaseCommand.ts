@@ -8,14 +8,19 @@ export abstract class BaseCommand implements Command {
 
     public options: () => Option[] = () => [];
 
-    public name: () => string;
+    public abstract name: () => string;
     
-    public abstract action: (opts: any) => void;
+    public abstract action(opts: any): void;
 
     public register(builder: commander.CommanderStatic): void {
         let commandBuilder = builder.command(this.name());
         this.options().forEach(o => commandBuilder.option(o.flags, o.description, o.defaultValue));
-        commandBuilder = commandBuilder.action(opts => this.action(opts));
+        commandBuilder = commandBuilder.action(opts => {
+            // need to do it manually :(
+            // https://github.com/tj/commander.js/issues/44
+            this.validateRequiredOpts(opts);
+            this.action(opts);
+        });
         const examples = this.usageExamples();
         if (examples) {
             commandBuilder.on('--help', () => {
@@ -28,9 +33,24 @@ export abstract class BaseCommand implements Command {
         }
     }
 
+    private validateRequiredOpts(opts: any): void {
+        const options: any[] = opts.options;
+        if (options) {
+            options
+            .filter(o => o.flags.indexOf('>') <= o.flags.indexOf('<'))    
+            .forEach(o => {
+                const flags = o.flags;
+                const optName = flags.substring(flags.lastIndexOf('<') + 1, flags.lastIndexOf('>'));
+                if (opts[optName] === undefined) {
+                    this.exit(`'${o.flags}' option is not defined`);
+                }
+            });
+        }
+    }
+
     public exit(error: any): void {
         if (error) {
-            console.error('Failed', error);
+            console.error('error: ', error);
             process.exit(1);
         } else {
             console.log('Done!');
