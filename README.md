@@ -67,7 +67,7 @@ Please adjust following Environment variables:
  `HTTPS_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port. 
 `NO_PROXY` | `127.0.0.1,localhost,.acme.com` | List of Intranet hosts to exclude from accessing through proxy.
 `ELECTRON_MIRROR` | `https://github.com/electron/electron/releases/` | Host to download Electron binaries from, if different from default Github releases site.
-`SASS_BINARY_SITE` | `https://github.com/sass/node-sass/releases/` | Host to download Saas binaries from, if different from Github releases site.
+`SASS_BINARY_SITE` | `https://github.com/sass/node-sass/releases/` | Host to download Saas binaries from, if different from default Github releases site.
 
 There are also few recommended/optional variables to improve your build/development experience:
 
