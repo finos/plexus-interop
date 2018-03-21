@@ -66,8 +66,8 @@ Please adjust following Environment varibles:
 | `HTTP_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port 
 | `HTTPS_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port 
 | `NO_PROXY` | `127.0.0.1,localhost,.acme.com` | List of Intranet hosts to exclude from accessing through proxy
-| `ELECTRON_MIRROR` | `https://npm.taobao.org/mirrors/electron/` | Host to download Electron binaries from, intstead of default Github releases site
-| `SASS_BINARY_SITE` | `https://npm.taobao.org/mirrors/node-sass/` | Host to download Saas binaries from, intstead of default Github releases site
+| `ELECTRON_MIRROR` | `https://mirrow.host/electron/` | Host to download Electron binaries from, intstead of default Github releases site
+| `SASS_BINARY_SITE` | `https://mirrow.host/node-sass/` | Host to download Saas binaries from, intstead of default Github releases site
 
 There are also few recommended/optional variables to improve your build/development experience:
 
