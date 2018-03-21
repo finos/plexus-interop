@@ -30,6 +30,8 @@ Build and samples are currently tested on Windows environments; building and run
 
 ## Build/Install
 
+### General
+
 Make sure that Java SDK is installed and [JAVA_HOME variable is set](https://www.mkyong.com/java/how-to-set-java_home-on-windows-10/).
 
 All Plexus Interop components can be built using [Gradle](https://gradle.org/) tool using the following single command:
@@ -37,6 +39,45 @@ All Plexus Interop components can be built using [Gradle](https://gradle.org/) t
 `./gradlew build --console plain`
 
 Build produces artifacts into folder "bin"; the first run can take 10 minutes or more, depending on your Internet connection speed.
+
+### Build in retricted environment
+
+Build configuration should work fine on stadard setup, with access to Internet. However it is quite often to have Dev setup behind corporate proxy. To run build successfully you'll need to adjust few configuration items shown below:
+
+#### Gradle Proxy Settings
+
+To adjust Gradle Proxy settings please update following lines in ```%USERPROFILE%\.gradle\gradle.properties```, using your Corporate Proxy's host and port instead of example values:  
+
+```
+systemProp.proxySet="true"
+systemProp.http.proxyHost=proxy.host.acme.com
+systemProp.http.proxyPort=8080
+systemProp.https.proxyHost=proxy.host.acme.com
+systemProp.https.proxyPort=8080
+systemProp.http.nonProxyHosts=*.acme.com|localhost
+```
+
+#### Environment variables
+
+Please adjust following Environment varibles:
+
+| Name | Value/Example | Description |
+| --- | --- | --- | --- |
+| `HTTP_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port 
+| `HTTPS_PROXY` | `http://userproxy.acme.com:8080` | Your corporate proxy host:port 
+| `NO_PROXY` | `127.0.0.1,localhost,.acme.com` | List of Intranet hosts to exclude from accessing through proxy
+| `ELECTRON_MIRROR` | `https://npm.taobao.org/mirrors/electron/` | Host to download Electron binaries from, intstead of default Github releases site
+| `SASS_BINARY_SITE` | `https://npm.taobao.org/mirrors/node-sass/` | Host to download Saas binaries from, intstead of default Github releases site
+
+There are also few recommended/optional variables to improve your build/development experience:
+
+| Name | Value/Example | Description |
+| --- | --- | --- | --- |
+| `PLEXUS_BUILD_SKIP_DOTNET_TESTS` | `true` | Disable integration tests for .Net components to descrease build time
+| `PLEXUS_BUILD_SKIP_WEB_TESTS` | `true` | Disable integration tests for Javascript components to descrease build time
+| `GRADLE_USER_HOME` | `C:\Home\Gradle` | Gradle stores cached packages in `%USERPROFILE%\.gradle` by default, often pointing to Roaming Profile. So it worth to use some local folder instead. Please also copy existing Gradle settings to new folder.
+| `NUGET_PACKAGES` | `C:\Home\NuGetGlobalPackages` | Nuget stores cached binaries in `%USERPROFILE%\.nuget` by defailt, often pointing to Roaming Profile. So it worth to use some local folder instead.
+| `NPM_REGISTRY_INSTALL` | `https://npm.registry.acme.com` | Can be used to replace default `https://registry.npmjs.org` to another registry/mirror to download NPM dependencies from. 
 
 ### Using OSX
 
