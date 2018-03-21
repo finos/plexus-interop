@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.validation.IResourceValidator
 import org.eclipse.xtext.validation.CheckMode
 import org.eclipse.xtext.util.CancelIndicator
+import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
 
 @RunWith(XtextRunner)
 @InjectWith(InteropLangInjectorProvider)
@@ -42,10 +43,15 @@ class InteropLangParsingTest {
 	
 	@Inject
 	IResourceValidator validator
+	
+	@Inject
+	ProtoLangConfig protoLangConfig 
 		
 	@Test
 	def void loadModel() {
 		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource("com/db/plexus/interop/dsl/tests/example1.interop").toURI().toString())
+		val baseUri = uri.trimSegments(1).appendSegment("")
+		protoLangConfig.baseURIs.add(baseUri)
 		System.out.println("Parsing " + uri)
 		Assert.assertEquals(0, rs.resources.length)
 		rs.getResource(uri, true)
@@ -54,7 +60,7 @@ class InteropLangParsingTest {
 		for (r : allResources) {
 			validateResource(r)
 		}								
-		Assert.assertEquals(3, allResources.length)	
+		Assert.assertEquals(4, allResources.length)	
 	}
 	
 	@Test

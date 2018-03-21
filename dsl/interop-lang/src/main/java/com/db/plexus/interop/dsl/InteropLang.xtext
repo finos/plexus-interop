@@ -45,11 +45,21 @@ ApplicationElement:
 ;
 
 InteropOption:
-	'option' name=OPTION_NAME '=' value=OptionValue ';'+
+	(-> CustomInteropOption | PredefinedInteropOption)
+;
+
+PredefinedInteropOption returns InteropOption: 
+	'option' descriptor=[Field|SHORT_ID] '=' value=Constant ';'+
+;
+
+CustomInteropOption returns InteropOption:
+	'option' (-> isCustom?='(') descriptor=[Field|FULL_ID] ')' '=' value=Constant ';'+
 ;
 
 ConsumedService:
-	'consumes' service=[Service|FULL_ID] ('as' alias=VALID_INTEROP_ID)? ('from' restrictions=RestrictionList)? body=ConsumedServiceBody ';'*
+	'consumes' service=[Service|FULL_ID] ('as' alias=VALID_INTEROP_ID)? ('from' restrictions=RestrictionList)? '{'
+		(elements+=ConsumedServiceElement)*
+	'}' ';'*
 ;
 
 RestrictionList:
@@ -60,28 +70,18 @@ WildcardRestriction:
 	wildcard=WILDCARD
 ;
 
-ConsumedServiceBody: {ConsumedServiceBody}
-	'{'
-		(elements+=ConsumedServiceElement)*
-	'}'
-;
-
 ConsumedServiceElement:
 	ConsumedMethod | InteropOption
 ;
 
 ConsumedMethod:
-	method=[Method|VALID_INTEROP_ID] (options=OptionList)? ';'+
+	method=[Method|VALID_INTEROP_ID] ('[' options+=InteropOptionListItem (','  options+=InteropOptionListItem)* ']')? ';'+
 ;
 
 ProvidedService:
-	'provides' service=[Service|FULL_ID] ('as' alias=VALID_INTEROP_ID)? ('to' restrictions=RestrictionList)? body=ProvidedServiceBody
-;
-
-ProvidedServiceBody: {ProvidedServiceBody}
-	'{'
+	'provides' service=[Service|FULL_ID] ('as' alias=VALID_INTEROP_ID)? ('to' restrictions=RestrictionList)? '{'
 		(elements+=ProvidedServiceElement)*
-	'}'
+	'}' ';'*
 ;
 
 ProvidedServiceElement:
@@ -89,15 +89,28 @@ ProvidedServiceElement:
 ;
 
 ProvidedMethod:
-	method=[Method|VALID_INTEROP_ID] (options=OptionList)? ';'+
+	method=[Method|VALID_INTEROP_ID] ('[' options+=InteropOptionListItem (','  options+=InteropOptionListItem)* ']')? ';'+
 ;
+
+InteropOptionListItem returns InteropOption: 
+	(-> CustomInteropOptionItem | PredefinedInteropOptionItem)
+;
+
+PredefinedInteropOptionItem returns InteropOption:
+	descriptor=[Field|SHORT_ID] -> '=' value=Constant
+;
+
+CustomInteropOptionItem returns InteropOption:
+	isCustom?='(' descriptor=[Field|FULL_ID] ')' -> '=' value=Constant
+;
+
 
 INTEROP_KEYWORD:
 	'application' | 'consumes' | 'provides'
 ;
  
 VALID_INTEROP_ID:
-	 INTEROP_KEYWORD | VALID_ID	 
+	 INTEROP_KEYWORD | SHORT_ID	 
 ;
 
 WILDCARD:

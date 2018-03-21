@@ -15,12 +15,18 @@
 // limitations under the License.
 //
 
-package interop;
+syntax="proto3";
 
-import "interop/AppLifecycleService.proto";
+package plexus.interop.test.interop;
 
-application CommandLineTool {
+import "com/db/plexus/interop/dsl/protobuf/tests/scoping/test2.proto";
+import "com/db/plexus/interop/dsl/protobuf/tests/scoping/test3.proto";
 
-	consumes AppLifecycleService from interop.AppLifecycleManager { ActivateApp; }
+message message2 {
+  interop.message1 field = 1;
+  message3 field2 = 2;
+}
 
+message message3 {
+	bool field = 2;
 }

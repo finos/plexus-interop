@@ -6,9 +6,6 @@
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.0;net45;net46</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.0</TargetFrameworks>
 
-    <PlatformTarget Condition=" '$(OS)' == 'Windows_NT'">x86</PlatformTarget>
-    <PlatformTarget Condition=" '$(OS)' != 'Windows_NT'">x64</PlatformTarget>
-    
     <RootNamespace>Plexus.Interop</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>

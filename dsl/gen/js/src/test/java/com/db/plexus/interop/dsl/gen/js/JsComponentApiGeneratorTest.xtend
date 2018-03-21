@@ -24,8 +24,8 @@ import org.junit.Test
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.emf.common.util.URI
-import com.db.plexus.interop.dsl.gen.InteropLangUtils
 import java.util.Arrays
+import com.db.plexus.interop.dsl.gen.GenUtils
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))
@@ -45,7 +45,7 @@ class JsComponentApiGeneratorTest extends BaseCodeOutputGeneratorTest {
         resourceSet.getResource(getURI("ComponentA.interop"), true)
         resourceSet.getResource(getURI("ComponentC.interop"), true)
 
-        val apps = InteropLangUtils.getApplications(resourceSet.getResources())
+        val apps = GenUtils.getApplications(resourceSet.getResources())
 
         var plexusConfig = new PlexusGenConfig();
         plexusConfig.namespace = "plexus"

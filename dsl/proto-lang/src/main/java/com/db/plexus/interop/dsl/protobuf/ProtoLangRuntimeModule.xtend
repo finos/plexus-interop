@@ -67,6 +67,7 @@ class ProtoLangRuntimeModule extends AbstractProtoLangRuntimeModule {
 	} 	
 	
 	def configureProtoLangConfig(Binder binder) {		
-		binder.bind(typeof(ProtoLangConfig)).toInstance(this.config);
+		binder.bind(typeof(ProtoLangConfig)).toInstance(this.config)		
+		binder.bind(typeof(ProtoLangImportResolver))		
 	}
 }

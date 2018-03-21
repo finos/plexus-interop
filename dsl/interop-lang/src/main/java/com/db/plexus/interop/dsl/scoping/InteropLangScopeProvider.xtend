@@ -19,16 +19,25 @@
  */
 package com.db.plexus.interop.dsl.scoping
 
-import org.eclipse.emf.ecore.EReference
-import org.eclipse.emf.ecore.EObject
-import com.db.plexus.interop.dsl.DslPackage
 import com.db.plexus.interop.dsl.ConsumedMethod
-import org.eclipse.xtext.EcoreUtil2
 import com.db.plexus.interop.dsl.ConsumedService
-import com.db.plexus.interop.dsl.protobuf.Method
-import org.eclipse.xtext.scoping.Scopes
+import com.db.plexus.interop.dsl.DslPackage
+import com.db.plexus.interop.dsl.InteropLangUtils
+import com.db.plexus.interop.dsl.InteropOption
 import com.db.plexus.interop.dsl.ProvidedMethod
 import com.db.plexus.interop.dsl.ProvidedService
+import com.db.plexus.interop.dsl.protobuf.Extend
+import com.db.plexus.interop.dsl.protobuf.Field
+import com.db.plexus.interop.dsl.protobuf.Method
+import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
+import com.google.inject.Inject
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.naming.QualifiedName
+import org.eclipse.xtext.scoping.IScope
+import org.eclipse.xtext.scoping.Scopes
+import org.eclipse.xtext.scoping.impl.SimpleScope
 
 /**
  * This class contains custom scoping description.
@@ -37,6 +46,9 @@ import com.db.plexus.interop.dsl.ProvidedService
  * on how and when to use it.
  */
 class InteropLangScopeProvider extends AbstractInteropLangScopeProvider {
+	
+	@Inject
+	InteropLangUtils utils
 
 	override getScope(EObject context, EReference reference) {
 		
@@ -54,7 +66,23 @@ class InteropLangScopeProvider extends AbstractInteropLangScopeProvider {
 			return Scopes.scopeFor(serviceMethods)
 		}
 		
+		if (context instanceof InteropOption && reference == ProtobufPackage.Literals.OPTION__DESCRIPTOR) {
+			val option = context as InteropOption
+			val optionMsg = utils.getDescriptorsContainer(option) 
+			if (option.isCustom) {
+				val superScope = super.getScope(context, reference).allElements
+				val extendFields = 
+					superScope
+						.filter[x | x.EClass.equals(ProtobufPackage.Literals.FIELD)]
+						.filter[x | x.EObjectOrProxy.eContainer instanceof Extend]
+						.filter[x | (x.EObjectOrProxy.eContainer as Extend).message.equals(optionMsg)]
+				return new SimpleScope(extendFields)
+			} else {
+				val optionFields = optionMsg.elements.filter(typeof(Field))
+				return Scopes.scopeFor(optionFields, [x|QualifiedName.create(x.name)], IScope.NULLSCOPE)
+			}
+		}
+		
 		return super.getScope(context, reference);
-	}
-
+	}	
 }

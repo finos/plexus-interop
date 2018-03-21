@@ -1,7 +1,6 @@
 {
   "projects": [ "src" ],
   "sdk": {
-    "version": "2.1.4",
-    "architecture": "x86"
+    "version": "2.1.101"
   }
 }

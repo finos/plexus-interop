@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 import org.junit.Test
 import java.nio.file.Files
 import java.nio.file.Paths
+import com.db.plexus.interop.dsl.gen.ResourceSetValidator
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))
@@ -35,22 +36,26 @@ class MetaJsonGeneratorTest {
 
     @Inject
     private XtextResourceSet resourceSet;
+    
+    @Inject
+    private ResourceSetValidator validator;
 
     @Inject
     private MetaJsonGenerator outputGenerator;
-
+    
     @Test
     def testFullContentGeneration() {
-
+    	
         resourceSet.getResource(getURI("services.proto"), true)
         resourceSet.getResource(getURI("messages.proto"), true)
         resourceSet.getResource(getURI("ComponentA.interop"), true)
         resourceSet.getResource(getURI("ComponentC.interop"), true)
-
+        
+        validator.validateResources(resourceSet)
 
         val expected = new String(Files.readAllBytes(Paths.get(getStandardURI("expected.json"))));
 
-        val generatedResult = outputGenerator.generate(new PlexusGenConfig(), resourceSet.getResources())
+        val generatedResult = outputGenerator.generate(new PlexusGenConfig(), resourceSet)
 
         assertEqualsIgnoreWhiteSpaces(expected, generatedResult)
     }

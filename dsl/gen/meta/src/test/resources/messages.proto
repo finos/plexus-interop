@@ -19,7 +19,10 @@ syntax = "proto3";
 
 package com.plexus.model;
 
+import "interop/Options.proto";
+
 message Request {
+	option (interop.message_id) = "com.plexus.mode.Request";
     string stringField = 1;
     bool booleanField = 2;
     sint32 sIntField = 3;
@@ -28,5 +31,6 @@ message Request {
 }
 
 message Response {
+	option (interop.message_id) = "com.plexus.mode.Response";
     string result = 1;
 }

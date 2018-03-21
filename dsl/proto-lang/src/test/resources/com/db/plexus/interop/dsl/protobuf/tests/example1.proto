@@ -19,10 +19,38 @@ syntax = "proto3";
 
 package plexus.interop;
 
-import "example2.proto";
+import "google/protobuf/descriptor.proto";
+import "com/db/plexus/interop/dsl/protobuf/tests/example2.proto";
 
 option csharp_namespace="Plexus.Interop.Generated";
-option int_option=1;
+option (int_option)=1;
+
+extend google.protobuf.FileOptions {
+	uint32 int_option = 9000;
+}
+
+extend google.protobuf.MessageOptions {
+	string message_opt = 9000;
+}
+
+extend google.protobuf.FieldOptions {
+	string string_option = 9000;
+	Enum2 enum_option = 9100;
+}
+
+extend google.protobuf.ServiceOptions {
+	string service_id = 9000;
+}
+
+extend google.protobuf.MethodOptions {
+	string method_id = 9000;
+}
+
+enum Enum2 {
+	value1 = 1;
+	value2 = 2;
+	value3 = 3;
+}
 
 message Message1 {
 	string string_field_1 = 1;
@@ -62,16 +90,17 @@ message Message2 {
 	}
 
 	message SubMessage2 {
-		SubMessage1.SubMessage1 sub_sub_field_1 = 1 [string_option="aaa", int_option=12];
+		SubMessage1.SubMessage1 sub_sub_field_1 = 1 [(interop.string_option)="aaa", (.plexus.interop.enum_option) = value2];
 		SubMessage1 sub_field_1 = 2;
 	}
 
-	option message_opt = "aaa";
+	option (message_opt) = "aaa";
 
 	SubMessage1 sub_message_field_1 = 1;
 }
 
-service Service1 {
+service Service1 {        
 	rpc ServerStream (Message1) returns (stream Message2);
-	rpc DuplexStream (stream Message2) returns (stream interop.Message2) { option service_id="xxx"; }
+	rpc DuplexStream (stream Message2) returns (stream interop.Message2) { option (plexus.interop.method_id)="xxx"; }
+	option (service_id) = "Service1";
 }

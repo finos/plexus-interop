@@ -1,136 +1,197 @@
 {
-    "messages": [
-		    	{
-	"id": "plexus.interop.testing.EchoRequest",
-	"fields": [
+	"messages": [
 		{
-			"name": "string_field",
-			"num": 1,
-			"primitive": true,
-			"type": "string"
+			"id": "plexus.interop.testing.EchoRequest",
+			"fields": [
+				{
+					"name": "string_field",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "int64_field",
+					"num": 2,
+					"primitive": true,
+					"type": "int64"
+				},
+				{
+					"name": "uint32_field",
+					"num": 3,
+					"primitive": true,
+					"type": "uint32"
+				},
+				{
+					"name": "repeated_double_field",
+					"num": 4,
+					"primitive": true,
+					"type": "double"
+				},
+				{
+					"name": "enum_field",
+					"num": 5,
+					"primitive": false,
+					"type": "plexus.interop.testing.EchoRequest.SubEnum"
+				},
+				{
+					"name": "sub_message_field",
+					"num": 6,
+					"primitive": false,
+					"type": "plexus.interop.testing.EchoRequest.SubMessage"
+				},
+				{
+					"name": "repeated_sub_message_field",
+					"num": 7,
+					"primitive": false,
+					"type": "plexus.interop.testing.EchoRequest.SubMessage"
+				}
+			]
 		},
 		{
-			"name": "int64_field",
-			"num": 2,
-			"primitive": true,
-			"type": "int64"
+			"id": "plexus.interop.testing.EchoRequest.SubMessage",
+			"fields": [
+				{
+					"name": "bytes_field",
+					"num": 1,
+					"primitive": true,
+					"type": "bytes"
+				},
+				{
+					"name": "string_field",
+					"num": 2,
+					"primitive": true,
+					"type": "string"
+				}
+			]
 		},
 		{
-			"name": "uint32_field",
-			"num": 3,
-			"primitive": true,
-			"type": "uint32"
+			"id": "plexus.interop.testing.GreetingRequest",
+			"fields": [
+				{
+					"name": "name",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				}
+			]
 		},
 		{
-			"name": "repeated_double_field",
-			"num": 4,
-			"primitive": true,
-			"type": "double"
+			"id": "plexus.interop.testing.GreetingResponse",
+			"fields": [
+				{
+					"name": "greeting",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				}
+			]
 		},
 		{
-			"name": "enum_field",
-			"num": 5,
-			"primitive": false,
-			"type": "Unsupported"
+			"id": "interop.ApplicationOptions",
+			"fields": [
+				{
+					"name": "title",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "default_launch_mode",
+					"num": 2,
+					"primitive": false,
+					"type": "interop.LaunchMode"
+				}
+			]
 		},
 		{
-			"name": "sub_message_field",
-			"num": 6,
-			"primitive": false,
-			"type": "plexus.interop.testing.EchoRequest.SubMessage"
+			"id": "interop.ProvidedServiceOptions",
+			"fields": [
+				{
+					"name": "title",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "default_launch_mode",
+					"num": 2,
+					"primitive": false,
+					"type": "interop.LaunchMode"
+				}
+			]
 		},
 		{
-			"name": "repeated_sub_message_field",
-			"num": 7,
-			"primitive": false,
-			"type": "plexus.interop.testing.EchoRequest.SubMessage"
+			"id": "interop.ConsumedServiceOptions",
+			"fields": [
+			]
+		},
+		{
+			"id": "interop.ProvidedMethodOptions",
+			"fields": [
+				{
+					"name": "title",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "launch_mode",
+					"num": 2,
+					"primitive": false,
+					"type": "interop.LaunchMode"
+				}
+			]
+		},
+		{
+			"id": "interop.ConsumedMethodOptions",
+			"fields": [
+			]
+		},
+		{
+			"id": "interop.AppLaunchRequest",
+			"fields": [
+				{
+					"name": "app_id",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "launch_params_json",
+					"num": 2,
+					"primitive": true,
+					"type": "string"
+				}
+			]
+		},
+		{
+			"id": "interop.AppLaunchResponse",
+			"fields": [
+				{
+					"name": "app_instance_id",
+					"num": 1,
+					"primitive": false,
+					"type": "interop.UniqueId"
+				}
+			]
+		},
+		{
+			"id": "interop.UniqueId",
+			"fields": [
+				{
+					"name": "lo",
+					"num": 1,
+					"primitive": true,
+					"type": "fixed64"
+				},
+				{
+					"name": "hi",
+					"num": 2,
+					"primitive": true,
+					"type": "fixed64"
+				}
+			]
 		}
-	]
-},
-		    	{
-	"id": "plexus.interop.testing.EchoRequest.SubMessage",
-	"fields": [
-		{
-			"name": "bytes_field",
-			"num": 1,
-			"primitive": true,
-			"type": "bytes"
-		},
-		{
-			"name": "string_field",
-			"num": 2,
-			"primitive": true,
-			"type": "string"
-		}
-	]
-},
-		    	{
-	"id": "plexus.interop.testing.GreetingRequest",
-	"fields": [
-		{
-			"name": "name",
-			"num": 1,
-			"primitive": true,
-			"type": "string"
-		}
-	]
-},
-		    	{
-	"id": "plexus.interop.testing.GreetingResponse",
-	"fields": [
-		{
-			"name": "greeting",
-			"num": 1,
-			"primitive": true,
-			"type": "string"
-		}
-	]
-},
-		    	{
-	"id": "interop.AppLaunchRequest",
-	"fields": [
-		{
-			"name": "app_id",
-			"num": 1,
-			"primitive": true,
-			"type": "string"
-		},
-		{
-			"name": "launch_params_json",
-			"num": 2,
-			"primitive": true,
-			"type": "string"
-		}
-	]
-},
-		    	{
-	"id": "interop.AppLaunchResponse",
-	"fields": [
-		{
-			"name": "app_instance_id",
-			"num": 1,
-			"primitive": false,
-			"type": "interop.UniqueId"
-		}
-	]
-},
-		    	{
-	"id": "interop.UniqueId",
-	"fields": [
-		{
-			"name": "lo",
-			"num": 1,
-			"primitive": true,
-			"type": "fixed64"
-		},
-		{
-			"name": "hi",
-			"num": 2,
-			"primitive": true,
-			"type": "fixed64"
-		}
-	]
-}
     ],
 	"services": [
 		{
@@ -138,26 +199,26 @@
 			"methods": [
 				{
 					"name": "Unary",
-					"input": "plexus.interop.testing.EchoRequest",
-					"output": "plexus.interop.testing.EchoRequest",
+					"request": "plexus.interop.testing.EchoRequest",
+					"response": "plexus.interop.testing.EchoRequest",
 					"type": "Unary"
 				},
 				{
 					"name": "ServerStreaming",
-					"input": "plexus.interop.testing.EchoRequest",
-					"output": "plexus.interop.testing.EchoRequest",
+					"request": "plexus.interop.testing.EchoRequest",
+					"response": "plexus.interop.testing.EchoRequest",
 					"type": "ServerStreaming"
 				},
 				{
 					"name": "ClientStreaming",
-					"input": "plexus.interop.testing.EchoRequest",
-					"output": "plexus.interop.testing.EchoRequest",
+					"request": "plexus.interop.testing.EchoRequest",
+					"response": "plexus.interop.testing.EchoRequest",
 					"type": "ClientStreaming"
 				},
 				{
 					"name": "DuplexStreaming",
-					"input": "plexus.interop.testing.EchoRequest",
-					"output": "plexus.interop.testing.EchoRequest",
+					"request": "plexus.interop.testing.EchoRequest",
+					"response": "plexus.interop.testing.EchoRequest",
 					"type": "DuplexStreaming"
 				}
 			]
@@ -167,8 +228,8 @@
 			"methods": [
 				{
 					"name": "Hello",
-					"input": "plexus.interop.testing.GreetingRequest",
-					"output": "plexus.interop.testing.GreetingResponse",
+					"request": "plexus.interop.testing.GreetingRequest",
+					"response": "plexus.interop.testing.GreetingResponse",
 					"type": "Unary"
 				}
 			]
@@ -178,8 +239,8 @@
 			"methods": [
 				{
 					"name": "Launch",
-					"input": "interop.AppLaunchRequest",
-					"output": "interop.AppLaunchResponse",
+					"request": "interop.AppLaunchRequest",
+					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
 				}
 			]
@@ -191,114 +252,151 @@
 			"consumes": [
 				{
 					"service": "plexus.interop.testing.EchoService",
+					"methods": [
+						{
+							"name": "Unary"
+						},
+						{
+							"name": "ServerStreaming"
+						},
+						{
+							"name": "ClientStreaming"
+						},
+						{
+							"name": "DuplexStreaming"
+						}
+					],
 					"from": [
 						"plexus.interop.testing.*"
-					],
-					"methods": [
-						"Unary",
-						"ServerStreaming",
-						"ClientStreaming",
-						"DuplexStreaming"
 					]
 				},
 				{
 					"service": "plexus.interop.testing.GreetingService",
+					"methods": [
+						{
+							"name": "Hello"
+						}
+					],
 					"from": [
 						"plexus.interop.testing.*"
-					],
-					"methods": [
-						"Hello"
 					]
 				}
-		     ],
-		     "provides": [
-		     ]
-		  },
+			]
+		},
 		{
 			"id": "plexus.interop.testing.EchoServer",
 			"consumes": [
 				{
 					"service": "plexus.interop.testing.EchoService",
+					"methods": [
+						{
+							"name": "Unary"
+						},
+						{
+							"name": "ServerStreaming"
+						},
+						{
+							"name": "ClientStreaming"
+						},
+						{
+							"name": "DuplexStreaming"
+						}
+					],
 					"from": [
 						"plexus.interop.testing.*"
-					],
-					"methods": [
-						"Unary",
-						"ServerStreaming",
-						"ClientStreaming",
-						"DuplexStreaming"
 					]
 				},
 				{
 					"service": "plexus.interop.testing.GreetingService",
+					"methods": [
+						{
+							"name": "Hello"
+						}
+					],
 					"from": [
 						"plexus.interop.testing.*"
-					],
-					"methods": [
-						"Hello"
 					]
 				}
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "plexus.interop.testing.EchoService",
-		     		"title": "Sample Echo Service",
-		     		"to": [
-		     			"plexus.interop.testing.*"
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Unary",
-		     				"title": "Sample Unary Method"
-		     			},
-		     			{
-		     				"name": "ServerStreaming",
-		     				"title": "Sample Server Streaming Method"
-		     			},
-		     			{
-		     				"name": "ClientStreaming",
-		     				"title": "Sample Client Streaming Method"
-		     			},
-		     			{
-		     				"name": "DuplexStreaming",
-		     				"title": "Sample Duplex Streaming Method"
-		     			}
-		     		]
-		     	},
-		     	{
-		     		"service": "plexus.interop.testing.GreetingService",
-		     		"title": "GreetingService",
-		     		"to": [
-		     			"plexus.interop.testing.*"
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Hello",
-		     				"title": "Hello"
-		     			}
-		     		]
-		     	}
-		     ]
-		  },
+			],
+			"provides": [
+				{
+					"service": "plexus.interop.testing.EchoService",
+					"methods": [
+						{
+							"name": "Unary",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": "Sample Unary Method"
+								}
+							]
+						},
+						{
+							"name": "ServerStreaming",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": "Sample Server Streaming Method"
+								}
+							]
+						},
+						{
+							"name": "ClientStreaming",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": "Sample Client Streaming Method"
+								}
+							]
+						},
+						{
+							"name": "DuplexStreaming",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": "Sample Duplex Streaming Method"
+								}
+							]
+						}
+					],
+					"to": [
+						"plexus.interop.testing.*"
+					],
+					"options": [
+						{
+							"id": "interop.ProvidedServiceOptions.title",
+							"value": "Sample Echo Service"
+						}
+					]
+				},
+				{
+					"service": "plexus.interop.testing.GreetingService",
+					"methods": [
+						{
+							"name": "Hello"
+						}
+					],
+					"to": [
+						"plexus.interop.testing.*"
+					]
+				}
+			]
+		},
 		{
 			"id": "plexus.interop.testing.TestAppLauncher",
-			"consumes": [
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "interop.AppLauncherService",
-		     		"title": "AppLauncherService",
-		     		"to": [
-		     			"interop.AppLifecycleManager"
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Launch",
-		     				"title": "Launch"
-		     			}
-		     		]
-		     	}
-		     ]
-		  }
+			"provides": [
+				{
+					"service": "interop.AppLauncherService",
+					"methods": [
+						{
+							"name": "Launch"
+						}
+					],
+					"to": [
+						"interop.AppLifecycleManager"
+					]
+				}
+			]
+		}
 	]
 }

@@ -31,13 +31,52 @@ import java.util.LinkedList
 import com.db.plexus.interop.dsl.protobuf.Option
 import org.eclipse.emf.ecore.EObject
 import com.db.plexus.interop.dsl.protobuf.Message
+import com.db.plexus.interop.dsl.protobuf.Enum
 import com.db.plexus.interop.dsl.protobuf.Field
 import com.db.plexus.interop.dsl.protobuf.PrimitiveFieldType
 import com.db.plexus.interop.dsl.protobuf.ComplexFieldType
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import com.google.inject.Inject
+import org.eclipse.xtext.naming.QualifiedName
+import com.db.plexus.interop.dsl.protobuf.Constant
+import com.db.plexus.interop.dsl.protobuf.StringConstant
+import com.db.plexus.interop.dsl.protobuf.IntConstant
+import com.db.plexus.interop.dsl.protobuf.EnumConstant
+import com.db.plexus.interop.dsl.protobuf.BoolConstant
+import com.db.plexus.interop.dsl.protobuf.DecimalConstant
 
-public class InteropLangUtils {
-
+public class GenUtils {
+		
+	public static final String INTEROP_OPTIONS_PROTO = "interop/Options.proto"
+	public static final String INTEROP_DESCRIPTOR_PROTO = "interop/Descriptor.proto"
+	public static final String PROTOBUF_DESCRIPTOR_PROTO = "google/protobuf/descriptor.proto"
+		 
+	public static final QualifiedName ROOT_PACKAGE_NAME = QualifiedName.create("")
+	public static final QualifiedName INTEROP_PACKAGE_NAME = ROOT_PACKAGE_NAME.append("interop")
+	public static final QualifiedName INTEROP_SERVICE_ID_OPTION_NAME = INTEROP_PACKAGE_NAME.append("service_id")  
+	public static final QualifiedName INTEROP_MESSAGE_ID_OPTION_NAME = INTEROP_PACKAGE_NAME.append("message_id")
+	
+	public static final QualifiedName INTEROP_PROVIDED_SERVICE_TITLE_OPTION_NAME = INTEROP_PACKAGE_NAME.append(QualifiedName.create("ProvidedServiceOptions", "title"))		
+	public static final QualifiedName INTEROP_PROVIDED_METHOD_TITLE_OPTION_NAME = INTEROP_PACKAGE_NAME.append(QualifiedName.create("ProvidedMethodOptions", "title"))
+	
+	@Inject
+	IQualifiedNameProvider qualifiedNameProvider
+	
+	def static getOptionList(EObject obj) {
+		return obj.eContents.filter(typeof(Option)).toList()
+	}
+	
+	def static getValueAsString(Option option) {		
+		val constant = option.value
+		return switch (constant) {
+			IntConstant: return constant.value.toString
+			EnumConstant: return constant.value.name
+			StringConstant: return constant.value
+			BoolConstant: return constant.value.toString
+			DecimalConstant: return constant.value.toString			 
+		}		
+	}	
+	
     def static List<Service> getServices(Resource... resources) {
         return Arrays.stream(resources)
         .flatMap([resource | getServices(resource).stream()])
@@ -50,11 +89,11 @@ public class InteropLangUtils {
         .collect(Collectors.toList());
     }
 
-    def static String getType(Field field, IQualifiedNameProvider qualifiedNameProvider) {
+    def String getType(Field field) {
         val typeRef = field.getTypeReference();
         switch typeRef {
             PrimitiveFieldType: typeRef.getValue().literal.toLowerCase()
-            ComplexFieldType: getType(typeRef, qualifiedNameProvider)
+            ComplexFieldType: getType(typeRef)
             default: "Unsupported"
         }
     }
@@ -66,23 +105,27 @@ public class InteropLangUtils {
             default: false
         }
     }
-
-    def static getFullName(EObject obj, IQualifiedNameProvider qualifiedNameProvider) {
-        return qualifiedNameProvider.getFullyQualifiedName(obj).skipFirst(1).toString()
+    
+    def getQualifiedName(EObject obj) {
+    	return qualifiedNameProvider.getFullyQualifiedName(obj)
     }
 
-    def static String getType(ComplexFieldType complexFieldType, IQualifiedNameProvider nameProvider) {
+    def getFullName(EObject obj) {
+        return getQualifiedName(obj).skipFirst(1).toString()
+    }
+
+    def String getType(ComplexFieldType complexFieldType) {
         val complexType = complexFieldType.getValue()
         switch complexType {
-            Message: getFullName(complexType, nameProvider)
-            Enum: getFullName(complexType, nameProvider)
+            Message: getFullName(complexType)
+            Enum: getFullName(complexType)
             default: "Unsupported"
         }
     }
 
     def static List<Field> getFields(Message message) {
-        return message.getBody()
-        .getElements()
+        return message
+        .elements
         .stream()
         .filter([el | el instanceof Field])
         .map([el | el as Field])
@@ -102,7 +145,7 @@ public class InteropLangUtils {
     }
 
     def static List<Method> getMethods(Service service) {
-        return service.body.elements.filter(typeof(Method)).toList()
+        return service.elements.filter(typeof(Method)).toList()
     }
 
     def static Service getService(Method method) {
@@ -164,11 +207,11 @@ public class InteropLangUtils {
     }
 
     def static List<ConsumedMethod> getMethods(ConsumedService service) {
-        return service.body.elements.filter(typeof(ConsumedMethod)).toList()
+        return service.elements.filter(typeof(ConsumedMethod)).toList()
     }
 
     def static List<ProvidedMethod> getMethods(ProvidedService service) {
-        return service.body.elements.filter(typeof(ProvidedMethod)).toList()
+        return service.elements.filter(typeof(ProvidedMethod)).toList()
     }
 
     def static List<String> getWildcards(ConsumedService service) {
@@ -185,23 +228,26 @@ public class InteropLangUtils {
         return service.restrictions.elements.map[x | x.wildcard]
     }
 
-    def static String getTitle(ProvidedService providedService) {
-        val titleOption = providedService.body.elements.filter(typeof(Option)).findFirst[o | o.name.equals("service_title") || o.name.equals("(.interop.service_title)")];
+    def String getTitle(ProvidedService providedService) {
+        val titleOption = providedService.elements
+        	.filter(typeof(Option))
+        	.findFirst[o | getQualifiedName(o.descriptor).equals(INTEROP_PROVIDED_SERVICE_TITLE_OPTION_NAME)];
         if(titleOption === null) {
             return providedService.service.name
         }
-        return titleOption.value.replaceAll("^\"", "").replaceAll("\"$", "")
+        return titleOption.value.asString
     }
 
-    def static String getTitle(ProvidedMethod providedMethod) {
+    def String getTitle(ProvidedMethod providedMethod) {
         if(providedMethod.options === null) {
             return providedMethod.method.name
         }
-        val titleOption = providedMethod.options.elements.findFirst[o | o.name.equals("method_title") || o.name.equals("(.interop.method_title")];
+        val titleOption = providedMethod.options
+        	.findFirst[o | getQualifiedName(o.descriptor).equals(INTEROP_PROVIDED_METHOD_TITLE_OPTION_NAME)];
         if(titleOption === null) {
             return providedMethod.method.name
         }
-        return titleOption.value.replaceAll("^\"", "").replaceAll("\"$", "")
+        return titleOption.value.asString
     }
 
     def static String getType(Method method) {
@@ -215,5 +261,11 @@ public class InteropLangUtils {
             return "ClientStreaming"
         }
         return "Unary"
+    }
+    
+    def static String getAsString(Constant constant) {
+    	if (constant instanceof StringConstant) {
+    		return (constant as StringConstant).value
+    	}
     }
 }

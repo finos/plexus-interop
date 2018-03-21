@@ -21,6 +21,14 @@ package com.plexus.components;
 
 application ComponentC {
 
-    provides com.plexus.services.ExampleService to com.plexus.* { PointToPoint; ServerStreaming; ClientToServer; BidiStreaming; };
+    provides com.plexus.services.ExampleService to com.plexus.* 
+    { 
+    	option title = "Example Service";
+    	 
+    	PointToPoint; 
+    	ServerStreaming; 
+    	ClientToServer; 
+    	BidiStreaming; 
+    };
 
 }

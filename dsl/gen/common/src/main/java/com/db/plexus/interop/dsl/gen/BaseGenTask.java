@@ -16,36 +16,28 @@
  */
 package com.db.plexus.interop.dsl.gen;
 
-import com.db.plexus.interop.dsl.gen.errors.CodeGenerationException;
-import com.db.plexus.interop.dsl.gen.util.FileUtils;
-import com.google.inject.Inject;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xtext.EcoreUtil2;
-import org.eclipse.xtext.diagnostics.Severity;
-import org.eclipse.xtext.resource.XtextResourceSet;
-import org.eclipse.xtext.util.CancelIndicator;
-import org.eclipse.xtext.validation.CheckMode;
-import org.eclipse.xtext.validation.IResourceValidator;
-import org.eclipse.xtext.validation.Issue;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.resource.XtextResourceSet;
+
+import com.db.plexus.interop.dsl.gen.util.FileUtils;
+import com.google.inject.Inject;
 
 public abstract class BaseGenTask implements GenTask {
     
     private XtextResourceSet resourceSet = new XtextResourceSet();
 
     @Inject
-    protected IResourceValidator validator;
+    protected ResourceSetValidator validator;
 
     protected Logger logger = Logger.getLogger("PlexusCodeGenerator");
 
@@ -64,7 +56,7 @@ public abstract class BaseGenTask implements GenTask {
         this.outDirUri = getOutDirUri(config);
         this.resourceBaseUri = getResourceBaseUri(config);
         loadResources(config);
-        validateResources();
+        this.validator.validateResources(resourceSet);
         doGenWithResources(config, this.resourceSet);
     }
 
@@ -88,44 +80,7 @@ public abstract class BaseGenTask implements GenTask {
 
     protected String getAbsolutePath(String relativePath) {
         return Paths.get(".").resolve(relativePath).toAbsolutePath().toString();
-    }
-
-    protected void validateResources() {
-
-        final List<Issue> allIssues = new ArrayList<>();
-
-        for (Resource resource : resourceSet.getResources()) {
-            this.logger.info("Loaded resource: " + resource.getURI());
-            final List<Issue> issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl);
-            allIssues.addAll(issues);
-        }
-
-        final List<Issue> errors = allIssues.stream().filter(issue -> issue.getSeverity() == Severity.ERROR).collect(Collectors.toList());
-
-        if (!errors.isEmpty()) {
-            this.logger.severe(validationErrorsMessage(errors));
-        }
-        for (Issue error : errors) {
-            this.logger.severe(error.toString());
-        }
-
-        final List<Issue> otherIssues = allIssues.stream().filter(issue -> issue.getSeverity() != Severity.ERROR).collect(Collectors.toList());
-
-        if (!otherIssues.isEmpty()) {
-            this.logger.warning(String.format("%d validation warnings found:", otherIssues.size()));
-        }
-        for (Issue warning : otherIssues) {
-            this.logger.warning(warning.toString());
-        }
-        if (!errors.isEmpty()) {
-            throw new CodeGenerationException(validationErrorsMessage(errors));
-        }
-
-    }
-
-    private String validationErrorsMessage(List<Issue> errors) {
-        return String.format("%d validation errors found in loaded resources", errors.size());
-    }
+    }    
 
     protected void loadResources(PlexusGenConfig config) throws IOException {
         FileUtils.processFiles(

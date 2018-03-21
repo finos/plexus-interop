@@ -15,12 +15,33 @@
 // limitations under the License.
 //
 
+syntax = "proto3";
+
 package interop;
 
-import "interop/AppLifecycleService.proto";
+message ApplicationOptions {
+	string title = 1;
+	LaunchMode default_launch_mode = 2;
+}
 
-application CommandLineTool {
+message ProvidedServiceOptions {
+	string title = 1;
+	LaunchMode default_launch_mode = 2;	
+}
 
-	consumes AppLifecycleService from interop.AppLifecycleManager { ActivateApp; }
+message ConsumedServiceOptions {
+}
 
+message ProvidedMethodOptions {
+	string title = 1;
+	LaunchMode launch_mode = 2;	
+}
+
+message ConsumedMethodOptions {
+}
+
+enum LaunchMode {
+	None = 1;
+	SingleInstance = 2;
+	MultiInstance = 3;
 }

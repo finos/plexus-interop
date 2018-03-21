@@ -15,12 +15,28 @@
 // limitations under the License.
 //
 
-package interop;
+syntax = "proto3";
 
-import "interop/AppLifecycleService.proto";
+package com.plexus.services;
 
-application CommandLineTool {
+import "interop/Descriptor.proto";
+import "google/protobuf/descriptor.proto";
 
-	consumes AppLifecycleService from interop.AppLifecycleManager { ActivateApp; }
+extend google.protobuf.MessageOptions {
+	double message_option_double = 10000;	
+}
 
+extend google.protobuf.ServiceOptions {
+	string service_option_string = 10001;		
+	bool service_option_bool = 21000;
+}
+
+extend interop.ConsumedMethodOptions {
+	TestEnum consumed_method_option_enum = 10;
+}
+
+enum TestEnum {
+	EnumValue1 = 1;
+	EnumValue2 = 2;
+	EnumValue3 = 3;	
 }

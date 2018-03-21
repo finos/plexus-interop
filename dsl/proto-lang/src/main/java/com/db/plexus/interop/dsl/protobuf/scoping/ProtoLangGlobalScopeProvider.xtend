@@ -21,32 +21,30 @@ import org.eclipse.emf.ecore.resource.Resource
 import java.util.Set
 import org.eclipse.xtext.util.IAcceptor
 import org.eclipse.emf.common.util.URI
-import org.eclipse.xtext.EcoreUtil2
 import com.db.plexus.interop.dsl.protobuf.Import
 import com.db.plexus.interop.dsl.protobuf.ImportModifier
 import com.google.inject.Inject
-import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
-import java.util.List
+import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
 
 class ProtoLangGlobalScopeProvider extends ImportUriGlobalScopeProvider {
 
 	@Inject
-	ProtoLangConfig config
-	
+	ProtoLangImportResolver importResolver
+		
 	override IAcceptor<String> createURICollector(Resource resource, Set<URI> collectInto) {
-		new ImportCollector(resource, collectInto, config.baseURIs)
+		new ImportCollector(resource, collectInto, importResolver)
 	}
-
+	
 	static class ImportCollector implements IAcceptor<String> {
 
 		Resource resource
 		Set<URI> result
-		List<URI> roots
+		ProtoLangImportResolver importResolver
 
-		new(Resource resource, Set<URI> result, List<URI> roots) {
+		new(Resource resource, Set<URI> result, ProtoLangImportResolver importResolver) {
 			this.resource = resource
 			this.result = result
-			this.roots = roots
+			this.importResolver = importResolver
 		}
 
 		def void addTransitiveImports(URI uri) {
@@ -54,48 +52,22 @@ class ProtoLangGlobalScopeProvider extends ImportUriGlobalScopeProvider {
 				return;
 			}
 			result.add(uri)
-			val resource = this.resource.resourceSet.getResource(uri, true)
+			val resource = resource.resourceSet.getResource(uri, true)
 			if (resource.contents.length == 0) {
 				return;
 			}
 			for (import : resource.contents.get(0).eContents.filter(typeof(Import))) {
 				if (import.modifier == ImportModifier.PUBLIC) {
-					new ImportCollector(resource, result, roots).accept(import.importURI)
+					new ImportCollector(resource, result, importResolver).accept(import.importURI)
 				}
 			}
 		}
 
 		override accept(String importString) {
-			if (importString === null) {
-				return;
-			}
-			var URI uri;
-			try {
-				uri = URI.createURI(importString)
-				if (EcoreUtil2.isValidUri(resource, uri)) {
-					addTransitiveImports(uri.resolve(resource.URI))
-					return;
-				}
-			} catch (Exception e) {
-			}
-			for (root : roots) {
-				try {
-					val resolvedUri = uri.resolve(root)
-					if (EcoreUtil2.isValidUri(resource, resolvedUri)) {
-						addTransitiveImports(resolvedUri)
-						return;
-					}
-				} catch (Exception e) {
-				}
-			}
-			try {
-				uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource(importString).toURI().toString())
-				if (EcoreUtil2.isValidUri(resource, uri)) {
-					addTransitiveImports(uri)
-					return;
-				}
-			} catch (Exception e) {
-			}
+			val resolvedUri = importResolver.resolveURI(resource.resourceSet, importString) 
+			if (resolvedUri !== null) {
+				addTransitiveImports(resolvedUri)				
+			}			
 		}
 	}
 }

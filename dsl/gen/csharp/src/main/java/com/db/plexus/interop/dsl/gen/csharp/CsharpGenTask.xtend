@@ -28,13 +28,17 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
 
-import static extension com.db.plexus.interop.dsl.gen.InteropLangUtils.*
+import static extension com.db.plexus.interop.dsl.gen.GenUtils.*
+import com.google.inject.Injector
 
 class CsharpGenTask extends BaseGenTask {
 
 	@Inject
 	IQualifiedNameProvider qualifiedNameProvider
-			
+	
+	@Inject
+	Injector injector
+					
 	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException {
 		
 		var accessModifier = "public"
@@ -46,6 +50,7 @@ class CsharpGenTask extends BaseGenTask {
 		}
 		
 		var generator = new CsharpCodeGenerator(config, qualifiedNameProvider, baseDirUri, accessModifier)
+		injector.injectMembers(generator)
 
 		val resources = resourceSet.resources;
 

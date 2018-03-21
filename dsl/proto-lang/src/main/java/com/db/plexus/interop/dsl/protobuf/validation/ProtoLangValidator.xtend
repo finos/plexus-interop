@@ -42,10 +42,7 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 
 	@Inject
 	ResourceDescriptionsProvider resourceDescriptionsProvider;
-	
-	@Inject
-	private INamesAreUniqueValidationHelper helper;
-	
+		
 	@Inject
 	private IQualifiedNameProvider qualifiedNameProvider;
 		

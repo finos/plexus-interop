@@ -15,12 +15,10 @@
 // limitations under the License.
 //
 
-package interop;
+syntax="proto3";
 
-import "interop/AppLifecycleService.proto";
+package plexus.interop.test.interop;
 
-application CommandLineTool {
-
-	consumes AppLifecycleService from interop.AppLifecycleManager { ActivateApp; }
-
+message message1 {
+  string field = 1;
 }

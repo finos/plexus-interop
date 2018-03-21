@@ -18,14 +18,29 @@ package com.db.plexus.interop.dsl.gen;
 
 import com.db.plexus.interop.dsl.Application;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public interface ApplicationCodeGenerator {
+public abstract class ApplicationCodeGenerator {
 
-    String TS = "ts";
+    public static final String TS = "ts";
 
-    String JS = "js";
+    public static final String JS = "js";
+    
+    public final String generate(PlexusGenConfig genConfig, Application application, ResourceSet resourceSet) {    	
+    	return generate(
+    		genConfig,
+    		application,
+    		resourceSet
+    			.getResources()
+    			.stream()
+    			.filter(x -> 
+    				!x.getURI().toString().endsWith("google/protobuf/descriptor.proto") && 
+    				!x.getURI().toString().endsWith("interop/Descriptor.proto"))
+    			.collect(Collectors.toList()));
+    }
 
-    String generate(PlexusGenConfig genConfig, Application application, List<Resource> resources);
+    protected abstract String generate(PlexusGenConfig genConfig, Application application, List<Resource> resources);    
 }

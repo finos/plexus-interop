@@ -15,10 +15,10 @@
 // limitations under the License.
 //
 
+package interop;
+
 import "interop/AppLauncherService.proto";
 import "interop/AppLifecycleService.proto";
-
-package interop;
 
 application AppLifecycleManager {
 

@@ -18,7 +18,7 @@ package com.db.plexus.interop.dsl.gen.ts;
 
 import com.db.plexus.interop.dsl.Application;
 import com.db.plexus.interop.dsl.gen.BaseGenTask;
-import com.db.plexus.interop.dsl.gen.InteropLangUtils;
+import com.db.plexus.interop.dsl.gen.GenUtils;
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig;
 import com.google.inject.Inject;
 import org.eclipse.emf.common.util.EList;
@@ -95,7 +95,7 @@ public class TsGenTask extends BaseGenTask {
             }
         }
 
-        final List<Application> applications = InteropLangUtils.getApplications(resources.toArray(new Resource[]{}));
+        final List<Application> applications = GenUtils.getApplications(resources.toArray(new Resource[]{}));
 
         config.setExternalDependencies(Arrays.asList("./" + PLEXUS_MESSAGES_MODULES));
 

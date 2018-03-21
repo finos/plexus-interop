@@ -23,15 +23,12 @@ import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.MessageOptions {
 	string message_id = 9650;
-	string message_title = 9651;
 }
 
 extend google.protobuf.ServiceOptions {
-	string service_id = 9651;
-	string service_title = 9652;
+	string service_id = 9650;
 }
 
 extend google.protobuf.MethodOptions {
 	string method_id = 9650;
-	string method_title = 9651;
 }

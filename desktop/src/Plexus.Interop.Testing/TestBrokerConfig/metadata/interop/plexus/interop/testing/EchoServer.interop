@@ -27,11 +27,11 @@ application EchoServer {
 	consumes plexus.interop.testing.GreetingService from plexus.interop.testing.* { Hello; } 
 
 	provides plexus.interop.testing.EchoService to plexus.interop.testing.* {
-		option service_title = "Sample Echo Service";
-		Unary [method_title = "Sample Unary Method"]; 
-		ServerStreaming [method_title = "Sample Server Streaming Method"]; 
-		ClientStreaming [method_title = "Sample Client Streaming Method"]; 
-		DuplexStreaming [method_title = "Sample Duplex Streaming Method"]; 
+		option title = "Sample Echo Service";
+		Unary [title = "Sample Unary Method"]; 
+		ServerStreaming [title = "Sample Server Streaming Method"]; 
+		ClientStreaming [title = "Sample Client Streaming Method"]; 
+		DuplexStreaming [title = "Sample Duplex Streaming Method"]; 
 	}
 
 	provides plexus.interop.testing.GreetingService to plexus.interop.testing.* { Hello; } 	

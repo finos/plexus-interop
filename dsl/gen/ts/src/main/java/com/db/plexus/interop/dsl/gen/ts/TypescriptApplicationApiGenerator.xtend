@@ -21,16 +21,16 @@ import com.db.plexus.interop.dsl.Application
 import java.util.List
 import org.eclipse.emf.ecore.resource.Resource
 import com.db.plexus.interop.dsl.gen.ApplicationCodeGenerator
-import static extension com.db.plexus.interop.dsl.gen.InteropLangUtils.*
 import com.google.inject.Inject
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.emf.ecore.EObject
 import com.db.plexus.interop.dsl.ConsumedMethod
 import com.db.plexus.interop.dsl.protobuf.Method
 import javax.inject.Named
+import static extension com.db.plexus.interop.dsl.gen.GenUtils.*
 
 @Named
-class TypescriptApplicationApiGenerator implements ApplicationCodeGenerator {
+class TypescriptApplicationApiGenerator extends ApplicationCodeGenerator {
 
     @Inject
     IQualifiedNameProvider qualifiedNameProvider

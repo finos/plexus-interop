@@ -15,12 +15,25 @@
 // limitations under the License.
 //
 
+syntax = "proto3";
+
 package interop;
 
-import "interop/AppLifecycleService.proto";
+import "google/protobuf/empty.proto";
+import "com/db/plexus/interop/dsl/protobuf/tests/option_declare.proto";
 
-application CommandLineTool {
+message UniqueId {
+    option (interop.message_string) = "interop.UniqueId";
+    option (message_int) = 10;
+    option deprecated = true;
 
-	consumes AppLifecycleService from interop.AppLifecycleManager { ActivateApp; }
+    fixed64 lo = 1;
+    fixed64 hi = 2;
+}
 
+service UniqueIdService {
+	option (service_string) = "interop.GetUniqueId";
+	option (.interop.service_int) = 10;
+	
+	rpc GetUniqueId (google.protobuf.Empty) returns (UniqueId);
 }
