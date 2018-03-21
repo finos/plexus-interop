@@ -38,7 +38,6 @@ describe("Framed Transport Connection: Client to Server communication", () => {
         await disconnect(client, server);
     });
 
-
     it("Can send big message", async () => {
         const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
         const payload = randomPayload(2 * 1024);

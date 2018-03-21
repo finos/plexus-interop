@@ -14,6 +14,7 @@ node {
     version = '8.5.0'
     nodeModulesDir = projectDir
     download = true
+    npmVersion = '5.7.1'
 }
 
 license {
@@ -35,7 +36,7 @@ tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
 task npmRunInstall(type: NpmTask) {
-    args = ['install'];
+    args = ['install', '--no-package-lock'];
 }
 
 task preNpmBuild {
@@ -44,6 +45,7 @@ task preNpmBuild {
 	    println "CI Publish: $ciPublishBuild"
 	    println "CI Full: $ciFullBuild"
 	    println "CI Build: $ciBuild"
+	    println "Integration tests: $e2eTestsEnabled"
     }
 }
 
@@ -55,7 +57,7 @@ task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
     args =  ciPublishBuild ? ['run', 'ci-publish'] :
             ciFullBuild ? ['run', 'ci-build-e2e'] : 
             ciBuild ? ['run', 'ci-build'] :
-            isWindows ? ['run', 'build-win'] : ['run', 'build']
+            e2eTestsEnabled ? ['run', 'build-e2e'] : ['run', 'build']
 }
 
 task buildTransport(dependsOn: npmBuild) {

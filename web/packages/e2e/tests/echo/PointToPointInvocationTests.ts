@@ -37,7 +37,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
     }
     
     public testHugeMessageSent(): Promise<void> {
-        const echoRequest = this.clientsSetup.createHugeRequestDto(10 * 65000);
+        const echoRequest = this.clientsSetup.createHugeRequestDto(10 * 1024 * 1024);
         return this.testMessageSentInternal(echoRequest);
     }
 
