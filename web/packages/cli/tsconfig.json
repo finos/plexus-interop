@@ -22,7 +22,7 @@
         "pretty": true,
         "removeComments": false,
         "lib": [
-            "es6"
+            "es6", "dom"
         ],
         "types": [
             "node",
