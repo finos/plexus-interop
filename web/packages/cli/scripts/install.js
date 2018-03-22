@@ -8,8 +8,8 @@ const request = require('request');
 const ProgressBar = require('progress');
 const { createIfNotExistSync } = require('./files');
 const { getJreDownloadUrl, getJreDir } = require('./java');
-const unzip = require('unzip');
-const printProgress = require('./progress');
+const unzipper = require('unzipper');
+const { printProgress } = require('./progress');
 
 // TODO add cached files support
 const downloadJre = callback => {
@@ -40,7 +40,7 @@ const downloadJre = callback => {
     .on('end', () => console.log('JRE Download finished'));
 
   if (isZip) {
-    basePipe.pipe(unzip.Extract({ path: jreDir }));
+    basePipe.pipe(unzipper.Extract({ path: jreDir }));
   } else if (isTarGz) {
     basePipe
       .pipe(zlib.createUnzip())
