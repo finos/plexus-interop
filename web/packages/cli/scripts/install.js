@@ -8,12 +8,14 @@ const request = require('request');
 const ProgressBar = require('progress');
 const { createIfNotExistSync } = require('./files');
 
-const getJreDir = () => path.join(__dirname, 'jre');
+const getJreDir = () => path.normalize(path.join(__dirname, '..', 'dist', 'jre'));
 
-const downloadJre = () => {
+// TODO add cached files support
+const downloadJre = callback => {
     const url = process.env['PLEXUS_JRE_DOWNLOAD_URL'];
     const jreDir = getJreDir();
-    console.log("Downloading from: ", url);
+    console.log("Downloading JRE from: ", url);
+    console.log("Target dir: ", jreDir);
     callback = callback || (() => {});
     rmdir(jreDir);
     createIfNotExistSync(jreDir);
@@ -28,15 +30,14 @@ const downloadJre = () => {
         }
       })
       .on('response', res => {
-		console.log(res.headers);
-        var len = parseInt(res.headers['content-length'], 10);
-        var bar = new ProgressBar('  downloading and preparing JRE [:bar] :percent :etas', {
+        var length = parseInt(res.headers['content-length'], 10);
+        var progress = new ProgressBar('  Downloading JRE [:bar] :percent :etas', {
           complete: '=',
           incomplete: ' ',
           width: 80,
-          total: len
+          total: length
         });
-        res.on('data', chunk => bar.tick(chunk.length));
+        res.on('data', chunk => progress.tick(chunk.length));
       })
       .on('error', err => {
         console.log(`problem with request: ${err.message}`);
@@ -44,7 +45,7 @@ const downloadJre = () => {
       })
       .on('end', () => console.log('Finished'))
       .pipe(zlib.createUnzip())
-      .pipe(tar.extract(jreDir()));
+      .pipe(tar.extract(jreDir));
   };
 
   downloadJre();
