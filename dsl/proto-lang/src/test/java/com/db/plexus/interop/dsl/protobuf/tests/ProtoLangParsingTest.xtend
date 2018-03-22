@@ -71,7 +71,7 @@ class ProtoLangParsingTest {
 	
 	@Test
 	def void loadScopingProto() {
-		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/scoping/test1.proto", 2)
+		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/scoping/test1.proto", 3)
 	}
 	
 	def loadAndValidateResource(String resourceUri, int expectedResourceCount) {

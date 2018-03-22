@@ -33,6 +33,7 @@ import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 import com.google.inject.Inject
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IResourceDescriptionsProvider
 import org.eclipse.xtext.scoping.IScope
@@ -55,6 +56,9 @@ class ProtoLangScopeProvider extends AbstractProtoLangScopeProvider {
 	
 	@Inject
 	protected ProtoLangUtils utils
+	
+	@Inject
+	protected IQualifiedNameProvider qualifiedNameProvider
 	
 	override getScope(EObject context, EReference reference) {
 
@@ -93,7 +97,7 @@ class ProtoLangScopeProvider extends AbstractProtoLangScopeProvider {
 				}
 			}
 		}
-
+		
 		return super.getScope(context, reference)
 	}
 }

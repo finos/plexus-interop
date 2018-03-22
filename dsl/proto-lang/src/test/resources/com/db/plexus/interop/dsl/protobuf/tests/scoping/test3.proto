@@ -19,6 +19,6 @@ syntax="proto3";
 
 package plexus.interop.test.interop;
 
-message message1 {
+message message3 {
   string field = 1;
 }
