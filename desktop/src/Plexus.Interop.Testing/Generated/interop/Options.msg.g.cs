@@ -42,14 +42,11 @@ namespace Plexus.Interop.Testing.Generated {
           string.Concat(
             "ChVpbnRlcm9wL09wdGlvbnMucHJvdG8SB2ludGVyb3AaIGdvb2dsZS9wcm90",
             "b2J1Zi9kZXNjcmlwdG9yLnByb3RvOjQKCm1lc3NhZ2VfaWQSHy5nb29nbGUu",
-            "cHJvdG9idWYuTWVzc2FnZU9wdGlvbnMYsksgASgJOjcKDW1lc3NhZ2VfdGl0",
-            "bGUSHy5nb29nbGUucHJvdG9idWYuTWVzc2FnZU9wdGlvbnMYs0sgASgJOjQK",
-            "CnNlcnZpY2VfaWQSHy5nb29nbGUucHJvdG9idWYuU2VydmljZU9wdGlvbnMY",
-            "s0sgASgJOjcKDXNlcnZpY2VfdGl0bGUSHy5nb29nbGUucHJvdG9idWYuU2Vy",
-            "dmljZU9wdGlvbnMYtEsgASgJOjIKCW1ldGhvZF9pZBIeLmdvb2dsZS5wcm90",
-            "b2J1Zi5NZXRob2RPcHRpb25zGLJLIAEoCTo1CgxtZXRob2RfdGl0bGUSHi5n",
-            "b29nbGUucHJvdG9idWYuTWV0aG9kT3B0aW9ucxizSyABKAlCI6oCIFBsZXh1",
-            "cy5JbnRlcm9wLlRlc3RpbmcuR2VuZXJhdGVkYgZwcm90bzM="));
+            "cHJvdG9idWYuTWVzc2FnZU9wdGlvbnMYsksgASgJOjQKCnNlcnZpY2VfaWQS",
+            "Hy5nb29nbGUucHJvdG9idWYuU2VydmljZU9wdGlvbnMYsksgASgJOjIKCW1l",
+            "dGhvZF9pZBIeLmdvb2dsZS5wcm90b2J1Zi5NZXRob2RPcHRpb25zGLJLIAEo",
+            "CUIjqgIgUGxleHVzLkludGVyb3AuVGVzdGluZy5HZW5lcmF0ZWRiBnByb3Rv",
+            "Mw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { pbr::FileDescriptor.DescriptorProtoFileDescriptor, },
           new pbr::GeneratedClrTypeInfo(null, null));

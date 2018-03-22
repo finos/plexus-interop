@@ -38,7 +38,7 @@
             var messageIds =
                 from svcDto in dto.Services
                 from metDto in svcDto.Methods
-                from mid in new[] { metDto.InputMessageId, metDto.OutputMessageId }
+                from mid in new[] { metDto.RequestMessageId, metDto.ResponseMessageId }
                 select mid;
             var messages = messageIds.Distinct().ToDictionary(x => x, x => (IMessage)new Message { Id = x });
             var services = dto.Services.Select(x => Convert(messages, x)).ToDictionary(x => x.Id, x => x);
@@ -58,8 +58,8 @@
                 (IMethod)new Method
                 {
                     Name = x.Name,
-                    InputMessage = messages[x.InputMessageId],
-                    OutputMessage = messages[x.OutputMessageId],
+                    InputMessage = messages[x.RequestMessageId],
+                    OutputMessage = messages[x.ResponseMessageId],
                     Service = service,
                     Type = Convert(x.Type)
                 })
@@ -90,7 +90,7 @@
                 From = ConvertMatchPatterns(dto.From)
             };
             cs.Methods = dto.Methods
-                .Select(x => (IConsumedMethod)new ConsumedMethod { Method = service.Methods[x], ConsumedService = cs })
+                .Select(x => (IConsumedMethod)new ConsumedMethod { Method = service.Methods[x.Name], ConsumedService = cs })
                 .ToDictionary(x => x.Method.Name, x => x);
             return cs;
         }
@@ -118,12 +118,17 @@
             {
                 Alias = ConvertMaybe(dto.Alias),
                 Service = service,
-                Title = ConvertMaybe(dto.Title),
+                Title = dto.Options.GetValue("interop.ProvidedServiceOptions.title"),
                 Application = application,
                 To = ConvertMatchPatterns(dto.To)
             };
             ps.Methods = dto.Methods
-                .Select(x => (IProvidedMethod)new ProvidedMethod { Method = service.Methods[x.Name], ProvidedService = ps, Title = ConvertMaybe(x.Title) })
+                .Select(x => (IProvidedMethod)new ProvidedMethod
+                {
+                    Method = service.Methods[x.Name], 
+                    ProvidedService = ps, 
+                    Title = x.Options.GetValue("interop.ProvidedMethodOptions.title")
+                })
                 .ToDictionary(x => x.Method.Name, x => x);
             return ps;
         }

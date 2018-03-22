@@ -5,26 +5,26 @@
       "methods": [
         {
           "name": "Unary",
-          "input": "interop.testing.EchoRequest",
-          "output": "interop.testing.EchoRequest",
+          "request": "interop.testing.EchoRequest",
+          "response": "interop.testing.EchoRequest",
           "type": "Unary"
         },
         {
           "name": "ServerStreaming",
-          "input": "interop.testing.EchoRequest",
-          "output": "interop.testing.EchoRequest",
+          "request": "interop.testing.EchoRequest",
+          "response": "interop.testing.EchoRequest",
           "type": "ServerStreaming"
         },
         {
           "name": "ClientStreaming",
-          "input": "interop.testing.EchoRequest",
-          "output": "interop.testing.EchoRequest",
+          "request": "interop.testing.EchoRequest",
+          "response": "interop.testing.EchoRequest",
           "type": "ClientStreaming"
         },
         {
           "name": "DuplexStreaming",
-          "input": "interop.testing.EchoRequest",
-          "output": "interop.testing.EchoRequest",
+          "request": "interop.testing.EchoRequest",
+          "response": "interop.testing.EchoRequest",
           "type": "DuplexStreaming"
         }
       ]
@@ -34,8 +34,8 @@
       "methods": [
         {
           "name": "Launch",
-          "input": "interop.AppLaunchRequest",
-          "output": "interop.AppLaunchResponse",
+          "request": "interop.AppLaunchRequest",
+          "response": "interop.AppLaunchResponse",
           "type": "Unary"
         }
       ]
@@ -77,8 +77,13 @@
       "consumes": [
         {
           "service": "interop.testing.EchoService",
-          "from": [ "interop.testing.*" ],
-          "methods": [ "Unary", "ServerStreaming", "ClientStreaming", "DuplexStreaming" ]
+          "from": ["interop.testing.*"],
+          "methods": [
+            { "name": "Unary" },
+            { "name": "ServerStreaming" }, 
+            { "name": "ClientStreaming" }, 
+            { "name": "DuplexStreaming" }
+          ]
         }
       ]
     },
@@ -88,7 +93,9 @@
         {
           "service": "interop.AppLauncherService",
           "from": [ "*" ],
-          "methods": [ "Launch" ]
+          "methods": [
+            { "name": "Launch" }
+          ]
         }
       ]
     },

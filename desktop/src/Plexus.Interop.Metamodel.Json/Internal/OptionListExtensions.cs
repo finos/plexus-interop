@@ -14,26 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Metamodel.Json.Internal
+﻿namespace Plexus.Interop.Metamodel.Json.Internal
 {
-    using Newtonsoft.Json;
     using System.Collections.Generic;
+    using System.Linq;
 
-    internal sealed class ConsumedServiceDto
+    internal static class OptionListExtensions
     {
-        [JsonProperty("service")]
-        public string ServiceId{ get; set; }
-
-        [JsonProperty("methods")]
-        public List<ConsumedMethodDto> Methods { get; set; } = new List<ConsumedMethodDto>();
-
-        [JsonProperty("alias")]
-        public string Alias { get; set; }
-
-        [JsonProperty("from")]
-        public List<string> From { get; set; } = new List<string>();
-
-        [JsonProperty("options")]
-        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
+        public static Maybe<string> GetValue(this ICollection<OptionDto> options, string id)
+        {
+            var option = options.FirstOrDefault(x => x.Id.Equals(id));
+            if (option == null)
+            {
+                return Maybe<string>.Nothing;
+            }
+            return option.Value;
+        }
     }
 }

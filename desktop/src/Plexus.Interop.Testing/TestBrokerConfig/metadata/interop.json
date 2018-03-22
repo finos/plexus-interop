@@ -87,67 +87,6 @@
 			]
 		},
 		{
-			"id": "interop.ApplicationOptions",
-			"fields": [
-				{
-					"name": "title",
-					"num": 1,
-					"primitive": true,
-					"type": "string"
-				},
-				{
-					"name": "default_launch_mode",
-					"num": 2,
-					"primitive": false,
-					"type": "interop.LaunchMode"
-				}
-			]
-		},
-		{
-			"id": "interop.ProvidedServiceOptions",
-			"fields": [
-				{
-					"name": "title",
-					"num": 1,
-					"primitive": true,
-					"type": "string"
-				},
-				{
-					"name": "default_launch_mode",
-					"num": 2,
-					"primitive": false,
-					"type": "interop.LaunchMode"
-				}
-			]
-		},
-		{
-			"id": "interop.ConsumedServiceOptions",
-			"fields": [
-			]
-		},
-		{
-			"id": "interop.ProvidedMethodOptions",
-			"fields": [
-				{
-					"name": "title",
-					"num": 1,
-					"primitive": true,
-					"type": "string"
-				},
-				{
-					"name": "launch_mode",
-					"num": 2,
-					"primitive": false,
-					"type": "interop.LaunchMode"
-				}
-			]
-		},
-		{
-			"id": "interop.ConsumedMethodOptions",
-			"fields": [
-			]
-		},
-		{
 			"id": "interop.AppLaunchRequest",
 			"fields": [
 				{

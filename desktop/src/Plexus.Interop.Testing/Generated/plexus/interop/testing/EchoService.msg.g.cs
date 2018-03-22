@@ -62,7 +62,7 @@ namespace Plexus.Interop.Testing.Generated {
             "aG9SZXF1ZXN0GiMucGxleHVzLmludGVyb3AudGVzdGluZy5FY2hvUmVxdWVz",
             "dCgBEl8KD0R1cGxleFN0cmVhbWluZxIjLnBsZXh1cy5pbnRlcm9wLnRlc3Rp",
             "bmcuRWNob1JlcXVlc3QaIy5wbGV4dXMuaW50ZXJvcC50ZXN0aW5nLkVjaG9S",
-            "ZXF1ZXN0KAEwARommtsEInBsZXh1cy5pbnRlcm9wLnRlc3RpbmcuRWNob1Nl",
+            "ZXF1ZXN0KAEwARomktsEInBsZXh1cy5pbnRlcm9wLnRlc3RpbmcuRWNob1Nl",
             "cnZpY2VCI6oCIFBsZXh1cy5JbnRlcm9wLlRlc3RpbmcuR2VuZXJhdGVkYgZw",
             "cm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,

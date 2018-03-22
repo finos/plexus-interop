@@ -16,6 +16,7 @@
  */
 namespace Plexus.Interop.Metamodel.Json.Internal
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
     internal sealed class MethodDto
@@ -26,13 +27,16 @@ namespace Plexus.Interop.Metamodel.Json.Internal
         [JsonProperty("title")]
         public string Title { get; set; }
 
-        [JsonProperty("input")]
-        public string InputMessageId { get; set; }
+        [JsonProperty("request")]
+        public string RequestMessageId { get; set; }
 
-        [JsonProperty("output")]
-        public string OutputMessageId { get; set; }
+        [JsonProperty("response")]
+        public string ResponseMessageId { get; set; }
 
         [JsonProperty("type")]
         public MethodTypeDto Type { get; set; }
+
+        [JsonProperty("options")]
+        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
     }
 }

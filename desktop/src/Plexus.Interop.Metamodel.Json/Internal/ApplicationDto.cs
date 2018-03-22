@@ -29,5 +29,8 @@ namespace Plexus.Interop.Metamodel.Json.Internal
 
         [JsonProperty("consumes")]
         public List<ConsumedServiceDto> ConsumedServices { get; set; } = new List<ConsumedServiceDto>();
+        
+        [JsonProperty("options")]
+        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
     }
 }
