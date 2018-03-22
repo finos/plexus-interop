@@ -7,45 +7,45 @@ const tar = require('tar-fs');
 const request = require('request');
 const ProgressBar = require('progress');
 const { createIfNotExistSync } = require('./files');
-
-const getJreDir = () => path.normalize(path.join(__dirname, '..', 'dist', 'jre'));
+const { getJreDownloadUrl, getJreDir } = require('./java');
+const unzip = require('unzip');
+const printProgress = require('./progress');
 
 // TODO add cached files support
 const downloadJre = callback => {
-    const url = process.env['PLEXUS_JRE_DOWNLOAD_URL'];
-    const jreDir = getJreDir();
-    console.log("Downloading JRE from: ", url);
-    console.log("Target dir: ", jreDir);
-    callback = callback || (() => {});
-    rmdir(jreDir);
-    createIfNotExistSync(jreDir);
-    request
-      .get({
-        url,
-        rejectUnauthorized: false,
-        agent: false,
-        headers: {
-          connection: 'keep-alive',
-          'Cookie': 'gpw_e24=http://www.oracle.com/; oraclelicense=accept-securebackup-cookie'
-        }
-      })
-      .on('response', res => {
-        var length = parseInt(res.headers['content-length'], 10);
-        var progress = new ProgressBar('  Downloading JRE [:bar] :percent :etas', {
-          complete: '=',
-          incomplete: ' ',
-          width: 80,
-          total: length
-        });
-        res.on('data', chunk => progress.tick(chunk.length));
-      })
-      .on('error', err => {
-        console.log(`problem with request: ${err.message}`);
-        callback(err);
-      })
-      .on('end', () => console.log('Finished'))
+  const url = getJreDownloadUrl();
+  const jreDir = getJreDir();
+  const isZip = url.endsWith('.zip');
+  const isTarGz = url.endsWith('.tar.gz');
+  console.log("Downloading JRE from: ", url);
+  console.log("Target dir: ", jreDir);
+  callback = callback || (() => { });
+  rmdir(jreDir);
+  createIfNotExistSync(jreDir);
+  const basePipe = request
+    .get({
+      url,
+      rejectUnauthorized: false,
+      agent: false,
+      headers: {
+        connection: 'keep-alive',
+        'Cookie': 'gpw_e24=http://www.oracle.com/; oraclelicense=accept-securebackup-cookie'
+      }
+    })
+    .on('response', response => printProgress(response, 'Downloading JRE'))
+    .on('error', error => {
+      console.log(`JRE Download failed: ${error.message}`);
+      callback(error);
+    })
+    .on('end', () => console.log('JRE Download finished'));
+
+  if (isZip) {
+    basePipe.pipe(unzip.Extract({ path: jreDir }));
+  } else if (isTarGz) {
+    basePipe
       .pipe(zlib.createUnzip())
       .pipe(tar.extract(jreDir));
-  };
+  }
+};
 
-  downloadJre();
+downloadJre();

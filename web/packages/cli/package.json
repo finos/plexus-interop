@@ -25,7 +25,8 @@
       "progress": "2.0.0",
       "request": "2.75.0",
       "rmdir": "1.2.0",
-      "tar-fs": "1.13.2"
+      "tar-fs": "1.13.2",
+      "unzip": "0.1.11"
     },
     "devDependencies": {
       "@types/chai": "^4.0.2",
