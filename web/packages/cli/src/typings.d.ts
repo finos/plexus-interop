@@ -1,0 +1,2 @@
+
+declare module 'node-jvm';

@@ -21,7 +21,11 @@
     "dependencies": {
       "@plexus-interop/common": "0.1.0",
       "commander": "2.15.1",
-      "protobufjs": "6.8.0"
+      "protobufjs": "6.8.0",
+      "progress": "2.0.0",
+      "request": "2.75.0",
+      "rmdir": "1.2.0",
+      "tar-fs": "1.13.2"
     },
     "devDependencies": {
       "@types/chai": "^4.0.2",

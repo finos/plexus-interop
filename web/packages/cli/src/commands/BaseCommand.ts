@@ -4,13 +4,13 @@ import * as commander from 'commander';
 
 export abstract class BaseCommand implements Command {
 
-    public usageExamples: () => string | null = () => null;
-
-    public options: () => Option[] = () => [];
-
     public abstract name: () => string;
     
     public abstract action(opts: any): void;
+
+    public usageExamples: () => string | null = () => null;
+
+    public options: () => Option[] = () => [];
 
     public register(builder: commander.CommanderStatic): void {
         let commandBuilder = builder.command(this.name());
@@ -32,22 +32,7 @@ export abstract class BaseCommand implements Command {
             });
         }
     }
-
-    private validateRequiredOpts(opts: any): void {
-        const options: any[] = opts.options;
-        if (options) {
-            options
-            .filter(o => o.flags.indexOf('>') <= o.flags.indexOf('<'))    
-            .forEach(o => {
-                const flags = o.flags;
-                const optName = flags.substring(flags.lastIndexOf('<') + 1, flags.lastIndexOf('>'));
-                if (opts[optName] === undefined) {
-                    this.exit(`'${o.flags}' option is not defined`);
-                }
-            });
-        }
-    }
-
+    
     public exit(error: any): void {
         if (error) {
             console.error('error: ', error);
@@ -60,6 +45,21 @@ export abstract class BaseCommand implements Command {
 
     public log(msg: string, args?: any[]): void {
         console.log(msg, args);
+    }
+
+    private validateRequiredOpts(opts: any): void {
+        const options: any[] = opts.options;
+        if (options) {
+            options
+            .filter(o => o.flags.indexOf('<') !== -1)    
+            .forEach(o => {
+                const flags = o.flags;
+                const optName = flags.substring(flags.lastIndexOf('<') + 1, flags.lastIndexOf('>'));
+                if (opts[optName] === undefined) {
+                    this.exit(`'${o.flags}' option is not defined`);
+                }
+            });
+        }
     }
 
 }

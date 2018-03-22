@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { BaseCommand } from './BaseCommand';
-import { pbts, pbjs } from 'protobufjs/cli';
+import * as JVM from 'node-jvm';
 
 export class GenTsCommand extends BaseCommand {
 
@@ -26,32 +26,35 @@ export class GenTsCommand extends BaseCommand {
             description: 'generated message dtos namespace',
             defaultValue: `plexus`
         }
-    ];
+    ]
 
     public action(opts: any): void {
-        const namespace = opts.namespace;
-        const out = opts.out;
-        const input = opts.input;
-        const baseDir = opts.baseDir;
-        const jsDtoOut = path.join(out, 'plexus-messages.js');
-        pbjs.main(this.pbJsArgs(namespace, out), (error, output) => {
-            if (error) {
-                this.exit(error);
-            }
-            this.log(`JS protobuf dtos generated to ${jsDtoOut}`);
-            return {};
-        }); 
+        // const namespace = opts.namespace;
+        // const out = opts.out;
+        // const input = opts.input;
+        // const baseDir = opts.baseDir;
+        // const jsDtoOut = path.join(out, 'plexus-messages.js');
+        console.log(JVM);
+        const jvm = new JVM();
+        jvm.setLogLevel(7);
+        const entryPointClassName = jvm.loadJarFile('W:/projects/plexus-interop/bin/win-x86/sdk/plexusgen.jar');
+        jvm.setEntryPointClassName(entryPointClassName);
+        jvm.on('exit', (code: any) => {
+            console.log('finished' + code);
+            process.exit(code);
+        });
+        jvm.run();
     }
 
-    public pbJsArgs(namespace: string, out: string): string[] {
-        const jsDtoOut = path.join(out, 'plexus-messages.js');
-        return ['--force-long',
-            '-t', 'static-module',
-            '-r', namespace,
-            '-w', 'commonjs',
-            '-o', jsDtoOut];
-    }
+    // public pbJsArgs(namespace: string, out: string): string[] {
+    //     const jsDtoOut = path.join(out, 'plexus-messages.js');
+    //     return ['--force-long',
+    //         '-t', 'static-module',
+    //         '-r', namespace,
+    //         '-w', 'commonjs',
+    //         '-o', jsDtoOut];
+    // }
 
-    public usageExamples = () => ` $ plexus ${this.name()} -b ./metadata -i RateProvider.interop -o ./src/gen`
+    public usageExamples = () => ` $ plexus ${this.name()} -b ./metadata -i RateProvider.interop -o ./src/gen`;
 
 }
