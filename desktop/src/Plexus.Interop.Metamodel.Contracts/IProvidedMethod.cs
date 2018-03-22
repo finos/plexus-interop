@@ -23,5 +23,7 @@
         IProvidedService ProvidedService { get; }
 
         Maybe<string> Title { get; }
+
+        LaunchMode LaunchMode { get; }
     }
 }

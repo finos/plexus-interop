@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 ﻿namespace Plexus.Interop.Metamodel.Json.Internal
-{
+{    
     using System.Collections.Generic;
     using System.Linq;
 

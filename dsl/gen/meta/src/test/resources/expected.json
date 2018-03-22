@@ -115,7 +115,7 @@
 							"options": [
 								{
 									"id": "com.plexus.services.consumed_method_option_enum",
-									"value": "EnumValue2"
+									"value": "VALUE2"
 								}
 							]
 						},
@@ -137,7 +137,7 @@
 							"options": [
 								{
 									"id": "interop.ProvidedMethodOptions.launch_mode",
-									"value": "MultiInstance"
+									"value": "MULTI_INSTANCE"
 								},
 								{
 									"id": "interop.ProvidedMethodOptions.title",
@@ -156,7 +156,7 @@
 							"options": [
 								{
 									"id": "interop.ProvidedMethodOptions.launch_mode",
-									"value": "MultiInstance"
+									"value": "NONE"
 								}
 							]
 						}

@@ -127,7 +127,9 @@
                 {
                     Method = service.Methods[x.Name], 
                     ProvidedService = ps, 
-                    Title = x.Options.GetValue("interop.ProvidedMethodOptions.title")
+                    Title = x.Options.GetValue("interop.ProvidedMethodOptions.title"),
+                    LaunchMode = ConvertLaunchMode(
+                        x.Options.GetValue("interop.ProvidedMethodOptions.launch_mode").GetValueOrDefault())
                 })
                 .ToDictionary(x => x.Method.Name, x => x);
             return ps;
@@ -153,6 +155,17 @@
         private static Maybe<string> ConvertMaybe(string s)
         {
             return string.IsNullOrEmpty(s) ? Maybe<string>.Nothing : new Maybe<string>(s);
+        }
+
+        private static LaunchMode ConvertLaunchMode(string value)
+        {
+            switch (value)
+            {
+                case "NONE": return LaunchMode.None;
+                case "SINGLE_INSTANCE": return LaunchMode.SingleInstance;
+                case "MULTI_INSTANCE": return LaunchMode.MultiInstance;
+                default: return LaunchMode.SingleInstance;
+            }
         }
     }
 }

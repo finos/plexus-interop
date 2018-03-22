@@ -53,20 +53,29 @@
           "methods": [
             {
               "name": "Unary",
-              "title": "Sample Unary Method"
+              "title": "Sample Unary Method",
+              "options":  [
+                {
+                   "id": "interop.ProvidedMethodOptions.launch_mode", 
+                   "value": "MULTI_INSTANCE"
+                } 
+              ]
             },
             {
-              "name": "ServerStreaming",
-              "title": "Sample Server Streaming Method"
+              "name": "ServerStreaming"
             },
             {
-              "name": "ClientStreaming",
-              "title": "Sample Client Streaming Method"
+              "name": "ClientStreaming"
             },
             {
-              "name": "DuplexStreaming",
-              "title": "Sample Duplex Streaming Method"
+              "name": "DuplexStreaming"
             }
+          ],
+          "options":  [
+            {
+              "id": "interop.ProvidedServiceOptions.title", 
+              "value": "Sample Echo Service Implementation"
+            } 
           ]
         }
       ]

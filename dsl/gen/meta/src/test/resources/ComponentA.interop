@@ -22,12 +22,12 @@ package com.plexus.components;
 
 application ComponentA {
 
-        consumes com.plexus.services.ExampleService { PointToPoint; ServerStreaming [(services.consumed_method_option_enum)=EnumValue2]; ClientToServer; BidiStreaming; }
+        consumes com.plexus.services.ExampleService { PointToPoint; ServerStreaming [(services.consumed_method_option_enum)=VALUE2]; ClientToServer; BidiStreaming; }
 
         provides com.plexus.services.ExampleService to com.plexus.* { 
-        	PointToPoint [launch_mode=MultiInstance, title="Point-to-point"]; 
+        	PointToPoint [launch_mode=MULTI_INSTANCE, title="Point-to-point"]; 
         	ServerStreaming; 
         	ClientToServer; 
-        	BidiStreaming [launch_mode = MultiInstance]; 
+        	BidiStreaming [launch_mode = NONE]; 
         }
 }

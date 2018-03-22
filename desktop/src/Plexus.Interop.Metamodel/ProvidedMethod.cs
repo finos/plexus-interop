@@ -19,9 +19,11 @@
     public sealed class ProvidedMethod : IProvidedMethod
     {
         public Maybe<string> Title { get; set; }
-
+               
         public IProvidedService ProvidedService { get; set; }
 
         public IMethod Method { get; set; }
+
+        public LaunchMode LaunchMode { get; set; } = LaunchMode.SingleInstance;
     }
 }

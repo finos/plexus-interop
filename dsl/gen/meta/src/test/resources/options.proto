@@ -36,7 +36,7 @@ extend interop.ConsumedMethodOptions {
 }
 
 enum TestEnum {
-	EnumValue1 = 1;
-	EnumValue2 = 2;
-	EnumValue3 = 3;	
+	VALUE1 = 1;
+	VALUE2 = 2;
+	VALUE3 = 3;
 }
