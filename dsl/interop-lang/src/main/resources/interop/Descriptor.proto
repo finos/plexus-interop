@@ -34,7 +34,8 @@ message ConsumedServiceOptions {
 
 message ProvidedMethodOptions {
 	string title = 1;
-	LaunchMode launch_mode = 2;	
+	LaunchMode launch_mode = 2;
+	uint32 timeout = 3;
 }
 
 message ConsumedMethodOptions {
