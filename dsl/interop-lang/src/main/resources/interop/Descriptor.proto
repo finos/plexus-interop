@@ -41,7 +41,7 @@ message ConsumedMethodOptions {
 }
 
 enum LaunchMode {
-	None = 1;
-	SingleInstance = 2;
-	MultiInstance = 3;
+	None = 0;
+	SingleInstance = 1;
+	MultiInstance = 2;
 }

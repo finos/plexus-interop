@@ -62,7 +62,7 @@ class CsharpGenTask extends BaseGenTask {
 			} else {
 				newUri = newUri.deresolve(resourceBaseUri).resolve(outDirUri)
 			}
-			if (newUri.toString.endsWith(".proto") && !newUri.toString.endsWith("google/protobuf/descriptor.proto")) {
+			if (newUri.toString.endsWith(".proto") && !newUri.toString.endsWith("google/protobuf/descriptor.proto") && !newUri.toString.endsWith("interop/Descriptor.proto")) {
 				val newPath = newUri.toFileString
 				val file = new File(newPath)
 				file.parentFile.mkdirs
