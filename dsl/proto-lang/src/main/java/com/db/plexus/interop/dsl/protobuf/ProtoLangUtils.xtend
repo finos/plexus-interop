@@ -27,7 +27,7 @@ import com.google.inject.Singleton
 @Singleton
 class ProtoLangUtils {
 		
-	public static final String DESCRIPTOR_RESOURCE_IMPORT_PATH = "google/protobuf/descriptor.proto"
+	public static final String DESCRIPTOR_RESOURCE_PATH = "google/protobuf/descriptor.proto"
 	public static final QualifiedName DESCRIPTOR_PACKAGE_NAME = QualifiedName.create("", "google", "protobuf")
 	
 	@Inject
@@ -46,7 +46,7 @@ class ProtoLangUtils {
 	}
 	
 	def public IResourceDescription getDescriptorResourceDescription(ResourceSet resourceSet) {
-		return importResolver.resolveResourceDescription(resourceSet, DESCRIPTOR_RESOURCE_IMPORT_PATH)
+		return importResolver.resolveResourceDescription(resourceSet, DESCRIPTOR_RESOURCE_PATH)
 	}
 	
 	def private static QualifiedName getDescriptorContainerName(Option option) {

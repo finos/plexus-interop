@@ -17,7 +17,7 @@
 
 package plexus.interop.tests;
 
-import "interop/AppLauncherService.proto";
+import "interop/app_launcher_service.proto";
 
 application ElectronAppLauncher {
 	provides .interop.AppLauncherService { Launch; }

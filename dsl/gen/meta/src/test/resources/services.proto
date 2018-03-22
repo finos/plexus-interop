@@ -21,7 +21,7 @@ package com.plexus.services;
 
 import "messages.proto";
 import "options.proto";
-import "interop/Options.proto";
+import "interop/options.proto";
 
 service ExampleService {
 

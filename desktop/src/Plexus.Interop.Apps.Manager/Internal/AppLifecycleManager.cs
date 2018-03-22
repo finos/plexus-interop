@@ -27,7 +27,7 @@ namespace Plexus.Interop.Apps.Internal
     using Plexus.Processes;
     using UniqueId = Plexus.UniqueId;
 
-    internal sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager
+    internal sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager, AppLifecycleManagerClient.IAppLifecycleServiceImpl
     {        
         private readonly Dictionary<UniqueId, IAppConnection> _connections
             = new Dictionary<UniqueId, IAppConnection>();
@@ -38,7 +38,7 @@ namespace Plexus.Interop.Apps.Internal
         private readonly Dictionary<UniqueId, Promise<IAppConnection>> _connectionWaiters
             = new Dictionary<UniqueId, Promise<IAppConnection>>();
 
-        private readonly IClient _client;
+        private readonly IAppLifecycleManagerClient _client;
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.CreateDefault();
         private readonly NativeAppLauncherClient _nativeAppLauncherClient;
         private readonly AppsDto _appsDto;
@@ -47,14 +47,9 @@ namespace Plexus.Interop.Apps.Internal
         {
             _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir, _jsonSerializer);
             _appsDto = AppsDto.Load(Path.Combine(metadataDir, "apps.json"));
-            _client = ClientFactory.Instance.Create(
-                new ClientOptionsBuilder()
-                    .WithBrokerWorkingDir(Directory.GetCurrentDirectory())
-                    .WithDefaultConfiguration()
-                    .WithApplicationId("interop.AppLifecycleManager")
-                    .WithProvidedService("interop.AppLifecycleService",
-                        s => s.WithUnaryMethod<ActivateAppRequest, ActivateAppResponse>("ActivateApp", ActivateAppAsync))
-                    .Build());
+            _client = new AppLifecycleManagerClient(
+                this, 
+                s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
             OnStop(_nativeAppLauncherClient.Stop);
             OnStop(_client.Disconnect);
         }        
@@ -184,37 +179,20 @@ namespace Plexus.Interop.Apps.Internal
             }
         }
 
-        private void OnClientConnectionCompleted(Task completion, object state)
-        {
-            var connection = (IAppConnection)state;
-            lock (_connections)
-            {
-                _connections.Remove(connection.Id);
-                var appInstanceId = connection.Info.ApplicationInstanceId;
-                if (_appInstanceConnections.TryGetValue(connection.Info.ApplicationInstanceId, out var list))
-                {
-                    list.Remove(connection);
-                    if (list.Count == 0)
-                    {
-                        _appInstanceConnections.Remove(appInstanceId);
-                    }
-                }
-            }
-        }
-
-        private async Task<ActivateAppResponse> ActivateAppAsync(ActivateAppRequest request, MethodCallContext context)
+        async Task<ActivateAppResponse> AppLifecycleService.IActivateAppImpl.ActivateApp(
+            ActivateAppRequest request, MethodCallContext context)
         {
             Log.Debug("Activating app {0} by request from {{{1}}}", request.AppId, context);
             var connection = await SpawnConnectionAsync(request.AppId).ConfigureAwait(false);
             Log.Info("App connection {{{0}}} activated by request from {{{1}}}", connection, context);
             var response = new ActivateAppResponse
             {
-                AppConnectionId = new Internal.Generated.UniqueId
+                AppConnectionId = new Generated.UniqueId
                 {
                     Hi = connection.Info.ConnectionId.Hi,
                     Lo = connection.Info.ConnectionId.Lo
                 },
-                AppInstanceId = new Internal.Generated.UniqueId
+                AppInstanceId = new Generated.UniqueId
                 {
                     Hi = connection.Info.ApplicationInstanceId.Hi,
                     Lo = connection.Info.ApplicationInstanceId.Lo

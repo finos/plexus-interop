@@ -44,12 +44,14 @@ import com.db.plexus.interop.dsl.protobuf.IntConstant
 import com.db.plexus.interop.dsl.protobuf.EnumConstant
 import com.db.plexus.interop.dsl.protobuf.BoolConstant
 import com.db.plexus.interop.dsl.protobuf.DecimalConstant
+import com.db.plexus.interop.dsl.InteropLangUtils
+import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils
 
 public class GenUtils {
 		
-	public static final String INTEROP_OPTIONS_PROTO = "interop/Options.proto"
-	public static final String INTEROP_DESCRIPTOR_PROTO = "interop/Descriptor.proto"
-	public static final String PROTOBUF_DESCRIPTOR_PROTO = "google/protobuf/descriptor.proto"
+	public static final String INTEROP_OPTIONS_RESOURCE_PATH = "interop/options.proto"
+	public static final String INTEROP_DESCRIPTOR_RESOURCE_PATH = InteropLangUtils.DESCRIPTOR_RESOURCE_PATH
+	public static final String PROTOBUF_DESCRIPTOR_RESOURCE_PATH = ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH
 		 
 	public static final QualifiedName ROOT_PACKAGE_NAME = QualifiedName.create("")
 	public static final QualifiedName INTEROP_PACKAGE_NAME = ROOT_PACKAGE_NAME.append("interop")

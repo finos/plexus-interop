@@ -19,7 +19,7 @@ syntax = "proto3";
 
 package com.plexus.model;
 
-import "interop/Options.proto";
+import "interop/options.proto";
 
 message Request {
 	option (interop.message_id) = "com.plexus.mode.Request";

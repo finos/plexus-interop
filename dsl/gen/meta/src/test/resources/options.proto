@@ -19,7 +19,7 @@ syntax = "proto3";
 
 package com.plexus.services;
 
-import "interop/Descriptor.proto";
+import "interop/descriptor.proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.MessageOptions {

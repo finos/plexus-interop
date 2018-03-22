@@ -30,7 +30,7 @@ import com.google.inject.Singleton
 @Singleton
 class InteropLangUtils {
 	
-	public static String DESCRIPTOR_RESOURCE_IMPORT_PATH = "interop/Descriptor.proto"	
+	public static final String DESCRIPTOR_RESOURCE_PATH = "interop/descriptor.proto"	
 	public static final QualifiedName DESCRIPTOR_PACKAGE_NAME = QualifiedName.create("", "interop")
 	
 	@Inject
@@ -47,7 +47,7 @@ class InteropLangUtils {
 	}
 	
 	def public IResourceDescription getDescriptorResourceDescription(ResourceSet resourceSet) {
-		return importResolver.resolveResourceDescription(resourceSet, DESCRIPTOR_RESOURCE_IMPORT_PATH)
+		return importResolver.resolveResourceDescription(resourceSet, DESCRIPTOR_RESOURCE_PATH)
 	}
 	
 	def private static QualifiedName getDescriptorContainerName(InteropOption option) {

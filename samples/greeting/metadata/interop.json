@@ -1,72 +1,78 @@
 {
-    "messages": [
-		    	{
-	"id": "interop.AppLaunchRequest",
-	"fields": [
+	"messages": [
 		{
-			"name": "app_id",
-			"num": 1,
-			"primitive": true,
-			"type": "string"
+			"id": "interop.AppLaunchRequest",
+			"fields": [
+				{
+					"name": "app_id",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "launch_params_json",
+					"num": 2,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "launch_mode",
+					"num": 3,
+					"primitive": false,
+					"type": "interop.AppLaunchMode"
+				}
+			]
 		},
 		{
-			"name": "launch_params_json",
-			"num": 2,
-			"primitive": true,
-			"type": "string"
-		}
-	]
-},
-		    	{
-	"id": "interop.AppLaunchResponse",
-	"fields": [
-		{
-			"name": "app_instance_id",
-			"num": 1,
-			"primitive": false,
-			"type": "interop.UniqueId"
-		}
-	]
-},
-		    	{
-	"id": "interop.samples.GreetingRequest",
-	"fields": [
-		{
-			"name": "name",
-			"num": 1,
-			"primitive": true,
-			"type": "string"
-		}
-	]
-},
-		    	{
-	"id": "interop.samples.GreetingResponse",
-	"fields": [
-		{
-			"name": "greeting",
-			"num": 1,
-			"primitive": true,
-			"type": "string"
-		}
-	]
-},
-		    	{
-	"id": "interop.UniqueId",
-	"fields": [
-		{
-			"name": "lo",
-			"num": 1,
-			"primitive": true,
-			"type": "fixed64"
+			"id": "interop.AppLaunchResponse",
+			"fields": [
+				{
+					"name": "app_instance_id",
+					"num": 1,
+					"primitive": false,
+					"type": "interop.UniqueId"
+				}
+			]
 		},
 		{
-			"name": "hi",
-			"num": 2,
-			"primitive": true,
-			"type": "fixed64"
+			"id": "interop.samples.GreetingRequest",
+			"fields": [
+				{
+					"name": "name",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				}
+			]
+		},
+		{
+			"id": "interop.samples.GreetingResponse",
+			"fields": [
+				{
+					"name": "greeting",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				}
+			]
+		},
+		{
+			"id": "interop.UniqueId",
+			"fields": [
+				{
+					"name": "lo",
+					"num": 1,
+					"primitive": true,
+					"type": "fixed64"
+				},
+				{
+					"name": "hi",
+					"num": 2,
+					"primitive": true,
+					"type": "fixed64"
+				}
+			]
 		}
-	]
-}
     ],
 	"services": [
 		{
@@ -74,8 +80,8 @@
 			"methods": [
 				{
 					"name": "Launch",
-					"input": "interop.AppLaunchRequest",
-					"output": "interop.AppLaunchResponse",
+					"request": "interop.AppLaunchRequest",
+					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
 				}
 			]
@@ -85,26 +91,26 @@
 			"methods": [
 				{
 					"name": "Unary",
-					"input": "interop.samples.GreetingRequest",
-					"output": "interop.samples.GreetingResponse",
+					"request": "interop.samples.GreetingRequest",
+					"response": "interop.samples.GreetingResponse",
 					"type": "Unary"
 				},
 				{
 					"name": "ServerStreaming",
-					"input": "interop.samples.GreetingRequest",
-					"output": "interop.samples.GreetingResponse",
+					"request": "interop.samples.GreetingRequest",
+					"response": "interop.samples.GreetingResponse",
 					"type": "ServerStreaming"
 				},
 				{
 					"name": "ClientStreaming",
-					"input": "interop.samples.GreetingRequest",
-					"output": "interop.samples.GreetingResponse",
+					"request": "interop.samples.GreetingRequest",
+					"response": "interop.samples.GreetingResponse",
 					"type": "ClientStreaming"
 				},
 				{
 					"name": "DuplexStreaming",
-					"input": "interop.samples.GreetingRequest",
-					"output": "interop.samples.GreetingResponse",
+					"request": "interop.samples.GreetingRequest",
+					"response": "interop.samples.GreetingResponse",
 					"type": "DuplexStreaming"
 				}
 			]
@@ -113,94 +119,109 @@
 	"applications": [
 		{
 			"id": "interop.ElectronAppLauncher",
-			"consumes": [
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "interop.AppLauncherService",
-		     		"title": "AppLauncherService",
-		     		"to": [
-		     			"interop.AppLifecycleManager"
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Launch",
-		     				"title": "Launch"
-		     			}
-		     		]
-		     	}
-		     ]
-		  },
+			"provides": [
+				{
+					"service": "interop.AppLauncherService",
+					"methods": [
+						{
+							"name": "Launch"
+						}
+					],
+					"to": [
+						"interop.AppLifecycleManager"
+					]
+				}
+			]
+		},
 		{
 			"id": "interop.samples.GreetingClient",
 			"consumes": [
 				{
 					"service": "interop.samples.GreetingService",
+					"methods": [
+						{
+							"name": "Unary"
+						},
+						{
+							"name": "ServerStreaming"
+						},
+						{
+							"name": "ClientStreaming"
+						},
+						{
+							"name": "DuplexStreaming"
+						}
+					],
 					"from": [
 						"interop.samples.*"
-					],
-					"methods": [
-						"Unary",
-						"ServerStreaming",
-						"ClientStreaming",
-						"DuplexStreaming"
 					]
 				}
-		     ],
-		     "provides": [
-		     ]
-		  },
+			]
+		},
 		{
 			"id": "interop.samples.GreetingServer",
-			"consumes": [
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "interop.samples.GreetingService",
-		     		"title": "Greeting service implemented by .NET app",
-		     		"to": [
-		     			"interop.samples.GreetingClient"
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Unary",
-		     				"title": "Greeting from .NET app"
-		     			},
-		     			{
-		     				"name": "ServerStreaming",
-		     				"title": "Greetings from .NET app"
-		     			},
-		     			{
-		     				"name": "ClientStreaming",
-		     				"title": "ClientStreaming"
-		     			},
-		     			{
-		     				"name": "DuplexStreaming",
-		     				"title": "DuplexStreaming"
-		     			}
-		     		]
-		     	}
-		     ]
-		  },
+			"provides": [
+				{
+					"service": "interop.samples.GreetingService",
+					"methods": [
+						{
+							"name": "Unary",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": "Greeting from .NET app"
+								}
+							]
+						},
+						{
+							"name": "ServerStreaming",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": "Greetings from .NET app"
+								}
+							]
+						},
+						{
+							"name": "ClientStreaming"
+						},
+						{
+							"name": "DuplexStreaming"
+						}
+					],
+					"to": [
+						"interop.samples.GreetingClient"
+					],
+					"options": [
+						{
+							"id": "interop.ProvidedServiceOptions.title",
+							"value": "Greeting service implemented by .NET app"
+						}
+					]
+				}
+			]
+		},
 		{
 			"id": "interop.samples.WebGreetingServer",
-			"consumes": [
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "interop.samples.GreetingService",
-		     		"title": "GreetingService",
-		     		"to": [
-		     			"interop.samples.GreetingClient"
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Unary",
-		     				"title": "Greeting from Electron Web app"
-		     			}
-		     		]
-		     	}
-		     ]
-		  }
+			"provides": [
+				{
+					"service": "interop.samples.GreetingService",
+					"methods": [
+						{
+							"name": "Unary",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": "Greeting from Electron Web app"
+								}
+							]
+						}
+					],
+					"to": [
+						"interop.samples.GreetingClient"
+					]
+				}
+			]
+		}
 	]
 }

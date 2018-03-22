@@ -115,7 +115,7 @@ public abstract class BaseGenTask implements GenTask {
     private URI getResourceBaseUri(PlexusGenConfig config) throws URISyntaxException {
     	URI commonUri;
     	commonUri = URI.createURI(
-    			ClassLoader.getSystemClassLoader().getResource("interop/Options.proto").toURI().toString());
+    			ClassLoader.getSystemClassLoader().getResource("interop/options.proto").toURI().toString());
     	URI resourceBaseUri = commonUri.trimSegments(2).appendSegment("");
     	return resourceBaseUri;
     }

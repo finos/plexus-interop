@@ -68,15 +68,15 @@ public class ProtoGenTask extends BaseGenTask {
 		logger.info("Generating proto contract for " + config.input + " to folder " + config.outDir)
 
 		val optionsUri = URI.createURI(
-			ClassLoader.getSystemClassLoader().getResource(GenUtils.INTEROP_OPTIONS_PROTO).toURI().toString())
+			ClassLoader.getSystemClassLoader().getResource(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH).toURI().toString())
 			
 		val descriptorUri = URI.createURI(
-			ClassLoader.getSystemClassLoader().getResource(GenUtils.PROTOBUF_DESCRIPTOR_PROTO).toURI().toString())		
+			ClassLoader.getSystemClassLoader().getResource(GenUtils.PROTOBUF_DESCRIPTOR_RESOURCE_PATH).toURI().toString())		
 			
 		var interopResourceBaseUri = optionsUri.trimSegments(2).appendSegment("");
 		var protoResourceBaseUri = descriptorUri.trimSegments(3).appendSegment("");
 		
-		if (rs.resources.findFirst[r|r.URI.toString().endsWith(GenUtils.INTEROP_OPTIONS_PROTO)] === null) {
+		if (rs.resources.findFirst[r|r.URI.toString().endsWith(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)] === null) {
 			rs.getResource(optionsUri, true)
 		}
 
@@ -102,10 +102,11 @@ public class ProtoGenTask extends BaseGenTask {
 
 		val oldResources = new LinkedList<Resource>
 		oldResources.addAll(rs.resources)
+		
+		val optionsResourceDescription = importResolver.resolveResourceDescription(rs, GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)
 
 		for (r : oldResources) {
-			
-			val optionsResourceDescription = importResolver.resolveResourceDescription(rs, GenUtils.INTEROP_OPTIONS_PROTO)
+		
 						
 			val serviceIdOptionDescriptor = 
 				optionsResourceDescription
@@ -123,9 +124,9 @@ public class ProtoGenTask extends BaseGenTask {
 
 				val uriStr = r.URI.toString()
 				val isProto = uriStr.endsWith(".proto")
-				val isDescriptorProto = isProto && (uriStr.endsWith(GenUtils.PROTOBUF_DESCRIPTOR_PROTO) || uriStr.endsWith(GenUtils.INTEROP_DESCRIPTOR_PROTO))
+				val isDescriptorProto = isProto && (uriStr.endsWith(GenUtils.PROTOBUF_DESCRIPTOR_RESOURCE_PATH) || uriStr.endsWith(GenUtils.INTEROP_DESCRIPTOR_RESOURCE_PATH))
 				val needAddCustomOptions = !isDescriptorProto
-				val needAddPlexusOptions = !isDescriptorProto && !uriStr.endsWith(GenUtils.INTEROP_OPTIONS_PROTO)
+				val needAddPlexusOptions = !isDescriptorProto && !uriStr.endsWith(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)
 
 				val root = r.contents.get(0) as Proto
 				val firstDefinition = root.elements.findFirst[x|x instanceof NamedElement]
@@ -138,10 +139,10 @@ public class ProtoGenTask extends BaseGenTask {
 					
 					val needAddImport = r.allContents
 						.filter(typeof(Import))
-						.findFirst(x|x.importURI.endsWith(GenUtils.INTEROP_OPTIONS_PROTO)) === null						
+						.findFirst(x|x.importURI.endsWith(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)) === null						
 					if (needAddImport) {
 						val importElement = ProtobufFactory.eINSTANCE.createImport
-						importElement.importURI = GenUtils.INTEROP_OPTIONS_PROTO
+						importElement.importURI = GenUtils.INTEROP_OPTIONS_RESOURCE_PATH
 						root.elements.add(addIndex, importElement)
 						addIndex++
 					}					

@@ -25,5 +25,7 @@
         Maybe<string> Title { get; }
 
         LaunchMode LaunchMode { get; }
+
+        int TimeoutMs { get; }
     }
 }

@@ -19,6 +19,9 @@ package com.db.plexus.interop.dsl.gen;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 
+import com.db.plexus.interop.dsl.InteropLangUtils;
+import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +42,8 @@ public abstract class CodeOutputGenerator {
     			.getResources()
     			.stream()
     			.filter(x -> 
-    				!x.getURI().toString().endsWith("google/protobuf/descriptor.proto") && 
-    				!x.getURI().toString().endsWith("interop/Descriptor.proto"))
+    				!x.getURI().toString().endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH) && 
+    				!x.getURI().toString().endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH))
     			.collect(Collectors.toList()));
     }
 

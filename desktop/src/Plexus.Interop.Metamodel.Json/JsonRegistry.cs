@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Metamodel.Json
+namespace Plexus.Interop.Metamodel.Json
 {
+    using Plexus.Interop.Metamodel.Json.Internal;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Plexus.Interop.Metamodel.Json.Internal;
 
     public static class JsonRegistry
     {
@@ -129,7 +129,10 @@
                     ProvidedService = ps, 
                     Title = x.Options.GetValue("interop.ProvidedMethodOptions.title"),
                     LaunchMode = ConvertLaunchMode(
-                        x.Options.GetValue("interop.ProvidedMethodOptions.launch_mode").GetValueOrDefault())
+                        x.Options.GetValue("interop.ProvidedMethodOptions.launch_mode").GetValueOrDefault()),
+                    TimeoutMs = int.TryParse(
+                        x.Options.GetValue("interop.ProvidedMethodOptions.launch_mode").GetValueOrDefault(), 
+                        out var result) ? result : 0
                 })
                 .ToDictionary(x => x.Method.Name, x => x);
             return ps;

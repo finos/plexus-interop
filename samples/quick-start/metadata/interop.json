@@ -1,12 +1,93 @@
 {
+	"messages": [
+		{
+			"id": "interop.AppLaunchRequest",
+			"fields": [
+				{
+					"name": "app_id",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "launch_params_json",
+					"num": 2,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "launch_mode",
+					"num": 3,
+					"primitive": false,
+					"type": "interop.AppLaunchMode"
+				}
+			]
+		},
+		{
+			"id": "interop.AppLaunchResponse",
+			"fields": [
+				{
+					"name": "app_instance_id",
+					"num": 1,
+					"primitive": false,
+					"type": "interop.UniqueId"
+				}
+			]
+		},
+		{
+			"id": "fx.CcyPair",
+			"fields": [
+				{
+					"name": "ccyPairName",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				}
+			]
+		},
+		{
+			"id": "fx.CcyPairRate",
+			"fields": [
+				{
+					"name": "ccyPairName",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "rate",
+					"num": 2,
+					"primitive": true,
+					"type": "double"
+				}
+			]
+		},
+		{
+			"id": "interop.UniqueId",
+			"fields": [
+				{
+					"name": "lo",
+					"num": 1,
+					"primitive": true,
+					"type": "fixed64"
+				},
+				{
+					"name": "hi",
+					"num": 2,
+					"primitive": true,
+					"type": "fixed64"
+				}
+			]
+		}
+    ],
 	"services": [
 		{
 			"id": "interop.AppLauncherService",
 			"methods": [
 				{
 					"name": "Launch",
-					"input": "interop.AppLaunchRequest",
-					"output": "interop.AppLaunchResponse",
+					"request": "interop.AppLaunchRequest",
+					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
 				}
 			]
@@ -16,8 +97,8 @@
 			"methods": [
 				{
 					"name": "GetRate",
-					"input": "fx.CcyPair",
-					"output": "fx.CcyPairRate",
+					"request": "fx.CcyPair",
+					"response": "fx.CcyPairRate",
 					"type": "Unary"
 				}
 			]
@@ -26,93 +107,89 @@
 	"applications": [
 		{
 			"id": "interop.ElectronAppLauncher",
-			"consumes": [
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "interop.AppLauncherService",
-		     		"title": "AppLauncherService",
-		     		"to": [
-		     			"interop.AppLifecycleManager"
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Launch",
-		     				"title": "Launch"
-		     			}
-		     		]
-		     	}
-		     ]
-		  },
+			"provides": [
+				{
+					"service": "interop.AppLauncherService",
+					"methods": [
+						{
+							"name": "Launch"
+						}
+					],
+					"to": [
+						"interop.AppLifecycleManager"
+					]
+				}
+			]
+		},
 		{
 			"id": "vendorA.fx.CcyPairRateProvider",
-			"consumes": [
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "fx.CcyPairRateService",
-		     		"title": "CcyPairRateService",
-		     		"to": [
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "GetRate",
-		     				"title": ".NET Provider - Get Rate"
-		     			}
-		     		]
-		     	}
-		     ]
-		  },
+			"provides": [
+				{
+					"service": "fx.CcyPairRateService",
+					"methods": [
+						{
+							"name": "GetRate",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": ".NET Provider - Get Rate"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
 		{
 			"id": "vendorA.fx.WebCcyPairRateProvider",
-			"consumes": [
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "fx.CcyPairRateService",
-		     		"title": "CcyPairRateService",
-		     		"to": [
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "GetRate",
-		     				"title": "Web Provider - Get Rate"
-		     			}
-		     		]
-		     	}
-		     ]
-		  },
+			"provides": [
+				{
+					"service": "fx.CcyPairRateService",
+					"methods": [
+						{
+							"name": "GetRate",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.title",
+									"value": "Web Provider - Get Rate"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
 		{
 			"id": "vendorB.fx.CcyPairRateViewer",
 			"consumes": [
 				{
 					"service": "fx.CcyPairRateService",
+					"methods": [
+						{
+							"name": "GetRate"
+						}
+					],
 					"from": [
 						"vendorA.fx.CcyPairRateProvider"
-					],
-					"methods": [
-						"GetRate"
 					]
 				}
-		     ],
-		     "provides": [
-		     ]
-		  },
+			]
+		},
 		{
 			"id": "vendorB.fx.WebCcyPairRateViewer",
 			"consumes": [
 				{
 					"service": "fx.CcyPairRateService",
+					"methods": [
+						{
+							"name": "GetRate"
+						}
+					],
 					"from": [
 						"vendorA.fx.WebCcyPairRateProvider"
-					],
-					"methods": [
-						"GetRate"
 					]
 				}
-		     ],
-		     "provides": [
-		     ]
-		  }
+			]
+		}
 	]
 }

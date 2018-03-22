@@ -30,6 +30,8 @@ import org.eclipse.xtext.resource.XtextResourceSet
 
 import static extension com.db.plexus.interop.dsl.gen.GenUtils.*
 import com.google.inject.Injector
+import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils
+import com.db.plexus.interop.dsl.InteropLangUtils
 
 class CsharpGenTask extends BaseGenTask {
 
@@ -55,53 +57,59 @@ class CsharpGenTask extends BaseGenTask {
 		val resources = resourceSet.resources;
 
 		for (resource : resources) {
-			var newUri = resource.URI.resolve(workingDirUri);
-			val path = newUri.toFileString
-			if (newUri.toString().startsWith(baseDirUri.toString())) {
-				newUri = newUri.deresolve(baseDirUri).resolve(outDirUri)
-			} else {
-				newUri = newUri.deresolve(resourceBaseUri).resolve(outDirUri)
-			}
-			if (newUri.toString.endsWith(".proto") && !newUri.toString.endsWith("google/protobuf/descriptor.proto") && !newUri.toString.endsWith("interop/Descriptor.proto")) {
-				val newPath = newUri.toFileString
-				val file = new File(newPath)
-				file.parentFile.mkdirs
-				val args = new LinkedList<String>()
-				args.add(config.protocPath)
-				args.add("--proto_path=" + baseDirUri.toFileString)
-				val resourceBasePath = resourceBaseUri.toFileString
-				if (resourceBasePath !== null) { 				
-					args.add("--proto_path=" + resourceBaseUri.toFileString)				
+			if (!resource.URI.toString.endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH) 
+				&& !resource.URI.toString.endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH))
+			{
+				var newUri = resource.URI.resolve(workingDirUri)
+				var path = newUri.toFileString
+				if (newUri.toString().startsWith(baseDirUri.toString())) {
+					newUri = newUri.deresolve(baseDirUri).resolve(outDirUri)
+				} else {
+					newUri = newUri.deresolve(resourceBaseUri).resolve(outDirUri)
+				}			
+				if (newUri.toString.endsWith(".proto")) {
+					val newPath = newUri.toFileString				
+					val file = new File(newPath)
+					file.parentFile.mkdirs
+					val args = new LinkedList<String>()
+					args.add(config.protocPath)
+					args.add("--proto_path=" + baseDirUri.toFileString)
+					val resourceBasePath = resourceBaseUri.toFileString
+					if (resourceBasePath !== null) { 				
+						args.add("--proto_path=" + resourceBaseUri.toFileString)				
+					}
+					args.add("--csharp_out=" + internalAccessArg + Paths.get(newPath).parent)
+					args.add("--csharp_opt=file_extension=.msg.g.cs")
+					args.add(path)
+					val procBuilder = new ProcessBuilder(args)
+					procBuilder.inheritIO()
+					logger.info("Launching " + String.join(" ", procBuilder.command))
+					var Process proc = null
+					try {
+						proc = procBuilder.start()
+					} catch (Exception e) {
+						throw new IOException("Cannot start Protobuf compiler: " + config.protocPath +
+							". Probably the path is wrong. You can change it using command-line argument --protoc=<path>.",
+							e)
+					}
+					var exitCode = proc.waitFor
+					if (exitCode != 0) {
+						throw new IOException("protoc process exited with non-zero exit code: " + exitCode)
+					}
+					logger.info("Completed " + String.join(" ", procBuilder.command))
 				}
-				args.add("--csharp_out=" + internalAccessArg + Paths.get(newPath).parent)
-				args.add("--csharp_opt=file_extension=.msg.g.cs")
-				args.add(path)
-				val procBuilder = new ProcessBuilder(args)
-				procBuilder.inheritIO()
-				logger.info("Launching " + String.join(" ", procBuilder.command))
-				var Process proc = null
-				try {
-					proc = procBuilder.start()
-				} catch (Exception e) {
-					throw new IOException("Cannot start Protobuf compiler: " + config.protocPath +
-						". Probably the path is wrong. You can change it using command-line argument --protoc=<path>.",
-						e)
+				val fileNameSegments = newUri.lastSegment.split("_").map[x | x.toFirstUpper]
+				newUri = newUri.trimSegments(1).appendSegment(String.join("", fileNameSegments))				
+				if (resource.services.length > 0) {
+					val newPath = newUri.toFileString.replace(".proto", ".svc.g.cs");				
+					logger.info("Generating " + newPath);
+					FileUtils.writeStringToFile(new File(newPath), generator.gen(resource as XtextResource))
 				}
-				var exitCode = proc.waitFor
-				if (exitCode != 0) {
-					throw new IOException("protoc process exited with non-zero exit code: " + exitCode)
+				if (resource.applications.length > 0) {				
+					val newPath = newUri.toFileString.replace(".interop", ".app.g.cs");				
+					logger.info("Generating " + newPath);
+					FileUtils.writeStringToFile(new File(newPath), generator.gen(resource as XtextResource))
 				}
-				logger.info("Completed " + String.join(" ", procBuilder.command))
-			}
-			if (resource.services.length > 0) {
-				val newPath = newUri.toFileString.replace(".proto", ".svc.g.cs");				
-				logger.info("Generating " + newPath);
-				FileUtils.writeStringToFile(new File(newPath), generator.gen(resource as XtextResource))
-			}
-			if (resource.applications.length > 0) {				
-				val newPath = newUri.toFileString.replace(".interop", ".app.g.cs");				
-				logger.info("Generating " + newPath);
-				FileUtils.writeStringToFile(new File(newPath), generator.gen(resource as XtextResource))
 			}
 		}
 	}
