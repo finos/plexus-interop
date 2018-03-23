@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Arrays, stringToArrayBuffer, arrayBufferToString} from "../../src/util/Arrays";
+import { Arrays, stringToArrayBuffer, arrayBufferToString } from "../../src/util/Arrays";
 
-describe("Arrays Util", () => {
+describe("Arrays", () => {
 
     it("Should contatenate two Array Buffers", () => {
         const first = new Uint32Array([1, 2, 3]);

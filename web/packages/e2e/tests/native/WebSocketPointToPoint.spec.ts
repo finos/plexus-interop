@@ -35,7 +35,7 @@ describe("Client: Web Socket Point to Point invocation", () => {
     });
 
     it("Sends invocation request with huge payload and receives response", function() {
-        this.timeout(5000);
+        this.timeout(10000);
         return pointToPointTests.testHugeMessageSent();
     });
 
