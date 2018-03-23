@@ -12,9 +12,9 @@ def npmPackageVersion = System.getenv("PLEXUS_BUILD_NPM_PACKAGE_VERSION") ?: (Sy
 
 node {
     version = '8.5.0'
+    npmVersion = '5.7.1'    
     nodeModulesDir = projectDir
     download = true
-    npmVersion = '5.7.1'
 }
 
 license {
@@ -52,7 +52,7 @@ task preNpmBuild {
 task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
     // https://github.com/srs/gradle-node-plugin/issues/128
     environment = [
-        'PLEXUS_BUILD_NPM_PACKAGE_VERSION': npmVersion
+        'PLEXUS_BUILD_NPM_PACKAGE_VERSION': npmPackageVersion
     ]
     args =  ciPublishBuild ? ['run', 'ci-publish'] :
             ciFullBuild ? ['run', 'ci-build-e2e'] : 
