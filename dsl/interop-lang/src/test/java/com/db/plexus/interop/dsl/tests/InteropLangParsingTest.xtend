@@ -60,7 +60,7 @@ class InteropLangParsingTest {
 		for (r : allResources) {
 			validateResource(r)
 		}								
-		Assert.assertEquals(4, allResources.length)	
+		Assert.assertEquals(5, allResources.length)	
 	}
 	
 	@Test
@@ -74,7 +74,7 @@ class InteropLangParsingTest {
 		for (r : allResources) {
 			validateResource(r)
 		}								
-		Assert.assertEquals(3, allResources.length)	
+		Assert.assertEquals(4, allResources.length)	
 	}
 	
 	def validateResource(Resource r) {		

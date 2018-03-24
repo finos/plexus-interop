@@ -136,8 +136,8 @@
 							"name": "PointToPoint",
 							"options": [
 								{
-									"id": "interop.ProvidedMethodOptions.launch_mode",
-									"value": "MULTI_INSTANCE"
+									"id": "interop.ProvidedMethodOptions.launch_on_call",
+									"value": "ALWAYS"
 								},
 								{
 									"id": "interop.ProvidedMethodOptions.title",
@@ -155,8 +155,8 @@
 							"name": "BidiStreaming",
 							"options": [
 								{
-									"id": "interop.ProvidedMethodOptions.launch_mode",
-									"value": "NONE"
+									"id": "interop.ProvidedMethodOptions.launch_on_call",
+									"value": "DISABLED"
 								}
 							]
 						}

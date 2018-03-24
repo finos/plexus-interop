@@ -21,12 +21,12 @@ package interop;
 
 message ApplicationOptions {
 	string title = 1;
-	ProvidedMethodLaunchMode launch_mode = 2;
+	ApplicationLaunchOnCallMode launch_on_call = 2;
 }
 
 message ProvidedServiceOptions {
 	string title = 1;
-	ProvidedMethodLaunchMode launch_mode = 2;
+	ApplicationLaunchOnCallMode launch_on_call = 2;
 }
 
 message ConsumedServiceOptions {
@@ -34,15 +34,19 @@ message ConsumedServiceOptions {
 
 message ProvidedMethodOptions {
 	string title = 1;
-	ProvidedMethodLaunchMode launch_mode = 2;
+	ApplicationLaunchOnCallMode launch_on_call = 2;
 	uint32 timeout_ms = 3;
 }
 
 message ConsumedMethodOptions {
 }
 
-enum ProvidedMethodLaunchMode {
-	NONE = 0;
-	SINGLE_INSTANCE = 1;
-	MULTI_INSTANCE = 2;
+enum ApplicationLaunchOnCallMode {
+	option allow_alias = true;
+	IF_NOT_LAUNCHED = 0;
+	DEFAULT = 0;
+	ALWAYS = 1;
+	ENABLED = 1;
+	NEVER = 2;
+	DISABLED = 2;
 }

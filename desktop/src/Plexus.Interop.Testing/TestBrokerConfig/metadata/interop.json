@@ -106,6 +106,12 @@
 					"num": 3,
 					"primitive": false,
 					"type": "interop.AppLaunchMode"
+				},
+				{
+					"name": "suggested_app_instance_id",
+					"num": 4,
+					"primitive": false,
+					"type": "interop.UniqueId"
 				}
 			]
 		},
@@ -321,6 +327,42 @@
 							"name": "Hello"
 						}
 					],
+					"to": [
+						"plexus.interop.testing.*"
+					]
+				},
+				{
+					"service": "plexus.interop.testing.GreetingService",
+					"methods": [
+						{
+							"name": "Hello",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.launch_on_call",
+									"value": "ALWAYS"
+								}
+							]
+						}
+					],
+					"alias": "AlwaysLaunchGreetingService",
+					"to": [
+						"plexus.interop.testing.*"
+					]
+				},
+				{
+					"service": "plexus.interop.testing.GreetingService",
+					"methods": [
+						{
+							"name": "Hello",
+							"options": [
+								{
+									"id": "interop.ProvidedMethodOptions.launch_on_call",
+									"value": "NEVER"
+								}
+							]
+						}
+					],
+					"alias": "NeverLaunchGreetingService",
 					"to": [
 						"plexus.interop.testing.*"
 					]

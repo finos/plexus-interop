@@ -28,11 +28,13 @@ application EchoServer {
 
 	provides plexus.interop.testing.EchoService to plexus.interop.testing.* {
 		option title = "Sample Echo Service";
-		Unary [title = "Sample Unary Method"]; 
-		ServerStreaming [title = "Sample Server Streaming Method"]; 
+		Unary [title = "Sample Unary Method"];
+		ServerStreaming [title = "Sample Server Streaming Method"];
 		ClientStreaming [title = "Sample Client Streaming Method"]; 
 		DuplexStreaming [title = "Sample Duplex Streaming Method"]; 
 	}
 
-	provides plexus.interop.testing.GreetingService to plexus.interop.testing.* { Hello; } 	
+	provides plexus.interop.testing.GreetingService to plexus.interop.testing.* { Hello; }
+	provides plexus.interop.testing.GreetingService as AlwaysLaunchGreetingService to plexus.interop.testing.* { Hello [ launch_on_call=ALWAYS ]; }
+	provides plexus.interop.testing.GreetingService as NeverLaunchGreetingService to plexus.interop.testing.* { Hello [ launch_on_call=NEVER ]; }
 }

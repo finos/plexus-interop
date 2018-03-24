@@ -50,14 +50,8 @@
 					"type": "string"
 				},
 				{
-					"name": "app_launcher_args_json",
+					"name": "app_resolve_mode",
 					"num": 2,
-					"primitive": true,
-					"type": "string"
-				},
-				{
-					"name": "app_launch_mode",
-					"num": 3,
 					"primitive": false,
 					"type": "interop.AppLaunchMode"
 				}

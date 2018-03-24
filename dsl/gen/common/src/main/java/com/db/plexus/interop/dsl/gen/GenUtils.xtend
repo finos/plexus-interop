@@ -267,7 +267,7 @@ public class GenUtils {
     
     def static String getAsString(Constant constant) {
     	if (constant instanceof StringConstant) {
-    		return (constant as StringConstant).value
+    		return constant.value
     	}
     }
 }

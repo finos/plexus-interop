@@ -25,9 +25,9 @@ application ComponentA {
         consumes com.plexus.services.ExampleService { PointToPoint; ServerStreaming [(services.consumed_method_option_enum)=VALUE2]; ClientToServer; BidiStreaming; }
 
         provides com.plexus.services.ExampleService to com.plexus.* { 
-        	PointToPoint [launch_mode=MULTI_INSTANCE, title="Point-to-point"]; 
+        	PointToPoint [launch_on_call=ALWAYS, title="Point-to-point"]; 
         	ServerStreaming; 
         	ClientToServer; 
-        	BidiStreaming [launch_mode = NONE]; 
+        	BidiStreaming [launch_on_call=DISABLED]; 
         }
 }
