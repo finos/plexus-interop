@@ -338,7 +338,7 @@ namespace Plexus.Interop.Apps.Internal
                 case ResolveMode.SingleInstance:
                     return AppLaunchMode.SingleInstance;
                 case ResolveMode.SingleLaunchingInstance:
-                    return AppLaunchMode.SingleInstance;
+                    return AppLaunchMode.MultiInstance;
                 case ResolveMode.MultiInstance:
                     return AppLaunchMode.MultiInstance;
                 default:
