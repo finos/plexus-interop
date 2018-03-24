@@ -28,8 +28,7 @@ service AppLifecycleService {
 
 message ResolveAppRequest {
 	string app_id = 1;
-	string app_launcher_args_json = 2;
-	AppLaunchMode app_resolve_mode = 3;
+	AppLaunchMode app_resolve_mode = 2;
 }
 
 message ResolveAppResponse {

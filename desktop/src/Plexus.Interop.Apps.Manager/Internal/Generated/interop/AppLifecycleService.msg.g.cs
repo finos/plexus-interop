@@ -26,23 +26,22 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           string.Concat(
             "CiNpbnRlcm9wL2FwcF9saWZlY3ljbGVfc2VydmljZS5wcm90bxIHaW50ZXJv",
             "cBoXaW50ZXJvcC91bmlxdWVfaWQucHJvdG8aHWludGVyb3AvYXBwX2xhdW5j",
-            "aF9tb2RlLnByb3RvGhVpbnRlcm9wL29wdGlvbnMucHJvdG8ilAEKEVJlc29s",
-            "dmVBcHBSZXF1ZXN0Eg4KBmFwcF9pZBgBIAEoCRIeChZhcHBfbGF1bmNoZXJf",
-            "YXJnc19qc29uGAIgASgJEjAKEGFwcF9yZXNvbHZlX21vZGUYAyABKA4yFi5p",
-            "bnRlcm9wLkFwcExhdW5jaE1vZGU6HZLbBBlpbnRlcm9wLlJlc29sdmVBcHBS",
-            "ZXF1ZXN0IrABChJSZXNvbHZlQXBwUmVzcG9uc2USKgoPYXBwX2luc3RhbmNl",
-            "X2lkGAEgASgLMhEuaW50ZXJvcC5VbmlxdWVJZBIsChFhcHBfY29ubmVjdGlv",
-            "bl9pZBgCIAEoCzIRLmludGVyb3AuVW5pcXVlSWQSIAoYaXNfbmV3X2luc3Rh",
-            "bmNlX2xhdW5jaGVkGAMgASgIOh6S2wQaaW50ZXJvcC5SZXNvbHZlQXBwUmVz",
-            "cG9uc2UyfQoTQXBwTGlmZWN5Y2xlU2VydmljZRJFCgpSZXNvbHZlQXBwEhou",
-            "aW50ZXJvcC5SZXNvbHZlQXBwUmVxdWVzdBobLmludGVyb3AuUmVzb2x2ZUFw",
-            "cFJlc3BvbnNlGh+S2wQbaW50ZXJvcC5BcHBMaWZlY3ljbGVTZXJ2aWNlQimq",
-            "AiZQbGV4dXMuSW50ZXJvcC5BcHBzLkludGVybmFsLkdlbmVyYXRlZGIGcHJv",
-            "dG8z"));
+            "aF9tb2RlLnByb3RvGhVpbnRlcm9wL29wdGlvbnMucHJvdG8idAoRUmVzb2x2",
+            "ZUFwcFJlcXVlc3QSDgoGYXBwX2lkGAEgASgJEjAKEGFwcF9yZXNvbHZlX21v",
+            "ZGUYAiABKA4yFi5pbnRlcm9wLkFwcExhdW5jaE1vZGU6HZLbBBlpbnRlcm9w",
+            "LlJlc29sdmVBcHBSZXF1ZXN0IrABChJSZXNvbHZlQXBwUmVzcG9uc2USKgoP",
+            "YXBwX2luc3RhbmNlX2lkGAEgASgLMhEuaW50ZXJvcC5VbmlxdWVJZBIsChFh",
+            "cHBfY29ubmVjdGlvbl9pZBgCIAEoCzIRLmludGVyb3AuVW5pcXVlSWQSIAoY",
+            "aXNfbmV3X2luc3RhbmNlX2xhdW5jaGVkGAMgASgIOh6S2wQaaW50ZXJvcC5S",
+            "ZXNvbHZlQXBwUmVzcG9uc2UyfQoTQXBwTGlmZWN5Y2xlU2VydmljZRJFCgpS",
+            "ZXNvbHZlQXBwEhouaW50ZXJvcC5SZXNvbHZlQXBwUmVxdWVzdBobLmludGVy",
+            "b3AuUmVzb2x2ZUFwcFJlc3BvbnNlGh+S2wQbaW50ZXJvcC5BcHBMaWZlY3lj",
+            "bGVTZXJ2aWNlQimqAiZQbGV4dXMuSW50ZXJvcC5BcHBzLkludGVybmFsLkdl",
+            "bmVyYXRlZGIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchModeReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest), global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest.Parser, new[]{ "AppId", "AppLauncherArgsJson", "AppResolveMode" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest), global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest.Parser, new[]{ "AppId", "AppResolveMode" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse), global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse.Parser, new[]{ "AppInstanceId", "AppConnectionId", "IsNewInstanceLaunched" }, null, null, null)
           }));
     }
@@ -76,7 +75,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ResolveAppRequest(ResolveAppRequest other) : this() {
       appId_ = other.appId_;
-      appLauncherArgsJson_ = other.appLauncherArgsJson_;
       appResolveMode_ = other.appResolveMode_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -97,19 +95,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
-    /// <summary>Field number for the "app_launcher_args_json" field.</summary>
-    public const int AppLauncherArgsJsonFieldNumber = 2;
-    private string appLauncherArgsJson_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string AppLauncherArgsJson {
-      get { return appLauncherArgsJson_; }
-      set {
-        appLauncherArgsJson_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
     /// <summary>Field number for the "app_resolve_mode" field.</summary>
-    public const int AppResolveModeFieldNumber = 3;
+    public const int AppResolveModeFieldNumber = 2;
     private global::Plexus.Interop.Apps.Internal.Generated.AppLaunchMode appResolveMode_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Plexus.Interop.Apps.Internal.Generated.AppLaunchMode AppResolveMode {
@@ -133,7 +120,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         return true;
       }
       if (AppId != other.AppId) return false;
-      if (AppLauncherArgsJson != other.AppLauncherArgsJson) return false;
       if (AppResolveMode != other.AppResolveMode) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -142,7 +128,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public override int GetHashCode() {
       int hash = 1;
       if (AppId.Length != 0) hash ^= AppId.GetHashCode();
-      if (AppLauncherArgsJson.Length != 0) hash ^= AppLauncherArgsJson.GetHashCode();
       if (AppResolveMode != 0) hash ^= AppResolveMode.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -161,12 +146,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(10);
         output.WriteString(AppId);
       }
-      if (AppLauncherArgsJson.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(AppLauncherArgsJson);
-      }
       if (AppResolveMode != 0) {
-        output.WriteRawTag(24);
+        output.WriteRawTag(16);
         output.WriteEnum((int) AppResolveMode);
       }
       if (_unknownFields != null) {
@@ -179,9 +160,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       int size = 0;
       if (AppId.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(AppId);
-      }
-      if (AppLauncherArgsJson.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(AppLauncherArgsJson);
       }
       if (AppResolveMode != 0) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) AppResolveMode);
@@ -199,9 +177,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.AppId.Length != 0) {
         AppId = other.AppId;
-      }
-      if (other.AppLauncherArgsJson.Length != 0) {
-        AppLauncherArgsJson = other.AppLauncherArgsJson;
       }
       if (other.AppResolveMode != 0) {
         AppResolveMode = other.AppResolveMode;
@@ -221,11 +196,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             AppId = input.ReadString();
             break;
           }
-          case 18: {
-            AppLauncherArgsJson = input.ReadString();
-            break;
-          }
-          case 24: {
+          case 16: {
             appResolveMode_ = (global::Plexus.Interop.Apps.Internal.Generated.AppLaunchMode) input.ReadEnum();
             break;
           }
