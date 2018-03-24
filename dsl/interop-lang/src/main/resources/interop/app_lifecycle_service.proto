@@ -20,16 +20,20 @@ syntax = "proto3";
 package interop;
 
 import "interop/unique_id.proto";
+import "interop/app_launch_mode.proto";
 
 service AppLifecycleService {
-	rpc ActivateApp (ActivateAppRequest) returns (ActivateAppResponse);
+	rpc ResolveApp (ResolveAppRequest) returns (ResolveAppResponse);
 }
 
-message ActivateAppRequest {
+message ResolveAppRequest {
 	string app_id = 1;
+	string app_launcher_args_json = 2;
+	AppLaunchMode app_resolve_mode = 3;
 }
 
-message ActivateAppResponse {
+message ResolveAppResponse {
 	UniqueId app_instance_id = 1;
 	UniqueId app_connection_id = 2;
+	bool is_new_instance_launched = 3;
 }

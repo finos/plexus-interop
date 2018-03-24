@@ -74,6 +74,8 @@ namespace Plexus.Interop.Metamodel.Json
             var app = new Application { Id = appDto.Id };
             app.ConsumedServices = appDto.ConsumedServices.Select(x => Convert(app, services[x.ServiceId], x)).ToList();
             app.ProvidedServices = appDto.ProvidedServices.Select(x => Convert(app, services[x.ServiceId], x)).ToList();
+            app.LaunchMode = ConvertLaunchMode(
+                appDto.Options.GetValue("interop.ApplicationOptions.launch_mode").GetValueOrDefault());
             return app;
         }
 
@@ -120,8 +122,10 @@ namespace Plexus.Interop.Metamodel.Json
                 Service = service,
                 Title = dto.Options.GetValue("interop.ProvidedServiceOptions.title"),
                 Application = application,
-                To = ConvertMatchPatterns(dto.To)
-            };
+                To = ConvertMatchPatterns(dto.To),
+                LaunchMode = ConvertLaunchMode(
+                    dto.Options.GetValue("interop.ProvidedServiceOptions.launch_mode").GetValueOrDefault())
+        };
             ps.Methods = dto.Methods
                 .Select(x => (IProvidedMethod)new ProvidedMethod
                 {
@@ -160,14 +164,14 @@ namespace Plexus.Interop.Metamodel.Json
             return string.IsNullOrEmpty(s) ? Maybe<string>.Nothing : new Maybe<string>(s);
         }
 
-        private static LaunchMode ConvertLaunchMode(string value)
+        private static Maybe<LaunchMode> ConvertLaunchMode(string value)
         {
             switch (value)
             {
                 case "NONE": return LaunchMode.None;
                 case "SINGLE_INSTANCE": return LaunchMode.SingleInstance;
                 case "MULTI_INSTANCE": return LaunchMode.MultiInstance;
-                default: return LaunchMode.SingleInstance;
+                default: return Maybe<LaunchMode>.Nothing;
             }
         }
     }

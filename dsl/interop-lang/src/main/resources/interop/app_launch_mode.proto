@@ -19,30 +19,7 @@ syntax = "proto3";
 
 package interop;
 
-message ApplicationOptions {
-	string title = 1;
-	ProvidedMethodLaunchMode default_launch_mode = 2;
-}
-
-message ProvidedServiceOptions {
-	string title = 1;
-	ProvidedMethodLaunchMode default_launch_mode = 2;
-}
-
-message ConsumedServiceOptions {
-}
-
-message ProvidedMethodOptions {
-	string title = 1;
-	ProvidedMethodLaunchMode launch_mode = 2;
-	uint32 timeout_ms = 3;
-}
-
-message ConsumedMethodOptions {
-}
-
-enum ProvidedMethodLaunchMode {
-	NONE = 0;
-	SINGLE_INSTANCE = 1;
-	MULTI_INSTANCE = 2;
+enum AppLaunchMode {
+	SINGLE_INSTANCE = 0;
+	MULTI_INSTANCE = 1;
 }

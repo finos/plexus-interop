@@ -25,5 +25,7 @@
         IReadOnlyCollection<IConsumedService> ConsumedServices { get; }
 
         IReadOnlyCollection<IProvidedService> ProvidedServices { get; }
+
+        Maybe<LaunchMode> LaunchMode { get; }
     }
 }

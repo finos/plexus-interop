@@ -24,7 +24,7 @@
 
         public IMethod Method { get; set; }
 
-        public LaunchMode LaunchMode { get; set; } = LaunchMode.SingleInstance;
+        public Maybe<LaunchMode> LaunchMode { get; set; }
 
         public int TimeoutMs { get; set; } = 0;
     }

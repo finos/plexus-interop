@@ -31,5 +31,7 @@
         Maybe<string> Alias { get; }
 
         IReadOnlyDictionary<string, IProvidedMethod> Methods { get; }
+
+        Maybe<LaunchMode> LaunchMode { get; }
     }
 }

@@ -20,6 +20,7 @@ syntax = "proto3";
 package interop;
 
 import "interop/unique_id.proto";
+import "interop/app_launch_mode.proto";
 
 service AppLauncherService {
 	rpc Launch(AppLaunchRequest) returns (AppLaunchResponse);
@@ -29,14 +30,9 @@ message AppLaunchRequest {
 	string app_id = 1;
 	string launch_params_json = 2;
 	AppLaunchMode launch_mode = 3;
+	UniqueId suggested_app_instance_id = 4;
 }
 
 message AppLaunchResponse {
 	UniqueId app_instance_id = 1;
-}
-
-enum AppLaunchMode {
-	NONE = 0;
-	SINGLE_INSTANCE = 1;
-	MULTI_INSTANCE = 2;
 }

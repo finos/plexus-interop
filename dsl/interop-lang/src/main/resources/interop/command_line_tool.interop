@@ -21,6 +21,6 @@ import "interop/app_lifecycle_service.proto";
 
 application CommandLineTool {
 
-	consumes AppLifecycleService from interop.AppLifecycleManager { ActivateApp; }
+	consumes AppLifecycleService from interop.AppLifecycleManager { ResolveApp; }
 
 }
