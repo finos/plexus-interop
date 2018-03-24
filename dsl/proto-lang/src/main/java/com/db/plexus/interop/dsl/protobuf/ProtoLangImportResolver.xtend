@@ -22,6 +22,7 @@ import java.util.Collections
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.xtext.resource.IResourceDescriptionsProvider
+import java.util.ArrayList
 
 @Singleton
 class ProtoLangImportResolver {
@@ -36,23 +37,10 @@ class ProtoLangImportResolver {
 		if (importString === null) {
 			return null;
 		}
-		val URI uri = URI.createURI(importString)
-		for (root : config.baseURIs) {
-			try {
-				val resolvedUri = uri.resolve(root)
-				if (isValidURI(resourceSet, resolvedUri)) {
-					return resolvedUri				
-				}
-			} catch (Exception e) {
-			}
-		}
-		try {
-			val resolvedUri = URI.createURI(
-				ClassLoader.getSystemClassLoader().getResource(importString).toURI().toString())
+		for (resolvedUri: getResolveCandidates(importString)) {
 			if (isValidURI(resourceSet, resolvedUri)) {
 				return resolvedUri				
 			}
-		} catch (Exception e) {
 		}
 	}
 	
@@ -72,6 +60,25 @@ class ProtoLangImportResolver {
 		return resourceDescriptionsProvider
 			.getResourceDescriptions(resourceSet)
 			.getResourceDescription(resource.URI) 		
+	}
+	
+	def public getResolveCandidates(String importString) {
+		val result = new ArrayList<URI>()
+		val URI uri = URI.createURI(importString)
+		for (root : config.baseURIs) {
+			try {
+				val resolvedUri = uri.resolve(root)
+				result.add(resolvedUri)
+			} catch (Exception e) {
+			}
+		}
+		try {
+			val resolvedUri = URI.createURI(
+				ClassLoader.getSystemClassLoader().getResource(importString).toURI().toString())
+			result.add(resolvedUri)
+		} catch (Exception e) {
+		}
+		return result
 	}
 	
 	def private static isValidURI(ResourceSet resourceSet, URI uri) {

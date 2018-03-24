@@ -25,10 +25,11 @@ import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 import com.google.inject.Inject
 import org.eclipse.xtext.resource.IContainer
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
-import org.eclipse.xtext.validation.INamesAreUniqueValidationHelper
 import com.db.plexus.interop.dsl.protobuf.NamedElement
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import com.db.plexus.interop.dsl.protobuf.Import
+import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
 
 /**
  * This class contains custom validation rules. 
@@ -44,7 +45,10 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	ResourceDescriptionsProvider resourceDescriptionsProvider;
 		
 	@Inject
-	private IQualifiedNameProvider qualifiedNameProvider;
+	IQualifiedNameProvider qualifiedNameProvider;
+	
+	@Inject
+	ProtoLangImportResolver importResolver
 		
 	@Check
 	def checkSinglePackageDeclaration(Package ele) {		
@@ -65,6 +69,14 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 				}
 			}
 		}
-	}
+	}	
 	
+	@Check
+	def checkImport(Import ele) {
+		val path = ele.importURI
+		if (importResolver.resolveURI(ele.eResource.resourceSet, path) === null) {
+			val resolveCandidates = importResolver.getResolveCandidates(path)
+			error('Imported resource cannot be resolved: ' + path + '. The following candidates were checked: ' + resolveCandidates, ProtobufPackage.Literals.IMPORT__IMPORT_URI);			
+		}				
+	}
 }
