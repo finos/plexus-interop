@@ -56,8 +56,8 @@
               "title": "Sample Unary Method",
               "options":  [
                 {
-                   "id": "interop.ProvidedMethodOptions.launch_mode", 
-                   "value": "MULTI_INSTANCE"
+                   "id": "interop.ProvidedMethodOptions.launch_on_call", 
+                   "value": "ALWAYS"
                 } 
               ]
             },

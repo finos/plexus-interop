@@ -26,6 +26,7 @@ namespace Plexus.Interop
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
+    using Plexus.Interop.Transport.Protocol;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -696,7 +697,7 @@ namespace Plexus.Interop
         }
 
         [Fact]
-        public void InvocationShouldAlwaysTriggerLaunchWhenLaunchModeSetToAlways()
+        public void InvocationShouldAlwaysTriggerLaunchWhenMethodLaunchModeSetToAlways()
         {
             Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
             {
@@ -733,6 +734,7 @@ namespace Plexus.Interop
                     )
                 );
                 await appLauncher.StartAsync();
+                ConnectEchoServer();
                 var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
                 client.ConnectAsync().ShouldCompleteIn(Timeout5Sec);
                 var callDescriptor = new MethodCallDescriptor(
@@ -740,6 +742,56 @@ namespace Plexus.Interop
                 await client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
                 await client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
                 serverCreatedCount.ShouldBe(2);
+            });
+        }
+
+        [Fact]
+        public void InvocationShouldFailIfThereIsNoOnlineInstanceAndMethodLaunchModeSetToNever()
+        {
+            Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
+            {
+                return Task.FromResult(new GreetingResponse { Greeting = greetingRequest.Name });
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                var serverCreatedCount = 0;
+                var echoServerFactory = (TestClientFactory)((broker, id) =>
+                {
+                    var optionsBuilder = new ClientOptionsBuilder()
+                        .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                        .WithAppInstanceId(id)
+                        .WithApplicationId(EchoServerClient.Id)
+                        .WithDefaultConfiguration()
+                        .WithProvidedService(
+                            GreetingService.Id,
+                            "NeverLaunchGreetingService",
+                            x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+
+                    serverCreatedCount++;
+
+                    return ClientFactory.Instance.Create(optionsBuilder.Build());
+                });
+
+                var appLauncher = RegisterDisposable(
+                    new TestAppLauncher(
+                        _testBrokerFixture.SharedInstance,
+                        new Dictionary<string, TestClientFactory>
+                        {
+                            {EchoServerClient.Id, echoServerFactory}
+                        }
+                    )
+                );
+                await appLauncher.StartAsync();
+                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
+                await client.ConnectAsync();
+                var callDescriptor = new MethodCallDescriptor(
+                    ProvidedMethodReference.Create(GreetingService.Id, "NeverLaunchGreetingService", "Hello", EchoServerClient.Id));
+                client.CallInvoker
+                    .CallUnary(callDescriptor, new GreetingRequest {Name = "Test"})
+                    .AsTask()
+                    .ShouldThrow<RemoteErrorException>();
+                serverCreatedCount.ShouldBe(0);
             });
         }
 

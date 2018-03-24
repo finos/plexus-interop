@@ -75,7 +75,7 @@ namespace Plexus.Interop.Metamodel.Json
             app.ConsumedServices = appDto.ConsumedServices.Select(x => Convert(app, services[x.ServiceId], x)).ToList();
             app.ProvidedServices = appDto.ProvidedServices.Select(x => Convert(app, services[x.ServiceId], x)).ToList();
             app.LaunchMode = ConvertLaunchMode(
-                appDto.Options.GetValue("interop.ApplicationOptions.launch_mode").GetValueOrDefault());
+                appDto.Options.GetValue("interop.ApplicationOptions.launch_on_call").GetValueOrDefault());
             return app;
         }
 
@@ -124,7 +124,7 @@ namespace Plexus.Interop.Metamodel.Json
                 Application = application,
                 To = ConvertMatchPatterns(dto.To),
                 LaunchMode = ConvertLaunchMode(
-                    dto.Options.GetValue("interop.ProvidedServiceOptions.launch_mode").GetValueOrDefault())
+                    dto.Options.GetValue("interop.ProvidedServiceOptions.launch_on_call").GetValueOrDefault())
         };
             ps.Methods = dto.Methods
                 .Select(x => (IProvidedMethod)new ProvidedMethod
@@ -133,9 +133,9 @@ namespace Plexus.Interop.Metamodel.Json
                     ProvidedService = ps, 
                     Title = x.Options.GetValue("interop.ProvidedMethodOptions.title"),
                     LaunchMode = ConvertLaunchMode(
-                        x.Options.GetValue("interop.ProvidedMethodOptions.launch_mode").GetValueOrDefault()),
+                        x.Options.GetValue("interop.ProvidedMethodOptions.launch_on_call").GetValueOrDefault()),
                     TimeoutMs = int.TryParse(
-                        x.Options.GetValue("interop.ProvidedMethodOptions.launch_mode").GetValueOrDefault(), 
+                        x.Options.GetValue("interop.ProvidedMethodOptions.timeout_ms").GetValueOrDefault(), 
                         out var result) ? result : 0
                 })
                 .ToDictionary(x => x.Method.Name, x => x);
@@ -168,10 +168,17 @@ namespace Plexus.Interop.Metamodel.Json
         {
             switch (value)
             {
-                case "NONE": return LaunchMode.None;
-                case "SINGLE_INSTANCE": return LaunchMode.SingleInstance;
-                case "MULTI_INSTANCE": return LaunchMode.MultiInstance;
-                default: return Maybe<LaunchMode>.Nothing;
+                case "NEVER":
+                case "DISABLED":
+                    return LaunchMode.None;
+                case "ALWAYS": 
+                case "ENABLED": 
+                    return LaunchMode.MultiInstance;
+                case "DEFAULT":
+                case "IF_NOT_LAUNCHED":
+                    return LaunchMode.SingleInstance;
+                default: 
+                    return Maybe<LaunchMode>.Nothing;
             }
         }
     }

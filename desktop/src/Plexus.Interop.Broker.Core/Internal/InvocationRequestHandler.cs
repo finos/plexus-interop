@@ -131,6 +131,7 @@ namespace Plexus.Interop.Broker.Internal
             IAppConnection source)
         {
             var method = _registryService.GetProvidedMethod(methodReference);
+            var launchMode = GetLaunchMode(method);
             var appId = methodReference.ProvidedService.ApplicationId;
             if (methodReference.ProvidedService.ConnectionId.HasValue)
             {
@@ -144,17 +145,18 @@ namespace Plexus.Interop.Broker.Internal
             Task<ResolvedConnection> resolveTask;
             lock (_resolveConnectionSync)
             {
-                var onlineConnections = _appLifecycleManager
-                    .GetOnlineConnections()
-                    .Where(x => x.Info.ApplicationId.Equals(appId) &&
-                                !x.Info.ConnectionId.Equals(source.Id)).ToArray();
-
-                if (onlineConnections.Any())
+                if (launchMode != LaunchMode.MultiInstance)
                 {
-                    return onlineConnections.First();
+                    var onlineConnections = _appLifecycleManager
+                        .GetOnlineConnections()
+                        .Where(x => x.Info.ApplicationId.Equals(appId) &&
+                                    !x.Info.ConnectionId.Equals(source.Id)).ToArray();
+
+                    if (onlineConnections.Any())
+                    {
+                        return onlineConnections.First();
+                    }
                 }
-                
-                var launchMode = GetLaunchMode(method);
 
                 if (launchMode == LaunchMode.None || !_appLifecycleManager.CanBeLaunched(appId))
                 {
