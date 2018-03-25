@@ -57,9 +57,7 @@ CustomInteropOption returns InteropOption:
 ;
 
 ConsumedService:
-	'consumes' service=[Service|FULL_ID] ('as' alias=VALID_INTEROP_ID)? ('from' restrictions=RestrictionList)? '{'
-		(elements+=ConsumedServiceElement)*
-	'}' ';'*
+	'consumes' service=[Service|FULL_ID] (('{' (elements+=ConsumedServiceElement)* '}') & ('as' alias=VALID_INTEROP_ID)? & ('from' restrictions=RestrictionList)?) ';'*
 ;
 
 RestrictionList:
@@ -79,9 +77,7 @@ ConsumedMethod:
 ;
 
 ProvidedService:
-	'provides' service=[Service|FULL_ID] ('as' alias=VALID_INTEROP_ID)? ('to' restrictions=RestrictionList)? '{'
-		(elements+=ProvidedServiceElement)*
-	'}' ';'*
+	'provides' service=[Service|FULL_ID] (('{'(elements+=ProvidedServiceElement)* '}') & ('as' alias=VALID_INTEROP_ID)? & ('to' restrictions=RestrictionList)?) ';'*
 ;
 
 ProvidedServiceElement:
