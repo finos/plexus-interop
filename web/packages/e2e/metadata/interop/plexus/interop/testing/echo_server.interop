@@ -15,11 +15,17 @@
 // limitations under the License.
 //
 
-import "plexus/interop/testing/EchoService.proto";
+import "plexus/interop/testing/echo_service.proto";
 
 package plexus.interop.testing;
 
-application EchoClient {
-	
-	consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
+application EchoServer {
+
+	provides plexus.interop.testing.EchoService to plexus.interop.testing.* {
+		option title = "Sample Echo Service";
+		Unary [title = "Sample Unary Method"]; 
+		ServerStreaming [title = "Sample Server Streaming Method"]; 
+		ClientStreaming [title = "Sample Client Streaming Method"]; 
+		DuplexStreaming [title = "Sample Duplex Streaming Method"]; 
+	}
 }

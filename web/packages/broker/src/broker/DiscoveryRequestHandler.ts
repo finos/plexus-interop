@@ -58,7 +58,7 @@ export class DiscoveryRequestHandler {
                 : this.interopRegistryService.getMatchingProvidedMethodsForApp(appMetadata);
 
             if (methodDiscoveryRequest.inputMessageId) {
-                providedMethods = providedMethods.filter(m => m.method.inputMessage.id === methodDiscoveryRequest.inputMessageId);
+                providedMethods = providedMethods.filter(m => m.method.requestMessage.id === methodDiscoveryRequest.inputMessageId);
             }
 
             if (methodDiscoveryRequest.outputMessageId) {
@@ -106,8 +106,8 @@ export class DiscoveryRequestHandler {
     private convertDiscoveredMethod(pm: ProvidedMethod, connectionId?: UniqueId): DiscoveredMethod {
         const methodType: MethodType = pm.method.type;
         const methodTitle = pm.title;
-        const inputMessageId = pm.method.inputMessage.id;
-        const outputMessageId = pm.method.outputMessage.id;
+        const inputMessageId = pm.method.requestMessage.id;
+        const outputMessageId = pm.method.responseMessage.id;
 
         const providedMethod = {
             providedService: {

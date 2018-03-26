@@ -15,11 +15,11 @@
 // limitations under the License.
 //
 
-import "interop/AppLauncherService.proto";
+import "plexus/interop/testing/echo_service.proto";
 
 package plexus.interop.testing;
 
-application TestAppLauncher {
-
-	provides .interop.AppLauncherService to interop.AppLifecycleManager { Launch; }
+application EchoClient {
+	
+	consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
 }

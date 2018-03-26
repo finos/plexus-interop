@@ -175,8 +175,8 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
                 return {
                     name: methodDto.name,
                     type: this.convertMethodType(methodDto.type),
-                    inputMessage: messagesMap.get(methodDto.input) as Message,
-                    outputMessage: messagesMap.get(methodDto.output) as Message,
+                    requestMessage: messagesMap.get(methodDto.request) as Message,
+                    responseMessage: messagesMap.get(methodDto.response) as Message,
                     service
                 } as Method;
             }), m => m.name, m => m);
