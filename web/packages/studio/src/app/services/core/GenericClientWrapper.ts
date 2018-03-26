@@ -76,8 +76,8 @@ export class GenericClientWrapper implements InteropClient {
     private toMetaInfo(method: DiscoveredMethod | ConsumedMethod): DiscoveredMetaInfo | ConsumedMetaInfo {
         if (this.isConsumed(method)) {
             return {
-                inputMessageId: method.method.inputMessage.id,
-                outputMessageId: method.method.outputMessage.id,
+                inputMessageId: method.method.requestMessage.id,
+                outputMessageId: method.method.responseMessage.id,
                 serviceId: method.consumedService.service.id,
                 methodId: method.method.name
             };
@@ -188,7 +188,7 @@ export class GenericClientWrapper implements InteropClient {
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .forEach(pm => {
                 const pmFullName = fullName(pm);
-                const defaultResponse = this.defaultGenerator.generate(pm.method.outputMessage.id);
+                const defaultResponse = this.defaultGenerator.generate(pm.method.responseMessage.id);
                 switch (pm.method.type) {
                     case MethodType.Unary:
                         this.unaryHandlers.set(pmFullName, async requestJson => Promise.reject(notInterceptedError));
