@@ -29,4 +29,4 @@ export function getJreBaseDir(downloadDir: string): string {
     return path.join(downloadDir, childs[0]);
 }
 
-export const getJreDownloadDir = () => path.normalize(path.join(__dirname, '..', 'dist', 'jre'));
+export const getJreDownloadDir = () => path.normalize(path.join(__dirname, '..', '..', 'jre'));
