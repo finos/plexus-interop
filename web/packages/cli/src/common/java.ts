@@ -40,4 +40,10 @@ export async function getJavaExecPath(): Promise<string> {
     }
 }
 
-export const getJreDownloadDir = () => path.normalize(path.join(__dirname, '..', '..', '..', 'jre'));
+export const getJreDownloadDir = () => path.join(getDistDir(), 'jre');
+
+export const getJavaGenLibPath = () => path.join(getDistDir(), 'lib', 'plexusGen.jar');
+
+function getDistDir(): string {
+    return path.normalize(path.join(__dirname, '..', '..', '..'));
+}

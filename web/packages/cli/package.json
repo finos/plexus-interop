@@ -9,7 +9,9 @@
       "plexus": "./cli.js"
     },
     "scripts": {
-      "prebuild": "yarn lint && trash dist/main",
+      "prebuild": "yarn lint && trash dist/main && npm run copy-assets && npm run rename-lib",
+      "copy-assets": "copyfiles -f ../../../dsl/gen/cli/build/libs/cli-*-all.jar dist/lib",
+      "rename-lib": "renamer --find cli-.*-all.jar --regex --replace plexusgen.jar dist/lib/*",
       "build": "yarn build:main",
       "postinstall": "node dist/main/src/install.js",
       "postbuild": "yarn test",
@@ -35,6 +37,8 @@
       "@types/node": "^7.0.5",
       "chai": "^4.1.0",
       "jest": "^21.0.1",
+      "copyfiles": "^1.2.0",
+      "renamer": "^0.6.1",
       "trash": "^4.1.0",
       "trash-cli": "^1.4.0",
       "ts-mockito": "2.0.2",
