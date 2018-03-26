@@ -32,7 +32,10 @@ export function downloadJre(): Promise<string> {
                 console.log(`JRE Download failed: ${error.message}`);
                 reject(error);
             })
-            .on('end', () => console.log('JRE Download finished'));
+            .on('end', () => {
+                console.log('JRE Download finished');
+                resolve(jreDownloadDir);
+            });
         if (isZip) {
             basePipe.pipe(unzipper.Extract({ path: jreDownloadDir }));
         } else if (isTarGz) {
