@@ -1,2 +1,2 @@
 
-declare module 'node-jvm';
+declare module 'progress';
