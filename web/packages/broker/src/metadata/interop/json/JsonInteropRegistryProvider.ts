@@ -36,6 +36,7 @@ import { ProvidedMethod } from "../model/ProvidedMethod";
 import { ProvidedServiceDto } from "./ProvidedServiceDto";
 import { ProvidedService } from "../model/ProvidedService";
 import { ApplicationDto } from "./ApplicationDto";
+import { OptionDto } from "./OptionDto";
 
 export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
@@ -121,7 +122,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         serviceDto.methods
             .map(m => {
                 return {
-                    method: service.methods.get(m) as Method,
+                    method: service.methods.get(m.name) as Method,
                     consumedService
                 } as ConsumedMethod;
             })
@@ -145,13 +146,24 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
             return {
                 method: service.methods.get(pm.name) as Method,
                 providedService,
-                title: pm.title
+                title: this.getOptionValueOrDefault(pm.options, "interop.ProvidedMethodOptions.title", pm.name)
             } as ProvidedMethod;
         })
             .forEach(pm => methods.set(pm.method.name, pm));
 
         return providedService;
+    }
 
+    private getOptionValueOrDefault(options: OptionDto[], id: string, defaultValue: string): string {
+        if (options === null) {
+            return defaultValue;
+        }
+        for (let o of options) {
+            if (o.id === id) {
+                return o.value;
+            }
+        }
+        return defaultValue;
     }
 
     private convertService(messagesMap: Map<string, Message>, serviceDto: ServiceDto): Service {
@@ -172,8 +184,8 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         return service;
     }
 
-    private convertMethodType(methoTypeDto: MethodTypeDto): MethodType {
-        switch (methoTypeDto) {
+    private convertMethodType(methodTypeDto: MethodTypeDto): MethodType {
+        switch (methodTypeDto) {
             case MethodTypeDto.ClientStreaming:
                 return MethodType.ClientStreaming;
             case MethodTypeDto.ServerStreaming:
@@ -183,7 +195,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
             case MethodTypeDto.DuplexStreaming:
                 return MethodType.DuplexStreaming;
             default:
-                throw new Error("Unsupported method type: " + methoTypeDto);
+                throw new Error("Unsupported method type: " + methodTypeDto);
         }
     }
 

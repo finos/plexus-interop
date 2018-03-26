@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 import { ProvidedMethodDto } from "./ProvidedMethodDto";
+import { OptionDto } from "./OptionDto";
 
 export interface ProvidedServiceDto {
     
     service: string;
-    
-    title: string;
     
     to: string[];
     
     alias?: string;
     
     methods: ProvidedMethodDto[];
+
+    options: OptionDto[];
 
 }

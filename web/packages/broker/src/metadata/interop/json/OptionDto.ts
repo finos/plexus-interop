@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OptionDto } from "./OptionDto";
-
-export interface ProvidedMethodDto {
-    name: string;
-    options: OptionDto[];
+export interface OptionDto {
+    id: string;
+    value: string;
 }
