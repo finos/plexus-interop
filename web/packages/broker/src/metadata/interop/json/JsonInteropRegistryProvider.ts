@@ -155,12 +155,11 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
     }
 
     private getOptionValueOrDefault(options: OptionDto[], id: string, defaultValue: string): string {
-        if (options === null) {
-            return defaultValue;
-        }
-        for (let o of options) {
-            if (o.id === id) {
-                return o.value;
+        if (options) {
+            for (let o of options) {
+                if (o.id === id) {
+                    return o.value;
+                }
             }
         }
         return defaultValue;
