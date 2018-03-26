@@ -57,7 +57,6 @@ namespace Plexus.Logging.NLog
 #if NETSTANDARD1_6
         public void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
-            loggerFactory.ConfigureNLog(NLogManager.Configuration);
             loggerFactory.AddNLog();
         }
 #endif
