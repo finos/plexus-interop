@@ -29,4 +29,15 @@ export function getJreBaseDir(downloadDir: string): string {
     return path.join(downloadDir, childs[0]);
 }
 
-export const getJreDownloadDir = () => path.normalize(path.join(__dirname, '..', '..', 'jre'));
+export async function getJavaExecPath(): Promise<string> {
+    const baseDir = getJreBaseDir(getJreDownloadDir());
+    const platform = os.platform();
+    switch (platform) {
+        case 'win32':
+            return path.join(baseDir, 'bin', 'java.exe');
+        default:
+            throw new Error(`${platform} is not supported`);
+    }
+}
+
+export const getJreDownloadDir = () => path.normalize(path.join(__dirname, '..', '..', '..', 'jre'));

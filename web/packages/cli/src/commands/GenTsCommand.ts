@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { BaseCommand } from './BaseCommand';
-import * as JVM from 'node-jvm';
+import { getJavaExecPath } from '../common/java';
+import { spawn } from 'child_process';
 
 export class GenTsCommand extends BaseCommand {
 
@@ -28,22 +29,34 @@ export class GenTsCommand extends BaseCommand {
         }
     ]
 
-    public action(opts: any): void {
+    public async action(opts: any): Promise<void> {
         // const namespace = opts.namespace;
         // const out = opts.out;
         // const input = opts.input;
         // const baseDir = opts.baseDir;
         // const jsDtoOut = path.join(out, 'plexus-messages.js');
-        console.log(JVM);
-        const jvm = new JVM();
-        jvm.setLogLevel(7);
-        const entryPointClassName = jvm.loadJarFile('W:/projects/plexus-interop/bin/win-x86/sdk/plexusgen.jar');
-        jvm.setEntryPointClassName(entryPointClassName);
-        jvm.on('exit', (code: any) => {
-            console.log('finished' + code);
-            process.exit(code);
+        const javaExecPath = await getJavaExecPath();
+        return new Promise<void>((resolve, reject) => {
+            console.log(`Executing ${javaExecPath}`);
+            const javaProcess = spawn(javaExecPath, ['-version']);
+            javaProcess.stdout.on('data', data => {
+                console.log(`${data}`);
+            });
+            javaProcess.stderr.on('data', (data) => {
+                console.error(`${data}`);
+            });
+            javaProcess.on('exit', (code, signal) => {
+                console.log(`completed ${code} ${signal}`);
+                if (code !== 0) {
+                    reject(new Error(`Child process completed with error code: ${code}`));
+                } else {
+                    resolve();
+                }
+            });
+            javaProcess.on('error', error => {
+                reject(error);
+            });
         });
-        jvm.run();
     }
 
     // public pbJsArgs(namespace: string, out: string): string[] {

@@ -9,9 +9,9 @@
       "plexus": "./cli.js"
     },
     "scripts": {
-      "prebuild": "yarn lint && trash dist",
+      "prebuild": "yarn lint && trash dist/main",
       "build": "yarn build:main",
-      "install": "node dist/main/src/install.js",
+      "postinstall": "node dist/main/src/install.js",
       "postbuild": "yarn test",
       "build:main": "tsc -p tsconfig.json",
       "build:watch": "tsc -w -p tsconfig.json",

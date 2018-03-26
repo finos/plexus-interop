@@ -6,7 +6,7 @@ export abstract class BaseCommand implements Command {
 
     public abstract name: () => string;
     
-    public abstract action(opts: any): void;
+    public abstract action(opts: any): Promise<void>;
 
     public usageExamples: () => string | null = () => null;
 
@@ -19,7 +19,9 @@ export abstract class BaseCommand implements Command {
             // need to do it manually :(
             // https://github.com/tj/commander.js/issues/44
             this.validateRequiredOpts(opts);
-            this.action(opts);
+            this.action(opts)
+                .then(() => console.log('Command completed'))
+                .catch(e => console.error('Failed to execute', e));
         });
         const examples = this.usageExamples();
         if (examples) {
