@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { BaseCommand } from './BaseCommand';
 import { getJavaExecPath } from '../common/java';
-import { spawn } from 'child_process';
+import { simpleSpawn } from '../common/process';
 
 export class GenTsCommand extends BaseCommand {
 
@@ -36,27 +36,7 @@ export class GenTsCommand extends BaseCommand {
         // const baseDir = opts.baseDir;
         // const jsDtoOut = path.join(out, 'plexus-messages.js');
         const javaExecPath = await getJavaExecPath();
-        return new Promise<void>((resolve, reject) => {
-            console.log(`Executing ${javaExecPath}`);
-            const javaProcess = spawn(javaExecPath, ['-version']);
-            javaProcess.stdout.on('data', data => {
-                console.log(`${data}`);
-            });
-            javaProcess.stderr.on('data', (data) => {
-                console.error(`${data}`);
-            });
-            javaProcess.on('exit', (code, signal) => {
-                console.log(`completed ${code} ${signal}`);
-                if (code !== 0) {
-                    reject(new Error(`Child process completed with error code: ${code}`));
-                } else {
-                    resolve();
-                }
-            });
-            javaProcess.on('error', error => {
-                reject(error);
-            });
-        });
+        return simpleSpawn(javaExecPath, ['-version']);
     }
 
     // public pbJsArgs(namespace: string, out: string): string[] {
