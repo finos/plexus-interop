@@ -8,6 +8,7 @@ export function baseDir(): Option {
         longName: 'baseDir',
         exampleValue: 'metadata',
         description: 'plexus metadata base directory',
+        isRequired: true,        
         defaultValue: process.cwd()
     };
 }
@@ -17,6 +18,7 @@ export function plexusEntryPoint(): Option {
         shortName: 'i',
         longName: 'input',
         exampleValue: 'plexus_application.interop',
+        isRequired: true,        
         description: 'file containing Plexus Component\'s entry point, e.g. rate_provider.interop'
     };
 }
@@ -24,9 +26,10 @@ export function plexusEntryPoint(): Option {
 export function out(): Option {
     return {
         shortName: 'o',
-        longName: 'output',
+        longName: 'out',
         exampleValue: 'src/gen',
         description: 'output directory',
+        isRequired: true,
         defaultValue: path.join(process.cwd(), 'gen')
     };
 }
@@ -36,6 +39,7 @@ export function namespace(): Option {
         shortName: 'n',
         longName: 'namespace',
         exampleValue: 'plexus',
+        isRequired: true,        
         description: 'generated message dtos namespace',
         defaultValue: `plexus`
     };

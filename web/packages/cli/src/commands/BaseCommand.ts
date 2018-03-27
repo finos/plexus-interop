@@ -38,7 +38,10 @@ export abstract class BaseCommand implements Command {
             // need to do it manually :(
             // https://github.com/tj/commander.js/issues/44
             this.log('Validating input args');            
-            this.validateRequiredOpts(opts);
+            const errors = this.validateRequiredOpts(this.options(), opts);
+            if (errors.length > 0) {
+                this.fail(errors.join('\n'));
+            }
             this.log('Starting execution');
             this.action(opts)
                 .then(() => this.log('Completed successfully'))
@@ -61,18 +64,13 @@ export abstract class BaseCommand implements Command {
         process.exit(1);
     }
 
-    private validateRequiredOpts(opts: any): void {
-        const options: any[] = opts.options;
+    public validateRequiredOpts(options: Option[], commanderOpts: any): string[] {
         if (options) {
-            options
-            .filter(o => o.flags.indexOf('<') !== -1)    
-            .forEach(o => {
-                const flags = o.flags;
-                const optName = flags.substring(flags.lastIndexOf('<') + 1, flags.lastIndexOf('>'));
-                if (opts[optName] === undefined) {
-                    this.fail(`'${o.flags}' option is not defined`);
-                }
-            });
+            return options
+                .filter(o => !!o.isRequired && !commanderOpts[o.longName])
+                .map(o => `'${getFlags(o)}' option is required`);
+        } else {
+            return [];
         }
     }
 
