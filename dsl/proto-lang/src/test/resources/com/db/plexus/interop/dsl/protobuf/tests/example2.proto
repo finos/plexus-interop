@@ -19,7 +19,7 @@ syntax = "proto3";
 
 package com.db.plexus.interop.dsl.protobuf.tests;
 
-import public "com/db/plexus/interop/dsl/protobuf/tests/subFolder/example3.proto";
+import public "com/db/plexus/interop/dsl/protobuf/tests/subfolder/example3.proto";
 
 message Message3 {
 	string int_field = 1;
@@ -32,5 +32,5 @@ enum Enum3 {
 }
 
 service TestService {
-	rpc Test (subFolder.Message4) returns (subFolder.Message4);
+	rpc Test (subfolder.Message4) returns (subfolder.Message4);
 }

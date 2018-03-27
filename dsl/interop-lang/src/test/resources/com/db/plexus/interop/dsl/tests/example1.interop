@@ -18,7 +18,7 @@
 package com.db.plexus.interop.dsl.tests;
 
 import "com/db/plexus/interop/dsl/tests/example1.proto";
-import "com/db/plexus/interop/dsl/tests/subFolder/example2.proto";
+import "com/db/plexus/interop/dsl/tests/subfolder/example2.proto";
 
 application App1 {
 
@@ -26,7 +26,7 @@ application App1 {
 	
 	consumes Service1 { Do; DoAgain; } as MyAlias from plexus.interop.*, com.db.plexus.interop.*;
 	
-	provides subFolder.Service2 { 
+	provides subfolder.Service2 { 
 		Hello [title="Sample Hello Method"];
 	}
 }

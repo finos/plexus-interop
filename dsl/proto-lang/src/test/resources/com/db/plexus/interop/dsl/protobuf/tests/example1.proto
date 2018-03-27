@@ -74,7 +74,7 @@ message Message1 {
 
 	reserved 100 to 999, 10000;
 
-	subFolder.Message4 msg4_field = 5;
+	subfolder.Message4 msg4_field = 5;
 }
 
 enum Enum1 {

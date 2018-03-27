@@ -17,13 +17,7 @@
 
 syntax = "proto3";
 
-package com.db.plexus.interop.dsl.tests.subFolder;
+package com.db.plexus.interop.dsl.protobuf.tests.subfolder;
 
-message Message2 {
-	message Message2 {
-	}
-}
-
-service Service2 {
-	rpc Hello (Message2) returns (stream Message2.Message2);
+message Message4 {
 }

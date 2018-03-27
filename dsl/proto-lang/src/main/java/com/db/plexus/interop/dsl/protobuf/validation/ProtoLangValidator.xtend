@@ -119,6 +119,25 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	}
 	
 	@Check
+	def checkPackageName(Package ^package) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
+		val name = ^package.importedNamespace
+		var isValid = true		
+		for (var i=0; isValid && i<name.length; i++) {			
+			val c = name.charAt(i)
+			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == DOT_CHAR
+			if (!isValid){
+				Character.isLowerCase(c)
+			}
+		}
+		if (!isValid) {
+			error('Package name "' + name + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.', ^package, ProtobufPackage.Literals.PACKAGE__IMPORTED_NAMESPACE)		
+		}
+	}
+	
+	@Check
 	def checkProtoResourceLocation(Proto proto) {
 		if (!protoLangConfig.strictMode) {
 			return
