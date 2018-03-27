@@ -20,7 +20,6 @@
 package com.db.plexus.interop.dsl.protobuf.tests
 
 import com.google.inject.Inject
-import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.junit.Assert
 import org.junit.Test
@@ -36,9 +35,10 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.validation.Issue
 import java.util.List
 import java.util.LinkedList
+import org.eclipse.xtext.testing.InjectWith
 
 @RunWith(XtextRunner)
-@InjectWith(ProtoTestInjectorProvider)
+@InjectWith(ProtoLangInjectorProvider)
 class ProtoLangParsingTest {
 	
 	@Inject
@@ -48,12 +48,7 @@ class ProtoLangParsingTest {
 	def void loadFile() {
 		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/example1.proto", 4)									
 	}
-	
-	@Test
-	def void loadCommonProto() {		
-		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/common.proto", 2)									
-	}
-	
+		
 	@Test
 	def void loadOptionsProto() {		
 		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/option_usage.proto", 4)									
@@ -61,12 +56,12 @@ class ProtoLangParsingTest {
 	
 	@Test
 	def void loadDescriptorProto() {
-		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/google/protobuf/descriptor.proto", 1)		
+		loadAndValidateResource("google/protobuf/descriptor.proto", 1)		
 	}
 	
 	@Test
 	def void loadApiProto() {
-		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/google/protobuf/api.proto", 5)		
+		loadAndValidateResource("google/protobuf/api.proto", 5)		
 	}
 	
 	@Test

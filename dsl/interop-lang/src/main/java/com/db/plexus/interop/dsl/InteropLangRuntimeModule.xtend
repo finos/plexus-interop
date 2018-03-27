@@ -41,7 +41,7 @@ class InteropLangRuntimeModule extends AbstractInteropLangRuntimeModule {
 	private ProtoLangConfig config
 
 	new() {
-		this.config = new ProtoLangConfig();
+		this(new ProtoLangConfig())
 	}
 
 	new(ProtoLangConfig config) {

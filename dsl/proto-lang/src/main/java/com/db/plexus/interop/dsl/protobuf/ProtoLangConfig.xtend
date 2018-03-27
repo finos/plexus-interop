@@ -19,11 +19,29 @@ package com.db.plexus.interop.dsl.protobuf
 import java.util.List
 import org.eclipse.emf.common.util.URI
 import java.util.LinkedList
+import com.google.inject.Singleton
 
+@Singleton
 class ProtoLangConfig {
 	private List<URI> baseURIs = new LinkedList<URI>()
-
-	def List<URI> getBaseURIs() {
+	
+	private boolean strictMode = true; 
+	
+	def Iterable<URI> getBaseURIs() {
 		baseURIs
+	}
+	
+	def addBaseUri(URI uri) {
+		if (!baseURIs.contains(uri)) {
+			baseURIs.add(uri)		
+		}
+	}
+	
+	def getStrictMode() {
+		return strictMode
+	}
+	
+	def setStrictMode(boolean value) {
+		strictMode = value
 	}
 }

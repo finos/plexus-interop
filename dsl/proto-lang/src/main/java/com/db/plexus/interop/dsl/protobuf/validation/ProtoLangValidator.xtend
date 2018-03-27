@@ -31,6 +31,8 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider
 import com.db.plexus.interop.dsl.protobuf.Import
 import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
 import com.db.plexus.interop.dsl.protobuf.Field
+import com.db.plexus.interop.dsl.protobuf.Proto
+import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
 
 /**
  * This class contains custom validation rules. 
@@ -50,6 +52,9 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	
 	@Inject
 	ProtoLangImportResolver importResolver
+	
+	@Inject
+	ProtoLangConfig protoLangConfig
 		
 	@Check
 	def checkSinglePackageDeclaration(Package ele) {		
@@ -88,6 +93,22 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 			if (otherField.number == field.number && !otherField.equals(field)) {
 				error('The same number assigned to field "' + otherField.name + '"', ProtobufPackage.Literals.FIELD__NUMBER)
 			}			
+		}
+	}
+	
+	@Check
+	def checkProtoResourceLocation(Proto proto) {
+		if (!protoLangConfig.strictMode) {
+			return			
+		}			
+		val resource = proto.eResource
+		val name = this.qualifiedNameProvider.getFullyQualifiedName(proto)		
+		val segments = name.skipFirst(1).segments		
+		val importPath = if (segments.length > 0) segments.join("/") + "/" + resource.URI.lastSegment else resource.URI.lastSegment
+		val resolvedUri = this.importResolver.resolveURI(resource.resourceSet, importPath)	
+		if (resolvedUri != resource.URI) {
+			val candidates = this.importResolver.getResolveCandidates(importPath)
+			error('Resource folder do not correspond to its package name "' + name.skipFirst(1) + '". Valid locations for the resource: ' + candidates, proto, ProtobufPackage.Literals.PROTO__ELEMENTS)
 		}
 	}	
 }

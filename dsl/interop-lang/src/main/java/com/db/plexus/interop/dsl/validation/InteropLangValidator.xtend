@@ -24,6 +24,11 @@ import com.db.plexus.interop.dsl.ConsumedMethod
 import org.eclipse.xtext.EcoreUtil2
 import com.db.plexus.interop.dsl.DslPackage
 import com.db.plexus.interop.dsl.ProvidedMethod
+import com.db.plexus.interop.dsl.protobuf.Proto
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import com.google.inject.Inject
+import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
+import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 
 /**
  * This class contains custom validation rules. 
@@ -31,6 +36,12 @@ import com.db.plexus.interop.dsl.ProvidedMethod
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 class InteropLangValidator extends AbstractInteropLangValidator {
+	
+	@Inject
+	IQualifiedNameProvider qualifiedNameProvider
+	
+	@Inject
+	ProtoLangImportResolver importResolver
 	
 	override def isLanguageSpecific() {
 		false
@@ -52,5 +63,5 @@ class InteropLangValidator extends AbstractInteropLangValidator {
 				error("Duplicated provided method definition: " + providedMethod.method.name, DslPackage.Literals.PROVIDED_METHOD__METHOD);								
 			}			
 		}						
-	}		
+	}
 }

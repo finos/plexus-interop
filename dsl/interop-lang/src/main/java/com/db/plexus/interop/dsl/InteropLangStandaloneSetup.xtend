@@ -19,44 +19,39 @@
  */
 package com.db.plexus.interop.dsl
 
-import com.google.inject.Injector
-import org.eclipse.emf.ecore.EPackage
-import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
 import com.db.plexus.interop.dsl.protobuf.ProtoLangStandaloneSetup
-import com.google.inject.Guice
-import com.google.inject.Module
-import java.util.List
-import java.util.LinkedList
+import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
+import com.google.inject.Injector
+import org.eclipse.emf.common.util.URI
+import org.eclipse.emf.ecore.EPackage
 
 /**
  * Initialization support for running Xtext languages without Equinox extension registry.
  */
 class InteropLangStandaloneSetup extends InteropLangStandaloneSetupGenerated {
-	
-	ProtoLangConfig config	
-	List<Module> modules = new LinkedList<Module>
+		
+	URI interopResourcesBaseUri
 		
 	new () {
-		this(null)		
+		interopResourcesBaseUri = URI.createURI(
+			ClassLoader.getSystemClassLoader().getResource(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH).toURI().toString()
+		).trimSegments(2).appendSegment("")		
 	}
-	
-	new (ProtoLangConfig config, Module... modules) {
-		this.config = if (config === null) new ProtoLangConfig() else config
-		this.modules.addAll(modules)		
-	}	
-		
+			
 	override createInjectorAndDoEMFRegistration() {
-		new ProtoLangStandaloneSetup(this.config, this.modules).createInjectorAndDoEMFRegistration();
+		val protoInjector = new ProtoLangStandaloneSetup().createInjectorAndDoEMFRegistration();
+		val protoLangConfig = protoInjector.getInstance(typeof(ProtoLangConfig))
+		protoLangConfig.addBaseUri(interopResourcesBaseUri)
 		val injector = createInjector();
+		val interopLangConfig = injector.getInstance(typeof(ProtoLangConfig))
+		for (uri: protoLangConfig.baseURIs) {
+			interopLangConfig.addBaseUri(uri)
+		}		
 		register(injector);
 		return injector;
 	}
-
-	override Injector createInjector() {		
-		return Guice.createInjector(new InteropLangRuntimeModule(this.config));					
-	}
-	
+		
 	override register(Injector injector) {
 		if (!EPackage.Registry.INSTANCE.containsKey(ProtobufPackage.eNS_URI)) {
 			EPackage.Registry.INSTANCE.put(ProtobufPackage.eNS_URI, ProtobufPackage.eINSTANCE);

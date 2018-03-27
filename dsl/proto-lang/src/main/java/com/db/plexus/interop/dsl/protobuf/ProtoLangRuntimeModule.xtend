@@ -36,19 +36,7 @@ import com.db.plexus.interop.dsl.protobuf.scoping.ProtoLangGlobalScopeProvider
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 class ProtoLangRuntimeModule extends AbstractProtoLangRuntimeModule {
-	
-	private ProtoLangConfig config = new ProtoLangConfig()
-	
-	new() {
-		this(null)		
-	}
-	
-	new(ProtoLangConfig config) {
-		if (config !== null) {
-			this.config = config
-		}
-	}
-	
+		
 	// workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=495851
 	def void configureIPreferenceValuesProvider(Binder binder) {
 		binder.bind(IPreferenceValuesProvider).annotatedWith(FormatterPreferences).to(FormatterPreferenceValuesProvider)
@@ -67,7 +55,7 @@ class ProtoLangRuntimeModule extends AbstractProtoLangRuntimeModule {
 	} 	
 	
 	def configureProtoLangConfig(Binder binder) {		
-		binder.bind(typeof(ProtoLangConfig)).toInstance(this.config)		
+		binder.bind(typeof(ProtoLangConfig))		
 		binder.bind(typeof(ProtoLangImportResolver))		
 	}
 }

@@ -17,14 +17,14 @@
 
 syntax="proto3";
 
-package plexus.interop.test.interop;
+package com.db.plexus.interop.dsl.protobuf.tests.scoping;
 
 import "com/db/plexus/interop/dsl/protobuf/tests/scoping/test2.proto";
-import "com/db/plexus/interop/dsl/protobuf/tests/scoping/test3.proto";
+import "com/db/plexus/interop/dsl/protobuf/tests/scoping/scoping/test3.proto";
 
 message message1 {
   message2 field2 = 2;
-  interop.message3 field = 1;
+  scoping.message3 field = 1;
 }
 
 message message2 {

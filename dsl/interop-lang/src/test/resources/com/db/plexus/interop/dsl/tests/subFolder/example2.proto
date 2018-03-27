@@ -17,6 +17,8 @@
 
 syntax = "proto3";
 
+package com.db.plexus.interop.dsl.tests.subFolder;
+
 message Message2 {
 	message Message2 {
 	}
