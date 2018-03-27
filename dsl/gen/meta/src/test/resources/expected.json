@@ -94,7 +94,7 @@
 					"value": "interop.samples.ExampleService"
 				},
 				{
-					"id": "com.plexus.services.service_option_bool",
+					"id": "com.plexus.model.service_option_bool",
 					"value": "true"
 				}
 			]
@@ -114,7 +114,7 @@
 							"name": "ServerStreaming",
 							"options": [
 								{
-									"id": "com.plexus.services.consumed_method_option_enum",
+									"id": "com.plexus.model.consumed_method_option_enum",
 									"value": "VALUE2"
 								}
 							]

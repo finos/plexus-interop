@@ -27,6 +27,11 @@ class ProtoLangConfig {
 	
 	private boolean strictMode = true; 
 	
+	new() {
+		val baseResourceURI = URI.createURI(typeof(ClassLoader).getResource("/").toURI().toString())
+		baseURIs.add(baseResourceURI)		
+	}
+	
 	def Iterable<URI> getBaseURIs() {
 		baseURIs
 	}

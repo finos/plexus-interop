@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.db.plexus.interop.dsl.gen.metadata
+package com.db.plexus.interop.dsl.gen.metadata.tests
 
 import org.junit.runner.RunWith
-import org.eclipse.xtext.junit4.XtextRunner
-import org.eclipse.xtext.junit4.InjectWith
+import org.eclipse.xtext.testing.InjectWith
+import org.eclipse.xtext.testing.XtextRunner
 import com.google.inject.Inject
 import org.eclipse.xtext.resource.XtextResourceSet
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenerator
@@ -29,9 +29,10 @@ import org.junit.Test
 import java.nio.file.Files
 import java.nio.file.Paths
 import com.db.plexus.interop.dsl.gen.ResourceSetValidator
+import com.db.plexus.interop.dsl.tests.InteropLangInjectorProvider
 
 @RunWith(typeof(XtextRunner))
-@InjectWith(typeof(InteropLangInjectionProvider))
+@InjectWith(InteropLangInjectorProvider)
 class MetaJsonGeneratorTest {
 
     @Inject
@@ -42,14 +43,14 @@ class MetaJsonGeneratorTest {
 
     @Inject
     private MetaJsonGenerator outputGenerator;
-    
+            
     @Test
     def testFullContentGeneration() {
-    	
-        resourceSet.getResource(getURI("services.proto"), true)
-        resourceSet.getResource(getURI("messages.proto"), true)
-        resourceSet.getResource(getURI("ComponentA.interop"), true)
-        resourceSet.getResource(getURI("ComponentC.interop"), true)
+        	    
+        resourceSet.getResource(getURI("com/plexus/services/services.proto"), true)
+        resourceSet.getResource(getURI("com/plexus/model/messages.proto"), true)
+        resourceSet.getResource(getURI("com/plexus/components/ComponentA.interop"), true)
+        resourceSet.getResource(getURI("com/plexus/components/ComponentC.interop"), true)
         
         validator.validateResources(resourceSet)
 

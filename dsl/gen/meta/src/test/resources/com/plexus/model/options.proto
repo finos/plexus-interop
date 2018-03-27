@@ -15,19 +15,28 @@
 // limitations under the License.
 //
 
-import "services.proto";
-import "options.proto";
+syntax = "proto3";
 
-package com.plexus.components;
+package com.plexus.model;
 
-application ComponentA {
+import "interop/descriptor.proto";
+import "google/protobuf/descriptor.proto";
 
-        consumes com.plexus.services.ExampleService { PointToPoint; ServerStreaming [(services.consumed_method_option_enum)=VALUE2]; ClientToServer; BidiStreaming; }
+extend google.protobuf.MessageOptions {
+	double message_option_double = 10000;	
+}
 
-        provides com.plexus.services.ExampleService to com.plexus.* { 
-        	PointToPoint [launch_on_call=ALWAYS, title="Point-to-point"]; 
-        	ServerStreaming; 
-        	ClientToServer; 
-        	BidiStreaming [launch_on_call=DISABLED]; 
-        }
+extend google.protobuf.ServiceOptions {
+	string service_option_string = 10001;		
+	bool service_option_bool = 21000;
+}
+
+extend interop.ConsumedMethodOptions {
+	TestEnum consumed_method_option_enum = 10;
+}
+
+enum TestEnum {
+	VALUE1 = 1;
+	VALUE2 = 2;
+	VALUE3 = 3;
 }

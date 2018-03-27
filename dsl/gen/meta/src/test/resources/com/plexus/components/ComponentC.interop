@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-import "services.proto";
+import "com/plexus/services/services.proto";
 
 package com.plexus.components;
 
