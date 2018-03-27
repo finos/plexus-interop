@@ -11,7 +11,6 @@ export function simpleSpawn(execPath: string, args: string[] = []): Promise<void
             console.error(`${data}`);
         });
         child.on('exit', (code, signal) => {
-            console.log(`completed ${code} ${signal}`);
             if (code !== 0) {
                 reject(new Error(`Child process completed with error code: ${code}`));
             } else {

@@ -50,9 +50,6 @@
   "jest": {
     "testEnvironment": "node",
     "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine.js",
-    "transform": {
-      ".(ts|tsx|js)": "<rootDir>/../../configs/jest-preprocessor.js"
-    },
     "transformIgnorePatterns": [
       "<rootDir>(node_modules)/"
     ],

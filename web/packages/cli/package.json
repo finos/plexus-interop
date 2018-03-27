@@ -48,9 +48,6 @@
     },
     "jest": {
       "testEnvironment": "node",
-      "transform": {
-        ".(ts|tsx)": "<rootDir>/../../configs/jest-preprocessor.js"
-      },
       "moduleFileExtensions": [
         "ts",
         "js"

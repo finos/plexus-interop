@@ -4,7 +4,9 @@ import * as path from 'path';
 
 export function baseDir(): Option {
     return {
-        flags: '-b, --baseDir <baseDir>',
+        shortName: 'b',
+        longName: 'baseDir',
+        exampleValue: 'metadata',
         description: 'plexus metadata base directory',
         defaultValue: process.cwd()
     };
@@ -12,14 +14,18 @@ export function baseDir(): Option {
 
 export function plexusEntryPoint(): Option {
     return {
-        flags: '-i, --input <input>',
-        description: 'file containing Plexus Component\'s entry point, e.g. RateProvider.interop'
+        shortName: 'i',
+        longName: 'input',
+        exampleValue: 'plexus_application.interop',
+        description: 'file containing Plexus Component\'s entry point, e.g. rate_provider.interop'
     };
 }
 
 export function out(): Option {
     return {
-        flags: '-o, --out <out>',
+        shortName: 'o',
+        longName: 'output',
+        exampleValue: 'src/gen',
         description: 'output directory',
         defaultValue: path.join(process.cwd(), 'gen')
     };
@@ -27,7 +33,9 @@ export function out(): Option {
 
 export function namespace(): Option {
     return {
-        flags: '-n, --namespace <namespace>',
+        shortName: 'n',
+        longName: 'namespace',
+        exampleValue: 'plexus',
         description: 'generated message dtos namespace',
         defaultValue: `plexus`
     };

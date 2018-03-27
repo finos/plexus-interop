@@ -1,5 +1,5 @@
 import { Command } from './Command';
-import { Option } from './Option';
+import { Option, getFlags } from './Option';
 import * as commander from 'commander';
 
 export abstract class BaseCommand implements Command {
@@ -8,20 +8,41 @@ export abstract class BaseCommand implements Command {
     
     public abstract action(opts: any): Promise<void>;
 
-    public usageExamples: () => string | null = () => null;
+    public usageExamples = () => ` $ plexus ${this.name()} ${this.optionsExampleArgs().join(' ')}`;
 
     public options: () => Option[] = () => [];
 
+    public optionArgs = (optValues: any, separator?: string): string[] => {
+        return this.options().reduce<string[]>((seed, option) => {
+            const name = `--${option.longName}`;
+            const value = optValues[option.longName];
+            const optionArgs = !!separator ? [`${name}=${value}`] : [name, value];
+            return seed.concat(optionArgs);
+        }, []);
+    }
+
+    public optionsExampleArgs = () => {
+        return this.options().reduce<string[]>((seed, option) => {
+            return seed.concat([`-${option.shortName}`, option.exampleValue]);
+        }, []);
+    }
+
+    public log(msg: string, ...args: any[]): void {
+        console.log(`[${this.name()}] ${msg}`, args);
+    }
+
     public register(builder: commander.CommanderStatic): void {
         let commandBuilder = builder.command(this.name());
-        this.options().forEach(o => commandBuilder.option(o.flags, o.description, o.defaultValue));
+        this.options().forEach(o => commandBuilder.option(getFlags(o), o.description, o.defaultValue));
         commandBuilder = commandBuilder.action(opts => {
             // need to do it manually :(
             // https://github.com/tj/commander.js/issues/44
+            this.log('Validating input args');            
             this.validateRequiredOpts(opts);
+            this.log('Starting execution');
             this.action(opts)
-                .then(() => console.log('Command completed'))
-                .catch(e => console.error('Failed to execute', e));
+                .then(() => this.log('Completed successfully'))
+                .catch(e => this.fail(e));
         });
         const examples = this.usageExamples();
         if (examples) {
@@ -35,18 +56,9 @@ export abstract class BaseCommand implements Command {
         }
     }
     
-    public exit(error: any): void {
-        if (error) {
-            console.error('error: ', error);
-            process.exit(1);
-        } else {
-            console.log('Done!');
-            process.exit(0);
-        }
-    }
-
-    public log(msg: string, args?: any[]): void {
-        console.log(msg, args);
+    public fail(error: any): void {
+        this.log('Failed to execute', error);
+        process.exit(1);
     }
 
     private validateRequiredOpts(opts: any): void {
@@ -58,7 +70,7 @@ export abstract class BaseCommand implements Command {
                 const flags = o.flags;
                 const optName = flags.substring(flags.lastIndexOf('<') + 1, flags.lastIndexOf('>'));
                 if (opts[optName] === undefined) {
-                    this.exit(`'${o.flags}' option is not defined`);
+                    this.fail(`'${o.flags}' option is not defined`);
                 }
             });
         }
