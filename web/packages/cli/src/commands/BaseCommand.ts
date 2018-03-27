@@ -1,6 +1,7 @@
 import { Command } from './Command';
 import { Option, getFlags } from './Option';
 import * as commander from 'commander';
+import { verbose } from './DefaultOptions';
 
 export abstract class BaseCommand implements Command {
 
@@ -34,6 +35,8 @@ export abstract class BaseCommand implements Command {
     public register(builder: commander.CommanderStatic): void {
         let commandBuilder = builder.command(this.name());
         this.options().forEach(o => commandBuilder.option(getFlags(o), o.description, o.defaultValue));
+        const verboseOption = verbose();
+        commandBuilder = commandBuilder.option(getFlags(verboseOption), verboseOption.description, verboseOption.defaultValue);
         commandBuilder = commandBuilder.action(opts => {
             // need to do it manually :(
             // https://github.com/tj/commander.js/issues/44

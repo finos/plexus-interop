@@ -7,7 +7,6 @@ export class GenJsCommand implements Command {
         builder.command('gen-js')
             .option('--baseDir <baseDir>', 'Plexus Metadata base directory')
             .action((opts) => {
-
                 // tslint:disable-next-line:no-console
                 console.log(opts.baseDir);
             })

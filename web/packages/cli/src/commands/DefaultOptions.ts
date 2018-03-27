@@ -44,3 +44,14 @@ export function namespace(): Option {
         defaultValue: `plexus`
     };
 }
+
+export function verbose(): Option {
+    return {
+        shortName: 'v',
+        longName: 'verbose',
+        exampleValue: 'true',
+        isRequired: true, 
+        description: 'print verbose code generation output',
+        defaultValue: `false`
+    };
+}

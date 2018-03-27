@@ -1,14 +1,18 @@
 
 import { spawn } from 'child_process';
 
-export function simpleSpawn(execPath: string, args: string[] = []): Promise<void> {
+export function simpleSpawn(execPath: string, args: string[] = [], printOutput: boolean = false): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         const child = spawn(execPath, args);
         child.stdout.on('data', data => {
-            console.log(`${data}`);
+            if (printOutput) {
+                console.log(`${data}`);
+            }
         });
         child.stderr.on('data', (data) => {
-            console.error(`${data}`);
+            if (printOutput) {
+                console.error(`${data}`);
+            }
         });
         child.on('exit', (code, signal) => {
             if (code !== 0) {
