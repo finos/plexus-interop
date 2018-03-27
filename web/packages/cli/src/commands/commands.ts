@@ -1,8 +1,8 @@
 import { Command } from 'src/commands/Command';
 import { GenTsCommand } from './GenTsCommand';
-import { GenJsCommand } from './GenJsCommand';
 import { GenJsonCommand } from './GenJsonCommand';
+import { GenProtoCommand } from './GenProtoCommand';
 
 export function commands(): Command[] {
-    return [new GenTsCommand(), new GenJsCommand(), new GenJsonCommand()];
+    return [new GenTsCommand(), new GenJsonCommand(), new GenProtoCommand()];
 }
