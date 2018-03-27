@@ -41,6 +41,9 @@ import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
  */
 class ProtoLangValidator extends AbstractProtoLangValidator {
 	
+	private static final char DOT_CHAR = '.'
+	private static final char UNDERSCORE_CHAR = '_'
+	
 	@Inject
 	IContainer.Manager containermanager;
 
@@ -97,10 +100,29 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	}
 	
 	@Check
+	def checkProtoResourceName(Proto proto) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
+		val fileName = proto.eResource.URI.lastSegment
+		var isValid = true		
+		for (var i=0; isValid && i<fileName.length; i++) {			
+			val c = fileName.charAt(i)
+			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == UNDERSCORE_CHAR || c == DOT_CHAR
+			if (!isValid){
+				Character.isLowerCase(c)
+			}
+		}
+		if (!isValid) {
+			error('Resource name "' + fileName + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.', proto, ProtobufPackage.Literals.PROTO__ELEMENTS)		
+		}
+	}
+	
+	@Check
 	def checkProtoResourceLocation(Proto proto) {
 		if (!protoLangConfig.strictMode) {
-			return			
-		}			
+			return
+		}
 		val resource = proto.eResource
 		val name = this.qualifiedNameProvider.getFullyQualifiedName(proto)		
 		val segments = name.skipFirst(1).segments		
@@ -110,5 +132,5 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 			val candidates = this.importResolver.getResolveCandidates(importPath)
 			error('Resource folder do not correspond to its package name "' + name.skipFirst(1) + '". Valid locations for the resource: ' + candidates, proto, ProtobufPackage.Literals.PROTO__ELEMENTS)
 		}
-	}	
+	}		
 }

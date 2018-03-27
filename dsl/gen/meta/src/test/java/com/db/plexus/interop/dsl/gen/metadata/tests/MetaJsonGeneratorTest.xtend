@@ -49,8 +49,8 @@ class MetaJsonGeneratorTest {
         	    
         resourceSet.getResource(getURI("com/plexus/services/services.proto"), true)
         resourceSet.getResource(getURI("com/plexus/model/messages.proto"), true)
-        resourceSet.getResource(getURI("com/plexus/components/ComponentA.interop"), true)
-        resourceSet.getResource(getURI("com/plexus/components/ComponentC.interop"), true)
+        resourceSet.getResource(getURI("com/plexus/components/component_a.interop"), true)
+        resourceSet.getResource(getURI("com/plexus/components/component_c.interop"), true)
         
         validator.validateResources(resourceSet)
 
