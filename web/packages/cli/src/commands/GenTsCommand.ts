@@ -1,5 +1,6 @@
-import * as path from 'path';
-import { BaseJavaGenCommand } from 'src/commands/BaseJavaGenCommand';
+import { BaseJavaGenCommand } from './BaseJavaGenCommand';
+import { baseDir, plexusEntryPoint, out, namespace } from './DefaultOptions';
+import { Option } from './Option';
 
 export class GenTsCommand extends BaseJavaGenCommand {
     
@@ -9,27 +10,7 @@ export class GenTsCommand extends BaseJavaGenCommand {
 
     public name = () => 'gen-ts';
 
-    public options = () => [
-        {
-            flags: '-b, --baseDir <baseDir>',
-            description: 'plexus metadata base directory',
-            defaultValue: process.cwd()
-        },
-        {
-            flags: '-i, --input <input>',
-            description: 'file containing Plexus Component\'s entry point, e.g. RateProvider.interop'
-        },
-        {
-            flags: '-o, --out <out>',
-            description: 'output directory',
-            defaultValue: `${process.cwd()}${path.sep}gen`
-        },
-        {
-            flags: '-n, --namespace <namespace>',
-            description: 'generated message dtos namespace',
-            defaultValue: `plexus`
-        }
-    ]
+    public options: () => Option[] = () => [baseDir(), plexusEntryPoint(), out(), namespace()];
 
     public usageExamples = () => ` $ plexus ${this.name()} -b ./metadata -i RateProvider.interop -o ./src/gen`;
 

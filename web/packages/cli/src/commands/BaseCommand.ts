@@ -1,5 +1,5 @@
-import { Command } from 'src/commands/Command';
-import { Option } from 'src/commands/Option';
+import { Command } from './Command';
+import { Option } from './Option';
 import * as commander from 'commander';
 
 export abstract class BaseCommand implements Command {
