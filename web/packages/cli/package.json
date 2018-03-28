@@ -13,7 +13,7 @@
     "copy-assets": "copyfiles -f ../../../dsl/gen/cli/build/libs/cli-*-all.jar dist/lib",
     "rename-lib": "renamer --find cli-.*-all.jar --regex --replace plexusgen.jar dist/lib/* && trash dist/lib/cli-.*-all.jar",
     "build": "yarn build:main",
-    "postinstall": "node dist/main/src/install.js",
+    "postinstall": "npm run build:main && node dist/main/src/install.js",
     "postbuild": "yarn test",
     "build:main": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json",
