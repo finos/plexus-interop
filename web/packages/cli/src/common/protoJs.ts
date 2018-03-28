@@ -3,9 +3,11 @@ import { pbjs, pbts } from 'protobufjs/cli';
 
 export function genJsStaticModule(outFilePath: string, protoFiles: string[], namespace: string, verbose: boolean = false): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-        pbjs.main(['--force-long', '-t', 'static-module', '-w', 'commonjs', '-o', outFilePath, ...protoFiles], (error, output) => {
-            if (verbose) {
-                console.log(output);
+        pbjs.main(['--force-long', '-t', 'static-module', '-r', namespace, '-w', 'commonjs', '-o', outFilePath, ...protoFiles], (error, output) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
             }
             return {};
         });

@@ -46,6 +46,9 @@ export abstract class BaseCommand implements Command {
                 this.fail(errors.join('\n'));
             }
             this.log('Starting execution');
+            if (opts.verbose === 'true') {
+                this.log(`Passed options: ${this.optionValuesToString(opts)}`);
+            }
             this.action(opts)
                 .then(() => this.log('Completed successfully'))
                 .catch(e => this.fail(e));
@@ -65,6 +68,10 @@ export abstract class BaseCommand implements Command {
     public fail(error: any): void {
         this.log('Failed to execute', error);
         process.exit(1);
+    }
+
+    public optionValuesToString(opts: any): string {
+        return this.options().reduce<string>((seed, option) => `${seed} ${opts[option.longName]}`, '');
     }
 
     public validateRequiredOpts(options: Option[], commanderOpts: any): string[] {
