@@ -23,13 +23,14 @@
   },
   "dependencies": {
     "commander": "2.15.1",
-    "protobufjs": "6.8.0",
+    "grpc-tools": "1.6.6",
+    "mkdirp": "0.5.1",
     "progress": "2.0.0",
+    "protobufjs": "6.8.0",
     "request": "2.75.0",
     "rmdir": "1.2.0",
     "tar-fs": "1.13.2",
-    "unzipper": "0.8.11",
-    "mkdirp": "0.5.1"
+    "unzipper": "0.8.11"
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",

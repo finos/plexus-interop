@@ -14,12 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'src/commands/Command';
-import { GenTsCommand } from './GenTsCommand';
-import { GenJsonCommand } from './GenJsonCommand';
-import { GenProtoCommand } from './GenProtoCommand';
-import { GenCSharpCommand } from './GenCSharpCommand';
+import { getProtocExecPath } from '../src/common/protoc';
+import * as fs from 'fs';
+ 
+describe('Protoc discovery', () => {
 
-export function commands(): Command[] {
-    return [new GenTsCommand(), new GenJsonCommand(), new GenProtoCommand(), new GenCSharpCommand()];
-}
+    it('Discover protoc compiler from child module', async () => {
+        const path = await getProtocExecPath();
+        expect(fs.existsSync(path)).toBeTruthy();
+    });
+
+});

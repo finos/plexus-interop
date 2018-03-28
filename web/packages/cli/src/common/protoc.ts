@@ -14,12 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'src/commands/Command';
-import { GenTsCommand } from './GenTsCommand';
-import { GenJsonCommand } from './GenJsonCommand';
-import { GenProtoCommand } from './GenProtoCommand';
-import { GenCSharpCommand } from './GenCSharpCommand';
+import * as path from 'path';
 
-export function commands(): Command[] {
-    return [new GenTsCommand(), new GenJsonCommand(), new GenProtoCommand(), new GenCSharpCommand()];
+export async function getProtocExecPath(): Promise<string> {
+    if (process.env.PLEXUS_CLI_PROTOC_EXE_PATH) {
+        console.log(`Using protoc from env variable ${process.env.PLEXUS_CLI_PROTOC_EXE_PATH}`);
+        return process.env.PLEXUS_CLI_PROTOC_EXE_PATH;
+    }
+    const extension = process.platform === 'win32' ? '.exe' : '';
+    const indexJs = require.resolve('grpc-tools');
+    const parts = indexJs.split(path.sep);
+    parts.pop();
+    return path.join(...parts, 'bin', `protoc${extension}`);
 }

@@ -38,25 +38,25 @@ export function plexusEntryPoint(): Option {
     };
 }
 
-export function out(): Option {
+export function out(defaultValue: string = path.join(process.cwd(), 'gen')): Option {
     return {
         shortName: 'o',
         longName: 'out',
         exampleValue: 'src/gen',
         description: 'output directory',
         isRequired: true,
-        defaultValue: path.join(process.cwd(), 'gen')
+        defaultValue
     };
 }
 
-export function namespace(): Option {
+export function namespace(defaultValue: string = 'plexus'): Option {
     return {
         shortName: 'n',
         longName: 'namespace',
         exampleValue: 'plexus',
         isRequired: true,        
-        description: 'generated message dtos namespace',
-        defaultValue: `plexus`
+        description: 'namespace',
+        defaultValue
     };
 }
 
