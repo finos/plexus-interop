@@ -14,11 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.db.plexus.interop.dsl.gen.js
+package com.db.plexus.interop.dsl.gen.js.tests
 
-import org.eclipse.xtext.junit4.XtextRunner
-import org.eclipse.xtext.junit4.InjectWith
-import org.junit.runner.RunWith
 import com.google.inject.Inject
 import org.junit.Test
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
@@ -29,6 +26,11 @@ import com.db.plexus.interop.dsl.gen.GenUtils
 import java.nio.file.Files
 import java.nio.file.Paths
 import static org.junit.Assert.*;
+import com.db.plexus.interop.dsl.tests.InteropLangInjectionProvider
+import org.eclipse.xtext.testing.InjectWith
+import org.junit.runner.RunWith
+import org.eclipse.xtext.testing.XtextRunner
+import com.db.plexus.interop.dsl.gen.js.JsComponentApiGenerator
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))
@@ -57,7 +59,7 @@ class JsComponentApiGeneratorTest {
         val generatedResult = outputGenerator.generate(plexusConfig, apps.get(0),
         resourceSet.getResources())
         
-        val expectedURI = getStandardURI("com/db/plexus/interop/dsl/gen/js/expected.js")
+        val expectedURI = getStandardURI("com/db/plexus/interop/dsl/gen/js/tests/expected.js")
         val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))
 
 		Files.write(Paths.get("out.txt"), generatedResult.bytes)
