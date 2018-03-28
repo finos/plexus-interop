@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.db.plexus.gen.ts
+package com.db.plexus.interop.dsl.gen.ts.tests
 
 import org.junit.runner.RunWith
 import com.google.inject.Inject
@@ -28,10 +28,13 @@ import com.db.plexus.interop.dsl.gen.GenUtils
 import org.eclipse.xtext.testing.XtextRunner
 import com.db.plexus.interop.dsl.tests.InteropLangInjectionProvider
 import org.eclipse.xtext.testing.InjectWith
+import java.nio.file.Files
+import java.nio.file.Paths
+import static org.junit.Assert.*;
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))
-class TypescriptComponentApiGeneratorTest extends BaseCodeOutputGeneratorTest {
+class TypescriptComponentApiGeneratorTest {
 
     @Inject
     private XtextResourceSet resourceSet;
@@ -40,12 +43,12 @@ class TypescriptComponentApiGeneratorTest extends BaseCodeOutputGeneratorTest {
     TypescriptApplicationApiGenerator outputGenerator;
 
     @Test
-    def testFullContentGeneration() {
+    def void testFullContentGeneration() {
 
-        resourceSet.getResource(getURI("services.proto"), true)
-        resourceSet.getResource(getURI("messages.proto"), true)
-        resourceSet.getResource(getURI("ComponentA.interop"), true)
-        resourceSet.getResource(getURI("ComponentC.interop"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/services/services.proto"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/model/messages.proto"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_a.interop"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_c.interop"), true)
 
         val apps = GenUtils.getApplications(resourceSet.getResources())
 
@@ -54,13 +57,26 @@ class TypescriptComponentApiGeneratorTest extends BaseCodeOutputGeneratorTest {
         plexusConfig.externalDependencies = Arrays.asList("./plexus-messages")
 
         val generatedResult = outputGenerator.generate(plexusConfig, apps.get(0),
-            resourceSet.getResources())
+        resourceSet.getResources())
+        
+        val expectedURI = getStandardURI("com/db/plexus/interop/dsl/gen/ts/tests/expected.ts")
+        val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))
 
-        assertEqualsIgnoreWhiteSpaces(fullExpectedContent.toString, generatedResult)
+		Files.write(Paths.get("out.txt"), generatedResult.bytes)
+
+        assertEqualsIgnoreWhiteSpaces(expected, generatedResult)                    
     }
 
     def getURI(String file) {
-        return URI.createFileURI(typeof(ClassLoader).getResource("/" + file).toURI().getPath())
+        return URI.createFileURI(typeof(TypescriptComponentApiGeneratorTest).getResource("/" + file).toURI().getPath())
+    }
+    
+    def getStandardURI(String file) {
+        typeof(TypescriptComponentApiGeneratorTest).getResource("/" + file).toURI()
+    }    
+    
+    def assertEqualsIgnoreWhiteSpaces(String s1, String s2) {
+        assertEquals("Equals ignoring whitespaces", s1.replaceAll("\\s", ""), s2.replaceAll("\\s", ""))
     }
 
 }

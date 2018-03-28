@@ -1,48 +1,3 @@
-/**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
- * SPDX-License-Identifier: Apache-2.0
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package com.db.plexus.gen.ts
-
-import static org.junit.Assert.*;
-import org.eclipse.xtext.naming.IQualifiedNameConverter
-import org.eclipse.xtext.resource.IResourceServiceProvider
-import com.google.inject.Inject
-import org.eclipse.emf.ecore.resource.Resource
-
-class BaseCodeOutputGeneratorTest {
-
-    @Inject IResourceServiceProvider.Registry rspr
-    @Inject IQualifiedNameConverter converter
-
-    def void printExportedObjects(Resource resource) {
-        val resServiceProvider = rspr.getResourceServiceProvider(resource.URI)
-        val manager = resServiceProvider.getResourceDescriptionManager()
-        val description = manager.getResourceDescription(resource)
-        for(eod : description.exportedObjects) {
-            println(converter.toString(eod.qualifiedName))
-        }
-    }
-
-    def assertEqualsIgnoreWhiteSpaces(String s1, String s2) {
-        assertEquals("Equals ignoring whitespaces",
-        s1.replaceAll("\\s", ""),
-        s2.replaceAll("\\s", ""));
-    }
-
-    def fullExpectedContent() '''
 import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
@@ -56,13 +11,13 @@ import * as plexus from "./plexus-messages";
  */
 export abstract class ExampleServiceProxy {
 
-    public abstract pointToPoint(request: plexus.com.plexus.model.IRequest): Promise<plexus.com.plexus.model.IResponse>;
-
-    public abstract serverStreaming(request: plexus.com.plexus.model.IRequest, responseObserver: InvocationObserver<plexus.com.plexus.model.IResponse>): Promise<InvocationClient>;
-
-    public abstract clientToServer(responseObserver: InvocationObserver<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IRequest>>;
-
-    public abstract bidiStreaming(responseObserver: InvocationObserver<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IRequest>>;
+    public abstract pointToPoint(request: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>;
+    
+    public abstract serverStreaming(request: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest, responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): Promise<InvocationClient>;
+    
+    public abstract clientToServer(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest>>;
+    
+    public abstract bidiStreaming(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest>>;
 
 }
 
@@ -73,15 +28,15 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
 
     constructor(private readonly genericClient: GenericClientApi) { }
 
-    public pointToPoint(request: plexus.com.plexus.model.IRequest): Promise<plexus.com.plexus.model.IResponse> {
-        const requestToBinaryConverter = (from: plexus.com.plexus.model.IRequest) => Arrays.toArrayBuffer(plexus.com.plexus.model.Request.encode(from).finish());
+    public pointToPoint(request: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse> {
+        const requestToBinaryConverter = (from: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest) => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.com.plexus.model.Response.decode(new Uint8Array(from));
-            return plexus.com.plexus.model.Response.toObject(decoded);
+            const decoded = plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.decode(new Uint8Array(from));
+            return plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.toObject(decoded);
         };
         const invocationInfo: InvocationRequestInfo = {
             methodId: "PointToPoint",
-            serviceId: "com.plexus.services.ExampleService"
+            serviceId: "com.db.plexus.interop.dsl.gen.tests.services.ExampleService"
         };
         return new Promise((resolve, reject) => {
             this.genericClient.sendRawUnaryRequest(invocationInfo, requestToBinaryConverter(request), {
@@ -94,62 +49,62 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
             });
         });
     }
-
-    public serverStreaming(request: plexus.com.plexus.model.IRequest, responseObserver: InvocationObserver<plexus.com.plexus.model.IResponse>): Promise<InvocationClient> {
-        const requestToBinaryConverter = (from: plexus.com.plexus.model.IRequest) => Arrays.toArrayBuffer(plexus.com.plexus.model.Request.encode(from).finish());
+    
+    public serverStreaming(request: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest, responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): Promise<InvocationClient> {
+        const requestToBinaryConverter = (from: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest) => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.com.plexus.model.Response.decode(new Uint8Array(from));
-            return plexus.com.plexus.model.Response.toObject(decoded);
+            const decoded = plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.decode(new Uint8Array(from));
+            return plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.toObject(decoded);
         };
         const invocationInfo: InvocationRequestInfo = {
             methodId: "ServerStreaming",
-            serviceId: "com.plexus.services.ExampleService"
+            serviceId: "com.db.plexus.interop.dsl.gen.tests.services.ExampleService"
         };
         return this.genericClient.sendRawServerStreamingRequest(
             invocationInfo,
             requestToBinaryConverter(request),
-            new InvocationObserverConverter<plexus.com.plexus.model.IResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter));
+            new InvocationObserverConverter<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter));
     }
-
-    public clientToServer(responseObserver: InvocationObserver<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IRequest>> {
-        const requestToBinaryConverter = (from: plexus.com.plexus.model.IRequest) => Arrays.toArrayBuffer(plexus.com.plexus.model.Request.encode(from).finish());
+    
+    public clientToServer(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest>> {
+        const requestToBinaryConverter = (from: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest) => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.com.plexus.model.Response.decode(new Uint8Array(from));
-            return plexus.com.plexus.model.Response.toObject(decoded);
+            const decoded = plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.decode(new Uint8Array(from));
+            return plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.toObject(decoded);
         };
         const invocationInfo: InvocationRequestInfo = {
             methodId: "ClientToServer",
-            serviceId: "com.plexus.services.ExampleService"
+            serviceId: "com.db.plexus.interop.dsl.gen.tests.services.ExampleService"
         };
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
-            new InvocationObserverConverter<plexus.com.plexus.model.IResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
+            new InvocationObserverConverter<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
             .then(baseClient =>  {
                 return {
-                    next: (request: plexus.com.plexus.model.IRequest) => baseClient.next(requestToBinaryConverter(request)),
+                    next: (request: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest) => baseClient.next(requestToBinaryConverter(request)),
                     error: baseClient.error.bind(baseClient),
                     complete: baseClient.complete.bind(baseClient),
                     cancel: baseClient.cancel.bind(baseClient)
                 };
             });
     }
-
-    public bidiStreaming(responseObserver: InvocationObserver<plexus.com.plexus.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.plexus.model.IRequest>> {
-        const requestToBinaryConverter = (from: plexus.com.plexus.model.IRequest) => Arrays.toArrayBuffer(plexus.com.plexus.model.Request.encode(from).finish());
+    
+    public bidiStreaming(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest>> {
+        const requestToBinaryConverter = (from: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest) => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.com.plexus.model.Response.decode(new Uint8Array(from));
-            return plexus.com.plexus.model.Response.toObject(decoded);
+            const decoded = plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.decode(new Uint8Array(from));
+            return plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.toObject(decoded);
         };
         const invocationInfo: InvocationRequestInfo = {
             methodId: "BidiStreaming",
-            serviceId: "com.plexus.services.ExampleService"
+            serviceId: "com.db.plexus.interop.dsl.gen.tests.services.ExampleService"
         };
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
-            new InvocationObserverConverter<plexus.com.plexus.model.IResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
+            new InvocationObserverConverter<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
             .then(baseClient =>  {
                 return {
-                    next: (request: plexus.com.plexus.model.IRequest) => baseClient.next(requestToBinaryConverter(request)),
+                    next: (request: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest) => baseClient.next(requestToBinaryConverter(request)),
                     error: baseClient.error.bind(baseClient),
                     complete: baseClient.complete.bind(baseClient),
                     cancel: baseClient.cancel.bind(baseClient)
@@ -163,7 +118,7 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
  * Main client API
  *
  */
-export interface ComponentAClient extends GenericClientApi {
+export interface ComponentAClient extends GenericClientApi  {
 
     getExampleServiceProxy(): ExampleServiceProxy;
 
@@ -194,13 +149,13 @@ class ComponentAClientImpl extends GenericClientApiBase implements ComponentACli
  */
 export abstract class ExampleServiceInvocationHandler {
 
-    public abstract onPointToPoint(invocationContext: MethodInvocationContext, request: plexus.com.plexus.model.IRequest): Promise<plexus.com.plexus.model.IResponse>;
+    public abstract onPointToPoint(invocationContext: MethodInvocationContext, request: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>;
 
-    public abstract onServerStreaming(invocationContext: MethodInvocationContext, request: plexus.com.plexus.model.IRequest, hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): void;
+    public abstract onServerStreaming(invocationContext: MethodInvocationContext, request: plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest, hostClient: StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): void;
 
-    public abstract onClientToServer(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): InvocationObserver<plexus.com.plexus.model.IRequest>;
+    public abstract onClientToServer(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest>;
 
-    public abstract onBidiStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.com.plexus.model.IResponse>): InvocationObserver<plexus.com.plexus.model.IRequest>;
+    public abstract onBidiStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse>): InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.tests.model.IRequest>;
 
 }
 
@@ -213,21 +168,21 @@ class ExampleServiceInvocationHandlerInternal {
     public constructor(private readonly clientHandler: ExampleServiceInvocationHandler) {}
 
     public onPointToPoint(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.com.plexus.model.IResponse) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
+        const responseToBinaryConverter = (from: plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse) => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
-            return plexus.com.plexus.model.Request.toObject(decoded);
+            const decoded = plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.decode(new Uint8Array(from));
+            return plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.toObject(decoded);
         };
         return this.clientHandler
             .onPointToPoint(invocationContext, requestFromBinaryConverter(request))
             .then(response => responseToBinaryConverter(response));
     }
-
+    
     public onServerStreaming(invocationContext: MethodInvocationContext, request: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>): void {
-        const responseToBinaryConverter = (from: plexus.com.plexus.model.IResponse) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
+        const responseToBinaryConverter = (from: plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse) => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
-            return plexus.com.plexus.model.Request.toObject(decoded);
+            const decoded = plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.decode(new Uint8Array(from));
+            return plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.toObject(decoded);
         };
         this.clientHandler
             .onServerStreaming(invocationContext, requestFromBinaryConverter(request), {
@@ -237,12 +192,12 @@ class ExampleServiceInvocationHandlerInternal {
                 cancel: hostClient.cancel.bind(hostClient)
             });
     }
-
+    
     public onClientToServer(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): InvocationObserver<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.com.plexus.model.IResponse) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
+        const responseToBinaryConverter = (from: plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse) => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
-            return plexus.com.plexus.model.Request.toObject(decoded);
+            const decoded = plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.decode(new Uint8Array(from));
+            return plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.toObject(decoded);
         };
         const baseObserver = this.clientHandler
             .onClientToServer(invocationContext, {
@@ -258,12 +213,12 @@ class ExampleServiceInvocationHandlerInternal {
             streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
         };
     }
-
+    
     public onBidiStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): InvocationObserver<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.com.plexus.model.IResponse) => Arrays.toArrayBuffer(plexus.com.plexus.model.Response.encode(from).finish());
+        const responseToBinaryConverter = (from: plexus.com.db.plexus.interop.dsl.gen.tests.model.IResponse) => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.tests.model.Response.encode(from).finish());
         const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.com.plexus.model.Request.decode(new Uint8Array(from));
-            return plexus.com.plexus.model.Request.toObject(decoded);
+            const decoded = plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.decode(new Uint8Array(from));
+            return plexus.com.db.plexus.interop.dsl.gen.tests.model.Request.toObject(decoded);
         };
         const baseObserver = this.clientHandler
             .onBidiStreaming(invocationContext, {
@@ -288,8 +243,9 @@ class ExampleServiceInvocationHandlerInternal {
 export class ComponentAClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "com.plexus.components.ComponentA"
+        applicationId: "com.db.plexus.interop.dsl.gen.tests.components.ComponentA"
     };
+
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
     private exampleServiceHandler: ExampleServiceInvocationHandlerInternal;
@@ -325,7 +281,7 @@ export class ComponentAClientBuilder {
             .withClientDetails(this.clientDetails)
             .withUnaryInvocationHandler({
                 serviceInfo: {
-                    serviceId: "com.plexus.services.ExampleService"
+                    serviceId: "com.db.plexus.interop.dsl.gen.tests.services.ExampleService"
                 },
                 handler: {
                     methodId: "PointToPoint",
@@ -334,7 +290,7 @@ export class ComponentAClientBuilder {
             })
             .withServerStreamingInvocationHandler({
                 serviceInfo: {
-                    serviceId: "com.plexus.services.ExampleService"
+                    serviceId: "com.db.plexus.interop.dsl.gen.tests.services.ExampleService"
                 },
                 handler: {
                     methodId: "ServerStreaming",
@@ -343,7 +299,7 @@ export class ComponentAClientBuilder {
             })
             .withBidiStreamingInvocationHandler({
                 serviceInfo: {
-                    serviceId: "com.plexus.services.ExampleService"
+                    serviceId: "com.db.plexus.interop.dsl.gen.tests.services.ExampleService"
                 },
                 handler: {
                     methodId: "ClientToServer",
@@ -352,7 +308,7 @@ export class ComponentAClientBuilder {
             })
             .withBidiStreamingInvocationHandler({
                 serviceInfo: {
-                    serviceId: "com.plexus.services.ExampleService"
+                    serviceId: "com.db.plexus.interop.dsl.gen.tests.services.ExampleService"
                 },
                 handler: {
                     methodId: "BidiStreaming",
@@ -363,9 +319,6 @@ export class ComponentAClientBuilder {
             .then(genericClient => new ComponentAClientImpl(
                 genericClient,
                 new ExampleServiceProxyImpl(genericClient)
-            ));
+                ));
     }
-}
-
-    '''
 }

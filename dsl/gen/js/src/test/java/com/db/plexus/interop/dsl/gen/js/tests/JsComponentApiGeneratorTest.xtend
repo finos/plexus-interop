@@ -60,9 +60,7 @@ class JsComponentApiGeneratorTest {
         resourceSet.getResources())
         
         val expectedURI = getStandardURI("com/db/plexus/interop/dsl/gen/js/tests/expected.js")
-        val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))
-
-		Files.write(Paths.get("out.txt"), generatedResult.bytes)
+        val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))		
 
         assertEqualsIgnoreWhiteSpaces(expected, generatedResult)                    
     }
