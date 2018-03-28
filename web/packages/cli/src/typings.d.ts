@@ -5,3 +5,4 @@ declare module 'tar-fs';
 declare module 'request';
 declare module 'unzipper';
 declare module 'node-jvm';
+declare module 'mkdirp';
