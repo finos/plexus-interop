@@ -15,14 +15,22 @@
 // limitations under the License.
 //
 
-import "services.proto";
+syntax = "proto3";
 
-package com.plexus.components;
+package com.db.plexus.interop.dsl.gen.tests.model;
 
-application ComponentA {
+import "interop/options.proto";
 
-        consumes com.plexus.services.ExampleService { PointToPoint; ServerStreaming; ClientToServer; BidiStreaming; }
+message Request {
+	option (.interop.message_id) = "com.plexus.mode.Request";
+    string stringField = 1;
+    bool booleanField = 2;
+    sint32 sIntField = 3;
+    uint32 uIntField = 4;
+    Request requestField = 5;
+}
 
-        provides com.plexus.services.ExampleService to com.plexus.* { PointToPoint; ServerStreaming; ClientToServer; BidiStreaming; }
-
+message Response {
+	option (.interop.message_id) = "com.plexus.mode.Response";
+    string result = 1;
 }

@@ -34,7 +34,7 @@ import org.eclipse.xtext.validation.CheckMode
 import org.eclipse.xtext.util.CancelIndicator
 
 @RunWith(XtextRunner)
-@InjectWith(InteropLangInjectorProvider)
+@InjectWith(InteropLangInjectionProvider)
 class InteropLangParsingTest {
 	
 	@Inject

@@ -6,7 +6,7 @@ subprojects {
         compile "org.eclipse.xtext:org.eclipse.xtext.ecore:${xtextVersion}"    
 
 	testCompile project(':dsl:interop-lang')
-        testCompile group: 'junit', name: 'junit', version: '4.11'
+        testCompile group: 'junit', name: 'junit', version: '4.12'
         testCompile "org.eclipse.xtext:org.eclipse.xtext.junit4:${xtextJunitVersion}"
         testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
         testCompile "org.eclipse.xtext:org.eclipse.xtext.xbase.testing:${xtextVersion}"

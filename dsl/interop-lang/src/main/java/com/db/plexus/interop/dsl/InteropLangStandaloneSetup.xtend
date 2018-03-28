@@ -30,26 +30,44 @@ import org.eclipse.emf.ecore.EPackage
  * Initialization support for running Xtext languages without Equinox extension registry.
  */
 class InteropLangStandaloneSetup extends InteropLangStandaloneSetupGenerated {
-		
-	URI interopResourcesBaseUri
-		
-	new () {
-		interopResourcesBaseUri = URI.createURI(
-			ClassLoader.getSystemClassLoader().getResource(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH).toURI().toString()
-		).trimSegments(2).appendSegment("")		
+	
+	private Injector protoLangInjector
+	private Injector interopLangInjector
+	private ProtoLangConfig protoLangConfig
+	private ProtoLangConfig interopLangConfig
+	
+	def Injector getInteropLangInjector() { 
+		return interopLangInjector	
 	}
-			
+	
+	def Injector protoLangInjector() {
+		return protoLangInjector
+	}
+	
+	def void addBaseURI(URI baseURI) {
+		protoLangConfig.addBaseURI(baseURI)
+		interopLangConfig.addBaseURI(baseURI)
+	}
+	
+	def void removeBaseURI(URI baseURI) {
+		protoLangConfig.removeBaseURI(baseURI)
+		interopLangConfig.removeBaseURI(baseURI)		
+	}
+							
 	override createInjectorAndDoEMFRegistration() {
-		val protoInjector = new ProtoLangStandaloneSetup().createInjectorAndDoEMFRegistration();
-		val protoLangConfig = protoInjector.getInstance(typeof(ProtoLangConfig))
-		protoLangConfig.addBaseUri(interopResourcesBaseUri)
-		val injector = createInjector();
-		val interopLangConfig = injector.getInstance(typeof(ProtoLangConfig))
+		protoLangInjector = new ProtoLangStandaloneSetup().createInjectorAndDoEMFRegistration()
+		protoLangConfig = protoLangInjector.getInstance(typeof(ProtoLangConfig))
+		val interopResourcesBaseUri = URI.createURI(
+			ClassLoader.getSystemClassLoader().getResource(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH).toURI().toString()
+		).trimSegments(2).appendSegment("")				
+		protoLangConfig.addBaseURI(interopResourcesBaseUri)
+		interopLangInjector = createInjector();
+		interopLangConfig = interopLangInjector.getInstance(typeof(ProtoLangConfig))
 		for (uri: protoLangConfig.baseURIs) {
-			interopLangConfig.addBaseUri(uri)
+			interopLangConfig.addBaseURI(uri)
 		}		
-		register(injector);
-		return injector;
+		register(interopLangInjector);
+		return interopLangInjector;
 	}
 		
 	override register(Injector injector) {

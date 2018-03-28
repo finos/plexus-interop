@@ -16,8 +16,6 @@
  */
 package com.db.plexus.gen.ts
 
-import org.eclipse.xtext.junit4.XtextRunner
-import org.eclipse.xtext.junit4.InjectWith
 import org.junit.runner.RunWith
 import com.google.inject.Inject
 import org.junit.Test
@@ -27,6 +25,9 @@ import java.util.Arrays
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.emf.common.util.URI
 import com.db.plexus.interop.dsl.gen.GenUtils
+import org.eclipse.xtext.testing.XtextRunner
+import com.db.plexus.interop.dsl.tests.InteropLangInjectionProvider
+import org.eclipse.xtext.testing.InjectWith
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))

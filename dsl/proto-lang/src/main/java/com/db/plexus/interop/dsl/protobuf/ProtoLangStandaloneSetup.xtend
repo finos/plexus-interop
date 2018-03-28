@@ -39,7 +39,7 @@ class ProtoLangStandaloneSetup extends ProtoLangStandaloneSetupGenerated {
 		var protoResourcesBaseUri = URI.createURI(
 			ClassLoader.getSystemClassLoader().getResource(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH).toURI().toString()
 		).trimSegments(3).appendSegment("")
-		config.addBaseUri(protoResourcesBaseUri)
+		config.addBaseURI(protoResourcesBaseUri)
 		super.register(injector)			
 	}
 }

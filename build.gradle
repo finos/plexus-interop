@@ -1,18 +1,20 @@
 buildscript {
-    repositories {
-        jcenter()
+    repositories {        
         mavenCentral()
+	jcenter()
     }
 }
 
 allprojects {
-    repositories {
-        jcenter()
+    repositories {        
+        mavenCentral()
+	jcenter()
     }
 }
 
 subprojects {
-    repositories {
-        jcenter()
+    repositories {        
+        mavenCentral()
+	jcenter()
     }
 }

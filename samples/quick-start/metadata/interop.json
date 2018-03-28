@@ -20,6 +20,12 @@
 					"num": 3,
 					"primitive": false,
 					"type": "interop.AppLaunchMode"
+				},
+				{
+					"name": "suggested_app_instance_id",
+					"num": 4,
+					"primitive": false,
+					"type": "interop.UniqueId"
 				}
 			]
 		},

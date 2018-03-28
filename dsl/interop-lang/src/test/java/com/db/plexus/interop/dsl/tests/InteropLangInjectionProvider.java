@@ -14,40 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.db.plexus.interop.dsl.protobuf
+package com.db.plexus.interop.dsl.tests;
 
-import java.util.List
-import org.eclipse.emf.common.util.URI
-import java.util.LinkedList
-import com.google.inject.Singleton
+import org.eclipse.xtext.testing.IInjectorProvider;
 
-@Singleton
-class ProtoLangConfig {
-	
-	private List<URI> baseURIs = new LinkedList<URI>()
-	
-	private boolean strictMode = true; 
-	
-	def Iterable<URI> getBaseURIs() {
-		baseURIs
-	}
-	
-	def addBaseURI(URI uri) {
-		if (!baseURIs.contains(uri)) {
-			return baseURIs.add(uri)		
-		}
-		return false
-	}
-	
-	def removeBaseURI(URI uri) {
-		return baseURIs.remove(uri)
-	}
-	
-	def getStrictMode() {
-		return strictMode
-	}
-	
-	def setStrictMode(boolean value) {
-		strictMode = value
-	}
+import com.db.plexus.interop.dsl.InteropLangStandaloneSetup;
+import com.google.inject.Injector;
+
+public class InteropLangInjectionProvider implements IInjectorProvider {
+    @Override
+    public Injector getInjector() {
+        return new InteropLangStandaloneSetup().createInjectorAndDoEMFRegistration();
+    }
 }

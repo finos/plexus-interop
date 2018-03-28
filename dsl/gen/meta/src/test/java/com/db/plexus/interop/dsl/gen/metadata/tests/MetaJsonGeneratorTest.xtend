@@ -16,23 +16,23 @@
  */
 package com.db.plexus.interop.dsl.gen.metadata.tests
 
-import org.junit.runner.RunWith
-import org.eclipse.xtext.testing.InjectWith
-import org.eclipse.xtext.testing.XtextRunner
-import com.google.inject.Inject
-import org.eclipse.xtext.resource.XtextResourceSet
-import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenerator
-import org.eclipse.emf.common.util.URI
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
-import static org.junit.Assert.*;
-import org.junit.Test
+import com.db.plexus.interop.dsl.gen.ResourceSetValidator
+import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenerator
+import com.google.inject.Inject
 import java.nio.file.Files
 import java.nio.file.Paths
-import com.db.plexus.interop.dsl.gen.ResourceSetValidator
-import com.db.plexus.interop.dsl.tests.InteropLangInjectorProvider
+import org.eclipse.emf.common.util.URI
+import org.eclipse.xtext.resource.XtextResourceSet
+import org.eclipse.xtext.testing.InjectWith
+import org.eclipse.xtext.testing.XtextRunner
+import org.junit.Test
+import org.junit.runner.RunWith
 
-@RunWith(typeof(XtextRunner))
-@InjectWith(InteropLangInjectorProvider)
+import static org.junit.Assert.*
+
+@RunWith(XtextRunner)
+@InjectWith(InteropLangInjectionProvider)
 class MetaJsonGeneratorTest {
 
     @Inject
@@ -47,10 +47,10 @@ class MetaJsonGeneratorTest {
     @Test
     def testFullContentGeneration() {
         	    
-        resourceSet.getResource(getURI("com/plexus/services/services.proto"), true)
-        resourceSet.getResource(getURI("com/plexus/model/messages.proto"), true)
-        resourceSet.getResource(getURI("com/plexus/components/component_a.interop"), true)
-        resourceSet.getResource(getURI("com/plexus/components/component_c.interop"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/services/services.proto"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/model/messages.proto"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_a.interop"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_c.interop"), true)
         
         validator.validateResources(resourceSet)
 

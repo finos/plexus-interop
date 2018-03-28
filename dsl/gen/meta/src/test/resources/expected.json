@@ -1,7 +1,7 @@
 {
 	"messages": [
 		{
-			"id": "com.plexus.model.Request",
+			"id": "com.db.plexus.interop.dsl.gen.tests.model.Request",
 			"fields": [
 				{
 					"name": "stringField",
@@ -31,7 +31,7 @@
 					"name": "requestField",
 					"num": 5,
 					"primitive": false,
-					"type": "com.plexus.model.Request"
+					"type": "com.db.plexus.interop.dsl.gen.tests.model.Request"
 				}
 			],
 			"options": [
@@ -42,7 +42,7 @@
 			]
 		},
 		{
-			"id": "com.plexus.model.Response",
+			"id": "com.db.plexus.interop.dsl.gen.tests.model.Response",
 			"fields": [
 				{
 					"name": "result",
@@ -61,30 +61,30 @@
     ],
 	"services": [
 		{
-			"id": "com.plexus.services.ExampleService",
+			"id": "com.db.plexus.interop.dsl.gen.tests.services.ExampleService",
 			"methods": [
 				{
 					"name": "PointToPoint",
-					"request": "com.plexus.model.Request",
-					"response": "com.plexus.model.Response",
+					"request": "com.db.plexus.interop.dsl.gen.tests.model.Request",
+					"response": "com.db.plexus.interop.dsl.gen.tests.model.Response",
 					"type": "Unary"
 				},
 				{
 					"name": "ServerStreaming",
-					"request": "com.plexus.model.Request",
-					"response": "com.plexus.model.Response",
+					"request": "com.db.plexus.interop.dsl.gen.tests.model.Request",
+					"response": "com.db.plexus.interop.dsl.gen.tests.model.Response",
 					"type": "ServerStreaming"
 				},
 				{
 					"name": "ClientToServer",
-					"request": "com.plexus.model.Request",
-					"response": "com.plexus.model.Response",
+					"request": "com.db.plexus.interop.dsl.gen.tests.model.Request",
+					"response": "com.db.plexus.interop.dsl.gen.tests.model.Response",
 					"type": "ClientStreaming"
 				},
 				{
 					"name": "BidiStreaming",
-					"request": "com.plexus.model.Request",
-					"response": "com.plexus.model.Response",
+					"request": "com.db.plexus.interop.dsl.gen.tests.model.Request",
+					"response": "com.db.plexus.interop.dsl.gen.tests.model.Response",
 					"type": "DuplexStreaming"
 				}
 			],
@@ -94,7 +94,7 @@
 					"value": "interop.samples.ExampleService"
 				},
 				{
-					"id": "com.plexus.model.service_option_bool",
+					"id": "com.db.plexus.interop.dsl.gen.tests.model.service_option_bool",
 					"value": "true"
 				}
 			]
@@ -102,10 +102,10 @@
 	],
 	"applications": [
 		{
-			"id": "com.plexus.components.ComponentA",
+			"id": "com.db.plexus.interop.dsl.gen.tests.components.ComponentA",
 			"consumes": [
 				{
-					"service": "com.plexus.services.ExampleService",
+					"service": "com.db.plexus.interop.dsl.gen.tests.services.ExampleService",
 					"methods": [
 						{
 							"name": "PointToPoint"
@@ -114,7 +114,7 @@
 							"name": "ServerStreaming",
 							"options": [
 								{
-									"id": "com.plexus.model.consumed_method_option_enum",
+									"id": "com.db.plexus.interop.dsl.gen.tests.model.consumed_method_option_enum",
 									"value": "VALUE2"
 								}
 							]
@@ -130,7 +130,7 @@
 			],
 			"provides": [
 				{
-					"service": "com.plexus.services.ExampleService",
+					"service": "com.db.plexus.interop.dsl.gen.tests.services.ExampleService",
 					"methods": [
 						{
 							"name": "PointToPoint",
@@ -162,16 +162,16 @@
 						}
 					],
 					"to": [
-						"com.plexus.*"
+						"com.db.plexus.*"
 					]
 				}
 			]
 		},
 		{
-			"id": "com.plexus.components.ComponentC",
+			"id": "com.db.plexus.interop.dsl.gen.tests.components.ComponentC",
 			"provides": [
 				{
-					"service": "com.plexus.services.ExampleService",
+					"service": "com.db.plexus.interop.dsl.gen.tests.services.ExampleService",
 					"methods": [
 						{
 							"name": "PointToPoint"
@@ -187,7 +187,7 @@
 						}
 					],
 					"to": [
-						"com.plexus.*"
+						"com.db.plexus.*"
 					],
 					"options": [
 						{

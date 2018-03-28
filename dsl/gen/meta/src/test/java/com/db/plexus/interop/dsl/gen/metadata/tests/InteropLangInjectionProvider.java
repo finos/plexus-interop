@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.db.plexus.gen.ts;
+package com.db.plexus.interop.dsl.gen.metadata.tests;
+
+import org.eclipse.xtext.testing.IInjectorProvider;
 
 import com.db.plexus.interop.dsl.InteropLangStandaloneSetup;
 import com.google.inject.Injector;
-import org.eclipse.xtext.junit4.IInjectorProvider;
 
 public class InteropLangInjectionProvider implements IInjectorProvider {
     @Override

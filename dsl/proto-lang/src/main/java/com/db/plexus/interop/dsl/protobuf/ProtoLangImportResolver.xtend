@@ -72,13 +72,13 @@ class ProtoLangImportResolver {
 			} catch (Exception e) {
 			}
 		}
-//		try {
-//			val baseUri = URI.createURI(
-//				ClassLoader.getSystemClassLoader().getResource(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH).toURI().toString()).trimSegments(3).appendSegment("")
-//			val resolvedUri = uri.resolve(baseUri)			
-//			result.add(resolvedUri)
-//		} catch (Exception e) {
-//		}
+		try {
+			val resolvedUri = URI.createURI(ClassLoader.getSystemClassLoader().getResource(importString).toURI().toString())			
+			if (!result.contains(resolvedUri)) {
+				result.add(resolvedUri)
+			}
+		} catch (Exception e) {
+		}
 		return result
 	}
 	
