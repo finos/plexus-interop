@@ -21,6 +21,8 @@ import * as zlib from 'zlib';
 import * as tar from 'tar-fs';
 import * as request from 'request';
 import * as unzipper from 'unzipper';
+// to execute 'warmp up' of protobufjs cli at this point rather than on first execution
+import 'protobufjs/cli';
 
 export function downloadJre(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
