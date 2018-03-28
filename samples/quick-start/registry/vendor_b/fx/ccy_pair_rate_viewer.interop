@@ -15,14 +15,12 @@
 // limitations under the License.
 //
 
-package vendorA.fx;
+package vendor_b.fx;
 
 import "fx/ccy_pair_rate_service.proto";
 
-application CcyPairRateProvider {
+application CcyPairRateViewer {
 
-    provides .fx.CcyPairRateService {
-        GetRate [title = ".NET Provider - Get Rate"];
-    }
+    consumes .fx.CcyPairRateService from vendor_a.fx.CcyPairRateProvider { GetRate; }
 
 }

@@ -85,7 +85,7 @@ class ProtoLangImportResolver {
 	def private static isValidURI(ResourceSet resourceSet, URI uri) {
 		if (uri === null || uri.isEmpty()) {
 			return false;
-		}
+		}		
 		try {
 			if (resourceSet.getResource(uri, false) !== null) {
 				return true;

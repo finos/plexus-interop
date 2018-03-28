@@ -19,16 +19,11 @@
  */
 package com.db.plexus.interop.dsl.validation
 
-import org.eclipse.xtext.validation.Check
 import com.db.plexus.interop.dsl.ConsumedMethod
-import org.eclipse.xtext.EcoreUtil2
 import com.db.plexus.interop.dsl.DslPackage
 import com.db.plexus.interop.dsl.ProvidedMethod
-import com.db.plexus.interop.dsl.protobuf.Proto
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import com.google.inject.Inject
-import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
-import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.validation.Check
 
 /**
  * This class contains custom validation rules. 
@@ -36,12 +31,6 @@ import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 class InteropLangValidator extends AbstractInteropLangValidator {
-	
-	@Inject
-	IQualifiedNameProvider qualifiedNameProvider
-	
-	@Inject
-	ProtoLangImportResolver importResolver
 	
 	override def isLanguageSpecific() {
 		false

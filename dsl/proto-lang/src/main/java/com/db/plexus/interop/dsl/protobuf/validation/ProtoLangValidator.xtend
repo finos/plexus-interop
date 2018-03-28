@@ -113,7 +113,7 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 				Character.isLowerCase(c)
 			}
 		}
-		if (!isValid) {
+		if (!isValid) {			
 			error('Resource name "' + fileName + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.', proto, ProtobufPackage.Literals.PROTO__ELEMENTS)		
 		}
 	}
@@ -127,13 +127,14 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		var isValid = true		
 		for (var i=0; isValid && i<name.length; i++) {			
 			val c = name.charAt(i)
-			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == DOT_CHAR
+			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == UNDERSCORE_CHAR || c == DOT_CHAR
 			if (!isValid){
 				Character.isLowerCase(c)
 			}
 		}
 		if (!isValid) {
-			error('Package name "' + name + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.', ^package, ProtobufPackage.Literals.PACKAGE__IMPORTED_NAMESPACE)		
+			val message = 'Package name "' + name + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.'
+			error(message, ^package, ProtobufPackage.Literals.PACKAGE__IMPORTED_NAMESPACE)		
 		}
 	}
 	
@@ -141,15 +142,21 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	def checkProtoResourceLocation(Proto proto) {
 		if (!protoLangConfig.strictMode) {
 			return
-		}
+		}				
 		val resource = proto.eResource
 		val name = this.qualifiedNameProvider.getFullyQualifiedName(proto)		
 		val segments = name.skipFirst(1).segments		
 		val importPath = if (segments.length > 0) segments.join("/") + "/" + resource.URI.lastSegment else resource.URI.lastSegment
 		val resolvedUri = this.importResolver.resolveURI(resource.resourceSet, importPath)	
-		if (resolvedUri != resource.URI) {
+		if (resolvedUri === null) {
 			val candidates = this.importResolver.getResolveCandidates(importPath)
-			error('Resource folder do not correspond to its package name "' + name.skipFirst(1) + '". Valid locations for the resource: ' + candidates, proto, ProtobufPackage.Literals.PROTO__ELEMENTS)
+			val message = 'Resource folder do not correspond to its package name "' + name.skipFirst(1) + '". Valid locations for the resource: ' + candidates
+			var package = proto.elements.filter(typeof(Package)).findFirst[x|true]					
+			if (package === null) {
+				error(message, proto, ProtobufPackage.Literals.PROTO__ELEMENTS)
+			} else {
+				error(message, package, ProtobufPackage.Literals.PACKAGE__IMPORTED_NAMESPACE)
+			}
 		}
 	}		
 }

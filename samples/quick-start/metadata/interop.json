@@ -128,7 +128,7 @@
 			]
 		},
 		{
-			"id": "vendorA.fx.CcyPairRateProvider",
+			"id": "vendor_a.fx.CcyPairRateProvider",
 			"provides": [
 				{
 					"service": "fx.CcyPairRateService",
@@ -147,7 +147,7 @@
 			]
 		},
 		{
-			"id": "vendorA.fx.WebCcyPairRateProvider",
+			"id": "vendor_a.fx.WebCcyPairRateProvider",
 			"provides": [
 				{
 					"service": "fx.CcyPairRateService",
@@ -166,7 +166,7 @@
 			]
 		},
 		{
-			"id": "vendorB.fx.CcyPairRateViewer",
+			"id": "vendor_b.fx.CcyPairRateViewer",
 			"consumes": [
 				{
 					"service": "fx.CcyPairRateService",
@@ -176,13 +176,13 @@
 						}
 					],
 					"from": [
-						"vendorA.fx.CcyPairRateProvider"
+						"vendor_a.fx.CcyPairRateProvider"
 					]
 				}
 			]
 		},
 		{
-			"id": "vendorB.fx.WebCcyPairRateViewer",
+			"id": "vendor_b.fx.WebCcyPairRateViewer",
 			"consumes": [
 				{
 					"service": "fx.CcyPairRateService",
@@ -192,7 +192,7 @@
 						}
 					],
 					"from": [
-						"vendorA.fx.WebCcyPairRateProvider"
+						"vendor_a.fx.WebCcyPairRateProvider"
 					]
 				}
 			]

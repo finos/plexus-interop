@@ -40,7 +40,7 @@ class InteropLangStandaloneSetup extends InteropLangStandaloneSetupGenerated {
 		return interopLangInjector	
 	}
 	
-	def Injector protoLangInjector() {
+	def Injector getProtoLangInjector() {
 		return protoLangInjector
 	}
 	
@@ -57,10 +57,6 @@ class InteropLangStandaloneSetup extends InteropLangStandaloneSetupGenerated {
 	override createInjectorAndDoEMFRegistration() {
 		protoLangInjector = new ProtoLangStandaloneSetup().createInjectorAndDoEMFRegistration()
 		protoLangConfig = protoLangInjector.getInstance(typeof(ProtoLangConfig))
-		val interopResourcesBaseUri = URI.createURI(
-			ClassLoader.getSystemClassLoader().getResource(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH).toURI().toString()
-		).trimSegments(2).appendSegment("")				
-		protoLangConfig.addBaseURI(interopResourcesBaseUri)
 		interopLangInjector = createInjector();
 		interopLangConfig = interopLangInjector.getInstance(typeof(ProtoLangConfig))
 		for (uri: protoLangConfig.baseURIs) {

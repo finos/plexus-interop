@@ -19,11 +19,12 @@ package com.db.plexus.interop.dsl.gen.js.tests
 import com.db.plexus.interop.dsl.gen.GenUtils
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import com.db.plexus.interop.dsl.gen.js.JsComponentApiGenerator
+import com.db.plexus.interop.dsl.gen.test.InteropLangInjectionProvider
+import com.db.plexus.interop.dsl.gen.test.ResourceUtils
 import com.google.inject.Inject
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Arrays
-import org.eclipse.emf.common.util.URI
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
@@ -31,8 +32,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static org.junit.Assert.*
-import com.db.plexus.interop.dsl.gen.test.InteropLangInjectionProvider
-import com.db.plexus.interop.dsl.gen.test.ResourceUtils
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))

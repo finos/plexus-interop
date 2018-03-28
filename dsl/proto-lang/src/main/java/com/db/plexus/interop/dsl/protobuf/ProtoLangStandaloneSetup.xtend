@@ -20,7 +20,6 @@
 package com.db.plexus.interop.dsl.protobuf
 
 import com.google.inject.Injector
-import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 
 /**
@@ -35,11 +34,6 @@ class ProtoLangStandaloneSetup extends ProtoLangStandaloneSetupGenerated {
 		if (!EPackage.Registry.INSTANCE.containsKey(ProtobufPackage.eNS_URI)) {
 			EPackage.Registry.INSTANCE.put(ProtobufPackage.eNS_URI, ProtobufPackage.eINSTANCE);
 		}	
-		var config = injector.getInstance(typeof(ProtoLangConfig))
-		var protoResourcesBaseUri = URI.createURI(
-			ClassLoader.getSystemClassLoader().getResource(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH).toURI().toString()
-		).trimSegments(3).appendSegment("")
-		config.addBaseURI(protoResourcesBaseUri)
 		super.register(injector)			
 	}
 }
