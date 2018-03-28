@@ -22,7 +22,9 @@ import "com/db/plexus/interop/dsl/tests/subFolder/example2.proto";
 
 application App1 {
 
-	consumes Service1 as MyAlias from plexus.interop.*, interop.* {  Do; DoAgain; }
+	consumes Service1 from plexus.interop.*, interop.* {  Do; DoAgain; }
+	
+	consumes Service1 { Do; DoAgain; } as MyAlias from plexus.interop.*, interop.*;
 	
 	provides Service2 { 
 		Hello [title="Sample Hello Method"];

@@ -7,7 +7,7 @@ if not defined NUGET_PACKAGES (
 )
 set PROTOC_PATH=%NUGET_PACKAGES%\google.protobuf.tools\3.5.1\tools\windows_x86\protoc.exe
 
-set INTEROP_MANIFEST_PATH=GreetingServer.interop
+set INTEROP_MANIFEST_PATH=greeting_server.interop
 set CSHARP_NAMESPACE=internal_access:Plexus.Interop.Samples.GreetingServer.Generated
 set CSHARP_OUT=Generated
 

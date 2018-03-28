@@ -16,13 +16,17 @@
 //
 
 syntax = "proto3";
-import "Messages.proto";
 
 package com.plexus.services;
 
+import "messages.proto";
+import "options.proto";
+import "interop/options.proto";
+
 service ExampleService {
 
-    option (service_id)="interop.samples.ExampleService";
+    option (.interop.service_id)="interop.samples.ExampleService";
+    option (service_option_bool) = true;    
 
     rpc PointToPoint(com.plexus.model.Request) returns (com.plexus.model.Response) {}
 

@@ -29,5 +29,7 @@
         IReadOnlyCollection<IConsumedService> IApplication.ConsumedServices => ConsumedServices;
 
         IReadOnlyCollection<IProvidedService> IApplication.ProvidedServices => ProvidedServices;
+
+        public Maybe<LaunchMode> LaunchMode { get; set; }
     }
 }

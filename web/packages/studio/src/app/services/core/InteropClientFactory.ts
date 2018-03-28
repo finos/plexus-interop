@@ -64,8 +64,8 @@ export class InteropClientFactory {
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .forEach(pm => {
                 const fullName = this.fullName(pm);
-                const requestMarshaller = marshallerFactory.getMarshaller(pm.method.inputMessage.id);
-                const responseMarshaller = marshallerFactory.getMarshaller(pm.method.outputMessage.id);
+                const requestMarshaller = marshallerFactory.getMarshaller(pm.method.requestMessage.id);
+                const responseMarshaller = marshallerFactory.getMarshaller(pm.method.responseMessage.id);
                 switch (pm.method.type) {
                     case MethodType.Unary:
                         genericClientBuilder.withUnaryInvocationHandler(this.createUnaryHandler(pm, requestMarshaller, responseMarshaller, unaryHandlers));

@@ -32,10 +32,12 @@
 
         bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection);
 
-        Task<IAppConnection> SpawnConnectionAsync(string appId);
-
-        ValueTask<IAppConnection> GetOrSpawnConnectionAsync(IAppConnection source, IReadOnlyCollection<string> appId);
-
         IReadOnlyCollection<IAppConnection> GetOnlineConnections();
+        
+        IEnumerable<string> FilterCanBeLaunched(IEnumerable<string> appIds);
+
+        bool CanBeLaunched(string appId);
+
+        Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode);               
     }
 }

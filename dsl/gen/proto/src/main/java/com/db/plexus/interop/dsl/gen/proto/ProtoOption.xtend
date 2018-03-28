@@ -16,12 +16,14 @@
  */
 package com.db.plexus.interop.dsl.gen.proto
 
+import org.eclipse.xtext.naming.QualifiedName
+
 public class ProtoOption {
 			
-	private String name
+	private QualifiedName name
 	private String value
 	
-	new(String name, String value) {
+	new(QualifiedName name, String value) {
 		this.name = name
 		this.value = value
 	}

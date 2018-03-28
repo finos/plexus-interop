@@ -30,8 +30,7 @@ class MetaJsonGenTask extends BaseGenTask {
     MetaJsonGenerator generator
 
     override doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
-    	val resources = rs.resources
-        val str = generator.generate(config, resources.filter[r | !r.URI.toString().endsWith("/google/protobuf/descriptor.proto")].toList)
+        val str = generator.generate(config, rs)
         FileUtils.writeStringToFile(new File(config.outDir + "/interop.json"), str)
     }
 

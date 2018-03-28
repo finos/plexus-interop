@@ -21,9 +21,9 @@ import org.eclipse.emf.common.util.URI
 import java.util.LinkedList
 
 class ProtoLangConfig {
-	private List<URI> baseURIs = new LinkedList<URI>()	
-	
+	private List<URI> baseURIs = new LinkedList<URI>()
+
 	def List<URI> getBaseURIs() {
 		baseURIs
-	}		
+	}
 }

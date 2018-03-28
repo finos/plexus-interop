@@ -1,12 +1,111 @@
 {
+	"messages": [
+		{
+			"id": "interop.AppLaunchRequest",
+			"fields": [
+				{
+					"name": "app_id",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "launch_params_json",
+					"num": 2,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "launch_mode",
+					"num": 3,
+					"primitive": false,
+					"type": "interop.AppLaunchMode"
+				},
+				{
+					"name": "suggested_app_instance_id",
+					"num": 4,
+					"primitive": false,
+					"type": "interop.UniqueId"
+				}
+			]
+		},
+		{
+			"id": "interop.AppLaunchResponse",
+			"fields": [
+				{
+					"name": "app_instance_id",
+					"num": 1,
+					"primitive": false,
+					"type": "interop.UniqueId"
+				}
+			]
+		},
+		{
+			"id": "interop.ResolveAppRequest",
+			"fields": [
+				{
+					"name": "app_id",
+					"num": 1,
+					"primitive": true,
+					"type": "string"
+				},
+				{
+					"name": "app_resolve_mode",
+					"num": 2,
+					"primitive": false,
+					"type": "interop.AppLaunchMode"
+				}
+			]
+		},
+		{
+			"id": "interop.ResolveAppResponse",
+			"fields": [
+				{
+					"name": "app_instance_id",
+					"num": 1,
+					"primitive": false,
+					"type": "interop.UniqueId"
+				},
+				{
+					"name": "app_connection_id",
+					"num": 2,
+					"primitive": false,
+					"type": "interop.UniqueId"
+				},
+				{
+					"name": "is_new_instance_launched",
+					"num": 3,
+					"primitive": true,
+					"type": "bool"
+				}
+			]
+		},
+		{
+			"id": "interop.UniqueId",
+			"fields": [
+				{
+					"name": "lo",
+					"num": 1,
+					"primitive": true,
+					"type": "fixed64"
+				},
+				{
+					"name": "hi",
+					"num": 2,
+					"primitive": true,
+					"type": "fixed64"
+				}
+			]
+		}
+    ],
 	"services": [
 		{
 			"id": "interop.AppLauncherService",
 			"methods": [
 				{
 					"name": "Launch",
-					"input": "interop.AppLaunchRequest",
-					"output": "interop.AppLaunchResponse",
+					"request": "interop.AppLaunchRequest",
+					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
 				}
 			]
@@ -15,9 +114,9 @@
 			"id": "interop.AppLifecycleService",
 			"methods": [
 				{
-					"name": "ActivateApp",
-					"input": "interop.ActivateAppRequest",
-					"output": "interop.ActivateAppResponse",
+					"name": "ResolveApp",
+					"request": "interop.ResolveAppRequest",
+					"response": "interop.ResolveAppResponse",
 					"type": "Unary"
 				}
 			]
@@ -29,63 +128,55 @@
 			"consumes": [
 				{
 					"service": "interop.AppLauncherService",
-					"from": [
-					],
 					"methods": [
-						"Launch"
+						{
+							"name": "Launch"
+						}
 					]
 				}
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "interop.AppLifecycleService",
-		     		"title": "AppLifecycleService",
-		     		"to": [
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "ActivateApp",
-		     				"title": "ActivateApp"
-		     			}
-		     		]
-		     	}
-		     ]
-		  },
+			],
+			"provides": [
+				{
+					"service": "interop.AppLifecycleService",
+					"methods": [
+						{
+							"name": "ResolveApp"
+						}
+					]
+				}
+			]
+		},
 		{
 			"id": "interop.CommandLineTool",
 			"consumes": [
 				{
 					"service": "interop.AppLifecycleService",
+					"methods": [
+						{
+							"name": "ResolveApp"
+						}
+					],
 					"from": [
 						"interop.AppLifecycleManager"
-					],
-					"methods": [
-						"ActivateApp"
 					]
 				}
-		     ],
-		     "provides": [
-		     ]
-		  },
+			]
+		},
 		{
 			"id": "interop.NativeAppLauncher",
-			"consumes": [
-		     ],
-		     "provides": [
-		     	{
-		     		"service": "interop.AppLauncherService",
-		     		"title": "AppLauncherService",
-		     		"to": [
-		     			"plexus.interop.AppLifecycleManager"
-		     		],
-		     		"methods": [
-		     			{
-		     				"name": "Launch",
-		     				"title": "Launch"
-		     			}
-		     		]
-		     	}
-		     ]
-		  }
+			"provides": [
+				{
+					"service": "interop.AppLauncherService",
+					"methods": [
+						{
+							"name": "Launch"
+						}
+					],
+					"to": [
+						"plexus.interop.AppLifecycleManager"
+					]
+				}
+			]
+		}
 	]
 }

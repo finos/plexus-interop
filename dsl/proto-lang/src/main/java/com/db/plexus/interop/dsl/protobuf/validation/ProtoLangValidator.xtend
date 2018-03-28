@@ -25,10 +25,12 @@ import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 import com.google.inject.Inject
 import org.eclipse.xtext.resource.IContainer
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
-import org.eclipse.xtext.validation.INamesAreUniqueValidationHelper
 import com.db.plexus.interop.dsl.protobuf.NamedElement
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import com.db.plexus.interop.dsl.protobuf.Import
+import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
+import com.db.plexus.interop.dsl.protobuf.Field
 
 /**
  * This class contains custom validation rules. 
@@ -42,12 +44,12 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 
 	@Inject
 	ResourceDescriptionsProvider resourceDescriptionsProvider;
+		
+	@Inject
+	IQualifiedNameProvider qualifiedNameProvider;
 	
 	@Inject
-	private INamesAreUniqueValidationHelper helper;
-	
-	@Inject
-	private IQualifiedNameProvider qualifiedNameProvider;
+	ProtoLangImportResolver importResolver
 		
 	@Check
 	def checkSinglePackageDeclaration(Package ele) {		
@@ -68,6 +70,24 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 				}
 			}
 		}
+	}	
+	
+	@Check
+	def checkImport(Import ele) {
+		val path = ele.importURI
+		if (importResolver.resolveURI(ele.eResource.resourceSet, path) === null) {
+			val resolveCandidates = importResolver.getResolveCandidates(path)
+			error('Imported resource cannot be resolved: ' + path + '. The following candidates were checked: ' + resolveCandidates, ProtobufPackage.Literals.IMPORT__IMPORT_URI);			
+		}				
 	}
 	
+	@Check
+	def checkFieldNumbers(Field field) {
+		var fields = field.eContainer.eContents.filter(typeof(Field))
+		for (otherField: fields) {
+			if (otherField.number == field.number && !otherField.equals(field)) {
+				error('The same number assigned to field "' + otherField.name + '"', ProtobufPackage.Literals.FIELD__NUMBER)
+			}			
+		}
+	}	
 }

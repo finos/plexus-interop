@@ -26,5 +26,8 @@ namespace Plexus.Interop.Metamodel.Json.Internal
         
         [JsonProperty("methods")]
         public List<MethodDto> Methods { get; set; } = new List<MethodDto>();
+
+        [JsonProperty("options")]
+        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
     }
 }

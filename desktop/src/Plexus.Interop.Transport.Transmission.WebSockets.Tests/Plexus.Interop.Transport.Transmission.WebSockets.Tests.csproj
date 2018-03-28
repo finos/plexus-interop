@@ -5,9 +5,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     
-    <PlatformTarget Condition=" '$(OS)' == 'Windows_NT'">x86</PlatformTarget>
-    <PlatformTarget Condition=" '$(OS)' != 'Windows_NT'">x64</PlatformTarget>
-
     <IsPackable>false</IsPackable>
 
     <RootNamespace>Plexus.Interop.Transport.Transmission.WebSockets</RootNamespace>

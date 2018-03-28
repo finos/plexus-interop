@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ConsumedMethodDto } from "./ConsumedMethodDto";
+
 export interface ConsumedServiceDto {
     
     service: string;
     
     from: string[];
 
-    methods: string[];
+    methods: ConsumedMethodDto[];
 
     alias?: string;
 

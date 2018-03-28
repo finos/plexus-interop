@@ -68,5 +68,6 @@ class InteropLangRuntimeModule extends AbstractInteropLangRuntimeModule {
 
 	def configureProtoLangConfig(Binder binder) {
 		binder.bind(typeof(ProtoLangConfig)).toInstance(config);
+		binder.bind(typeof(InteropLangUtils))
 	}
 }

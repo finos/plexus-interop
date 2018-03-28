@@ -16,23 +16,22 @@
  */
 package com.db.plexus.interop.dsl.gen.js
 
-import com.db.plexus.interop.dsl.gen.CodeOutputGenerator
-import com.db.plexus.interop.dsl.gen.EntryPoint
-import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import com.db.plexus.interop.dsl.Application
-import java.util.List
-import org.eclipse.emf.ecore.resource.Resource
-import com.db.plexus.interop.dsl.gen.ApplicationCodeGenerator
-import static extension com.db.plexus.interop.dsl.gen.InteropLangUtils.*
-import com.google.inject.Inject
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import org.eclipse.emf.ecore.EObject
 import com.db.plexus.interop.dsl.ConsumedMethod
+import com.db.plexus.interop.dsl.gen.ApplicationCodeGenerator
+import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import com.db.plexus.interop.dsl.protobuf.Method
+import com.google.inject.Inject
+import java.util.List
 import javax.inject.Named
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+
+import static extension com.db.plexus.interop.dsl.gen.GenUtils.*
 
 @Named
-class JsComponentApiGenerator implements ApplicationCodeGenerator {
+class JsComponentApiGenerator extends ApplicationCodeGenerator {
 
     @Inject
     IQualifiedNameProvider qualifiedNameProvider
