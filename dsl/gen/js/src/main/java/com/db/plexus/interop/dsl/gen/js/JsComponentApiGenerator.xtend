@@ -49,8 +49,6 @@ class JsComponentApiGenerator extends ApplicationCodeGenerator {
         val consumedServices = app.getConsumedServices
         val providedServices = app.getProvidedServices
 
-        val namespace = genConfig.namespace
-
         '''
 «imports(genConfig)»
 

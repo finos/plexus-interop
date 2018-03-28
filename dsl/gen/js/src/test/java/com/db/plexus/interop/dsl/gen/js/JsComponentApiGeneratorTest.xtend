@@ -26,10 +26,13 @@ import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.emf.common.util.URI
 import java.util.Arrays
 import com.db.plexus.interop.dsl.gen.GenUtils
+import java.nio.file.Files
+import java.nio.file.Paths
+import static org.junit.Assert.*;
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))
-class JsComponentApiGeneratorTest extends BaseCodeOutputGeneratorTest {
+class JsComponentApiGeneratorTest {
 
     @Inject
     private XtextResourceSet resourceSet;
@@ -38,12 +41,12 @@ class JsComponentApiGeneratorTest extends BaseCodeOutputGeneratorTest {
     JsComponentApiGenerator outputGenerator;
 
     @Test
-    def testFullContentGeneration() {
+    def void testFullContentGeneration() {
 
-        resourceSet.getResource(getURI("services.proto"), true)
-        resourceSet.getResource(getURI("messages.proto"), true)
-        resourceSet.getResource(getURI("ComponentA.interop"), true)
-        resourceSet.getResource(getURI("ComponentC.interop"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/services/services.proto"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/model/messages.proto"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_a.interop"), true)
+        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_c.interop"), true)
 
         val apps = GenUtils.getApplications(resourceSet.getResources())
 
@@ -53,12 +56,24 @@ class JsComponentApiGeneratorTest extends BaseCodeOutputGeneratorTest {
 
         val generatedResult = outputGenerator.generate(plexusConfig, apps.get(0),
         resourceSet.getResources())
+        
+        val expectedURI = getStandardURI("com/db/plexus/interop/dsl/gen/js/expected.js")
+        val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))
 
-        assertEqualsIgnoreWhiteSpaces(fullExpectedContent.toString, generatedResult)
+		Files.write(Paths.get("out.txt"), generatedResult.bytes)
+
+        assertEqualsIgnoreWhiteSpaces(expected, generatedResult)                    
     }
 
     def getURI(String file) {
-        return URI.createFileURI(typeof(ClassLoader).getResource("/" + file).toURI().getPath())
+        return URI.createFileURI(typeof(JsComponentApiGeneratorTest).getResource("/" + file).toURI().getPath())
     }
-
+    
+    def getStandardURI(String file) {
+        typeof(JsComponentApiGeneratorTest).getResource("/" + file).toURI()
+    }    
+    
+    def assertEqualsIgnoreWhiteSpaces(String s1, String s2) {
+        assertEquals("Equals ignoring whitespaces", s1.replaceAll("\\s", ""), s2.replaceAll("\\s", ""))
+    }
 }
