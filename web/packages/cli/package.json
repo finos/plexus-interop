@@ -9,9 +9,9 @@
       "plexus": "./cli.js"
     },
     "scripts": {
-      "prebuild": "yarn lint && trash dist/main && npm run copy-assets && npm run rename-lib",
+      "prebuild": "yarn lint && trash dist/main && trash dist/lib && npm run copy-assets && npm run rename-lib",
       "copy-assets": "copyfiles -f ../../../dsl/gen/cli/build/libs/cli-*-all.jar dist/lib",
-      "rename-lib": "renamer --find cli-.*-all.jar --regex --replace plexusgen.jar dist/lib/*",
+      "rename-lib": "renamer --find cli-.*-all.jar --regex --replace plexusgen.jar dist/lib/* && trash dist/lib/cli-.*-all.jar",
       "build": "yarn build:main",
       "postinstall": "node dist/main/src/install.js",
       "postbuild": "yarn test",
