@@ -45,6 +45,10 @@ export function getJreBaseDir(downloadDir: string): string {
 }
 
 export async function getJavaExecPath(): Promise<string> {
+    if (process.env.PLEXUS_CLI_JAVA_EXE_PATH) {
+        console.log(`Using Java executable from env variable ${process.env.PLEXUS_CLI_JAVA_EXE_PATH}`);
+        return process.env.PLEXUS_CLI_JAVA_EXE_PATH;
+    }
     const baseDir = getJreBaseDir(getJreDownloadDir());
     const platform = os.platform();
     switch (platform) {

@@ -54,9 +54,10 @@ task preNpmBuild {
 }
 
 task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
-    // https://github.com/srs/gradle-node-plugin/issues/128
+    // https://github.com/srs/gradle-node-plugin/issues/128 
     environment = [
         'PLEXUS_BUILD_NPM_PACKAGE_VERSION': npmPackageVersion
+        'PLEXUS_BUILD_SKIP_JRE_DOWNLOAD': 'true'
     ]
     args =  ciPublishBuild ? ['run', 'ci-publish'] :
             ciFullBuild ? ['run', 'ci-build-e2e'] : 

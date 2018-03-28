@@ -66,5 +66,9 @@ export function downloadJre(): Promise<string> {
         }
     });
 }
-
-downloadJre();
+// tslint:disable-next-line:no-string-literal
+if (process.env.PLEXUS_BUILD_SKIP_JRE_DOWNLOAD !== 'true') {
+    downloadJre();
+} else {
+    console.log('JRE download skipped');
+}

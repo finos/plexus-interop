@@ -294,7 +294,7 @@
   version "1.5.3"
   resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/@types/loglevel/-/loglevel-1.5.3.tgz#adfce55383edc5998a2170ad581b3e23d6adb5b8"
 
-"@types/long@^3.0.31", "@types/long@^3.0.32":
+"@types/long@^3.0.31":
   version "3.0.32"
   resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
@@ -310,13 +310,13 @@
   version "6.0.96"
   resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/@types/node/-/node-6.0.96.tgz#7bf0bf40d6ce51e93762cc47d010c8cc5ebb2179"
 
-"@types/node@^7.0.18", "@types/node@^7.0.29", "@types/node@^7.0.5":
+"@types/node@^7.0.29", "@types/node@^7.0.5":
   version "7.0.52"
   resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/@types/node/-/node-7.0.52.tgz#8990d3350375542b0c21a83cd0331e6a8fc86716"
 
-"@types/node@^8.5.5":
-  version "8.5.9"
-  resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/@types/node/-/node-8.5.9.tgz#7155cfb4ae405bca4dd8df1a214c339e939109bf"
+"@types/node@^8.0.24":
+  version "8.10.0"
+  resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/@types/node/-/node-8.10.0.tgz#f5d649cc49af8ed6507d15dc6e9b43fe8b927540"
 
 "@types/q@^0.0.32":
   version "0.0.32"
@@ -3615,11 +3615,11 @@ electron-window@^0.8.0:
   dependencies:
     is-electron-renderer "^2.0.0"
 
-electron@1.7.12:
-  version "1.7.12"
-  resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/electron/-/electron-1.7.12.tgz#dcc61a2c1b0c3df25f68b3425379a01abd01190e"
+electron@1.8.3:
+  version "1.8.3"
+  resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/electron/-/electron-1.8.3.tgz#001416ea3a25ce594e317cb5531bc41eadd22f7f"
   dependencies:
-    "@types/node" "^7.0.18"
+    "@types/node" "^8.0.24"
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
@@ -8384,24 +8384,6 @@ protobufjs@6.8.0:
     "@protobufjs/utf8" "^1.1.0"
     "@types/long" "^3.0.31"
     "@types/node" "^7.0.29"
-    long "^3.2.0"
-
-protobufjs@^6.8.0:
-  version "6.8.4"
-  resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/protobufjs/-/protobufjs-6.8.4.tgz#183f90d1c4aca5f6b34a79eaedd0d89ad21f603b"
-  dependencies:
-    "@protobufjs/aspromise" "^1.1.2"
-    "@protobufjs/base64" "^1.1.2"
-    "@protobufjs/codegen" "^2.0.4"
-    "@protobufjs/eventemitter" "^1.1.0"
-    "@protobufjs/fetch" "^1.1.0"
-    "@protobufjs/float" "^1.0.2"
-    "@protobufjs/inquire" "^1.1.0"
-    "@protobufjs/path" "^1.1.2"
-    "@protobufjs/pool" "^1.1.0"
-    "@protobufjs/utf8" "^1.1.0"
-    "@types/long" "^3.0.32"
-    "@types/node" "^8.5.5"
     long "^3.2.0"
 
 protractor@~5.1.2:
