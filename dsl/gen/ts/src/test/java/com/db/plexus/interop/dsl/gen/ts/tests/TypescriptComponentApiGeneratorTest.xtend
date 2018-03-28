@@ -26,11 +26,12 @@ import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.emf.common.util.URI
 import com.db.plexus.interop.dsl.gen.GenUtils
 import org.eclipse.xtext.testing.XtextRunner
-import com.db.plexus.interop.dsl.tests.InteropLangInjectionProvider
 import org.eclipse.xtext.testing.InjectWith
 import java.nio.file.Files
 import java.nio.file.Paths
 import static org.junit.Assert.*;
+import com.db.plexus.interop.dsl.gen.test.InteropLangInjectionProvider
+import com.db.plexus.interop.dsl.gen.test.ResourceUtils
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))
@@ -45,10 +46,10 @@ class TypescriptComponentApiGeneratorTest {
     @Test
     def void testFullContentGeneration() {
 
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/services/services.proto"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/model/messages.proto"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_a.interop"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_c.interop"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/services.proto"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/messages.proto"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_c.interop"), true)
 
         val apps = GenUtils.getApplications(resourceSet.getResources())
 
@@ -59,21 +60,11 @@ class TypescriptComponentApiGeneratorTest {
         val generatedResult = outputGenerator.generate(plexusConfig, apps.get(0),
         resourceSet.getResources())
         
-        val expectedURI = getStandardURI("com/db/plexus/interop/dsl/gen/ts/tests/expected.ts")
-        val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))
-
-		Files.write(Paths.get("out.txt"), generatedResult.bytes)
+        val expectedURI = ResourceUtils.resolveStandardURI("com/db/plexus/interop/dsl/gen/ts/tests/expected.data")
+        val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))	
 
         assertEqualsIgnoreWhiteSpaces(expected, generatedResult)                    
     }
-
-    def getURI(String file) {
-        return URI.createFileURI(typeof(TypescriptComponentApiGeneratorTest).getResource("/" + file).toURI().getPath())
-    }
-    
-    def getStandardURI(String file) {
-        typeof(TypescriptComponentApiGeneratorTest).getResource("/" + file).toURI()
-    }    
     
     def assertEqualsIgnoreWhiteSpaces(String s1, String s2) {
         assertEquals("Equals ignoring whitespaces", s1.replaceAll("\\s", ""), s2.replaceAll("\\s", ""))

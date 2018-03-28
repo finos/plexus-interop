@@ -16,39 +16,41 @@
  */
 package com.db.plexus.interop.dsl.gen.js.tests
 
-import com.google.inject.Inject
-import org.junit.Test
-import com.db.plexus.interop.dsl.gen.PlexusGenConfig
-import org.eclipse.xtext.resource.XtextResourceSet
-import org.eclipse.emf.common.util.URI
-import java.util.Arrays
 import com.db.plexus.interop.dsl.gen.GenUtils
+import com.db.plexus.interop.dsl.gen.PlexusGenConfig
+import com.db.plexus.interop.dsl.gen.js.JsComponentApiGenerator
+import com.google.inject.Inject
 import java.nio.file.Files
 import java.nio.file.Paths
-import static org.junit.Assert.*;
-import com.db.plexus.interop.dsl.tests.InteropLangInjectionProvider
+import java.util.Arrays
+import org.eclipse.emf.common.util.URI
+import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.testing.InjectWith
-import org.junit.runner.RunWith
 import org.eclipse.xtext.testing.XtextRunner
-import com.db.plexus.interop.dsl.gen.js.JsComponentApiGenerator
+import org.junit.Test
+import org.junit.runner.RunWith
+
+import static org.junit.Assert.*
+import com.db.plexus.interop.dsl.gen.test.InteropLangInjectionProvider
+import com.db.plexus.interop.dsl.gen.test.ResourceUtils
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(InteropLangInjectionProvider))
 class JsComponentApiGeneratorTest {
-
+	
     @Inject
-    private XtextResourceSet resourceSet;
+    private XtextResourceSet resourceSet;      
 
     @Inject
     JsComponentApiGenerator outputGenerator;
-
+    
     @Test
     def void testFullContentGeneration() {
-
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/services/services.proto"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/model/messages.proto"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_a.interop"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_c.interop"), true)
+						
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/services.proto"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/messages.proto"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_c.interop"), true)
 
         val apps = GenUtils.getApplications(resourceSet.getResources())
 
@@ -56,23 +58,14 @@ class JsComponentApiGeneratorTest {
         plexusConfig.namespace = "plexus"
         plexusConfig.externalDependencies = Arrays.asList("./plexus-messages")
 
-        val generatedResult = outputGenerator.generate(plexusConfig, apps.get(0),
-        resourceSet.getResources())
+        val generatedResult = outputGenerator.generate(plexusConfig, apps.get(0), resourceSet.getResources())
         
-        val expectedURI = getStandardURI("com/db/plexus/interop/dsl/gen/js/tests/expected.js")
-        val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))		
+        val expectedURI = ResourceUtils.resolveStandardURI("com/db/plexus/interop/dsl/gen/js/tests/expected.data")
+        val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))       
 
         assertEqualsIgnoreWhiteSpaces(expected, generatedResult)                    
     }
-
-    def getURI(String file) {
-        return URI.createFileURI(typeof(JsComponentApiGeneratorTest).getResource("/" + file).toURI().getPath())
-    }
-    
-    def getStandardURI(String file) {
-        typeof(JsComponentApiGeneratorTest).getResource("/" + file).toURI()
-    }    
-    
+  
     def assertEqualsIgnoreWhiteSpaces(String s1, String s2) {
         assertEquals("Equals ignoring whitespaces", s1.replaceAll("\\s", ""), s2.replaceAll("\\s", ""))
     }

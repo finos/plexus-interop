@@ -17,10 +17,10 @@
 
 syntax = "proto3";
 
-package com.db.plexus.interop.dsl.gen.tests.services;
+package com.db.plexus.interop.dsl.gen.test.services;
 
-import "com/db/plexus/interop/dsl/gen/tests/model/messages.proto";
-import "com/db/plexus/interop/dsl/gen/tests/model/options.proto";
+import "com/db/plexus/interop/dsl/gen/test/model/messages.proto";
+import "com/db/plexus/interop/dsl/gen/test/model/options.proto";
 import "interop/options.proto";
 
 service ExampleService {
@@ -28,15 +28,15 @@ service ExampleService {
     option (.interop.service_id)="interop.samples.ExampleService";
     option (model.service_option_bool) = true;
 
-    rpc PointToPoint(com.db.plexus.interop.dsl.gen.tests.model.Request) returns (model.Response) {}
+    rpc PointToPoint(com.db.plexus.interop.dsl.gen.test.model.Request) returns (model.Response) {}
 
     // A server-to-client streaming RPC.
-    rpc ServerStreaming(tests.model.Request) returns (stream .com.db.plexus.interop.dsl.gen.tests.model.Response) {}
+    rpc ServerStreaming(test.model.Request) returns (stream .com.db.plexus.interop.dsl.gen.test.model.Response) {}
 
     // A client-to-server streaming RPC.
-    rpc ClientToServer(stream model.Request) returns (tests.model.Response) {}
+    rpc ClientToServer(stream model.Request) returns (test.model.Response) {}
 
     // A Bidirectional streaming RPC.
-    rpc BidiStreaming(stream .com.db.plexus.interop.dsl.gen.tests.model.Request) returns (stream dsl.gen.tests.model.Response) {}
+    rpc BidiStreaming(stream .com.db.plexus.interop.dsl.gen.test.model.Request) returns (stream dsl.gen.test.model.Response) {}
 
 }

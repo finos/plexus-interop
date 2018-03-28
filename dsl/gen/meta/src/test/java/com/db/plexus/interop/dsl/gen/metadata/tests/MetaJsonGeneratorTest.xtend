@@ -19,10 +19,11 @@ package com.db.plexus.interop.dsl.gen.metadata.tests
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import com.db.plexus.interop.dsl.gen.ResourceSetValidator
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenerator
+import com.db.plexus.interop.dsl.gen.test.InteropLangInjectionProvider
+import com.db.plexus.interop.dsl.gen.test.ResourceUtils
 import com.google.inject.Inject
 import java.nio.file.Files
 import java.nio.file.Paths
-import org.eclipse.emf.common.util.URI
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
@@ -47,35 +48,21 @@ class MetaJsonGeneratorTest {
     @Test
     def testFullContentGeneration() {
         	    
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/services/services.proto"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/model/messages.proto"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_a.interop"), true)
-        resourceSet.getResource(getURI("com/db/plexus/interop/dsl/gen/tests/components/component_c.interop"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/services.proto"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/messages.proto"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_c.interop"), true)
         
         validator.validateResources(resourceSet)
 
-        val expected = new String(Files.readAllBytes(Paths.get(getStandardURI("expected.json"))));
-
-        val generatedResult = outputGenerator.generate(new PlexusGenConfig(), resourceSet)
+        val expected = new String(Files.readAllBytes(Paths.get(ResourceUtils.resolveStandardURI("com/db/plexus/interop/dsl/gen/metadata/tests/expected.json"))));
+               
+        val generatedResult = outputGenerator.generate(new PlexusGenConfig(), resourceSet)       
 
         assertEqualsIgnoreWhiteSpaces(expected, generatedResult)
     }
 
-    def getURI(String file) {
-        return URI.createFileURI(getPath(file))
-    }
-
-    def getStandardURI(String file) {
-        typeof(ClassLoader).getResource("/" + file).toURI()
-    }
-
-    def getPath(String file) {
-        return getStandardURI(file).getPath()
-    }
-
     def assertEqualsIgnoreWhiteSpaces(String s1, String s2) {
-        assertEquals("Equals ignoring whitespaces",
-        s1.replaceAll("\\s", ""),
-        s2.replaceAll("\\s", ""));
+        assertEquals("Equals ignoring whitespaces", s1.replaceAll("\\s", ""), s2.replaceAll("\\s", ""))
     }
 }
