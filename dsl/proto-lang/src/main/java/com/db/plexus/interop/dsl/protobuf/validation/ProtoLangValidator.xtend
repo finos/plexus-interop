@@ -121,6 +121,9 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	
 	@Check
 	def checkFieldName(Field field) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
 		val name = field.name
 		var isValid = name.length > 0 && Character.isLetter(name.charAt(0))
 		for (var i=0; isValid && i<name.length; i++) {			
@@ -138,6 +141,9 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	
 	@Check
 	def checkDefinitionName(NamedElement ele) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
 		val name = ele.name
 		var isValid = name.length > 0 && Character.isLetter(name.charAt(0)) && Character.isUpperCase(name.charAt(0))
 		for (var i=0; isValid && i<name.length; i++) {			
@@ -155,6 +161,9 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	
 	@Check
 	def checkMethodName(Method ele) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
 		val name = ele.name
 		var isValid = name.length > 0 && Character.isLetter(name.charAt(0)) && Character.isUpperCase(name.charAt(0))
 		for (var i=0; isValid && i<name.length; i++) {			
