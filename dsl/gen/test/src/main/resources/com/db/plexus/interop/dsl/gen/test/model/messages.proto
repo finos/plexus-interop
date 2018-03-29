@@ -23,11 +23,11 @@ import "interop/options.proto";
 
 message Request {
 	option (.interop.message_id) = "com.plexus.mode.Request";
-    string stringField = 1;
-    bool booleanField = 2;
-    sint32 sIntField = 3;
-    uint32 uIntField = 4;
-    Request requestField = 5;
+    string string_field = 1;
+    bool boolean_field = 2;
+    sint32 sint_field = 3;
+    uint32 uint_field = 4;
+    Request request_field = 5;
 }
 
 message Response {

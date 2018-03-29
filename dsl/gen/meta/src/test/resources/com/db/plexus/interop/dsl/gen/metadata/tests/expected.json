@@ -4,31 +4,31 @@
 			"id": "com.db.plexus.interop.dsl.gen.test.model.Request",
 			"fields": [
 				{
-					"name": "stringField",
+					"name": "string_field",
 					"num": 1,
 					"primitive": true,
 					"type": "string"
 				},
 				{
-					"name": "booleanField",
+					"name": "boolean_field",
 					"num": 2,
 					"primitive": true,
 					"type": "bool"
 				},
 				{
-					"name": "sIntField",
+					"name": "sint_field",
 					"num": 3,
 					"primitive": true,
 					"type": "sint32"
 				},
 				{
-					"name": "uIntField",
+					"name": "uint_field",
 					"num": 4,
 					"primitive": true,
 					"type": "uint32"
 				},
 				{
-					"name": "requestField",
+					"name": "request_field",
 					"num": 5,
 					"primitive": false,
 					"type": "com.db.plexus.interop.dsl.gen.test.model.Request"
