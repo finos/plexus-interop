@@ -19,6 +19,6 @@ syntax="proto3";
 
 package com.db.plexus.interop.dsl.protobuf.tests.scoping;
 
-message message3 {
+message Message3 {
   string field = 1;
 }
