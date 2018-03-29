@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { downloadJre } from './common/java';
-// to execute 'warmp up' of protobufjs cli at this point rather than on first execution
-import 'protobufjs/cli';
-
-export function install(): void {
-    // tslint:disable-next-line:no-string-literal
-    if (process.env.PLEXUS_BUILD_SKIP_JRE_DOWNLOAD !== 'true') {
-        downloadJre();
-    } else {
-        console.log('JRE download skipped');
-    }
+const path = require('path');
+let install = null;
+try {
+    install = require(path.join(__dirname, 'dist/main/src/install')).install;    
+} catch (error) {
+    console.warn(`dist/main/src/install module is not available`);
+}
+if (install) {
+    install();
 }

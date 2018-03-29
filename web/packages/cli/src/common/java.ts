@@ -16,7 +16,18 @@
  */
 import * as path from 'path';
 import * as os from 'os';
-import { getDirectories } from './files';
+import { getDirectories, getDistDir } from './files';
+import { downloadPackage } from './download';
+
+export function downloadJre(): Promise<string> {
+    const url = getJreDownloadUrl();
+    const downloadDir = getJreDownloadDir();
+    const title = 'JRE';
+    return downloadPackage(url, downloadDir, title, {
+        connection: 'keep-alive',
+        Cookie: 'gpw_e24=http://www.oracle.com/; oraclelicense=accept-securebackup-cookie'
+    });
+}
 
 export function getJreDownloadUrl(): string {
     const platform = `${os.platform()}-${os.arch()}`;
@@ -62,7 +73,3 @@ export async function getJavaExecPath(): Promise<string> {
 export const getJreDownloadDir = () => path.join(getDistDir(), 'jre');
 
 export const getJavaGenLibPath = () => path.join(getDistDir(), 'lib', 'plexusgen.jar');
-
-function getDistDir(): string {
-    return path.normalize(path.join(__dirname, '..', '..', '..'));
-}

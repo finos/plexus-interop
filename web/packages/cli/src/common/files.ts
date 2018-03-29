@@ -19,6 +19,11 @@ import * as path from 'path';
 import * as rmdir from 'rmdir';
 import * as mrkdirp from 'mkdirp';
 
+
+export function getDistDir(): string {
+    return path.normalize(path.join(__dirname, '..', '..', '..'));
+}
+
 export function getDirectories(dirPath: string): string[] {
     return fs.readdirSync(dirPath).filter(
         file => fs.statSync(path.join(dirPath, file)).isDirectory()
