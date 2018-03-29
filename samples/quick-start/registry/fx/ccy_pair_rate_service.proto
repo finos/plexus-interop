@@ -20,11 +20,11 @@ syntax = "proto3";
 package fx;
 
 message CcyPair {
-    string ccyPairName = 1;
+    string ccy_pair_name = 1;
 }
 
 message CcyPairRate {
-    string ccyPairName = 1;
+    string ccy_pair_name = 1;
     double rate = 2;
 }
 

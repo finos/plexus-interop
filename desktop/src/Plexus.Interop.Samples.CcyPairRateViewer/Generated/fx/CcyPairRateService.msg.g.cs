@@ -41,13 +41,13 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer.Generated {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Ch5meC9jY3lfcGFpcl9yYXRlX3NlcnZpY2UucHJvdG8SAmZ4GhVpbnRlcm9w",
-            "L29wdGlvbnMucHJvdG8iLgoHQ2N5UGFpchITCgtjY3lQYWlyTmFtZRgBIAEo",
-            "CToOktsECmZ4LkNjeVBhaXIiRAoLQ2N5UGFpclJhdGUSEwoLY2N5UGFpck5h",
-            "bWUYASABKAkSDAoEcmF0ZRgCIAEoAToSktsEDmZ4LkNjeVBhaXJSYXRlMlgK",
-            "EkNjeVBhaXJSYXRlU2VydmljZRInCgdHZXRSYXRlEgsuZnguQ2N5UGFpchoP",
-            "LmZ4LkNjeVBhaXJSYXRlGhmS2wQVZnguQ2N5UGFpclJhdGVTZXJ2aWNlQjWq",
-            "AjJQbGV4dXMuSW50ZXJvcC5TYW1wbGVzLkNjeVBhaXJSYXRlVmlld2VyLkdl",
-            "bmVyYXRlZGIGcHJvdG8z"));
+            "L29wdGlvbnMucHJvdG8iMAoHQ2N5UGFpchIVCg1jY3lfcGFpcl9uYW1lGAEg",
+            "ASgJOg6S2wQKZnguQ2N5UGFpciJGCgtDY3lQYWlyUmF0ZRIVCg1jY3lfcGFp",
+            "cl9uYW1lGAEgASgJEgwKBHJhdGUYAiABKAE6EpLbBA5meC5DY3lQYWlyUmF0",
+            "ZTJYChJDY3lQYWlyUmF0ZVNlcnZpY2USJwoHR2V0UmF0ZRILLmZ4LkNjeVBh",
+            "aXIaDy5meC5DY3lQYWlyUmF0ZRoZktsEFWZ4LkNjeVBhaXJSYXRlU2Vydmlj",
+            "ZUI1qgIyUGxleHVzLkludGVyb3AuU2FtcGxlcy5DY3lQYWlyUmF0ZVZpZXdl",
+            "ci5HZW5lcmF0ZWRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Samples.CcyPairRateViewer.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
@@ -93,7 +93,7 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer.Generated {
       return new CcyPair(this);
     }
 
-    /// <summary>Field number for the "ccyPairName" field.</summary>
+    /// <summary>Field number for the "ccy_pair_name" field.</summary>
     public const int CcyPairNameFieldNumber = 1;
     private string ccyPairName_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -223,7 +223,7 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer.Generated {
       return new CcyPairRate(this);
     }
 
-    /// <summary>Field number for the "ccyPairName" field.</summary>
+    /// <summary>Field number for the "ccy_pair_name" field.</summary>
     public const int CcyPairNameFieldNumber = 1;
     private string ccyPairName_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
