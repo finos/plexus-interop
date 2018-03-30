@@ -23,21 +23,20 @@
   },
   "dependencies": {
     "commander": "2.15.1",
-    "mkdirp": "0.5.1",
     "progress": "2.0.0",
     "protobufjs": "6.8.0",
     "request": "2.75.0",
-    "rmdir": "1.2.0",
-    "tar-fs": "1.13.2",
+    "fs-extra": "5.0.0",
     "unzipper": "0.8.11",
-    "tar": "4.4.1",
-    "detect-libc": "1.0.3"
+    "tar-fs": "1.13.2",
+    "tar": "4.4.1"
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",
     "@types/jest": "^18.1.1",
     "@types/mocha": "^2.2.41",
     "@types/node": "^7.0.5",
+    "@types/fs-extra": "5.0.1",
     "chai": "^4.1.0",
     "jest": "^21.0.1",
     "copyfiles": "^1.2.0",

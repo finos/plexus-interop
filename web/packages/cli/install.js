@@ -19,7 +19,7 @@ let install = null;
 try {
     install = require(path.join(__dirname, 'dist/main/src/install')).install;    
 } catch (error) {
-    console.warn(`dist/main/src/install module is not available`);
+    console.warn(`Unable to load dist/main/src/install module`, error);
 }
 if (install) {
     install();

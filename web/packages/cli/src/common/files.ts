@@ -14,11 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as rmdir from 'rmdir';
-import * as mrkdirp from 'mkdirp';
-
 
 export function getDistDir(): string {
     return path.normalize(path.join(__dirname, '..', '..', '..'));
@@ -30,18 +27,12 @@ export function getDirectories(dirPath: string): string[] {
     );
 }
 
-export function deleteDirectory(dir: string): void {
-    rmdir(dir);
+export function removeSync(file: string): void {
+    fs.removeSync(file);
 }
 
 export function mkdirsSync(dir: string): void {
-    mrkdirp.sync(dir);
-}
-
-export function createIfNotExistSync(dir: string): void {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
+    fs.mkdirsSync(dir);
 }
 
 export async function listFiles(baseDir: string, pattern: RegExp): Promise<string[]> {
@@ -50,17 +41,33 @@ export async function listFiles(baseDir: string, pattern: RegExp): Promise<strin
     return result;
 }
 
-function iterateFiles(baseDir: string, pattern: RegExp, callback: (file: string) => void): void {
+export function iterateFiles(baseDir: string, pattern: RegExp, callback: (file: string) => void, recursive: boolean = true): void {
     if (!fs.existsSync(baseDir)) {
         return;
     }
     const files = fs.readdirSync(baseDir);
     files.forEach(f => {
         const fileName = path.join(baseDir, f);
-        if (fs.lstatSync(fileName).isDirectory()) {
+        if (isDirectory(fileName, false)) {
             iterateFiles(fileName, pattern, callback);
         } else if (pattern.test(fileName)) {
             callback(fileName);
         }
     });
+}
+
+function isDirectory(path: string, failOnPermissonError: boolean = true): boolean {
+    try {
+        return fs.lstatSync(path).isDirectory();
+    } catch (error) {
+        if (!failOnPermissonError && error.code === 'EPERM') {
+            return false;
+        } else {
+            throw error;
+        }
+    }
+}
+
+export function copyFile(source: string, target: string): Promise<void> {
+    return fs.copy(source, target);
 }

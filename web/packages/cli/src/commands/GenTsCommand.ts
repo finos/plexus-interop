@@ -21,7 +21,7 @@ import { BaseCommand } from './BaseCommand';
 import { simpleSpawn } from '../common/process';
 import { genJsStaticModule, genTsStaticModule } from '../common/protoJs';
 import * as path from 'path';
-import { deleteDirectory, mkdirsSync, listFiles } from '../common/files';
+import { removeSync, mkdirsSync, listFiles } from '../common/files';
 import { GenProtoCommand } from './GenProtoCommand';
 
 export class GenTsCommand extends BaseCommand {
@@ -51,7 +51,7 @@ export class GenTsCommand extends BaseCommand {
         await genJsStaticModule(jsFilePath, protoFiles, opts.namespace);
 
         this.log('Deleting proto definitions');
-        deleteDirectory(protoFilesDir);
+        removeSync(protoFilesDir);
 
         this.log('Generating proto messages TS definitions');
         const tsFileName = 'plexus-messages.d.ts';

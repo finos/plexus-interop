@@ -33,10 +33,10 @@ export function getJreDownloadUrl(): string {
     const platform = `${os.platform()}-${os.arch()}`;
     return process.env[`PLEXUS_JRE_DOWNLOAD_URL_${platform.toUpperCase()}`]
         || process.env.PLEXUS_JRE_DOWNLOAD_URL
-        || getDefaultDownloadUrlPlatform(platform);
+        || getDefaultDownloadUrl(platform);
 }
 
-export function getDefaultDownloadUrlPlatform(platform: string): string {
+function getDefaultDownloadUrl(platform: string): string {
     switch (platform) {
         case 'win32-x32':
             return 'http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jre-8u161-windows-i586.tar.gz';
@@ -70,6 +70,6 @@ export async function getJavaExecPath(): Promise<string> {
     }
 }
 
-export const getJreDownloadDir = () => path.join(getDistDir(), 'jre');
+const getJreDownloadDir = () => path.join(getDistDir(), 'jre');
 
 export const getJavaGenLibPath = () => path.join(getDistDir(), 'lib', 'plexusgen.jar');

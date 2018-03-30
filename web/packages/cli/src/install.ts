@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { downloadProtoc } from './common/protoc';
 import { downloadJre } from './common/java';
 // to execute 'warmp up' of protobufjs cli at this point rather than on first execution
 import 'protobufjs/cli';
@@ -21,8 +22,18 @@ import 'protobufjs/cli';
 export function install(): void {
     // tslint:disable-next-line:no-string-literal
     if (process.env.PLEXUS_BUILD_SKIP_JRE_DOWNLOAD !== 'true') {
-        downloadJre();
+        downloadJre()
+        .then(() => console.log('JRE downloaded'))
+        .catch(e => console.error('Failed to download JRE', e));
     } else {
         console.log('JRE download skipped');
+    }
+    // tslint:disable-next-line:no-string-literal
+    if (process.env.PLEXUS_BUILD_SKIP_PROTOC_DOWNLOAD !== 'true') {
+        downloadProtoc()
+            .then(() => console.log('protoc downloaded'))
+            .catch(e => console.error('Failed to download protoc', e));
+    } else {
+        console.log('protoc download skipped');
     }
 }

@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { deleteDirectory, mkdirsSync } from './files';
+import { removeSync, mkdirsSync } from './files';
 import { printProgress } from './progress';
 import * as zlib from 'zlib';
 import * as tar from 'tar-fs';
 import * as request from 'request';
+import * as path from 'path';
+import * as fs from 'fs';
 import * as unzipper from 'unzipper';
 
 export function downloadPackage(url: string, downloadDir: string, title: string = 'Package', headers: any = {}): Promise<string> {
@@ -28,7 +30,7 @@ export function downloadPackage(url: string, downloadDir: string, title: string 
             const isTarGz = url.endsWith('.tar.gz');
             console.log(`Downloading ${title} from: `, url);
             console.log('Target dir: ', downloadDir);
-            deleteDirectory(downloadDir);
+            removeSync(downloadDir);
             mkdirsSync(downloadDir);
             const basePipe = request
                 .get({
@@ -52,6 +54,9 @@ export function downloadPackage(url: string, downloadDir: string, title: string 
                 basePipe
                     .pipe(zlib.createUnzip())
                     .pipe(tar.extract(downloadDir));
+            } else {
+                const fileName = url.split('/').pop() as string;
+                basePipe.pipe(fs.createWriteStream(path.join(downloadDir, fileName)));
             }
         } catch (error) {
             console.error('Unexpected error', error);
