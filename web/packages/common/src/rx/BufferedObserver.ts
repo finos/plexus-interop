@@ -30,7 +30,7 @@ export class BufferedObserver<T> implements Observer<T> {
     private receivedError: any;
     private completed: boolean = false;
 
-    constructor(private readonly limit: number = 1024 * 10, private readonly log: Logger = LoggerFactory.getLogger("BufferedObserver")) {
+    constructor(readonly limit: number = 1024 * 10, private readonly log: Logger = LoggerFactory.getLogger("BufferedObserver")) {
         this.buffer = new LimitedBufferQueue<T>(limit);
     }
 

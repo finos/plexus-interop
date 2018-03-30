@@ -17,7 +17,6 @@
 import { GenericClientApiBuilder, GenericClientApi } from "../generic";
 import { ConnectionDetailsService } from "./ConnectionDetailsService";
 import { DefaultConnectionDetailsService } from "./DefaultConnectionDetailsService";
-import { LoggerFactory, Logger } from "@plexus-interop/common";
 import { UniqueId } from "@plexus-interop/transport-common";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 

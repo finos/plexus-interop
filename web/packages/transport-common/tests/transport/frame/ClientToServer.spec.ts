@@ -54,7 +54,7 @@ describe("Framed Transport Connection: Client to Server communication", () => {
     it("Can continue to send messages even if remote channel requested close", async () => {
 
         // tslint:disable-next-line:no-unused-variable
-        const { client, server, clientChannelsObserver, serverChannelsObserver } = await setupConnections();
+        const { client, server, serverChannelsObserver } = await setupConnections();
 
         const clientChannel = await client.createChannel();
 

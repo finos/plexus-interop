@@ -34,7 +34,7 @@ export class StateMaschineBase<T> implements StateMaschine<T> {
 
     private readonly stateDescriptorsMap: Map<T, StateDescriptor<T>> = new Map<T, StateDescriptor<T>>();
 
-    constructor(private current: T, private transitions: Transitions<T>, private logger: Logger = LoggerFactory.getLogger("StateMaschine")) {
+    constructor(private current: T, transitions: Transitions<T>, private logger: Logger = LoggerFactory.getLogger("StateMaschine")) {
         transitions.forEach(transition => {
             this.putIfAbsent(transition.from);
             this.putIfAbsent(transition.to);
