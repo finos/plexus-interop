@@ -110,9 +110,6 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		for (var i=0; isValid && i<fileName.length; i++) {			
 			val c = fileName.charAt(i)
 			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == UNDERSCORE_CHAR || c == DOT_CHAR
-			if (!isValid){
-				Character.isLowerCase(c)
-			}
 		}
 		if (!isValid) {			
 			error('Resource name "' + fileName + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.', proto, ProtobufPackage.Literals.PROTO__ELEMENTS)		
@@ -129,9 +126,6 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		for (var i=0; isValid && i<name.length; i++) {			
 			val c = name.charAt(i)
 			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == UNDERSCORE_CHAR
-			if (!isValid){
-				Character.isLowerCase(c)
-			}
 		}
 		if (!isValid) {
 			val message = 'Field name "' + name + '" is not valid. Only lower-case letters, digits and underscores allowed. First symbol must be lower-cased letter.'
@@ -149,9 +143,6 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		for (var i=0; isValid && i<name.length; i++) {			
 			val c = name.charAt(i)
 			isValid = Character.isLetter(c) || Character.isDigit(c)
-			if (!isValid){
-				Character.isLowerCase(c)
-			}
 		}
 		if (!isValid) {
 			val message = 'Name of ' + ele.eClass.name + ' "' + name + '" is not valid. Only letters and digits allowed. First symbol must be upper-cased letter.'
@@ -169,9 +160,6 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		for (var i=0; isValid && i<name.length; i++) {			
 			val c = name.charAt(i)
 			isValid = Character.isLetter(c) || Character.isDigit(c)
-			if (!isValid){
-				Character.isLowerCase(c)
-			}
 		}
 		if (!isValid) {
 			val message = 'Name of method "' + name + '" is not valid. Only letters and digits allowed. First symbol must be upper-cased letter.'
@@ -189,9 +177,6 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		for (var i=0; isValid && i<name.length; i++) {			
 			val c = name.charAt(i)
 			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == UNDERSCORE_CHAR || c == DOT_CHAR
-			if (!isValid){
-				Character.isLowerCase(c)
-			}
 		}
 		if (!isValid) {
 			val message = 'Package name "' + name + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.'
