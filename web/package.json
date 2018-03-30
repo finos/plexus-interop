@@ -12,7 +12,7 @@
     "prebuild": "run-s bootstrap",
     "build": "lerna run build --stream --concurrency 1",
     "prepublish-all": "node ./scripts/replace-auth-vars.js --publish && lerna exec -- cross-var shx cp $LERNA_ROOT_PATH/.npmrc .npmrc",
-    "publish-all": "lerna exec --stream --concurrency 1 -- npm publish --verbose --access=public",
+    "publish-all": "lerna exec --stream --scope {@plexus-interop/broker,@plexus-interop/cli,@plexus-interop/client,@plexus-interop/client-api,@plexus-interop/common,@plexus-interop/protocol,@plexus-interop/transport-common,@plexus-interop/websocket-transport} --concurrency 1 -- npm publish --verbose --access=public",
     "postpublish-all": "shx rm -rf .npmrc && lerna exec -- shx rm -rf .npmrc",
     "e2e-native": "cd ./packages/e2e && yarn e2e-native",
     "poste2e-native": "yarn coverage",
