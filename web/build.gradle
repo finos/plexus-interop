@@ -8,13 +8,13 @@ def ciPublishBuild = ciBuild && (System.env['APPVEYOR_REPO_TAG'] == "true" || Sy
 def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows();
 def e2eTestsEnabled = isWindows && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_WEB_TESTS'] != 'true'
 def ciFullBuild = ciBuild && e2eTestsEnabled
-def npmVersion = System.getenv("PLEXUS_BUILD_NPM_VERSION") ?: (System.getenv("APPVEYOR_REPO_TAG_NAME") ?: System.getenv("PackageVersion")) 
+def npmPackageVersion = System.getenv("PLEXUS_BUILD_NPM_PACKAGE_VERSION") ?: (System.getenv("APPVEYOR_REPO_TAG_NAME") ?: System.getenv("PackageVersion")) 
 
 node {
     version = '8.5.0'
+    npmVersion = '5.7.1'    
     nodeModulesDir = projectDir
     download = true
-    npmVersion = '5.7.1'
 }
 
 license {
@@ -41,7 +41,7 @@ task npmRunInstall(type: NpmTask) {
 
 task preNpmBuild {
     doLast {
-        println "NPM version: $npmVersion"
+        println "NPM version: $npmPackageVersion"
 	    println "CI Publish: $ciPublishBuild"
 	    println "CI Full: $ciFullBuild"
 	    println "CI Build: $ciBuild"
@@ -52,7 +52,7 @@ task preNpmBuild {
 task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
     // https://github.com/srs/gradle-node-plugin/issues/128
     environment = [
-        'PLEXUS_BUILD_NPM_VERSION': npmVersion
+        'PLEXUS_BUILD_NPM_PACKAGE_VERSION': npmPackageVersion
     ]
     args =  ciPublishBuild ? ['run', 'ci-publish'] :
             ciFullBuild ? ['run', 'ci-build-e2e'] : 
