@@ -21,7 +21,7 @@ import 'protobufjs/cli';
 
 export function install(): void {
     // tslint:disable-next-line:no-string-literal
-    if (process.env.PLEXUS_BUILD_SKIP_JRE_DOWNLOAD !== 'true') {
+    if (process.env.PLEXUS_CLI_SKIP_JRE_DOWNLOAD !== 'true') {
         downloadJre()
         .then(() => console.log('JRE downloaded'))
         .catch(e => console.error('Failed to download JRE', e));
@@ -29,7 +29,7 @@ export function install(): void {
         console.log('JRE download skipped');
     }
     // tslint:disable-next-line:no-string-literal
-    if (process.env.PLEXUS_BUILD_SKIP_PROTOC_DOWNLOAD !== 'true') {
+    if (process.env.PLEXUS_CLI_SKIP_PROTOC_DOWNLOAD !== 'true') {
         downloadProtoc()
             .then(() => console.log('protoc downloaded'))
             .catch(e => console.error('Failed to download protoc', e));
