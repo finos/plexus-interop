@@ -48,7 +48,6 @@ export async function downloadProtoc(): Promise<string> {
     return downloadDir;
 }
 
-
 export async function getProtocExecPath(): Promise<string> {
     if (process.env.PLEXUS_CLI_PROTOC_EXE_PATH) {
         console.log(`Using protoc from env variable ${process.env.PLEXUS_CLI_PROTOC_EXE_PATH}`);
