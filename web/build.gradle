@@ -35,28 +35,29 @@ task licenseFormatTS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
 tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
-task npmRunInstall(type: NpmTask, dependsOn: ':dsl:gen:cli:build') {
+task npmVersion(type: NpmTask) {
+    args = ['--version'];
+}
+
+task npmRunInstall(type: NpmTask, dependsOn: npmVersion) {
     args = ['install', '--no-package-lock'];
 }
 
 task preNpmBuild {
     doLast {
-
         println "NPM Package version: $npmPackageVersion"
 	    println "CI Publish: $ciPublishBuild"
 	    println "CI Full: $ciFullBuild"
 	    println "CI Build: $ciBuild"
 	    println "Integration tests: $e2eTestsEnabled"
-        
         File packagesDir = file('packages');
         FileCollection collection = files { packagesDir.listFiles() }
-
         println "\nModules to build:"
         collection.collect { relativePath(it) }.sort().each { println it }
     }
 }
 
-task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
+task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild', ':dsl:gen:cli:build']) {
     // https://github.com/srs/gradle-node-plugin/issues/128 
     environment = [
         'PLEXUS_BUILD_NPM_PACKAGE_VERSION': npmPackageVersion,
