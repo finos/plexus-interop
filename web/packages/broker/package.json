@@ -51,18 +51,18 @@
   "jest": {
     "testEnvironment": "node",
     "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine.js",
-    "transformIgnorePatterns": [
-      "<rootDir>(node_modules)/"
-    ],
     "moduleFileExtensions": [
       "ts",
       "js"
     ],
-    "testRegex": "<rootDir>(tests/).*\\.(test|spec)\\.(ts|js)$",
+    "testRegex": ".+/dist/main/tests/.+.spec.js$",
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
-      "src/**/*.ts",
-      "!src/**/*.d.ts"
+      "dist/main/src/**/*.js",
+      "!dist/main/src/gen/**/*.js",
+      "!src/*.d.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.spec.ts"
     ]
   }
 }
