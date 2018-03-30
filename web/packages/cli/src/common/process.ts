@@ -18,7 +18,9 @@ import { spawn } from 'child_process';
 
 export function simpleSpawn(execPath: string, args: string[] = [], printOutput: boolean = false): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-        const child = spawn(execPath, args);
+        const child = spawn(execPath, args, {
+            detached: true
+        });
         child.stdout.on('data', data => {
             if (printOutput) {
                 console.log(`${data}`);

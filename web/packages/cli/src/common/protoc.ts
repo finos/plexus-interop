@@ -39,7 +39,7 @@ export async function downloadProtoc(): Promise<string> {
         });
         console.log('Downloaded exe file', downloadedExe); 
         mkdirsSync(path.join(downloadDir, 'bin'));
-        const targetFile = path.join(downloadDir, 'bin', 'proto.exe');
+        const targetFile = path.join(downloadDir, 'bin', 'protoc.exe');
         console.log('Copying to', targetFile);        
         await copyFile(downloadedExe, targetFile);
         console.log(`Clearing ${downloadedExe}`);
