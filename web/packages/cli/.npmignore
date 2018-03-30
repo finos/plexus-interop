@@ -4,3 +4,5 @@ coverage
 .vscode
 *.log
 dist/jre
+dist/protoc
+dist/gen
