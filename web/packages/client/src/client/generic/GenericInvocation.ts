@@ -45,7 +45,7 @@ export class GenericInvocation {
     public constructor(
         private readonly sourceChannel: Channel,
         baseReadToken: CancellationToken = new CancellationToken(),
-        private readonly invocationTimeout: number = Defaults.OPERATION_TIMEOUT) {
+        private readonly invocationTimeout: number = -1) {
         this.readCancellationToken = new CancellationToken(baseReadToken);
         this.log = LoggerFactory.getLogger("Invocation");
         this.stateMachine = new StateMaschineBase<InvocationState>(InvocationState.CREATED, [
@@ -143,12 +143,6 @@ export class GenericInvocation {
         this.sourceChannel.sendMessage(headerPayload);
         this.sourceChannel.sendMessage(data);
         this.sentMessagesCounter++;
-    }
-
-    public async waitForState(state: InvocationState): Promise<void> {
-        this.log.trace(`Waiting for state ${state}`);
-        await this.waitForIt(() => this.stateMachine.is(state));
-        this.log.trace(`Waiting for state ${state} - DONE`);
     }
 
     // public methods below are NOT a part of API, for unit tests only
