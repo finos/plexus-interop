@@ -112,7 +112,8 @@ Now let us update CcyPairRateProvider app to provide real-time notifications.
 +
 [NOTE]
 ====
-Plexus Generator tool will generate interfaces and proxy classes from service descriptions. It uses https://github.com/google/protobuf/releases/latest[protobuf compiler] to generate C# message definitions from `.proto` files.
+Plexus Generator tool generates interfaces and proxy classes from service descriptions.
+Internally it uses https://github.com/google/protobuf/releases/latest[protobuf compiler] to generate C# message definitions from `.proto` files.
 ====
 
 . Open `Program.cs` file and update the code to provide implementation of the new method:
@@ -215,7 +216,7 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
 }
 -----
 
-. Re-build the app by executing the following command in `desktop\src\Plexus.Interop.Samples.CcyPairRateProvider` directory:
+. Re-build the app by executing the following command:
 [source, bash]
 -----
 dotnet build
@@ -224,6 +225,8 @@ dotnet build
 ====== Modify and build consumer app
 
 Now let us update "CCY Pair Rate Viewer" app to handle multiple incoming real-time updates.
+
+. Navigate to the `desktop/src/Plexus.Interop.Samples.CcyPairRateViewer` directory and call `Generate.cmd`
 
 . Navigate to the `desktop/src/Plexus.Interop.Samples.CcyPairRateViewer` directory, open `Program.cs` file and update the code to the following:
 +
@@ -300,7 +303,7 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer
 }
 -----
 
-. Re-build the app by executing the following command in `desktop\src\Plexus.Interop.Samples.CcyPairRateProvider` directory:
+. Re-build the app by executing the following command:
 [source, bash]
 -----
 dotnet build

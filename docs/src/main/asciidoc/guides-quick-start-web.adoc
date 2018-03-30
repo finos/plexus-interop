@@ -70,7 +70,7 @@ import "fx/ccy_pair_rate_service.proto";
 
 application WebCcyPairRateProvider {
     provides .fx.CcyPairRateService {
-        GetRateStream [method_title = "Web Provider - Get Rate Stream"];
+        GetRateStream [title = "Web Provider - Get Rate Stream"];
     }
 }
 -----
