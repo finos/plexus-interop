@@ -51,7 +51,7 @@ window.getRate = () => log("Not connected to Broker");
 
 new WebCcyPairRateViewerClientBuilder()
     .withClientDetails({
-        applicationId: "vendorB.fx.WebCcyPairRateViewer",
+        applicationId: "vendor_b.fx.WebCcyPairRateViewer",
         applicationInstanceId: instanceId
     })
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())

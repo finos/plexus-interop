@@ -1,5 +1,5 @@
 [NOTE]
 ====
-`plexus activate` command sends a request to *App Lifecycle Manager* to make some app up and running. App Lifecycle Manager is a part of the broker that
+`plexus launch` command sends a request to *App Lifecycle Manager* to make some app up and running. App Lifecycle Manager is a part of the broker that
 tracks which apps are alive and can create a new instance of an app if there is no live one. Different app types may have very different life cycles, so App Lifecycle Manager launches new app instances and tracks their status using *App Launchers*.
 ====
