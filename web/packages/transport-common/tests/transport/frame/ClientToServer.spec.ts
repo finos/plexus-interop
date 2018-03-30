@@ -89,20 +89,26 @@ describe("Framed Transport Connection: Client to Server communication", () => {
         clientChannelsObserver: BufferedObserver<TransportChannel>,
         serverChannelsObserver: BufferedObserver<TransportChannel>,
         payload: ArrayBuffer): Promise<void> {
+        // tslint:disable-next-line:no-console
         console.log("Creating channel");
         const clientChannel = await clientConnection.createChannel();
+        // tslint:disable-next-line:no-console
         console.log("Created channel");
         await new Promise<AnonymousSubscription>(
             (resolve, reject) => clientChannel.open(new DelegateChannelObserver(new LogObserver(undefined, clientChannel.uuid()), (s) => {
+                // tslint:disable-next-line:no-console
                 console.log("Client channel created");
                 resolve(s);
             })));
+        // tslint:disable-next-line:no-console
         console.log("Client channel created");
 
         await clientChannel.sendMessage(payload);
+        // tslint:disable-next-line:no-console
         console.log("Client sent message");
 
         const serverChannel = await serverChannelsObserver.pullData();
+        // tslint:disable-next-line:no-console
         console.log("Waiting for server chanel channel");
 
         const observer = new BufferedObserver<ArrayBuffer>();

@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, Channel, Defaults, ChannelObserver } from "@plexus-interop/transport-common";
+import { UniqueId, Channel, Defaults } from "@plexus-interop/transport-common";
 import { clientProtocol as plexus, SuccessCompletion, ErrorCompletion, ClientError, ClientProtocolUtils, InvocationMetaInfo } from "@plexus-interop/protocol";
 import { ClientProtocolHelper as modelHelper, ClientProtocolHelper } from "@plexus-interop/protocol";
 import { InvocationState } from "./InvocationState";
-import { Observer } from "@plexus-interop/common";
 import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
 import { StateMaschine, CancellationToken, Logger, LoggerFactory, StateMaschineBase, AsyncHelper } from "@plexus-interop/common";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
@@ -36,9 +35,6 @@ export class GenericInvocation {
     private sentMessagesCounter: number = 0;
 
     private sendCompletionReceived: boolean = false;
-
-
-    private sourceChannelSubscription: AnonymousSubscription;
 
     private metaInfo: InvocationMetaInfo;
 
@@ -246,7 +242,6 @@ export class GenericInvocation {
 
                 started: sourceSubscription => {
                     this.log.debug("Source channel subscription started");
-                    this.sourceChannelSubscription = sourceSubscription;
                     resolve(sourceSubscription);
                 },
 

@@ -238,12 +238,10 @@ function setupHostedInvocation(
         invocationCloseHandler(completion);
         return Promise.resolve(new SuccessCompletion());
     });
-
     when(mockInvocation.open(anything())).thenCall((observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>) => {
         setTimeout(() => {
             observer.started(new Subscription());
             setTimeout(() => {
-                requestObserver = observer;
                 for (let i = 0; i < requestMessagesCount; i++) {
                     observer.next(requestPayload);
                 }
