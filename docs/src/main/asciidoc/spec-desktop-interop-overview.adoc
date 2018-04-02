@@ -1,0 +1,9 @@
+:imagesdir: ./images
+
+Plexus Interop project aim is to define open standard for Desktop Interop - communication between apps on client
+desktops - and provide reference implementation of these standards.
+
+Desktop Interop standard only covers communication between applications running on client desktop in a single user
+session without crossing network boundaries. Client-server and server-server communication is out of Desktop Interop
+scope as well as communication between different users.
+

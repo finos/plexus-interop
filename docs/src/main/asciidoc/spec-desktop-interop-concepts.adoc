@@ -1,4 +1,11 @@
-==== Application
+:imagesdir: ./images
+
+Desktop Interop consist of several concepts. This section contains overview diagram which shows how different concepts
+are connected and provides brief description for each of them.
+
+image::desktop-interop-layers.png[]
+
+===== Application
 
 Application is a program on client desktop which can be started and stopped. Each application can provide services
 and/or consume services provided by other applications.
@@ -7,38 +14,28 @@ Application is not necessary correspond to OS process. It can be a part of proce
 Examples of applications:
 
 * A program with GUI
-
 * A program without GUI, e.g. Windows Service
-
 * A part of process, e.g. a plugin running in a big container application consisting of many isolated plugins
-
 * A web window or worker in Electron.js or other web container
 
-===== Application Instance
+====== Application Instance
 
 Application instance is a running (started) application. There can be many instances of the same application running
 simultaneously on client desktop.
 
-==== Interop Registry
+===== Interop Registry
 
-Interop registry defines strong-typed contracts for communication between applications on client desktop.
+Interop registry defines strong-typed contracts between applications on client desktop.
 
 It consist of definitions of the following types:
 
-===== Message Definition
+* Message definitions represent types of data which can be sent between applications.
+* Service definitions represent named sets of related methods which can be implemented by applications. Each service method
+is defined by its name, type, and types of request and response.
+* Application definitions declare which service implementations are provided and which consumed
+by each application participating in desktop interop.
 
-Message defines type of data which can be sent between applications.
-
-===== Service Definition
-
-Service defines set of related methods which can be implemented by application.
-Each method definition consist of its name, type, request and response message types.
-
-===== Application Definition
-
-Application manifest defines which service implementations are provided and which consumed by a certain application.
-
-==== Broker
+===== Broker
 
 Broker is the central part of desktop interop. Broker accepts, authenticates and tracks application (client) connections,
 validates and routes calls between them, and optionally can trigger launch of application on demand.
@@ -52,16 +49,30 @@ uniquely identifies each connection and tracks it, so it always knows which apps
 Online applications instances can send protocol requests to broker to discover or call service implementations provided
 by other applications. Broker validates and routes such calls to target applications according to interop registry.
 
-==== Client
+===== Client
 
 Client is a library used by application to connect to interop broker. Client can be implemented in any language,
-it communicates with broker according to transport and protocol specifications.
+it communicates with broker using interop protocol, transport protocol and wire protocols.
 
-==== Transport
+===== Interop Protocol
 
-Transport is an abstraction of wire for sending bytes between client and broker.
+Interop Protocol is a language for conversations between client and broker through transport channels.
 
-===== Connection
+It consist of 4 main types of conversations:
+
+* Connect handshake - the first conversation performed after new transport connection is established
+* Disconnect handshake - the last conversation performed before transport connection is closed
+* Discovery - request from application to broker to get the available services filtered by specific parameters
+* Method call - request from an application to call a method implemented in another application
+
+Each interop protocol conversation is performed within a separate transport channel and can complete with "Completed",
+"Canceled" or "Failed" statuses.
+
+===== Transport Protocol
+
+Transport protocol is used to send binary messages between client and broker.
+
+====== Transport Connection
 
 Transport connection is an abstraction of established connectivity between client and broker.
 
@@ -70,7 +81,7 @@ Connection is initiated by client and accepted by broker.
 Transport implementation must detect if the connection is still alive (e.g. by sending heartbeats)
 and raise "disconnected" event on both sides when connectivity is broken.
 
-===== Channel
+====== Transport Channel
 
 Transport channel is a logical unit of data exchange through connection. It consist of request and response
 byte streams on both sides of connection.
@@ -90,13 +101,7 @@ Channel considered "Completed" when both sides completed request stream and cons
 Additionally it can be terminated by either client or broker with either "Failed" or "Canceled" status in case of
 exception.
 
-==== Interop Protocol
+===== Wire Protocol
 
-Interop Protocol is a language used for conversations between client and broker through transport channels.
-
-It consist of 4 main types of conversations:
-
-* Connect handshake
-* Disconnect handshake
-* Discovery
-* Method call
+Wire protocol is an abstraction for sending bytes through cross-process boundaries. Any existing stream-based network
+protocol such as named pipe or websocket can be used as wire protocol.
