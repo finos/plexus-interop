@@ -17,7 +17,7 @@
 import { BaseJavaGenCommand } from './BaseJavaGenCommand';
 import { baseDir, out } from './DefaultOptions';
 import { Option } from './Option';
-import { getProtocExecPath } from 'src/common/protoc';
+import { getProtocExecPath } from '../common/protoc';
 
 export class GenJsonCommand extends BaseJavaGenCommand {
     

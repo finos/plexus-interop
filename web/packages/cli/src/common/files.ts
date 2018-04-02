@@ -50,6 +50,10 @@ export async function listFiles(baseDir: string, pattern: RegExp): Promise<strin
     return result;
 }
 
+export function readTextFile(filePath: string): Promise<string> {
+    return fs.readFile(filePath, 'utf8');
+}
+
 export function iterateFiles(baseDir: string, pattern: RegExp, callback: (file: string) => void, recursive: boolean = true): void {
     if (!fs.existsSync(baseDir)) {
         return;
