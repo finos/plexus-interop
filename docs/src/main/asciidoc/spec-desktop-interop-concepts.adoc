@@ -40,8 +40,8 @@ by each application participating in desktop interop.
 Broker is the central part of desktop interop. Broker accepts, authenticates and tracks application (client) connections,
 validates and routes calls between them, and optionally can trigger launch of application on demand.
 
-Broker listens to one or many transport servers to accept client connections. Applications can use any of the listened
-transports to establish connection with broker.
+Broker listens to one or many wire protocol servers to accept client connections. Applications can use any of the listened
+wire protocol implementations to establish connection with broker.
 
 Application instance is considered "online" while it has at least one established connection with broker. Broker
 uniquely identifies each connection and tracks it, so it always knows which apps are online in any given time.
