@@ -8,9 +8,10 @@ dependencies {
     	
 	compile project(':dsl:model')
 	compile project(':dsl:proto-lang')
-    	compile "org.eclipse.xtext:org.eclipse.xtext:${xtextVersion}"
-    	compile "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
-	compile "org.eclipse.xtext:org.eclipse.xtext.ecore:${xtextVersion}"    
+    compile "org.eclipse.xtext:org.eclipse.xtext:${xtextVersion}"
+    compile "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
+	compile "org.eclipse.xtext:org.eclipse.xtext.ecore:${xtextVersion}"
+
 }
 configurations {
     mwe2 {
@@ -42,4 +43,5 @@ task generateXtextLanguage(type: JavaExec) {
 
 generateXtext.dependsOn(generateXtextLanguage)
 clean.dependsOn(cleanGenerateXtextLanguage)
+build.dependsOn ':dsl:proto-lang:build'
 eclipse.classpath.plusConfigurations += [configurations.mwe2]

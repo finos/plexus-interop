@@ -37,8 +37,10 @@ subprojects {
         exclude "**/*.xtextbin"
         exclude "**/*.tokens"
         exclude "**/*.json"
+        exclude "**/xtext-gen/**"
+        exclude "**/xtend-gen/**"
         exclude "**/*/*._trace"
-	exclude "**/google/protobuf/*.proto"
+	    exclude "**/google/protobuf/*.proto"
         strictCheck true
     }
 
