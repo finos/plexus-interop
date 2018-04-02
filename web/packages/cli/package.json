@@ -38,7 +38,7 @@
     "@types/node": "^7.0.5",
     "@types/fs-extra": "5.0.1",
     "chai": "^4.1.0",
-    "jest": "^21.0.1",
+    "jest": "22.4.1",
     "copyfiles": "^1.2.0",
     "renamer": "^0.6.1",
     "trash": "^4.1.0",

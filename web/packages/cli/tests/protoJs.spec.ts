@@ -14,12 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getDistDir } from '../src/common/files';
+import { getPbJsExecPath } from '../src/common/protoJs';
+import { existSync } from '../src/common/files';
 
-describe('File utilities', () => {
+describe('ProtoJS compiler utilities', () => {
 
-    it('Returns dist folder', () => {
-        expect(getDistDir()).toMatch(/.+[\\\/]{1}dist/g);
-    });
+    it('It correctly locates pbjs exec path', () => {
+        const execPath = getPbJsExecPath();
+        console.log(execPath);
+        expect(existSync(execPath)).toBeTruthy();
+        expect(execPath.includes('pbjs')).toBeTruthy();
+    });    
 
 });

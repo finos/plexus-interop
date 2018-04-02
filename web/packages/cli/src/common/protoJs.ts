@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 import { pbjs, pbts } from 'protobufjs/cli';
+import * as os from 'os';
+import * as path from 'path';
+import { getBaseDir } from '../common/files';
 
 export function genJsStaticModule(outFilePath: string, protoFiles: string[], namespace: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -27,6 +30,10 @@ export function genJsStaticModule(outFilePath: string, protoFiles: string[], nam
             return {};
         });
     });
+}
+
+export function getPbJsExecPath(): string {
+    return path.resolve(getBaseDir(), 'node_modules', '.bin', os.platform() === 'win32' ? 'pbjs.cmd' : 'pbjs');
 }
 
 export function genTsStaticModule(outFilePath: string, jsGeneratedFilePath: string): Promise<void> {
