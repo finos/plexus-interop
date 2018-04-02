@@ -60,6 +60,8 @@ include::guides-system-requirements.adoc[]
 [[reference]]
 == Reference
 
+=== Desktop interop
+
 === App Registry
 include::spec-app-registry.adoc[]
 

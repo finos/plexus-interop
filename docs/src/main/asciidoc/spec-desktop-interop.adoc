@@ -1,0 +1,25 @@
+Plexus Interop project aim is to define open standards for Desktop Interop - communication between apps on client
+desktops - and provide reference implementation of these standards.
+
+Desktop Interop is unifying concept of communication between applications running on client desktop. Such client
+programs usually have servers associated with them, but communication between client and server, or between
+different servers, is not a subject of Desktop Interop which only defines communication between client parts running
+on user desktop in a single user session without crossing network boundaries.
+
+Traders and other professional users often have many different applications from different vendors running
+simultaneously on their desktops, so the main requirements for Desktop Interop standards are:
+
+- Allows using any possible technology used to build client desktop application
+- De-couples applications from each other allowing independent releases and dynamic discovery of available services
+- Defines strong-typed contracts between applications in a declarative way to simplify integration of applications written
+by different vendors using different technologies
+- Can be easily used in most restricted desktop environments without admin or other special permissions
+
+The Desktop Interop standard consist of several layers. For each layer we provide open specification and a reference
+implementation. Open specification for each layer allows replacing implementation of each layer independently.
+
+[NOTE]
+====
+The specifications below are not yet final and subject to change. We're aiming to release final version 1.0
+after discussions with community.
+====

@@ -1,0 +1,102 @@
+==== Application
+
+Application is a program on client desktop which can be started and stopped. Each application can provide services
+and/or consume services provided by other applications.
+
+Application is not necessary correspond to OS process. It can be a part of process, or consist of many processes.
+Examples of applications:
+
+* A program with GUI
+
+* A program without GUI, e.g. Windows Service
+
+* A part of process, e.g. a plugin running in a big container application consisting of many isolated plugins
+
+* A web window or worker in Electron.js or other web container
+
+===== Application Instance
+
+Application instance is a running (started) application. There can be many instances of the same application running
+simultaneously on client desktop.
+
+==== Interop Registry
+
+Interop registry defines strong-typed contracts for communication between applications on client desktop.
+
+It consist of definitions of the following types:
+
+===== Message Definition
+
+Message defines type of data which can be sent between applications.
+
+===== Service Definition
+
+Service defines set of related methods which can be implemented by application.
+Each method definition consist of its name, type, request and response message types.
+
+===== Application Definition
+
+Application manifest defines which service implementations are provided and which consumed by a certain application.
+
+==== Broker
+
+Broker is the central part of desktop interop. Broker accepts, authenticates and tracks application (client) connections,
+validates and routes calls between them, and optionally can trigger launch of application on demand.
+
+Broker listens to one or many transport servers to accept client connections. Applications can use any of the listened
+transports to establish connection with broker.
+
+Application instance is considered "online" while it has at least one established connection with broker. Broker
+uniquely identifies each connection and tracks it, so it always knows which apps are online in any given time.
+
+Online applications instances can send protocol requests to broker to discover or call service implementations provided
+by other applications. Broker validates and routes such calls to target applications according to interop registry.
+
+==== Client
+
+Client is a library used by application to connect to interop broker. Client can be implemented in any language,
+it communicates with broker according to transport and protocol specifications.
+
+==== Transport
+
+Transport is an abstraction of wire for sending bytes between client and broker.
+
+===== Connection
+
+Transport connection is an abstraction of established connectivity between client and broker.
+
+Connection is initiated by client and accepted by broker.
+
+Transport implementation must detect if the connection is still alive (e.g. by sending heartbeats)
+and raise "disconnected" event on both sides when connectivity is broken.
+
+===== Channel
+
+Transport channel is a logical unit of data exchange through connection. It consist of request and response
+byte streams on both sides of connection.
+
+Channel opening can be initiated by both client and broker. It's only possible to write and read bytes to/from
+an opened channel. Many channels can be simultaneously opened in the context of the same connection.
+
+For example, for each call from one application to another, 2 transport channels are opened. First is opened by source
+application to broker. Second is opened by broker to target application. All the data sent in context of the call
+is transferred through these 2 channels.
+
+Bytes written to request stream on one side of channel can be read in exactly the same order from response stream
+on another side. As soon as one of the sides sent all the data it closes request stream. This triggers
+response stream completion event on another side as soon as all the sent bytes consumed.
+
+Channel considered "Completed" when both sides completed request stream and consumed all the bytes from response stream.
+Additionally it can be terminated by either client or broker with either "Failed" or "Canceled" status in case of
+exception.
+
+==== Interop Protocol
+
+Interop Protocol is a language used for conversations between client and broker through transport channels.
+
+It consist of 4 main types of conversations:
+
+* Connect handshake
+* Disconnect handshake
+* Discovery
+* Method call
