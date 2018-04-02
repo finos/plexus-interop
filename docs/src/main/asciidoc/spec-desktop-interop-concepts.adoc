@@ -70,7 +70,8 @@ Each interop protocol conversation is performed within a separate transport chan
 
 ===== Transport Protocol
 
-Transport protocol is used to send binary messages between client and broker.
+Transport protocol is used to send binary messages between client and broker and is responsible for multiplexing and
+de-multiplexing to allow opening many channels simultaneously through a single connection.
 
 ====== Transport Connection
 
@@ -104,4 +105,8 @@ exception.
 ===== Wire Protocol
 
 Wire protocol is an abstraction for sending bytes through cross-process boundaries. Any existing stream-based network
-protocol such as named pipe or websocket can be used as wire protocol.
+protocol such as named pipe or websocket can be used as wire protocol for Desktop Interop.
+
+Broker can listen to many wire protocols simultaneously on different addresses. Each client can choose one of wire
+protocols supported by broker. Usually for native apps it's more convenient to use named pipes and for web apps it's
+more convenient to use websockets because most of browsers has native support for them.
