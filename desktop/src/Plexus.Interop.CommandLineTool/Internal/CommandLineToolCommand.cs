@@ -19,6 +19,6 @@
     internal enum CommandLineToolCommand
     {
         None,
-        ActivateApp
+        LaunchApp
     }
 }

@@ -27,7 +27,6 @@ import com.db.plexus.interop.dsl.gen.csharp.CsharpProtoGenTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenTask;
 import com.db.plexus.interop.dsl.gen.ts.TsGenTask;
 import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask;
-import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig;
 import com.google.inject.Injector;
 
 import java.io.File;
@@ -51,9 +50,9 @@ public class Main {
         Path workDirPath = Paths.get("").toAbsolutePath();
         URI workDir = URI.createFileURI(workDirPath.toString()).appendSegment("");
         URI baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
-        ProtoLangConfig config = new ProtoLangConfig();
-        config.getBaseURIs().add(baseDir);
-        final Injector injector = new InteropLangStandaloneSetup(config).createInjectorAndDoEMFRegistration();
+        final InteropLangStandaloneSetup setup = new InteropLangStandaloneSetup();
+        final Injector injector = setup.createInjectorAndDoEMFRegistration();
+        setup.addBaseURI(baseDir);
         final String type = genConfig.getType();
         switch (type) {
             case ApplicationCodeGenerator.TS:
@@ -82,9 +81,9 @@ public class Main {
                 preProcessTask.doGen(genConfig);                
                 genConfig.setBaseDir(temp.getPath());
                 genConfig.setOutDir(outDir);
-                config.getBaseURIs().remove(baseDir);                
+                setup.removeBaseURI(baseDir);                
                 baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
-                config.getBaseURIs().add(baseDir);
+                setup.addBaseURI(baseDir);
                 GenTask cSharpGenTask = injector.getInstance(CsharpGenTask.class);
                 cSharpGenTask.doGen(genConfig);
                 break;

@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Metamodel.Json
+namespace Plexus.Interop.Metamodel.Json
 {
+    using Plexus.Interop.Metamodel.Json.Internal;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Plexus.Interop.Metamodel.Json.Internal;
 
     public static class JsonRegistry
     {
@@ -38,7 +38,7 @@
             var messageIds =
                 from svcDto in dto.Services
                 from metDto in svcDto.Methods
-                from mid in new[] { metDto.InputMessageId, metDto.OutputMessageId }
+                from mid in new[] { metDto.RequestMessageId, metDto.ResponseMessageId }
                 select mid;
             var messages = messageIds.Distinct().ToDictionary(x => x, x => (IMessage)new Message { Id = x });
             var services = dto.Services.Select(x => Convert(messages, x)).ToDictionary(x => x.Id, x => x);
@@ -58,8 +58,8 @@
                 (IMethod)new Method
                 {
                     Name = x.Name,
-                    InputMessage = messages[x.InputMessageId],
-                    OutputMessage = messages[x.OutputMessageId],
+                    InputMessage = messages[x.RequestMessageId],
+                    OutputMessage = messages[x.ResponseMessageId],
                     Service = service,
                     Type = Convert(x.Type)
                 })
@@ -74,6 +74,8 @@
             var app = new Application { Id = appDto.Id };
             app.ConsumedServices = appDto.ConsumedServices.Select(x => Convert(app, services[x.ServiceId], x)).ToList();
             app.ProvidedServices = appDto.ProvidedServices.Select(x => Convert(app, services[x.ServiceId], x)).ToList();
+            app.LaunchMode = ConvertLaunchMode(
+                appDto.Options.GetValue("interop.ApplicationOptions.launch_on_call").GetValueOrDefault());
             return app;
         }
 
@@ -90,7 +92,7 @@
                 From = ConvertMatchPatterns(dto.From)
             };
             cs.Methods = dto.Methods
-                .Select(x => (IConsumedMethod)new ConsumedMethod { Method = service.Methods[x], ConsumedService = cs })
+                .Select(x => (IConsumedMethod)new ConsumedMethod { Method = service.Methods[x.Name], ConsumedService = cs })
                 .ToDictionary(x => x.Method.Name, x => x);
             return cs;
         }
@@ -118,12 +120,24 @@
             {
                 Alias = ConvertMaybe(dto.Alias),
                 Service = service,
-                Title = ConvertMaybe(dto.Title),
+                Title = dto.Options.GetValue("interop.ProvidedServiceOptions.title"),
                 Application = application,
-                To = ConvertMatchPatterns(dto.To)
-            };
+                To = ConvertMatchPatterns(dto.To),
+                LaunchMode = ConvertLaunchMode(
+                    dto.Options.GetValue("interop.ProvidedServiceOptions.launch_on_call").GetValueOrDefault())
+        };
             ps.Methods = dto.Methods
-                .Select(x => (IProvidedMethod)new ProvidedMethod { Method = service.Methods[x.Name], ProvidedService = ps, Title = ConvertMaybe(x.Title) })
+                .Select(x => (IProvidedMethod)new ProvidedMethod
+                {
+                    Method = service.Methods[x.Name], 
+                    ProvidedService = ps, 
+                    Title = x.Options.GetValue("interop.ProvidedMethodOptions.title"),
+                    LaunchMode = ConvertLaunchMode(
+                        x.Options.GetValue("interop.ProvidedMethodOptions.launch_on_call").GetValueOrDefault()),
+                    TimeoutMs = int.TryParse(
+                        x.Options.GetValue("interop.ProvidedMethodOptions.timeout_ms").GetValueOrDefault(), 
+                        out var result) ? result : 0
+                })
                 .ToDictionary(x => x.Method.Name, x => x);
             return ps;
         }
@@ -148,6 +162,24 @@
         private static Maybe<string> ConvertMaybe(string s)
         {
             return string.IsNullOrEmpty(s) ? Maybe<string>.Nothing : new Maybe<string>(s);
+        }
+
+        private static Maybe<LaunchMode> ConvertLaunchMode(string value)
+        {
+            switch (value)
+            {
+                case "NEVER":
+                case "DISABLED":
+                    return LaunchMode.None;
+                case "ALWAYS": 
+                case "ENABLED": 
+                    return LaunchMode.MultiInstance;
+                case "DEFAULT":
+                case "IF_NOT_LAUNCHED":
+                    return LaunchMode.SingleInstance;
+                default: 
+                    return Maybe<LaunchMode>.Nothing;
+            }
         }
     }
 }

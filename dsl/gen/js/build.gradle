@@ -1,4 +1,5 @@
 dependencies {
     compile project(':dsl:gen:common')
+    testCompile project(':dsl:gen:common')
 }
 

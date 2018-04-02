@@ -17,9 +17,11 @@
 package com.db.plexus.interop.dsl.gen.ts;
 
 import com.db.plexus.interop.dsl.Application;
+import com.db.plexus.interop.dsl.InteropLangUtils;
 import com.db.plexus.interop.dsl.gen.BaseGenTask;
-import com.db.plexus.interop.dsl.gen.InteropLangUtils;
+import com.db.plexus.interop.dsl.gen.GenUtils;
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig;
+import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils;
 import com.google.inject.Inject;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -67,8 +69,10 @@ public class TsGenTask extends BaseGenTask {
         }
 
         final List<String> protoFilePaths = resources.stream()
-                .map(resource -> new File(resource.getURI().toFileString()).getAbsolutePath())
-                .filter(resourcePath -> resourcePath.endsWith(".proto"))
+        		.filter(x -> x.getURI().lastSegment().endsWith(".proto"))
+        		.filter(x -> !x.getURI().toString().endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH))
+        		.filter(x -> !x.getURI().toString().endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH))        		
+                .map(resource -> new File(resource.getURI().toFileString()).getAbsolutePath())                
                 .collect(Collectors.toList());
 
         final String outDirPath = this.getAbsolutePath(config.getOutDir());
@@ -95,7 +99,7 @@ public class TsGenTask extends BaseGenTask {
             }
         }
 
-        final List<Application> applications = InteropLangUtils.getApplications(resources.toArray(new Resource[]{}));
+        final List<Application> applications = GenUtils.getApplications(resources.toArray(new Resource[]{}));
 
         config.setExternalDependencies(Arrays.asList("./" + PLEXUS_MESSAGES_MODULES));
 

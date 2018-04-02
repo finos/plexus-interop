@@ -25,10 +25,15 @@ import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 import com.google.inject.Inject
 import org.eclipse.xtext.resource.IContainer
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
-import org.eclipse.xtext.validation.INamesAreUniqueValidationHelper
 import com.db.plexus.interop.dsl.protobuf.NamedElement
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import com.db.plexus.interop.dsl.protobuf.Import
+import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
+import com.db.plexus.interop.dsl.protobuf.Field
+import com.db.plexus.interop.dsl.protobuf.Proto
+import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
+import com.db.plexus.interop.dsl.protobuf.Method
 
 /**
  * This class contains custom validation rules. 
@@ -37,17 +42,23 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider
  */
 class ProtoLangValidator extends AbstractProtoLangValidator {
 	
+	private static final char DOT_CHAR = '.'
+	private static final char UNDERSCORE_CHAR = '_'
+	
 	@Inject
 	IContainer.Manager containermanager;
 
 	@Inject
 	ResourceDescriptionsProvider resourceDescriptionsProvider;
+		
+	@Inject
+	IQualifiedNameProvider qualifiedNameProvider;
 	
 	@Inject
-	private INamesAreUniqueValidationHelper helper;
+	ProtoLangImportResolver importResolver
 	
 	@Inject
-	private IQualifiedNameProvider qualifiedNameProvider;
+	ProtoLangConfig protoLangConfig
 		
 	@Check
 	def checkSinglePackageDeclaration(Package ele) {		
@@ -68,6 +79,130 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 				}
 			}
 		}
+	}	
+	
+	@Check
+	def checkImport(Import ele) {
+		val path = ele.importURI
+		if (importResolver.resolveURI(ele.eResource.resourceSet, path) === null) {
+			val resolveCandidates = importResolver.getResolveCandidates(path)
+			error('Imported resource cannot be resolved: ' + path + '. The following candidates were checked: ' + resolveCandidates, ProtobufPackage.Literals.IMPORT__IMPORT_URI);			
+		}				
 	}
 	
+	@Check
+	def checkFieldNumbers(Field field) {
+		var fields = field.eContainer.eContents.filter(typeof(Field))
+		for (otherField: fields) {
+			if (otherField.number == field.number && !otherField.equals(field)) {
+				error('The same number assigned to field "' + otherField.name + '"', ProtobufPackage.Literals.FIELD__NUMBER)
+			}			
+		}
+	}
+	
+	@Check
+	def checkProtoResourceName(Proto proto) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
+		val fileName = proto.eResource.URI.lastSegment
+		var isValid = true		
+		for (var i=0; isValid && i<fileName.length; i++) {			
+			val c = fileName.charAt(i)
+			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == UNDERSCORE_CHAR || c == DOT_CHAR
+		}
+		if (!isValid) {			
+			error('Resource name "' + fileName + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.', proto, ProtobufPackage.Literals.PROTO__ELEMENTS)		
+		}
+	}
+	
+	@Check
+	def checkFieldName(Field field) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
+		val name = field.name
+		var isValid = name.length > 0 && Character.isLetter(name.charAt(0))
+		for (var i=0; isValid && i<name.length; i++) {			
+			val c = name.charAt(i)
+			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == UNDERSCORE_CHAR
+		}
+		if (!isValid) {
+			val message = 'Field name "' + name + '" is not valid. Only lower-case letters, digits and underscores allowed. First symbol must be lower-cased letter.'
+			error(message, field, ProtobufPackage.Literals.FIELD__NAME)		
+		}
+	}
+	
+	@Check
+	def checkDefinitionName(NamedElement ele) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
+		val name = ele.name
+		var isValid = name.length > 0 && Character.isLetter(name.charAt(0)) && Character.isUpperCase(name.charAt(0))
+		for (var i=0; isValid && i<name.length; i++) {			
+			val c = name.charAt(i)
+			isValid = Character.isLetter(c) || Character.isDigit(c)
+		}
+		if (!isValid) {
+			val message = 'Name of ' + ele.eClass.name + ' "' + name + '" is not valid. Only letters and digits allowed. First symbol must be upper-cased letter.'
+			error(message, ele, ProtobufPackage.Literals.NAMED_ELEMENT__NAME)		
+		}
+	}
+	
+	@Check
+	def checkMethodName(Method ele) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
+		val name = ele.name
+		var isValid = name.length > 0 && Character.isLetter(name.charAt(0)) && Character.isUpperCase(name.charAt(0))
+		for (var i=0; isValid && i<name.length; i++) {			
+			val c = name.charAt(i)
+			isValid = Character.isLetter(c) || Character.isDigit(c)
+		}
+		if (!isValid) {
+			val message = 'Name of method "' + name + '" is not valid. Only letters and digits allowed. First symbol must be upper-cased letter.'
+			error(message, ele, ProtobufPackage.Literals.METHOD__NAME)		
+		}
+	}
+	
+	@Check
+	def checkPackageName(Package ^package) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
+		val name = ^package.importedNamespace
+		var isValid = true		
+		for (var i=0; isValid && i<name.length; i++) {			
+			val c = name.charAt(i)
+			isValid = (Character.isLowerCase(c) && Character.isLetter(c)) || Character.isDigit(c) || c == UNDERSCORE_CHAR || c == DOT_CHAR
+		}
+		if (!isValid) {
+			val message = 'Package name "' + name + '" is not valid. Only lower-case letters, digits, underscores and dots allowed.'
+			error(message, ^package, ProtobufPackage.Literals.PACKAGE__IMPORTED_NAMESPACE)		
+		}
+	}
+	
+	@Check
+	def checkProtoResourceLocation(Proto proto) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}				
+		val resource = proto.eResource
+		val name = this.qualifiedNameProvider.getFullyQualifiedName(proto)		
+		val segments = name.skipFirst(1).segments		
+		val importPath = if (segments.length > 0) segments.join("/") + "/" + resource.URI.lastSegment else resource.URI.lastSegment
+		val resolvedUri = this.importResolver.resolveURI(resource.resourceSet, importPath)	
+		if (resolvedUri === null) {
+			val candidates = this.importResolver.getResolveCandidates(importPath)
+			val message = 'Resource folder do not correspond to its package name "' + name.skipFirst(1) + '". Valid locations for the resource: ' + candidates
+			var package = proto.elements.filter(typeof(Package)).findFirst[x|true]					
+			if (package === null) {
+				error(message, proto, ProtobufPackage.Literals.PROTO__ELEMENTS)
+			} else {
+				error(message, package, ProtobufPackage.Literals.PACKAGE__IMPORTED_NAMESPACE)
+			}
+		}
+	}		
 }

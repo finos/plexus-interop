@@ -18,7 +18,7 @@ import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInv
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer } from "@plexus-interop/common";
-import { InvocationObserver, InvocationObserverConverter } from "@plexus-interop/client";
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
 
 import * as plexus from "./plexus-messages";
 
@@ -100,8 +100,7 @@ class WebCcyPairRateViewerClientImpl extends GenericClientApiBase implements Web
 export class WebCcyPairRateViewerClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "vendorB.fx.WebCcyPairRateViewer",
-        applicationInstanceId: UniqueId.generateNew()
+        applicationId: "vendor_b.fx.WebCcyPairRateViewer"
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
@@ -129,7 +128,7 @@ export class WebCcyPairRateViewerClientBuilder {
     }
 
     public connect(): Promise<WebCcyPairRateViewerClient> {
-        return new GenericClientApiBuilder()
+        return new ContainerAwareClientAPIBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
             .connect()

@@ -23,12 +23,12 @@ namespace Plexus.Interop.Apps.Internal
     using System.IO;
     using System.Threading.Tasks;
 
-    internal sealed class NativeAppLauncherClient : ProcessBase
+    internal sealed class NativeAppLauncherClient : ProcessBase, Generated.NativeAppLauncherClient.IAppLauncherServiceImpl
     {
         private readonly SubProcessLauncher _subProcessLauncher;
         private readonly string _cmdBasePath;
         private readonly JsonSerializer _jsonSerializer;
-        private IClient _client;
+        private INativeAppLauncherClient _client;
 
         public Plexus.UniqueId Id { get; }
 
@@ -46,22 +46,15 @@ namespace Plexus.Interop.Apps.Internal
 
         protected override async Task<Task> StartCoreAsync()
         {
-            var options = new ClientOptionsBuilder()
-                .WithBrokerWorkingDir(Directory.GetCurrentDirectory())
-                .WithDefaultConfiguration()
-                .WithApplicationId("interop.NativeAppLauncher")
-                .WithAppInstanceId(Id)
-                .WithProvidedService(
-                    "interop.AppLauncherService",
-                    s => s.WithUnaryMethod<AppLaunchRequest, AppLaunchResponse>("Launch", LaunchAsync))
-                .Build();
-            _client = ClientFactory.Instance.Create(options);
+            _client = new Generated.NativeAppLauncherClient(
+                this, 
+                s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
             await _client.ConnectAsync().ConfigureAwait(false);
             Log.Debug("Connected");
             return ProcessAsync();
         }
-        
-        private Task<AppLaunchResponse> LaunchAsync(AppLaunchRequest request, MethodCallContext context)
+
+        Task<AppLaunchResponse> AppLauncherService.ILaunchImpl.Launch(AppLaunchRequest request, MethodCallContext context)
         {
             Log.Debug("Launch request received: {0}", request);
             var paramsDto = _jsonSerializer.Deserialize<NativeAppLauncherParamsDto>(

@@ -16,14 +16,15 @@
  */
 ﻿namespace Plexus.Interop.Metamodel.Json.Internal
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public sealed class ProvidedMethodDto
+    internal sealed class ProvidedMethodDto
     {
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("title")]
-        public string Title { get; set; }
+        [JsonProperty("options")]
+        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
     }
 }

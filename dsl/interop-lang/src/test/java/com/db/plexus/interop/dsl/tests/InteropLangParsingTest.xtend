@@ -34,7 +34,7 @@ import org.eclipse.xtext.validation.CheckMode
 import org.eclipse.xtext.util.CancelIndicator
 
 @RunWith(XtextRunner)
-@InjectWith(InteropLangInjectorProvider)
+@InjectWith(InteropLangInjectionProvider)
 class InteropLangParsingTest {
 	
 	@Inject
@@ -54,7 +54,7 @@ class InteropLangParsingTest {
 		for (r : allResources) {
 			validateResource(r)
 		}								
-		Assert.assertEquals(3, allResources.length)	
+		Assert.assertEquals(5, allResources.length)	
 	}
 	
 	@Test
@@ -68,7 +68,7 @@ class InteropLangParsingTest {
 		for (r : allResources) {
 			validateResource(r)
 		}								
-		Assert.assertEquals(3, allResources.length)	
+		Assert.assertEquals(4, allResources.length)	
 	}
 	
 	def validateResource(Resource r) {		

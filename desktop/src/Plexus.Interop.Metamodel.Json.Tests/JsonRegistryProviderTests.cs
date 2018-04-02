@@ -45,7 +45,7 @@
                 unaryMethod.Service.ShouldBe(service);
                 unaryMethod.InputMessage.ShouldBe(message);
                 unaryMethod.OutputMessage.ShouldBe(message);
-                unaryMethod.Type.ShouldBe(MethodType.Unary);
+                unaryMethod.Type.ShouldBe(MethodType.Unary);                
 
                 var clientStreamingMethod = service.Methods["ClientStreaming"];
                 clientStreamingMethod.Service.ShouldBe(service);
@@ -62,7 +62,19 @@
                 consumedService.From.IsMatch("interop.testing.EchoServer").ShouldBe(true);
                 consumedService.From.IsMatch("something.EchoServer").ShouldBe(false);
                 consumedService.Methods.Count.ShouldBe(4);
-                consumedService.Methods["ClientStreaming"].Method.ShouldBe(clientStreamingMethod);
+                consumedService.Methods["ClientStreaming"].Method.ShouldBe(clientStreamingMethod);            
+
+                var providerApp = registry.Applications["interop.testing.EchoServer"];
+                providerApp.ProvidedServices.Count.ShouldBe(1);
+                var providedService = providerApp.ProvidedServices.Single();
+                providedService.Service.ShouldBe(service);
+                providedService.Alias.ShouldBe(Maybe<string>.Nothing);
+                providedService.To.ShouldNotBeNull();
+                providedService.To.IsMatch("interop.testing.*").ShouldBe(true);
+                providedService.Title.ShouldBe("Sample Echo Service Implementation");
+                var providedMethod = providedService.Methods["Unary"];
+                providedMethod.Method.ShouldBe(unaryMethod);
+                providedMethod.LaunchMode.ShouldBe(LaunchMode.MultiInstance);                
             }
         }
     }

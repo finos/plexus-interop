@@ -24,6 +24,31 @@
         /// <summary>
         /// Allows converting this object to Task.
         /// </summary>
+        public static Task AsTask(this IUnaryMethodCall methodCall)
+        {
+            return methodCall.ResponseAsync;
+        }
+
+        /// <summary>
+        /// Allows awaiting this object directly.
+        /// </summary>
+        public static TaskAwaiter GetAwaiter(this IUnaryMethodCall methodCall)
+        {
+            return methodCall.ResponseAsync.GetAwaiter();
+        }
+
+        /// <summary>
+        /// Allows configuring awaiting for this object.
+        /// </summary>
+        public static ConfiguredTaskAwaitable ConfigureAwait(
+            this IUnaryMethodCall methodCall, bool continueOnCapturedContext)
+        {
+            return methodCall.ResponseAsync.ConfigureAwait(continueOnCapturedContext);
+        }
+
+        /// <summary>
+        /// Allows converting this object to Task.
+        /// </summary>
         public static Task<TResponse> AsTask<TResponse>(this IUnaryMethodCall<TResponse> methodCall)
         {
             return methodCall.ResponseAsync;

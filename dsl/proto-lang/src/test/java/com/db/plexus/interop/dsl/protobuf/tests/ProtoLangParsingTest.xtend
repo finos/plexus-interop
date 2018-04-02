@@ -20,7 +20,6 @@
 package com.db.plexus.interop.dsl.protobuf.tests
 
 import com.google.inject.Inject
-import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.junit.Assert
 import org.junit.Test
@@ -36,9 +35,10 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.validation.Issue
 import java.util.List
 import java.util.LinkedList
+import org.eclipse.xtext.testing.InjectWith
 
 @RunWith(XtextRunner)
-@InjectWith(ProtoTestInjectorProvider)
+@InjectWith(ProtoLangInjectorProvider)
 class ProtoLangParsingTest {
 	
 	@Inject
@@ -46,29 +46,34 @@ class ProtoLangParsingTest {
 
 	@Test
 	def void loadFile() {
-		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/example1.proto", 3)									
+		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/example1.proto", 4)									
 	}
-	
+		
 	@Test
-	def void loadCommonProto() {		
-		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/common.proto", 2)									
+	def void loadOptionsProto() {		
+		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/option_usage.proto", 4)									
 	}
 	
 	@Test
 	def void loadDescriptorProto() {
-		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/google/protobuf/descriptor.proto", 1)		
+		loadAndValidateResource("google/protobuf/descriptor.proto", 1)		
 	}
 	
 	@Test
 	def void loadApiProto() {
-		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/google/protobuf/api.proto", 4)		
+		loadAndValidateResource("google/protobuf/api.proto", 5)		
+	}
+	
+	@Test
+	def void loadScopingProto() {
+		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/scoping/test1.proto", 3)
 	}
 	
 	def loadAndValidateResource(String resourceUri, int expectedResourceCount) {
 		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource(resourceUri).toURI().toString())
 		System.out.println("Parsing " + uri)
 		Assert.assertEquals(0, rs.resources.length)
-		rs.getResource(uri, true)
+		val resource = rs.getResource(uri, true)
 		EcoreUtil2.resolveAll(rs);
 		val allResources = rs.resources
 		val issues = new LinkedList<Issue>()		
@@ -79,7 +84,8 @@ class ProtoLangParsingTest {
 			System.err.println(issue);
 		}
 		Assert.assertEquals(0, issues.length)
-		Assert.assertEquals(expectedResourceCount, allResources.length)		
+		Assert.assertEquals(expectedResourceCount, allResources.length)
+		return resource
 	}
 	
 	def validateResource(Resource r, List<Issue> issues) {

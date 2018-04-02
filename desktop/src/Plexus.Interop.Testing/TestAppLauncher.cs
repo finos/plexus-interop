@@ -14,33 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Testing
+namespace Plexus.Interop.Testing
 {
+    using Plexus.Interop.Testing.Generated;
+    using Plexus.Processes;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using Plexus.Interop.Testing.Generated;
     using System.Threading.Tasks;
-    using Plexus.Processes;
     using UniqueId = Plexus.UniqueId;
 
-    internal sealed class TestAppLauncher : ProcessBase
+    internal sealed class TestAppLauncher : ProcessBase, TestAppLauncherClient.IAppLauncherServiceImpl
     {
-        private readonly Dictionary<string, ClientOptionsBuilder> _clients;
-        private readonly IClient _client;
+        private readonly ITestBroker _broker;
+        private readonly Dictionary<string, TestClientFactory> _clientFactories;
+        private readonly ITestAppLauncherClient _client;
 
-        public TestAppLauncher(ITestBroker broker, IEnumerable<ClientOptionsBuilder> clients = null)
+        public TestAppLauncher(ITestBroker broker, Dictionary<string, TestClientFactory> clientFactories)
         {
-            _clients = clients?.ToDictionary(x => x.ApplicationId, x => x) ?? new Dictionary<string, ClientOptionsBuilder>();
-            var options = new ClientOptionsBuilder()
-                .WithBrokerWorkingDir(broker.WorkingDir)
-                .WithDefaultConfiguration()
-                .WithApplicationId("plexus.interop.testing.TestAppLauncher")
-                .WithProvidedService(
-                    "interop.AppLauncherService",
-                    s => s.WithUnaryMethod<AppLaunchRequest, AppLaunchResponse>("Launch", LaunchAppAsync))
-                .Build();
-            _client = ClientFactory.Instance.Create(options);
+            _broker = broker;
+            _clientFactories = clientFactories;
+            _client = new TestAppLauncherClient(this, s => s.WithBrokerWorkingDir(broker.WorkingDir));
             OnStop(_client.Disconnect);
         }
 
@@ -50,22 +43,21 @@
             return _client.Completion;
         }
 
-        private async Task<AppLaunchResponse> LaunchAppAsync(AppLaunchRequest request, MethodCallContext context)
+        public async Task<AppLaunchResponse> Launch(AppLaunchRequest request, MethodCallContext context)
         {
-            if (!_clients.TryGetValue(request.AppId, out var clientOptions))
+            if (!_clientFactories.TryGetValue(request.AppId, out var clientFactory))
             {
                 throw new InvalidOperationException($"Unknown application launch requested: {request.AppId}");
             }
-            var instanceId = UniqueId.Generate();
-            var client = ClientFactory.Instance.Create(clientOptions.WithAppInstanceId(instanceId).Build());
+            var client = clientFactory(_broker, UniqueId.FromHiLo(request.SuggestedAppInstanceId.Hi, request.SuggestedAppInstanceId.Lo));
             OnStop(client.Disconnect);
             await client.ConnectAsync().ConfigureAwait(false);
             return new AppLaunchResponse
             {
                 AppInstanceId = new Generated.UniqueId
                 {
-                    Hi = instanceId.Hi,
-                    Lo = instanceId.Lo
+                    Hi = client.ApplicationInstanceId.Hi,
+                    Lo = client.ApplicationInstanceId.Lo
                 }
             };
         }

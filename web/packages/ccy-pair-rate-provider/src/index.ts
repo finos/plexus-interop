@@ -55,7 +55,7 @@ const rateService = new RateService();
 
 new WebCcyPairRateProviderClientBuilder()
     .withClientDetails({
-        applicationId: "vendorA.fx.WebCcyPairRateProvider",
+        applicationId: "vendor_a.fx.WebCcyPairRateProvider",
         applicationInstanceId: instanceId
     })
     .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket(webSocketUrl)).connect())

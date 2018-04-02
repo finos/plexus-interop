@@ -13,14 +13,14 @@ Two most popular cases for interoperability are web and .NET, so the guide is sp
 Both guides describe the same flow/API, so if you want to experiment with interop between different technologies - just combine the samples, e.g. take web implementation of `CcyPairRateViewer` from the first guide and
 .NET implementation of `CcyPairRateProvider` from the second guide and run them together.
 
-===== Prerequisites
+==== Prerequisites
 
 You will need the following software:
 
-- Windows 7 or later
+- Windows 7+
 - http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[JDK 8+]
-- https://nodejs.org/en/download/[Node.js 6+ with npm 3+] for web quick start
-- https://www.microsoft.com/net/download/core[.NET Core 2.0 SDK x86] for .NET quick start
+- https://nodejs.org/en/download/[Node.js 6+ with npm 3+] for Web quick start
+- https://www.microsoft.com/net/download/core[.NET Core SDK 2.0+] for .NET quick start
 
 You also need to build Plexus Interop components if you have not done it yet. See <<how-to-build, How to build>> for details.
 
