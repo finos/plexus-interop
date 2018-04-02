@@ -5,6 +5,7 @@
   "productName": "Plexus Electron App Launcher",
   "license": "Apache-2.0",
   "main": "./dist/electronLauncher.bundle.js",
+  "private": true,
   "scripts": {
     "prebuild": "trash dist",
     "build": "yarn build:main && npm run copy-gen-folders && npm run package && npm run build-binary",

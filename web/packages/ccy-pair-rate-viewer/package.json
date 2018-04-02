@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Quick start Rate Viewer App",
   "main": "index.js",
+  "private": true,
   "license": "Apache-2.0",
   "dependencies": {
     "@plexus-interop/client": "0.1.0",

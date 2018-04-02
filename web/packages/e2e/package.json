@@ -5,6 +5,7 @@
   "main": "dist/main/src/index.js",
   "description": "Integration tests for Plexus Web Interop",
   "license": "Apache-2.0",
+  "private": true,
   "scripts": {
     "prebuild": "trash dist",
     "build": "yarn build:main && npm run copy-assets && npm run build-host-proxy",
