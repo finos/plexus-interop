@@ -17,11 +17,12 @@
 import { BaseJavaGenCommand } from './BaseJavaGenCommand';
 import { baseDir, out } from './DefaultOptions';
 import { Option } from './Option';
+import { getProtocExecPath } from 'src/common/protoc';
 
 export class GenJsonCommand extends BaseJavaGenCommand {
     
     public plexusGenArgs: (opts: any) => string[] = opts => {
-        return ['--type=json_meta', ...this.optionArgs(opts)];
+        return ['--type=json_meta', ...this.optionArgs(opts), `--protoc='${getProtocExecPath()}'`];
     }
 
     public name = () => 'gen-json-meta';
