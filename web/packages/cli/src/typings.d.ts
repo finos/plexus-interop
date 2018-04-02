@@ -18,6 +18,6 @@ declare module 'progress';
 declare module 'rmdir';
 declare module 'tar-fs';
 declare module 'request';
-declare module 'unzipper';
+declare module 'adm-zip';
 declare module 'node-jvm';
 declare module 'mkdirp';

@@ -27,7 +27,7 @@
     "protobufjs": "6.8.0",
     "request": "2.75.0",
     "fs-extra": "5.0.0",
-    "unzipper": "0.8.11",
+    "adm-zip": "0.4.7",
     "tar-fs": "1.13.2",
     "tar": "4.4.1"
   },

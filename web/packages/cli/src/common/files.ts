@@ -16,6 +16,7 @@
  */
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as AdmZip from 'adm-zip';
 
 export function getDistDir(): string {
     return path.normalize(path.join(__dirname, '..', '..', '..'));
@@ -54,6 +55,17 @@ export function iterateFiles(baseDir: string, pattern: RegExp, callback: (file: 
             callback(fileName);
         }
     });
+}
+
+export function unzipSync(zipPath: string, dir: string, removeZip: boolean = true): void {
+    console.log(`Extracting ${zipPath} to ${dir}`);
+    const zipArchive = new AdmZip(zipPath);
+    zipArchive.extractAllTo(dir, true);
+    console.log(`Extracted zip to ${dir}`);
+    if (removeZip) {
+        console.log(`Clearing zip ${zipPath}`);
+        removeSync(zipPath);
+    }
 }
 
 function isDirectory(path: string, failOnPermissonError: boolean = true): boolean {
