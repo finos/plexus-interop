@@ -69,16 +69,15 @@ Each interop protocol conversation is performed within a separate transport chan
 
 ===== Application Launcher
 
-Application launcher is application which can launch other applications.
+Application launchers are applications which can launch other applications. This concept was introduced to de-couple
+and allow easy customization of launch workflows, because they can be very different for different apps.
+E.g. web application is loaded in a separate browser window, native application just started as a new process and
+.NET plugin is loaded by its container application. In addition each vendor can also have custom launch steps like
+auto-updating or accepting terms & conditions which can also be implemented in vendor-specific app launcher.
 
 On method call broker can either route the call to an online application instance or trigger launch of a new
-instance. Launch workflow implementations are very different for different apps, e.g. web application should be loaded
-in browser window, simple exe application just started as a new process and .NET plugin should be loaded by its container
-application. In addition each vendor can also have custom launch steps like auto-updating or accepting terms & conditions.
-
-To de-couple launch workflows from interop and allow extensibility, application launcher concept was introduced.
-Launchers are usual applications which provide the special launcher service. Each application
-can specify its launcher in interop registry and broker will delegate launch of such application to the specified launcher.
+instance. Each application can specify its launcher in interop registry and broker will delegate launch to
+the specified launcher.
 
 ===== Transport Protocol
 
