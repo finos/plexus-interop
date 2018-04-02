@@ -60,15 +60,11 @@ include::guides-system-requirements.adoc[]
 [[reference]]
 == Reference
 
-=== Desktop Interop Standards
+=== Desktop Interop Overview
 
-==== Overview
 include::spec-desktop-interop-overview.adoc[]
 
-==== Requirements
-include::spec-desktop-interop-requirements.adoc[]
-
-==== Concepts
+=== Desktop Interop Concepts
 include::spec-desktop-interop-concepts.adoc[]
 
 === App Registry

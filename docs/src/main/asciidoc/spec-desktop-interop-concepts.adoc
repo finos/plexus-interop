@@ -65,8 +65,20 @@ It consist of 4 main types of conversations:
 * Discovery - request from application to broker to get the available services filtered by specific parameters
 * Method call - request from an application to call a method implemented in another application
 
-Each interop protocol conversation is performed within a separate transport channel and can complete with "Completed",
-"Canceled" or "Failed" statuses.
+Each interop protocol conversation is performed within a separate transport channel.
+
+===== Application Launcher
+
+Application launcher is application which can launch other applications.
+
+On method call broker can either route the call to an online application instance or trigger launch of a new
+instance. Launch workflow implementations are very different for different apps, e.g. web application should be loaded
+in browser window, simple exe application just started as a new process and .NET plugin should be loaded by its container
+application. In addition each vendor can also have custom launch steps like auto-updating or accepting terms & conditions.
+
+To de-couple launch workflows from interop and allow extensibility, application launcher concept was introduced.
+Launchers are usual applications which provide the special launcher service. Each application
+can specify its launcher in interop registry and broker will delegate launch of such application to the specified launcher.
 
 ===== Transport Protocol
 
