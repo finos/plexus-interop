@@ -7,7 +7,7 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "echo 'Not implemented'",
     "e2e": "ng e2e",
     "republish": "echo 'Not implemented'"
   },

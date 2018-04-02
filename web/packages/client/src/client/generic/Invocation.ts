@@ -17,7 +17,6 @@
 import { BaseChannel } from "@plexus-interop/transport-common";
 import { InvocationMetaInfo } from "@plexus-interop/protocol";
 import { AnonymousSubscription } from "@plexus-interop/common";
-import { InvocationObserver } from "./InvocationObserver";
 import { InvocationChannelObserver } from "./InvocationChannelObserver";
 
 export interface Invocation extends BaseChannel<InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>> {

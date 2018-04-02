@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, Channel, Defaults, ChannelObserver } from "@plexus-interop/transport-common";
+import { UniqueId, Channel, Defaults } from "@plexus-interop/transport-common";
 import { clientProtocol as plexus, SuccessCompletion, ErrorCompletion, ClientError, ClientProtocolUtils, InvocationMetaInfo } from "@plexus-interop/protocol";
 import { ClientProtocolHelper as modelHelper, ClientProtocolHelper } from "@plexus-interop/protocol";
 import { InvocationState } from "./InvocationState";
-import { Observer } from "@plexus-interop/common";
 import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
 import { StateMaschine, CancellationToken, Logger, LoggerFactory, StateMaschineBase, AsyncHelper } from "@plexus-interop/common";
 import { ProvidedMethodReference } from "@plexus-interop/client-api";
@@ -37,9 +36,6 @@ export class GenericInvocation {
 
     private sendCompletionReceived: boolean = false;
 
-
-    private sourceChannelSubscription: AnonymousSubscription;
-
     private metaInfo: InvocationMetaInfo;
 
     private log: Logger;
@@ -49,7 +45,7 @@ export class GenericInvocation {
     public constructor(
         private readonly sourceChannel: Channel,
         baseReadToken: CancellationToken = new CancellationToken(),
-        private readonly invocationTimeout: number = Defaults.OPERATION_TIMEOUT) {
+        private readonly invocationTimeout: number = -1) {
         this.readCancellationToken = new CancellationToken(baseReadToken);
         this.log = LoggerFactory.getLogger("Invocation");
         this.stateMachine = new StateMaschineBase<InvocationState>(InvocationState.CREATED, [
@@ -149,12 +145,6 @@ export class GenericInvocation {
         this.sentMessagesCounter++;
     }
 
-    public async waitForState(state: InvocationState): Promise<void> {
-        this.log.trace(`Waiting for state ${state}`);
-        await this.waitForIt(() => this.stateMachine.is(state));
-        this.log.trace(`Waiting for state ${state} - DONE`);
-    }
-
     // public methods below are NOT a part of API, for unit tests only
 
     public currentState(): InvocationState {
@@ -246,7 +236,6 @@ export class GenericInvocation {
 
                 started: sourceSubscription => {
                     this.log.debug("Source channel subscription started");
-                    this.sourceChannelSubscription = sourceSubscription;
                     resolve(sourceSubscription);
                 },
 

@@ -34,7 +34,7 @@ export class GenericInvocationsHost {
     public readonly handlersRegistry: Map<String, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>> = new Map<String, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>>();
 
     constructor(
-        private sourceApplicationId: string,
+        sourceApplicationId: string,
         private readonly genericClient: GenericClient,
         private bidiStreamingHandlers: GenericBidiStreamingInvocationHandler[],
         private unaryHandlers: GenericUnaryInvocationHandler[] = [],

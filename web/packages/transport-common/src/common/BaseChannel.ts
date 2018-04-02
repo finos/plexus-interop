@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 import { UniqueId } from "@plexus-interop/protocol";
-import { AnonymousSubscription } from "rxjs/Subscription";
 import { clientProtocol as plexus } from "@plexus-interop/protocol";
-import { ChannelObserver } from "./ChannelObserver";
 
 export interface BaseChannel<ObserverType> {
 

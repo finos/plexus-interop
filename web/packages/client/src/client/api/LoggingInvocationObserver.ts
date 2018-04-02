@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Observer } from "@plexus-interop/common";
 import { Logger } from "@plexus-interop/common";
 import { InvocationObserver } from "../generic";
 

@@ -1,10 +1,8 @@
 include ':docs'
 
-include ':dsl'
 include ':dsl:model'
 include ':dsl:proto-lang'
 include ':dsl:interop-lang'
-include ':dsl:gen'
 include ':dsl:gen:common'
 include ':dsl:gen:test'
 include ':dsl:gen:meta'
@@ -13,9 +11,6 @@ include ':dsl:gen:js'
 include ':dsl:gen:proto'
 include ':dsl:gen:csharp'
 include ':dsl:gen:cli'
-
 include ':desktop'
-
 include ':web'
-
 include ':samples'

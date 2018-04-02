@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,19 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const tsc = require('typescript');
-const tsConfig = require('./tsconfig.json');
+import { Command } from 'src/commands/Command';
+import { GenTsCommand } from './GenTsCommand';
+import { GenJsonCommand } from './GenJsonCommand';
+import { GenProtoCommand } from './GenProtoCommand';
+import { GenCSharpCommand } from './GenCSharpCommand';
 
-module.exports = {
-    process(src, path) {
-        if (path.endsWith('.ts') || path.endsWith('.tsx')) {
-            return tsc.transpile(
-                src,
-                tsConfig.compilerOptions,
-                path,
-                []
-            );
-        }
-        return src;
-    },
-};
+export function commands(): Command[] {
+    return [new GenTsCommand(), new GenJsonCommand(), new GenProtoCommand(), new GenCSharpCommand()];
+}

@@ -21,7 +21,7 @@ import { FramedTransport } from "./FramedTransport";
 import { UniqueId } from "@plexus-interop/protocol";
 import { Observer, ReadWriteCancellationToken, AsyncHelper } from "@plexus-interop/common";
 import { AnonymousSubscription, Subscription } from "rxjs/Subscription";
-import { StateMaschineBase, Arrays, CancellationToken, LoggerFactory, Logger, StateMaschine, SequencedExecutor } from "@plexus-interop/common";
+import { StateMaschineBase, CancellationToken, LoggerFactory, Logger, StateMaschine, SequencedExecutor } from "@plexus-interop/common";
 import { clientProtocol as plexus, SuccessCompletion, ClientProtocolUtils, ClientError, ErrorCompletion } from "@plexus-interop/protocol";
 import { Frame } from "./model/Frame";
 import { ChannelObserver } from "../../common/ChannelObserver";

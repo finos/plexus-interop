@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,19 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const tsc = require('typescript');
-const tsConfig = require('./tsconfig.json');
-
-module.exports = {
-    process(src, path) {
-        if (path.endsWith('.ts') || path.endsWith('.tsx')) {
-            return tsc.transpile(
-                src,
-                tsConfig.compilerOptions,
-                path,
-                []
-            );
-        }
-        return src;
-    },
-};
+const path = require('path');
+let install = null;
+try {
+    install = require(path.join(__dirname, 'dist/main/src/install')).install;    
+} catch (error) {
+    console.warn(`Unable to load dist/main/src/install module`, error);
+}
+if (install) {
+    install();
+}

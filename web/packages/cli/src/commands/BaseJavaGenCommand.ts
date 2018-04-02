@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,19 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const tsc = require('typescript');
-const tsConfig = require('./tsconfig.json');
+import { BaseCommand } from './BaseCommand';
+import { getJavaExecPath, getJavaGenLibPath } from '../common/java';
+import { simpleSpawn } from '../common/process';
 
-module.exports = {
-    process(src, path) {
-        if (path.endsWith('.ts') || path.endsWith('.tsx')) {
-            return tsc.transpile(
-                src,
-                tsConfig.compilerOptions,
-                path,
-                []
-            );
-        }
-        return src;
-    },
-};
+export abstract class BaseJavaGenCommand extends BaseCommand {
+
+    public abstract plexusGenArgs: (opts: any) => string[];
+
+    public async action(opts: any): Promise<void> {
+        const javaExecPath = await getJavaExecPath();
+        const javaLibPath = getJavaGenLibPath();
+        return simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.plexusGenArgs(opts)], opts.verbose === 'true');
+    }
+
+}

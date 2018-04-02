@@ -31,7 +31,7 @@ export class DiscoveryRequestHandler {
 
     public constructor(
         private readonly appLifeCycleManager: AppLifeCycleManager,
-        private readonly appRegistryService: AppRegistryService,
+        readonly appRegistryService: AppRegistryService,
         private readonly interopRegistryService: InteropRegistryService
     ) { }
 
