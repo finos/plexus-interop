@@ -28,8 +28,8 @@ license {
 }
 
 task licenseFormatTS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
-    source = fileTree(dir: ".").exclude("**/node_modules/*")
-            .include("**/*.ts").include("**/*.proto").include("**/*.interop")
+    source = fileTree(dir: ".").exclude("**/node_modules/*").exclude("**/dist/*")
+            .include("**/*.ts").include("**/*.js").include("**/*.proto").include("**/*.interop")
 }
 
 tasks["license"].dependsOn licenseFormatTS
