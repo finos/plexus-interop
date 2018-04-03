@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { downloadProtoc } from './common/protoc';
+import { downloadProtoc, protocExecProvided } from './common/protoc';
 import { downloadJre, javaExecProvided } from './common/java';
 // to execute 'warmp up' of protobufjs cli at this point rather than on first execution
 import 'protobufjs/cli';
@@ -28,9 +28,13 @@ async function installProtoc(): Promise<void> {
     if (process.env.PLEXUS_CLI_SKIP_PROTOC_DOWNLOAD === 'true') {
         console.log('protoc download skipped');
     } else {
-        downloadProtoc()
-        .then(() => console.log('protoc downloaded'))
-        .catch(e => console.error('Failed to download protoc', e));
+        try {
+            const provided = await protocExecProvided();
+            console.log(`protoc executable already provided: ${provided}`);
+        } catch (error) {
+            console.log('Failed to locate Protoc Executable, going to download', error.message);
+            await downloadProtoc();
+        }
     }
 }
 
@@ -41,7 +45,7 @@ async function installJre(): Promise<void> {
     } else {
         try {
             const provided = await javaExecProvided();
-            console.log(`Java executable already provided: ${provided}`);            
+            console.log(`Java executable already provided: ${provided}`);
         } catch (error) {
             console.log('Failed to locate Java Executable, going to download', error.message);
             await downloadJre();

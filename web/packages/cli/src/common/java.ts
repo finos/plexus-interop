@@ -31,8 +31,8 @@ export function downloadJre(): Promise<string> {
 
 export async function javaExecProvided(): Promise<string> {
     const execPath = await getJavaExecPath();
-    const execExists = exists(execPath);
-    if (!execExists) {
+    const execExists = await exists(execPath);
+    if (execExists) {
         return execPath;
     } else {
         throw new Error(`Do not exist ${execPath}`);

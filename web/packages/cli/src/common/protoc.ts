@@ -16,7 +16,7 @@
  */
 import * as path from 'path';
 import * as os from 'os';
-import { getDistDir, iterateFiles, mkdirsSync, copyFile, removeSync } from './files';
+import { getDistDir, iterateFiles, mkdirsSync, copyFile, removeSync, exists } from './files';
 import { downloadPackage } from './download';
 
 const getDownloadDir = () => path.join(getDistDir(), 'protoc');
@@ -48,19 +48,23 @@ export async function downloadProtoc(): Promise<string> {
     return downloadDir;
 }
 
+export async function protocExecProvided(): Promise<string> {
+    const execPath = await getProtocExecPath();
+    const execExists = await exists(execPath);
+    if (execExists) {
+        return execPath;
+    } else {
+        throw new Error(`Do not exist ${execPath}`);
+    }
+}
+
 export async function getProtocExecPath(): Promise<string> {
     if (process.env.PLEXUS_CLI_PROTOC_EXE_PATH) {
         console.log(`Using protoc from env variable ${process.env.PLEXUS_CLI_PROTOC_EXE_PATH}`);
         return process.env.PLEXUS_CLI_PROTOC_EXE_PATH;
     }
     const baseDir = getDownloadDir();
-    const platform = os.platform();
-    switch (platform) {
-        case 'win32':
-            return path.join(baseDir, 'bin', 'protoc.exe');
-        default:
-            throw new Error(`${platform} is not supported`);
-    }
+    return path.join(baseDir, ...getExePath());
 }
 
 export function getProtocDownloadUrl(): string {
@@ -68,6 +72,10 @@ export function getProtocDownloadUrl(): string {
     return process.env[`PLEXUS_PROTOC_DOWNLOAD_URL_${platform.toUpperCase()}`]
         || process.env.PLEXUS_PROTOC_DOWNLOAD_URL
         || getDefaultDownloadUrl(platform);
+}
+
+function getExePath(): string[] {
+    return os.platform() === 'win32' ? ['bin', 'protoc.exe'] : ['bin', 'protoc'];
 }
 
 function getDefaultDownloadUrl(platform: string): string {
