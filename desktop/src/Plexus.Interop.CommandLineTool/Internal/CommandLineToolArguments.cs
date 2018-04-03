@@ -33,7 +33,7 @@
                 syntax.HandleErrors = false;
                 syntax.HandleResponseFiles = false;
 
-                syntax.DefineCommand("activate", ref command, CommandLineToolCommand.ActivateApp, "Activate application(s)");
+                syntax.DefineCommand("launch", ref command, CommandLineToolCommand.LaunchApp, "Launch application(s)");
                 syntax.DefineParameterList("application", ref appIds, "Application IDs");
             });
             return new CommandLineToolArguments

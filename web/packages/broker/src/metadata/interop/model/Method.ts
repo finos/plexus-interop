@@ -21,7 +21,7 @@ import { Service } from "./Service";
 export interface Method {
     name: string;
     type: MethodType;
-    inputMessage: Message;
-    outputMessage: Message;
+    requestMessage: Message;
+    responseMessage: Message;
     service: Service;
 }

@@ -20,8 +20,9 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
     using System;
     using System.IO;
     using System.Threading.Tasks;
+    using Plexus.Channels;
 
-    public sealed class Program
+    public sealed class Program : CcyPairRateProviderClient.ICcyPairRateServiceImpl
     {
         private readonly Random _random = new Random();
 
@@ -33,24 +34,15 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
         public async Task MainAsync(string[] args)
         {
             // Read broker working dir specified either in the first
-            // command line argument or in environment variable, or just use current working directory
+            // command line argument or in environment variable, 
+            // or just use current working directory.
             var brokerWorkingDir = args.Length > 0
                 ? args[0]
                 : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
 
+            // Creating client and connecting to broker
             Console.WriteLine("Connecting to broker {0}", brokerWorkingDir);
-
-            // Defining client options
-            var clientOptions = new ClientOptionsBuilder()
-                .WithBrokerWorkingDir(brokerWorkingDir)
-                .WithDefaultConfiguration()
-                .WithApplicationId("vendorA.fx.CcyPairRateProvider")
-                .WithProvidedService("fx.CcyPairRateService", s => 
-                    s.WithUnaryMethod<CcyPair, CcyPairRate>("GetRate", GetRateAsync))
-                .Build();
-
-            // Connecting
-            var client = ClientFactory.Instance.Create(clientOptions);
+            var client = new CcyPairRateProviderClient(this, setup => setup.WithBrokerWorkingDir(brokerWorkingDir));            
             await client.ConnectAsync();
             Console.WriteLine("Connected. Waiting for requests. Press CTRL+C to disconnect.");
             Console.CancelKeyPress += (sender, eventArgs) =>
@@ -64,9 +56,42 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
             Console.WriteLine("Disconnected.");
         }
 
-        private Task<CcyPairRate> GetRateAsync(CcyPair request, MethodCallContext context)
+
+        // Implementation of unary method GetRate
+        public Task<CcyPairRate> GetRate(CcyPair request, MethodCallContext context)
         {
             Console.WriteLine("Received request: {0}", request);
+            var response = GetCcyPairRate(request);
+            Console.WriteLine("Sending response: {0}", response);
+            return Task.FromResult(response);
+        }
+
+        // Implementation of server streaming method GetRateStream
+        public async Task GetRateStream(
+            CcyPair request,
+            IWritableChannel<CcyPairRate> responseStream,
+            MethodCallContext context)
+        {
+            Console.WriteLine("Received subscription: {0}", request);
+            try
+            {
+                do
+                {
+                    var response = GetCcyPairRate(request);
+                    Console.WriteLine("Sending response: {0}", response);
+                    await responseStream.TryWriteAsync(response, context.CancellationToken);
+                    await Task.Delay(_random.Next(1000, 3000), context.CancellationToken);
+                } while (!context.CancellationToken.IsCancellationRequested);
+            }
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                // Ignoring cancellation exception
+            }
+            Console.WriteLine("Subscription completed");
+        }
+
+        private CcyPairRate GetCcyPairRate(CcyPair request)
+        {
             CcyPairRate response;
             switch (request.CcyPairName)
             {
@@ -87,8 +112,8 @@ namespace Plexus.Interop.Samples.CcyPairRateProvider
                 default:
                     throw new ArgumentOutOfRangeException($"Unknown currency pair: {request.CcyPairName}");
             }
-            Console.WriteLine("Sending response: {0}", response);
-            return Task.FromResult(response);
+
+            return response;
         }
     }
 }

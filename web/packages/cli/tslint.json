@@ -1,0 +1,10 @@
+{
+    "extends": "../../configs/tslint.json",
+    "rules": {
+        "quotemark": [
+            true,
+            "single"
+        ],
+        "no-console": [false]
+    }
+}

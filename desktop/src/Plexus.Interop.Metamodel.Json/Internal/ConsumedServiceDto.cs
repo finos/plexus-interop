@@ -25,12 +25,15 @@ namespace Plexus.Interop.Metamodel.Json.Internal
         public string ServiceId{ get; set; }
 
         [JsonProperty("methods")]
-        public List<string> Methods { get; set; } = new List<string>();
+        public List<ConsumedMethodDto> Methods { get; set; } = new List<ConsumedMethodDto>();
 
         [JsonProperty("alias")]
         public string Alias { get; set; }
 
         [JsonProperty("from")]
         public List<string> From { get; set; } = new List<string>();
+
+        [JsonProperty("options")]
+        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
     }
 }

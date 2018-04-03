@@ -38,7 +38,7 @@ enum ProtoSyntax {
 	Proto3
 }
 
-class ProtoElement {	
+interface ProtoElement {	
 }
 
 class Package extends ProtoElement {
@@ -52,14 +52,10 @@ class Import extends ProtoElement {
 
 class Extend extends ProtoElement {
 	refers Message message
-	contains ExtendBody body 
+	contains ExtendElement[] elements 
 }
 
-class ExtendBody {
-	contains ExtendBodyElement[] elements	
-}
-
-class ExtendBodyElement {	
+interface ExtendElement {	
 }
 
 enum ImportModifier {
@@ -68,65 +64,73 @@ enum ImportModifier {
 	Weak
 }
 
-class Option extends ProtoElement, MessageBodyElement, ServiceBodyElement, MethodBodyElement, EnumBodyElement {
-	String name	
+class Option extends ProtoElement, MessageElement, ServiceElement, MethodElement, EnumElement, FieldElement {
+	Boolean isCustom = "false"
+	refers Field descriptor	
+	contains Constant value
+}
+
+interface Constant {
+}
+
+class StringConstant extends Constant {
 	String value
 }
 
-class OptionList {
-	contains Option[] elements
+class BoolConstant extends Constant {
+	Boolean value = "false"
 }
 
-class ProtoDefinition extends ProtoElement, NamedElement {	
+class IntConstant extends Constant {
+	Integer value
 }
 
-class ComplexType extends NamedElement {
+class EnumConstant extends Constant {
+	refers EnumValue value
 }
 
-class Message extends ComplexType, ProtoDefinition, MessageBodyElement {
-	contains MessageBody body	
+class DecimalConstant extends Constant {
+	Double value
 }
 
-class MessageBody {
-	contains MessageBodyElement[] elements 	
+interface ProtoDefinition extends ProtoElement, NamedElement {	
 }
 
-class MessageBodyElement {	
+interface ComplexType extends NamedElement {
 }
 
-class Enum extends ComplexType, ProtoDefinition, MessageBodyElement {	
-	contains EnumBody body	
+class Message extends ComplexType, ProtoDefinition, MessageElement {
+	contains MessageElement[] elements	
 }
 
-class EnumBody {
-	contains EnumBodyElement[] elements	
+interface MessageElement {	
 }
 
-class EnumBodyElement {	
+class Enum extends ComplexType, ProtoDefinition, MessageElement {	
+	contains EnumElement[] elements	
 }
 
-class EnumValue extends EnumBodyElement {
+interface EnumElement {	
+}
+
+class EnumValue extends EnumElement {
 	String name
 	Integer value
-	contains OptionList options	
+	contains Option[] options	
 }
 
-class Service extends ProtoDefinition {	
-	contains ServiceBody body
+class Service extends ProtoDefinition {		
+	contains ServiceElement[] elements
 }
 
-class ServiceBody {
-	contains ServiceBodyElement[] elements	
+interface ServiceElement {
 }
 
-class ServiceBodyElement {
-}
-
-class Method extends ServiceBodyElement {	
+class Method extends ServiceElement {	
 	String name	
 	contains MethodData request
 	contains MethodData response
-	contains MethodBody body
+	contains MethodElement[] elements
 }
 
 class MethodData {
@@ -134,26 +138,29 @@ class MethodData {
 	Boolean isStream = "false" 	
 }
 
-class MethodBody {
-	contains MethodBodyElement[] elements
+interface MethodElement {	
 }
 
-class MethodBodyElement {	
-}
-
-class Field extends MessageBodyElement, ExtendBodyElement {
+class Field extends MessageElement, ExtendElement {
 	String name	
 	Integer number
 	FieldLabel label
 	contains FieldTypeReference typeReference	
-	contains OptionList options
+	contains FieldElement[] elements	
 }
 
-class Group extends MessageBodyElement, ExtendBodyElement {
+interface FieldElement {	
+}
+
+class DefaultFieldValue extends FieldElement {
+	contains Constant value
+}
+
+class Group extends MessageElement, ExtendElement {
 	String name	
 	Integer number	
 	FieldLabel label
-	contains MessageBody body
+	contains MessageElement[] elements
 }
 
 enum FieldLabel {
@@ -193,24 +200,24 @@ class ComplexFieldType extends FieldTypeReference {
 	refers ComplexType value
 }
 
-class OneOf extends MessageBodyElement {
+class OneOf extends MessageElement {
 	String name
 	contains Field[] fields
 }
 
-class MapField extends MessageBodyElement {
+class MapField extends MessageElement {
 	String name
 	PrimitiveType keyType 
 	contains FieldTypeReference valueType
 	Integer number
-	contains OptionList options		
+	contains Option[] options		
 }
 
-class Reserved extends MessageBodyElement {
+class Reserved extends MessageElement {
 	contains ReservedFields fields	
 }
 
-class ReservedFields {	
+interface ReservedFields {	
 }
 
 class FieldNames extends ReservedFields {
@@ -227,6 +234,6 @@ class FieldRange {
 	Boolean toUnbounded = "false"
 }
 
-class Extensions extends MessageBodyElement {
+class Extensions extends MessageElement {
 	contains FieldRanges fields		
 }

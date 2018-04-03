@@ -23,8 +23,7 @@ import { UnaryHandlerConverter } from "../../src/client/api/unary/UnaryHandlerCo
 import { ServerStreamingInvocationHandler } from "../../src/client/api/streaming/ServerStreamingInvocationHandler";
 import { ServerStreamingConverter } from "../../src/client/api/streaming/ServerStreamingHandlerConveter";
 import { ServiceInfo } from "@plexus-interop/client-api";
-
-import { when, mock, instance, anything, verify, capture } from "ts-mockito";
+import { when, mock, instance, anything, verify } from "ts-mockito";
 import { GenericClientImpl } from "../../src/client/generic/GenericClientImpl";
 import { Observer } from "@plexus-interop/common";
 import { clientProtocol as plexus, SuccessCompletion } from "@plexus-interop/protocol";
@@ -239,13 +238,10 @@ function setupHostedInvocation(
         invocationCloseHandler(completion);
         return Promise.resolve(new SuccessCompletion());
     });
-
-    let requestObserver = null;
     when(mockInvocation.open(anything())).thenCall((observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>) => {
         setTimeout(() => {
             observer.started(new Subscription());
             setTimeout(() => {
-                requestObserver = observer;
                 for (let i = 0; i < requestMessagesCount; i++) {
                     observer.next(requestPayload);
                 }

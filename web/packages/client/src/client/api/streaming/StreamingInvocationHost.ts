@@ -23,7 +23,7 @@ import { MethodInvocationContext } from "@plexus-interop/client-api";
 import { UniqueId } from "@plexus-interop/transport-common";
 import { InvocationObserver } from "../../generic/InvocationObserver";
 
-export class StreamingInvocationHost<Req, Res> {
+export class StreamingInvocationHost {
 
     private logger: Logger = LoggerFactory.getLogger("StreamingInvocationHost");
 

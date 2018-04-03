@@ -21,38 +21,19 @@ package com.db.plexus.interop.dsl.protobuf
 
 import com.google.inject.Injector
 import org.eclipse.emf.ecore.EPackage
-import com.google.inject.Guice
-import java.util.List
-import java.util.LinkedList
-import com.google.inject.Module
 
 /**
  * Initialization support for running Xtext languages without Equinox extension registry.
  */
-class ProtoLangStandaloneSetup extends ProtoLangStandaloneSetupGenerated {
+class ProtoLangStandaloneSetup extends ProtoLangStandaloneSetupGenerated {	
 		
-	List<Module> modules = new LinkedList<Module>
-	
 	static def doSetup() {		
-	}
-	
-	new() {
-		this(null)
-	}
+	}	
 
-	new(ProtoLangConfig config, Module... modules) {
-		this.modules.add(new ProtoLangRuntimeModule(if (config === null) new ProtoLangConfig() else config))
-		this.modules.addAll(modules)
-	}
-	
-	override createInjector() {
-		return Guice.createInjector(modules);
-	}
-		
 	override register(Injector injector) {
 		if (!EPackage.Registry.INSTANCE.containsKey(ProtobufPackage.eNS_URI)) {
 			EPackage.Registry.INSTANCE.put(ProtobufPackage.eNS_URI, ProtobufPackage.eINSTANCE);
-		}
-		super.register(injector)
+		}	
+		super.register(injector)			
 	}
 }

@@ -54,8 +54,8 @@ describe("JsonRegistryProvider", () => {
 
         const unaryMethod = service.methods.get("Unary") as Method;
         expect(unaryMethod.service).toBe(service);
-        expect(unaryMethod.inputMessage).toBe(message);
-        expect(unaryMethod.outputMessage).toBe(message);
+        expect(unaryMethod.requestMessage).toBe(message);
+        expect(unaryMethod.responseMessage).toBe(message);
         expect(unaryMethod.type).toBe(MethodType.Unary);
 
         const consumerApp = registry.applications.get("interop.testing.EchoClient") as Application;

@@ -8,13 +8,13 @@ def ciPublishBuild = ciBuild && (System.env['APPVEYOR_REPO_TAG'] == "true" || Sy
 def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows();
 def e2eTestsEnabled = isWindows && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_WEB_TESTS'] != 'true'
 def ciFullBuild = ciBuild && e2eTestsEnabled
-def npmVersion = System.getenv("PLEXUS_BUILD_NPM_VERSION") ?: (System.getenv("APPVEYOR_REPO_TAG_NAME") ?: System.getenv("PackageVersion")) 
+def npmPackageVersion = System.getenv("PLEXUS_BUILD_NPM_PACKAGE_VERSION") ?: (System.getenv("APPVEYOR_REPO_TAG_NAME") ?: System.getenv("PackageVersion")) 
 
 node {
     version = '8.5.0'
+    npmVersion = '5.7.1'    
     nodeModulesDir = projectDir
     download = true
-    npmVersion = '5.7.1'
 }
 
 license {
@@ -28,31 +28,41 @@ license {
 }
 
 task licenseFormatTS(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
-    source = fileTree(dir: ".").exclude("**/node_modules/*")
-            .include("**/*.ts").include("**/*.proto").include("**/*.interop")
+    source = fileTree(dir: ".").exclude("**/node_modules/*").exclude("**/dist/*")
+            .include("**/*.ts").include("**/*.js").include("**/*.proto").include("**/*.interop")
 }
 
 tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
-task npmRunInstall(type: NpmTask) {
+task npmVersion(type: NpmTask) {
+    args = ['--version'];
+}
+
+task npmRunInstall(type: NpmTask, dependsOn: npmVersion) {
     args = ['install', '--no-package-lock'];
 }
 
 task preNpmBuild {
     doLast {
-        println "NPM version: $npmVersion"
+        println "NPM Package version: $npmPackageVersion"
 	    println "CI Publish: $ciPublishBuild"
 	    println "CI Full: $ciFullBuild"
 	    println "CI Build: $ciBuild"
 	    println "Integration tests: $e2eTestsEnabled"
+        File packagesDir = file('packages');
+        FileCollection collection = files { packagesDir.listFiles() }
+        println "\nModules to build:"
+        collection.collect { relativePath(it) }.sort().each { println it }
     }
 }
 
-task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
-    // https://github.com/srs/gradle-node-plugin/issues/128
+task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild', ':dsl:gen:cli:build']) {
+    // https://github.com/srs/gradle-node-plugin/issues/128 
     environment = [
-        'PLEXUS_BUILD_NPM_VERSION': npmVersion
+        'PLEXUS_BUILD_NPM_PACKAGE_VERSION': npmPackageVersion,
+        'PLEXUS_CLI_SKIP_JRE_DOWNLOAD': 'true',
+        'PLEXUS_CLI_SKIP_PROTOC_DOWNLOAD': 'true'
     ]
     args =  ciPublishBuild ? ['run', 'ci-publish'] :
             ciFullBuild ? ['run', 'ci-build-e2e'] : 

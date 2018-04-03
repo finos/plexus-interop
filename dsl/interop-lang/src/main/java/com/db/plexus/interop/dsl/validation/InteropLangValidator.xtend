@@ -19,11 +19,11 @@
  */
 package com.db.plexus.interop.dsl.validation
 
-import org.eclipse.xtext.validation.Check
 import com.db.plexus.interop.dsl.ConsumedMethod
-import org.eclipse.xtext.EcoreUtil2
 import com.db.plexus.interop.dsl.DslPackage
 import com.db.plexus.interop.dsl.ProvidedMethod
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.validation.Check
 
 /**
  * This class contains custom validation rules. 
@@ -52,5 +52,5 @@ class InteropLangValidator extends AbstractInteropLangValidator {
 				error("Duplicated provided method definition: " + providedMethod.method.name, DslPackage.Literals.PROVIDED_METHOD__METHOD);								
 			}			
 		}						
-	}		
+	}
 }

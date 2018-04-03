@@ -34,11 +34,11 @@ Package:
 ;
 
 ProtoElement:
-	(Package | Import | Option | Extend | ProtoDefinition)
+	(-> Package | -> Import | -> Extend | -> Option | ProtoDefinition)
 ;
 
 Import: 
-	 -> 'import' ( -> modifier=ImportModifier)? importURI=STRING ';'+
+	 'import' ( -> modifier=ImportModifier)? importURI=STRING ';'+
 ;
 
 enum ImportModifier:	
@@ -46,78 +46,110 @@ enum ImportModifier:
 	Weak = 'weak'
 ;
 
-Option: 
-	 -> 'option' name=OPTION_NAME '=' value=OptionValue ';'+
+Option:
+	(-> CustomOption | PredefinedOption)
 ;
 
-OptionValue:
-	-> STRING | -> INT | -> BOOL | VALID_ID
+PredefinedOption returns Option: 
+	'option' descriptor=[Field|SHORT_ID] '=' value=Constant ';'+
 ;
 
-Extend: 
-	 -> 'extend' message=[Message|FULL_ID] body=ExtendBody ';'*
+CustomOption returns Option:
+	'option' (-> isCustom?='(') descriptor=[Field|FULL_ID] ')' '=' value=Constant ';'+
 ;
 
-ExtendBody: {ExtendBody}
-	'{'
-		(elements+=ExtendBodyElement)*
-	'}'
+Constant:
+	(-> StringConstant | -> BoolConstant | EnumConstant | IntConstant | DecimalConstant)
 ;
 
-ExtendBodyElement:
-	Field | Group
+StringConstant:
+	value=STRING
+;
+
+IntConstant:
+	value=SIGNED_INT
+;
+
+BoolConstant:
+	value=BOOL
+;
+
+DecimalConstant:
+	value=DECIMAL
+;
+
+EnumConstant:
+	value=[EnumValue|FULL_ID]
+;
+
+Extend:
+	'extend' message=[Message|FULL_ID] '{' 
+	 	(elements+=ExtendElement)* 
+	'}' ';'*
+;
+
+ExtendElement:
+	(-> Group | Field) 
 ;
 
 ProtoDefinition:
-	Message | Enum | Service
+	(-> Message | -> Enum | -> Service)
 ;
 
 Enum: 
-	 -> 'enum' name=VALID_ID body=EnumBody ';'*
+	'enum' name=SHORT_ID '{'
+		elements+=EnumElement*
+	'}' ';'*
 ;
 
-EnumBody: {EnumBody}
-	'{'
-		elements+=EnumBodyElement*
-	'}'
-;
-
-EnumBodyElement:
-	EnumValue | Option
+EnumElement:
+	(-> Option | EnumValue)
 ;
 
 EnumValue:
-	name=VALID_ID '=' value=INT (options=OptionList)? ';'+
-;
-
-OptionList: 
-	'[' elements+=OptionListItem (','  elements+=OptionListItem)* ']'
+	name=SHORT_ID '=' value=INT ('[' options+=OptionListItem (','  options+=OptionListItem)* ']')? ';'+
 ;
 
 OptionListItem returns Option: 
-	name=OPTION_NAME '=' value=OptionValue
+	(-> CustomOptionItem | PredefinedOptionItem)
+;
+
+PredefinedOptionItem returns Option:
+	descriptor=[Field|SHORT_ID] -> '=' value=Constant
+;
+
+CustomOptionItem returns Option:
+	isCustom?='(' descriptor=[Field|FULL_ID] ')' -> '=' value=Constant
 ;
 
 Message: 
-	 -> 'message' name=VALID_ID body=MessageBody ';'*
+	'message' name=SHORT_ID '{'
+		elements+=MessageElement*
+	'}' ';'*
 ;
 
-MessageBody: {MessageBody}  
-	'{'
-		elements+=MessageBodyElement*
-	'}'
-;
-
-MessageBodyElement:
-	-> Enum | -> Message | -> OneOf | -> MapField | -> Reserved | -> Extensions | -> Group | -> Option | Field
+MessageElement:
+	-> Enum | -> Message | -> OneOf | -> MapField | -> Reserved | 
+	-> Extensions | -> Group | -> Option | Field
 ;
 
 Field:
-	(-> label=FieldLabel)? typeReference=FieldTypeReference name=VALID_ID '=' number=INT (options=OptionList)? ';'+
+	(-> label=FieldLabel)? typeReference=FieldTypeReference name=SHORT_ID '=' number=INT 
+	(('[' elements+=FieldElement (','  elements+=FieldElement)* ']'))? ';'+
+;
+
+FieldElement:
+	( -> DefaultFieldValue | OptionListItem)
+;
+
+DefaultFieldValue:
+	'default' '=' value=Constant
 ;
 
 Group:
-	(-> label=FieldLabel)? name=VALID_ID '=' number=INT body=MessageBody ';'*
+	(-> label=FieldLabel)? name=SHORT_ID '=' number=INT '{'
+		elements+=MessageElement*
+	'}' ';'*
 ;
 
 enum FieldLabel:
@@ -127,7 +159,7 @@ enum FieldLabel:
 ;
 
 FieldTypeReference:
-	(-> PrimitiveFieldType|ComplexFieldType)
+	(-> PrimitiveFieldType | ComplexFieldType)
 ;
 
 PrimitiveFieldType:
@@ -139,19 +171,21 @@ ComplexFieldType:
 ;
 
 OneOf: 
-	-> 'oneof' name=VALID_ID '{' (fields+=OneOfField)* '}' ';'*
+	'oneof' name=SHORT_ID '{' (fields+=OneOfField)* '}' ';'*
 ;
 
 OneOfField returns Field:
-	typeReference=FieldTypeReference name=VALID_ID '=' number=INT (options=OptionList)? ';'+
+	typeReference=FieldTypeReference name=SHORT_ID '=' number=INT 
+	(('[' elements+=FieldElement (','  elements+=FieldElement)* ']'))? ';'+
 ;
 
 MapField: 
-	 -> 'map' '<' keyType=MapKeyType ',' valueType=FieldTypeReference '>' name=VALID_ID '=' number=INT (options=OptionList)? ';'+
+	'map' '<' keyType=MapKeyType ',' valueType=FieldTypeReference '>' name=SHORT_ID '=' number=INT 
+	 (('[' options+=OptionListItem (','  options+=OptionListItem)* ']'))? ';'+
 ;
 
 Reserved: 
-	-> 'reserved' fields=ReservedFields ';'+
+	'reserved' fields=ReservedFields ';'+
 ;
 
 ReservedFields:
@@ -171,38 +205,29 @@ FieldRange:
 ;
 
 Extensions:
-	-> 'extensions' fields=FieldRanges ';'+
+	'extensions' fields=FieldRanges ';'+
 ;
 
 Service: 
-	-> 'service' name=VALID_ID body=ServiceBody ';'*
+	'service' name=SHORT_ID '{'		
+		elements+=ServiceElement*
+	'}' ';'*
 ;
 
-ServiceBody: {ServiceBody}  	
-	'{'		
-		elements+=ServiceBodyElement*
-	'}'
-;
-
-ServiceBodyElement: 
-	Option | Method
+ServiceElement: 
+	-> Option | Method
 ;
 
 Method: 
-	-> 'rpc' name=VALID_ID request=MethodData 'returns' response=MethodData (body=MethodBody | ';') ';'*
+	'rpc' name=SHORT_ID request=MethodData 'returns' response=MethodData 
+	('{' elements+=MethodElement* '}' | ';') ';'*
 ;
 
 MethodData:
 	'(' ( -> isStream?='stream')? message=[Message|FULL_ID] ')'
 ;
 
-MethodBody: {MethodBody}
-	'{'
-		elements+=MethodBodyElement*
-	'}'
-;
-
-MethodBodyElement:
+MethodElement:
 	Option
 ;
 
@@ -243,9 +268,17 @@ BOOL returns ecore::EBoolean:
 	'true' | 'false'
 ;
 
+DECIMAL returns ecore::EDouble: 
+	SIGNED_INT'.'INT
+;
+
+SIGNED_INT returns ecore::EInt: 
+	'-'?INT
+;
+
 PROTO_LANG_KEYWORD:
-	'package' |   'syntax' |   'message' |   'rpc' |   'service' |   'max' |   'oneof' |   'map' |   'extensions' |   'stream' |   'reserved' | 
-	  'required' |   'optional' |   'repeated' |   'enum' |   'extend' |   'option' |   'public' |   'weak' |   'import' |   'true' |   'false'
+	'package' | 'syntax' | 'message' | 'rpc' | 'service' | 'max' | 'oneof' | 'map' | 'extensions' | 'stream' | 'reserved' | 
+	  'required' | 'optional' | 'repeated' | 'enum' | 'extend' | 'option' | 'public' | 'weak' | 'import' | 'true' | 'false' | 'default'
 ;
 
 PROTO_TYPE_KEYWORD:
@@ -253,15 +286,11 @@ PROTO_TYPE_KEYWORD:
 	  'sfixed64' |   'bool' |   'string' |   'bytes'
 ;
 
-OPTION_NAME:
-	( VALID_ID | '(' FULL_ID ')' ) ('.' VALID_ID)*
-;
-
 FULL_ID:
-	'.'? VALID_ID ('.' VALID_ID)*
+	'.'? SHORT_ID ('.' SHORT_ID)*
 ;
 
-VALID_ID:
+SHORT_ID:
 	 PROTO_LANG_KEYWORD | PROTO_TYPE_KEYWORD | ID	 
 ;
 

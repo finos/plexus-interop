@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Observer } from "@plexus-interop/common";
 import { ServiceDiscoveryRequest } from "@plexus-interop/client-api";
 import { ServiceDiscoveryResponse } from "@plexus-interop/client-api";
 import { StreamingInvocationClient } from "./../streaming/StreamingInvocationClient";

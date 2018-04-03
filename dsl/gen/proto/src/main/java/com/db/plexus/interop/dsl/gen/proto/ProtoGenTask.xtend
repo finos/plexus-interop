@@ -17,13 +17,17 @@
 package com.db.plexus.interop.dsl.gen.proto
 
 import com.db.plexus.interop.dsl.gen.BaseGenTask
+import com.db.plexus.interop.dsl.gen.GenUtils
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
+import com.db.plexus.interop.dsl.protobuf.Field
 import com.db.plexus.interop.dsl.protobuf.Import
 import com.db.plexus.interop.dsl.protobuf.Message
 import com.db.plexus.interop.dsl.protobuf.NamedElement
 import com.db.plexus.interop.dsl.protobuf.Option
 import com.db.plexus.interop.dsl.protobuf.Proto
+import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
 import com.db.plexus.interop.dsl.protobuf.ProtobufFactory
+import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 import com.db.plexus.interop.dsl.protobuf.Service
 import com.google.inject.Inject
 import java.io.File
@@ -43,33 +47,36 @@ import org.eclipse.xtext.validation.IResourceValidator
 import org.eclipse.xtext.validation.Issue
 
 public class ProtoGenTask extends BaseGenTask {
-
+	
 	@Inject
 	IResourceValidator validator
 
 	@Inject
 	IQualifiedNameProvider qualifiedNameProvider
-
-	protected val customOptions = new LinkedList<ProtoOption>
+		
+	@Inject
+	ProtoLangImportResolver importResolver 
+	
+	protected val customOptions = new LinkedList<Option>
 
 	public def getCustomOptions() {
 		customOptions
-	}
+	}	
 
 	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
 
 		logger.info("Generating proto contract for " + config.input + " to folder " + config.outDir)
 
 		val optionsUri = URI.createURI(
-			ClassLoader.getSystemClassLoader().getResource("interop/Options.proto").toURI().toString())
+			ClassLoader.getSystemClassLoader().getResource(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH).toURI().toString())
 			
 		val descriptorUri = URI.createURI(
-			ClassLoader.getSystemClassLoader().getResource("google/protobuf/descriptor.proto").toURI().toString())		
+			ClassLoader.getSystemClassLoader().getResource(GenUtils.PROTOBUF_DESCRIPTOR_RESOURCE_PATH).toURI().toString())		
 			
 		var interopResourceBaseUri = optionsUri.trimSegments(2).appendSegment("");
 		var protoResourceBaseUri = descriptorUri.trimSegments(3).appendSegment("");
 		
-		if (rs.resources.findFirst[r|r.URI.toString().endsWith("interop/Options.proto")] === null) {
+		if (rs.resources.findFirst[r|r.URI.toString().endsWith(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)] === null) {
 			rs.getResource(optionsUri, true)
 		}
 
@@ -95,8 +102,21 @@ public class ProtoGenTask extends BaseGenTask {
 
 		val oldResources = new LinkedList<Resource>
 		oldResources.addAll(rs.resources)
+		
+		val optionsResourceDescription = importResolver.resolveResourceDescription(rs, GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)
 
 		for (r : oldResources) {
+		
+						
+			val serviceIdOptionDescriptor = 
+				optionsResourceDescription
+					.getExportedObjects(ProtobufPackage.Literals.FIELD, GenUtils.INTEROP_SERVICE_ID_OPTION_NAME, false)
+					.findFirst[x|x.name.equals(GenUtils.INTEROP_SERVICE_ID_OPTION_NAME)].EObjectOrProxy as Field
+					
+			val messageIdOptionDescriptor = 
+				optionsResourceDescription
+					.getExportedObjects(ProtobufPackage.Literals.FIELD, GenUtils.INTEROP_MESSAGE_ID_OPTION_NAME, false)
+					.findFirst[x|x.name.equals(GenUtils.INTEROP_MESSAGE_ID_OPTION_NAME)].EObjectOrProxy as Field		
 
 			if (r.contents.length > 0) {
 
@@ -104,9 +124,9 @@ public class ProtoGenTask extends BaseGenTask {
 
 				val uriStr = r.URI.toString()
 				val isProto = uriStr.endsWith(".proto")
-				val isDescriptorProto = isProto && uriStr.endsWith("google/protobuf/descriptor.proto")
+				val isDescriptorProto = isProto && (uriStr.endsWith(GenUtils.PROTOBUF_DESCRIPTOR_RESOURCE_PATH) || uriStr.endsWith(GenUtils.INTEROP_DESCRIPTOR_RESOURCE_PATH))
 				val needAddCustomOptions = !isDescriptorProto
-				val needAddPlexusOptions = !isDescriptorProto && !uriStr.endsWith("interop/Options.proto")
+				val needAddPlexusOptions = !isDescriptorProto && !uriStr.endsWith(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)
 
 				val root = r.contents.get(0) as Proto
 				val firstDefinition = root.elements.findFirst[x|x instanceof NamedElement]
@@ -116,57 +136,64 @@ public class ProtoGenTask extends BaseGenTask {
 				}
 				
 				if (needAddPlexusOptions) {
+					
+					val needAddImport = r.allContents
+						.filter(typeof(Import))
+						.findFirst(x|x.importURI.endsWith(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)) === null						
+					if (needAddImport) {
+						val importElement = ProtobufFactory.eINSTANCE.createImport
+						importElement.importURI = GenUtils.INTEROP_OPTIONS_RESOURCE_PATH
+						root.elements.add(addIndex, importElement)
+						addIndex++
+					}					
 
 					for (service : r.allContents.toIterable().filter(typeof(Service))) {
-						val needSetOption = service.body.elements
+						
+						val needSetOption = service.elements
 							.filter(typeof(Option))
-							.findFirst [ o | o.name.equals("(.interop.service_id)")] === null
+							.findFirst [o | qualifiedNameProvider.getFullyQualifiedName(o.descriptor).equals(GenUtils.INTEROP_SERVICE_ID_OPTION_NAME)] === null
+														
 						if (needSetOption) {
 							var id = qualifiedNameProvider.getFullyQualifiedName(service).skipFirst(1).toString()
+							val stringConstant = ProtobufFactory.eINSTANCE.createStringConstant
+							stringConstant.value = id
+							
 							val option = ProtobufFactory.eINSTANCE.createOption()
-							option.name = "(.interop.service_id)"
-							option.value = "\"" + id + "\""
-							service.body.elements.add(0, option)
+							option.isCustom = true							
+							option.descriptor = serviceIdOptionDescriptor							
+							option.value = stringConstant							
+							service.elements.add(0, option)
 						}
 					}
 
 					for (message : r.allContents.toIterable().filter(typeof(Message))) {
-						val needSetOption = message.body.elements
+						val needSetOption = message.elements
 							.filter(typeof(Option))
-							.findFirst [o | o.name.equals("(.interop.message_id)")] === null
+							.findFirst[o | qualifiedNameProvider.getFullyQualifiedName(o.descriptor).equals(GenUtils.INTEROP_MESSAGE_ID_OPTION_NAME)] === null
 						if (needSetOption) {
 							var id = qualifiedNameProvider.getFullyQualifiedName(message).skipFirst(1).toString()
+							val stringConstant = ProtobufFactory.eINSTANCE.createStringConstant
+							stringConstant.value = id
+							
 							val option = ProtobufFactory.eINSTANCE.createOption()
-							option.name = "(.interop.message_id)"
-							option.value = "\"" + id + "\""
-							message.body.elements.add(0, option)
+							option.isCustom = true
+							option.descriptor = messageIdOptionDescriptor
+							option.value = stringConstant							
+							message.elements.add(0, option)
 						}
-					}
-
-					val needAddImport = r.allContents
-						.filter(typeof(Import))
-						.findFirst(x|x.importURI.endsWith("interop/Options.proto")) === null						
-					if (needAddImport) {
-						val importElement = ProtobufFactory.eINSTANCE.createImport
-						importElement.importURI = "interop/Options.proto"
-						root.elements.add(addIndex, importElement)
-						addIndex++
 					}
 				}
 
 				if (needAddCustomOptions) {
-					for (o : this.customOptions) {
-						var customOption = root.elements
+					for (customOption : this.customOptions) {
+						var existingOption = root.elements
 							.filter(typeof(Option))
-							.findFirst [existingOption | existingOption.name.equals(o.name)]
-						if (customOption === null) {							
-							customOption = ProtobufFactory.eINSTANCE.createOption()
-							customOption.name = o.name
-							customOption.value = "\"" + o.value + "\""
+							.findFirst [o | qualifiedNameProvider.getFullyQualifiedName(o.descriptor).equals(qualifiedNameProvider.getFullyQualifiedName(customOption.descriptor))]
+						if (existingOption === null) {							
 							root.elements.add(addIndex, customOption)
 							addIndex++
 						} else {
-							customOption.value = "\"" + o.value + "\""
+							existingOption.value = EcoreUtil2.cloneIfContained(customOption.value)
 						}
 					}
 				}
@@ -203,6 +230,8 @@ public class ProtoGenTask extends BaseGenTask {
 						fop.close();
 					}
 				}
+				
+				logger.info("Saved " + uri)
 			}
 		}
 	}

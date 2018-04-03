@@ -18,19 +18,42 @@ package com.db.plexus.interop.dsl.gen.csharp
 
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask
-import com.db.plexus.interop.dsl.gen.proto.ProtoOption
 import java.io.IOException
 import org.eclipse.xtext.resource.XtextResourceSet
+import com.google.inject.Inject
+import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
+import org.eclipse.xtext.naming.QualifiedName
+import com.db.plexus.interop.dsl.protobuf.ProtobufFactory
+import com.db.plexus.interop.dsl.protobuf.Field
+import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils
 
 class CsharpProtoGenTask extends ProtoGenTask {
 	
+	private static final QualifiedName CSHARP_NAMESPACE_OPTION_DESCRIPTOR_NAME = 
+		QualifiedName.create("", "google", "protobuf", "FileOptions", "csharp_namespace")
+		
+	@Inject
+	ProtoLangUtils utils
+	 			
 	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException {
 		var namespace = config.namespace;
 		if (config.namespace !== null) {
 			if (namespace.startsWith("internal_access:")) {
 				namespace = namespace.substring("internal_access:".length)
-			}
-			super.customOptions.add(new ProtoOption("csharp_namespace", namespace))		
+			}		
+			val description = utils.getDescriptorResourceDescription(resourceSet)
+			val optionDescriptor = description.getExportedObjects(
+				ProtobufPackage.Literals.FIELD, 
+				CSHARP_NAMESPACE_OPTION_DESCRIPTOR_NAME, 
+				false
+			).findFirst[x | true].EObjectOrProxy as Field
+			val csharpNamespaceOption = ProtobufFactory.eINSTANCE.createOption()
+			csharpNamespaceOption.isCustom = false
+			csharpNamespaceOption.descriptor = optionDescriptor
+			val stringConstant = ProtobufFactory.eINSTANCE.createStringConstant()
+			stringConstant.value = namespace
+			csharpNamespaceOption.value = stringConstant	
+			super.customOptions.add(csharpNamespaceOption)		
 		}
 
 		super.doGenWithResources(config, resourceSet)

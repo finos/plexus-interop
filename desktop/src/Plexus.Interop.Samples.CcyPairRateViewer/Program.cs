@@ -23,9 +23,6 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer
 
     public sealed class Program
     {
-        private static readonly UnaryMethod<CcyPair, CcyPairRate> GetRateMethod =
-            Method.Unary<CcyPair, CcyPairRate>("fx.CcyPairRateService", "GetRate");
-
         public static void Main(string[] args)
         {
             new Program().MainAsync(args).GetAwaiter().GetResult();
@@ -34,24 +31,17 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer
         public async Task MainAsync(string[] args)
         {
             // Read broker working dir specified either in the first
-            // command line argument or in environment variable, or just use current working directory
+            // command line argument or in environment variable, 
+            // or just use current working directory.
             var brokerWorkingDir = args.Length > 0
                 ? args[0]
                 : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
 
+            // Creating client and connecting to broker
             Console.WriteLine("Connecting to broker {0}", brokerWorkingDir);
-
-            // Defining client options
-            var clientOptions = new ClientOptionsBuilder()
-                .WithBrokerWorkingDir(brokerWorkingDir)
-                .WithDefaultConfiguration()
-                .WithApplicationId("vendorB.fx.CcyPairRateViewer")
-                .Build();
-
-            // Connecting
-            var client = ClientFactory.Instance.Create(clientOptions);
+            var client = new CcyPairRateViewerClient(setup => setup.WithBrokerWorkingDir(brokerWorkingDir));
             await client.ConnectAsync();
-            Console.WriteLine("Connected.");
+            Console.WriteLine("Connected");
 
             while (true)
             {
@@ -62,14 +52,14 @@ namespace Plexus.Interop.Samples.CcyPairRateViewer
                     break;
                 }
                 // Requesting ccy pair rate from another app
-                var request = new CcyPair {CcyPairName = ccyPairName};                
-                var response = await client.CallInvoker.Call(GetRateMethod, request);
+                var request = new CcyPair { CcyPairName = ccyPairName };
+                var response = await client.CcyPairRateService.GetRate(request);
                 Console.WriteLine("Response received: " + response);
             }
 
-            Console.WriteLine("Disconnecting.");
+            Console.WriteLine("Disconnecting");
             await client.DisconnectAsync();
-            Console.WriteLine("Disconnected.");
+            Console.WriteLine("Disconnected");
         }
     }
 }

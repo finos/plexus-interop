@@ -23,5 +23,9 @@
         IProvidedService ProvidedService { get; }
 
         Maybe<string> Title { get; }
+
+        Maybe<LaunchMode> LaunchMode { get; }
+
+        int TimeoutMs { get; }
     }
 }

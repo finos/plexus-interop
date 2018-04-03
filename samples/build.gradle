@@ -24,9 +24,9 @@ tasks["license"].dependsOn licenseFormatProto
 licenseFormat.dependsOn licenseFormatProto
 
 task copySamplesMetadata(type: Copy) {
-  def outputDir = "${rootDir}/bin/win-x86/samples/metadata"
+  def outputDir = "${rootDir}/bin/win-x86/samples/greeting/metadata"
   if (Os.isFamily(Os.FAMILY_MAC)) {
-      outputDir="${rootDir}/bin/osx-x64/samples/metadata"
+      outputDir="${rootDir}/bin/osx-x64/samples/greeting/metadata"
   }
   outputs.dir outputDir
   inputs.dir 'samples/metadata'
@@ -35,9 +35,9 @@ task copySamplesMetadata(type: Copy) {
 }
 
 task copyQuickStartMetadata(type: Copy) {
-  def outputDir = "${rootDir}/bin/win-x86/quick-start/metadata"
+  def outputDir = "${rootDir}/bin/win-x86/samples/quick-start/metadata"
   if (Os.isFamily(Os.FAMILY_MAC)) {
-      outputDir="${rootDir}/bin/osx-x64/quick-start/metadata"
+      outputDir="${rootDir}/bin/osx-x64/samples/quick-start/metadata"
   }
   outputs.dir outputDir
   inputs.dir 'quick-start/metadata'

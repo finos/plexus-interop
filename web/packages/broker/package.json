@@ -26,7 +26,7 @@
     "@plexus-interop/transport-common": "0.1.0",
     "ya-js-storage": "0.1.4",
     "long": "^3.2.0",
-    "protobufjs": "^6.8.0",
+    "protobufjs": "6.8.0",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.4.2",
     "superagent": "3.8.2",
@@ -51,21 +51,18 @@
   "jest": {
     "testEnvironment": "node",
     "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine.js",
-    "transform": {
-      ".(ts|tsx|js)": "<rootDir>/preprocessor.js"
-    },
-    "transformIgnorePatterns": [
-      "<rootDir>(node_modules)/"
-    ],
     "moduleFileExtensions": [
       "ts",
       "js"
     ],
-    "testRegex": "<rootDir>(tests/).*\\.(test|spec)\\.(ts|js)$",
+    "testRegex": ".+/dist/main/tests/.+.spec.js$",
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
-      "src/**/*.ts",
-      "!src/**/*.d.ts"
+      "dist/main/src/**/*.js",
+      "!dist/main/src/gen/**/*.js",
+      "!src/*.d.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.spec.ts"
     ]
   }
 }

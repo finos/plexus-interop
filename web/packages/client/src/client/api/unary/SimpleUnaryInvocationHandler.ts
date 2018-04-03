@@ -20,6 +20,6 @@ export interface SimpleUnaryInvocationHandler<Req, Res> {
 
     methodId: string;
 
-    handle(invocationContext: MethodInvocationContext, request: Req): Promise<Req>;
+    handle(invocationContext: MethodInvocationContext, request: Req): Promise<Res>;
 
 }

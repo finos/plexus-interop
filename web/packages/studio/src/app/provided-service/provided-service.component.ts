@@ -166,7 +166,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
   createDefaultMessage() {
     const method = this.providedMethod.method;
-    this.messageContent = this.interopClient.createDefaultPayload(method.outputMessage.id);
+    this.messageContent = this.interopClient.createDefaultPayload(method.responseMessage.id);
     this.formatAndUpdateArea();
   }
 

@@ -17,7 +17,6 @@
 import { GenericClientApiBuilder, GenericClientApi } from "../generic";
 import { ConnectionDetailsService } from "./ConnectionDetailsService";
 import { DefaultConnectionDetailsService } from "./DefaultConnectionDetailsService";
-import { LoggerFactory, Logger } from "@plexus-interop/common";
 import { UniqueId } from "@plexus-interop/transport-common";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 
@@ -37,7 +36,7 @@ export class ContainerAwareClientAPIBuilder extends GenericClientApiBuilder {
                 }
                 if (!this.transportConnectionProvider && (details.ws && details.ws.port)) {
                     this.log.info("Transport connection provider from container");
-                    this.transportConnectionProvider = () => new WebSocketConnectionFactory(new WebSocket(`ws://localhost:${details.ws.port}`)).connect();
+                    this.transportConnectionProvider = () => new WebSocketConnectionFactory(new WebSocket(`ws://127.0.0.1:${details.ws.port}`)).connect();
                 }
             } catch (e) {
                 this.log.info("Failed to discover container connection details", e);

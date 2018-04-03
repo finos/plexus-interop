@@ -26,14 +26,23 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.resource.XtextResource
 
-import static extension com.db.plexus.interop.dsl.gen.InteropLangUtils.*
 import com.db.plexus.interop.dsl.Application
 import com.db.plexus.interop.dsl.ProvidedService
 import org.eclipse.emf.common.util.URI
 import com.db.plexus.interop.dsl.ConsumedService
+import org.eclipse.xtext.naming.QualifiedName
+import com.db.plexus.interop.dsl.protobuf.StringConstant
+import com.google.inject.Inject
+import static extension com.db.plexus.interop.dsl.gen.GenUtils.*
+import com.db.plexus.interop.dsl.gen.GenUtils
 
 class CsharpCodeGenerator  {
-    
+	
+	private static final QualifiedName CSHARP_NAMESPACE_OPTION_DESCRIPTOR_NAME = QualifiedName.create("", "google", "protobuf", "FileOptions", "csharp_namespace")
+	
+	@Inject
+	GenUtils utils 
+	    
     IQualifiedNameProvider qualifiedNameProvider    
     PlexusGenConfig config    
     URI baseDirUri
@@ -84,7 +93,7 @@ class CsharpCodeGenerator  {
 
 			«accessModifier» sealed partial class «application.clientName»: ClientBase, I«application.clientName» {
 				
-				public const string Id = "«getFullName(application, qualifiedNameProvider)»";
+				public const string Id = "«utils.getFullName(application)»";
 				
 				«IF application.providedServices.length > 0»				
 				private static ClientOptions CreateClientOptions(«application.clientName».ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null) {
@@ -287,7 +296,7 @@ class CsharpCodeGenerator  {
 		'''
 			«accessModifier» static partial class «service.name.toFirstUpper» {
 				
-				public const string Id = "«getFullName(service, qualifiedNameProvider)»";			
+				public const string Id = "«utils.getFullName(service)»";			
 				«FOR method : service.methods»
 					public const string «method.name.toFirstUpper»MethodId = "«method.name»";
 				«ENDFOR»
@@ -370,13 +379,13 @@ class CsharpCodeGenerator  {
 	}
 
 	def String genMethodDescriptorDeclaration(Method method) {
-		val serviceName = method.service.getFullName(qualifiedNameProvider);
+		val serviceName = utils.getFullName(method.service);
 		val type = method.type
 		'''Method.«type»«method.genericArgs»("«serviceName»", "«method.name»")'''
 	}
 
 	def String genMethodDescriptorDeclaration(Method method, String aliasVar) {
-		val serviceName = method.service.getFullName(qualifiedNameProvider);
+		val serviceName = utils.getFullName(method.service);
 		val type = method.type
 		'''Method.«type»«method.genericArgs»("«serviceName»", «aliasVar», "«method.name»")'''
 	}
@@ -410,9 +419,11 @@ class CsharpCodeGenerator  {
 		if (package !== null) {					
 			ns = qualifiedNameProvider.getFullyQualifiedName(package).skipFirst(1).segments.map[x|x.toFirstUpper].join(".");		
 		}
-		val option = package.eContents.filter(typeof(Option)).findFirst[o|o.name.equals("csharp_namespace")]
-		if (option !== null) {			
-			ns = option.value.substring(1, option.value.length - 1)
+		val option = package.eContents
+			.filter(typeof(Option))
+			.findFirst[o|qualifiedNameProvider.getFullyQualifiedName(o.descriptor).equals(CSHARP_NAMESPACE_OPTION_DESCRIPTOR_NAME)]
+		if (option !== null) {
+			ns = (option.value as StringConstant).value 						
 		}
 		if (config.namespace !== null) {
 			ns = config.namespace;
