@@ -65,6 +65,18 @@ by other applications. Broker validates and routes such calls to target applicat
 Component inside broker which tracks active connections and can trigger launch of an application on demand by sending
 request to the appropriate app launcher.
 
+==== Application Launcher
+
+Application launchers are applications which can launch other applications. This concept was introduced to allow easy
+implementation of custom launch workflows which can be very different. E.g. web application is loaded in a browser window,
+native application started as a new OS process and plugin is loaded by its container application. In addition each vendor
+usually has custom launch steps like auto-updating or accepting terms & conditions. Such steps can also be implemented
+in a vendor-specific app launcher.
+
+On method call broker can either route the call to an online application instance or trigger launch of a new
+instance. Each application can specify its launcher in interop registry and broker will delegate launch to
+the specified launcher.
+
 ==== Client
 
 Client is a library used by application to communicate with interop broker. Client can be implemented in any language,
@@ -88,18 +100,6 @@ methods.
 Library which implements core functionality of interop client. It converts method calls to interop protocol messages
 and vice versa according to specification and uses pluggable transport implementation to send/receive messages
 to/from broker.
-
-==== Application Launcher
-
-Application launchers are applications which can launch other applications. This concept was introduced to allow easy
-implementation of custom launch workflows which can be very different. E.g. web application is loaded in a browser window,
-native application started as a new OS process and plugin is loaded by its container application. In addition each vendor
-usually has custom launch steps like auto-updating or accepting terms & conditions. Such steps can also be implemented
-in a vendor-specific app launcher.
-
-On method call broker can either route the call to an online application instance or trigger launch of a new
-instance. Each application can specify its launcher in interop registry and broker will delegate launch to
-the specified launcher.
 
 ==== Interop Protocol
 
