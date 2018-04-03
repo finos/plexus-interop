@@ -1,7 +1,8 @@
 :imagesdir: ./images
 
-Desktop Interop consist of several components. This section contains overview diagram which shows how components
-are related to each other and provides brief description for each of them.
+Plexus Interop standard spans several layers and concepts. This section contains overview diagram which shows how
+layers and concepts are related to each other on example of 2 applications calling each other through broker. Below
+this diagram you can find descriptions for all these layers and concepts.
 
 image::desktop-interop-layers.png[]
 
@@ -151,7 +152,7 @@ exception.
 ==== Wire Protocol
 
 Wire protocol is an abstraction for sending bytes through cross-process boundaries. Any existing stream-based network
-protocol such as named pipes or websockets can be used as a wire protocol for Desktop Interop.
+protocol such as named pipes or websockets can be used as a wire protocol for Plexus Interop.
 
 Broker listens to many wire protocols simultaneously on different addresses, so each client can choose which one to use.
 Usually for native apps it's more convenient to use named pipes, but for web apps it's more convenient to use websockets,

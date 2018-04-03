@@ -60,12 +60,11 @@ include::guides-system-requirements.adoc[]
 [[reference]]
 == Reference
 
-=== Desktop Interop Overview
+=== Overview
+include::spec-plexus-interop-overview.adoc[]
 
-include::spec-desktop-interop-overview.adoc[]
-
-=== Desktop Interop Concepts
-include::spec-desktop-interop-concepts.adoc[]
+=== Concepts
+include::spec-plexus-interop-concepts.adoc[]
 
 === App Registry
 include::spec-app-registry.adoc[]

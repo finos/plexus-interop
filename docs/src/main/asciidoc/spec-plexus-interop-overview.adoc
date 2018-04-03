@@ -1,12 +1,10 @@
 :imagesdir: ./images
 
-Plexus Interop project aim is to define open standard and provide reference implementation of Desktop Interop solution.
+Plexus Interop project aim is to define open standards for desktop application interop and provide reference
+implementations of these standards. It formalizes application launch, lifecycle tracking and communication between
+running applications within a single user session on client desktop without crossing  network boundaries.
 
-Desktop Interop formalizes application launch, lifecycle tracking and communication within a single user session
-on client desktop without crossing  network boundaries. Please note that client-server and server-server communication
-is out of scope of Desktop Interop, as well as communication between different users.
-
-The main goals for Desktop Interop standard are:
+The main goals for Plexus Interop standards are:
 
 - Provide a unified way of building integrated flows spanning desktop applications from different vendors
 - Provide a way to define strong-typed contracts between applications in a declarative way and auto-generate
