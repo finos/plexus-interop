@@ -20,7 +20,7 @@
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "pretest": "trash dist/gen", 
-    "test": "yarn unit"
+    "test": "if-env PLEXUS_CLI_TESTS_ENABLED=true && yarn unit || echo 'CLI tests disabled'"
   },
   "dependencies": {
     "commander": "2.15.1",
@@ -39,6 +39,7 @@
     "@types/node": "^7.0.5",
     "@types/fs-extra": "5.0.1",
     "chai": "^4.1.0",
+    "if-env": "1.0.0",
     "jest": "22.4.1",
     "copyfiles": "^1.2.0",
     "renamer": "^0.6.1",
