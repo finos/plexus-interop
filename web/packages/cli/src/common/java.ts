@@ -61,13 +61,11 @@ export async function getJavaExecPath(): Promise<string> {
         return process.env.PLEXUS_CLI_JAVA_EXE_PATH;
     }
     const baseDir = getJreBaseDir(getJreDownloadDir());
-    const platform = os.platform();
-    switch (platform) {
-        case 'win32':
-            return path.join(baseDir, 'bin', 'java.exe');
-        default:
-            throw new Error(`${platform} is not supported`);
-    }
+    return path.join(baseDir, ...getExePath());
+}
+
+function getExePath(): string[] {
+    return os.platform() === 'win32' ? ['bin', 'java.exe'] : ['bin', 'java'];
 }
 
 const getJreDownloadDir = () => path.join(getDistDir(), 'jre');

@@ -15,28 +15,29 @@
  * limitations under the License.
  */
 import * as approvals from 'approvals';
-import { getApprovalsBaseDir, prepareOutDir, getTestBaseDir } from '../setup';
-import { GenJsonCommand } from '../../../src/commands/GenJsonCommand';
-import { readTextFile } from '../../../src/common/files';
+import { getApprovalsBaseDir, prepareOutDir, getTestBaseDir, getTestClientInput } from './setup';
+import { readTextFile } from '../../src/common/files';
 import * as path from 'path';
+import { GenTsCommand } from '../../src/commands/GenTsCommand';
 
-describe('Metadata JSON generation CLI', () => {
+describe('Typescript Client generation CLI', () => {
 
-    it('Generates JSON with all metadata', async () => {
-
-        const testName = 'generated-json';
-        const genCommand = new GenJsonCommand();
+    it('Generates Client and messages definitions', async () => {
+        
+        const testName = 'generated-ts-client';
+        const genCommand = new GenTsCommand();
         const outDir = prepareOutDir(testName);
         
         await genCommand.action({
             out: outDir,
-            baseDir: getTestBaseDir()
+            baseDir: getTestBaseDir(),
+            input: getTestClientInput(),
+            namespace: 'plexus'
         });
 
-        const generatedContent = await readTextFile(path.join(outDir, 'interop.json'));
+        let generatedContent = await readTextFile(path.join(outDir, 'GreetingClientGeneratedClient.ts'));
+        approvals.verify(getApprovalsBaseDir(), 'generated-ts-client', generatedContent);
 
-        approvals.verify(getApprovalsBaseDir(), 'generated-json', generatedContent);
-
-    });
+    }, 10000);
 
 });

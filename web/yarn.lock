@@ -306,6 +306,10 @@
   version "18.1.1"
   resolved "https://registry.npmjs.org/@types/jest/-/jest-18.1.1.tgz#6f63488c64726900885ab9cd5697bb7fa1b416cc"
 
+"@types/jest@^22.0.0":
+  version "22.2.2"
+  resolved "https://artifactory.intranet.db.com/artifactory/api/npm/npm-all/@types/jest/-/jest-22.2.2.tgz#afe5dacbd00d65325f52da0ed3e76e259629ac9d"
+
 "@types/jstorage@^0.3.30":
   version "0.3.30"
   resolved "https://registry.npmjs.org/@types/jstorage/-/jstorage-0.3.30.tgz#0e6be0c55fc8bc8a37bb4692bedca173f4d6dfe8"
