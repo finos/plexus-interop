@@ -1,14 +1,14 @@
 :imagesdir: ./images
 
-Desktop Interop consist of several concepts. This section contains overview diagram which shows how different concepts
-are connected and provides brief description for each of them.
+Desktop Interop consist of several components. This section contains overview diagram which shows how components
+are related to each other and provides brief description for each of them.
 
 image::desktop-interop-layers.png[]
 
 ===== Application
 
-Application is a program on client desktop which can be started and stopped. Each application can provide services
-and/or consume services provided by other applications.
+Application is a program on client desktop which can be started and stopped. Each application can provide
+(i.e. implement) services and/or consume (i.e. call) services provided by other applications.
 
 Application is not necessary correspond to OS process. It can be a part of process, or consist of many processes.
 Examples of applications:
@@ -25,23 +25,34 @@ simultaneously on client desktop.
 
 ===== Interop Registry
 
-Interop registry defines strong-typed contracts between applications on client desktop.
+Interop registry defines strong-typed contracts between applications on client desktop using a special human-readable
+interface definition language.
 
 It consist of definitions of the following types:
 
 * Message definitions represent types of data which can be sent between applications.
-* Service definitions represent named sets of related methods which can be implemented by applications. Each service method
-is defined by its name, type, and types of request and response.
+* Service definitions represent named sets of related methods which can be implemented by applications. Service can
+contain one or many methods and each method is defined by its name, type, and types of request and response.
 * Application definitions declare which service implementations are provided and which consumed
 by each application participating in desktop interop.
+
+Broker loads Interop Registry from server on launch and re-loads it on changes. This allows adding new services to
+user desktops in runtime.
+
+Interop Registry enables dynamic service discovery. Applications are only connected to broker and call services rather
+than other applications. This concept is similar to dynamic injection containers available in almost any language and
+framework, but here it is used on a higher level. Broker dynamically searches for a suitable service implementation
+across all the applications in Interop Registry. Because of this applications are always de-coupled from each other,
+they don't need to know about counter-parties implementation details and they can release separately.
 
 ===== Broker
 
 Broker is the central part of desktop interop. Broker accepts, authenticates and tracks application (client) connections,
-validates and routes calls between them, and optionally can trigger launch of application on demand.
+validates and routes calls between them, and optionally can trigger launch of application on demand by sending launch
+request to an application launcher.
 
-Broker listens to one or many wire protocol servers to accept client connections. Applications can use any of the listened
-wire protocol implementations to establish connection with broker.
+Broker listens to one or many wire protocol servers to accept client connections. Applications can use any of the
+listened wire protocol implementations to establish connection with broker.
 
 Application instance is considered "online" while it has at least one established connection with broker. Broker
 uniquely identifies each connection and tracks it, so it always knows which apps are online in any given time.
@@ -51,29 +62,48 @@ by other applications. Broker validates and routes such calls to target applicat
 
 ===== Client
 
-Client is a library used by application to connect to interop broker. Client can be implemented in any language,
-it communicates with broker using interop protocol, transport protocol and wire protocols.
+Client is a library used by application to communicate with interop broker. Client can be implemented in any language,
+it communicates with broker using interop protocol, transport protocol and wire protocol.
+
+====== Client Message Marshaller
+
+Pluggable module used by client library to serialize and deserialize request/response messages.
+
+====== Generated Client API
+
+Application-specific API which is auto-generated using Interop Registry.
+
+For each consumed service a proxy class is generated which allows invocation of service methods.
+
+For each provided service an interface is generated which should be implemented to provide implementations for service
+methods.
+
+====== Generic Client API
+
+Library which implements core functionality of interop client. It converts method calls to interop protocol messages
+and vice versa according to specification and uses pluggable transport implementation to send/receive messages
+to/from broker.
 
 ===== Interop Protocol
 
 Interop Protocol is a language for conversations between client and broker through transport channels.
 
-It consist of 4 main types of conversations:
+Each interop protocol conversation is performed within a separate transport channel.
+
+Protocol describes 4 main types of conversations:
 
 * Connect handshake - the first conversation performed after new transport connection is established
 * Disconnect handshake - the last conversation performed before transport connection is closed
 * Discovery - request from application to broker to get the available services filtered by specific parameters
 * Method call - request from an application to call a method implemented in another application
 
-Each interop protocol conversation is performed within a separate transport channel.
-
 ===== Application Launcher
 
-Application launchers are applications which can launch other applications. This concept was introduced to de-couple
-and allow easy customization of launch workflows, because they can be very different for different apps.
-E.g. web application is loaded in a separate browser window, native application just started as a new process and
-.NET plugin is loaded by its container application. In addition each vendor can also have custom launch steps like
-auto-updating or accepting terms & conditions which can also be implemented in vendor-specific app launcher.
+Application launchers are applications which can launch other applications. This concept was introduced to allow easy
+implementation of custom launch workflows which can be very different. E.g. web application is loaded in a browser window,
+native application started as a new OS process and plugin is loaded by its container application. In addition each vendor
+usually have custom launch steps like auto-updating or accepting terms & conditions. Such steps can also be implemented
+in a vendor-specific app launcher.
 
 On method call broker can either route the call to an online application instance or trigger launch of a new
 instance. Each application can specify its launcher in interop registry and broker will delegate launch to
@@ -82,7 +112,7 @@ the specified launcher.
 ===== Transport Protocol
 
 Transport protocol is used to send binary messages between client and broker and is responsible for multiplexing and
-de-multiplexing to allow opening many channels simultaneously through a single connection.
+de-multiplexing many channels through a single connection.
 
 ====== Transport Connection
 
@@ -116,8 +146,8 @@ exception.
 ===== Wire Protocol
 
 Wire protocol is an abstraction for sending bytes through cross-process boundaries. Any existing stream-based network
-protocol such as named pipe or websocket can be used as wire protocol for Desktop Interop.
+protocol such as named pipes or websockets can be used as a wire protocol for Desktop Interop.
 
-Broker can listen to many wire protocols simultaneously on different addresses. Each client can choose one of wire
-protocols supported by broker. Usually for native apps it's more convenient to use named pipes and for web apps it's
-more convenient to use websockets because most of browsers has native support for them.
+Broker listens to many wire protocols simultaneously on different addresses, so each client can choose which one to use.
+Usually for native apps it's more convenient to use named pipes, but for web apps it's more convenient to use websockets,
+because most of browsers has built-in websockets support.
