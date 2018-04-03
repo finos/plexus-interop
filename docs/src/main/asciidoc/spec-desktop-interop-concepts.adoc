@@ -5,7 +5,7 @@ are related to each other and provides brief description for each of them.
 
 image::desktop-interop-layers.png[]
 
-===== Application
+==== Application
 
 Application is a program on client desktop which can be started and stopped. Each application can provide
 (i.e. implement) services and/or consume (i.e. call) services provided by other applications.
@@ -18,12 +18,12 @@ Examples of applications:
 * A part of process, e.g. a plugin running in a big container application consisting of many isolated plugins
 * A web window or worker in Electron.js or other web container
 
-====== Application Instance
+===== Application Instance
 
 Application instance is a running (started) application. There can be many instances of the same application running
 simultaneously on client desktop.
 
-===== Interop Registry
+==== Interop Registry
 
 Interop registry defines strong-typed contracts between applications on client desktop using a special human-readable
 interface definition language.
@@ -45,7 +45,7 @@ framework, but here it is used on a higher level. Broker dynamically searches fo
 across all the applications in Interop Registry. Because of this applications are always de-coupled from each other,
 they don't need to know about counter-parties implementation details and they can release separately.
 
-===== Broker
+==== Broker
 
 Broker is the central part of desktop interop. Broker accepts, authenticates and tracks application (client) connections,
 validates and routes calls between them, and optionally can trigger launch of application on demand by sending launch
@@ -60,16 +60,21 @@ uniquely identifies each connection and tracks it, so it always knows which apps
 Online applications instances can send protocol requests to broker to discover or call service implementations provided
 by other applications. Broker validates and routes such calls to target applications according to interop registry.
 
-===== Client
+===== App Lifecycle Manager
+
+Component inside broker which tracks active connections and can trigger launch of an application on demand by sending
+request to the appropriate app launcher.
+
+==== Client
 
 Client is a library used by application to communicate with interop broker. Client can be implemented in any language,
 it communicates with broker using interop protocol, transport protocol and wire protocol.
 
-====== Client Message Marshaller
+===== Client Message Marshaller
 
 Pluggable module used by client library to serialize and deserialize request/response messages.
 
-====== Generated Client API
+===== Generated Client API
 
 Application-specific API which is auto-generated using Interop Registry.
 
@@ -78,13 +83,25 @@ For each consumed service a proxy class is generated which allows invocation of 
 For each provided service an interface is generated which should be implemented to provide implementations for service
 methods.
 
-====== Generic Client API
+===== Generic Client API
 
 Library which implements core functionality of interop client. It converts method calls to interop protocol messages
 and vice versa according to specification and uses pluggable transport implementation to send/receive messages
 to/from broker.
 
-===== Interop Protocol
+==== Application Launcher
+
+Application launchers are applications which can launch other applications. This concept was introduced to allow easy
+implementation of custom launch workflows which can be very different. E.g. web application is loaded in a browser window,
+native application started as a new OS process and plugin is loaded by its container application. In addition each vendor
+usually has custom launch steps like auto-updating or accepting terms & conditions. Such steps can also be implemented
+in a vendor-specific app launcher.
+
+On method call broker can either route the call to an online application instance or trigger launch of a new
+instance. Each application can specify its launcher in interop registry and broker will delegate launch to
+the specified launcher.
+
+==== Interop Protocol
 
 Interop Protocol is a language for conversations between client and broker through transport channels.
 
@@ -97,33 +114,21 @@ Protocol describes 4 main types of conversations:
 * Discovery - request from application to broker to get the available services filtered by specific parameters
 * Method call - request from an application to call a method implemented in another application
 
-===== Application Launcher
-
-Application launchers are applications which can launch other applications. This concept was introduced to allow easy
-implementation of custom launch workflows which can be very different. E.g. web application is loaded in a browser window,
-native application started as a new OS process and plugin is loaded by its container application. In addition each vendor
-usually have custom launch steps like auto-updating or accepting terms & conditions. Such steps can also be implemented
-in a vendor-specific app launcher.
-
-On method call broker can either route the call to an online application instance or trigger launch of a new
-instance. Each application can specify its launcher in interop registry and broker will delegate launch to
-the specified launcher.
-
-===== Transport Protocol
+==== Transport Protocol
 
 Transport protocol is used to send binary messages between client and broker and is responsible for multiplexing and
 de-multiplexing many channels through a single connection.
 
-====== Transport Connection
+===== Transport Connection
 
 Transport connection is an abstraction of established connectivity between client and broker.
 
 Connection is initiated by client and accepted by broker.
 
-Transport implementation must detect if the connection is still alive (e.g. by sending heartbeats)
-and raise "disconnected" event on both sides when connectivity is broken.
+Transport implementation must detect if the connection is still alive, e.g. by sending heartbeats or using lower-level
+wire protocol capabilities for this, and raise "disconnected" event on both sides when connectivity is lost.
 
-====== Transport Channel
+===== Transport Channel
 
 Transport channel is a logical unit of data exchange through connection. It consist of request and response
 byte streams on both sides of connection.
@@ -143,7 +148,7 @@ Channel considered "Completed" when both sides completed request stream and cons
 Additionally it can be terminated by either client or broker with either "Failed" or "Canceled" status in case of
 exception.
 
-===== Wire Protocol
+==== Wire Protocol
 
 Wire protocol is an abstraction for sending bytes through cross-process boundaries. Any existing stream-based network
 protocol such as named pipes or websockets can be used as a wire protocol for Desktop Interop.
