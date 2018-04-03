@@ -38,6 +38,12 @@ describe('Typescript Client generation CLI', () => {
         let generatedContent = await readTextFile(path.join(outDir, 'GreetingClientGeneratedClient.ts'));
         approvals.verify(getApprovalsBaseDir(), 'generated-ts-client', generatedContent);
 
+        generatedContent = await readTextFile(path.join(outDir, 'plexus-messages.js'));
+        approvals.verify(getApprovalsBaseDir(), 'generated-ts-messages', generatedContent);
+
+        generatedContent = await readTextFile(path.join(outDir, 'plexus-messages.d.ts'));
+        approvals.verify(getApprovalsBaseDir(), 'generated-ts-definitions', generatedContent);
+
     }, 10000);
 
 });
