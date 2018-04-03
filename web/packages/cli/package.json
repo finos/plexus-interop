@@ -20,7 +20,8 @@
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "pretest": "trash dist/gen", 
-    "test": "if-env PLEXUS_CLI_TESTS_ENABLED=true && yarn unit || echo 'CLI tests disabled'"
+    "test": "if-env PLEXUS_CLI_TESTS_ENABLED=true && npm run cli-test || echo 'CLI tests disabled'",
+    "cli-test": "node ./install.js && yarn unit"
   },
   "dependencies": {
     "commander": "2.15.1",
