@@ -193,7 +193,7 @@ public class ProtoGenTask extends BaseGenTask {
 							root.elements.add(addIndex, customOption)
 							addIndex++
 						} else {
-							existingOption.value = customOption.value
+							existingOption.value = EcoreUtil2.cloneIfContained(customOption.value)
 						}
 					}
 				}
@@ -230,6 +230,8 @@ public class ProtoGenTask extends BaseGenTask {
 						fop.close();
 					}
 				}
+				
+				logger.info("Saved " + uri)
 			}
 		}
 	}
