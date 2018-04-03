@@ -14,19 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseJavaGenCommand } from './BaseJavaGenCommand';
-import { baseDir, out } from './DefaultOptions';
-import { Option } from './Option';
-import { getPbJsExecPath } from '../common/protoJs';
+package com.db.plexus.interop.dsl.gen.util;
 
-export class GenJsonCommand extends BaseJavaGenCommand {
-    
-    public plexusGenArgs: (opts: any) => string[] = opts => {
-        return ['--type=json_meta', ...this.optionArgs(opts), `--protoc=${getPbJsExecPath()}`];
+public class ProcessResult {
+
+    public final int code;
+    public final String stdout;
+
+    public ProcessResult(int code, String stdout) {
+        this.code = code;
+        this.stdout = stdout;
     }
-
-    public name = () => 'gen-json-meta';
-
-    public options: () => Option[] = () => [baseDir(), out()];
-
 }

@@ -45,6 +45,16 @@ public class PlexusGenConfig {
 
     private List<String> externalDependencies = new ArrayList<>();
 
+    private String messagesMetadata;
+
+    public String getMessagesMetadata() {
+        return messagesMetadata;
+    }
+
+    public void setMessagesMetadata(String messagesMetadata) {
+        this.messagesMetadata = messagesMetadata;
+    }
+
     public String getProtocPath() {
         return protocPath;
     }

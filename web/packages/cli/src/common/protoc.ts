@@ -49,7 +49,7 @@ export async function downloadProtoc(): Promise<string> {
 }
 
 export async function protocExecProvided(): Promise<string> {
-    const execPath = await getProtocExecPath();
+    const execPath = getProtocExecPath();
     const execExists = await exists(execPath);
     if (execExists) {
         return execPath;
@@ -58,7 +58,7 @@ export async function protocExecProvided(): Promise<string> {
     }
 }
 
-export async function getProtocExecPath(): Promise<string> {
+export function getProtocExecPath(): string {
     if (process.env.PLEXUS_CLI_PROTOC_EXE_PATH) {
         console.log(`Using protoc from env variable ${process.env.PLEXUS_CLI_PROTOC_EXE_PATH}`);
         return process.env.PLEXUS_CLI_PROTOC_EXE_PATH;

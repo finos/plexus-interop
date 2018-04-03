@@ -68,12 +68,7 @@ public class TsGenTask extends BaseGenTask {
                             : configProtocPath.substring(0, configProtocPath.lastIndexOf(PROTO_TS_COMPILER_CMD)) + PROTO_JS_COMPILER_CMD;
         }
 
-        final List<String> protoFilePaths = resources.stream()
-        		.filter(x -> x.getURI().lastSegment().endsWith(".proto"))
-        		.filter(x -> !x.getURI().toString().endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH))
-        		.filter(x -> !x.getURI().toString().endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH))        		
-                .map(resource -> new File(resource.getURI().toFileString()).getAbsolutePath())                
-                .collect(Collectors.toList());
+        final List<String> protoFilePaths = getProtoFilePaths(resources);
 
         final String outDirPath = this.getAbsolutePath(config.getOutDir());
 

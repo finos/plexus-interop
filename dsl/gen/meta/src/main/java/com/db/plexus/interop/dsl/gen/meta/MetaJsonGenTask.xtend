@@ -21,8 +21,13 @@ import java.io.IOException
 import com.google.inject.Inject
 import com.db.plexus.interop.dsl.gen.util.FileUtils
 import java.io.File
+import java.util.ArrayList
+import java.util.Arrays
 import com.db.plexus.interop.dsl.gen.BaseGenTask
 import org.eclipse.xtext.resource.XtextResourceSet
+import java.util.logging.Logger;
+import static com.db.plexus.interop.dsl.gen.util.ProcessUtils.*
+import com.db.plexus.interop.dsl.gen.util.ProcessResult
 
 class MetaJsonGenTask extends BaseGenTask {
 
@@ -30,12 +35,32 @@ class MetaJsonGenTask extends BaseGenTask {
     MetaJsonGenerator generator
 
     override doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
+        val resources = rs.getResources()
+        val protoFilePaths = getProtoFilePaths(resources)
+        var messagesJson = "[]";
+        if (!protoFilePaths.isEmpty() && config.getProtocPath() != null) {
+            val pbJsArgs = new ArrayList(Arrays.asList(config.getProtocPath()));
+            pbJsArgs.addAll(this.protoArgs())
+            pbJsArgs.addAll(protoFilePaths);
+            this.logger.info(String.format("Running compiler with args [%s]", String.join(" ", pbJsArgs)));
+            val result = execSync(pbJsArgs);
+            if (result.code !=  0) {
+                this.logger.warning("Compiler has returned non-zero result code " + result.code);
+            } else {
+                messagesJson = result.stdout;
+            }
+        }
+        config.setMessagesMetadata(messagesJson);
         val str = generator.generate(config, rs)
         FileUtils.writeStringToFile(new File(config.outDir + "/interop.json"), str)
     }
 
     override inputFilesGlob(PlexusGenConfig config) {
         "*.interop"
+    }
+
+    def protoArgs() {
+        return Arrays.asList("-t", "json");
     }
 
 }

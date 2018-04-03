@@ -24,8 +24,13 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import com.db.plexus.interop.dsl.InteropLangUtils;
+import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.XtextResourceSet;
 
@@ -80,7 +85,17 @@ public abstract class BaseGenTask implements GenTask {
 
     protected String getAbsolutePath(String relativePath) {
         return Paths.get(".").resolve(relativePath).toAbsolutePath().toString();
-    }    
+    }
+
+    protected List<String> getProtoFilePaths(EList<Resource> resources) {
+        return resources.stream()
+                .filter(x -> x.getURI().lastSegment().endsWith(".proto"))
+                .filter(x -> !x.getURI().toString().endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH))
+                .filter(x -> !x.getURI().toString().endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH))
+                .filter(x -> x.getURI().toFileString() != null)
+                .map(resource -> new File(resource.getURI().resolve(workingDirUri).toFileString()).getAbsolutePath())
+                .collect(Collectors.toList());
+    }
 
     protected void loadResources(PlexusGenConfig config) throws IOException {
         FileUtils.processFiles(

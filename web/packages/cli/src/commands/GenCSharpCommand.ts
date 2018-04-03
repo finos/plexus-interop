@@ -35,7 +35,7 @@ export class GenCSharpCommand extends BaseCommand {
 
         this.log('Generating interop client');
         const javaExecPath = await getJavaExecPath();
-        const protocExecPath = await getProtocExecPath();
+        const protocExecPath = getProtocExecPath();
         const javaLibPath = getJavaGenLibPath();
         await simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.clientGenArgs(opts), `--protoc=${protocExecPath}`], opts.verbose === 'true');
         
