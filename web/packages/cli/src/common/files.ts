@@ -40,8 +40,16 @@ export function mkdirsSync(dir: string): void {
     fs.mkdirsSync(dir);
 }
 
-export function existSync(path: string): boolean {
+export function existsSync(path: string): boolean {
     return fs.existsSync(path);
+}
+
+export function exists(path: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+        fs.exists(path, exists => {
+            resolve(exists);
+        });
+    });
 }
 
 export async function listFiles(baseDir: string, pattern: RegExp): Promise<string[]> {

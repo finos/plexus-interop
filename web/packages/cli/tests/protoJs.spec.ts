@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 import { getPbJsExecPath } from '../src/common/protoJs';
-import { existSync } from '../src/common/files';
+import { existsSync } from '../src/common/files';
 
 describe('ProtoJS compiler utilities', () => {
 
     it('It correctly locates pbjs exec path', () => {
         const execPath = getPbJsExecPath();
         console.log(execPath);
-        expect(existSync(execPath)).toBeTruthy();
+        expect(existsSync(execPath)).toBeTruthy();
         expect(execPath.includes('pbjs')).toBeTruthy();
     });    
 

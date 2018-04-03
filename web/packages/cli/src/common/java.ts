@@ -16,7 +16,7 @@
  */
 import * as path from 'path';
 import * as os from 'os';
-import { getDirectories, getDistDir } from './files';
+import { getDirectories, getDistDir, exists } from './files';
 import { downloadPackage } from './download';
 
 export function downloadJre(): Promise<string> {
@@ -27,6 +27,16 @@ export function downloadJre(): Promise<string> {
         connection: 'keep-alive',
         Cookie: 'gpw_e24=http://www.oracle.com/; oraclelicense=accept-securebackup-cookie'
     });
+}
+
+export async function javaExecProvided(): Promise<string> {
+    const execPath = await getJavaExecPath();
+    const execExists = exists(execPath);
+    if (!execExists) {
+        return execPath;
+    } else {
+        throw new Error(`Do not exist ${execPath}`);
+    }
 }
 
 export function getJreDownloadUrl(): string {

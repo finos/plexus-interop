@@ -22,5 +22,11 @@ try {
     console.warn(`Unable to load dist/main/src/install module`, error);
 }
 if (install) {
-    install();
+    install()
+        .then(() => {
+            console.log('Plexus CLI installation completed');
+        })
+        .catch(e => {
+            console.warn('Plexus CLI installation completed with errors', e);            
+        });
 }
