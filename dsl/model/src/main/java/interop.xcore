@@ -26,9 +26,7 @@ package com.db.plexus.interop.dsl
 import com.db.plexus.interop.dsl.protobuf.Service
 import com.db.plexus.interop.dsl.protobuf.Method
 import com.db.plexus.interop.dsl.protobuf.Option
-import com.db.plexus.interop.dsl.protobuf.OptionList
 import com.db.plexus.interop.dsl.protobuf.ProtoDefinition
-
 
 class Application extends ProtoDefinition {
 	contains ApplicationElement[] elements	
@@ -44,38 +42,30 @@ class ConsumedService extends ApplicationElement {
 	String alias
 	refers Service service
 	contains RestrictionList restrictions	
-	contains ConsumedServiceBody body
-}
-
-class ConsumedServiceBody {	
 	contains ConsumedServiceElement[] elements
 }
 
-class ConsumedServiceElement {	
+interface ConsumedServiceElement {	
 }
 
 class ConsumedMethod extends ConsumedServiceElement {
 	refers Method method
-	contains OptionList options	
+	contains InteropOption[] options	
 }
 
 class ProvidedService extends ApplicationElement {
 	String alias
 	refers Service service
 	contains RestrictionList restrictions
-	contains ProvidedServiceBody body
-}
-
-class ProvidedServiceBody {	
 	contains ProvidedServiceElement[] elements
 }
 
-class ProvidedServiceElement {		
+interface ProvidedServiceElement {		
 }
 
 class ProvidedMethod extends ProvidedServiceElement {
 	refers Method method
-	contains OptionList options
+	contains InteropOption[] options
 }
 
 class RestrictionList {

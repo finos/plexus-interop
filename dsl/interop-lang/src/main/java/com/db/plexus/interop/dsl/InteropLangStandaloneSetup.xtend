@@ -19,44 +19,53 @@
  */
 package com.db.plexus.interop.dsl
 
-import com.google.inject.Injector
-import org.eclipse.emf.ecore.EPackage
-import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
 import com.db.plexus.interop.dsl.protobuf.ProtoLangStandaloneSetup
-import com.google.inject.Guice
-import com.google.inject.Module
-import java.util.List
-import java.util.LinkedList
+import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
+import com.google.inject.Injector
+import org.eclipse.emf.common.util.URI
+import org.eclipse.emf.ecore.EPackage
 
 /**
  * Initialization support for running Xtext languages without Equinox extension registry.
  */
 class InteropLangStandaloneSetup extends InteropLangStandaloneSetupGenerated {
 	
-	ProtoLangConfig config	
-	List<Module> modules = new LinkedList<Module>
-		
-	new () {
-		this(null)		
+	private Injector protoLangInjector
+	private Injector interopLangInjector
+	private ProtoLangConfig protoLangConfig
+	private ProtoLangConfig interopLangConfig
+	
+	def Injector getInteropLangInjector() { 
+		return interopLangInjector	
 	}
 	
-	new (ProtoLangConfig config, Module... modules) {
-		this.config = if (config === null) new ProtoLangConfig() else config
-		this.modules.addAll(modules)		
-	}	
-		
+	def Injector getProtoLangInjector() {
+		return protoLangInjector
+	}
+	
+	def void addBaseURI(URI baseURI) {
+		protoLangConfig.addBaseURI(baseURI)
+		interopLangConfig.addBaseURI(baseURI)
+	}
+	
+	def void removeBaseURI(URI baseURI) {
+		protoLangConfig.removeBaseURI(baseURI)
+		interopLangConfig.removeBaseURI(baseURI)		
+	}
+							
 	override createInjectorAndDoEMFRegistration() {
-		new ProtoLangStandaloneSetup(this.config, this.modules).createInjectorAndDoEMFRegistration();
-		val injector = createInjector();
-		register(injector);
-		return injector;
+		protoLangInjector = new ProtoLangStandaloneSetup().createInjectorAndDoEMFRegistration()
+		protoLangConfig = protoLangInjector.getInstance(typeof(ProtoLangConfig))
+		interopLangInjector = createInjector();
+		interopLangConfig = interopLangInjector.getInstance(typeof(ProtoLangConfig))
+		for (uri: protoLangConfig.baseURIs) {
+			interopLangConfig.addBaseURI(uri)
+		}		
+		register(interopLangInjector);
+		return interopLangInjector;
 	}
-
-	override Injector createInjector() {		
-		return Guice.createInjector(new InteropLangRuntimeModule(this.config));					
-	}
-	
+		
 	override register(Injector injector) {
 		if (!EPackage.Registry.INSTANCE.containsKey(ProtobufPackage.eNS_URI)) {
 			EPackage.Registry.INSTANCE.put(ProtobufPackage.eNS_URI, ProtobufPackage.eINSTANCE);

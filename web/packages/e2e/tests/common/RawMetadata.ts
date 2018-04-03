@@ -60,26 +60,26 @@ export class RawMetadata {
                 "methods": [
                     {
                         "name": "Unary",
-                        "input": "plexus.interop.testing.EchoRequest",
-                        "output": "plexus.interop.testing.EchoRequest",
+                        "request": "plexus.interop.testing.EchoRequest",
+                        "response": "plexus.interop.testing.EchoRequest",
                         "type": "Unary"
                     },
                     {
                         "name": "ServerStreaming",
-                        "input": "plexus.interop.testing.EchoRequest",
-                        "output": "plexus.interop.testing.EchoRequest",
+                        "request": "plexus.interop.testing.EchoRequest",
+                        "response": "plexus.interop.testing.EchoRequest",
                         "type": "ServerStreaming"
                     },
                     {
                         "name": "ClientStreaming",
-                        "input": "plexus.interop.testing.EchoRequest",
-                        "output": "plexus.interop.testing.EchoRequest",
+                        "request": "plexus.interop.testing.EchoRequest",
+                        "response": "plexus.interop.testing.EchoRequest",
                         "type": "ClientStreaming"
                     },
                     {
                         "name": "DuplexStreaming",
-                        "input": "plexus.interop.testing.EchoRequest",
-                        "output": "plexus.interop.testing.EchoRequest",
+                        "request": "plexus.interop.testing.EchoRequest",
+                        "response": "plexus.interop.testing.EchoRequest",
                         "type": "DuplexStreaming"
                     }
                 ]
@@ -89,8 +89,8 @@ export class RawMetadata {
                 "methods": [
                     {
                         "name": "Launch",
-                        "input": "interop.AppLaunchRequest",
-                        "output": "interop.AppLaunchResponse",
+                        "request": "interop.AppLaunchRequest",
+                        "response": "interop.AppLaunchResponse",
                         "type": "Unary"
                     }
                 ]
@@ -106,10 +106,18 @@ export class RawMetadata {
                             "plexus.interop.testing.*"
                         ],
                         "methods": [
-                            "Unary",
-                            "ServerStreaming",
-                            "ClientStreaming",
-                            "DuplexStreaming"
+                            {
+                                "name": "Unary"
+                            },
+                            {
+                                "name": "ServerStreaming"
+                            },
+                            {
+                                "name": "ClientStreaming"
+                            },
+                            {
+                                "name": "DuplexStreaming"
+                            }
                         ]
                     }
                 ],
@@ -123,26 +131,51 @@ export class RawMetadata {
                 "provides": [
                     {
                         "service": "plexus.interop.testing.EchoService",
-                        "title": "Sample Echo Service",
+                        "options": [
+                            {
+                                "id": "interop.ProvidedServiceOptions.title",
+                                "value": "Sample Echo Service"
+                            }
+                        ],
                         "to": [
                             "plexus.interop.testing.*"
                         ],
                         "methods": [
                             {
                                 "name": "Unary",
-                                "title": "Sample Unary Method"
+                                "options": [
+                                    {
+                                        "id": "interop.ProvidedMethodOptions.title",
+                                        "value": "Sample Unary Method"
+                                    }
+                                ]                                
                             },
                             {
-                                "name": "ServerStreaming",
-                                "title": "Sample Server Streaming Method"
+                                "name": "ServerStreaming",                                
+                                "options": [
+                                    {
+                                        "id": "interop.ProvidedMethodOptions.title",
+                                        "value": "Sample Server Streaming Method"
+                                    }
+                                ]
                             },
                             {
-                                "name": "ClientStreaming",
-                                "title": "Sample Client Streaming Method"
+                                "name": "ClientStreaming",                                
+                                "options": [
+                                    {
+                                        "id": "interop.ProvidedMethodOptions.title",
+                                        "value": "Sample Client Streaming Method"
+                                    }
+                                ]
                             },
                             {
-                                "name": "DuplexStreaming",
-                                "title": "Sample Duplex Streaming Method"
+                                "name": "DuplexStreaming",                                
+                                "options": [
+                                    {
+                                        "id": "interop.ProvidedMethodOptions.title",
+                                        "value": "Sample Duplex Streaming Method"
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -155,14 +188,12 @@ export class RawMetadata {
                 "provides": [
                     {
                         "service": "interop.AppLauncherService",
-                        "title": "AppLauncherService",
                         "to": [
                             "interop.AppLifecycleManager"
                         ],
                         "methods": [
                             {
-                                "name": "Launch",
-                                "title": "Launch"
+                                "name": "Launch"
                             }
                         ]
                     }

@@ -1,0 +1,1 @@
+java -jar ..\..\..\bin\win-x86\sdk\plexusgen.jar --baseDir=metadata\interop --type=json_meta --out=metadata

@@ -22,6 +22,6 @@
         Broker,
         Stop,
         Load,
-        Activate,
+        Launch,
     }
 }

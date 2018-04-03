@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import { StreamingInvocationClient } from "./StreamingInvocationClient";
-import { Observer } from "@plexus-interop/common";
 import { MethodInvocationContext } from "@plexus-interop/client-api";
 import { InvocationObserver } from "../../generic";
 

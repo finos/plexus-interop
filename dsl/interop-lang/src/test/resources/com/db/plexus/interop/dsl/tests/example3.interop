@@ -15,10 +15,10 @@
 // limitations under the License.
 //
 
-package plexus.interop.tests;
+package com.db.plexus.interop.dsl.tests;
 
-import "interop/AppLauncherService.proto";
+import "interop/app_launcher_service.proto";
 
 application ElectronAppLauncher {
-	provides interop.AppLauncherService { Launch; }
+	provides .interop.AppLauncherService { Launch; }
 }

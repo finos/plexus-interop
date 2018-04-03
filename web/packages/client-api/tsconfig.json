@@ -14,6 +14,7 @@
         "forceConsistentCasingInFileNames": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
+        "noUnusedLocals": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "experimentalDecorators": true,

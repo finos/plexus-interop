@@ -6,13 +6,13 @@
   "description": "Plexus Web Interop root module",
   "scripts": {
     "prebootstrap": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
-    "bootstrap": "yarn install --check-files && lerna bootstrap",
+    "bootstrap": "lerna bootstrap -- --check-files --ignore-optional",
     "postbootstrap": "node ./scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
     "preinstall": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
     "prebuild": "run-s bootstrap",
     "build": "lerna run build --stream --concurrency 1",
     "prepublish-all": "node ./scripts/replace-auth-vars.js --publish && lerna exec -- cross-var shx cp $LERNA_ROOT_PATH/.npmrc .npmrc",
-    "publish-all": "lerna exec --stream --concurrency 1 -- npm publish --verbose --access=public",
+    "publish-all": "lerna exec --stream --scope {@plexus-interop/broker,@plexus-interop/cli,@plexus-interop/client,@plexus-interop/client-api,@plexus-interop/common,@plexus-interop/protocol,@plexus-interop/transport-common,@plexus-interop/websocket-transport,@plexus-interop/studio} --concurrency 1 -- npm publish --verbose --access=public",
     "postpublish-all": "shx rm -rf .npmrc && lerna exec -- shx rm -rf .npmrc",
     "e2e-native": "cd ./packages/e2e && yarn e2e-native",
     "poste2e-native": "yarn coverage",
@@ -23,7 +23,7 @@
     "ci-build": "run-s build",
     "ci-build-e2e": "run-s build e2e-native e2e-web",
     "ci-publish": "run-s bump-version build publish-all",
-    "bump-version": "cross-var lerna publish --repo-version $PLEXUS_BUILD_NPM_VERSION --skip-git --skip-npm --yes --verbose --force-publish=*",
+    "bump-version": "cross-var lerna publish --repo-version $PLEXUS_BUILD_NPM_PACKAGE_VERSION --skip-git --skip-npm --yes --verbose --force-publish=*",
     "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
   },
   "workspaces": [
@@ -31,7 +31,7 @@
   ],
   "devDependencies": {
     "cross-var": "1.1.0",
-    "electron": "1.7.12",
+    "electron": "1.8.4",
     "lerna": "2.8.0",
     "minimist": "1.2.0",
     "npm-run-all": "4.1.1",

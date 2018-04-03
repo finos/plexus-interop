@@ -16,14 +16,13 @@
  */
 package com.db.plexus.interop.dsl.protobuf.scoping
 
-import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider
-import org.eclipse.xtext.naming.QualifiedName
-import org.eclipse.xtext.naming.IQualifiedNameConverter
+import com.db.plexus.interop.dsl.protobuf.Package
+import com.db.plexus.interop.dsl.protobuf.Proto
 import com.google.inject.Inject
 import java.util.LinkedList
-import com.db.plexus.interop.dsl.protobuf.Proto
-import com.db.plexus.interop.dsl.protobuf.Package
-import com.db.plexus.interop.dsl.protobuf.Method
+import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider
+import org.eclipse.xtext.naming.IQualifiedNameConverter
+import org.eclipse.xtext.naming.QualifiedName
 
 class ProtoLangQualifiedNameProvider extends DefaultDeclarativeQualifiedNameProvider {
 	

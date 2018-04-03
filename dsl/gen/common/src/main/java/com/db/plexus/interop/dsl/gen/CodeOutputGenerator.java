@@ -17,19 +17,35 @@
 package com.db.plexus.interop.dsl.gen;
 
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+
+import com.db.plexus.interop.dsl.InteropLangUtils;
+import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public interface CodeOutputGenerator {
+public abstract class CodeOutputGenerator {
 
-    String JSON_META = "json_meta";
+	public static final String JSON_META = "json_meta";
     
-    String PROTO = "proto";
+    public static final String PROTO = "proto";
     
-    String PROTO_CSHARP = "proto_csharp";
+    public static final String PROTO_CSHARP = "proto_csharp";
     
-    String CSHARP = "csharp";
+    public static final String CSHARP = "csharp";
+    
+    public final String generate(PlexusGenConfig genConfig, ResourceSet resourceSet) {    	
+    	return generate(
+    		genConfig,
+    		resourceSet
+    			.getResources()
+    			.stream()
+    			.filter(x -> 
+    				!x.getURI().toString().endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH) && 
+    				!x.getURI().toString().endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH))
+    			.collect(Collectors.toList()));
+    }
 
-    String generate(PlexusGenConfig genConfig, List<Resource> resources);
-
+    abstract protected String generate(PlexusGenConfig genConfig, List<Resource> resources);
 }

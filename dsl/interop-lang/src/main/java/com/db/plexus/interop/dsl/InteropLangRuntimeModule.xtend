@@ -37,16 +37,6 @@ import com.db.plexus.interop.dsl.protobuf.scoping.ProtoLangQualifiedNameProvider
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 class InteropLangRuntimeModule extends AbstractInteropLangRuntimeModule {
-	
-	private ProtoLangConfig config
-
-	new() {
-		this.config = new ProtoLangConfig();
-	}
-
-	new(ProtoLangConfig config) {
-		this.config = config
-	}
 
 	// workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=495851
 	def void configureIPreferenceValuesProvider(Binder binder) {
@@ -67,6 +57,7 @@ class InteropLangRuntimeModule extends AbstractInteropLangRuntimeModule {
 	}
 
 	def configureProtoLangConfig(Binder binder) {
-		binder.bind(typeof(ProtoLangConfig)).toInstance(config);
+		binder.bind(typeof(ProtoLangConfig))
+		binder.bind(typeof(InteropLangUtils))
 	}
 }

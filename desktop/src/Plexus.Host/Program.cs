@@ -70,7 +70,7 @@ namespace Plexus.Host
                         false,
                         "Directory to seek for metadata files: apps.json and interop.json");
 
-                    syntax.DefineCommand("activate", ref command, CliCommand.Activate, "Activate app in the running broker");
+                    syntax.DefineCommand("launch", ref command, CliCommand.Launch, "Launch app through the running broker");
                     syntax.DefineOption(
                         "d|directory",
                         ref workingDir,
@@ -113,13 +113,13 @@ namespace Plexus.Host
                             return 1;
                         }
                         return await LoadAndRunProgramAsync(pluginPath, pluginArgs, workingDir);
-                    case CliCommand.Activate:
+                    case CliCommand.Launch:
                         if (appIds.Count == 0)
                         {
                             result.ReportError("At least one <application> must be specified");
                             return 1;
                         }
-                        return await ActivateAppAsync(workingDir, appIds);
+                        return await LaunchAppAsync(workingDir, appIds);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -142,12 +142,12 @@ namespace Plexus.Host
             }
         }
 
-        private static async Task<int> ActivateAppAsync(string workingDir, IEnumerable<string> appIds)
+        private static async Task<int> LaunchAppAsync(string workingDir, IEnumerable<string> appIds)
         {
             var commandLineToolPluginPath = Path.Combine(
                 Path.GetDirectoryName(typeof(Program).Assembly.Location),
                 "Plexus.Interop.CommandLineTool.dll");
-            var args = new List<string> {"activate"};
+            var args = new List<string> {"launch"};
             args.AddRange(appIds);
             return await LoadAndRunProgramAsync(commandLineToolPluginPath, args, workingDir).ConfigureAwait(false);
         }

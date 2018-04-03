@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Simple Web App examples",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "prebuild": "trash dist",
     "compile": "tsc -p tsconfig.json",
@@ -29,7 +30,7 @@
   "devDependencies": {
     "browserify": "^14.4.0",
     "copyfiles": "^1.2.0",
-    "electron": "1.7.12",
+    "electron": "1.8.4",
     "http-server": "^0.10.0",
     "trash-cli": "^1.4.0",
     "typescript": "2.6.1"

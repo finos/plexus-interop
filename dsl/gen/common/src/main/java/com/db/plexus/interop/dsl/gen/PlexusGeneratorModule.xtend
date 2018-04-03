@@ -16,9 +16,6 @@
  */
 package com.db.plexus.interop.dsl.gen
 
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.xtext.generator.IGenerator;
 import org.eclipse.xtext.resource.generic.AbstractGenericResourceRuntimeModule
 
 class PlexusGeneratorModule extends AbstractGenericResourceRuntimeModule {

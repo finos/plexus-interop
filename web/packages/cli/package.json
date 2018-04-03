@@ -1,0 +1,67 @@
+{
+  "name": "@plexus-interop/cli",
+  "version": "0.1.0",
+  "main": "plexus.js",
+  "description": "Plexus Interop CLI tools",
+  "license": "Apache-2.0",
+  "preferGlobal": true,
+  "bin": {
+    "plexus": "./plexus.js"
+  },
+  "scripts": {
+    "prebuild": "yarn lint && trash dist/main && trash dist/lib && npm run copy-assets && npm run rename-lib",
+    "copy-assets": "copyfiles -f ../../../dsl/gen/cli/build/libs/cli-*-all.jar dist/lib",
+    "rename-lib": "renamer --find cli-.*-all.jar --regex --replace plexusgen.jar dist/lib/* && trash dist/lib/cli-.*-all.jar",
+    "build": "yarn build:main",
+    "postinstall": "node ./install.js",
+    "postbuild": "yarn test",
+    "build:main": "tsc -p tsconfig.json",
+    "build:watch": "tsc -w -p tsconfig.json",
+    "lint": "tslint src/**/*.ts",
+    "unit": "jest --coverage",
+    "test": "yarn unit"
+  },
+  "dependencies": {
+    "commander": "2.15.1",
+    "progress": "2.0.0",
+    "protobufjs": "6.8.0",
+    "request": "2.75.0",
+    "fs-extra": "5.0.0",
+    "adm-zip": "0.4.7",
+    "tar-fs": "1.13.2",
+    "tar": "4.4.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.2",
+    "@types/jest": "^18.1.1",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^7.0.5",
+    "@types/fs-extra": "5.0.1",
+    "chai": "^4.1.0",
+    "jest": "^21.0.1",
+    "copyfiles": "^1.2.0",
+    "renamer": "^0.6.1",
+    "trash": "^4.1.0",
+    "trash-cli": "^1.4.0",
+    "ts-mockito": "2.0.2",
+    "tslint": "5.8.0",
+    "typescript": "2.6.1",
+    "yarn": "1.4.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".+/dist/main/tests/.+spec.js$",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "dist/main/src/**/*.js",
+      "!dist/main/src/gen/**/*.js",
+      "!src/*.d.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.spec.ts"
+    ]
+  }
+}

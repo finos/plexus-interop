@@ -30,8 +30,10 @@
 
         public Maybe<string> Alias { get; set; }
 
-        public Dictionary<string, IProvidedMethod> Methods { get; set; } = new Dictionary<string, IProvidedMethod>();
+        public Dictionary<string, IProvidedMethod> Methods { get; set; } = new Dictionary<string, IProvidedMethod>();        
 
         IReadOnlyDictionary<string, IProvidedMethod> IProvidedService.Methods => Methods;
+
+        public Maybe<LaunchMode> LaunchMode { get; set; } = Metamodel.LaunchMode.SingleInstance;
     }
 }

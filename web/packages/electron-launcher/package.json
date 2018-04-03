@@ -5,6 +5,7 @@
   "productName": "Plexus Electron App Launcher",
   "license": "Apache-2.0",
   "main": "./dist/electronLauncher.bundle.js",
+  "private": true,
   "scripts": {
     "prebuild": "trash dist",
     "build": "yarn build:main && npm run copy-gen-folders && npm run package && npm run build-binary",
@@ -38,7 +39,7 @@
   "devDependencies": {
     "browserify": "^14.4.0",
     "copyfiles": "^1.2.0",
-    "electron": "1.7.12",
+    "electron": "1.8.4",
     "electron-log": "^2.2.9",
     "electron-packager": "9.1.0",
     "jest": "^21.1.0",
@@ -50,9 +51,6 @@
   "jest": {
     "testEnvironment": "node",
     "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine.js",
-    "transform": {
-      ".(ts|tsx)": "<rootDir>/preprocessor.js"
-    },
     "moduleFileExtensions": [
       "ts",
       "js"

@@ -27,16 +27,14 @@ import { TransportFrameHandler } from "./TransportFrameHandler";
 import { StateMaschineBase, StateMaschine, LoggerFactory, Logger, ReadWriteCancellationToken, Observer, BufferedObserver, Subscription, AnonymousSubscription } from "@plexus-interop/common";
 import { TransportFrameListener } from "./TransportFrameListener";
 
-export type ConnectionState = "CREATED" | "ACCEPT" | "OPEN" | "CLOSE_RECEIVED" | "CLOSE_REQUESTED" | "CLOSED";
-
-export const ConnectionState = {
-    CREATED: "CREATED" as ConnectionState,
-    ACCEPT: "ACCEPT" as ConnectionState,
-    OPEN: "OPEN" as ConnectionState,
-    CLOSE_RECEIVED: "CLOSE_RECEIVED" as ConnectionState,
-    CLOSE_REQUESTED: "CLOSE_REQUESTED" as ConnectionState,
-    CLOSED: "CLOSED" as ConnectionState
-};
+export enum ConnectionState {
+    CREATED = "CREATED",
+    ACCEPT = "ACCEPT",
+    OPEN = "OPEN",
+    CLOSE_RECEIVED = "CLOSE_RECEIVED",
+    CLOSE_REQUESTED = "CLOSE_REQUESTED",
+    CLOSED = "CLOSED"
+}
 
 type ChannelDescriptor = {
     channel: FramedTransportChannel,
