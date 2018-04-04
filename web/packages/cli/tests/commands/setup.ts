@@ -5,7 +5,8 @@ import * as approvals from 'approvals';
 import { mkdirsSync } from 'fs-extra';
 
 approvals.configure({
-    reporters: ['gitdiff']
+    reporters: ['gitdiff'],
+    errorOnStaleApprovedFiles: false
 });
 
 export function getTestBaseDir(): string {
