@@ -37,6 +37,7 @@ import { ProvidedServiceDto } from "./ProvidedServiceDto";
 import { ProvidedService } from "../model/ProvidedService";
 import { ApplicationDto } from "./ApplicationDto";
 import { OptionDto } from "./OptionDto";
+import { MessagesNamespace, isMessage } from "./MessagesNamespace";
 
 export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
@@ -54,7 +55,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
             next: update => this.current = update
         });
     }
-    
+
     public getCurrent(): InteropRegistry {
         return this.current;
     }
@@ -69,8 +70,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         const registryDto: RegistryDto = JSON.parse(jsonRegistry);
         this.log.trace(`Finished parsing ${jsonRegistry.length} length`);
 
-        const messages: ExtendedMap<string, Message> = ExtendedArray.of(registryDto.messages)
-            .toMap(x => x.id, x => x );
+        const messages: ExtendedMap<string, Message> = this.collectMessages(registryDto.messages);
 
         const services = ExtendedArray.of(
             registryDto.services.map(s => this.convertService(messages, s)))
@@ -84,9 +84,24 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         return {
             messages,
             services,
-            applications
+            applications,
+            rawMessages: registryDto.messages
         };
+    }
 
+    private collectMessages(rawMessages: MessagesNamespace, namespace: string | null = null, resultMap?: ExtendedMap<string, Message>): ExtendedMap<string, Message> {
+        resultMap = resultMap || ExtendedMap.create<string, Message>();
+        const nested = rawMessages.nested;
+        for (let key in nested) {
+            const value = nested[key];
+            const id = namespace ? `${namespace}.${key}` : key;
+            if (isMessage(value)) {
+                resultMap.set(id, { id });
+            } else {
+                this.collectMessages(value, id, resultMap);
+            }
+        }
+        return resultMap;
     }
 
     private convertApplication(services: ExtendedMap<string, Service>, appDto: ApplicationDto): Application {

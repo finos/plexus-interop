@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ApplicationDto } from "./ApplicationDto";
-import { ServiceDto } from "./ServiceDto";
-import { Message } from "../model/Message";
-import { MessagesNamespace } from "./MessagesNamespace";
+import { Options } from "./Options";
+import { MessageDto } from "./MessageDto";
 
-export interface RegistryDto {
+export type MessagesNamespace = {
+    options?: Options;
+    nested: MessagesNamespaceContent;
+};
 
-    messages: MessagesNamespace;
-    
-    applications: ApplicationDto[];
-    
-    services: ServiceDto[];
+export type MessagesNamespaceContent = {
+    [key: string]: MessageDto | MessagesNamespace;
+};
 
+export function isMessage(o: MessageDto | MessagesNamespace): o is MessageDto {
+    return !!(o as MessageDto).fields;
 }

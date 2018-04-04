@@ -14,17 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ApplicationDto } from "./ApplicationDto";
-import { ServiceDto } from "./ServiceDto";
-import { Message } from "../model/Message";
-import { MessagesNamespace } from "./MessagesNamespace";
+import { Fields } from "./Fields";
+import { Options } from "./Options";
 
-export interface RegistryDto {
-
-    messages: MessagesNamespace;
-    
-    applications: ApplicationDto[];
-    
-    services: ServiceDto[];
-
+export interface MessageDto {
+    fields: Fields;
+    options?: Options;
 }

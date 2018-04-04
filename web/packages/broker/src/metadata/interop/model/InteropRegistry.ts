@@ -18,6 +18,7 @@ import { Application } from "./Application";
 import { Message } from "./Message";
 import { Service } from "./Service";
 import { ExtendedMap } from "@plexus-interop/common";
+import { MessagesNamespace } from "../json/MessagesNamespace";
 
 export interface InteropRegistry {
 
@@ -26,5 +27,7 @@ export interface InteropRegistry {
     messages: ExtendedMap<string, Message>;
 
     services: ExtendedMap<string, Service>;
+
+    rawMessages: MessagesNamespace;
     
 }

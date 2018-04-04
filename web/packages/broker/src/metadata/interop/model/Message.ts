@@ -18,5 +18,4 @@ import { Field } from "./Field";
 
 export interface Message {
     id: string;
-    fields: Field[];
 }
