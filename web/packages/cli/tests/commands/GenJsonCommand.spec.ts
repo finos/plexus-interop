@@ -38,6 +38,6 @@ describe('Metadata JSON generation CLI', () => {
 
         approvals.verify(getApprovalsBaseDir(), 'generated-json', generatedContent);
 
-    });
+    }, 10000);
 
 });
