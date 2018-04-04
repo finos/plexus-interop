@@ -47,6 +47,17 @@ public class PlexusGenConfig {
 
     private String messagesMetadata;
 
+    @Parameter(names = {"-d", "--descriptors"})
+    private boolean includeProtoDescriptors;
+
+    public boolean isIncludeProtoDescriptors() {
+        return includeProtoDescriptors;
+    }
+
+    public void setIncludeProtoDescriptors(boolean includeProtoDescriptors) {
+        this.includeProtoDescriptors = includeProtoDescriptors;
+    }
+
     public String getMessagesMetadata() {
         return messagesMetadata;
     }

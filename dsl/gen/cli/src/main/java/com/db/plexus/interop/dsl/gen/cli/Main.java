@@ -65,6 +65,7 @@ public class Main {
                 jsGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.JSON_META:
+                genConfig.setIncludeProtoDescriptors(true);
                 enhanceMetadata(genConfig, workDir, baseDir, setup, injector);
                 GenTask metaJsonGenTask = injector.getInstance(MetaJsonGenTask.class);
                 metaJsonGenTask.doGen(genConfig);

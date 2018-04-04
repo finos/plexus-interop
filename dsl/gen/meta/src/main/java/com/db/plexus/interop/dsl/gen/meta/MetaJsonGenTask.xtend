@@ -36,7 +36,7 @@ class MetaJsonGenTask extends BaseGenTask {
 
     override doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
         val resources = rs.getResources()
-        val protoFilePaths = getProtoFilePaths(resources)
+        val protoFilePaths = getProtoFilePaths(resources, config)
         var messagesJson = "[]";
         if (!protoFilePaths.isEmpty() && config.getProtocPath() != null) {
             val pbJsArgs = new ArrayList(Arrays.asList(config.getProtocPath()));

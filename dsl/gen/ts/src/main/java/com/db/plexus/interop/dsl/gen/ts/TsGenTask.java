@@ -68,7 +68,7 @@ public class TsGenTask extends BaseGenTask {
                             : configProtocPath.substring(0, configProtocPath.lastIndexOf(PROTO_TS_COMPILER_CMD)) + PROTO_JS_COMPILER_CMD;
         }
 
-        final List<String> protoFilePaths = getProtoFilePaths(resources);
+        final List<String> protoFilePaths = getProtoFilePaths(resources, config);
 
         final String outDirPath = this.getAbsolutePath(config.getOutDir());
 
