@@ -43,12 +43,13 @@ public class PlexusGenConfig {
     @Parameter(names = {"-pc", "--protoc"})
     private String protocPath = "protoc";
 
+    @Parameter(names = {"-d", "--descriptors"})
+    private boolean includeProtoDescriptors;
+
     private List<String> externalDependencies = new ArrayList<>();
 
     private String messagesMetadata;
 
-    @Parameter(names = {"-d", "--descriptors"})
-    private boolean includeProtoDescriptors;
 
     public boolean isIncludeProtoDescriptors() {
         return includeProtoDescriptors;

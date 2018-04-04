@@ -30,8 +30,7 @@ describe('Metadata JSON generation CLI', () => {
         
         await genCommand.action({
             out: outDir,
-            baseDir: getTestBaseDir(),
-            verbose: 'true'
+            baseDir: getTestBaseDir()
         });
 
         const generatedContent = await readTextFile(path.join(outDir, 'interop.json'));
