@@ -31,7 +31,8 @@
     "fs-extra": "5.0.0",
     "adm-zip": "0.4.7",
     "tar-fs": "1.13.2",
-    "tar": "4.4.1"
+    "tar": "4.4.1",
+    "tslib": "1.9.0"
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",
