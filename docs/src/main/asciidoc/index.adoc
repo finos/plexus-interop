@@ -60,6 +60,14 @@ include::guides-system-requirements.adoc[]
 [[reference]]
 == Reference
 
+=== Components Overview
+
+include::spec-plexus-interop-components.adoc[]
+
+=== Concepts and Definitions
+
+include::spec-plexus-interop-concepts.adoc[]
+
 === App Registry
 include::spec-app-registry.adoc[]
 
