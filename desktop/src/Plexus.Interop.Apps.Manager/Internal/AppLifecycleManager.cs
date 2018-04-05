@@ -95,15 +95,16 @@ namespace Plexus.Interop.Apps.Internal
                     appConnectionList = new List<IAppConnection>();
                     _appConnections[appId] = appConnectionList;
                 }
-                appConnectionList.Add(clientConnection);                                
-                
+                appConnectionList.Add(clientConnection);
+
+                Log.Debug("New connection accepted: {{{0}}}", clientConnection);
+
                 if (_appInstanceConnectionWaiters.TryGetValue(appInstanceId, out var waiter))
                 {
+                    Log.Debug("Resolving deferred connection for app instance {0} to accepted connection {{{1}}}", appInstanceId, connection);
                     waiter.TryComplete(clientConnection);
                     _appInstanceConnectionWaiters.Remove(appInstanceId);
                 }
-
-                Log.Debug("New connection accepted: {{{0}}}", clientConnection);
 
                 return clientConnection;
             }
@@ -113,6 +114,8 @@ namespace Plexus.Interop.Apps.Internal
         {
             lock (_connections)
             {
+                Log.Debug("Removing connection {0}", connection.Info);
+
                 _connections.Remove(connection.Id);
 
                 var appInstanceId = connection.Info.ApplicationInstanceId;
@@ -233,7 +236,7 @@ namespace Plexus.Interop.Apps.Internal
         private async Task<IAppConnection> LaunchAndWaitConnectionAsync(string appId, UniqueId suggestedAppInstanceId, ResolveMode resolveMode)
         {
             var appInstanceId = suggestedAppInstanceId;
-            Log.Info("Launching {0} with suggesed instance id {1}", appId, appInstanceId);
+            Log.Info("Launching {0}", appId);
             var connectionPromise = new Promise<IAppConnection>();
             try
             {
@@ -253,8 +256,10 @@ namespace Plexus.Interop.Apps.Internal
                 {
                     if (_appInstanceConnections.TryGetValue(appInstanceId, out var connectionList) && connectionList.Any())
                     {
-                        return connectionList.First();
-                    }
+                        var connection = connectionList.First();
+                        Log.Debug("Resolving deferred connection for app instance {0} to connection {{{1}}}", appInstanceId, connection);
+                        connectionPromise.TryComplete(connection);
+                    }                    
                     _appInstanceConnectionWaiters[appInstanceId] = connectionPromise;
                 }
 

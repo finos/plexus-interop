@@ -16,5 +16,26 @@
  */
 ﻿namespace Plexus.Interop.Testing
 {
-    public delegate IClient TestClientFactory(ITestBroker targetBroker, UniqueId appInstanceId);
+    using System;
+    using System.Threading.Tasks;
+
+    public sealed class TestClientFactory
+    {
+        private readonly Func<ITestBroker, UniqueId, Task<IClient>> _createClientDelegate;
+
+        public TestClientFactory(Func<ITestBroker, UniqueId, Task<IClient>> createClientDelegate)
+        {
+            _createClientDelegate = createClientDelegate;
+        }
+
+        public TestClientFactory(Func<ITestBroker, UniqueId, IClient> createClientDelegate)
+        {
+            _createClientDelegate = (x, y) => Task.FromResult(createClientDelegate(x, y));
+        }
+
+        public Task<IClient> CreateClientAsync(ITestBroker targetBroker, UniqueId appInstanceId)
+        {
+            return _createClientDelegate(targetBroker, appInstanceId);
+        }
+    }
 }
