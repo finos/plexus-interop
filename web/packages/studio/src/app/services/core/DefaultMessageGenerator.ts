@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService } from "@plexus-interop/broker";
+import { InteropRegistryService, Enum, Message } from "@plexus-interop/broker";
 
 export class DefaultMessageGenerator {
 
@@ -26,6 +26,10 @@ export class DefaultMessageGenerator {
         "sfixed32", "sfixed64", "bool", "string"];
 
     public generate(messageId: string): string {
+        return JSON.stringify(this.generateObj(messageId));
+    }
+
+    private generateObj(messageId: string, skipMessageType: boolean = false): any {
         // https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
         const message = this.interopRegistryService.getRegistry().messages.get(messageId);
         if (!message) {
@@ -48,10 +52,56 @@ export class DefaultMessageGenerator {
                         defaultPayload[fieldName] = 0;
                 }
             } else {
-                // message or enum not supported yet
+                const enumRef = this.lookupEnum(field.type) 
+                    // nested enum
+                    || this.lookupEnum(`${messageId}.${field.type}`) 
+                    // shared namespace
+                    || this.lookupEnum(`${this.getNamespace(messageId)}.${field.type}`)
+                if (enumRef) {
+                    defaultPayload[fieldName] = this.firstValue(enumRef.values);
+                } else if (skipMessageType) {
+                    defaultPayload[fieldName] = [];
+                } else {
+                    const subMessage = this.lookupMessage(field.type) 
+                        // nested enum
+                        || this.lookupMessage(`${messageId}.${field.type}`) 
+                        // shared namespace
+                        || this.lookupMessage(`${this.getNamespace(messageId)}.${field.type}`);
+                    if (subMessage) {
+                        defaultPayload[fieldName] = this.generateObj(subMessage.id, true);
+                    }
+                }
             }
         }
-        return JSON.stringify(defaultPayload);
+        return defaultPayload;
+    }
+
+    private firstValue(o: any): any {
+        for (let k of o) {
+            return k;
+        }
+        return null;
+    }
+
+    private getNamespace(id: string): string {
+        const parts = id.split('.');
+        if (parts.length > 1) {
+            return parts.slice(0, parts.length - 1).join('.');
+        } else {
+            return id;
+        }
+    }
+
+    private lookupEnum(id: string): Enum | null {
+        const enums = this.interopRegistryService.getRegistry().enums;
+        if (enums) {
+            return enums.get(id);
+        }
+        return null;
+    }
+
+    private lookupMessage(id: string): Message | null {
+        return this.interopRegistryService.getRegistry().messages.get(id);
     }
 
     private isPrimitive(type: string): boolean {

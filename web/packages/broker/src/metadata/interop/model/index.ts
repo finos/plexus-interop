@@ -29,3 +29,5 @@ export * from "./ProvidedService";
 export * from "./ProvidedServiceReference";
 export * from "./Service";
 export * from "./Field";
+export * from "./Enum";
+export * from "./Message";
