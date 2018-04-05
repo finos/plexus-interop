@@ -37,7 +37,8 @@ import { ProvidedServiceDto } from "./ProvidedServiceDto";
 import { ProvidedService } from "../model/ProvidedService";
 import { ApplicationDto } from "./ApplicationDto";
 import { OptionDto } from "./OptionDto";
-import { MessagesNamespace, isMessage } from "./MessagesNamespace";
+import { MessagesNamespace, isMessage, isEnum } from "./MessagesNamespace";
+import { Enum } from "../model/Enum";
 
 export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
@@ -70,7 +71,10 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         const registryDto: RegistryDto = JSON.parse(jsonRegistry);
         this.log.trace(`Finished parsing ${jsonRegistry.length} length`);
 
-        const messages: ExtendedMap<string, Message> = this.collectMessages(registryDto.messages);
+        const messages = ExtendedMap.create<string, Message>();
+        const enums = ExtendedMap.create<string, Enum>();
+
+        this.collectMessagesMetadata(registryDto.messages, null, messages, enums);
 
         const services = ExtendedArray.of(
             registryDto.services.map(s => this.convertService(messages, s)))
@@ -83,25 +87,35 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
         return {
             messages,
+            enums,
             services,
             applications,
             rawMessages: registryDto.messages
         };
     }
 
-    private collectMessages(rawMessages: MessagesNamespace, namespaceId: string | null = null, resultMap?: ExtendedMap<string, Message>): ExtendedMap<string, Message> {
-        resultMap = resultMap || ExtendedMap.create<string, Message>();
-        const nested = rawMessages.nested;
+    private collectMessagesMetadata(
+        rawEnries: MessagesNamespace,
+        namespaceId: string | null = null,
+        messagesMap: ExtendedMap<string, Message>,
+        enumsMap: ExtendedMap<string, Enum>): void {
+
+        const nested = rawEnries.nested;
+        if (!nested) {
+            return;
+        }
+
         for (let key in nested) {
             const namespaceEntry = nested[key];
             const id = namespaceId ? `${namespaceId}.${key}` : key;
             if (isMessage(namespaceEntry)) {
-                resultMap.set(id, { id, fields: namespaceEntry.fields });
-            } else {
-                this.collectMessages(namespaceEntry, id, resultMap);
+                messagesMap.set(id, { id, fields: namespaceEntry.fields });
+            } else if (isEnum(namespaceEntry)) {
+                enumsMap.set(id, { id, values: namespaceEntry.values });
             }
+            this.collectMessagesMetadata(namespaceEntry, id, messagesMap, enumsMap);
         }
-        return resultMap;
+
     }
 
     private convertApplication(services: ExtendedMap<string, Service>, appDto: ApplicationDto): Application {
@@ -212,6 +226,5 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
                 throw new Error("Unsupported method type: " + methodTypeDto);
         }
     }
-
 
 }

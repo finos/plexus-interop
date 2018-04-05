@@ -14,23 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Options } from "./Options";
-import { MessageDto } from "./MessageDto";
-import { EnumDto } from "./EnumDto";
+import { Field } from "./Field";
+import { Values } from "../json/Values";
 
-export type MessagesNamespace = {
-    options?: Options;
-    nested?: MessagesNamespaceContent;
-};
-
-export type MessagesNamespaceContent = {
-    [key: string]: MessageDto | MessagesNamespace | EnumDto;
-};
-
-export function isMessage(o: MessageDto | MessagesNamespace | EnumDto): o is MessageDto {
-    return !!(o as MessageDto).fields;
-}
-
-export function isEnum(o: MessageDto | MessagesNamespace | EnumDto): o is EnumDto {
-    return !!(o as EnumDto).values;
+export interface Enum {
+    id: string;
+    values: Values;
 }

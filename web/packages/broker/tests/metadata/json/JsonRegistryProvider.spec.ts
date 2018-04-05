@@ -22,12 +22,14 @@ import { MethodType } from "../../../src/metadata/interop/model/MethodType";
 import { Application } from "../../../src/metadata/interop/model/Application";
 import { ConsumedMethod } from "../../../src/metadata/interop/model/ConsumedMethod";
 import { ProvidedMethod } from "../../../src/metadata/interop/model/ProvidedMethod";
+import { Enum } from "../../../src/metadata/interop/model/Enum";
+import { ExtendedMap } from "@plexus-interop/common";
 
 const fs = require("fs");
 
 describe("JsonRegistryProvider", () => {
 
-    const metadataJson = fs.readFileSync("tests/metadata/json/test-interop.json", "utf8");    
+    const metadataJson = fs.readFileSync("tests/metadata/json/test-interop.json", "utf8");
 
     it("Can parse metadata JSON", () => {
 
@@ -45,6 +47,14 @@ describe("JsonRegistryProvider", () => {
         expect(message.fields.int64Field.rule).toBeFalsy();
         expect(message.fields.repeatedDoubleField.type).toBe("double");
         expect(message.fields.repeatedDoubleField.rule).toBe("repeated");
+
+        const subMessage = registry.messages.get("plexus.interop.testing.EchoRequest.SubMessage") as Message;
+        expect(subMessage.id).toBe("plexus.interop.testing.EchoRequest.SubMessage");
+        expect(subMessage.fields.bytesField.type).toBe("bytes");
+
+        const subEnum = (registry.enums as ExtendedMap<string, Enum>).get("plexus.interop.testing.EchoRequest.SubEnum") as Enum;
+        expect(subEnum.id).toBe("plexus.interop.testing.EchoRequest.SubEnum");
+        expect(subEnum.values.value_one).toBe(0);
 
         const service = registry.services.get("plexus.interop.testing.EchoService") as Service;
         expect(service.id).toBe("plexus.interop.testing.EchoService");
@@ -78,7 +88,7 @@ describe("JsonRegistryProvider", () => {
         expect(providedService.to.isMatch("plexus.interop.do.not.exist.Client")).toBeFalsy();
         expect(providedService.to.isMatch("plexus.interop.do.not.exist.Client")).toBeFalsy();
         expect((providedService.methods.get("Unary") as ProvidedMethod).method).toBe(unaryMethod);
-        
+
     });
 
 });

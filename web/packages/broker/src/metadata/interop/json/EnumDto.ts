@@ -15,22 +15,9 @@
  * limitations under the License.
  */
 import { Options } from "./Options";
-import { MessageDto } from "./MessageDto";
-import { EnumDto } from "./EnumDto";
+import { Values } from "./Values";
 
-export type MessagesNamespace = {
+export interface EnumDto {
+    values: Values;
     options?: Options;
-    nested?: MessagesNamespaceContent;
-};
-
-export type MessagesNamespaceContent = {
-    [key: string]: MessageDto | MessagesNamespace | EnumDto;
-};
-
-export function isMessage(o: MessageDto | MessagesNamespace | EnumDto): o is MessageDto {
-    return !!(o as MessageDto).fields;
-}
-
-export function isEnum(o: MessageDto | MessagesNamespace | EnumDto): o is EnumDto {
-    return !!(o as EnumDto).values;
 }

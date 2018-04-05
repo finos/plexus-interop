@@ -16,8 +16,10 @@
  */
 import { Fields } from "./Fields";
 import { Options } from "./Options";
+import { MessagesNamespaceContent } from "./MessagesNamespace";
 
 export interface MessageDto {
     fields: Fields;
     options?: Options;
+    nested?: MessagesNamespaceContent;
 }
