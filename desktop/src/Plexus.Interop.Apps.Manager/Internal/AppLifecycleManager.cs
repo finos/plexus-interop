@@ -259,8 +259,11 @@ namespace Plexus.Interop.Apps.Internal
                         var connection = connectionList.First();
                         Log.Debug("Resolving deferred connection for app instance {0} to connection {{{1}}}", appInstanceId, connection);
                         connectionPromise.TryComplete(connection);
-                    }                    
-                    _appInstanceConnectionWaiters[appInstanceId] = connectionPromise;
+                    }
+                    else
+                    {
+                        _appInstanceConnectionWaiters[appInstanceId] = connectionPromise;
+                    }
                 }
 
                 return await connectionPromise.Task.ConfigureAwait(false);
