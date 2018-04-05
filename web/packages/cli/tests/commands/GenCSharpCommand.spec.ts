@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as approvals from 'approvals';
-import { prepareOutDir, getTestBaseDir, getTestClientInput, getApprovalsBaseDir } from './setup';
-import { readTextFile } from '../../src/common/files';
+import { prepareOutDir, getTestBaseDir, getTestClientInput, getApprovalsBaseDir, filesEqual } from './setup';
 import * as path from 'path';
 import { GenCSharpCommand } from '../../src/commands/GenCSharpCommand';
 
@@ -35,18 +33,22 @@ describe('C# Client generation CLI', () => {
             namespace: 'plexus'
         });
 
-        let generatedContent = await readTextFile(path.join(outDir, 'interop/samples/GreetingClient.app.g.cs'));
-        approvals.verify(getApprovalsBaseDir(), 'generated-cs-client', generatedContent);
+        expect(await filesEqual(
+            path.join(outDir, 'interop/samples/GreetingClient.app.g.cs'), 
+            path.join(getApprovalsBaseDir(), 'generated-cs-client.approved.txt'))).toBeTruthy();
 
-        generatedContent = await readTextFile(path.join(outDir, 'interop/samples/GreetingService.msg.g.cs'));
-        approvals.verify(getApprovalsBaseDir(), 'generated-cs-messages', generatedContent);
+        expect(await filesEqual(
+            path.join(outDir, 'interop/samples/GreetingService.msg.g.cs'), 
+            path.join(getApprovalsBaseDir(), 'generated-cs-messages.approved.txt'))).toBeTruthy();
 
-        generatedContent = await readTextFile(path.join(outDir, 'interop/samples/GreetingService.svc.g.cs'));
-        approvals.verify(getApprovalsBaseDir(), 'generated-cs-service', generatedContent);
+        expect(await filesEqual(
+            path.join(outDir, 'interop/samples/GreetingService.svc.g.cs'), 
+            path.join(getApprovalsBaseDir(), 'generated-cs-service.approved.txt'))).toBeTruthy();
 
-        generatedContent = await readTextFile(path.join(outDir, 'interop/Options.msg.g.cs'));
-        approvals.verify(getApprovalsBaseDir(), 'generated-cs-options', generatedContent);
+        expect(await filesEqual(
+            path.join(outDir, 'interop/Options.msg.g.cs'), 
+            path.join(getApprovalsBaseDir(), 'generated-cs-options.approved.txt'))).toBeTruthy();
 
-    }, 10000);
+    }, 15000);
 
 });

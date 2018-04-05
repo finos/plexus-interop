@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as approvals from 'approvals';
-import { getApprovalsBaseDir, prepareOutDir, getTestBaseDir, getTestClientInput } from './setup';
-import { readTextFile } from '../../src/common/files';
+import { getApprovalsBaseDir, prepareOutDir, getTestBaseDir, getTestClientInput, filesEqual } from './setup';
 import * as path from 'path';
 import { GenTsCommand } from '../../src/commands/GenTsCommand';
 
@@ -35,15 +33,18 @@ describe('Typescript Client generation CLI', () => {
             namespace: 'plexus'
         });
 
-        let generatedContent = await readTextFile(path.join(outDir, 'GreetingClientGeneratedClient.ts'));
-        approvals.verify(getApprovalsBaseDir(), 'generated-ts-client', generatedContent);
+        expect(await filesEqual(
+            path.join(outDir, 'GreetingClientGeneratedClient.ts'), 
+            path.join(getApprovalsBaseDir(), 'generated-ts-client.approved.txt'))).toBeTruthy();
 
-        generatedContent = await readTextFile(path.join(outDir, 'plexus-messages.js'));
-        approvals.verify(getApprovalsBaseDir(), 'generated-ts-messages', generatedContent);
+        expect(await filesEqual(
+            path.join(outDir, 'plexus-messages.js'), 
+            path.join(getApprovalsBaseDir(), 'generated-ts-messages.approved.txt'))).toBeTruthy();
 
-        generatedContent = await readTextFile(path.join(outDir, 'plexus-messages.d.ts'));
-        approvals.verify(getApprovalsBaseDir(), 'generated-ts-definitions', generatedContent);
+        expect(await filesEqual(
+            path.join(outDir, 'plexus-messages.d.ts'), 
+            path.join(getApprovalsBaseDir(), 'generated-ts-definitions.approved.txt'))).toBeTruthy();
 
-    }, 10000);
+    }, 15000);
 
 });

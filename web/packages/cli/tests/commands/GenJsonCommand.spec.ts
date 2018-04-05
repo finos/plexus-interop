@@ -14,10 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as approvals from 'approvals';
-import { getApprovalsBaseDir, prepareOutDir, getTestBaseDir } from './setup';
+import { getApprovalsBaseDir, prepareOutDir, getTestBaseDir, filesEqual } from './setup';
 import { GenJsonCommand } from '../../src/commands/GenJsonCommand';
-import { readTextFile } from '../../src/common/files';
 import * as path from 'path';
 
 describe('Metadata JSON generation CLI', () => {
@@ -33,10 +31,10 @@ describe('Metadata JSON generation CLI', () => {
             baseDir: getTestBaseDir()
         });
 
-        const generatedContent = await readTextFile(path.join(outDir, 'interop.json'));
+        expect(await filesEqual(
+            path.join(outDir, 'interop.json'), 
+            path.join(getApprovalsBaseDir(), 'generated-json.approved.txt'))).toBeTruthy();
 
-        approvals.verify(getApprovalsBaseDir(), 'generated-json', generatedContent);
-
-    }, 10000);
+    }, 15000);
 
 });

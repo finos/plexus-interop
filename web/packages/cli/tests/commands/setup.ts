@@ -15,14 +15,8 @@
  * limitations under the License.
  */
 import * as path from 'path';
-import { getBaseDir } from '../../src/common/files';
-import * as approvals from 'approvals';
+import { getBaseDir, readTextFile } from '../../src/common/files';
 import { mkdirsSync } from 'fs-extra';
-
-approvals.configure({
-    reporters: ['gitdiff'],
-    errorOnStaleApprovedFiles: false
-});
 
 export function getTestBaseDir(): string {
     return path.resolve(getBaseDir(), '../../../samples/greeting/registry');
@@ -40,4 +34,17 @@ export function prepareOutDir(testName: string): string {
     const outDir = path.join(getBaseDir(), 'dist/gen', testName);
     mkdirsSync(outDir);
     return outDir;
+}
+
+export async function filesEqual(first: string, second: string): Promise<boolean> {
+    const firstContent = await readTextFile(first);
+    const secondContent = await readTextFile(second);
+    console.log(first);
+    console.log(second);
+    console.log('Length ', firstContent.length, secondContent.length);
+    return unifyWhiteSpaces(firstContent) === unifyWhiteSpaces(secondContent);
+}
+
+export function unifyWhiteSpaces(s: string): string {
+    return s.replace(/\s+/g, ' ');
 }

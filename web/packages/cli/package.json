@@ -50,8 +50,7 @@
     "ts-mockito": "2.0.2",
     "tslint": "5.8.0",
     "typescript": "2.6.1",
-    "yarn": "1.4.0",
-    "approvals": "2.1.2"
+    "yarn": "1.4.0"
   },
   "jest": {
     "testEnvironment": "node",

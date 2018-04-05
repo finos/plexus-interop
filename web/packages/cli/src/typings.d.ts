@@ -19,5 +19,4 @@ declare module 'rmdir';
 declare module 'tar-fs';
 declare module 'request';
 declare module 'adm-zip';
-declare module 'approvals';
 declare module 'mkdirp';
