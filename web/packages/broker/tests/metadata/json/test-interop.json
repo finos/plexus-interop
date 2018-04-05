@@ -935,6 +935,10 @@
 	                      "rule": "repeated",
 	                      "type": "SubMessage",
 	                      "id": 7
+	                    },
+	                    "boolField": {
+	                      "type": "bool",
+	                      "id": 8
 	                    }
 	                  },
 	                  "nested": {

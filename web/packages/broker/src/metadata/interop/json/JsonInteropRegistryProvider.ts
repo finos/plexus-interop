@@ -89,16 +89,16 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         };
     }
 
-    private collectMessages(rawMessages: MessagesNamespace, namespace: string | null = null, resultMap?: ExtendedMap<string, Message>): ExtendedMap<string, Message> {
+    private collectMessages(rawMessages: MessagesNamespace, namespaceId: string | null = null, resultMap?: ExtendedMap<string, Message>): ExtendedMap<string, Message> {
         resultMap = resultMap || ExtendedMap.create<string, Message>();
         const nested = rawMessages.nested;
         for (let key in nested) {
-            const value = nested[key];
-            const id = namespace ? `${namespace}.${key}` : key;
-            if (isMessage(value)) {
-                resultMap.set(id, { id });
+            const namespaceEntry = nested[key];
+            const id = namespaceId ? `${namespaceId}.${key}` : key;
+            if (isMessage(namespaceEntry)) {
+                resultMap.set(id, { id, fields: namespaceEntry.fields });
             } else {
-                this.collectMessages(value, id, resultMap);
+                this.collectMessages(namespaceEntry, id, resultMap);
             }
         }
         return resultMap;

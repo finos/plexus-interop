@@ -40,6 +40,11 @@ describe("JsonRegistryProvider", () => {
 
         const message = registry.messages.get("plexus.interop.testing.EchoRequest") as Message;
         expect(message.id).toBe("plexus.interop.testing.EchoRequest");
+        expect(message.fields.stringField.type).toBe("string");
+        expect(message.fields.int64Field.type).toBe("int64");
+        expect(message.fields.int64Field.rule).toBeFalsy();
+        expect(message.fields.repeatedDoubleField.type).toBe("double");
+        expect(message.fields.repeatedDoubleField.rule).toBe("repeated");
 
         const service = registry.services.get("plexus.interop.testing.EchoService") as Service;
         expect(service.id).toBe("plexus.interop.testing.EchoService");

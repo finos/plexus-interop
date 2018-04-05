@@ -20,29 +20,16 @@ import { Application } from "../../src/metadata/interop/model/Application";
 import { Message } from "../../src/metadata/interop/model/Message";
 import { Service } from "../../src/metadata/interop/model/Service";
 import { DynamicMarshallerFactory } from "../../src/io/DynamicMarshallerFactory";
+import * as fs from "fs";
+import { JsonInteropRegistryProvider } from "../../src/metadata/interop/json/JsonInteropRegistryProvider";
 
 describe("DynamicMarshallerFactory", () => {
 
-    const messages = ExtendedMap.create<string, Message>();
-    const messageId = "interop.testing.EchoRequest";
+    const metadataJson = fs.readFileSync("tests/metadata/json/test-interop.json", "utf8");    
+    const registry = new JsonInteropRegistryProvider(metadataJson).getCurrent();
 
-    messages.set(messageId, {
-        id: messageId,
-        fields: [
-            {
-                name: "stringField",
-                num: 1,
-                primitive: true,
-                type: "string"
-            },
-            {
-                name: "boolField",
-                num: 2,
-                primitive: true,
-                type: "bool"
-            }
-        ]
-    });
+    const messages = ExtendedMap.create<string, Message>();
+    const messageId = "plexus.interop.testing.EchoRequest";
 
     const validMessage = {
         stringField: "stringData",
@@ -53,12 +40,6 @@ describe("DynamicMarshallerFactory", () => {
         stringField: "stringData",
         boolField: "true"
     };    
-
-    const registry: InteropRegistry = {
-        messages,
-        applications: ExtendedMap.create<string, Application>(),
-        services: ExtendedMap.create<string, Service>()
-    };
 
     const sut = new DynamicMarshallerFactory(registry);
 
