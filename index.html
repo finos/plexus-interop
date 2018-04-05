@@ -540,7 +540,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#guides">Guides</a>
 <ul class="sectlevel2">
 <li><a href="#quick-starts">Quick starts</a>
-<ul class="sectlevel4">
+<ul class="sectlevel3">
 <li><a href="#prerequisites">Prerequisites</a></li>
 <li><a href="#quick-start-web">Quick Start - Web</a></li>
 <li><a href="#quick-start-dotnet">Quick Start - .NET</a></li>
@@ -571,6 +571,27 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#reference">Reference</a>
 <ul class="sectlevel2">
+<li><a href="#components-overview">Components Overview</a></li>
+<li><a href="#concepts-and-definitions">Concepts and Definitions</a>
+<ul class="sectlevel3">
+<li><a href="#application">Application</a></li>
+<li><a href="#application-instance">Application Instance</a></li>
+<li><a href="#interop-registry">Interop Registry</a></li>
+<li><a href="#broker">Broker</a></li>
+<li><a href="#application-lifecycle-manager">Application Lifecycle Manager</a></li>
+<li><a href="#application-launcher">Application Launcher</a></li>
+<li><a href="#client">Client</a></li>
+<li><a href="#client-message-marshaller">Client Message Marshaller</a></li>
+<li><a href="#generated-client-api">Generated Client API</a></li>
+<li><a href="#generic-client-api">Generic Client API</a></li>
+<li><a href="#interop-protocol">Interop Protocol</a></li>
+<li><a href="#transport-protocol">Transport Protocol</a></li>
+<li><a href="#transport-connection">Transport Connection</a></li>
+<li><a href="#transport-channel">Transport Channel</a></li>
+<li><a href="#wire-protocol">Wire Protocol</a></li>
+<li><a href="#wire-connection">Wire Connection</a></li>
+</ul>
+</li>
 <li><a href="#app-registry">App Registry</a></li>
 <li><a href="#reference-metadata-definition-language">Interop Registry</a>
 <ul class="sectlevel3">
@@ -590,16 +611,28 @@ table.CodeRay td.code>pre{padding:0}
 <div class="sect2">
 <h3 id="overview">Overview</h3>
 <div class="paragraph">
-<p><strong>Plexus Interop</strong> is a metadata-centric language-agnostic desktop app-to-app interoperability framework with extensible model for launching new instances of desktop applications on demand.</p>
+<p>The <strong>Plexus Interop</strong> project aims to define an open standard for desktop application interoperability and provides
+reference implementation of this standard. It formalizes connections between applications within a single user session
+on client desktop through a central broker.</p>
 </div>
 <div class="paragraph">
-<p>The main goal of the framework is to enable development of extensible workflows connecting independent apps developed in different technologies (.NET, Web, Java, Python, etc.) and passing context (structured data objects) between those apps.</p>
+<p>The main goal is to enable development of extensible workflows connecting independent apps developed by different
+organizations in different technologies (.NET, Web, Java, Python, etc.) by passing relevant context  (structured
+data objects) between those apps.</p>
 </div>
 <div class="paragraph">
-<p>Framework architecture is based around central broker providing hub-and-spoke connectivity between apps and brokering strongly-typed RPC-style calls between them. Broker has a connection to Application Lifecycle Manager which is capable of creating new instances of the apps based on the their runtime-metadata (e.g. container type, launch command, command line parameters) defined in a registry.</p>
+<p>Although the industry is moving towards containerized desktop applications, Plexus Interop recognizes that much
+of the application landscape is not yet tied to containers and is architecturally agnostic of container implementation.
+Separating interoperability from the container provides notable advantages: different containers can be leveraged in
+the same workflow, and launched applications residing outside of containers can participate in interop activities.</p>
 </div>
 <div class="paragraph">
-<p>Plexus Interop separates interoperability from the container, which provides notable advantages: different containers can be leveraged in the same workflow, launched applications residing outside of containers can participate in interop activities.</p>
+<p>Technically speaking, Plexus Interop is a metadata-centric language-agnostic desktop app-to-app interoperability
+framework with an extensible model for launching new instances of desktop applications on demand. Its extensibility
+is based on open standards which are essential parts of the project.  The architecture is based around central broker
+providing hub-and-spoke connectivity between apps and brokering strongly-typed RPC-style calls between them. The broker
+has a connection to an Application Lifecycle Manager (or Launcher) which is capable of creating new instances of apps
+based on the their runtime-metadata (e.g. container type, launch command, command line parameters) defined in a registry.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -833,24 +866,24 @@ Once launched the app will show the information about connection and incoming re
 <p>Both guides describe the same flow/API, so if you want to experiment with interop between different technologies - just combine the samples, e.g. take web implementation of <code>CcyPairRateViewer</code> from the first guide and
 .NET implementation of <code>CcyPairRateProvider</code> from the second guide and run them together.</p>
 </div>
-<div class="sect4">
-<h5 id="prerequisites">Prerequisites</h5>
+<div class="sect3">
+<h4 id="prerequisites">Prerequisites</h4>
 <div class="paragraph">
 <p>You will need the following software:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Windows 7 or later</p>
+<p>Windows 7+</p>
 </li>
 <li>
 <p><a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">JDK 8+</a></p>
 </li>
 <li>
-<p><a href="https://nodejs.org/en/download/">Node.js 6+ with npm 3+</a> for web quick start</p>
+<p><a href="https://nodejs.org/en/download/">Node.js 6+ with npm 3+</a> for Web quick start</p>
 </li>
 <li>
-<p><a href="https://www.microsoft.com/net/download/core">.NET Core 2.0 SDK x86</a> for .NET quick start</p>
+<p><a href="https://www.microsoft.com/net/download/core">.NET Core SDK 2.0+</a> for .NET quick start</p>
 </li>
 </ul>
 </div>
@@ -923,7 +956,7 @@ but instance must run in a separate directory.</p>
 <p>Launch <code>WebCcyPairRateViewer</code> app:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">plexus activate vendorB.fx.WebCcyPairRateViewer</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">plexus launch vendor_b.fx.WebCcyPairRateViewer</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -934,7 +967,7 @@ but instance must run in a separate directory.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p><code>plexus activate</code> command sends a request to <strong>App Lifecycle Manager</strong> to make some app up and running. App Lifecycle Manager is a part of the broker that
+<p><code>plexus launch</code> command sends a request to <strong>App Lifecycle Manager</strong> to make some app up and running. App Lifecycle Manager is a part of the broker that
 tracks which apps are alive and can create a new instance of an app if there is no live one. Different app types may have very different life cycles, so App Lifecycle Manager launches new app instances and tracks their status using <strong>App Launchers</strong>.</p>
 </div>
 </td>
@@ -1035,9 +1068,9 @@ tracks which apps are alive and can create a new instance of an app if there is 
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Open <code>registry/fx/CcyPairRateService.proto</code> file and add a new <code>GetRateStream</code> method:</p>
+<p>Open <code>registry/fx/ccy_pair_rate_service.proto</code> file and add a new <code>GetRateStream</code> method:</p>
 <div class="listingblock">
-<div class="title">/registry/fx/CcyPairRateService.proto</div>
+<div class="title">/registry/fx/ccy_pair_rate_service.proto</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="php">service <span class="constant">CcyPairRateService</span> {
     rpc <span class="constant">GetRate</span>(<span class="constant">CcyPair</span>) returns (<span class="constant">CcyPairRate</span>);
@@ -1049,33 +1082,33 @@ tracks which apps are alive and can create a new instance of an app if there is 
 </div>
 </li>
 <li>
-<p>Open <code>registry/vendorA/fx/WebCcyPairRateProvider.interop</code> file and change provided method to <code>GetRateStream</code>:</p>
+<p>Open <code>registry/vendor_a/fx/web_ccy_pair_rate_provider.interop</code> file and change provided method to <code>GetRateStream</code>:</p>
 <div class="listingblock">
-<div class="title">/registry/vendorA/fx/WebCcyPairRateProvider.interop</div>
+<div class="title">/registry/vendor_a/fx/web_ccy_pair_rate_provider.interop</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="php">package vendorA.fx;
+<pre class="CodeRay highlight"><code data-lang="php">package vendor_a.fx;
 
-import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/CcyPairRateService.proto</span><span class="delimiter">&quot;</span></span>;
+import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/ccy_pair_rate_service.proto</span><span class="delimiter">&quot;</span></span>;
 
 application <span class="constant">WebCcyPairRateProvider</span> {
-    provides fx.<span class="constant">CcyPairRateService</span> {
-        <span class="constant">GetRateStream</span> [method_title = <span class="string"><span class="delimiter">&quot;</span><span class="content">Web Provider - Get Rate Stream</span><span class="delimiter">&quot;</span></span>];
+    provides .fx.<span class="constant">CcyPairRateService</span> {
+        <span class="constant">GetRateStream</span> [title = <span class="string"><span class="delimiter">&quot;</span><span class="content">Web Provider - Get Rate Stream</span><span class="delimiter">&quot;</span></span>];
     }
 }</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>Open <code>registry/vendorB/fx/WebCcyPairRateViewer.interop</code> file and change consumed method to <code>GetRateStream</code>:</p>
+<p>Open <code>registry/vendor_b/fx/web_ccy_pair_rate_viewer.interop</code> file and change consumed method to <code>GetRateStream</code>:</p>
 <div class="listingblock">
-<div class="title">/registry/vendorB/fx/WebCcyPairRateViewer.interop</div>
+<div class="title">/registry/vendor_b/fx/web_ccy_pair_rate_viewer.interop</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="php">package vendorB.fx;
+<pre class="CodeRay highlight"><code data-lang="php">package vendor_b.fx;
 
-import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/CcyPairRateService.proto</span><span class="delimiter">&quot;</span></span>;
+import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/ccy_pair_rate_service.proto</span><span class="delimiter">&quot;</span></span>;
 
 application <span class="constant">WebCcyPairRateViewer</span> {
-    consumes fx.<span class="constant">CcyPairRateService</span> { <span class="constant">GetRateStream</span>; }
+    consumes .fx.<span class="constant">CcyPairRateService</span> { <span class="constant">GetRateStream</span>; }
 }</code></pre>
 </div>
 </div>
@@ -1116,7 +1149,7 @@ application <span class="constant">WebCcyPairRateViewer</span> {
 <p>From project root call <strong>Plexus Generator</strong> tool to re-generate provider&#8217;s client code:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">java -jar bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=./bin/win-x86/samples/quick-start/registry --input=WebCcyPairRateProvider.interop --out=./web/packages/ccy-pair-rate-provider/src/gen --protoc=./web/node_modules/.bin/pbts.cmd</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">java -jar bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=./bin/win-x86/samples/quick-start/registry --input=web_ccy_pair_rate_provider.interop --out=./web/packages/ccy-pair-rate-provider/src/gen --protoc=./web/node_modules/.bin/pbts.cmd</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1140,7 +1173,7 @@ application <span class="constant">WebCcyPairRateViewer</span> {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="javascript"><span class="keyword">new</span> WebCcyPairRateProviderClientBuilder()
     .withClientDetails({
-        <span class="key">applicationId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">vendorA.fx.WebCcyPairRateProvider</span><span class="delimiter">&quot;</span></span>,
+        <span class="key">applicationId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">vendor_a.fx.WebCcyPairRateProvider</span><span class="delimiter">&quot;</span></span>,
         <span class="key">applicationInstanceId</span>: instanceId
     })
     .withTransportConnectionProvider(() =&gt; <span class="keyword">new</span> WebSocketConnectionFactory(<span class="keyword">new</span> WebSocket(webSocketUrl)).connect())
@@ -1198,7 +1231,7 @@ application <span class="constant">WebCcyPairRateViewer</span> {
 <p>From project root call <strong>Plexus Generator</strong> tools to re-generate consumer&#8217;s client code:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">java -jar bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=./bin/win-x86/samples/quick-start/registry --input=WebCcyPairRateViewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/node_modules/.bin/pbts.cmd</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">java -jar bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=./bin/win-x86/samples/quick-start/registry --input=web_ccy_pair_rate_viewer.interop --out=./web/packages/ccy-pair-rate-viewer/src/gen --protoc=./web/node_modules/.bin/pbts.cmd</code></pre>
 </div>
 </div>
 </li>
@@ -1208,7 +1241,7 @@ application <span class="constant">WebCcyPairRateViewer</span> {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="javascript"><span class="keyword">new</span> WebCcyPairRateViewerClientBuilder()
     .withClientDetails({
-        <span class="key">applicationId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">vendorB.fx.WebCcyPairRateViewer</span><span class="delimiter">&quot;</span></span>,
+        <span class="key">applicationId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">vendor_b.fx.WebCcyPairRateViewer</span><span class="delimiter">&quot;</span></span>,
         <span class="key">applicationInstanceId</span>: instanceId
     })
     .withTransportConnectionProvider(
@@ -1250,7 +1283,7 @@ application <span class="constant">WebCcyPairRateViewer</span> {
 <p>Launch the viewer app:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">plexus activate vendorB.fx.WebCcyPairRateViewer</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">plexus launch vendor_b.fx.WebCcyPairRateViewer</code></pre>
 </div>
 </div>
 </li>
@@ -1348,7 +1381,7 @@ but instance must run in a separate directory.</p>
 <p>Launch "CCY Pair Viewer" app:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">plexus activate vendorB.fx.CcyPairRateViewer</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">plexus launch vendor_b.fx.CcyPairRateViewer</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1359,7 +1392,7 @@ but instance must run in a separate directory.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p><code>plexus activate</code> command sends a request to <strong>App Lifecycle Manager</strong> to make some app up and running. App Lifecycle Manager is a part of the broker that
+<p><code>plexus launch</code> command sends a request to <strong>App Lifecycle Manager</strong> to make some app up and running. App Lifecycle Manager is a part of the broker that
 tracks which apps are alive and can create a new instance of an app if there is no live one. Different app types may have very different life cycles, so App Lifecycle Manager launches new app instances and tracks their status using <strong>App Launchers</strong>.</p>
 </div>
 </td>
@@ -1471,9 +1504,9 @@ tracks which apps are alive and can create a new instance of an app if there is 
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Open <code>registry/fx/CcyPairRateService.proto</code> file and add new <code>GetRateStream</code> method:</p>
+<p>Open <code>registry/fx/ccy_pair_rate_service.proto</code> file and add new <code>GetRateStream</code> method:</p>
 <div class="listingblock">
-<div class="title">/registry/fx/CcyPairRateService.proto</div>
+<div class="title">/registry/fx/ccy_pair_rate_service.proto</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="php">service <span class="constant">CcyPairRateService</span> {
     rpc <span class="constant">GetRate</span>(<span class="constant">CcyPair</span>) returns (<span class="constant">CcyPairRate</span>);
@@ -1485,33 +1518,33 @@ tracks which apps are alive and can create a new instance of an app if there is 
 </div>
 </li>
 <li>
-<p>Open <code>registry/vendorA/fx/CcyPairRateProvider.interop</code> file and change provided method to <code>GetRateStream</code>:</p>
+<p>Open <code>registry/vendor_a/fx/ccy_pair_rate_provider.interop</code> file and change provided method to <code>GetRateStream</code>:</p>
 <div class="listingblock">
-<div class="title">/registry/vendorA/fx/CcyPairRateProvider.interop</div>
+<div class="title">/registry/vendor_a/fx/ccy_pair_rate_provider.interop</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="php">package vendorA.fx;
+<pre class="CodeRay highlight"><code data-lang="php">package vendor_a.fx;
 
-import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/CcyPairRateService.proto</span><span class="delimiter">&quot;</span></span>;
+import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/ccy_pair_rate_service.proto</span><span class="delimiter">&quot;</span></span>;
 
 application <span class="constant">CcyPairRateProvider</span> {
-    provides fx.<span class="constant">CcyPairRateService</span> {
-        <span class="constant">GetRateStream</span> [method_title = <span class="string"><span class="delimiter">&quot;</span><span class="content">.NET Provider - Get Rate Stream</span><span class="delimiter">&quot;</span></span>];
+    provides .fx.<span class="constant">CcyPairRateService</span> {
+        <span class="constant">GetRateStream</span> [title = <span class="string"><span class="delimiter">&quot;</span><span class="content">.NET Provider - Get Rate Stream</span><span class="delimiter">&quot;</span></span>];
     }
 }</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>Open <code>registry/vendorB/fx/CcyPairRateViewer.interop</code> file and change consumed method to <code>GetRateStream</code>:</p>
+<p>Open <code>registry/vendor_b/fx/ccy_pair_rate_viewer.interop</code> file and change consumed method to <code>GetRateStream</code>:</p>
 <div class="listingblock">
-<div class="title">/registry/vendorB/fx/CcyPairRateViewer.interop</div>
+<div class="title">/registry/vendor_b/fx/ccy_pair_rate_viewer.interop</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="php">package vendorB.fx;
+<pre class="CodeRay highlight"><code data-lang="php">package vendor_b.fx;
 
-import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/CcyPairRateService.proto</span><span class="delimiter">&quot;</span></span>;
+import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/ccy_pair_rate_service.proto</span><span class="delimiter">&quot;</span></span>;
 
 application <span class="constant">CcyPairRateViewer</span> {
-    consumes fx.<span class="constant">CcyPairRateService</span> { <span class="constant">GetRateStream</span>; }
+    consumes .fx.<span class="constant">CcyPairRateService</span> { <span class="constant">GetRateStream</span>; }
 }</code></pre>
 </div>
 </div>
@@ -1549,7 +1582,25 @@ application <span class="constant">CcyPairRateViewer</span> {
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Navigate to the <code>desktop/src/Plexus.Interop.Samples.CcyPairRateProvider</code> directory , open <code>Program.cs</code> file and update the code:</p>
+<p>Navigate to the <code>desktop/src/Plexus.Interop.Samples.CcyPairRateProvider</code> directory and call <code>Generate.cmd</code></p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Plexus Generator tool generates interfaces and proxy classes from service descriptions.
+Internally it uses <a href="https://github.com/google/protobuf/releases/latest">protobuf compiler</a> to generate C# message definitions from <code>.proto</code> files.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Open <code>Program.cs</code> file and update the code to provide implementation of the new method:</p>
 <div class="listingblock">
 <div class="title">/desktop/src/Plexus.Interop.Samples.CcyPairRateProvider/Program.cs</div>
 <div class="content">
@@ -1561,7 +1612,7 @@ application <span class="constant">CcyPairRateViewer</span> {
     using <span class="predefined-type">System</span>.Threading.Tasks;
     using Plexus.Channels;
 
-    <span class="directive">public</span> sealed <span class="type">class</span> <span class="class">Program</span>
+    <span class="directive">public</span> sealed <span class="type">class</span> <span class="class">Program</span> : CcyPairRateProviderClient.ICcyPairRateServiceImpl
     {
         <span class="directive">private</span> readonly <span class="predefined-type">Random</span> _random = <span class="keyword">new</span> <span class="predefined-type">Random</span>();
 
@@ -1572,24 +1623,16 @@ application <span class="constant">CcyPairRateViewer</span> {
 
         <span class="directive">public</span> async Task MainAsync(string<span class="type">[]</span> args)
         {
-            <span class="comment">// Read broker's working directory specified either in the first</span>
-            <span class="comment">// command line argument or in environment variable, or just use current working directory</span>
-            var brokerLocation = args.Length &gt; <span class="integer">0</span>
+            <span class="comment">// Read broker working dir specified either in the first</span>
+            <span class="comment">// command line argument or in environment variable,</span>
+            <span class="comment">// or just use current working directory.</span>
+            var brokerWorkingDir = args.Length &gt; <span class="integer">0</span>
                 ? args[<span class="integer">0</span>]
-                : Environment.GetEnvironmentVariable(<span class="string"><span class="delimiter">&quot;</span><span class="content">PLEXUS_BROKER_WORKING_DIR</span><span class="delimiter">&quot;</span></span>) ?? Directory.GetCurrentDirectory();
+                : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
 
-            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Connecting to broker {0}.</span><span class="delimiter">&quot;</span></span>, brokerLocation);
-
-            <span class="comment">// Defining client options</span>
-            var clientOptions = <span class="keyword">new</span> ClientOptionsBuilder()
-                .WithDefaultConfiguration(brokerLocation)
-                .WithApplicationId(<span class="string"><span class="delimiter">&quot;</span><span class="content">vendorA.fx.CcyPairRateProvider</span><span class="delimiter">&quot;</span></span>)
-                .WithProvidedService(<span class="string"><span class="delimiter">&quot;</span><span class="content">fx.CcyPairRateService</span><span class="delimiter">&quot;</span></span>, s =&gt;
-                    s.WithServerStreamingMethod&lt;CcyPair, CcyPairRate&gt;(<span class="string"><span class="delimiter">&quot;</span><span class="content">GetRateStream</span><span class="delimiter">&quot;</span></span>, GetRateAsync))
-                .Build();
-
-            <span class="comment">// Connecting</span>
-            var client = ClientFactory.Instance.Create(clientOptions);
+            <span class="comment">// Creating client and connecting to broker</span>
+            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Connecting to broker {0}</span><span class="delimiter">&quot;</span></span>, brokerWorkingDir);
+            var client = <span class="keyword">new</span> CcyPairRateProviderClient(<span class="local-variable">this</span>, setup =&gt; setup.WithBrokerWorkingDir(brokerWorkingDir));
             await client.ConnectAsync();
             Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Connected. Waiting for requests. Press CTRL+C to disconnect.</span><span class="delimiter">&quot;</span></span>);
             Console.CancelKeyPress += (sender, eventArgs) =&gt;
@@ -1603,39 +1646,54 @@ application <span class="constant">CcyPairRateViewer</span> {
             Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Disconnected.</span><span class="delimiter">&quot;</span></span>);
         }
 
-        <span class="directive">private</span> async Task GetRateAsync(
+        <span class="comment">// Implementation of server streaming method GetRateStream</span>
+        <span class="directive">public</span> async Task GetRateStream(
             CcyPair request,
-            IWriteOnlyChannel&lt;CcyPairRate&gt; responseStream,
+            IWritableChannel&lt;CcyPairRate&gt; responseStream,
             MethodCallContext context)
         {
             Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Received subscription: {0}</span><span class="delimiter">&quot;</span></span>, request);
-            <span class="keyword">do</span>
+            <span class="keyword">try</span>
             {
-                CcyPairRate response;
-                <span class="keyword">switch</span> (request.CcyPairName)
+                <span class="keyword">do</span>
                 {
-                    <span class="keyword">case</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">EURUSD</span><span class="delimiter">&quot;</span></span>:
-                        response = <span class="keyword">new</span> CcyPairRate
-                        {
-                            CcyPairName = <span class="string"><span class="delimiter">&quot;</span><span class="content">EURUSD</span><span class="delimiter">&quot;</span></span>,
-                            Rate = <span class="float">1.15</span> + <span class="float">0.05</span> * _random.NextDouble()
-                        };
-                        <span class="keyword">break</span>;
-                    <span class="keyword">case</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">EURGBP</span><span class="delimiter">&quot;</span></span>:
-                        response = <span class="keyword">new</span> CcyPairRate
-                        {
-                            CcyPairName = <span class="string"><span class="delimiter">&quot;</span><span class="content">EURGBP</span><span class="delimiter">&quot;</span></span>,
-                            Rate = <span class="float">0.87</span> + <span class="float">0.05</span> * _random.NextDouble()
-                        };
-                        <span class="keyword">break</span>;
-                    <span class="keyword">default</span>:
-                        <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentOutOfRangeException(<span class="error">$</span><span class="string"><span class="delimiter">&quot;</span><span class="content">Unknown currency pair: {request.CcyPairName}</span><span class="delimiter">&quot;</span></span>);
-                }
-                Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Sending response: {0}</span><span class="delimiter">&quot;</span></span>, response);
-                await responseStream.TryWriteAsync(response, context.CancellationToken).IgnoreAnyCancellation();
-                await Task.Delay(_random.Next(<span class="integer">1000</span>, <span class="integer">3000</span>), context.CancellationToken).IgnoreAnyCancellation();
-            } <span class="keyword">while</span> (!context.CancellationToken.IsCancellationRequested);
+                    var response = GetCcyPairRate(request);
+                    Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Sending response: {0}</span><span class="delimiter">&quot;</span></span>, response);
+                    await responseStream.TryWriteAsync(response, context.CancellationToken);
+                    await Task.Delay(_random.Next(<span class="integer">1000</span>, <span class="integer">3000</span>), context.CancellationToken);
+                } <span class="keyword">while</span> (!context.CancellationToken.IsCancellationRequested);
+            }
+            <span class="keyword">catch</span> (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                <span class="comment">// Ignoring cancellation exception</span>
+            }
             Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Subscription completed</span><span class="delimiter">&quot;</span></span>);
+        }
+
+        <span class="directive">private</span> CcyPairRate GetCcyPairRate(CcyPair request)
+        {
+            CcyPairRate response;
+            <span class="keyword">switch</span> (request.CcyPairName)
+            {
+                <span class="keyword">case</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">EURUSD</span><span class="delimiter">&quot;</span></span>:
+                    response = <span class="keyword">new</span> CcyPairRate
+                    {
+                        CcyPairName = <span class="string"><span class="delimiter">&quot;</span><span class="content">EURUSD</span><span class="delimiter">&quot;</span></span>,
+                        Rate = <span class="float">1.15</span> + <span class="float">0.05</span> * _random.NextDouble()
+                    };
+                    <span class="keyword">break</span>;
+                <span class="keyword">case</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">EURGBP</span><span class="delimiter">&quot;</span></span>:
+                    response = <span class="keyword">new</span> CcyPairRate
+                    {
+                        CcyPairName = <span class="string"><span class="delimiter">&quot;</span><span class="content">EURGBP</span><span class="delimiter">&quot;</span></span>,
+                        Rate = <span class="float">0.87</span> + <span class="float">0.05</span> * _random.NextDouble()
+                    };
+                    <span class="keyword">break</span>;
+                <span class="keyword">default</span>:
+                    <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentOutOfRangeException(<span class="error">$</span><span class="string"><span class="delimiter">&quot;</span><span class="content">Unknown currency pair: {request.CcyPairName}</span><span class="delimiter">&quot;</span></span>);
+            }
+
+            <span class="keyword">return</span> response;
         }
     }
 }</code></pre>
@@ -1643,7 +1701,7 @@ application <span class="constant">CcyPairRateViewer</span> {
 </div>
 </li>
 <li>
-<p>Re-build the app by executing the following command in <code>desktop\src\Plexus.Interop.Samples.CcyPairRateProvider</code> directory:</p>
+<p>Re-build the app by executing the following command:</p>
 </li>
 </ol>
 </div>
@@ -1661,13 +1719,15 @@ application <span class="constant">CcyPairRateViewer</span> {
 <div class="olist arabic">
 <ol class="arabic">
 <li>
+<p>Navigate to the <code>desktop/src/Plexus.Interop.Samples.CcyPairRateViewer</code> directory and call <code>Generate.cmd</code></p>
+</li>
+<li>
 <p>Navigate to the <code>desktop/src/Plexus.Interop.Samples.CcyPairRateViewer</code> directory, open <code>Program.cs</code> file and update the code to the following:</p>
 <div class="listingblock">
-<div class="title">/desktop/src/Plexus.Interop.Samples.CcyPairRateProvider/Program.cs</div>
+<div class="title">/desktop/src/Plexus.Interop.Samples.CcyPairRateViewer/Program.cs</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">namespace Plexus.Interop.Samples.CcyPairRateViewer
 {
-    using Plexus.Channels;
     using Plexus.Interop.Samples.CcyPairRateViewer.Generated;
     using <span class="predefined-type">System</span>;
     using <span class="predefined-type">System</span>.IO;
@@ -1675,44 +1735,25 @@ application <span class="constant">CcyPairRateViewer</span> {
 
     <span class="directive">public</span> sealed <span class="type">class</span> <span class="class">Program</span>
     {
-        <span class="directive">private</span> <span class="directive">static</span> readonly ServerStreamingMethod&lt;CcyPair, CcyPairRate&gt; GetRateMethod =
-            <span class="predefined-type">Method</span>.ServerStreaming&lt;CcyPair, CcyPairRate&gt;(<span class="string"><span class="delimiter">&quot;</span><span class="content">fx.CcyPairRateService</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">GetRateStream</span><span class="delimiter">&quot;</span></span>);
-
-        <span class="directive">public</span> <span class="directive">static</span> <span class="type">int</span> Main(string<span class="type">[]</span> args)
+        <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> Main(string<span class="type">[]</span> args)
         {
-            <span class="keyword">try</span>
-            {
-                <span class="keyword">new</span> Program().MainAsync(args).GetAwaiter().GetResult();
-                <span class="keyword">return</span> <span class="integer">0</span>;
-            }
-            <span class="keyword">catch</span> (<span class="exception">Exception</span> ex)
-            {
-                Console.WriteLine(ex.FormatToString());
-                Console.ReadKey(<span class="predefined-constant">true</span>);
-                <span class="keyword">return</span> <span class="integer">1</span>;
-            }
+            <span class="keyword">new</span> Program().MainAsync(args).GetAwaiter().GetResult();
         }
 
         <span class="directive">public</span> async Task MainAsync(string<span class="type">[]</span> args)
         {
             <span class="comment">// Read broker working dir specified either in the first</span>
-            <span class="comment">// command line argument or in environment variable, or just use current working directory</span>
-            var brokerLocation = args.Length &gt; <span class="integer">0</span>
+            <span class="comment">// command line argument or in environment variable,</span>
+            <span class="comment">// or just use current working directory.</span>
+            var brokerWorkingDir = args.Length &gt; <span class="integer">0</span>
                 ? args[<span class="integer">0</span>]
-                : Environment.GetEnvironmentVariable(<span class="string"><span class="delimiter">&quot;</span><span class="content">PLEXUS_BROKER_WORKING_DIR</span><span class="delimiter">&quot;</span></span>) ?? Directory.GetCurrentDirectory();
+                : EnvironmentHelper.GetBrokerWorkingDir() ?? Directory.GetCurrentDirectory();
 
-            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Connecting to broker {0}.</span><span class="delimiter">&quot;</span></span>, brokerLocation);
-
-            <span class="comment">// Defining client options</span>
-            var clientOptions = <span class="keyword">new</span> ClientOptionsBuilder()
-                .WithDefaultConfiguration(brokerLocation)
-                .WithApplicationId(<span class="string"><span class="delimiter">&quot;</span><span class="content">vendorB.fx.CcyPairRateViewer</span><span class="delimiter">&quot;</span></span>)
-                .Build();
-
-            <span class="comment">// Connecting</span>
-            var client = ClientFactory.Instance.Create(clientOptions);
+            <span class="comment">// Creating client and connecting to broker</span>
+            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Connecting to broker {0}</span><span class="delimiter">&quot;</span></span>, brokerWorkingDir);
+            var client = <span class="keyword">new</span> CcyPairRateViewerClient(setup =&gt; setup.WithBrokerWorkingDir(brokerWorkingDir));
             await client.ConnectAsync();
-            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Connected.</span><span class="delimiter">&quot;</span></span>);
+            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Connected</span><span class="delimiter">&quot;</span></span>);
 
             <span class="keyword">while</span> (<span class="predefined-constant">true</span>)
             {
@@ -1724,8 +1765,8 @@ application <span class="constant">CcyPairRateViewer</span> {
                 }
 
                 <span class="comment">// Requesting ccy pair rate from another app</span>
-                var request = <span class="keyword">new</span> CcyPair {CcyPairName = ccyPairName};
-                var call = client.Call(GetRateMethod, request);
+                var request = <span class="keyword">new</span> CcyPair { CcyPairName = ccyPairName };
+                var call = client.CcyPairRateService.GetRateStream(request);
 
                 ConsoleCancelEventHandler cancelHandler = <span class="predefined-constant">null</span>;
                 cancelHandler = (sender, eventArgs) =&gt;
@@ -1741,15 +1782,15 @@ application <span class="constant">CcyPairRateViewer</span> {
                 await call.ResponseStream
                     .ConsumeAsync(item =&gt;
                     {
-                        Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Notification received: {0}</span><span class="delimiter">&quot;</span></span>, item);
+                        Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Notification received: {0}</span><span class="delimiter">&quot;</span></span>, (object)item);
                         Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Press CTRL+C to unscubscribe</span><span class="delimiter">&quot;</span></span>);
                     })
                     .IgnoreAnyCancellation();
             }
 
-            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Disconnecting.</span><span class="delimiter">&quot;</span></span>);
+            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Disconnecting</span><span class="delimiter">&quot;</span></span>);
             await client.DisconnectAsync();
-            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Disconnected.</span><span class="delimiter">&quot;</span></span>);
+            Console.WriteLine(<span class="string"><span class="delimiter">&quot;</span><span class="content">Disconnected</span><span class="delimiter">&quot;</span></span>);
         }
     }
 }</code></pre>
@@ -1757,7 +1798,7 @@ application <span class="constant">CcyPairRateViewer</span> {
 </div>
 </li>
 <li>
-<p>Re-build the app by executing the following command in <code>desktop\src\Plexus.Interop.Samples.CcyPairRateProvider</code> directory:</p>
+<p>Re-build the app by executing the following command:</p>
 </li>
 </ol>
 </div>
@@ -1775,7 +1816,7 @@ application <span class="constant">CcyPairRateViewer</span> {
 <p>Launch "CCY Pair Rate Viewer":</p>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">plexus activate vendorB.fx.CcyPairRateViewer</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">plexus launch vendor_b.fx.CcyPairRateViewer</code></pre>
 </div>
 </div>
 </li>
@@ -1812,21 +1853,23 @@ application <span class="constant">CcyPairRateViewer</span> {
 <div class="sect2">
 <h3 id="concepts">Concepts</h3>
 <div class="paragraph">
-<p>Like many other Remote Procedure Call (RPC) systems, Plexus is based around the idea of defining a service by specifying the methods that can be called remotely with their parameters and return types.</p>
+<p>Like many other Remote Procedure Call (RPC) systems, Plexus Interop is based around the idea of defining a service by
+specifying the methods that can be called remotely with their parameters and return types.</p>
 </div>
 <div class="paragraph">
-<p>There are 4 possible types of RPC methods in Plexus mirroring types supported by <a href="http://www.grpc.io/docs/guides/concepts.html#rpc-life-cycle">gRPC</a>:</p>
+<p>There are 4 possible types of RPC methods in Plexus Interop mirroring types supported by
+<a href="http://www.grpc.io/docs/guides/concepts.html#rpc-life-cycle">gRPC</a>:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Point-to-point call - consumer send a request, provider receives it, handles, and sends response back to the consumer.</p>
+<p>Unary call - consumer send a request, provider receives it, handles, and sends response back to the consumer.</p>
 </li>
 <li>
-<p>Provider streaming call - consumer sends one or many requests, provider sends only one response back.</p>
+<p>Consumer streaming call - consumer sends one or many requests, provider sends only one response back.</p>
 </li>
 <li>
-<p>Consumer streaming call - consumer sends one request, provider sends many responses back.</p>
+<p>Provider streaming call - consumer sends one request, provider sends many responses back.</p>
 </li>
 <li>
 <p>Bidirectional streaming call - consumer sends many requests, provider sends many responses.</p>
@@ -1834,7 +1877,7 @@ application <span class="constant">CcyPairRateViewer</span> {
 </ul>
 </div>
 <div class="paragraph">
-<p>However Plexus goes beyond what most RPC frameworks do:</p>
+<p>However Plexus Interop goes beyond what most RPC frameworks do:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1842,13 +1885,13 @@ application <span class="constant">CcyPairRateViewer</span> {
 <p>Plexus tracks the lifecycle of desktop apps, i.e. it knows if app is running or not and can launch app on demand.</p>
 </li>
 <li>
-<p>Plexus allows to define custom App Launchers, which allow fully custom installation, startup and shutdown flows</p>
+<p>Plexus allows to define custom App Launchers, which allow fully custom installation, startup and shutdown flows.</p>
 </li>
 <li>
 <p>Each app specified which interop services it provides and consumes. This way it is easy to track API usage and evolve APIs.</p>
 </li>
 <li>
-<p>Central Broker decouples apps from each other and allows dynamic discovery of service providers</p>
+<p>Central Broker decouples apps from each other and allows dynamic discovery of service providers.</p>
 </li>
 </ul>
 </div>
@@ -2259,6 +2302,295 @@ application <span class="constant">ElectronAppLauncher</span> {
 <h2 id="reference">Reference</h2>
 <div class="sectionbody">
 <div class="sect2">
+<h3 id="components-overview">Components Overview</h3>
+<div class="imageblock">
+<div class="content">
+<img src="images/desktop-interop-layers.png" alt="desktop interop layers">
+</div>
+</div>
+<div class="paragraph">
+<p>Plexus Interop consist of the following main components:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Broker - a process running on user desktop which handles application connections and routes calls between them</p>
+</li>
+<li>
+<p>Client - technology-specific library used by applications to communicate with broker</p>
+</li>
+<li>
+<p>Interop DSL - language to define connections between applications and associated tooling for parsing, validation and
+code-generation of application-specific client APIs from these definitions</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To participate in interop each application need to define itself in Interop Registry and auto-generate its specific
+client API using code-generation tool. Broker also uses Interop Registry to validate and route calls.</p>
+</div>
+<div class="paragraph">
+<p>Both client and broker use transport protocol and interop protocol to communicate with each other. Broker can support
+one or more interop and transport protocols. Currently it supports version 1 of interop protocol and 2 versions of
+transport protocols: named-pipe-based and websocket-based.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="concepts-and-definitions">Concepts and Definitions</h3>
+<div class="paragraph">
+<p>This section contains overview diagram which shows Plexus Interop layers on example of 2 applications interoperating
+through broker. Below this diagram you can find brief descriptions for each of the presented concepts.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/desktop-interop-concepts.png" alt="desktop interop concepts">
+</div>
+</div>
+<div class="sect3">
+<h4 id="application">Application</h4>
+<div class="paragraph">
+<p>Application is a program on client desktop which can be started and stopped. Each application can provide (i.e. implement)
+services and/or consume (i.e. call) services provided by other applications.</p>
+</div>
+<div class="paragraph">
+<p>Application is not necessary correspond to OS process. It can be a part of process, or consist of many processes.</p>
+</div>
+<div class="paragraph">
+<p>Examples of applications:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A program with GUI</p>
+</li>
+<li>
+<p>A program without GUI, e.g. Windows Service</p>
+</li>
+<li>
+<p>A part of process, e.g. a plugin running in a big container application consisting of many isolated plugins</p>
+</li>
+<li>
+<p>A web window or worker running in Electron.js or other web container</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="application-instance">Application Instance</h4>
+<div class="paragraph">
+<p>Application instance is a running (started) application. There can be many instances of the same application running
+simultaneously on client desktop.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="interop-registry">Interop Registry</h4>
+<div class="paragraph">
+<p>Interop registry defines strong-typed contracts between applications on client desktop using a special human-readable
+interface definition language.</p>
+</div>
+<div class="paragraph">
+<p>It consist of definitions of the following types:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Message definitions</strong> represent types of data which can be sent between applications.</p>
+</li>
+<li>
+<p><strong>Service definitions</strong> represent named sets of related methods which can be implemented by applications. Service can
+contain one or many methods and each method is defined by its name, type, and types of request and response.</p>
+</li>
+<li>
+<p><strong>Application definitions</strong> declare which service implementations are provided and which consumed
+by each application participating in desktop interop.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Broker loads Interop Registry from server on launch and re-loads it on changes. This allows adding new services to
+user desktops in runtime.</p>
+</div>
+<div class="paragraph">
+<p>Interop Registry enables dynamic service discovery. Applications are only connected to broker and call services rather
+than other applications. This concept is similar to dynamic injection containers available in almost any language and
+framework, but here it is used on a higher level. Broker dynamically searches for a suitable service implementation
+across all the applications in Interop Registry. Because of this applications are always de-coupled from each other,
+they don&#8217;t need to know about counter-parties implementation details and they can release separately.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="broker">Broker</h4>
+<div class="paragraph">
+<p>Broker is the central part of desktop interop. Broker accepts, authenticates and tracks application (client) connections,
+validates and routes calls between them, and optionally can trigger launch of application on demand through
+App Lifecycle Manager.</p>
+</div>
+<div class="paragraph">
+<p>Broker listens to one or many wire protocol servers to accept client connections. Applications can use any of the
+listened wire protocol implementations to establish connection with broker.</p>
+</div>
+<div class="paragraph">
+<p>Application instance is considered "online" while it has at least one established connection with broker. Broker
+uniquely identifies each connection and tracks it, so it always knows which apps are online in any given time.</p>
+</div>
+<div class="paragraph">
+<p>Online applications instances can send protocol requests to broker to discover or call service implementations provided
+by other applications. Broker validates and routes such calls to target applications according to interop registry.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="application-lifecycle-manager">Application Lifecycle Manager</h4>
+<div class="paragraph">
+<p>Component inside broker which tracks active connections and can trigger launch of an application on demand by sending a
+request to the appropriate Application Launcher.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="application-launcher">Application Launcher</h4>
+<div class="paragraph">
+<p>Application launchers are applications which can launch other applications. This concept was introduced to allow easy
+implementation of custom launch workflows which can be very different. E.g. web application is loaded in a browser window,
+native application started as a new OS process and plugin is loaded by its container application. In addition each vendor
+usually has custom launch steps like auto-updating or accepting terms &amp; conditions. Such steps can also be implemented
+in a vendor-specific app launcher.</p>
+</div>
+<div class="paragraph">
+<p>On method call broker can either route the call to an online application instance or trigger launch of a new
+instance. Each application can specify its launcher in interop registry and broker will delegate launch to
+the specified launcher.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="client">Client</h4>
+<div class="paragraph">
+<p>Client is a library used by application to communicate with interop broker. Client can be implemented in any language,
+it communicates with broker using interop protocol, transport protocol and wire protocol.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="client-message-marshaller">Client Message Marshaller</h4>
+<div class="paragraph">
+<p>Pluggable component used by client library to serialize and deserialize request/response messages.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="generated-client-api">Generated Client API</h4>
+<div class="paragraph">
+<p>Application-specific and language-specific API which is auto-generated by code-generation tool based on Interop Registry.</p>
+</div>
+<div class="paragraph">
+<p>For each consumed service a proxy class is generated which allows invocation of service methods.</p>
+</div>
+<div class="paragraph">
+<p>For each provided service an interface is generated which should be implemented to provide implementations for service
+methods.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="generic-client-api">Generic Client API</h4>
+<div class="paragraph">
+<p>Technology-specific library which implements core functionality of interop client. It converts method calls to interop
+protocol messages and vice versa according to specification and uses pluggable transport implementation to
+send/receive messages to/from broker.</p>
+</div>
+<div class="paragraph">
+<p>Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="interop-protocol">Interop Protocol</h4>
+<div class="paragraph">
+<p>Interop Protocol is a language for conversations between client and broker through transport channels.</p>
+</div>
+<div class="paragraph">
+<p>Each interop protocol conversation is performed within a separate transport channel.</p>
+</div>
+<div class="paragraph">
+<p>Protocol describes 4 main types of conversations:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect handshake - the first conversation performed after new transport connection is established</p>
+</li>
+<li>
+<p>Disconnect handshake - the last conversation performed before transport connection is closed</p>
+</li>
+<li>
+<p>Discovery - request from application to broker to get the available services filtered by specific parameters</p>
+</li>
+<li>
+<p>Method call - request from an application to call a method implemented in another application</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="transport-protocol">Transport Protocol</h4>
+<div class="paragraph">
+<p>Transport protocol is used to send binary messages between client and broker and is responsible for multiplexing and
+de-multiplexing many channels through a single connection.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="transport-connection">Transport Connection</h4>
+<div class="paragraph">
+<p>Transport connection is an abstraction of established connectivity between client and broker.</p>
+</div>
+<div class="paragraph">
+<p>Connection is initiated by client and accepted by broker.</p>
+</div>
+<div class="paragraph">
+<p>Transport implementation must detect if the connection is still alive, e.g. by sending heartbeats or using lower-level
+wire protocol capabilities for this, and raise "disconnected" event on both sides when connectivity is lost.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="transport-channel">Transport Channel</h4>
+<div class="paragraph">
+<p>Transport channel is a logical unit of data exchange through connection. It consist of request and response
+byte streams on both sides of connection.</p>
+</div>
+<div class="paragraph">
+<p>Channel opening can be initiated by both client and broker. It&#8217;s only possible to write and read bytes to/from
+an opened channel. Many channels can be simultaneously opened in the context of the same connection.</p>
+</div>
+<div class="paragraph">
+<p>For example, for each call from one application to another, 2 transport channels are opened. First is opened by source
+application to broker. Second is opened by broker to target application. All the data sent in context of the call
+is transferred through these 2 channels.</p>
+</div>
+<div class="paragraph">
+<p>Bytes written to request stream on one side of channel can be read in exactly the same order from response stream
+on another side. As soon as one of the sides sent all the data it closes request stream. This triggers
+response stream completion event on another side as soon as all the sent bytes consumed.</p>
+</div>
+<div class="paragraph">
+<p>Channel considered "Completed" when both sides completed request stream and consumed all the bytes from response stream.
+Additionally it can be terminated by either client or broker with either "Failed" or "Canceled" status in case of
+exception.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="wire-protocol">Wire Protocol</h4>
+<div class="paragraph">
+<p>Wire protocol is an abstraction for sending bytes through cross-process boundaries. Any existing stream-based network
+protocol such as named pipes or websockets can be used as a wire protocol for Plexus Interop.</p>
+</div>
+<div class="paragraph">
+<p>Broker listens to many wire protocols simultaneously on different addresses, so each client can choose which one to use.
+Usually for native apps it&#8217;s more convenient to use named pipes, but for web apps it&#8217;s more convenient to use websockets,
+because most of browsers has built-in websockets support.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="wire-connection">Wire Connection</h4>
+<div class="paragraph">
+<p>Wire connection is an abstraction of established cross-process connection.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="app-registry">App Registry</h3>
 <div class="paragraph">
 <p>Application registry is a JSON array where each item has following properties:</p>
@@ -2459,7 +2791,7 @@ all mapping are correct and consistent.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-10-28 15:52:06 +03:00
+Last updated 2018-04-05 14:38:17 MSK
 </div>
 </div>
 </body>
