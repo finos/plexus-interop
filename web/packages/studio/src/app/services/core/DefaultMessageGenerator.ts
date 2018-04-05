@@ -20,29 +20,46 @@ export class DefaultMessageGenerator {
 
     public constructor(private readonly interopRegistryService: InteropRegistryService) { }
 
+    private readonly primitiveTypes = [
+        "double", "float", "int32", "int64", "uint32",
+        "uint64", "sint32", "sint64", "fixed32", "fixed64",
+        "sfixed32", "sfixed64", "bool", "string"];
+
     public generate(messageId: string): string {
+        // https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
         const message = this.interopRegistryService.getRegistry().messages.get(messageId);
         if (!message) {
             throw new Error(`${messageId} is not found`);
         }
         const defaultPayload: any = {};
-        message.fields.forEach(field => {
-            if (!field.primitive) {
-                defaultPayload[field.name] = {};
+        for (let fieldName in message.fields) {
+            const field = message.fields[fieldName];
+            if (field.rule && field.rule === "repeated") {
+                defaultPayload[fieldName] = [];
             } else {
+
+            }
+            if (this.isPrimitive(field.type)) {
                 switch (field.type) {
                     case "string":
-                        defaultPayload[field.name] = "stringValue";
+                        defaultPayload[fieldName] = "stringValue";
                         break;
                     case "bool":
-                        defaultPayload[field.name] = false;
+                        defaultPayload[fieldName] = false;
                         break;
                     default:
-                        defaultPayload[field.name] = 0;
+                        defaultPayload[fieldName] = 0;
                 }
+            } else {
+                // message or enum, leave empty object for now
+                defaultPayload[fieldName] = {};
             }
-        });
+        }
         return JSON.stringify(defaultPayload);
+    }
+
+    private isPrimitive(type: string): boolean {
+        return this.primitiveTypes.indexOf(type) !== -1;
     }
 
 }
