@@ -34,22 +34,15 @@ describe("JsonRegistryProvider", () => {
         const sut = new JsonInteropRegistryProvider(metadataJson);
         const registry = sut.getCurrent();
         expect(registry).toBeTruthy();
-        expect(registry.applications.size).toBe(4);
+        expect(registry.applications.size).toBe(3);
         expect(registry.services.size).toBe(2);
-        expect(registry.messages.size).toBe(1);
+        expect(registry.messages.size).toBeGreaterThan(1);
 
-        const message = registry.messages.get("interop.testing.EchoRequest") as Message;
-        expect(message.id).toBe("interop.testing.EchoRequest");
-        expect(message.fields.length).toBeGreaterThan(0);
+        const message = registry.messages.get("plexus.interop.testing.EchoRequest") as Message;
+        expect(message.id).toBe("plexus.interop.testing.EchoRequest");
 
-        const firstField = message.fields[0];
-        expect(firstField.name).toBe("stringField");
-        expect(firstField.num).toBe(1);
-        expect(firstField.type).toBe("string");
-        expect(firstField.primitive).toBe(true);
-
-        const service = registry.services.get("interop.testing.EchoService") as Service;
-        expect(service.id).toBe("interop.testing.EchoService");
+        const service = registry.services.get("plexus.interop.testing.EchoService") as Service;
+        expect(service.id).toBe("plexus.interop.testing.EchoService");
         expect(service.methods.size).toBe(4);
 
         const unaryMethod = service.methods.get("Unary") as Method;
@@ -58,27 +51,27 @@ describe("JsonRegistryProvider", () => {
         expect(unaryMethod.responseMessage).toBe(message);
         expect(unaryMethod.type).toBe(MethodType.Unary);
 
-        const consumerApp = registry.applications.get("interop.testing.EchoClient") as Application;
+        const consumerApp = registry.applications.get("plexus.interop.testing.EchoClient") as Application;
         expect(consumerApp.consumedServices.length).toBe(1);
 
         const consumedService = consumerApp.consumedServices[0];
         expect(consumedService.alias).toBeUndefined();
         expect(consumedService.application).toBe(consumerApp);
-        expect(consumedService.from.isMatch("interop.testing.EchoServer")).toBeTruthy();
+        expect(consumedService.from.isMatch("plexus.interop.testing.EchoServer")).toBeTruthy();
         expect(consumedService.from.isMatch("do.not.exist.EchoServer")).toBeFalsy();
         expect(consumedService.methods.size).toBe(4);
         expect((consumedService.methods.get("Unary") as ConsumedMethod).method).toBe(unaryMethod);
 
-        const providedApp = registry.applications.get("interop.testing.EchoServer") as Application;
+        const providedApp = registry.applications.get("plexus.interop.testing.EchoServer") as Application;
         expect(providedApp.consumedServices.length).toBe(0);
         expect(providedApp.providedServices.length).toBe(1);
 
         const providedService = providedApp.providedServices[0];
         expect(providedService.methods.size).toBe(4);
-        expect(providedService.to.isMatch("interop.testing.EchoClient")).toBeTruthy();
-        expect(providedService.to.isMatch("interop.testing.EchoClient2")).toBeTruthy();
-        expect(providedService.to.isMatch("interop.do.not.exist.Client")).toBeFalsy();
-        expect(providedService.to.isMatch("interop.do.not.exist.Client")).toBeFalsy();
+        expect(providedService.to.isMatch("plexus.interop.testing.EchoClient")).toBeTruthy();
+        expect(providedService.to.isMatch("plexus.interop.testing.EchoClient2")).toBeTruthy();
+        expect(providedService.to.isMatch("plexus.interop.do.not.exist.Client")).toBeFalsy();
+        expect(providedService.to.isMatch("plexus.interop.do.not.exist.Client")).toBeFalsy();
         expect((providedService.methods.get("Unary") as ProvidedMethod).method).toBe(unaryMethod);
         
     });
