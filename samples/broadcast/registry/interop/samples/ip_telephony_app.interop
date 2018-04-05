@@ -15,11 +15,11 @@
 // limitations under the License.
 //
 
-import "interop/samples/ip_telephone_broadcast_service.proto";
+import "interop/samples/ip_telephony_broadcast_service.proto";
 
 package interop.samples;
 
-application IPTelephoneApp {
+application IPTelephonyApp {
 
-	provides IPTelephoneBroadcastService { IncomingCallReceived; CallCompleted; }
+	provides IPTelephonyBroadcastService { IncomingCallReceived; CallCompleted; }
 }

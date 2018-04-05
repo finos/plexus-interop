@@ -19,15 +19,28 @@ syntax = "proto3";
 
 package interop.samples;
 
-service IPTelephoneBroadcastService {
+service IPTelephonyBroadcastService {
 	option (broadcast) = true;
 
 	rpc IncomingCallReceived (CallContext) returns (Empty);
 	rpc CallCompleted (CompletedCallDetails) returns (Empty);
 }
 
+message PhoneNumber {
+	uint32 country_code = 1;
+	uint32 country_area_code = 2;
+	string number = 3;	
+}
+
+message ClientDetails {
+	int32 id = 1;
+	string name = 2;
+	string email = 5;
+}
+
 message CallContext {
-	string client_name = 1;
+	PhoneNumber phone_number = 1;
+	ClientDetails client_details = 2;
 }
 
 message CompletedCallDetails {
