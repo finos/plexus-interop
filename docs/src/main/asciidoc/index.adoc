@@ -60,7 +60,11 @@ include::guides-system-requirements.adoc[]
 [[reference]]
 == Reference
 
-=== Basic Concepts and Definitions
+=== Components Overview
+
+include::spec-plexus-interop-components.adoc[]
+
+=== Concepts and Definitions
 
 include::spec-plexus-interop-concepts.adoc[]
 

@@ -3,7 +3,7 @@
 This section contains overview diagram which shows Plexus Interop layers on example of 2 applications interoperating
 through broker. Below this diagram you can find brief descriptions for each of the presented concepts.
 
-image::desktop-interop-layers.png[]
+image::desktop-interop-concepts.png[]
 
 ==== Application
 
