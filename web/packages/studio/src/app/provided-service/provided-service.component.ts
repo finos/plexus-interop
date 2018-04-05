@@ -90,6 +90,10 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
     log.info("Remote stream completed");
   }
 
+  formatAndUpdateArea() {
+    this.messageContent = this.format(this.messageContent);
+  }
+
   updateResponse(contentJson: string, messagesToSend: number, messagesPeriodInMillis: number): void {
 
     const serviceId = this.providedMethod.providedService.service.id;
