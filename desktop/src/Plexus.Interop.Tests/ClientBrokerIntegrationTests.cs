@@ -764,11 +764,9 @@ namespace Plexus.Interop
             {
                 var serverCreatedCount = 0;
                 var echoServerFactory = new TestClientFactory(
-                    async (broker, id) =>
+                    (broker, id) =>
                     {
                         WriteLog("Launching server on demand");
-
-                        await Task.Delay(200);
 
                         var optionsBuilder = new ClientOptionsBuilder()
                             .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
