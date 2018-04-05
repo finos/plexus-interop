@@ -36,10 +36,7 @@ export class DefaultMessageGenerator {
             const field = message.fields[fieldName];
             if (field.rule && field.rule === "repeated") {
                 defaultPayload[fieldName] = [];
-            } else {
-
-            }
-            if (this.isPrimitive(field.type)) {
+            } else if (this.isPrimitive(field.type)) {
                 switch (field.type) {
                     case "string":
                         defaultPayload[fieldName] = "stringValue";
@@ -51,8 +48,7 @@ export class DefaultMessageGenerator {
                         defaultPayload[fieldName] = 0;
                 }
             } else {
-                // message or enum, leave empty object for now
-                defaultPayload[fieldName] = {};
+                // message or enum not supported yet
             }
         }
         return JSON.stringify(defaultPayload);

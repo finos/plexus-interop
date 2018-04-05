@@ -37,7 +37,7 @@ export interface InteropClient {
 
     createDefaultPayload(messageId: string): string;
 
-    validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, payload: string): void;
+    validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod, payload: string): void;
 
     resetInvocationHandlers(): void;
 
