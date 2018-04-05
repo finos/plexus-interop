@@ -7,7 +7,7 @@
     <div *ngIf="messageContentControl && messageContentControl.invalid" class="invalid-feedback">
       {{messageContentControl.errors.messageContentControl}}
     </div>
-    <button id="format-response-content-btn" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
+    <button id="format-response-content-btn" [disabled]="messageContentControl && messageContentControl.invalid" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
     <button id="default-response-content-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
   </div>
 </div>

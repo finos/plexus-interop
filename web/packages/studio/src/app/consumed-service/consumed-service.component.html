@@ -4,8 +4,15 @@
       <div class="col">
         <div>
           <label for="exampleFormControlTextarea1">Enter Request JSON:</label>
-          <textarea id="message-content-area" class="form-control" rows="8" [(ngModel)]="messageContent"></textarea>
-          <button id="format-content-btn" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
+          <textarea id="message-content-area" 
+            [class.is-invalid]="messageContentControl && messageContentControl.invalid" 
+            class="form-control" rows="8" 
+            [(ngModel)]="messageContent"
+            [formControl]="messageContentControl"></textarea>
+          <div *ngIf="messageContentControl && messageContentControl.invalid" class="invalid-feedback">
+            {{messageContentControl.errors.messageContentControl}}
+          </div>
+          <button id="format-content-btn" [disabled]="messageContentControl && messageContentControl.invalid" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
           <button id="default-msg-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
         </div>
       </div>
@@ -50,7 +57,7 @@
     </div>
   </div>
 
-  <button class="btn btn-primary" id="consumedInvokeBtn" (click)="sendRequest()" type="button">Send</button>
-  <button class="btn btn-primary" id="consumedStartUnarSpamBtn" [disabled]="spamStarted" [hidden]="!isUnary()" (click)="startUnarySpam()" type="button">Start Spam</button>
+  <button class="btn btn-primary" [disabled]="messageContentControl && messageContentControl.invalid" id="consumedInvokeBtn" (click)="sendRequest()" type="button">Send</button>
+  <button class="btn btn-primary" id="consumedStartUnarSpamBtn" [disabled]="spamStarted || (messageContentControl && messageContentControl.invalid)" [hidden]="!isUnary()" (click)="startUnarySpam()" type="button">Start Spam</button>
   <button class="btn btn-primary" id="consumedStopUnarSpamBtn" [disabled]="!spamStarted" [hidden]="!isUnary()" (click)="stopUnarySpam()" type="button">Stop Spam</button>
   <button class="btn btn-primary" id="consumedDiscoverBtn" (click)="discoverMethods()" type="button">Discover</button>
