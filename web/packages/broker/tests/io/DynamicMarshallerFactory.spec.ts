@@ -33,12 +33,22 @@ describe("DynamicMarshallerFactory", () => {
 
     const validMessage = {
         stringField: "stringData",
-        boolField: true
+        boolField: true,
+        enumField: 1,
+        repeatedDoubleField: [1, 2, 3],
+        subMessageField: {
+            stringField: "stringData"
+        }
     };  
 
     const invalidTypeMessage = {
         stringField: "stringData",
         boolField: "true"
+    };    
+
+    const invalidEnumValueMessage = {
+        stringField: "stringData",
+        enumField: 10
     };    
 
     const sut = new DynamicMarshallerFactory(registry);
@@ -68,17 +78,15 @@ describe("DynamicMarshallerFactory", () => {
 
     it("Creates Marshaller which fail on messages with wrong type", () => {
         const marshaller = sut.getMarshaller(messageId);
-
-        try {
-            marshaller.validate(invalidTypeMessage);
-            fail("Should fail");
-        } catch (error) {  
-            // tslint:disable-next-line:no-console
-            console.log("Error raised", error);
-        }
+        expect(() => marshaller.validate(invalidTypeMessage)).toThrowError();
     });
 
-    it("It creates Marshaller with primitive types support", () => {
+    it("Creates Marshaller which fail on messages with wrong enum value", () => {
+        const marshaller = sut.getMarshaller(messageId);
+        expect(() => marshaller.validate(invalidEnumValueMessage)).toThrowError();
+    });
+
+    it("Creates Marshaller encoding/decoding support", () => {
         const marshaller = sut.getMarshaller(messageId);  
         const encoded = marshaller.encode(validMessage);
         expect(encoded).toBeDefined();
