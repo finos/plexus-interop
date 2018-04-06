@@ -27,6 +27,8 @@ export abstract class BaseCommand implements Command {
 
     public usageExamples = () => ` $ plexus ${this.name()} ${this.optionsExampleArgs().join(' ')}`;
 
+    public generalDescription = () => '';
+
     public options: () => Option[] = () => [];
 
     public optionArgs = (optValues: any, separator?: string): string[] => {
@@ -49,7 +51,8 @@ export abstract class BaseCommand implements Command {
     }
 
     public register(builder: commander.CommanderStatic): void {
-        let commandBuilder = builder.command(this.name());
+        let commandBuilder = builder.command(this.name())
+            .description(this.generalDescription());
         this.options().forEach(o => commandBuilder.option(getFlags(o), o.description, o.defaultValue));
         const verboseOption = verbose();
         commandBuilder = commandBuilder.option(getFlags(verboseOption), verboseOption.description, verboseOption.defaultValue);

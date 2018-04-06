@@ -24,6 +24,8 @@ export class GenProtoCommand extends BaseJavaGenCommand {
         return ['--type=proto', '--descriptors', ...this.optionArgs(opts)];
     }
 
+    public generalDescription = () => 'Generates proto definitions for specified entry point';
+
     public name = () => 'gen-proto';
 
     public options: () => Option[] = () => [baseDir(), out(), plexusEntryPoint()];
