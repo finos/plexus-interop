@@ -20,6 +20,7 @@ export class DefaultMessageGenerator {
 
     public constructor(private readonly interopRegistryService: InteropRegistryService) { }
 
+    // https://developers.google.com/protocol-buffers/docs/reference/proto3-spec    
     private readonly primitiveTypes = [
         "double", "float", "int32", "int64", "uint32",
         "uint64", "sint32", "sint64", "fixed32", "fixed64",
@@ -30,8 +31,7 @@ export class DefaultMessageGenerator {
     }
 
     private generateObj(messageId: string, skipMessageType: boolean = false): any {
-        // https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
-        const message = this.interopRegistryService.getRegistry().messages.get(messageId);
+        const message = this.lookupMessage(messageId);
         if (!message) {
             throw new Error(`${messageId} is not found`);
         }
@@ -53,19 +53,15 @@ export class DefaultMessageGenerator {
                 }
             } else {
                 const enumRef = this.lookupEnum(field.type) 
-                    // nested enum
                     || this.lookupEnum(`${messageId}.${field.type}`) 
-                    // shared namespace
                     || this.lookupEnum(`${this.getNamespace(messageId)}.${field.type}`)
                 if (enumRef) {
-                    defaultPayload[fieldName] = this.firstValue(enumRef.values);
+                    defaultPayload[fieldName] = this.anyValue(enumRef.values);
                 } else if (skipMessageType) {
                     defaultPayload[fieldName] = [];
                 } else {
                     const subMessage = this.lookupMessage(field.type) 
-                        // nested enum
                         || this.lookupMessage(`${messageId}.${field.type}`) 
-                        // shared namespace
                         || this.lookupMessage(`${this.getNamespace(messageId)}.${field.type}`);
                     if (subMessage) {
                         defaultPayload[fieldName] = this.generateObj(subMessage.id, true);
@@ -76,9 +72,9 @@ export class DefaultMessageGenerator {
         return defaultPayload;
     }
 
-    private firstValue(o: any): any {
-        for (let k of o) {
-            return k;
+    private anyValue(o: any): any {
+        for (let k in o) {
+            return o[k];
         }
         return null;
     }
