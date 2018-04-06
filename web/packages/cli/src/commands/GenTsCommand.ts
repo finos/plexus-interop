@@ -32,7 +32,7 @@ export class GenTsCommand extends BaseCommand {
 
     public name = () => 'gen-ts';
 
-    public generalDescription = () => 'Generates Typescript client and messages definitions for specified entry point';
+    public generalDescription = () => 'generate Typescript client and messages definitions for specified entry point';
 
     public options: () => Option[] = () => [baseDir(), out(), plexusEntryPoint(), namespace()];
 

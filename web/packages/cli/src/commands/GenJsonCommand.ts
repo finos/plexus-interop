@@ -25,7 +25,7 @@ export class GenJsonCommand extends BaseJavaGenCommand {
         return ['--type=json_meta', ...this.optionArgs(opts), `--protoc=${getPbJsExecPath()}`];
     }
 
-    public generalDescription = () => 'Generates metadata in JSON format';
+    public generalDescription = () => 'generate metadata in JSON format';
 
     public name = () => 'gen-json-meta';
 
