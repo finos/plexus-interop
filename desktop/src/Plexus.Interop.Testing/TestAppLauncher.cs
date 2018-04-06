@@ -49,7 +49,13 @@ namespace Plexus.Interop.Testing
             {
                 throw new InvalidOperationException($"Unknown application launch requested: {request.AppId}");
             }
-            var client = clientFactory(_broker, UniqueId.FromHiLo(request.SuggestedAppInstanceId.Hi, request.SuggestedAppInstanceId.Lo));
+
+            var client = await clientFactory.CreateClientAsync(
+                _broker,
+                UniqueId.FromHiLo(
+                    request.SuggestedAppInstanceId.Hi,
+                    request.SuggestedAppInstanceId.Lo));
+
             OnStop(client.Disconnect);
             await client.ConnectAsync().ConfigureAwait(false);
             return new AppLaunchResponse

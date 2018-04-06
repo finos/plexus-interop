@@ -25,6 +25,7 @@ namespace Plexus.Interop
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Plexus.Interop.Transport.Protocol;
     using Xunit;
@@ -628,18 +629,19 @@ namespace Plexus.Interop
 
             RunWith10SecTimeout(async () =>
             {
-                var echoServerFactory = (TestClientFactory)((broker, id) =>
-                {
-                    var optionsBuilder = new ClientOptionsBuilder()
-                        .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
-                        .WithDefaultConfiguration()
-                        .WithProvidedService(
-                            EchoService.Id,
-                            x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
-                        .WithApplicationId(EchoServerClient.Id);
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                EchoService.Id,
+                                x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
+                            .WithApplicationId(EchoServerClient.Id);
 
-                    return ClientFactory.Instance.Create(optionsBuilder.Build());
-                });
+                        return ClientFactory.Instance.Create(optionsBuilder.Build());
+                    });
                 var appLauncher = RegisterDisposable(
                     new TestAppLauncher(
                         _testBrokerFixture.SharedInstance,
@@ -668,18 +670,19 @@ namespace Plexus.Interop
 
             RunWith10SecTimeout(async () =>
             {
-                var echoServerFactory = (TestClientFactory)((broker, id) =>
-                {
-                    var optionsBuilder = new ClientOptionsBuilder()
-                        .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
-                        .WithDefaultConfiguration()
-                        .WithProvidedService(
-                            EchoService.Id,
-                            x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
-                        .WithApplicationId(EchoServerClient.Id);
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                EchoService.Id,
+                                x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
+                            .WithApplicationId(EchoServerClient.Id);
 
-                    return ClientFactory.Instance.Create(optionsBuilder.Build());
-                });
+                        return ClientFactory.Instance.Create(optionsBuilder.Build());
+                    });
                 var appLauncher = RegisterDisposable(
                     new TestAppLauncher(
                         _testBrokerFixture.SharedInstance,
@@ -707,22 +710,23 @@ namespace Plexus.Interop
             RunWith10SecTimeout(async () =>
             {
                 var serverCreatedCount = 0;
-                var echoServerFactory = (TestClientFactory)((broker, id) =>
-                {
-                    var optionsBuilder = new ClientOptionsBuilder()
-                        .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
-                        .WithAppInstanceId(id)
-                        .WithApplicationId(EchoServerClient.Id)
-                        .WithDefaultConfiguration()
-                        .WithProvidedService(
-                            GreetingService.Id,
-                            "AlwaysLaunchGreetingService",
-                            x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithAppInstanceId(id)
+                            .WithApplicationId(EchoServerClient.Id)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                GreetingService.Id,
+                                "AlwaysLaunchGreetingService",
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
 
-                    serverCreatedCount++;
+                        serverCreatedCount++;
 
-                    return ClientFactory.Instance.Create(optionsBuilder.Build());
-                });
+                        return Task.FromResult(ClientFactory.Instance.Create(optionsBuilder.Build()));
+                    });
 
                 var appLauncher = RegisterDisposable(
                     new TestAppLauncher(
@@ -746,6 +750,64 @@ namespace Plexus.Interop
         }
 
         [Fact]
+        public void InvocationShouldNotTriggerSubsequentLaunchWhenMethodLaunchModeSetToDefault()
+        {
+            var serverInvokedCount = 0;
+
+            Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
+            {
+                Interlocked.Increment(ref serverInvokedCount);
+                return Task.FromResult(new GreetingResponse { Greeting = greetingRequest.Name });
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                var serverCreatedCount = 0;
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        WriteLog("Launching server on demand");
+
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithAppInstanceId(id)
+                            .WithApplicationId(EchoServerClient.Id)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                GreetingService.Id,
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+
+                        serverCreatedCount++;
+
+                        return ClientFactory.Instance.Create(optionsBuilder.Build());
+                    });
+
+                var appLauncher = RegisterDisposable(
+                    new TestAppLauncher(
+                        _testBrokerFixture.SharedInstance,
+                        new Dictionary<string, TestClientFactory>
+                        {
+                            {EchoServerClient.Id, echoServerFactory}
+                        }
+                    )
+                );
+                await appLauncher.StartAsync();
+                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
+                client.ConnectAsync().ShouldCompleteIn(Timeout5Sec);
+                var callDescriptor = new MethodCallDescriptor(
+                    ProvidedMethodReference.Create(GreetingService.Id, "Hello", EchoServerClient.Id));
+                var call1 = client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
+                var call2 = client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
+                await Task.WhenAny(call1.AsTask(), call2.AsTask());
+                WriteLog("Call 1 completed");
+                await Task.WhenAll(call1.AsTask(), call2.AsTask());
+                WriteLog("Call 2 completed");
+                serverCreatedCount.ShouldBe(1);
+                serverInvokedCount.ShouldBe(2);
+            });
+        }
+
+        [Fact]
         public void InvocationShouldFailIfThereIsNoOnlineInstanceAndMethodLaunchModeSetToNever()
         {
             Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
@@ -756,22 +818,23 @@ namespace Plexus.Interop
             RunWith10SecTimeout(async () =>
             {
                 var serverCreatedCount = 0;
-                var echoServerFactory = (TestClientFactory)((broker, id) =>
-                {
-                    var optionsBuilder = new ClientOptionsBuilder()
-                        .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
-                        .WithAppInstanceId(id)
-                        .WithApplicationId(EchoServerClient.Id)
-                        .WithDefaultConfiguration()
-                        .WithProvidedService(
-                            GreetingService.Id,
-                            "NeverLaunchGreetingService",
-                            x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithAppInstanceId(id)
+                            .WithApplicationId(EchoServerClient.Id)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                GreetingService.Id,
+                                "NeverLaunchGreetingService",
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
 
-                    serverCreatedCount++;
+                        serverCreatedCount++;
 
-                    return ClientFactory.Instance.Create(optionsBuilder.Build());
-                });
+                        return ClientFactory.Instance.Create(optionsBuilder.Build());
+                    });
 
                 var appLauncher = RegisterDisposable(
                     new TestAppLauncher(
