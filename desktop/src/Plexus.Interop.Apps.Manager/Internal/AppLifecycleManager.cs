@@ -254,7 +254,8 @@ namespace Plexus.Interop.Apps.Internal
 
                 lock (_connections)
                 {
-                    if (_appInstanceConnections.TryGetValue(appInstanceId, out var connectionList) && connectionList.Any())
+                    if (_appInstanceConnections.TryGetValue(appInstanceId, out var connectionList)
+                        && connectionList.Any(c => Equals(appId, c.Info.ApplicationId)))
                     {
                         var connection = connectionList.First();
                         Log.Debug("Resolving deferred connection for app instance {0} to connection {{{1}}}", appInstanceId, connection);
