@@ -32,16 +32,16 @@ namespace Plexus.Interop.Apps.Internal
         private readonly Dictionary<UniqueId, IAppConnection> _connections
             = new Dictionary<UniqueId, IAppConnection>();
 
-        private readonly Dictionary<UniqueId, List<IAppConnection>> _appInstanceConnections
-            = new Dictionary<UniqueId, List<IAppConnection>>();
+        private readonly Dictionary<(UniqueId AppInstanceId, string AppId), List<IAppConnection>> _appInstanceConnections
+            = new Dictionary<(UniqueId, string), List<IAppConnection>>();
 
         private readonly Dictionary<string, List<IAppConnection>> _appConnections
             = new Dictionary<string, List<IAppConnection>>();
 
-        private readonly Dictionary<UniqueId, Promise<IAppConnection>> _appInstanceConnectionWaiters
-            = new Dictionary<UniqueId, Promise<IAppConnection>>();
+        private readonly Dictionary<(UniqueId AppInstanceId, string AppId), Promise<IAppConnection>> _appInstanceConnectionsInProgress
+            = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
 
-        private readonly Dictionary<string, List<Task<IAppConnection>>> _appConnectionTasks
+        private readonly Dictionary<string, List<Task<IAppConnection>>> _appConnectionsInProgress
             = new Dictionary<string, List<Task<IAppConnection>>>();
 
         private readonly IAppLifecycleManagerClient _client;
@@ -81,11 +81,11 @@ namespace Plexus.Interop.Apps.Internal
                 }
 
                 _connections[clientConnection.Id] = clientConnection;
-                var appInstanceId = clientConnection.Info.ApplicationInstanceId;
-                if (!_appInstanceConnections.TryGetValue(appInstanceId, out var connectionList))
+                var deferredConnectionKey = (clientConnection.Info.ApplicationInstanceId, clientConnection.Info.ApplicationId);
+                if (!_appInstanceConnections.TryGetValue(deferredConnectionKey, out var connectionList))
                 {
                     connectionList = new List<IAppConnection>();
-                    _appInstanceConnections[appInstanceId] = connectionList;
+                    _appInstanceConnections[deferredConnectionKey] = connectionList;
                 }
                 connectionList.Add(clientConnection);
 
@@ -99,11 +99,11 @@ namespace Plexus.Interop.Apps.Internal
 
                 Log.Debug("New connection accepted: {{{0}}}", clientConnection);
 
-                if (_appInstanceConnectionWaiters.TryGetValue(appInstanceId, out var waiter))
+                if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
-                    Log.Debug("Resolving deferred connection for app instance {0} to accepted connection {{{1}}}", appInstanceId, connection);
+                    Log.Debug("Resolving deferred connection {{{0}}} to accepted connection {{{1}}}", deferredConnectionKey, connection);
                     waiter.TryComplete(clientConnection);
-                    _appInstanceConnectionWaiters.Remove(appInstanceId);
+                    _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
                 }
 
                 return clientConnection;
@@ -118,13 +118,13 @@ namespace Plexus.Interop.Apps.Internal
 
                 _connections.Remove(connection.Id);
 
-                var appInstanceId = connection.Info.ApplicationInstanceId;
-                if (_appInstanceConnections.TryGetValue(appInstanceId, out var list))
+                var deferredConnectionKey = (connection.Info.ApplicationInstanceId, connection.Info.ApplicationId);
+                if (_appInstanceConnections.TryGetValue(deferredConnectionKey, out var list))
                 {
                     list.Remove(connection);
                     if (list.Count == 0)
                     {
-                        _appInstanceConnections.Remove(appInstanceId);
+                        _appInstanceConnections.Remove(deferredConnectionKey);
                     }
                 }
 
@@ -138,10 +138,10 @@ namespace Plexus.Interop.Apps.Internal
                     }
                 }
 
-                if (_appInstanceConnectionWaiters.TryGetValue(appInstanceId, out var waiter))
+                if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
                     waiter.TryCancel();
-                    _appInstanceConnectionWaiters.Remove(appInstanceId);
+                    _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
                 }
             }
         }
@@ -183,7 +183,7 @@ namespace Plexus.Interop.Apps.Internal
                 } 
 
                 if (mode != ResolveMode.MultiInstance 
-                    && _appConnectionTasks.TryGetValue(appId, out var appConnectionTaskList) 
+                    && _appConnectionsInProgress.TryGetValue(appId, out var appConnectionTaskList) 
                     && appConnectionTaskList.Any())
                 {
                     Log.Debug("Resolving connection for app {0} with mode {1} to launching instance", appId, mode);
@@ -238,32 +238,35 @@ namespace Plexus.Interop.Apps.Internal
             var appInstanceId = suggestedAppInstanceId;
             Log.Info("Launching {0}", appId);
             var connectionPromise = new Promise<IAppConnection>();
+            var deferredConnectionKey = (suggestedAppInstanceId, appId);
             try
             {
                 lock (_connections)
                 {
-                    if (!_appConnectionTasks.TryGetValue(appId, out var appConnectionTaskList))
+                    if (!_appConnectionsInProgress.TryGetValue(appId, out var appConnectionTaskList))
                     {
                         appConnectionTaskList = new List<Task<IAppConnection>>();
-                        _appConnectionTasks[appId] = appConnectionTaskList;
+                        _appConnectionsInProgress[appId] = appConnectionTaskList;
                     }
                     appConnectionTaskList.Add(connectionPromise.Task);
                 }
 
                 appInstanceId = await LaunchAsync(appId, appInstanceId, resolveMode).ConfigureAwait(false);
 
+                deferredConnectionKey = (appInstanceId, appId);
+
                 lock (_connections)
                 {
-                    if (_appInstanceConnections.TryGetValue(appInstanceId, out var connectionList)
-                        && connectionList.Any(c => Equals(appId, c.Info.ApplicationId)))
+                    IAppConnection existingConnection;
+                    if (_appInstanceConnections.TryGetValue(deferredConnectionKey, out var connectionList)
+                        && (existingConnection = connectionList.FirstOrDefault(c => Equals(appId, c.Info.ApplicationId))) != null)
                     {
-                        var connection = connectionList.First();
-                        Log.Debug("Resolving deferred connection for app instance {0} to connection {{{1}}}", appInstanceId, connection);
-                        connectionPromise.TryComplete(connection);
+                        Log.Debug("Resolving deferred connection for app instance {0} to existing connection {{{1}}}", appInstanceId, existingConnection);
+                        connectionPromise.TryComplete(existingConnection);
                     }
                     else
                     {
-                        _appInstanceConnectionWaiters[appInstanceId] = connectionPromise;
+                        _appInstanceConnectionsInProgress[deferredConnectionKey] = connectionPromise;
                     }
                 }
 
@@ -273,13 +276,13 @@ namespace Plexus.Interop.Apps.Internal
             {
                 lock (_connections)
                 {
-                    _appInstanceConnectionWaiters.Remove(appInstanceId);
-                    if (_appConnectionTasks.TryGetValue(appId, out var appConnectionTaskList))
+                    _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
+                    if (_appConnectionsInProgress.TryGetValue(appId, out var appConnectionTaskList))
                     {
                         appConnectionTaskList.Remove(connectionPromise.Task);
                         if (!appConnectionTaskList.Any())
                         {
-                            _appConnectionTasks.Remove(appId);
+                            _appConnectionsInProgress.Remove(appId);
                         }
                     }
                 }

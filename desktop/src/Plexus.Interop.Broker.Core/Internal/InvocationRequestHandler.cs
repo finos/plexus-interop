@@ -150,7 +150,7 @@ namespace Plexus.Interop.Broker.Internal
                     var onlineConnections = _appLifecycleManager
                         .GetOnlineConnections()
                         .Where(x => x.Info.ApplicationId.Equals(appId) &&
-                                    !x.Info.ConnectionId.Equals(source.Id)).ToArray();
+                                    !x.Id.Equals(source.Id)).ToArray();
 
                     if (onlineConnections.Any())
                     {
