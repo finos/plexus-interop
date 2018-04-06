@@ -112,10 +112,10 @@ namespace Plexus.Interop.Apps.Internal
 
         public void RemoveConnection(IAppConnection connection)
         {
-            lock (_connections)
-            {
-                Log.Debug("Removing connection {0}", connection.Info);
+            Log.Debug("Removing connection {0}", connection.Info);
 
+            lock (_connections)
+            {                
                 _connections.Remove(connection.Id);
 
                 var deferredConnectionKey = (connection.Info.ApplicationInstanceId, connection.Info.ApplicationId);
@@ -257,11 +257,10 @@ namespace Plexus.Interop.Apps.Internal
 
                 lock (_connections)
                 {
-                    IAppConnection existingConnection;
-                    if (_appInstanceConnections.TryGetValue(deferredConnectionKey, out var connectionList)
-                        && (existingConnection = connectionList.FirstOrDefault(c => Equals(appId, c.Info.ApplicationId))) != null)
+                    if (_appInstanceConnections.TryGetValue(deferredConnectionKey, out var connectionList) && connectionList.Any())
                     {
-                        Log.Debug("Resolving deferred connection for app instance {0} to existing connection {{{1}}}", appInstanceId, existingConnection);
+                        var existingConnection = connectionList.First();
+                        Log.Debug("Resolving deferred connection {{{0}}} to existing connection {{{1}}}", deferredConnectionKey, existingConnection);
                         connectionPromise.TryComplete(existingConnection);
                     }
                     else
