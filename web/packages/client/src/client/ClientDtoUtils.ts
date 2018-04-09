@@ -22,7 +22,7 @@ import { ProvidedMethodReference } from "@plexus-interop/client-api";
 export class ClientDtoUtils {
 
     public static targetInvocationHash(invocation: InvocationRequestInfo): string {
-        return `${invocation.serviceId}.${invocation.methodId}`;
+        return `${invocation.serviceId}.${invocation.serviceAlias}.${invocation.methodId}`;
     }
 
     public static providedMethodToInvocationInfo(providedMethod: ProvidedMethodReference): InvocationMetaInfo {
