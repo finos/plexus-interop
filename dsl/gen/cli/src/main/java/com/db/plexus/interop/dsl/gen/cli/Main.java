@@ -27,6 +27,7 @@ import com.db.plexus.interop.dsl.gen.csharp.CsharpProtoGenTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenTask;
 import com.db.plexus.interop.dsl.gen.ts.TsGenTask;
 import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask;
+import com.db.plexus.interop.dsl.gen.util.FileUtils;
 import com.google.inject.Injector;
 
 import java.io.File;
@@ -64,6 +65,8 @@ public class Main {
                 jsGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.JSON_META:
+                genConfig.setIncludeProtoDescriptors(true);
+                enhanceMetadata(genConfig, workDir, baseDir, setup, injector);
                 GenTask metaJsonGenTask = injector.getInstance(MetaJsonGenTask.class);
                 metaJsonGenTask.doGen(genConfig);
                 break;
@@ -72,18 +75,7 @@ public class Main {
                 protoGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.CSHARP:
-                GenTask preProcessTask = injector.getInstance(CsharpProtoGenTask.class);
-                File temp = File.createTempFile("proto", Long.toString(System.nanoTime()));
-        		temp.delete();
-        		temp.mkdirs();
-        		String outDir = genConfig.getOutDir();
-        		genConfig.setOutDir(temp.getPath());
-                preProcessTask.doGen(genConfig);                
-                genConfig.setBaseDir(temp.getPath());
-                genConfig.setOutDir(outDir);
-                setup.removeBaseURI(baseDir);                
-                baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
-                setup.addBaseURI(baseDir);
+                enhanceMetadata(genConfig, workDir, baseDir, setup, injector);
                 GenTask cSharpGenTask = injector.getInstance(CsharpGenTask.class);
                 cSharpGenTask.doGen(genConfig);
                 break;
@@ -94,6 +86,19 @@ public class Main {
             default:
                 throw new IllegalArgumentException("Unknown type " + type);
         }
+    }
+
+    private static void enhanceMetadata(PlexusGenConfig genConfig, URI workDir, URI baseDir, InteropLangStandaloneSetup setup, Injector injector) throws IOException, URISyntaxException {
+        GenTask preProcessTask = injector.getInstance(CsharpProtoGenTask.class);
+        File temp = FileUtils.createTempDir();
+        String outDir = genConfig.getOutDir();
+        genConfig.setOutDir(temp.getPath());
+        preProcessTask.doGen(genConfig);
+        genConfig.setBaseDir(temp.getPath());
+        genConfig.setOutDir(outDir);
+        setup.removeBaseURI(baseDir);
+        baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
+        setup.addBaseURI(baseDir);
     }
 
 }

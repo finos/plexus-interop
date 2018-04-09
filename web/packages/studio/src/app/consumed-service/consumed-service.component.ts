@@ -27,6 +27,8 @@ import { DiscoveredMethod, InvocationRequestInfo, MethodType, StreamingInvocatio
 import { UniqueId } from "@plexus-interop/protocol";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { createInvocationLogger } from '../services/core/invocation-utils';
+import { FormControl } from '@angular/forms';
+import { plexusMessageValidator } from '../services/ui/validators';
 
 @Component({
   selector: 'app-consumed-service',
@@ -47,7 +49,8 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   private selectedDiscoveredMethod: DiscoveredMethod;
 
   messageContent: string;
-  responseContent: string;
+  messageContentControl: FormControl = new FormControl("{}");
+  responseContent: string = "{}";
 
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
@@ -83,7 +86,10 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
           this.interopClient = state.services.interopClient;
           this.registryService = state.services.interopRegistryService;
           this.consumedMethod = state.consumedMethod.method;
-          this.createDefaultMessage();
+          this.createDefaultMessage();          
+          this.messageContentControl.setValidators([
+            plexusMessageValidator('messageContentControl', this.interopClient, this.consumedMethod)
+          ]);
         }));
   }
 
@@ -225,11 +231,9 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   createDefaultMessage() {
-    if (!this.messageContent) {
-      const method = this.consumedMethod.method;
-      this.messageContent = this.interopClient.createDefaultPayload(method.requestMessage.id);
-      this.formatAndUpdateArea();
-    }
+    const method = this.consumedMethod.method;
+    this.messageContent = this.interopClient.createDefaultPayload(method.requestMessage.id);
+    this.formatAndUpdateArea();
   }
 
   formatAndUpdateArea() {

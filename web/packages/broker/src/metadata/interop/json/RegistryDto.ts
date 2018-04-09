@@ -17,10 +17,11 @@
 import { ApplicationDto } from "./ApplicationDto";
 import { ServiceDto } from "./ServiceDto";
 import { Message } from "../model/Message";
+import { MessagesNamespace } from "./MessagesNamespace";
 
 export interface RegistryDto {
 
-    messages: Message[];
+    messages: MessagesNamespace;
     
     applications: ApplicationDto[];
     

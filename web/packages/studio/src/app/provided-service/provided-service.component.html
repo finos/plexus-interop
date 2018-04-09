@@ -1,8 +1,13 @@
 <div>
   <div class="form-group">
-    <label for="response-content-area">Enter response JSON:</label>
-    <textarea id="response-content-area" class="form-control" id="exampleFormControlTextarea1" rows="8" [(ngModel)]="messageContent"></textarea>
-    <button id="format-response-content-btn" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
+    <label for="messageContentInput">Enter response JSON:</label>
+    <textarea id="response-content-area" [class.is-invalid]="messageContentControl && messageContentControl.invalid" [(ngModel)]="messageContent"
+      [formControl]="messageContentControl" name="messageContentControl" class="form-control" id="exampleFormControlTextarea1"
+      rows="8"></textarea>
+    <div *ngIf="messageContentControl && messageContentControl.invalid" class="invalid-feedback">
+      {{messageContentControl.errors.messageContentControl}}
+    </div>
+    <button id="format-response-content-btn" [disabled]="messageContentControl && messageContentControl.invalid" class="btn btn-link" type="button" (click)="formatAndUpdateArea()">Format content</button>
     <button id="default-response-content-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
   </div>
 </div>
@@ -17,4 +22,4 @@
   <input id="messages-interval" class="form-control" [(ngModel)]="messagesPeriodInMillis">
 </div>
 
-<button id="intercept-btn" class="btn btn-primary" (click)="intercept()" type="button">Update Response</button>
+<button id="intercept-btn" class="btn btn-primary" [disabled]="messageContentControl && messageContentControl.invalid" (click)="intercept()" type="button">Update Response</button>

@@ -54,7 +54,7 @@ export class GenericClientWrapper implements InteropClient {
         return this.genericClient.getConnectionId().toString();
     }
 
-    public validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, payload: string): void {
+    public validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod, payload: string): void {
         const { inputMessageId } = this.toMetaInfo(methodToInvoke);
         const requestEncoder = this.encoderProvider.getMarshaller(inputMessageId);
         const requestData = JSON.parse(payload);
@@ -69,11 +69,14 @@ export class GenericClientWrapper implements InteropClient {
         this.unaryHandlers.set(`${serviceId}.${methodId}`, handler);
     }
 
-    private isConsumed(methodToInvoke: DiscoveredMethod | ConsumedMethod): methodToInvoke is ConsumedMethod {
+    private isConsumed(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod): methodToInvoke is ConsumedMethod {
         return !!(methodToInvoke as ConsumedMethod).consumedService;
     }
+    private isDiscovered(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod): methodToInvoke is DiscoveredMethod {
+        return !!(methodToInvoke as DiscoveredMethod).providedMethod;
+    }
 
-    private toMetaInfo(method: DiscoveredMethod | ConsumedMethod): DiscoveredMetaInfo | ConsumedMetaInfo {
+    private toMetaInfo(method: DiscoveredMethod | ConsumedMethod | ProvidedMethod): DiscoveredMetaInfo | ConsumedMetaInfo {
         if (this.isConsumed(method)) {
             return {
                 inputMessageId: method.method.requestMessage.id,
@@ -81,12 +84,20 @@ export class GenericClientWrapper implements InteropClient {
                 serviceId: method.consumedService.service.id,
                 methodId: method.method.name
             };
+        } else if (this.isDiscovered(method)) {
+            return {
+                inputMessageId: method.inputMessageId as string,
+                outputMessageId: method.outputMessageId as string,
+                provided: method.providedMethod
+            };
+        } else {
+            return {
+                inputMessageId: method.method.requestMessage.id,
+                outputMessageId: method.method.responseMessage.id as string,
+                serviceId: method.method.service.id,
+                methodId: method.method.name
+            };
         }
-        return {
-            inputMessageId: method.inputMessageId as string,
-            outputMessageId: method.outputMessageId as string,
-            provided: method.providedMethod
-        };
     }
 
     public async sendUnaryRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient> {
@@ -201,9 +212,9 @@ export class GenericClientWrapper implements InteropClient {
                         this.bidiHandlers.set(pmFullName, hostClient => {
                             hostClient.error(new ClientError(notInterceptedMsg));
                             return {
-                                next: v => {},
+                                next: v => { },
                                 complete: () => { },
-                                error: e => {},
+                                error: e => { },
                                 streamCompleted: () => { }
                             };
                         });
@@ -227,7 +238,7 @@ export class GenericClientWrapper implements InteropClient {
             },
             methodId: method.method.name
         };
-        const discoveryRequest = {consumedMethod};
+        const discoveryRequest = { consumedMethod };
         const discoveredMethods = await this.discoverMethod(discoveryRequest);
         const onlineMethods = await this.discoverMethod({
             ...discoveryRequest,

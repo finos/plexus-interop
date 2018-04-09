@@ -29,13 +29,15 @@ export class GenCSharpCommand extends BaseCommand {
 
     public name = () => 'gen-csharp';
 
+    public generalDescription = () => 'generate C# client and messages definitions for specified entry point';
+
     public options: () => Option[] = () => [baseDir(), out('Generated'), plexusEntryPoint(), namespace('Plexus.Interop.Testing.Generated')];
 
     public async action(opts: any): Promise<void> {
 
         this.log('Generating interop client');
         const javaExecPath = await getJavaExecPath();
-        const protocExecPath = await getProtocExecPath();
+        const protocExecPath = getProtocExecPath();
         const javaLibPath = getJavaGenLibPath();
         await simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.clientGenArgs(opts), `--protoc=${protocExecPath}`], opts.verbose === 'true');
         

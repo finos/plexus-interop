@@ -19,7 +19,11 @@ import * as path from 'path';
 import * as AdmZip from 'adm-zip';
 
 export function getDistDir(): string {
-    return path.normalize(path.join(__dirname, '..', '..', '..'));
+    return path.resolve(getBaseDir(), 'dist');
+}
+
+export function getBaseDir(): string {
+    return path.join(__dirname, '..', '..', '..', '..');
 }
 
 export function getDirectories(dirPath: string): string[] {
@@ -36,10 +40,26 @@ export function mkdirsSync(dir: string): void {
     fs.mkdirsSync(dir);
 }
 
+export function existsSync(path: string): boolean {
+    return fs.existsSync(path);
+}
+
+export function exists(path: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+        fs.exists(path, exists => {
+            resolve(exists);
+        });
+    });
+}
+
 export async function listFiles(baseDir: string, pattern: RegExp): Promise<string[]> {
     const result: string[] = [];
     iterateFiles(baseDir, pattern, f => result.push(f));
     return result;
+}
+
+export function readTextFile(filePath: string): Promise<string> {
+    return fs.readFile(filePath, 'utf8');
 }
 
 export function iterateFiles(baseDir: string, pattern: RegExp, callback: (file: string) => void, recursive: boolean = true): void {

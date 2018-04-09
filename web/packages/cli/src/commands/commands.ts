@@ -23,3 +23,9 @@ import { GenCSharpCommand } from './GenCSharpCommand';
 export function commands(): Command[] {
     return [new GenTsCommand(), new GenJsonCommand(), new GenProtoCommand(), new GenCSharpCommand()];
 }
+
+export function printGeneralHelp(): void {
+    console.log('');    
+    console.log('  Help for specific command:  plexus [command] --help');
+    console.log('');
+}

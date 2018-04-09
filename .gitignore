@@ -50,7 +50,6 @@ package-lock.json
 *.ipr
 *.iws
 .idea/
-.vscode
 out/
 
 ### Local configuration file (sdk path, etc)

@@ -14,35 +14,94 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService } from "@plexus-interop/broker";
+import { InteropRegistryService, Enum, Message } from "@plexus-interop/broker";
 
 export class DefaultMessageGenerator {
 
     public constructor(private readonly interopRegistryService: InteropRegistryService) { }
 
+    // https://developers.google.com/protocol-buffers/docs/reference/proto3-spec    
+    private readonly primitiveTypes = [
+        "double", "float", "int32", "int64", "uint32",
+        "uint64", "sint32", "sint64", "fixed32", "fixed64",
+        "sfixed32", "sfixed64", "bool", "string"];
+
     public generate(messageId: string): string {
-        const message = this.interopRegistryService.getRegistry().messages.get(messageId);
+        return JSON.stringify(this.generateObj(messageId));
+    }
+
+    private generateObj(messageId: string, skipMessageType: boolean = false): any {
+        const message = this.lookupMessage(messageId);
         if (!message) {
             throw new Error(`${messageId} is not found`);
         }
         const defaultPayload: any = {};
-        message.fields.forEach(field => {
-            if (!field.primitive) {
-                defaultPayload[field.name] = {};
-            } else {
+        for (let fieldName in message.fields) {
+            const field = message.fields[fieldName];
+            if (field.rule && field.rule === "repeated") {
+                defaultPayload[fieldName] = [];
+            } else if (this.isPrimitive(field.type)) {
                 switch (field.type) {
                     case "string":
-                        defaultPayload[field.name] = "stringValue";
+                        defaultPayload[fieldName] = "stringValue";
                         break;
                     case "bool":
-                        defaultPayload[field.name] = false;
+                        defaultPayload[fieldName] = false;
                         break;
                     default:
-                        defaultPayload[field.name] = 0;
+                        defaultPayload[fieldName] = 0;
+                }
+            } else {
+                const enumRef = this.lookupEnum(field.type) 
+                    || this.lookupEnum(`${messageId}.${field.type}`) 
+                    || this.lookupEnum(`${this.getNamespace(messageId)}.${field.type}`)
+                if (enumRef) {
+                    defaultPayload[fieldName] = this.anyValue(enumRef.values);
+                } else if (skipMessageType) {
+                    defaultPayload[fieldName] = [];
+                } else {
+                    const subMessage = this.lookupMessage(field.type) 
+                        || this.lookupMessage(`${messageId}.${field.type}`) 
+                        || this.lookupMessage(`${this.getNamespace(messageId)}.${field.type}`);
+                    if (subMessage) {
+                        defaultPayload[fieldName] = this.generateObj(subMessage.id, true);
+                    }
                 }
             }
-        });
-        return JSON.stringify(defaultPayload);
+        }
+        return defaultPayload;
+    }
+
+    private anyValue(o: any): any {
+        for (let k in o) {
+            return o[k];
+        }
+        return null;
+    }
+
+    private getNamespace(id: string): string {
+        const parts = id.split('.');
+        if (parts.length > 1) {
+            return parts.slice(0, parts.length - 1).join('.');
+        } else {
+            return id;
+        }
+    }
+
+    private lookupEnum(id: string): Enum | null {
+        const enums = this.interopRegistryService.getRegistry().enums;
+        if (enums) {
+            return enums.get(id);
+        }
+        return null;
+    }
+
+    private lookupMessage(id: string): Message | null {
+        return this.interopRegistryService.getRegistry().messages.get(id);
+    }
+
+    private isPrimitive(type: string): boolean {
+        return this.primitiveTypes.indexOf(type) !== -1;
     }
 
 }

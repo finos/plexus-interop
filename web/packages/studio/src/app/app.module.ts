@@ -23,7 +23,7 @@ import { AppActions } from './services/ui/AppActions';
 import { AppRoutes } from './app.routing';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { MetadataLoaderComponent } from './metadata-loader/metadata-loader.component';
@@ -64,6 +64,7 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
     BrowserModule,
     NgbModule.forRoot(),
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forRoot(AppRoutes),
     StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([Effects]),

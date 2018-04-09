@@ -52,25 +52,7 @@ class MetaJsonGenerator extends CodeOutputGenerator {
         println("Generating interop meta JSON")
         '''
 		{
-			"messages": [
-				«FOR message : resources.messages SEPARATOR ','»
-				{
-					"id": "«message.fullName»",
-					"fields": [
-						«FOR field: message.fields SEPARATOR ','»
-						{
-							"name": "«field.name»",
-							"num": «field.number»,
-							"primitive": «field.isPrimitive»,
-							"type": "«utils.getType(field)»"«IF field.optionList.length > 0»,
-							«generateOptionsField(field.optionList)»«ENDIF»
-						}
-        				«ENDFOR»
-					]«IF message.optionList.length > 0»,
-					«generateOptionsField(message.optionList)»«ENDIF»
-				}
-		    	«ENDFOR»
-		    ],
+			"messages": «genConfig.messagesMetadata»,
 			"services": [
 				«FOR service : resources.services SEPARATOR ','»
 				{

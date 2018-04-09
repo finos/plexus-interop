@@ -15,18 +15,7 @@
  * limitations under the License.
  */
 
-// We pack launcher using browserify due to yarn worspaces usage
-// this is a hack to inject LongJs to ProtobufJs library
-// tslint:disable-next-line:variable-name
-const Long = require("long");
 declare var global: any;
-if (global && global.dcodeIO) {
-    global.dcodeIO.Long = Long;
-} else if (global) {
-    global.dcodeIO = {
-        Long
-    };
-}
 // tslint:disable-next-line:no-unused-variable
 global.WebSocket = global.WebSocket || require("ws");
 const argv = require("minimist")(process.argv.slice(1));

@@ -34,7 +34,7 @@ describe("WebSocketFramedTransport", () => {
 
     beforeEach((done) => {
         findPort("localhost", 8000, 8015, (ports: Array<number>) => {
-            connectionUrl = "ws://localhost:" + ports[0]
+            connectionUrl = "ws://localhost:" + ports[0];
             mockServer = new Server(connectionUrl);
             mockServer.on("connection", () => {
                 // tslint:disable-next-line:no-console
@@ -93,7 +93,7 @@ describe("WebSocketFramedTransport", () => {
         });
     });
 
-    it("Fails on to open connection after disconnect", (done) => {
+    it("Fails on to open connection after disconnect", done => {
         const transport = newMockedTransport();
         transport.connectionEstablished().then(() => {
             transport.disconnect().then(() => {
@@ -101,7 +101,8 @@ describe("WebSocketFramedTransport", () => {
                     next: (n) => { },
                     complete: () => { },
                     error: (w) => { }
-                }).catch(done);
+                })
+                .catch(() => done());
             });
         });
     });
@@ -111,7 +112,7 @@ describe("WebSocketFramedTransport", () => {
         transport.connectionEstablished().then(() => {
             transport.disconnect().then(() => {
                 const frame = ChannelOpenFrame.fromHeaderData({ channelId: UniqueId.generateNew() });
-                transport.writeFrame(frame).catch(done);
+                transport.writeFrame(frame).catch(() => done());
             });
         });
     });
@@ -174,7 +175,7 @@ describe("WebSocketFramedTransport", () => {
                     next: (n) => { },
                     complete: () => { },
                     error: (w) => { }
-                }).catch(done);
+                }).catch(() => done());
             }, 0);
         });
     });

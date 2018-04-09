@@ -17,12 +17,15 @@
 import { BaseJavaGenCommand } from './BaseJavaGenCommand';
 import { baseDir, out } from './DefaultOptions';
 import { Option } from './Option';
+import { getPbJsExecPath } from '../common/protoJs';
 
 export class GenJsonCommand extends BaseJavaGenCommand {
     
     public plexusGenArgs: (opts: any) => string[] = opts => {
-        return ['--type=json_meta', ...this.optionArgs(opts)];
+        return ['--type=json_meta', ...this.optionArgs(opts), `--protoc=${getPbJsExecPath()}`];
     }
+
+    public generalDescription = () => 'generate metadata in JSON format';
 
     public name = () => 'gen-json-meta';
 

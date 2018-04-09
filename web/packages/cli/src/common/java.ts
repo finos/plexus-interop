@@ -16,7 +16,7 @@
  */
 import * as path from 'path';
 import * as os from 'os';
-import { getDirectories, getDistDir } from './files';
+import { getDirectories, getDistDir, exists } from './files';
 import { downloadPackage } from './download';
 
 export function downloadJre(): Promise<string> {
@@ -27,6 +27,16 @@ export function downloadJre(): Promise<string> {
         connection: 'keep-alive',
         Cookie: 'gpw_e24=http://www.oracle.com/; oraclelicense=accept-securebackup-cookie'
     });
+}
+
+export async function javaExecProvided(): Promise<string> {
+    const execPath = await getJavaExecPath();
+    const execExists = await exists(execPath);
+    if (execExists) {
+        return execPath;
+    } else {
+        throw new Error(`Do not exist ${execPath}`);
+    }
 }
 
 export function getJreDownloadUrl(): string {
@@ -61,13 +71,11 @@ export async function getJavaExecPath(): Promise<string> {
         return process.env.PLEXUS_CLI_JAVA_EXE_PATH;
     }
     const baseDir = getJreBaseDir(getJreDownloadDir());
-    const platform = os.platform();
-    switch (platform) {
-        case 'win32':
-            return path.join(baseDir, 'bin', 'java.exe');
-        default:
-            throw new Error(`${platform} is not supported`);
-    }
+    return path.join(baseDir, ...getExePath());
+}
+
+function getExePath(): string[] {
+    return os.platform() === 'win32' ? ['bin', 'java.exe'] : ['bin', 'java'];
 }
 
 const getJreDownloadDir = () => path.join(getDistDir(), 'jre');
