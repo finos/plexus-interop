@@ -22,7 +22,8 @@ import { ProvidedMethodReference } from "@plexus-interop/client-api";
 export class ClientDtoUtils {
 
     public static targetInvocationHash(invocation: InvocationRequestInfo): string {
-        return `${invocation.serviceId}.${invocation.serviceAlias}.${invocation.methodId}`;
+        const alias = !!invocation.serviceAlias ? invocation.serviceAlias : "default";
+        return `${invocation.serviceId}.${alias}.${invocation.methodId}`;
     }
 
     public static providedMethodToInvocationInfo(providedMethod: ProvidedMethodReference): InvocationMetaInfo {

@@ -24,7 +24,11 @@ application ComponentA {
 
         consumes com.db.plexus.interop.dsl.gen.test.services.ExampleService { PointToPoint; ServerStreaming [(model.consumed_method_option_enum)=VALUE2]; ClientToServer; BidiStreaming; }
 
-        provides services.ExampleService to com.db.plexus.* { 
+        consumes com.db.plexus.interop.dsl.gen.test.services.ExampleService as NoLaunchExampleService {
+            PointToPoint;
+        } from com.db.plexus.*
+
+        provides services.ExampleService to com.db.plexus.* {
         	PointToPoint [launch_on_call=ALWAYS, title="Point-to-point"]; 
         	ServerStreaming; 
         	ClientToServer; 
