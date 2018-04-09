@@ -16,4 +16,5 @@
  */
 export interface ServiceInfo {
     serviceId: string;
+    serviceAlias?: string;
 }
