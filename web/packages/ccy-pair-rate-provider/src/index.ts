@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 declare var window: any;
-const Long = require("long");
-(<any>window).dcodeIO = { Long: Long };
 import { WebCcyPairRateProviderClientBuilder } from "./gen/WebCcyPairRateProviderGeneratedClient";
 import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
 import * as plexus from "./gen/plexus-messages";

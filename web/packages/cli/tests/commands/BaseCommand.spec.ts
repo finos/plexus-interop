@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenJsonCommand } from '../src/commands/GenJsonCommand';
-import { BaseCommand } from '../src/commands/BaseCommand';
-import { baseDir } from '../src/commands/DefaultOptions';
+import { GenJsonCommand } from '../../src/commands/GenJsonCommand';
+import { BaseCommand } from '../../src/commands/BaseCommand';
+import { baseDir } from '../../src/commands/DefaultOptions';
 
 describe('BaseCommand', () => {
 

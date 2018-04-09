@@ -57,7 +57,7 @@
     "http-server": "^0.11.1",
     "is-electron-renderer": "^2.0.1",
     "jasmine-reporters": "^2.2.0",
-    "jest": "^21.0.1",
+    "jest": "22.4.1",
     "karma": "^1.7.1",
     "karma-browserify": "^5.1.2",
     "karma-chrome-launcher": "^2.2.0",

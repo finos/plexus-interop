@@ -43,7 +43,29 @@ public class PlexusGenConfig {
     @Parameter(names = {"-pc", "--protoc"})
     private String protocPath = "protoc";
 
+    @Parameter(names = {"-d", "--descriptors"})
+    private boolean includeProtoDescriptors;
+
     private List<String> externalDependencies = new ArrayList<>();
+
+    private String messagesMetadata;
+
+
+    public boolean isIncludeProtoDescriptors() {
+        return includeProtoDescriptors;
+    }
+
+    public void setIncludeProtoDescriptors(boolean includeProtoDescriptors) {
+        this.includeProtoDescriptors = includeProtoDescriptors;
+    }
+
+    public String getMessagesMetadata() {
+        return messagesMetadata;
+    }
+
+    public void setMessagesMetadata(String messagesMetadata) {
+        this.messagesMetadata = messagesMetadata;
+    }
 
     public String getProtocPath() {
         return protocPath;

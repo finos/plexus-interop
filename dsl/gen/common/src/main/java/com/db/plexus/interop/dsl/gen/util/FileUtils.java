@@ -31,6 +31,11 @@ public class FileUtils {
 
     private static Logger log = Logger.getLogger(FileUtils.class);
 
+    public static File createTempDir() throws IOException {
+        final Path directory = Files.createTempDirectory("plexus" + Long.toString(System.nanoTime()));
+        return directory.toFile();
+    }
+
     public static void writeStringToFile(final File file, final String content) throws IOException {
         if (file.getParentFile() != null) {
             file.getParentFile().mkdirs();

@@ -19,7 +19,9 @@
     "build:watch": "tsc -w -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
-    "test": "yarn unit"
+    "pretest": "trash dist/gen", 
+    "test": "if-env PLEXUS_CLI_TESTS_ENABLED=true && npm run cli-test || echo 'CLI tests disabled'",
+    "cli-test": "node ./install.js && yarn unit"
   },
   "dependencies": {
     "commander": "2.15.1",
@@ -29,16 +31,18 @@
     "fs-extra": "5.0.0",
     "adm-zip": "0.4.7",
     "tar-fs": "1.13.2",
-    "tar": "4.4.1"
+    "tar": "4.4.1",
+    "tslib": "1.9.0"
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",
-    "@types/jest": "^18.1.1",
+    "@types/jest": "^22.0.0",
     "@types/mocha": "^2.2.41",
     "@types/node": "^7.0.5",
     "@types/fs-extra": "5.0.1",
     "chai": "^4.1.0",
-    "jest": "^21.0.1",
+    "if-env": "1.0.0",
+    "jest": "22.4.1",
     "copyfiles": "^1.2.0",
     "renamer": "^0.6.1",
     "trash": "^4.1.0",

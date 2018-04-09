@@ -32,9 +32,6 @@ import "core-js/es6/regexp";
 import "core-js/es6/map";
 import "core-js/es6/set";
 import "core-js/es6/reflect";
-import * as Long from "long";
-// tslint:disable-next-line:object-literal-shorthand
-(window as any).dcodeIO = { Long: Long };
 
 LoggerFactory.setLogLevel(LogLevel.TRACE);
 

@@ -42,7 +42,7 @@
     "babel-register": "^6.23.0",
     "browserify": "^14.4.0",
     "jasmine-reporters": "^2.2.0",
-    "jest": "~18.1.0",
+    "jest": "^22.0.0",
     "trash-cli": "^1.4.0",
     "tslint": "5.8.0",
     "typescript": "2.6.1",
