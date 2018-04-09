@@ -24,6 +24,9 @@ import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
 import { Logger, LoggerFactory } from "@plexus-interop/common";
 import { StreamingInvocationClient, MethodType } from "@plexus-interop/client";
 import { createInvocationLogger } from '../services/core/invocation-utils';
+import { FormGroup, ValidatorFn } from '@angular/forms';
+import { AbstractControl, FormControl } from '@angular/forms';
+import { plexusMessageValidator } from '../services/ui/validators';
 
 @Component({
   selector: 'app-provided-service',
@@ -36,10 +39,11 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
   private readonly log: Logger = LoggerFactory.getLogger("ProvidedServiceComponent");
   private readonly maxPrintedContent: number = 1024;
   private providedMethod: ProvidedMethod;
+  private messageContentControl: FormControl = new FormControl("{}");
+  private messageContent: string = "{}";
 
   private interopClient: InteropClient;
 
-  messageContent: string;
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
   requesId: number = 0;
@@ -57,7 +61,10 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
       .subscribe(plexus => {
         this.providedMethod = plexus.providedMethod.method;
         this.interopClient = plexus.services.interopClient;
-        this.createDefaultMessage();
+        this.messageContent = this.createDefaultPayload();
+        this.messageContentControl.setValidators([
+          plexusMessageValidator('messageContentControl', this.interopClient, this.providedMethod)
+        ]);
         this.updateResponse(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis);
       }));
   }
@@ -81,6 +88,10 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
   handleStreamCompleted(log) {
     log.info("Remote stream completed");
+  }
+
+  formatAndUpdateArea() {
+    this.messageContent = this.format(this.messageContent);
   }
 
   updateResponse(contentJson: string, messagesToSend: number, messagesPeriodInMillis: number): void {
@@ -165,13 +176,12 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
   }
 
   createDefaultMessage() {
-    const method = this.providedMethod.method;
-    this.messageContent = this.interopClient.createDefaultPayload(method.responseMessage.id);
-    this.formatAndUpdateArea();
+    this.messageContent = this.createDefaultPayload();
   }
 
-  formatAndUpdateArea() {
-    this.messageContent = this.format(this.messageContent);
+  createDefaultPayload() {
+    const method = this.providedMethod.method;
+    return this.format(this.interopClient.createDefaultPayload(method.responseMessage.id));
   }
 
   ngOnDestroy() {

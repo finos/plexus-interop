@@ -56,8 +56,10 @@ class MetaJsonGeneratorTest {
         validator.validateResources(resourceSet)
 
         val expected = new String(Files.readAllBytes(Paths.get(ResourceUtils.resolveStandardURI("com/db/plexus/interop/dsl/gen/metadata/tests/expected.json"))));
-               
-        val generatedResult = outputGenerator.generate(new PlexusGenConfig(), resourceSet)       
+
+        val genConfig = new PlexusGenConfig();
+        genConfig.setMessagesMetadata("[]");
+        val generatedResult = outputGenerator.generate(genConfig, resourceSet)
 
         assertEqualsIgnoreWhiteSpaces(expected, generatedResult)
     }

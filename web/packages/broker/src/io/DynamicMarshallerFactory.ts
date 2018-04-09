@@ -18,13 +18,18 @@ import { InteropRegistry } from "../metadata";
 import { Marshaller } from "./Marshaller";
 import * as protobuf from "protobufjs/light";
 import { DynamicProtoMarshaller } from "./DynamicProtoMarshaller";
+import { Root } from "protobufjs/light";
 
 export class DynamicMarshallerFactory {
 
     // tslint:disable-next-line:typedef
     private readonly cache = new Map<string, Marshaller<any, ArrayBuffer>>();
 
-    public constructor(private readonly registry: InteropRegistry) { }
+    private readonly protobufRoot: Root;
+
+    public constructor(private readonly registry: InteropRegistry) {
+        this.protobufRoot = protobuf.Root.fromJSON(registry.rawMessages);
+    }
 
     public getMarshaller(messageId: string): Marshaller<any, ArrayBuffer> {
         if (this.cache.has(messageId)) {
@@ -36,28 +41,11 @@ export class DynamicMarshallerFactory {
     }
 
     private createDynamicMarshaller(registry: InteropRegistry, messageId: string): Marshaller<any, ArrayBuffer> {
-        
-        // tslint:disable-next-line:variable-name        
-        const Type = protobuf.Type;
-        // tslint:disable-next-line:variable-name
-        const ProtoField = protobuf.Field;
-
         const message = registry.messages.get(messageId);
-
         if (!message) {
             throw new Error(`${messageId} not found in Registry`);
         }
-
-        const lastDotIndex = message.id.lastIndexOf("\.");
-        const name = lastDotIndex > 0 ? message.id.substr(lastDotIndex + 1, message.id.length - 1) : message.id;
-
-        const type = new Type(name);
-
-        message.fields
-            .filter(f => f.primitive)
-            .map(f => new ProtoField(f.name, f.num, f.type))
-            .forEach(pf => type.add(pf));
-
+        const type = this.protobufRoot.lookupType(messageId);
         return new DynamicProtoMarshaller(type);
     }
 

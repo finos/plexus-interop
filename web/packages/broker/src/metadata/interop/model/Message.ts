@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 import { Field } from "./Field";
+import { Fields } from "../json/Fields";
 
 export interface Message {
     id: string;
-    fields: Field[];
+    fields: Fields;
 }

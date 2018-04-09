@@ -28,11 +28,11 @@
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",
-    "@types/jest": "^18.1.1",
+    "@types/jest": "^22.0.0",
     "@types/mocha": "^2.2.41",
     "@types/node": "^7.0.5",
     "chai": "^4.1.0",
-    "jest": "^21.0.1",
+    "jest": "22.4.1",
     "karma": "^1.7.0",
     "path": "^0.12.7",
     "sinon": "^2.4.1",
