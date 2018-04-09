@@ -234,11 +234,10 @@ export class «app.name»ClientBuilder {
     }
 
     def handlerBuilderParam(Method rpcMethod, ProvidedService providedService, PlexusGenConfig genConfig) {
-        val alias = if (providedService.getAlias != null)  '''"«providedService.getAlias»"''' else 'null';
         return '''
             serviceInfo: {
-                serviceId: "«rpcMethod.service.fullName»",
-                serviceAlias: «alias»
+                serviceId: "«rpcMethod.service.fullName»"«IF providedService.alias !== null»,
+                serviceAlias: "«providedService.alias»"«ENDIF»
             },
             handler: {
                 methodId: "«rpcMethod.name»",
@@ -351,12 +350,11 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
 
     def clientInvocationInfo(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
         val rpcMethod = consumed.method
-        val alias = if (consumedService.getAlias != null)  '''"«consumedService.getAlias»"''' else 'null';
         return '''
             const invocationInfo: InvocationRequestInfo = {
                 methodId: "«rpcMethod.name»",
-                serviceId: "«rpcMethod.service.fullName»",
-                serviceAlias: «alias»
+                serviceId: "«rpcMethod.service.fullName»"«IF consumedService.alias !== null»,
+                serviceAlias: "«consumedService.alias»"«ENDIF»
             };
         '''
     }
