@@ -28,6 +28,10 @@ application ComponentA {
             PointToPoint;
         } from com.db.plexus.*
 
+        provides com.db.plexus.interop.dsl.gen.test.services.ExampleService as NoLaunchExampleService to com.db.plexus.* {
+            PointToPoint;
+        }
+
         provides services.ExampleService to com.db.plexus.* {
         	PointToPoint [launch_on_call=ALWAYS, title="Point-to-point"]; 
         	ServerStreaming; 
