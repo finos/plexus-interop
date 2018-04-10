@@ -20,7 +20,7 @@ import { BaseEchoTest } from "./BaseEchoTest";
 import * as plexus from "../../src/echo/gen/plexus-messages";
 import { NopServiceHandler } from "./NopServiceHandler";
 import { expect } from "chai";
-import { DiscoveredMethod, ProvidedMethodReference, DiscoveredServiceMethod } from "@plexus-interop/client";
+import { DiscoveredMethod, ProvidedMethodReference, DiscoveredServiceMethod, DiscoveredService } from "@plexus-interop/client-api";
 import { UnaryServiceHandler } from "./UnaryServiceHandler";
 import { ServerStreamingHandler } from "./ServerStreamingHandler";
 import { ClientStreamingHandler } from "./ClientStreamingHandler";
@@ -40,7 +40,8 @@ export class DiscoveryTests extends BaseEchoTest {
                 return client.discoverMethod({ inputMessageId: "plexus.interop.testing.EchoRequest" })
                     .then(discoveryResponse => {
                         if (discoveryResponse.methods) {
-                            expect(discoveryResponse.methods.length).to.be.eq(4);
+                            expect(discoveryResponse.methods.length).to.be.eq(5);
+                            expect(discoveryResponse.methods.filter(this.methodWithAlias).length).to.be.eq(1);
                             discoveryResponse.methods.forEach(method => this.assertDiscoveredMethodValid(method));
                         } else {
                             throw "Empty response";
@@ -52,6 +53,16 @@ export class DiscoveryTests extends BaseEchoTest {
             });
     }
 
+    public methodWithAlias = (m: DiscoveredMethod) => {
+        return !!m.providedMethod 
+                    && !!m.providedMethod.providedService 
+                    && !!m.providedMethod.providedService.serviceAlias;        
+    }
+    
+    public serviceWithAlias = (s: DiscoveredService) => {
+        return !!s && !!s.providedService && !!s.providedService.serviceAlias;
+    }
+
     public async testServiceDiscoveredById(): Promise<void> {
         const serviceId = "plexus.interop.testing.EchoService";
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
@@ -61,7 +72,8 @@ export class DiscoveryTests extends BaseEchoTest {
             }
         });
         if (serviceDiscoveryResponse.services) {
-            expect(serviceDiscoveryResponse.services.length).to.be.eq(1);
+            expect(serviceDiscoveryResponse.services.length).to.be.eq(2);
+            expect(serviceDiscoveryResponse.services.filter(this.serviceWithAlias).length).to.be.eq(1);
             const serviceRef = serviceDiscoveryResponse.services[0];
             if (serviceRef.consumedService) {
                 expect(serviceRef.consumedService.serviceId).to.eq(serviceId);
@@ -77,7 +89,7 @@ export class DiscoveryTests extends BaseEchoTest {
                 throw "Empty provided service";
             }
             if (serviceRef.methods) {
-                expect(serviceRef.methods.length).to.be.eq(4);
+                expect(serviceRef.methods.length).to.be.greaterThan(0);
                 serviceRef.methods.forEach(method => this.assertDiscoveredServiceMethodValid(method));
             } else {
                 throw "Empty methods";
@@ -204,7 +216,7 @@ export class DiscoveryTests extends BaseEchoTest {
             }
         });
         if (discoveryResponse.methods) {
-            expect(discoveryResponse.methods.length).to.be.eq(1);
+            expect(discoveryResponse.methods.length).to.be.eq(2);
             const method = discoveryResponse.methods[0];
             this.assertDiscoveredMethodValid(method);
             // invoke discovered
@@ -239,7 +251,7 @@ export class DiscoveryTests extends BaseEchoTest {
             }
         });
         if (discoveryResponse.methods) {
-            expect(discoveryResponse.methods.length).to.be.eq(1);
+            expect(discoveryResponse.methods.length).to.be.eq(2);
             const method = discoveryResponse.methods[0];
             this.assertDiscoveredMethodValid(method);
             // invoke discovered
@@ -266,7 +278,7 @@ export class DiscoveryTests extends BaseEchoTest {
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
         const discoveryResponse = await client.discoverMethod({ outputMessageId: "plexus.interop.testing.EchoRequest" });
         if (discoveryResponse.methods) {
-            expect(discoveryResponse.methods.length).to.be.eq(4);
+            expect(discoveryResponse.methods.length).to.be.eq(5);
             discoveryResponse.methods.forEach(
                 method => this.assertDiscoveredMethodValid(method));
         } else {
@@ -286,7 +298,7 @@ export class DiscoveryTests extends BaseEchoTest {
             }
         });
         if (discoveryResponse.methods) {
-            expect(discoveryResponse.methods.length).to.be.eq(1);
+            expect(discoveryResponse.methods.length).to.be.eq(2);
             discoveryResponse.methods.forEach(
                 method => this.assertDiscoveredMethodValid(method));
         } else {

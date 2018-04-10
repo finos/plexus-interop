@@ -34,7 +34,7 @@ export class ClientsSetup {
         transportConnectionProvider: ConnectionProvider,
         serviceHandler: EchoServiceInvocationHandler,
         aliasServiceHandler: ServiceAliasInvocationHandler = new NopServiceAliasHandler()): Promise<[EchoClientClient, EchoServerClient]> {
-        const server = await this.createEchoServer(transportConnectionProvider, serviceHandler);
+        const server = await this.createEchoServer(transportConnectionProvider, serviceHandler, aliasServiceHandler);
         const client = await this.createEchoClient(transportConnectionProvider);
         await TimeUtils.timeout(this.clientConnectionDelay);
         return [client, server];

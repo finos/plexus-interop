@@ -34,7 +34,7 @@ describe("Client: Web Socket Point to Point invocation", () => {
         return pointToPointTests.testMessageSent();
     });
 
-    it("Sends invocation request to aliased sercice and receives response", function() {
+    it("Sends invocation request to aliased service and receives response", function() {
         return pointToPointTests.testAliasedServiceInvoked();
     });
 
