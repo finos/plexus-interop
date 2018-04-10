@@ -22,4 +22,5 @@ package plexus.interop.testing;
 application EchoClient {
 	
 	consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
+	consumes plexus.interop.testing.EchoService as ServiceAlias from plexus.interop.testing.* { Unary; }
 }

@@ -22,6 +22,7 @@ import * as plexus from "../../src/echo/gen/plexus-messages";
 import { ClientError } from "@plexus-interop/protocol";
 import { expect } from "chai";
 import { MethodInvocationContext } from "@plexus-interop/client";
+import { NopServiceHandler } from "./NopServiceHandler";
 
 export class PointToPointInvocationTests extends BaseEchoTest {
 
@@ -34,6 +35,30 @@ export class PointToPointInvocationTests extends BaseEchoTest {
     public testMessageSent(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
         return this.testMessageSentInternal(echoRequest);
+    }
+
+    public testAliasedServiceInvoked(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            const aliasServiceHandler = {
+                onUnary: async (context: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> => {
+                    return request;
+                }
+            };
+            const echoRequest = this.clientsSetup.createRequestDto();            
+            return this.clientsSetup
+                .createEchoClients(this.connectionProvider, new NopServiceHandler(), aliasServiceHandler)
+                .then(clients => {
+                    return clients[0].getServiceAliasProxy()
+                        .unary(echoRequest)
+                        .then(echoResponse => {
+                            this.assertEqual(echoRequest, echoResponse);
+                            return this.clientsSetup.disconnect(clients[0], clients[1]);
+                        });
+                })
+                .then(() => resolve())
+                .catch(error => reject(error));
+        });
+
     }
     
     public testHugeMessageSent(): Promise<void> {

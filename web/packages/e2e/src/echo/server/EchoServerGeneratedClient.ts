@@ -14,40 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
+import { Arrays, Observer } from "@plexus-interop/common";
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
 
 import * as plexus from "../gen/plexus-messages";
-import { InvocationObserver } from "@plexus-interop/client";
+
+
 
 /**
  * Main client API
  *
  */
-export abstract class EchoServerClient {
+export interface EchoServerClient extends GenericClientApi  {
 
-    public abstract sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestMarshaller: any, responseType: any): Promise<InvocationClient>;
-    
-    public abstract sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
-    
-    public abstract sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<InvocationClient>;
-    
-    public abstract sendRawServerStreamingRequest(
-        invocationInfo: InvocationRequestInfo,
-        request: ArrayBuffer,
-        responseObserver: Observer<ArrayBuffer>): Promise<InvocationClient>;
-
-    public abstract sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
-    
-    public abstract sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
-
-    public abstract discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse>;
-
-    public abstract discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
-
-    public abstract disconnect(completion?: Completion): Promise<void>;
 
 }
 
@@ -55,50 +37,14 @@ export abstract class EchoServerClient {
  * Client's API internal implementation
  *
  */
-class EchoServerClientImpl implements EchoServerClient {
+class EchoServerClientImpl extends GenericClientApiBase implements EchoServerClient {
 
     public constructor(
         private readonly genericClient: GenericClientApi,
-    ) { }
-
-    public sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient> {
-        return this.genericClient.sendUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
+    ) {
+        super(genericClient);
     }
 
-    public sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient> {
-        return this.genericClient.sendRawUnaryRequest(invocationInfo, request, responseHandler);
-    }
-
-    public sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<InvocationClient> {
-        return this.genericClient.sendServerStreamingRequest(invocationInfo, request, responseObserver, requestType, responseType);
-    }
-
-    public sendRawServerStreamingRequest(
-        invocationInfo: GenericRequest,
-        request: ArrayBuffer,
-        responseObserver: InvocationObserver<ArrayBuffer>): Promise<InvocationClient> {
-        return this.genericClient.sendRawServerStreamingRequest(invocationInfo, request, responseObserver);
-    }
-
-    public sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>> {
-        return this.genericClient.sendBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
-    }
-
-    public sendRawBidirectionalStreamingRequest(methodReference: ProvidedMethodReference, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
-        return this.genericClient.sendRawBidirectionalStreamingRequest(methodReference, responseObserver);
-    }
-
-    public discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse> {
-        return this.genericClient.discoverService(discoveryRequest);
-    }
-
-    public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
-        return this.genericClient.discoverMethod(discoveryRequest);
-    }
-
-    public disconnect(completion?: Completion): Promise<void> {
-        return this.genericClient.disconnect(completion);
-    }
 
 }
 
@@ -115,6 +61,16 @@ export abstract class EchoServiceInvocationHandler {
     public abstract onClientStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>;
 
     public abstract onDuplexStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>;
+
+}
+
+/**
+ * Client invocation handler for ServiceAlias, to be implemented by Client
+ *
+ */
+export abstract class ServiceAliasInvocationHandler {
+
+    public abstract onUnary(invocationContext: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
 
 }
 
@@ -196,27 +152,63 @@ class EchoServiceInvocationHandlerInternal {
 }
 
 /**
+ * Internal invocation handler delegate for ServiceAlias
+ *
+ */
+class ServiceAliasInvocationHandlerInternal {
+
+    public constructor(private readonly clientHandler: ServiceAliasInvocationHandler) {}
+
+    public onUnary(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
+        const responseToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
+        const requestFromBinaryConverter = (from: ArrayBuffer) => {
+            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
+            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
+        };
+        return this.clientHandler
+            .onUnary(invocationContext, requestFromBinaryConverter(request))
+            .then(response => responseToBinaryConverter(response));
+    }
+}
+
+/**
  * Client API builder
  *
  */
 export class EchoServerClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "plexus.interop.testing.EchoServer",
-        applicationInstanceId: UniqueId.generateNew()
+        applicationId: "plexus.interop.testing.EchoServer"
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
     private echoServiceHandler: EchoServiceInvocationHandlerInternal;
+    
+    private serviceAliasHandler: ServiceAliasInvocationHandlerInternal;
 
     public withClientDetails(clientId: ClientConnectRequest): EchoServerClientBuilder {
         this.clientDetails = clientId;
         return this;
     }
 
+    public withAppInstanceId(appInstanceId: UniqueId): EchoServerClientBuilder {
+        this.clientDetails.applicationInstanceId = appInstanceId;
+        return this;
+    }
+
+    public withAppId(appId: string): EchoServerClientBuilder {
+        this.clientDetails.applicationId = appId;
+        return this;
+    }
+
     public withEchoServiceInvocationsHandler(invocationsHandler: EchoServiceInvocationHandler): EchoServerClientBuilder {
         this.echoServiceHandler = new EchoServiceInvocationHandlerInternal(invocationsHandler);
+        return this;
+    }
+    
+    public withServiceAliasInvocationsHandler(invocationsHandler: ServiceAliasInvocationHandler): EchoServerClientBuilder {
+        this.serviceAliasHandler = new ServiceAliasInvocationHandlerInternal(invocationsHandler);
         return this;
     }
 
@@ -226,7 +218,7 @@ export class EchoServerClientBuilder {
     }
 
     public connect(): Promise<EchoServerClient> {
-        return new GenericClientApiBuilder()
+        return new ContainerAwareClientAPIBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
             .withUnaryInvocationHandler({
@@ -263,6 +255,16 @@ export class EchoServerClientBuilder {
                 handler: {
                     methodId: "DuplexStreaming",
                     handle: this.echoServiceHandler.onDuplexStreaming.bind(this.echoServiceHandler)
+                }
+            })
+            .withUnaryInvocationHandler({
+                serviceInfo: {
+                    serviceId: "plexus.interop.testing.EchoService",
+                    serviceAlias: "ServiceAlias"
+                },
+                handler: {
+                    methodId: "Unary",
+                    handle: this.serviceAliasHandler.onUnary.bind(this.serviceAliasHandler)
                 }
             })
             .connect()

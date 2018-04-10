@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase, InvocationObserverConverter } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
 import { Arrays, Observer } from "@plexus-interop/common";
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
 
 import * as plexus from "../gen/plexus-messages";
-import { InvocationObserver } from "@plexus-interop/client";
 
 /**
  *  Proxy interface of EchoService service, to be consumed by Client API
@@ -28,12 +28,21 @@ import { InvocationObserver } from "@plexus-interop/client";
 export abstract class EchoServiceProxy {
 
     public abstract unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
-
+    
     public abstract serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient>;
-
+    
     public abstract clientStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>>;
-
+    
     public abstract duplexStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>>;
+
+}
+
+/**
+ *  Proxy interface of ServiceAlias service, to be consumed by Client API
+ */
+export abstract class ServiceAliasProxy {
+
+    public abstract unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
 
 }
 
@@ -65,7 +74,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
             });
         });
     }
-
+    
     public serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient> {
         const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
@@ -81,7 +90,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
             requestToBinaryConverter(request),
             new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter));
     }
-
+    
     public clientStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
         const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
@@ -95,7 +104,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
             new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-            .then(baseClient => {
+            .then(baseClient =>  {
                 return {
                     next: (request: plexus.plexus.interop.testing.IEchoRequest) => baseClient.next(requestToBinaryConverter(request)),
                     error: baseClient.error.bind(baseClient),
@@ -104,7 +113,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
                 };
             });
     }
-
+    
     public duplexStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
         const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
         const responseFromBinaryConverter = (from: ArrayBuffer) => {
@@ -118,7 +127,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
         return this.genericClient.sendRawBidirectionalStreamingRequest(
             invocationInfo,
             new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-            .then(baseClient => {
+            .then(baseClient =>  {
                 return {
                     next: (request: plexus.plexus.interop.testing.IEchoRequest) => baseClient.next(requestToBinaryConverter(request)),
                     error: baseClient.error.bind(baseClient),
@@ -131,12 +140,46 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
 }
 
 /**
+ *  Internal Proxy implementation for ServiceAlias service
+ */
+export class ServiceAliasProxyImpl implements ServiceAliasProxy {
+
+    constructor(private readonly genericClient: GenericClientApi) { }
+
+    public unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
+        const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
+        const responseFromBinaryConverter = (from: ArrayBuffer) => {
+            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
+            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
+        };
+        const invocationInfo: InvocationRequestInfo = {
+            methodId: "Unary",
+            serviceId: "plexus.interop.testing.EchoService",
+            serviceAlias: "ServiceAlias"
+        };
+        return new Promise((resolve, reject) => {
+            this.genericClient.sendRawUnaryRequest(invocationInfo, requestToBinaryConverter(request), {
+                value: (responsePayload: ArrayBuffer) => {
+                    resolve(responseFromBinaryConverter(responsePayload));
+                },
+                error: (e) => {
+                    reject(e);
+                }
+            });
+        });
+    }
+
+}
+
+/**
  * Main client API
  *
  */
-export interface EchoClientClient extends GenericClientApi {
+export interface EchoClientClient extends GenericClientApi  {
 
     getEchoServiceProxy(): EchoServiceProxy;
+    
+    getServiceAliasProxy(): ServiceAliasProxy;
 
 }
 
@@ -148,16 +191,23 @@ class EchoClientClientImpl extends GenericClientApiBase implements EchoClientCli
 
     public constructor(
         private readonly genericClient: GenericClientApi,
-        private readonly echoServiceProxy: EchoServiceProxy
-    ) { 
+        private readonly echoServiceProxy: EchoServiceProxy,
+        private readonly serviceAliasProxy: ServiceAliasProxy
+    ) {
         super(genericClient);
     }
 
     public getEchoServiceProxy(): EchoServiceProxy {
         return this.echoServiceProxy;
     }
+    
+    public getServiceAliasProxy(): ServiceAliasProxy {
+        return this.serviceAliasProxy;
+    }
 
 }
+
+
 
 /**
  * Client API builder
@@ -166,16 +216,27 @@ class EchoClientClientImpl extends GenericClientApiBase implements EchoClientCli
 export class EchoClientClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "plexus.interop.testing.EchoClient",
-        applicationInstanceId: UniqueId.generateNew()
+        applicationId: "plexus.interop.testing.EchoClient"
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
+
 
     public withClientDetails(clientId: ClientConnectRequest): EchoClientClientBuilder {
         this.clientDetails = clientId;
         return this;
     }
+
+    public withAppInstanceId(appInstanceId: UniqueId): EchoClientClientBuilder {
+        this.clientDetails.applicationInstanceId = appInstanceId;
+        return this;
+    }
+
+    public withAppId(appId: string): EchoClientClientBuilder {
+        this.clientDetails.applicationId = appId;
+        return this;
+    }
+
 
     public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): EchoClientClientBuilder {
         this.transportConnectionProvider = provider;
@@ -183,13 +244,14 @@ export class EchoClientClientBuilder {
     }
 
     public connect(): Promise<EchoClientClient> {
-        return new GenericClientApiBuilder()
+        return new ContainerAwareClientAPIBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
             .connect()
             .then(genericClient => new EchoClientClientImpl(
                 genericClient,
-                new EchoServiceProxyImpl(genericClient)
-            ));
+                new EchoServiceProxyImpl(genericClient),
+                                new ServiceAliasProxyImpl(genericClient)
+                ));
     }
 }
