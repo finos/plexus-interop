@@ -98,12 +98,14 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
     const serviceId = this.providedMethod.providedService.service.id;
     const methodId = this.providedMethod.method.name;
+    const serviceAlias = this.providedMethod.providedService.alias;
 
     switch (this.providedMethod.method.type) {
       case MethodType.Unary:
         this.interopClient.setUnaryActionHandler(
           serviceId,
           methodId,
+          serviceAlias,
           async requestJson => {
             const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
             this.printRequest(requestJson, invocationLogger);
@@ -112,14 +114,14 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
           });
         break;
       case MethodType.ServerStreaming:
-        this.interopClient.setServerStreamingActionHandler(serviceId, methodId, (request, client) => {
+        this.interopClient.setServerStreamingActionHandler(serviceId, methodId, serviceAlias, (request, client) => {
           const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
           this.printRequest(request, invocationLogger);
           this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
         });
         break;
       case MethodType.ClientStreaming:
-        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
+        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, serviceAlias, (client) => {
           const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
           return {
             next: request => this.printRequest(request, invocationLogger),
@@ -133,7 +135,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
         });
         break;
       case MethodType.DuplexStreaming:
-        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, (client) => {
+        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, serviceAlias, (client) => {
           const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
           this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
           return {

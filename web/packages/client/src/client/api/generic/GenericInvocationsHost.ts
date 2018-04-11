@@ -31,7 +31,8 @@ export class GenericInvocationsHost {
 
     private log: Logger = LoggerFactory.getLogger("GenericInvocationHost");
 
-    public readonly handlersRegistry: Map<String, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>> = new Map<String, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>>();
+    // tslint:disable-next-line:typedef
+    public readonly handlersRegistry = new Map<String, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>>();
 
     constructor(
         sourceApplicationId: string,
@@ -69,6 +70,7 @@ export class GenericInvocationsHost {
         this.bidiStreamingHandlers.forEach((serviceHandler) => {
             const invocationInfo: InvocationMetaInfo = {
                 serviceId: serviceHandler.serviceInfo.serviceId,
+                serviceAlias: serviceHandler.serviceInfo.serviceAlias,
                 methodId: serviceHandler.handler.methodId
             };
             const hash = ClientDtoUtils.targetInvocationHash(invocationInfo);

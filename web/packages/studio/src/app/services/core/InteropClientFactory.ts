@@ -22,7 +22,7 @@ import { InteropRegistryService, ProvidedMethod, ProvidedService } from "@plexus
 import { GenericClientApiBuilder, MethodType, GenericUnaryInvocationHandler, StreamingInvocationClient, GenericServerStreamingInvocationHandler, GenericBidiStreamingInvocationHandler, InvocationObserver } from '@plexus-interop/client';
 import { UniqueId, ClientError } from '@plexus-interop/protocol';
 import { flatMap, Logger, LoggerFactory, Observer } from "@plexus-interop/common";
-import { GenericClientWrapper } from "./GenericClientWrapper";
+import { GenericClientWrapper, methodHash } from "./GenericClientWrapper";
 import { DynamicMarshallerFactory, Marshaller } from "@plexus-interop/broker";
 import { DefaultMessageGenerator } from "./DefaultMessageGenerator";
 import { UnaryStringHandler, BidiStreamingStringHandler, ServerStreamingStringHandler, wrapGenericHostClient } from "./StringHandlers";
@@ -63,7 +63,6 @@ export class InteropClientFactory {
 
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .forEach(pm => {
-                const fullName = this.fullName(pm);
                 const requestMarshaller = marshallerFactory.getMarshaller(pm.method.requestMessage.id);
                 const responseMarshaller = marshallerFactory.getMarshaller(pm.method.responseMessage.id);
                 switch (pm.method.type) {
@@ -91,7 +90,11 @@ export class InteropClientFactory {
     }
 
     private fullName(pm: ProvidedMethod): string {
-        return `${pm.providedService.service.id}.${pm.method.name}`;
+        return methodHash({
+            serviceId: pm.providedService.service.id,
+            serviceAlias: pm.providedService.alias,
+            methodId: pm.method.name
+        });
     }
 
     private createUnaryHandler(pm: ProvidedMethod, requestMarshaller: Marshaller<any, ArrayBuffer>,
@@ -99,7 +102,8 @@ export class InteropClientFactory {
         const fullName = this.fullName(pm);
         return {
             serviceInfo: {
-                serviceId: pm.providedService.service.id
+                serviceId: pm.providedService.service.id,
+                serviceAlias: pm.providedService.alias
             },
             handler: {
                 methodId: pm.method.name,
@@ -121,7 +125,8 @@ export class InteropClientFactory {
         const fullName = this.fullName(pm);
         return {
             serviceInfo: {
-                serviceId: pm.providedService.service.id
+                serviceId: pm.providedService.service.id,
+                serviceAlias: pm.providedService.alias
             },
             handler: {
                 methodId: pm.method.name,
@@ -151,7 +156,8 @@ export class InteropClientFactory {
         const fullName = this.fullName(pm);
         return {
             serviceInfo: {
-                serviceId: pm.providedService.service.id
+                serviceId: pm.providedService.service.id,
+                serviceAlias: pm.providedService.alias
             },
             handler: {
                 methodId: pm.method.name,

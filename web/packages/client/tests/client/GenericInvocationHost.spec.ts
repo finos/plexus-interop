@@ -264,7 +264,8 @@ function setupHostedInvocation(
     const invocationHost = new GenericInvocationsHost(invocationInfo.applicationId as string, mockGenericClientInstance, [
         {
             serviceInfo: {
-                serviceId: invocationInfo.serviceId as string
+                serviceId: invocationInfo.serviceId as string,
+                serviceAlias: invocationInfo.serviceAlias
             },
             handler: {
                 methodId: invocationInfo.methodId as string,
