@@ -88,7 +88,8 @@ class MetaJsonGenerator extends CodeOutputGenerator {
 									«generateOptionsField(consumedMethod.optionList)»«ENDIF»
 								}
 								«ENDFOR»
-							]«IF consumedService.wildcards.length > 0»,
+							]«IF consumedService.alias !== null»,
+							"alias": "«consumedService.alias»"«ENDIF»«IF consumedService.wildcards.length > 0»,
 							"from": [
 								«FOR restriction : consumedService.wildcards SEPARATOR ','»
 									"«restriction»"

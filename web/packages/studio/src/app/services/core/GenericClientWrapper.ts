@@ -65,8 +65,12 @@ export class GenericClientWrapper implements InteropClient {
         return this.genericClient.disconnect();
     }
 
-    public setUnaryActionHandler(serviceId: string, methodId: string, handler: (requestJson: string) => Promise<string>): void {
-        this.unaryHandlers.set(`${serviceId}.${methodId}`, handler);
+    public setUnaryActionHandler(serviceId: string, methodId: string, serviceAlias: string, handler: (requestJson: string) => Promise<string>): void {
+        this.unaryHandlers.set(methodHash({
+            serviceId,
+            methodId,
+            serviceAlias
+        }), handler);
     }
 
     private isConsumed(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod): methodToInvoke is ConsumedMethod {
@@ -133,12 +137,20 @@ export class GenericClientWrapper implements InteropClient {
         }
     }
 
-    public setBidiStreamingActionHandler(serviceId: string, methodId: string, handler: BidiStreamingStringHandler): void {
-        this.bidiHandlers.set(`${serviceId}.${methodId}`, handler);
+    public setBidiStreamingActionHandler(serviceId: string, methodId: string, serviceAlias: string, handler: BidiStreamingStringHandler): void {
+        this.bidiHandlers.set(methodHash({
+            serviceId,
+            methodId,
+            serviceAlias
+        }), handler);
     }
 
-    public setServerStreamingActionHandler(serviceId: string, methodId: string, handler: ServerStreamingStringHandler): void {
-        this.serverStreamingHandlers.set(`${serviceId}.${methodId}`, handler);
+    public setServerStreamingActionHandler(serviceId: string, methodId: string, serviceAlias: string, handler: ServerStreamingStringHandler): void {
+        this.serverStreamingHandlers.set(methodHash({
+            serviceId,
+            methodId,
+            serviceAlias
+        }), handler);
     }
 
     public async sendBidiStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, responseObserver: InvocationObserver<string>): Promise<StreamingInvocationClient<string>> {
@@ -195,10 +207,13 @@ export class GenericClientWrapper implements InteropClient {
         const providedServices = this.interopRegistryService.getProvidedServices(this.appId);
         const notInterceptedMsg = "Plexus Studio: Not intercepted";
         const notInterceptedError: Error = new Error(notInterceptedMsg);
-        const fullName = (pm: ProvidedMethod) => `${pm.providedService.service.id}.${pm.method.name}`;
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .forEach(pm => {
-                const pmFullName = fullName(pm);
+                const pmFullName = methodHash({
+                    serviceId: pm.providedService.service.id,
+                    serviceAlias: pm.providedService.alias,
+                    methodId: pm.method.name
+                });
                 const defaultResponse = this.defaultGenerator.generate(pm.method.responseMessage.id);
                 switch (pm.method.type) {
                     case MethodType.Unary:
@@ -234,7 +249,8 @@ export class GenericClientWrapper implements InteropClient {
     public async discoverAllMethods(method: ConsumedMethod): Promise<MethodDiscoveryResponse> {
         const consumedMethod = {
             consumedService: {
-                serviceId: method.consumedService.service.id
+                serviceId: method.consumedService.service.id,
+                serviceAlias: method.consumedService.alias
             },
             methodId: method.method.name
         };
@@ -249,4 +265,10 @@ export class GenericClientWrapper implements InteropClient {
         }
         return discoveredMethods;
     }
+    
+}
+
+export function methodHash(methodInfo: {serviceId: string, methodId: string, serviceAlias?: string}): string {
+    const alias = methodInfo.serviceAlias || 'default';
+    return `${methodInfo.serviceId}.${alias}.${methodInfo.methodId}`;
 }

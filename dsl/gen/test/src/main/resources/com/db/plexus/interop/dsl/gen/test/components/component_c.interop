@@ -21,14 +21,20 @@ package com.db.plexus.interop.dsl.gen.test.components;
 
 application ComponentC {
 
-    provides services.ExampleService to com.db.plexus.* 
-    { 
+    provides services.ExampleService to com.db.plexus.*
+    {
     	option title = "Example Service";
-    	 
-    	PointToPoint; 
-    	ServerStreaming; 
-    	ClientToServer; 
-    	BidiStreaming; 
+    	PointToPoint;
+    	ServerStreaming;
+    	ClientToServer;
+    	BidiStreaming;
+    };
+
+    provides services.ExampleService as NoLaunchExampleService to com.db.plexus.*
+    {
+        option title = "No Launch Example Service";
+        option launch_on_call = NEVER;
+        PointToPoint;
     };
 
 }

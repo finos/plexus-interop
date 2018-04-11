@@ -145,7 +145,8 @@ export class InteropRegistryService {
             // matched by service id app permissions
             (c, p) => p.to.isMatch(c.application.id)
                 && c.from.isMatch(p.application.id)
-                && c.service.id === p.service.id);
+                && c.service.id === p.service.id
+                && c.alias === p.alias);
 
         const result = flatMap<{ consumed: ConsumedService, provided: ProvidedService }, ProvidedMethod>(pair => {
 

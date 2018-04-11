@@ -174,6 +174,7 @@ export class ClientProtocolHelper {
         return {
             methodId: header.methodId,
             serviceId: header.serviceId,
+            serviceAlias: header.serviceAlias,
             consumerApplicationId: header.consumerApplicationId,
             consumerConnectionId: UniqueId.fromProperties(header.consumerConnectionId as plexus.IUniqueId)
         };

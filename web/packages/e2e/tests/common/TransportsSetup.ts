@@ -49,9 +49,10 @@ export class TransportsSetup {
                 .connect();
             return {
                 getConnection: () => connection,
+                // tslint:disable-next-line:no-console
                 dropConnection: () => eventBus.disconnect().catch(e => console.error("Failed to disconnect", e))
             };
-        }
+        };
     }
 
 }

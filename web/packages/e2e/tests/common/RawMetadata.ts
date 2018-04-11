@@ -296,156 +296,192 @@ export class RawMetadata {
         }
         ,
         "services": [
-            {
-                "id": "plexus.interop.testing.EchoService",
-                "methods": [
-                    {
-                        "name": "Unary",
-                        "request": "plexus.interop.testing.EchoRequest",
-                        "response": "plexus.interop.testing.EchoRequest",
-                        "type": "Unary"
-                    },
-                    {
-                        "name": "ServerStreaming",
-                        "request": "plexus.interop.testing.EchoRequest",
-                        "response": "plexus.interop.testing.EchoRequest",
-                        "type": "ServerStreaming"
-                    },
-                    {
-                        "name": "ClientStreaming",
-                        "request": "plexus.interop.testing.EchoRequest",
-                        "response": "plexus.interop.testing.EchoRequest",
-                        "type": "ClientStreaming"
-                    },
-                    {
-                        "name": "DuplexStreaming",
-                        "request": "plexus.interop.testing.EchoRequest",
-                        "response": "plexus.interop.testing.EchoRequest",
-                        "type": "DuplexStreaming"
-                    }
-                ],
-                "options": [
-                    {
-                        "id": "interop.service_id",
-                        "value": "plexus.interop.testing.EchoService"
-                    }
-                ]
-            },
-            {
-                "id": "interop.AppLauncherService",
-                "methods": [
-                    {
-                        "name": "Launch",
-                        "request": "interop.AppLaunchRequest",
-                        "response": "interop.AppLaunchResponse",
-                        "type": "Unary"
-                    }
-                ],
-                "options": [
-                    {
-                        "id": "interop.service_id",
-                        "value": "interop.AppLauncherService"
-                    }
-                ]
-            }
+          {
+            "id": "plexus.interop.testing.EchoService",
+            "methods": [
+              {
+                "name": "Unary",
+                "request": "plexus.interop.testing.EchoRequest",
+                "response": "plexus.interop.testing.EchoRequest",
+                "type": "Unary"
+              },
+              {
+                "name": "ServerStreaming",
+                "request": "plexus.interop.testing.EchoRequest",
+                "response": "plexus.interop.testing.EchoRequest",
+                "type": "ServerStreaming"
+              },
+              {
+                "name": "ClientStreaming",
+                "request": "plexus.interop.testing.EchoRequest",
+                "response": "plexus.interop.testing.EchoRequest",
+                "type": "ClientStreaming"
+              },
+              {
+                "name": "DuplexStreaming",
+                "request": "plexus.interop.testing.EchoRequest",
+                "response": "plexus.interop.testing.EchoRequest",
+                "type": "DuplexStreaming"
+              }
+            ],
+            "options": [
+              {
+                "id": "interop.service_id",
+                "value": "plexus.interop.testing.EchoService"
+              }
+            ]
+          },
+          {
+            "id": "interop.AppLauncherService",
+            "methods": [
+              {
+                "name": "Launch",
+                "request": "interop.AppLaunchRequest",
+                "response": "interop.AppLaunchResponse",
+                "type": "Unary"
+              }
+            ],
+            "options": [
+              {
+                "id": "interop.service_id",
+                "value": "interop.AppLauncherService"
+              }
+            ]
+          }
         ],
         "applications": [
-            {
-                "id": "plexus.interop.testing.EchoClient",
-                "consumes": [
-                    {
-                        "service": "plexus.interop.testing.EchoService",
-                        "methods": [
-                            {
-                                "name": "Unary"
-                            },
-                            {
-                                "name": "ServerStreaming"
-                            },
-                            {
-                                "name": "ClientStreaming"
-                            },
-                            {
-                                "name": "DuplexStreaming"
-                            }
-                        ],
-                        "from": [
-                            "plexus.interop.testing.*"
-                        ]
-                    }
+          {
+            "id": "plexus.interop.testing.EchoClient",
+            "consumes": [
+              {
+                "service": "plexus.interop.testing.EchoService",
+                "methods": [
+                  {
+                    "name": "Unary"
+                  },
+                  {
+                    "name": "ServerStreaming"
+                  },
+                  {
+                    "name": "ClientStreaming"
+                  },
+                  {
+                    "name": "DuplexStreaming"
+                  }
+                ],
+                "from": [
+                  "plexus.interop.testing.*"
                 ]
-            },
-            {
-                "id": "plexus.interop.testing.EchoServer",
-                "provides": [
-                    {
-                        "service": "plexus.interop.testing.EchoService",
-                        "methods": [
-                            {
-                                "name": "Unary",
-                                "options": [
-                                    {
-                                        "id": "interop.ProvidedMethodOptions.title",
-                                        "value": "Sample Unary Method"
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "ServerStreaming",
-                                "options": [
-                                    {
-                                        "id": "interop.ProvidedMethodOptions.title",
-                                        "value": "Sample Server Streaming Method"
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "ClientStreaming",
-                                "options": [
-                                    {
-                                        "id": "interop.ProvidedMethodOptions.title",
-                                        "value": "Sample Client Streaming Method"
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "DuplexStreaming",
-                                "options": [
-                                    {
-                                        "id": "interop.ProvidedMethodOptions.title",
-                                        "value": "Sample Duplex Streaming Method"
-                                    }
-                                ]
-                            }
-                        ],
-                        "to": [
-                            "plexus.interop.testing.*"
-                        ],
-                        "options": [
-                            {
-                                "id": "interop.ProvidedServiceOptions.title",
-                                "value": "Sample Echo Service"
-                            }
-                        ]
-                    }
+              },
+              {
+                "service": "plexus.interop.testing.EchoService",
+                "methods": [
+                  {
+                    "name": "Unary"
+                  }
+                ],
+                "alias": "ServiceAlias",
+                "from": [
+                  "plexus.interop.testing.*"
                 ]
-            },
-            {
-                "id": "plexus.interop.testing.TestAppLauncher",
-                "provides": [
-                    {
-                        "service": "interop.AppLauncherService",
-                        "methods": [
-                            {
-                                "name": "Launch"
-                            }
-                        ],
-                        "to": [
-                            "interop.AppLifecycleManager"
-                        ]
-                    }
+              }
+            ]
+          },
+          {
+            "id": "plexus.interop.testing.EchoServer",
+            "provides": [
+              {
+                "service": "plexus.interop.testing.EchoService",
+                "methods": [
+                  {
+                    "name": "Unary",
+                    "options": [
+                      {
+                        "id": "interop.ProvidedMethodOptions.title",
+                        "value": "Sample Unary Method"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "ServerStreaming",
+                    "options": [
+                      {
+                        "id": "interop.ProvidedMethodOptions.title",
+                        "value": "Sample Server Streaming Method"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "ClientStreaming",
+                    "options": [
+                      {
+                        "id": "interop.ProvidedMethodOptions.title",
+                        "value": "Sample Client Streaming Method"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "DuplexStreaming",
+                    "options": [
+                      {
+                        "id": "interop.ProvidedMethodOptions.title",
+                        "value": "Sample Duplex Streaming Method"
+                      }
+                    ]
+                  }
+                ],
+                "to": [
+                  "plexus.interop.testing.*"
+                ],
+                "options": [
+                  {
+                    "id": "interop.ProvidedServiceOptions.title",
+                    "value": "Sample Echo Service"
+                  }
                 ]
-            }
+              },
+              {
+                "service": "plexus.interop.testing.EchoService",
+                "methods": [
+                  {
+                    "name": "Unary",
+                    "options": [
+                      {
+                        "id": "interop.ProvidedMethodOptions.title",
+                        "value": "Sample Unary Method with Alias"
+                      }
+                    ]
+                  }
+                ],
+                "alias": "ServiceAlias",
+                "to": [
+                  "plexus.interop.testing.*"
+                ],
+                "options": [
+                  {
+                    "id": "interop.ProvidedServiceOptions.title",
+                    "value": "Sample Echo Service with Alias"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "plexus.interop.testing.TestAppLauncher",
+            "provides": [
+              {
+                "service": "interop.AppLauncherService",
+                "methods": [
+                  {
+                    "name": "Launch"
+                  }
+                ],
+                "to": [
+                  "interop.AppLifecycleManager"
+                ]
+              }
+            ]
+          }
         ]
     }    
     `;

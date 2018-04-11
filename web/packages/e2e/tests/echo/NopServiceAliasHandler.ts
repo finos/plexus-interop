@@ -14,7 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface ServiceInfo {
-    serviceId: string;
-    serviceAlias?: string;
+import { ServiceAliasInvocationHandler } from "../../src/echo/server/EchoServerGeneratedClient";
+import { MethodInvocationContext } from "@plexus-interop/client";
+import { Observer } from "@plexus-interop/common";
+
+import * as plexus from "../../src/echo/gen/plexus-messages";
+
+export class NopServiceAliasHandler implements ServiceAliasInvocationHandler {
+
+    public onUnary(context: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
+        throw new Error("Not implemented");
+    }
+
 }

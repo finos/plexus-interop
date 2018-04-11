@@ -16,19 +16,20 @@
  */
 package com.db.plexus.interop.dsl.gen.js
 
-import com.db.plexus.interop.dsl.Application
-import com.db.plexus.interop.dsl.ConsumedMethod
-import com.db.plexus.interop.dsl.gen.ApplicationCodeGenerator
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
-import com.db.plexus.interop.dsl.protobuf.Method
-import com.google.inject.Inject
+import com.db.plexus.interop.dsl.Application
 import java.util.List
-import javax.inject.Named
-import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
+import com.db.plexus.interop.dsl.gen.ApplicationCodeGenerator
+import com.google.inject.Inject
 import org.eclipse.xtext.naming.IQualifiedNameProvider
-
+import org.eclipse.emf.ecore.EObject
+import com.db.plexus.interop.dsl.ConsumedMethod
+import com.db.plexus.interop.dsl.protobuf.Method
+import javax.inject.Named
 import static extension com.db.plexus.interop.dsl.gen.GenUtils.*
+import com.db.plexus.interop.dsl.ConsumedService
+import com.db.plexus.interop.dsl.ProvidedService
 
 @Named
 class JsComponentApiGenerator extends ApplicationCodeGenerator {
@@ -52,11 +53,11 @@ class JsComponentApiGenerator extends ApplicationCodeGenerator {
         '''
 «imports(genConfig)»
 
-«FOR consumedService : consumedServices »
+«FOR consumedService : consumedServices SEPARATOR "\n"»
     /**
-     *  Internal Proxy implementation for «consumedService.service.name» service
+     *  Internal Proxy implementation for «consumedService.aliasOrName.toFirstUpper» service
      */
-    export class «consumedService.service.name»Proxy {
+    export class «consumedService.aliasOrName.toFirstUpper»Proxy {
 
         constructor(genericClient) {
             this.genericClient = genericClient;
@@ -64,7 +65,7 @@ class JsComponentApiGenerator extends ApplicationCodeGenerator {
 
         «FOR consumedMethod : consumedService.methods SEPARATOR "\n"»
         «clientMethodSignature(consumedMethod, genConfig)» {
-            «clientMethodImpl(consumedMethod.method, genConfig)»
+            «clientMethodImpl(consumedMethod, consumedService, genConfig)»
         }
         «ENDFOR»
 
@@ -75,88 +76,54 @@ class JsComponentApiGenerator extends ApplicationCodeGenerator {
  * Client's API internal implementation
  *
  */
-class «app.name»Client {
+class «app.name»Client extends GenericClientApiBase {
 
-   constructor(
-        genericClient«IF !consumedServices.isEmpty»,«ENDIF»
-        «FOR consumedService : consumedServices SEPARATOR ',\n' »
-        «consumedService.service.name.toFirstLower»Proxy
+    constructor(
+        genericClient,
+        «FOR consumedService : consumedServices SEPARATOR ','»
+        «consumedService.aliasOrName.toFirstLower»Proxy
         «ENDFOR»
     ) {
-        this.genericClient = genericClient;
-        «FOR consumedService : consumedServices SEPARATOR ',\n' »
-        this.«consumedService.service.name.toFirstLower»Proxy = «consumedService.service.name.toFirstLower»Proxy;
+        super(genericClient);
+        «FOR consumedService : consumedServices »
+        this.«consumedService.aliasOrName.toFirstLower»Proxy = «consumedService.aliasOrName.toFirstLower»Proxy;
         «ENDFOR»
     }
 
     «FOR consumedService : consumedServices SEPARATOR '\n' »
-    get«consumedService.service.name»Proxy() {
-        return this.«consumedService.service.name.toFirstLower»Proxy;
+    get«consumedService.aliasOrName.toFirstUpper»Proxy() {
+        return this.«consumedService.aliasOrName.toFirstLower»Proxy;
     }
     «ENDFOR»
 
-    discoverService(discoveryRequest) {
-        return this.genericClient.discoverService(discoveryRequest);
-    }
-
-    discoverMethod(discoveryRequest) {
-        return this.genericClient.discoverMethod(discoveryRequest);
-    }
-
-    sendDiscoveredUnaryRequest(methodReference, request, responseHandler) {
-        return this.genericClient.sendDiscoveredUnaryRequest(methodReference, request, responseHandler);
-    }
-
-    sendDiscoveredBidirectionalStreamingRequest(methodReference, responseObserver) {
-        return this.genericClient.sendDiscoveredBidirectionalStreamingRequest(methodReference, responseObserver);
-    }
-
-    sendDiscoveredServerStreamingRequest(
-        methodReference,
-        request,
-        responseObserver) {
-        return this.genericClient.sendDiscoveredServerStreamingRequest(methodReference, request, responseObserver);
-    }
-
-    disconnect(completion) {
-        return this.genericClient.disconnect(completion);
-    }
-
-    sendUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType) {
-        return this.genericClient.sendDynamicUnaryRequest(invocationInfo, request, responseHandler, requestType, responseType);
-    }
-
-    sendStreamingRequest(invocationInfo, responseObserver, requestType, responseType) {
-        return this.genericClient.sendDynamicBidirectionalStreamingRequest(invocationInfo, responseObserver, requestType, responseType);
-    }
-
 }
 
-«FOR providedService : providedServices »
+«FOR providedService : providedServices SEPARATOR '\n' »
     /**
-     * Client invocation handler for «providedService.service.name», to be implemented by Client
+     * Client invocation handler for «providedService.aliasOrName.toFirstUpper», to be implemented by Client
      *
      */
-    export class «providedService.service.name»InvocationHandler {
+    export class «providedService.aliasOrName.toFirstUpper»InvocationHandler {
 
-        «FOR providedMethod : providedService.methods SEPARATOR "\n"»
+        «FOR providedMethod : providedService.methods»
         «clientHandlerSignature(providedMethod.method, genConfig)» {
-            //TODO implement handler
+            // TODO implement handler
         }
         «ENDFOR»
     }
 «ENDFOR»
 
-«FOR providedService : providedServices »
+«FOR providedService : providedServices SEPARATOR '\n' »
     /**
-     * Internal invocation handler delegate for «providedService.service.name»
+     * Internal invocation handler delegate for «providedService.aliasOrName.toFirstUpper»
      *
      */
-    class «providedService.service.name»InvocationHandlerInternal extends «providedService.service.name»InvocationHandler {
+    class «providedService.aliasOrName.toFirstUpper»InvocationHandlerInternal {
 
         constructor(clientHandler) {
             this.clientHandler = clientHandler;
         }
+
         «FOR providedMethod : providedService.methods SEPARATOR '\n'»
         «genericClientHandlerSignature(providedMethod.method, genConfig)» {
             «handlerMethodImpl(providedMethod.method, genConfig)»
@@ -171,21 +138,26 @@ class «app.name»Client {
  */
 export class «app.name»ClientBuilder {
 
-    constructor() {
-        this.clientDetails = {
-            applicationId: "«app.fullName»",
-            applicationInstanceId: UniqueId.generateNew()
-        };
-    }
-
     withClientDetails(clientId) {
         this.clientDetails = clientId;
         return this;
     }
 
+    withAppInstanceId(appInstanceId) {
+        this.clientDetails = this.clientDetails || {};
+        this.clientDetails.applicationInstanceId = appInstanceId;
+        return this;
+    }
+
+    withAppId(appId) {
+        this.clientDetails = this.clientDetails || {};
+        this.clientDetails.applicationId = appId;
+        return this;
+    }
+
     «FOR providedMethod : providedServices SEPARATOR '\n' »
-    with«providedMethod.service.name»InvocationsHandler(invocationsHandler) {
-        this.«providedMethod.service.name.toFirstLower»Handler = new «providedMethod.service.name»InvocationHandlerInternal(invocationsHandler);
+    with«providedMethod.aliasOrName.toFirstUpper»InvocationsHandler(invocationsHandler) {
+        this.«providedMethod.aliasOrName.toFirstLower»Handler = new «providedMethod.aliasOrName.toFirstUpper»InvocationHandlerInternal(invocationsHandler);
         return this;
     }
     «ENDFOR»
@@ -196,61 +168,65 @@ export class «app.name»ClientBuilder {
     }
 
     connect() {
-        return new GenericClientApiBuilder()
+        return new ContainerAwareClientAPIBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
             «FOR providedService : providedServices »
                 «FOR providedMethod : providedService.methods»
-                    «invocationHandlerBuilder(providedMethod.method, genConfig)»
+                    «invocationHandlerBuilder(providedMethod.method, providedService, genConfig)»
                 «ENDFOR»
             «ENDFOR»
             .connect()
-            .then(genericClient => new «app.name»Client(
+            .then(genericClient => new «app.name»ClientImpl(
                 genericClient«IF !consumedServices.isEmpty»,«ENDIF»
-                «FOR consumedService : consumedServices SEPARATOR ",\n"»
-                new «consumedService.service.name»Proxy(genericClient)
+                «FOR consumedService : consumedServices SEPARATOR ","»
+                new «consumedService.aliasOrName.toFirstUpper»ProxyImpl(genericClient)
                 «ENDFOR»));
     }
 }
     '''
     }
 
-    def invocationHandlerBuilder(Method rpcMethod, PlexusGenConfig genConfig) {
+    def invocationHandlerBuilder(Method rpcMethod, ProvidedService providedService, PlexusGenConfig genConfig) {
         switch (rpcMethod) {
             case rpcMethod.isPointToPoint: '''
             .withUnaryInvocationHandler({
-                «handlerBuilderParam(rpcMethod, genConfig)»
+                «handlerBuilderParam(rpcMethod, providedService, genConfig)»
             })
             '''
             case rpcMethod.isBidiStreaming
                     || rpcMethod.isClientStreaming: '''
             .withBidiStreamingInvocationHandler({
-                «handlerBuilderParam(rpcMethod, genConfig)»
+                «handlerBuilderParam(rpcMethod, providedService, genConfig)»
             })
             '''
             case rpcMethod.isServerStreaming: '''
             .withServerStreamingInvocationHandler({
-                «handlerBuilderParam(rpcMethod, genConfig)»
+                «handlerBuilderParam(rpcMethod, providedService, genConfig)»
             })
             '''
         }
     }
 
-    def handlerBuilderParam(Method rpcMethod, PlexusGenConfig genConfig) '''
-    serviceInfo: {
-        serviceId: "«rpcMethod.service.fullName»"
-    },
-    handler: {
-        methodId: "«rpcMethod.name»",
-        handle: this.«rpcMethod.service.name.toFirstLower»Handler.on«rpcMethod.name».bind(this.«rpcMethod.service.name.toFirstLower»Handler)
+    def handlerBuilderParam(Method rpcMethod, ProvidedService providedService, PlexusGenConfig genConfig) {
+        return '''
+            serviceInfo: {
+                serviceId: "«rpcMethod.service.fullName»"«IF providedService.alias !== null»,
+                serviceAlias: "«providedService.alias»"«ENDIF»
+            },
+            handler: {
+                methodId: "«rpcMethod.name»",
+                handle: this.«providedService.aliasOrName.toFirstLower»Handler.on«rpcMethod.name».bind(this.«providedService.aliasOrName.toFirstLower»Handler)
+            }
+        '''
     }
-    '''
 
     def imports(PlexusGenConfig genConfig) '''
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
 import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer, ConversionObserver } from "@plexus-interop/common";
+import { Arrays, Observer } from "@plexus-interop/common";
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
 
 import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
     '''
@@ -268,75 +244,95 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         }
     }
 
+    def requestType(Method rpcMethod, PlexusGenConfig genConfig)
+    '''«genConfig.namespace».«rpcMethod.request.message.namespace.toLowerCase».I«rpcMethod.request.message.name»'''
+
+    def responseType(Method rpcMethod, PlexusGenConfig genConfig)
+    '''«genConfig.namespace».«rpcMethod.response.message.namespace.toLowerCase».I«rpcMethod.response.message.name»'''
+
     def requestTypeImpl(Method rpcMethod, PlexusGenConfig genConfig)
     '''«genConfig.namespace».«rpcMethod.request.message.namespace.toLowerCase».«rpcMethod.request.message.name»'''
 
     def responseTypeImpl(Method rpcMethod, PlexusGenConfig genConfig)
     '''«genConfig.namespace».«rpcMethod.response.message.namespace.toLowerCase».«rpcMethod.response.message.name»'''
 
-    def clientMethodImpl(Method rpcMethod, PlexusGenConfig genConfig) {
+    def clientMethodImpl(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
+        val rpcMethod = consumed.method
         switch (rpcMethod) {
-            case rpcMethod.isPointToPoint: clientPointToPointImpl(rpcMethod, genConfig)
+            case rpcMethod.isPointToPoint: clientPointToPointImpl(consumed, consumedService, genConfig)
             case rpcMethod.isBidiStreaming
-                    || rpcMethod.isClientStreaming: clientBidiStreamingImpl(rpcMethod, genConfig)
-            case rpcMethod.isServerStreaming: serverStreamingImpl(rpcMethod, genConfig)
+                    || rpcMethod.isClientStreaming: clientBidiStreamingImpl(consumed, consumedService, genConfig)
+            case rpcMethod.isServerStreaming: serverStreamingImpl(consumed, consumedService, genConfig)
         }
     }
 
-    def clientPointToPointImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
-        «clientConverters(rpcMethod, genConfig)»
-        «clientInvocationInfo(rpcMethod, genConfig)»
-        return new Promise((resolve, reject) => {
-            this.genericClient.sendUnaryRequest(invocationInfo, requestToBinaryConverter(request), {
-                value: (responsePayload) => {
-                    resolve(responseFromBinaryConverter(responsePayload));
-                },
-                error: (e) => {
-                    reject(e);
-                }
+    def clientPointToPointImpl(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
+        val rpcMethod = consumed.method
+        return '''
+            «clientConverters(rpcMethod, genConfig)»
+            «clientInvocationInfo(consumed, consumedService, genConfig)»
+            return new Promise((resolve, reject) => {
+                this.genericClient.sendRawUnaryRequest(invocationInfo, requestToBinaryConverter(request), {
+                    value: responsePayload => {
+                        resolve(responseFromBinaryConverter(responsePayload));
+                    },
+                    error: (e) => {
+                        reject(e);
+                    }
+                });
             });
-        });
-    '''
+        '''
+    }
 
-    def clientBidiStreamingImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
-        «clientConverters(rpcMethod, genConfig)»
-        «clientInvocationInfo(rpcMethod, genConfig)»
-        return this.genericClient.sendBidirectionalStreamingRequest(
-            invocationInfo,
-            new ConversionObserver(responseObserver, responseFromBinaryConverter))
-            .then(baseClient =>  {
-                return {
-                    next: (request) => baseClient.next(requestToBinaryConverter(request)),
-                    error: baseClient.error.bind(baseClient),
-                    complete: baseClient.complete.bind(baseClient),
-                    cancel: baseClient.cancel.bind(baseClient)
-                };
-            });
-    '''
+    def clientBidiStreamingImpl(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
+        val rpcMethod = consumed.method
+        return '''
+            «clientConverters(rpcMethod, genConfig)»
+            «clientInvocationInfo(consumed, consumedService, genConfig)»
+            return this.genericClient.sendRawBidirectionalStreamingRequest(
+                invocationInfo,
+                new InvocationObserverConverter(responseObserver, responseFromBinaryConverter))
+                .then(baseClient =>  {
+                    return {
+                        next: (request: «requestType(rpcMethod, genConfig)») => baseClient.next(requestToBinaryConverter(request)),
+                        error: baseClient.error.bind(baseClient),
+                        complete: baseClient.complete.bind(baseClient),
+                        cancel: baseClient.cancel.bind(baseClient)
+                    };
+                });
+        '''
+    }
 
-    def serverStreamingImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
-        «clientConverters(rpcMethod, genConfig)»
-        «clientInvocationInfo(rpcMethod, genConfig)»
-        return this.genericClient.sendServerStreamingRequest(
-            invocationInfo,
-            requestToBinaryConverter(request),
-            new ConversionObserver(responseObserver, responseFromBinaryConverter));
-    '''
+    def serverStreamingImpl(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
+        val rpcMethod = consumed.method
+        return '''
+            «clientConverters(rpcMethod, genConfig)»
+            «clientInvocationInfo(consumed, consumedService, genConfig)»
+            return this.genericClient.sendRawServerStreamingRequest(
+                invocationInfo,
+                requestToBinaryConverter(request),
+                new InvocationObserverConverter(responseObserver, responseFromBinaryConverter));
+        '''
+    }
 
     def clientConverters(Method rpcMethod, PlexusGenConfig genConfig) '''
-        const requestToBinaryConverter = (from) => Arrays.toArrayBuffer(«requestTypeImpl(rpcMethod, genConfig)».encode(from).finish());
-        const responseFromBinaryConverter = (from) => {
+        const requestToBinaryConverter = from => Arrays.toArrayBuffer(«requestTypeImpl(rpcMethod, genConfig)».encode(from).finish());
+        const responseFromBinaryConverter = from => {
             const decoded = «responseTypeImpl(rpcMethod, genConfig)».decode(new Uint8Array(from));
             return «responseTypeImpl(rpcMethod, genConfig)».toObject(decoded);
         };
      '''
 
-    def clientInvocationInfo(Method rpcMethod, PlexusGenConfig genConfig) '''
-        const invocationInfo = {
-            methodId: "«rpcMethod.name»",
-            serviceId: "«rpcMethod.service.fullName»"
-        };
-    '''
+    def clientInvocationInfo(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
+        val rpcMethod = consumed.method
+        return '''
+            const invocationInfo = {
+                methodId: "«rpcMethod.name»",
+                serviceId: "«rpcMethod.service.fullName»"«IF consumedService.alias !== null»,
+                serviceAlias: "«consumedService.alias»"«ENDIF»
+            };
+        '''
+    }
 
     def clientHandlerSignature(Method rpcMethod, PlexusGenConfig genConfig) {
         switch (rpcMethod) {
@@ -384,7 +380,8 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         return {
             next: (value) => baseObserver.next(requestFromBinaryConverter(value)),
             complete: baseObserver.complete.bind(baseObserver),
-            error: baseObserver.error.bind(baseObserver)
+            error: baseObserver.error.bind(baseObserver),
+            streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
         };
     '''
 
@@ -400,8 +397,8 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
     '''
 
     def handlerConverters(Method rpcMethod, PlexusGenConfig genConfig) '''
-        const responseToBinaryConverter = (from) => Arrays.toArrayBuffer(«responseTypeImpl(rpcMethod, genConfig)».encode(from).finish());
-        const requestFromBinaryConverter = (from) => {
+        const responseToBinaryConverter = from => Arrays.toArrayBuffer(«responseTypeImpl(rpcMethod, genConfig)».encode(from).finish());
+        const requestFromBinaryConverter = from => {
             const decoded = «requestTypeImpl(rpcMethod, genConfig)».decode(new Uint8Array(from));
             return «requestTypeImpl(rpcMethod, genConfig)».toObject(decoded);
         };
