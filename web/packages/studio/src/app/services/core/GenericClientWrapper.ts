@@ -234,7 +234,8 @@ export class GenericClientWrapper implements InteropClient {
     public async discoverAllMethods(method: ConsumedMethod): Promise<MethodDiscoveryResponse> {
         const consumedMethod = {
             consumedService: {
-                serviceId: method.consumedService.service.id
+                serviceId: method.consumedService.service.id,
+                serviceAlias: method.consumedService.alias
             },
             methodId: method.method.name
         };

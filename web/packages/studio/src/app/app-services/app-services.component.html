@@ -3,7 +3,7 @@
     <h5>Consumed services</h5>
     <div class="p-2">
       <div *ngFor="let consumedService of consumedServices | async">
-        <span id="consumed-service-header-{{consumedService?.service.id}}">{{consumedService?.service.id}}</span>
+        <span id="consumed-service-header-{{consumedService?.service.id}}">{{consumedService?.service.id}}</span><span *ngIf="consumedService?.alias">({{consumedService?.alias}})</span>
         <div class="list-group mt-2">
           <a id="consumed-action-item-{{method?.method.name}}" class="list-group-item list-group-item-action" *ngFor="let method of getMethodsArray(consumedService)"
             (click)="openConsumed(method)">{{method?.method.name}}</a>
@@ -15,7 +15,7 @@
     <h5>Provided services</h5>
     <div class="p-2">
       <div *ngFor="let providedService of providedServices | async">
-        <span id="provided-service-header-{{providedService?.service.id}}">{{providedService?.service.id}}</span>
+        <span id="provided-service-header-{{providedService?.service.id}}{{providedService?.alias}}">{{providedService?.service.id}}</span><span *ngIf="providedService?.alias">({{providedService?.alias}})</span>
         <div class="list-group mt-2">
           <a id="provided-action-item-{{method?.method.name}}" class="list-group-item list-group-item-action" *ngFor="let method of getMethodsArray(providedService)"
             (click)="openProvided(method)">{{method?.method.name}}</a>
