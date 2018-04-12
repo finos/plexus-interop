@@ -70,7 +70,6 @@ export class DiscoveryRequestHandler {
             if (clientProtocol.interop.protocol.DiscoveryMode.Online
                 === methodDiscoveryRequest.discoveryMode) {
 
-
                 const connectedApps = await this.appLifeCycleManager.getOnlineConnections();
 
                 this.log.trace(`Handling online discovery, ${connectedApps.length} apps connected`);

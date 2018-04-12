@@ -104,7 +104,6 @@ export class GenericInvocation {
         return this.metaInfo;
     }
 
-
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
         /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
@@ -298,7 +297,9 @@ export class GenericInvocation {
         } else if (this.stateMachine.is(InvocationState.ACCEPTING_INVOCATION_INFO)) {
             const envelopObject = modelHelper.decodeBrokerEnvelop(data);
             if (envelopObject.invocationStartRequested) {
-                this.log.trace(`Received invocation request message ${JSON.stringify(envelopObject.invocationStartRequested)}`);
+                if (this.log.isTraceEnabled()) {
+                    this.log.trace(`Received invocation request message ${JSON.stringify(envelopObject.invocationStartRequested)}`);
+                }
                 this.metaInfo = ClientProtocolHelper.toInvocationInfo(envelopObject.invocationStartRequested);
                 // accepted invocation started
                 this.setUuid(UniqueId.generateNew());

@@ -28,4 +28,9 @@ application EchoServer {
 		ClientStreaming [title = "Sample Client Streaming Method"]; 
 		DuplexStreaming [title = "Sample Duplex Streaming Method"]; 
 	}
+
+	provides plexus.interop.testing.EchoService as ServiceAlias to plexus.interop.testing.* {
+		option title = "Sample Echo Service with Alias";
+		Unary [title = "Sample Unary Method with Alias"]; 
+	}
 }

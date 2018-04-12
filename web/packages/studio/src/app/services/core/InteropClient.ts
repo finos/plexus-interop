@@ -45,18 +45,18 @@ export interface InteropClient {
 
     sendUnaryRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient>;
 
-    setUnaryActionHandler(serviceId: string, methodId: string, handler: UnaryStringHandler): void;
+    setUnaryActionHandler(serviceId: string, methodId: string, alias: string, handler: UnaryStringHandler): void;
 
     // server streaming
 
     sendServerStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseObserver: InvocationObserver<string>): Promise<InvocationClient>;
 
-    setServerStreamingActionHandler(serviceId: string, methodId: string, handler: ServerStreamingStringHandler): void;
+    setServerStreamingActionHandler(serviceId: string, methodId: string, alias: string, handler: ServerStreamingStringHandler): void;
 
     // bidi streaming
 
     sendBidiStreamingRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, responseObserver: InvocationObserver<string>): Promise<StreamingInvocationClient<string>>;
 
-    setBidiStreamingActionHandler(serviceId: string, methodId: string, handler: BidiStreamingStringHandler): void;    
+    setBidiStreamingActionHandler(serviceId: string, methodId: string, alias: string, handler: BidiStreamingStringHandler): void;    
 
 }
