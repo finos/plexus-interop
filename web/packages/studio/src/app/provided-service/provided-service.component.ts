@@ -2,27 +2,27 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AppActions } from "../services/ui/AppActions";
-import { Store } from "@ngrx/store";
+import { AppActions } from '../services/ui/AppActions';
+import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
-import { ProvidedMethod } from "@plexus-interop/broker";
-import { InteropClient } from "../services/core/InteropClient";
-import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
-import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { StreamingInvocationClient, MethodType } from "@plexus-interop/client";
+import { ProvidedMethod } from '@plexus-interop/broker';
+import { InteropClient } from '../services/core/InteropClient';
+import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
+import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { StreamingInvocationClient, MethodType } from '@plexus-interop/client';
 import { createInvocationLogger } from '../services/core/invocation-utils';
 import { FormGroup, ValidatorFn } from '@angular/forms';
 import { AbstractControl, FormControl } from '@angular/forms';
@@ -36,11 +36,11 @@ import { plexusMessageValidator } from '../services/ui/validators';
 })
 export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
-  private readonly log: Logger = LoggerFactory.getLogger("ProvidedServiceComponent");
+  private readonly log: Logger = LoggerFactory.getLogger('ProvidedServiceComponent');
   private readonly maxPrintedContent: number = 1024;
   private providedMethod: ProvidedMethod;
-  private messageContentControl: FormControl = new FormControl("{}");
-  private messageContent: string = "{}";
+  private messageContentControl: FormControl = new FormControl('{}');
+  private messageContent: string = '{}';
 
   private interopClient: InteropClient;
 
@@ -83,11 +83,11 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
   }
 
   handleCompleted(log) {
-    log.info("Invocation completed");
+    log.info('Invocation completed');
   }
 
   handleStreamCompleted(log) {
-    log.info("Remote stream completed");
+    log.info('Remote stream completed');
   }
 
   formatAndUpdateArea() {
@@ -153,7 +153,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
   intercept() {
     this.updateResponse(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis);
-    this.log.info("Response updated");
+    this.log.info('Response updated');
   }
 
   format(data) {
@@ -168,7 +168,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
         this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client, logger);
       }, intervalInMillis);
     } else {
-      logger.info("Sending completion");
+      logger.info('Sending completion');
       client.complete();
     }
   }

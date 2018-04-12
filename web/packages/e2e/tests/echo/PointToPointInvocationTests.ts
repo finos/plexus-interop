@@ -2,26 +2,26 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ClientsSetup } from "../common/ClientsSetup";
-import { ConnectionProvider } from "../common/ConnectionProvider";
-import { UnaryServiceHandler } from "./UnaryServiceHandler";
-import { BaseEchoTest } from "./BaseEchoTest";
-import * as plexus from "../../src/echo/gen/plexus-messages";
-import { ClientError } from "@plexus-interop/protocol";
-import { expect } from "chai";
-import { MethodInvocationContext } from "@plexus-interop/client";
+import { ClientsSetup } from '../common/ClientsSetup';
+import { ConnectionProvider } from '../common/ConnectionProvider';
+import { UnaryServiceHandler } from './UnaryServiceHandler';
+import { BaseEchoTest } from './BaseEchoTest';
+import * as plexus from '../../src/echo/gen/plexus-messages';
+import { ClientError } from '@plexus-interop/protocol';
+import { expect } from 'chai';
+import { MethodInvocationContext } from '@plexus-interop/client';
 import { NopServiceHandler } from './NopServiceHandler';
 
 export class PointToPointInvocationTests extends BaseEchoTest {
@@ -66,22 +66,22 @@ export class PointToPointInvocationTests extends BaseEchoTest {
     }
 
     public testHostExecutionExceptionReceived(): Promise<void> {
-        const errorText = "Host error";
+        const errorText = 'Host error';
         return this.testHostsExecutionErrorReceivedInternal(new Error(errorText), errorText, false);
     }
 
     public testHostsExecutionClientErrorReceived(): Promise<void> {
-        const errorText = "Host error";
+        const errorText = 'Host error';
         return this.testHostsExecutionErrorReceivedInternal(new ClientError(errorText), errorText);
     }
 
     public testHostsExecutionErrorReceived(): Promise<void> {
-        const errorText = "Host error";
+        const errorText = 'Host error';
         return this.testHostsExecutionErrorReceivedInternal(new Error(errorText), errorText);
     }
 
     public testHostsExecutionStringErrorReceived(): Promise<void> {
-        const errorText = "Host error";
+        const errorText = 'Host error';
         return this.testHostsExecutionErrorReceivedInternal(errorText, errorText);
     }
 
@@ -150,7 +150,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
                     return clients[0].getEchoServiceProxy()
                         .unary(echoRequest)
                         .then(echoResponse => {
-                            reject("Should not happen");
+                            reject('Should not happen');
                         })
                         .catch(error => {
                             expect(error.message).to.eq(errorText);

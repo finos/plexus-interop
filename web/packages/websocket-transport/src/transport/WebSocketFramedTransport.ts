@@ -2,24 +2,24 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults } from "@plexus-interop/transport-common";
-import { CancellationToken, Logger, LoggerFactory, Observer, BufferedObserver, AsyncHelper } from "@plexus-interop/common";
+import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults } from '@plexus-interop/transport-common';
+import { CancellationToken, Logger, LoggerFactory, Observer, BufferedObserver, AsyncHelper } from '@plexus-interop/common';
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
-    public static TERMINATE_MESSAGE: string = "<END>";
+    public static TERMINATE_MESSAGE: string = '<END>';
     public static SOCKET_CLOSE_TIMEOUT: number = 5000;
     public static TERMINATE_MESSAGE_RECEIVED_TIMEOUT: number = 10000;
     public static TERMINATE_MESSAGE_CHECK_TIMEOUT: number = 300;
@@ -46,12 +46,12 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         private readonly socket: WebSocket,
         private readonly guid: UniqueId = UniqueId.generateNew(),
         private messagesConverter: InternalMessagesConverter = new InternalMessagesConverter()) {
-        this.socket.binaryType = "arraybuffer";
+        this.socket.binaryType = 'arraybuffer';
         this.log = LoggerFactory.getLogger(`WebSocketFramedTransport [${this.uuid().toString()}]`);
         this.connectionObserver = new BufferedObserver<Frame>(Defaults.DEFAULT_BUFFER_SIZE, this.log);
         this.connectionEstablishedPromise = this.createConnectionReadyPromise();
         this.bindToSocketEvents();
-        this.log.debug("Created");
+        this.log.debug('Created');
     }
 
     public connectionEstablished(): Promise<void> {
@@ -60,11 +60,11 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
     public disconnect(): Promise<void> {
         if (this.socketOpenToken.isCancelled()) {
-            this.log.warn("Already disconnected");
+            this.log.warn('Already disconnected');
             return Promise.resolve();
         }
         if (this.isSocketClosed()) {
-            this.log.warn("Socket is CLOSED, cancelling connection");
+            this.log.warn('Socket is CLOSED, cancelling connection');
             this.cancelConnectionAndCleanUp();
             return Promise.resolve();
         } else {
@@ -114,7 +114,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private sendTerminateMessage(): void {
-        this.log.debug("Sending terminate message");
+        this.log.debug('Sending terminate message');
         this.socket.send(WebSocketFramedTransport.TERMINATE_MESSAGE);
         this.terminateSent = true;
     }
@@ -127,11 +127,11 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
                 this.handleOpen();
                 resolve();
             };
-            this.socket.addEventListener("error", (e) => {
+            this.socket.addEventListener('error', (e) => {
                 if (!opened) {
-                    reject("Connection error");
+                    reject('Connection error');
                 } else {
-                    this.log.warn("Connection error", e);
+                    this.log.warn('Connection error', e);
                 }
             });
         });
@@ -149,12 +149,12 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private async closeConnectionInternal(): Promise<void> {
-        this.log.debug("Closing connection");
+        this.log.debug('Closing connection');
         this.cancelConnectionAndCleanUp();
         if (this.terminateSent && this.terminateReceived) {
             this.scheduleSocketDisconnect();
         } else if (this.terminateSent) {
-            this.log.debug("Server terminate event not received, waiting to close connection gracefully");
+            this.log.debug('Server terminate event not received, waiting to close connection gracefully');
             await this.waitForTerminateMessage();
         } else if (this.terminateReceived) {
             this.sendTerminateMessage();
@@ -179,45 +179,45 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private scheduleSocketDisconnect(): void {
-        this.log.debug("Scheduling socket close action");
+        this.log.debug('Scheduling socket close action');
         setTimeout(() => {
             try {
                 if (this.connected()) {
-                    this.log.debug("Closing socket");
+                    this.log.debug('Closing socket');
                     this.socket.close();
                 } else {
-                    this.log.debug("Already closed");
+                    this.log.debug('Already closed');
                 }
             } catch (error) {
-                this.log.error("Error on closing the socket", error);
+                this.log.error('Error on closing the socket', error);
             }
         }, WebSocketFramedTransport.SOCKET_CLOSE_TIMEOUT);
     }
 
-    private cancelConnectionAndCleanUp(reason: string = "Connection closed"): void {
+    private cancelConnectionAndCleanUp(reason: string = 'Connection closed'): void {
         this.log.debug(`Cancelling connection with reason: ${reason}`);
         this.socketOpenToken.cancel(reason);
         this.connectionObserver.clear();
     }
 
     private handleCloseEvent(socket: WebSocket, ev: CloseEvent): void {
-        this.log.debug("Connection closed event received", ev);
+        this.log.debug('Connection closed event received', ev);
         this.connectionObserver.complete();
     }
 
     private handleMessageEvent(ev: MessageEvent): void {
         /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
-            this.log.debug("Message event received");
+            this.log.debug('Message event received');
         }
         if (this.isTerminateMessage(ev)) {
             /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
-                this.log.debug("Terminate message received");
+                this.log.debug('Terminate message received');
             }
             this.terminateReceived = true;
         } else if (this.terminateReceived) {
-            this.log.warn("Terminate message already received, dropping frame", ev.data);
+            this.log.warn('Terminate message already received, dropping frame', ev.data);
         } else {
             const data: Uint8Array = this.readEventData(ev);
             /* istanbul ignore if */
@@ -233,7 +233,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
                 if (frame.isDataFrame()) {
                     /* istanbul ignore if */
                     if (this.log.isDebugEnabled()) {
-                        this.log.debug("Message header frame, waiting for data frame");
+                        this.log.debug('Message header frame, waiting for data frame');
                     }
                     this.dataFrame = frame;
                 } else {
@@ -253,18 +253,18 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
         } else if (this.isArrayBuffer(ev.data)) {
             /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
-                this.log.debug("Array Buffer message");
+                this.log.debug('Array Buffer message');
             }
             return new Uint8Array(ev.data);
         } else if (this.isArrayBufferView(ev.data)) {
             /* istanbul ignore if */
             if (this.log.isDebugEnabled()) {
-                this.log.debug("ArrayBufferView Buffer message");
+                this.log.debug('ArrayBufferView Buffer message');
             }
             return new Uint8Array(ev.data);
         } else {
-            this.log.error("Unknown payload type", ev.data);
-            throw new Error("Unknown payload type");
+            this.log.error('Unknown payload type', ev.data);
+            throw new Error('Unknown payload type');
         }
     }
 
@@ -277,27 +277,27 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     }
 
     private handleError(socket: WebSocket, ev: Event): void {
-        this.log.error("Connection error received", ev);
-        this.cancelConnectionAndCleanUp("Connection error received");
+        this.log.error('Connection error received', ev);
+        this.cancelConnectionAndCleanUp('Connection error received');
         if (this.connectionObserver) {
-            this.connectionObserver.error("Web Socket Connection Error received");
+            this.connectionObserver.error('Web Socket Connection Error received');
         }
     }
 
     private handleOpen(): void {
-        this.log.debug("Connection opened");
+        this.log.debug('Connection opened');
     }
 
     private throwIfNotConnected(): void {
         if (!this.connected()) {
-            throw new Error("Web Socket is not connected");
+            throw new Error('Web Socket is not connected');
         }
     }
 
     private throwIfNotConnectedOrDisconnectRequested(): void {
         this.throwIfNotConnected();
         if (this.terminateSent) {
-            throw new Error("Terminate socket requested");
+            throw new Error('Terminate socket requested');
         }
     }
 }

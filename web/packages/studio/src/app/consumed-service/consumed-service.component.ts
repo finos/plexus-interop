@@ -2,14 +2,14 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -17,15 +17,15 @@
 import { TransportConnection } from '@plexus-interop/transport-common/src/transport/TransportConnection';
 import { InteropClient } from '../services/core/InteropClient';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AppActions } from "../services/ui/AppActions";
-import { Store } from "@ngrx/store";
+import { AppActions } from '../services/ui/AppActions';
+import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
-import { Router } from "@angular/router";
-import { SubscriptionsRegistry } from "../services/ui/SubscriptionsRegistry";
-import { InteropRegistryService, ConsumedMethod } from "@plexus-interop/broker";
-import { DiscoveredMethod, InvocationRequestInfo, MethodType, StreamingInvocationClient } from "@plexus-interop/client";
-import { UniqueId } from "@plexus-interop/protocol";
-import { Logger, LoggerFactory } from "@plexus-interop/common";
+import { Router } from '@angular/router';
+import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
+import { InteropRegistryService, ConsumedMethod } from '@plexus-interop/broker';
+import { DiscoveredMethod, InvocationRequestInfo, MethodType, StreamingInvocationClient } from '@plexus-interop/client';
+import { UniqueId } from '@plexus-interop/protocol';
+import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { createInvocationLogger } from '../services/core/invocation-utils';
 import { FormControl } from '@angular/forms';
 import { plexusMessageValidator } from '../services/ui/validators';
@@ -38,7 +38,7 @@ import { plexusMessageValidator } from '../services/ui/validators';
 })
 export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
-  private readonly log: Logger = LoggerFactory.getLogger("ConsumedServiceComponent");
+  private readonly log: Logger = LoggerFactory.getLogger('ConsumedServiceComponent');
 
   private registryService: InteropRegistryService;
 
@@ -49,8 +49,8 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   private selectedDiscoveredMethod: DiscoveredMethod;
 
   messageContent: string;
-  messageContentControl: FormControl = new FormControl("{}");
-  responseContent: string = "{}";
+  messageContentControl: FormControl = new FormControl('{}');
+  responseContent: string = '{}';
 
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
@@ -70,7 +70,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.messageContent = ""
+    this.messageContent = ''
     const consumedMethod$ = this.store
       .filter(state => !!state.plexus.consumedMethod)
       .map(state => state.plexus);
@@ -120,7 +120,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   resetInvocationInfo() {
     this.responseCounter = 0;
-    this.responseContent = "";
+    this.responseContent = '';
     this.responseTime = 0;
     this.invocationStarted = new Date().getTime();
   }
@@ -215,7 +215,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
         this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client, logger);
       }, intervalInMillis);
     } else {
-      logger.info("Sending invocation completion");
+      logger.info('Sending invocation completion');
       client.complete();
     }
   }
@@ -224,7 +224,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     const alias = providedMethod.providedMethod.providedService.serviceAlias;
     const aliasPostfix = alias ? ` (${alias})` : '';
     const connectionId = providedMethod.providedMethod.providedService.connectionId;
-    const guidPostfix = connectionId && connectionId.hi ? ` - ${UniqueId.fromProperties(connectionId).toString()}` : "";
+    const guidPostfix = connectionId && connectionId.hi ? ` - ${UniqueId.fromProperties(connectionId).toString()}` : '';
     return `${providedMethod.providedMethod.providedService.applicationId}${aliasPostfix}${guidPostfix}`
   }
 

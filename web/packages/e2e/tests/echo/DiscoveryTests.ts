@@ -2,28 +2,28 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ClientsSetup } from "../common/ClientsSetup";
-import { ConnectionProvider } from "../common/ConnectionProvider";
-import { BaseEchoTest } from "./BaseEchoTest";
-import * as plexus from "../../src/echo/gen/plexus-messages";
-import { NopServiceHandler } from "./NopServiceHandler";
-import { expect } from "chai";
-import { DiscoveredMethod, ProvidedMethodReference, DiscoveredServiceMethod, DiscoveredService } from "@plexus-interop/client-api";
-import { UnaryServiceHandler } from "./UnaryServiceHandler";
-import { ServerStreamingHandler } from "./ServerStreamingHandler";
-import { ClientStreamingHandler } from "./ClientStreamingHandler";
+import { ClientsSetup } from '../common/ClientsSetup';
+import { ConnectionProvider } from '../common/ConnectionProvider';
+import { BaseEchoTest } from './BaseEchoTest';
+import * as plexus from '../../src/echo/gen/plexus-messages';
+import { NopServiceHandler } from './NopServiceHandler';
+import { expect } from 'chai';
+import { DiscoveredMethod, ProvidedMethodReference, DiscoveredServiceMethod, DiscoveredService } from '@plexus-interop/client-api';
+import { UnaryServiceHandler } from './UnaryServiceHandler';
+import { ServerStreamingHandler } from './ServerStreamingHandler';
+import { ClientStreamingHandler } from './ClientStreamingHandler';
 
 export class DiscoveryTests extends BaseEchoTest {
 
@@ -37,14 +37,14 @@ export class DiscoveryTests extends BaseEchoTest {
         return this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler())
             .then(clients => {
                 const client = clients[0];
-                return client.discoverMethod({ inputMessageId: "plexus.interop.testing.EchoRequest" })
+                return client.discoverMethod({ inputMessageId: 'plexus.interop.testing.EchoRequest' })
                     .then(discoveryResponse => {
                         if (discoveryResponse.methods) {
                             expect(discoveryResponse.methods.length).to.be.eq(5);
                             expect(discoveryResponse.methods.filter(this.methodWithAlias).length).to.be.eq(1);
                             discoveryResponse.methods.forEach(method => this.assertDiscoveredMethodValid(method));
                         } else {
-                            throw "Empty response";
+                            throw 'Empty response';
                         }
                     })
                     .then(() => {
@@ -64,7 +64,7 @@ export class DiscoveryTests extends BaseEchoTest {
     }
 
     public async testServiceDiscoveredById(): Promise<void> {
-        const serviceId = "plexus.interop.testing.EchoService";
+        const serviceId = 'plexus.interop.testing.EchoService';
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
         const serviceDiscoveryResponse = await client.discoverService({
             consumedService: {
@@ -78,24 +78,24 @@ export class DiscoveryTests extends BaseEchoTest {
             if (serviceRef.consumedService) {
                 expect(serviceRef.consumedService.serviceId).to.eq(serviceId);
             } else {
-                throw "Empty consumed service";
+                throw 'Empty consumed service';
             }
             if (serviceRef.providedService) {
-                expect(serviceRef.providedService.applicationId).to.eq("plexus.interop.testing.EchoServer");
+                expect(serviceRef.providedService.applicationId).to.eq('plexus.interop.testing.EchoServer');
                 // tslint:disable-next-line:no-unused-expression
                 expect(serviceRef.providedService.connectionId).to.not.be.undefined;
                 expect(serviceRef.providedService.serviceId).to.eq(serviceId);
             } else {
-                throw "Empty provided service";
+                throw 'Empty provided service';
             }
             if (serviceRef.methods) {
                 expect(serviceRef.methods.length).to.be.greaterThan(0);
                 serviceRef.methods.forEach(method => this.assertDiscoveredServiceMethodValid(method));
             } else {
-                throw "Empty methods";
+                throw 'Empty methods';
             }
         } else {
-            throw "Empty Response";
+            throw 'Empty Response';
         }
         await this.clientsSetup.disconnect(client, server);
     }
@@ -104,7 +104,7 @@ export class DiscoveryTests extends BaseEchoTest {
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
         const serviceDiscoveryResponse = await client.discoverService({
             consumedService: {
-                serviceId: "plexus.interop.testing.DoNotExist"
+                serviceId: 'plexus.interop.testing.DoNotExist'
             }
         });
         if (serviceDiscoveryResponse.services) {
@@ -123,16 +123,16 @@ export class DiscoveryTests extends BaseEchoTest {
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
-                methodId: "ServerStreaming"
+                methodId: 'ServerStreaming'
             }
         });
         if (discoveryResponse.methods) {
             expect(discoveryResponse.methods.length).to.be.eq(1);
             const method = discoveryResponse.methods[0];
             if (!method.providedMethod) {
-                throw new Error("Provided method is empty");
+                throw new Error('Provided method is empty');
             }
             let receivedResponse: plexus.plexus.interop.testing.IEchoRequest | null = null;
             return new Promise<void>((resolve, reject) => {
@@ -153,7 +153,7 @@ export class DiscoveryTests extends BaseEchoTest {
             });
 
         } else {
-            throw "Empty response";
+            throw 'Empty response';
         }
     }
 
@@ -164,7 +164,7 @@ export class DiscoveryTests extends BaseEchoTest {
                     next: clientRequest => hostClient.complete(),
                     complete: () => {},
                     // tslint:disable-next-line:no-console
-                    error: (e) => console.error("Error received by server", e),
+                    error: (e) => console.error('Error received by server', e),
                     streamCompleted: () => {}
                 };
             });
@@ -172,16 +172,16 @@ export class DiscoveryTests extends BaseEchoTest {
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
-                methodId: "DuplexStreaming"
+                methodId: 'DuplexStreaming'
             }
         });
         if (discoveryResponse.methods) {
             expect(discoveryResponse.methods.length).to.be.eq(1);
             const method = discoveryResponse.methods[0];
             if (!method.providedMethod) {
-                throw new Error("Provided method is empty");
+                throw new Error('Provided method is empty');
             }
             return new Promise<void>(async (resolve, reject) => {
                 const streamingClient = await client.sendRawBidirectionalStreamingRequest(method.providedMethod as ProvidedMethodReference, {
@@ -199,7 +199,7 @@ export class DiscoveryTests extends BaseEchoTest {
                 streamingClient.complete();
             });
         } else {
-            throw "Empty response";
+            throw 'Empty response';
         }
     }
 
@@ -210,9 +210,9 @@ export class DiscoveryTests extends BaseEchoTest {
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
-                methodId: "Unary"
+                methodId: 'Unary'
             }
         });
         if (discoveryResponse.methods) {
@@ -233,7 +233,7 @@ export class DiscoveryTests extends BaseEchoTest {
                     });
             });
         } else {
-            throw "Empty response";
+            throw 'Empty response';
         }
         await this.clientsSetup.disconnect(client, server);
     }
@@ -245,9 +245,9 @@ export class DiscoveryTests extends BaseEchoTest {
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
-                methodId: "Unary"
+                methodId: 'Unary'
             }
         });
         if (discoveryResponse.methods) {
@@ -269,20 +269,20 @@ export class DiscoveryTests extends BaseEchoTest {
                     plexus.plexus.interop.testing.EchoRequest);
             });
         } else {
-            throw "Empty response";
+            throw 'Empty response';
         }
         await this.clientsSetup.disconnect(client, server);
     }
 
     public async testMethodDiscoveredByOutputMessageId(): Promise<void> {
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, new NopServiceHandler());
-        const discoveryResponse = await client.discoverMethod({ outputMessageId: "plexus.interop.testing.EchoRequest" });
+        const discoveryResponse = await client.discoverMethod({ outputMessageId: 'plexus.interop.testing.EchoRequest' });
         if (discoveryResponse.methods) {
             expect(discoveryResponse.methods.length).to.be.eq(5);
             discoveryResponse.methods.forEach(
                 method => this.assertDiscoveredMethodValid(method));
         } else {
-            throw "Empty response";
+            throw 'Empty response';
         }
         await this.clientsSetup.disconnect(client, server);
     }
@@ -292,9 +292,9 @@ export class DiscoveryTests extends BaseEchoTest {
         const discoveryResponse = await client.discoverMethod({
             consumedMethod: {
                 consumedService: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
-                methodId: "Unary"
+                methodId: 'Unary'
             }
         });
         if (discoveryResponse.methods) {
@@ -302,22 +302,22 @@ export class DiscoveryTests extends BaseEchoTest {
             discoveryResponse.methods.forEach(
                 method => this.assertDiscoveredMethodValid(method));
         } else {
-            throw "Empty response";
+            throw 'Empty response';
         }
         await this.clientsSetup.disconnect(client, server);
     }
     
     private assertDiscoveredMethodValid(discoveredMethod: DiscoveredMethod) {
         expect(discoveredMethod.providedMethod).to.not.be.undefined;
-        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+        expect(discoveredMethod.inputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
+        expect(discoveredMethod.outputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
     }
 
     private assertDiscoveredServiceMethodValid(discoveredMethod: DiscoveredServiceMethod) {
         expect(discoveredMethod.methodId).to.not.be.undefined;
         expect(discoveredMethod.methodTitle).to.not.be.undefined;
-        expect(discoveredMethod.inputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
-        expect(discoveredMethod.outputMessageId).to.be.eq("plexus.interop.testing.EchoRequest");
+        expect(discoveredMethod.inputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
+        expect(discoveredMethod.outputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
     }
 
 }

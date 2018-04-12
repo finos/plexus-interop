@@ -2,45 +2,45 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericClientApi } from "./GenericClientApi";
-import { GenericClient } from "../../../client/generic/GenericClient";
-import { ServiceDiscoveryRequest } from "@plexus-interop/client-api";
-import { ServiceDiscoveryResponse } from "@plexus-interop/client-api";
-import { ClientDtoUtils } from "./../../ClientDtoUtils";
-import { StreamingInvocationClient } from "./../streaming/StreamingInvocationClient";
-import { StreamingInvocationClientImpl } from "./../streaming/StreamingInvocationClientImpl";
-import { InvocationClient } from "./../InvocationClient";
-import { ValueHandler } from "./../ValueHandler";
-import { ClientError } from "@plexus-interop/protocol";
-import { InvocationRequestInfo } from "@plexus-interop/protocol";
-import { Logger, LoggerFactory, Arrays } from "@plexus-interop/common";
-import { MarshallerProvider } from "../io/MarshallerProvider";
-import { Completion } from "@plexus-interop/client-api";
-import { UniqueId } from "@plexus-interop/transport-common";
-import { ProvidedMethodReference } from "@plexus-interop/client-api";
-import { Invocation } from "../../generic/Invocation";
-import { MethodDiscoveryRequest } from "@plexus-interop/client-api";
-import { MethodDiscoveryResponse } from "@plexus-interop/client-api";
-import { GenericRequest } from "@plexus-interop/client-api";
-import { InvocationObserver } from "../../generic";
-import { DelegateInvocationObserver } from "../../api/DelegateInvocationObserver";
-import { LoggingInvocationObserver } from "../LoggingInvocationObserver";
+import { GenericClientApi } from './GenericClientApi';
+import { GenericClient } from '../../../client/generic/GenericClient';
+import { ServiceDiscoveryRequest } from '@plexus-interop/client-api';
+import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
+import { ClientDtoUtils } from './../../ClientDtoUtils';
+import { StreamingInvocationClient } from './../streaming/StreamingInvocationClient';
+import { StreamingInvocationClientImpl } from './../streaming/StreamingInvocationClientImpl';
+import { InvocationClient } from './../InvocationClient';
+import { ValueHandler } from './../ValueHandler';
+import { ClientError } from '@plexus-interop/protocol';
+import { InvocationRequestInfo } from '@plexus-interop/protocol';
+import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
+import { MarshallerProvider } from '../io/MarshallerProvider';
+import { Completion } from '@plexus-interop/client-api';
+import { UniqueId } from '@plexus-interop/transport-common';
+import { ProvidedMethodReference } from '@plexus-interop/client-api';
+import { Invocation } from '../../generic/Invocation';
+import { MethodDiscoveryRequest } from '@plexus-interop/client-api';
+import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
+import { GenericRequest } from '@plexus-interop/client-api';
+import { InvocationObserver } from '../../generic';
+import { DelegateInvocationObserver } from '../../api/DelegateInvocationObserver';
+import { LoggingInvocationObserver } from '../LoggingInvocationObserver';
 
 export class GenericClientApiImpl implements GenericClientApi {
 
-    private readonly log: Logger = LoggerFactory.getLogger("GenericClientApi");
+    private readonly log: Logger = LoggerFactory.getLogger('GenericClientApi');
 
     constructor(
         private readonly genericClient: GenericClient,
@@ -51,12 +51,12 @@ export class GenericClientApiImpl implements GenericClientApi {
     }
 
     public discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse> {
-        this.log.debug("Service Discovery request");
+        this.log.debug('Service Discovery request');
         return this.genericClient.discoverService(discoveryRequest);
     }
 
     public discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse> {
-        this.log.debug("Method Discovery request");
+        this.log.debug('Method Discovery request');
         return this.genericClient.discoverMethod(discoveryRequest);
     }
 
@@ -143,7 +143,7 @@ export class GenericClientApiImpl implements GenericClientApi {
                     s => resolve(s),
                     e => reject(e)));
         });
-        logger.debug("Invocation opened");
+        logger.debug('Invocation opened');
         return new StreamingInvocationClientImpl(invocation, logger);
     }
 
@@ -194,17 +194,17 @@ export class GenericClientApiImpl implements GenericClientApi {
                 this.log.trace(`Received value of ${v.byteLength} bytes`);
                 result = v;
             },
-            streamCompleted: () => this.log.trace("Incoming stream completed"),
+            streamCompleted: () => this.log.trace('Incoming stream completed'),
             error: responseHandler.error.bind(responseHandler),
             complete: () => {
                 if (result === null) {
-                    const errorText = "No messages received before completion";
+                    const errorText = 'No messages received before completion';
                     this.log.error(errorText);
                     responseHandler.error(new ClientError(errorText));
                 } else {
                     responseHandler.value(result);
                 }
-                this.log.debug("Unary operation completed");
+                this.log.debug('Unary operation completed');
             }
         };
     }

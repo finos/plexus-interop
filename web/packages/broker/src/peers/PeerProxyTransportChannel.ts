@@ -2,23 +2,23 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TransportChannel, ChannelObserver } from "@plexus-interop/transport-common";
-import { clientProtocol as plexus, UniqueId, SuccessCompletion, ErrorCompletion, ClientError } from "@plexus-interop/protocol";
-import { AnonymousSubscription, Logger, LoggerFactory, arrayBufferToString, stringToArrayBuffer } from "@plexus-interop/common";
-import { RemoteActions } from "./actions/RemoteActions";
-import { RemoteBrokerService } from "./remote/RemoteBrokerService";
+import { TransportChannel, ChannelObserver } from '@plexus-interop/transport-common';
+import { clientProtocol as plexus, UniqueId, SuccessCompletion, ErrorCompletion, ClientError } from '@plexus-interop/protocol';
+import { AnonymousSubscription, Logger, LoggerFactory, arrayBufferToString, stringToArrayBuffer } from '@plexus-interop/common';
+import { RemoteActions } from './actions/RemoteActions';
+import { RemoteBrokerService } from './remote/RemoteBrokerService';
 
 export class PeerProxyTransportChannel implements TransportChannel {
 
@@ -32,7 +32,7 @@ export class PeerProxyTransportChannel implements TransportChannel {
         private remoteBrokerService: RemoteBrokerService) {
         this.channelId = UniqueId.fromString(strChannelId);
         this.log = LoggerFactory.getLogger(`PeerProxyTransportChannel [${strChannelId}]`);
-        this.log.debug("Created");
+        this.log.debug('Created');
     }
 
     public uuid(): UniqueId {
@@ -53,7 +53,7 @@ export class PeerProxyTransportChannel implements TransportChannel {
     }
 
     public open(observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
-        this.log.trace("Received open channel request");
+        this.log.trace('Received open channel request');
         this.remoteBrokerService.invoke(RemoteActions.OPEN_CHANNEL, {
             channelId: this.strChannelId
         }, this.remoteConnectionId, {
@@ -63,11 +63,11 @@ export class PeerProxyTransportChannel implements TransportChannel {
                     observer.next(abPayload);
                 },
                 error: e => {
-                    this.log.error("Received remote error", e);
+                    this.log.error('Received remote error', e);
                     observer.error(e);
                 },
                 complete: () => {
-                    this.log.trace("Received remote completion");
+                    this.log.trace('Received remote completion');
                     observer.complete();
                 }
             });
@@ -84,7 +84,7 @@ export class PeerProxyTransportChannel implements TransportChannel {
             }, this.remoteConnectionId);
             return response.completion;
         } catch (error) {
-            this.log.error("Error on close received", error);
+            this.log.error('Error on close received', error);
             return new ErrorCompletion(new ClientError(error));
         }
     }

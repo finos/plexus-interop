@@ -2,37 +2,37 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { EventBus } from "../../EventBus";
-import { Event } from "../../Event";
-import { StateMaschine, StateMaschineBase, LoggerFactory, Logger } from "@plexus-interop/common";
-import { Observable } from "rxjs/Observable";
-import "rxjs/add/observable/fromEvent";
-import "rxjs/add/operator/filter";
-import "rxjs/add/operator/map";
-import { IFrameHostMessage } from "../model/IFrameHostMessage";
-import { CrossDomainHostConfig } from "./CrossDomainHostConfig";
-import { MessageType } from "../model/MessageType";
-import { HostState } from "./HostState";
-import { HostMessageEvent } from "./HostMessageEvent";
-import { PublishRequest } from "../model/PublishRequest";
-import { SubscribeRequest } from "../model/SubscribeRequest";
-import { RemoteActionStatus } from "../../../peers/remote/RemoteActionStatus";
+import { EventBus } from '../../EventBus';
+import { Event } from '../../Event';
+import { StateMaschine, StateMaschineBase, LoggerFactory, Logger } from '@plexus-interop/common';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+import { IFrameHostMessage } from '../model/IFrameHostMessage';
+import { CrossDomainHostConfig } from './CrossDomainHostConfig';
+import { MessageType } from '../model/MessageType';
+import { HostState } from './HostState';
+import { HostMessageEvent } from './HostMessageEvent';
+import { PublishRequest } from '../model/PublishRequest';
+import { SubscribeRequest } from '../model/SubscribeRequest';
+import { RemoteActionStatus } from '../../../peers/remote/RemoteActionStatus';
 
 export class CrossDomainHost {
 
-    private readonly log: Logger = LoggerFactory.getLogger("CrossDomainHost");
+    private readonly log: Logger = LoggerFactory.getLogger('CrossDomainHost');
 
     private readonly parentWin: Window;
 
@@ -58,12 +58,12 @@ export class CrossDomainHost {
         const { origin, source } = message;
         return source === this.parentWin
             && this.config.whiteListedUrls
-            && !!this.config.whiteListedUrls.find(pattern => pattern === "*" || origin.endsWith(pattern));
+            && !!this.config.whiteListedUrls.find(pattern => pattern === '*' || origin.endsWith(pattern));
     }
 
     private initCommunicationWithParent(): void {
-        this.log.info("Subscribing to parent messages");
-        Observable.fromEvent<MessageEvent>(window, "message")
+        this.log.info('Subscribing to parent messages');
+        Observable.fromEvent<MessageEvent>(window, 'message')
             .filter(event => this.whiteListed(event))
             .map(event => {
                 if (this.log.isTraceEnabled()) {
@@ -81,7 +81,7 @@ export class CrossDomainHost {
                 && !parsed.message.responsePayload)
             .subscribe({
                 next: msg => this.handleParentMessage(msg),
-                error: e => this.log.error("Error from parent messages subscription", e)
+                error: e => this.log.error('Error from parent messages subscription', e)
             });
     }
 
@@ -93,7 +93,7 @@ export class CrossDomainHost {
         const message = parsedEvent.message;
         switch (message.type.id) {
             case MessageType.Ping.id:
-                this.log.trace("Received ping request");
+                this.log.trace('Received ping request');
                 message.responsePayload = {};
                 this.sendToParent(
                     message,

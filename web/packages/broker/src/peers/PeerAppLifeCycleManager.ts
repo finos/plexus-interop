@@ -2,39 +2,39 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
-import { TransportConnection } from "@plexus-interop/transport-common";
-import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
-import { Cache, InMemoryCache, Logger, LoggerFactory, CacheEntry } from "@plexus-interop/common";
-import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
-import { PeerProxyConnection } from "../peers/PeerProxyConnection";
-import { PeerConnectionsService } from "./PeerConnectionsService";
-import { AppConnectionHeartBit } from "./events/AppConnectionHeartBit";
-import { AppRegistryService } from "../metadata/apps/AppRegistryService";
-import { AppLauncherRegistry } from "../launcher/AppLauncherRegistry";
-import { CancellationToken } from "@plexus-interop/common";
-import { UniqueId } from "@plexus-interop/protocol";
-import { AsyncHelper } from "@plexus-interop/common";
-import { HostTransportConnection } from "./host/HostTransportConnection";
+import { AppLifeCycleManager } from '../lifecycle/AppLifeCycleManager';
+import { TransportConnection } from '@plexus-interop/transport-common';
+import { ApplicationConnection } from '../lifecycle/ApplicationConnection';
+import { Cache, InMemoryCache, Logger, LoggerFactory, CacheEntry } from '@plexus-interop/common';
+import { ApplicationDescriptor } from '../lifecycle/ApplicationDescriptor';
+import { PeerProxyConnection } from '../peers/PeerProxyConnection';
+import { PeerConnectionsService } from './PeerConnectionsService';
+import { AppConnectionHeartBit } from './events/AppConnectionHeartBit';
+import { AppRegistryService } from '../metadata/apps/AppRegistryService';
+import { AppLauncherRegistry } from '../launcher/AppLauncherRegistry';
+import { CancellationToken } from '@plexus-interop/common';
+import { UniqueId } from '@plexus-interop/protocol';
+import { AsyncHelper } from '@plexus-interop/common';
+import { HostTransportConnection } from './host/HostTransportConnection';
 
 /**
  * Manages one client connection and proxy connections for peer brokers
  */
 export class PeerAppLifeCycleManager implements AppLifeCycleManager {
 
-    private readonly log: Logger = LoggerFactory.getLogger("PeerAppLifeCycleManager");
+    private readonly log: Logger = LoggerFactory.getLogger('PeerAppLifeCycleManager');
 
     // time to wait for application to start before rejecting broker's request
     private readonly spawnConnectionTimeout: number = 5 * 60 * 1000;
@@ -78,7 +78,7 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
             });
             this.onlineConnections.set(connectionId.toString(), new CacheEntry(appConnection));
         } else {
-            throw new Error("Unsupported Transport Connection Type");
+            throw new Error('Unsupported Transport Connection Type');
         }
         return appConnection;
     }
@@ -138,7 +138,7 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
     }
 
     private subscribeToHeartBits(): void {
-        this.log.trace("Subscribing to app heartbits");
+        this.log.trace('Subscribing to app heartbits');
         this.peerConnectionsService.subscribeToConnectionsHearBits({
             next: connectionDescriptor => {
                 const connectionStrId = connectionDescriptor.connectionId;

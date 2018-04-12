@@ -2,24 +2,24 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId } from "@plexus-interop/protocol";
-import { Frame } from "./model";
-import { FramedTransport } from "./FramedTransport";
-import { Observer, Logger, LimitedBufferQueue } from "@plexus-interop/common";
-import { Queue } from "typescript-collections";
-import { Defaults } from "../../common/Defaults";
+import { UniqueId } from '@plexus-interop/protocol';
+import { Frame } from './model';
+import { FramedTransport } from './FramedTransport';
+import { Observer, Logger, LimitedBufferQueue } from '@plexus-interop/common';
+import { Queue } from 'typescript-collections';
+import { Defaults } from '../../common/Defaults';
 
 /**
  * Collects all read events until client opened connection
@@ -41,9 +41,9 @@ export abstract class BufferedReadFramedTransport implements FramedTransport, Ob
     public abstract writeFrame(frame: Frame): Promise<void>;
 
     public async open(framesObserver: Observer<Frame>): Promise<void> {
-        this.log.trace("Opening transport");
+        this.log.trace('Opening transport');
         if (this.framesObserver) {
-            throw new Error("Already opened");
+            throw new Error('Already opened');
         }
         this.framesObserver = framesObserver;
         while (!this.inBuffer.isEmpty()) {
@@ -73,7 +73,7 @@ export abstract class BufferedReadFramedTransport implements FramedTransport, Ob
     }
 
     public error(transportError: any): void {
-        this.log.debug("Received error", transportError);
+        this.log.debug('Received error', transportError);
         if (this.framesObserver) {
             this.framesObserver.error(transportError);
         } else {
@@ -82,7 +82,7 @@ export abstract class BufferedReadFramedTransport implements FramedTransport, Ob
     }
 
     public complete(): void {
-        this.log.debug("Receive complete message");
+        this.log.debug('Receive complete message');
         if (this.framesObserver) {
             this.framesObserver.complete();
         } else {

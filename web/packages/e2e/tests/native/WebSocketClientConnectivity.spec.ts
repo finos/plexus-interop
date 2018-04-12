@@ -2,25 +2,25 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { expect } from "chai";
-import { ClientsSetup } from "../common/ClientsSetup";
-import { TransportsSetup } from "../common/TransportsSetup";
-import { readWsUrl } from "../common/utils";
-import { ClientConnectivityTests } from "../echo/ClientConnectivityTests";
+import { expect } from 'chai';
+import { ClientsSetup } from '../common/ClientsSetup';
+import { TransportsSetup } from '../common/TransportsSetup';
+import { readWsUrl } from '../common/utils';
+import { ClientConnectivityTests } from '../echo/ClientConnectivityTests';
 
-describe("Web Socket Client connectivity", () => {
+describe('Web Socket Client connectivity', () => {
 
     const clientsSetup = new ClientsSetup();
     const transportsSetup = new TransportsSetup();
@@ -30,11 +30,11 @@ describe("Web Socket Client connectivity", () => {
         transportsSetup.createWebSocketTransportProvider(wsUrl), 
         clientsSetup);
     
-    it("Can receive WS URL from Broker", () => {
+    it('Can receive WS URL from Broker', () => {
         expect(wsUrl).is.not.empty;
     });
 
-    it("Can connect/disconnect from running Broker instance", function (done) {
+    it('Can connect/disconnect from running Broker instance', function (done) {
         this.timeout(5000);
         let wsUrl = readWsUrl();
         clientsSetup
@@ -47,19 +47,19 @@ describe("Web Socket Client connectivity", () => {
             });
     });
 
-    it("Received error for open invocation on disconnect", function() {
+    it('Received error for open invocation on disconnect', function() {
         return connectivityTests.testInvocationClientReceiveErrorOnClientDisconnect();
     });
 
-    it("Receives error if provide wrong client id to Broker", function() {
+    it('Receives error if provide wrong client id to Broker', function() {
         return connectivityTests.testClientReceiveErrorIfProvideWrongId();
     });
 
-    it("Server receives error if client dropped connection", function() {
+    it('Server receives error if client dropped connection', function() {
         return connectivityTests.testServerReceivesErrorIfClientDroppedConnection();
     });
 
-    it("Client receives error if server dropped connection", function() {
+    it('Client receives error if server dropped connection', function() {
         return connectivityTests.testClientReceivesErrorIfServerDroppedConnection();
     });
 

@@ -2,25 +2,25 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ConnectionProvider } from "../common/ConnectionProvider";
-import { ClientsSetup } from "../common/ClientsSetup";
-import { BaseEchoTest } from "./BaseEchoTest";
-import * as plexus from "../../src/echo/gen/plexus-messages";
-import { ClientStreamingHandler } from "./ClientStreamingHandler";
-import { StreamingInvocationClient, MethodInvocationContext } from "@plexus-interop/client";
-import { expect } from "chai";
+import { ConnectionProvider } from '../common/ConnectionProvider';
+import { ClientsSetup } from '../common/ClientsSetup';
+import { BaseEchoTest } from './BaseEchoTest';
+import * as plexus from '../../src/echo/gen/plexus-messages';
+import { ClientStreamingHandler } from './ClientStreamingHandler';
+import { StreamingInvocationClient, MethodInvocationContext } from '@plexus-interop/client';
+import { expect } from 'chai';
 
 export class ClientStreamingTests extends BaseEchoTest {
 
@@ -50,15 +50,15 @@ export class ClientStreamingTests extends BaseEchoTest {
             const streamingClient = await client.getEchoServiceProxy().clientStreaming({
                 next: (serverResponse) => { },
                 error: (e) => {
-                    console.error("Error received by client", e);
+                    console.error('Error received by client', e);
                     reject(e);
                 },
                 complete: async () => remoteCompleted = true,
                 streamCompleted: () => { }
             });
-            streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
+            streamingClient.next(this.clientsSetup.createSimpleRequestDto('Hey'));
             await streamingClient.complete();
-            if (!remoteCompleted) { reject("Server stream not completed"); }            
+            if (!remoteCompleted) { reject('Server stream not completed'); }            
             await this.clientsSetup.disconnect(client, server);
             resolve();
         });
@@ -74,7 +74,7 @@ export class ClientStreamingTests extends BaseEchoTest {
                     error: e => reject(e),
                     streamCompleted: () => {
                         if (!lastRequest) {
-                            reject("Request not received");
+                            reject('Request not received');
                         } else {
                             hostClient.next(lastRequest);
                             hostClient.complete();
@@ -91,10 +91,10 @@ export class ClientStreamingTests extends BaseEchoTest {
                 complete: async () => serverCompleted = true,
                 streamCompleted: () => serverStreamCompleted = true
             });
-            streamingClient.next(this.clientsSetup.createSimpleRequestDto("Hey"));
+            streamingClient.next(this.clientsSetup.createSimpleRequestDto('Hey'));
             await streamingClient.complete();
-            if (!serverCompleted) { reject("Server not completed"); }
-            if (!serverStreamCompleted) { reject("Server stream not completed"); }
+            if (!serverCompleted) { reject('Server not completed'); }
+            if (!serverStreamCompleted) { reject('Server stream not completed'); }
             await this.clientsSetup.disconnect(client, server);
             resolve();
         });

@@ -2,31 +2,31 @@
  * Copyright 2017 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { when, mock, instance, anything, verify, capture } from "ts-mockito";
-import { GenericClientApiImpl } from "../../src/client/api/generic/GenericClientApiImpl";
-import { GenericClientImpl } from "../../src/client/generic/GenericClientImpl";
-import { RequestedInvocation } from "../../src/client/generic/RequestedInvocation";
-import { Observer } from "@plexus-interop/common";
-import { createRemoteInvocationInfo, MockMarshallerProvider } from "./client-mocks";
-import { clientProtocol as plexus, Completion, ErrorCompletion, SuccessCompletion } from "@plexus-interop/protocol";
-import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
-import { ChannelObserver } from "@plexus-interop/transport-common";
+import { when, mock, instance, anything, verify, capture } from 'ts-mockito';
+import { GenericClientApiImpl } from '../../src/client/api/generic/GenericClientApiImpl';
+import { GenericClientImpl } from '../../src/client/generic/GenericClientImpl';
+import { RequestedInvocation } from '../../src/client/generic/RequestedInvocation';
+import { Observer } from '@plexus-interop/common';
+import { createRemoteInvocationInfo, MockMarshallerProvider } from './client-mocks';
+import { clientProtocol as plexus, Completion, ErrorCompletion, SuccessCompletion } from '@plexus-interop/protocol';
+import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
+import { ChannelObserver } from '@plexus-interop/transport-common';
 
-describe("GenericClientApi", () => {
+describe('GenericClientApi', () => {
 
-    it("Can send point to point invocation and receive result", async (done) => {
+    it('Can send point to point invocation and receive result', async (done) => {
         const mockInvocation = mock(RequestedInvocation);
 
         const responsePayload = new Uint8Array([3, 2, 1]).buffer;
@@ -55,7 +55,7 @@ describe("GenericClientApi", () => {
 
     });
 
-    it("Fails Point to Point invocation if invalid completion received", (done) => {
+    it('Fails Point to Point invocation if invalid completion received', (done) => {
 
         const mockInvocation = mock(RequestedInvocation);
 
@@ -84,7 +84,7 @@ describe("GenericClientApi", () => {
 
     });
 
-    it("Fails Point to Point invocation if completed without message", (done) => {
+    it('Fails Point to Point invocation if completed without message', (done) => {
 
         const mockInvocation = mock(RequestedInvocation);
 
@@ -111,7 +111,7 @@ describe("GenericClientApi", () => {
 
     });
 
-    it("Fails Point to Point invocation if send message failed", (done) => {
+    it('Fails Point to Point invocation if send message failed', (done) => {
 
         const mockInvocation = mock(RequestedInvocation);
 
@@ -122,7 +122,7 @@ describe("GenericClientApi", () => {
             observer.complete();
         });
 
-        when(mockInvocation.sendMessage(anything())).thenReturn(Promise.reject("Error"));
+        when(mockInvocation.sendMessage(anything())).thenReturn(Promise.reject('Error'));
 
         const mockGenericClient = mock(GenericClientImpl);
         when(mockGenericClient.requestInvocation(anything()))
@@ -136,10 +136,10 @@ describe("GenericClientApi", () => {
 
     });
 
-    it("Fails Point to Point invocation if request invocation failed", (done) => {
+    it('Fails Point to Point invocation if request invocation failed', (done) => {
 
         const mockGenericClient = mock(GenericClientImpl);
-        when(mockGenericClient.requestInvocation(anything())).thenReturn(Promise.reject("Error"));
+        when(mockGenericClient.requestInvocation(anything())).thenReturn(Promise.reject('Error'));
 
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
         const requestPayload = new Uint8Array([1, 2, 3]).buffer;
@@ -151,7 +151,7 @@ describe("GenericClientApi", () => {
 
     });
 
-    it("Allows to cancel invocation by client", async () => {
+    it('Allows to cancel invocation by client', async () => {
 
         const mockInvocation = mock(RequestedInvocation);
 
@@ -169,10 +169,10 @@ describe("GenericClientApi", () => {
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
         const invocationClient = await clientApi.sendRawUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
             value: (v) => {
-                fail("Not expected");
+                fail('Not expected');
             },
             error: () => {
-                fail("Not expected");
+                fail('Not expected');
             }
         });
 
@@ -183,7 +183,7 @@ describe("GenericClientApi", () => {
 
     });
 
-    it("It can send few messages and complete invocation by Streaming client", async () => {
+    it('It can send few messages and complete invocation by Streaming client', async () => {
 
         const mockInvocation = mock(RequestedInvocation);
 
@@ -203,7 +203,7 @@ describe("GenericClientApi", () => {
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), new MockMarshallerProvider());
         const streamingInvocationClient = await clientApi.sendRawBidirectionalStreamingRequest(createRemoteInvocationInfo(), {
             next: (v) => {
-                fail("Not expected");
+                fail('Not expected');
             },
             complete: () => { },
             error: () => { },
@@ -221,7 +221,7 @@ describe("GenericClientApi", () => {
 
     });
 
-    it("It can receive message, completion and complete invocation with Streaming client", async (done) => {
+    it('It can receive message, completion and complete invocation with Streaming client', async (done) => {
 
         const mockInvocation = mock(RequestedInvocation);
 
@@ -256,10 +256,10 @@ describe("GenericClientApi", () => {
                     verify(mockInvocation.close(anything())).once();
                     done();
                 }, (e) => {
-                    fail("Error not expected");
+                    fail('Error not expected');
                 });
             },
-            error: () => fail("Not expected"),
+            error: () => fail('Not expected'),
             streamCompleted: () => {}
         });
         
