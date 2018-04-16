@@ -1,27 +1,27 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TransportConnection, TransportChannel, UniqueId, Defaults } from "@plexus-interop/transport-common";
-import { Observer, BufferedObserver, Logger, LoggerFactory, Subscription, AnonymousSubscription } from "@plexus-interop/common";
-import { clientProtocol } from "@plexus-interop/protocol";
-import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
-import { ProxyAuthenticationHandler } from "./ProxyAuthenticationHandler";
-import { RemoteActions } from "./actions/RemoteActions";
-import { PeerProxyTransportChannel } from "./PeerProxyTransportChannel";
-import { RemoteBrokerService } from "./remote/RemoteBrokerService";
+import { TransportConnection, TransportChannel, UniqueId, Defaults } from '@plexus-interop/transport-common';
+import { Observer, BufferedObserver, Logger, LoggerFactory, Subscription, AnonymousSubscription } from '@plexus-interop/common';
+import { clientProtocol } from '@plexus-interop/protocol';
+import { ApplicationConnectionDescriptor } from '../lifecycle/ApplicationConnectionDescriptor';
+import { ProxyAuthenticationHandler } from './ProxyAuthenticationHandler';
+import { RemoteActions } from './actions/RemoteActions';
+import { PeerProxyTransportChannel } from './PeerProxyTransportChannel';
+import { RemoteBrokerService } from './remote/RemoteBrokerService';
 
 export class PeerProxyConnection implements TransportConnection {
 
@@ -59,24 +59,24 @@ export class PeerProxyConnection implements TransportConnection {
     }
 
     public getManagedChannel(): TransportChannel | undefined {
-        throw "getManagedChannel Not implemented";
+        throw 'getManagedChannel Not implemented';
     }
 
     public getManagedChannels(): TransportChannel[] {
-        throw "getManagedChannels Not implemented";
+        throw 'getManagedChannels Not implemented';
     }
 
     public isConnected(): boolean {
-        this.log.trace("isConnected called");
+        this.log.trace('isConnected called');
         return true;
     }
 
     public async disconnect(completion?: clientProtocol.ICompletion): Promise<void> {
-        this.log.info("Disconnect called", completion);
+        this.log.info('Disconnect called', completion);
     }
 
     public async createChannel(): Promise<TransportChannel> {
-        this.log.debug("Received create channel request");
+        this.log.debug('Received create channel request');
         const response = await this.remoteBrokerService.invokeUnary(RemoteActions.CREATE_CHANNEL, {}, this.remoteConnectionId);
         return new PeerProxyTransportChannel(response.id, this.remoteConnectionId, this.remoteBrokerService);
     }

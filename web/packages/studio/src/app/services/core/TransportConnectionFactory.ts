@@ -1,63 +1,63 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TransportConnectionProvider } from "./TransportConnectionProvider";
-import { Injectable } from "@angular/core";
-import { CrossDomainEventBus, WebBrokerConnectionBuilder, CrossDomainEventBusProvider, BroadCastChannelEventBus, EventBus } from "@plexus-interop/broker";
-import { TransportConnection } from "@plexus-interop/transport-common";
-import { InteropServiceFactory } from "./InteropServiceFactory";
-import { UrlResolver } from "./UrlResolver";
-import { WebSocketConnectionFactory } from "@plexus-interop/websocket-transport";
+import { TransportConnectionProvider } from './TransportConnectionProvider';
+import { Injectable } from '@angular/core';
+import { CrossDomainEventBus, WebBrokerConnectionBuilder, CrossDomainEventBusProvider, BroadCastChannelEventBus, EventBus } from '@plexus-interop/broker';
+import { TransportConnection } from '@plexus-interop/transport-common';
+import { InteropServiceFactory } from './InteropServiceFactory';
+import { UrlResolver } from './UrlResolver';
+import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
 import { UrlParamsProvider, LoggerFactory } from '@plexus-interop/common';
 import { StudioExtensions } from '../extensions/StudioExtensions';
-import { TransportType } from "./TransportType";
+import { TransportType } from './TransportType';
 
 @Injectable()
 export class TransportConnectionFactory {
 
     private readonly serviceFactory: InteropServiceFactory = new InteropServiceFactory();
     private readonly urlResolver: UrlResolver = new UrlResolver();
-    private readonly log = LoggerFactory.getLogger("TransportConnectionFactory");
+    private readonly log = LoggerFactory.getLogger('TransportConnectionFactory');
 
     public async getConnectionProvider(baseUrl: string): Promise<TransportConnectionProvider> {
         return StudioExtensions
             .getConnectionProvider()
             .then(cp => {
-                this.log.info("Received Connection Provider from extension");
+                this.log.info('Received Connection Provider from extension');
                 return cp;
             })
             .catch(() => {
-                this.log.debug("Could't get connection from extension");
+                this.log.debug('Could\'t get connection from extension');
                 return this.lookupProviderFromRequestParams(baseUrl);
             });
     }
 
     private async lookupProviderFromRequestParams(baseUrl: string): Promise<TransportConnectionProvider> {
-        const wsUrl = UrlParamsProvider.getParam("wsUrl");
-        const transport = UrlParamsProvider.getParam("transport");
+        const wsUrl = UrlParamsProvider.getParam('wsUrl');
+        const transport = UrlParamsProvider.getParam('transport');
         switch (transport) {
             case TransportType.NATIVE_WS:
-                const wsUrl = UrlParamsProvider.getParam("wsUrl");
-                this.log.info("Connecting to Native WS Transport");                        
+                const wsUrl = UrlParamsProvider.getParam('wsUrl');
+                this.log.info('Connecting to Native WS Transport');                        
                 return this.createWebSocketTransportProvider(wsUrl);
             case TransportType.WEB_SAME_BROADCAST:
-                this.log.info("Connecting to Same Domain Broad Cast Transport");
+                this.log.info('Connecting to Same Domain Broad Cast Transport');
                 return this.createSameOriginWebTransportProvider(baseUrl);
             default:
-                this.log.info("Connecting to Cross Domain Transport");                    
+                this.log.info('Connecting to Cross Domain Transport');                    
                 return this.createCrossDomainWebTransportProvider(baseUrl);
         }
     }
@@ -74,8 +74,8 @@ export class TransportConnectionFactory {
     private async getProxyHostUrl(baseUrl: string): Promise<string> {
         return StudioExtensions.getProxyHostUrl()
             .catch(e => {
-                this.log.debug("Proxy Host Extension is not provided");
-                return UrlParamsProvider.getParam("hostProxyUrl") || this.urlResolver.getProxyHostUrl(baseUrl)                
+                this.log.debug('Proxy Host Extension is not provided');
+                return UrlParamsProvider.getParam('hostProxyUrl') || this.urlResolver.getProxyHostUrl(baseUrl)                
             });
     }
 

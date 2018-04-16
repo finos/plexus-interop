@@ -1,35 +1,35 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Application } from "./model/Application";
-import { ConsumedService } from "./model/ConsumedService";
-import { ConsumedMethodReference } from "./model/ConsumedMethodReference";
-import { ConsumedMethod } from "./model/ConsumedMethod";
-import { ProvidedMethod } from "./model/ProvidedMethod";
-import { ProvidedServiceReference } from "./model/ProvidedServiceReference";
-import { InteropRegistryProvider } from "./InteropRegistryProvider";
-import { join, distinct, Logger, LoggerFactory, flatMap, ExtendedMap } from "@plexus-interop/common";
-import { InteropRegistry } from "./model/InteropRegistry";
-import { ConsumedServiceReference } from "./model/ConsumedServiceReference";
-import { ProvidedService } from "./model/ProvidedService";
-import { Method } from "./model/Method";
+import { Application } from './model/Application';
+import { ConsumedService } from './model/ConsumedService';
+import { ConsumedMethodReference } from './model/ConsumedMethodReference';
+import { ConsumedMethod } from './model/ConsumedMethod';
+import { ProvidedMethod } from './model/ProvidedMethod';
+import { ProvidedServiceReference } from './model/ProvidedServiceReference';
+import { InteropRegistryProvider } from './InteropRegistryProvider';
+import { join, distinct, Logger, LoggerFactory, flatMap, ExtendedMap } from '@plexus-interop/common';
+import { InteropRegistry } from './model/InteropRegistry';
+import { ConsumedServiceReference } from './model/ConsumedServiceReference';
+import { ProvidedService } from './model/ProvidedService';
+import { Method } from './model/Method';
 
 export class InteropRegistryService {
 
-    private readonly log: Logger = LoggerFactory.getLogger("RegistryService");
+    private readonly log: Logger = LoggerFactory.getLogger('RegistryService');
 
     private appProvidedMethodsCache: ExtendedMap<string, ProvidedMethod[]> = ExtendedMap.create<string, ProvidedMethod[]>();
 
@@ -90,7 +90,7 @@ export class InteropRegistryService {
         const result = this.getApplication(reference.applicationId as string)
             .providedServices.find(x => this.equalsIfExist(reference.serviceAlias, x.service.serviceAlias) && this.equalsIfExist(reference.serviceId, x.service.id));
         if (!result) {
-            throw new Error("Provided Service not found");
+            throw new Error('Provided Service not found');
         }
         return result;
     }
@@ -126,7 +126,7 @@ export class InteropRegistryService {
     }
     
     private updateRegistry(registry: InteropRegistry): void {
-        this.log.debug("Registry updated");
+        this.log.debug('Registry updated');
         this.registry = registry;
         this.appProvidedMethodsCache.clear();
     }
@@ -170,6 +170,6 @@ export class InteropRegistryService {
     }
 
     private equalsIfExist(expect: any, result: any): boolean {
-        return typeof expect === "undefined" || expect === result;
+        return typeof expect === 'undefined' || expect === result;
     }
 }

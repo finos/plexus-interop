@@ -1,34 +1,34 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionType } from "../ActionType";
-import { CreateChannelResponse } from "./CreateChannelResponse";
-import { SendMessageRequest } from "./SendMessageRequest";
-import { CloseChannelRequest } from "./CloseChannelRequest";
-import { CloseChannelResponse } from "./CloseChannelResponse";
-import { ChannelRequest } from "./ChannelRequest";
+import { ActionType } from '../ActionType';
+import { CreateChannelResponse } from './CreateChannelResponse';
+import { SendMessageRequest } from './SendMessageRequest';
+import { CloseChannelRequest } from './CloseChannelRequest';
+import { CloseChannelResponse } from './CloseChannelResponse';
+import { ChannelRequest } from './ChannelRequest';
 
 export class RemoteActions {
 
-    public static readonly CREATE_CHANNEL: ActionType<{}, CreateChannelResponse> = { id: "CREATE_CHANNEL" };
+    public static readonly CREATE_CHANNEL: ActionType<{}, CreateChannelResponse> = { id: 'CREATE_CHANNEL' };
 
-    public static readonly SEND_MESSAGE: ActionType<SendMessageRequest, {}> = { id: "SEND_MESSAGE" };
+    public static readonly SEND_MESSAGE: ActionType<SendMessageRequest, {}> = { id: 'SEND_MESSAGE' };
 
-    public static readonly CLOSE_CHANNEL: ActionType<CloseChannelRequest, CloseChannelResponse> = { id: "CLOSE_CHANNEL" };
+    public static readonly CLOSE_CHANNEL: ActionType<CloseChannelRequest, CloseChannelResponse> = { id: 'CLOSE_CHANNEL' };
 
-    public static readonly OPEN_CHANNEL: ActionType<ChannelRequest, string> = { id: "OPEN_CHANNEL" };
+    public static readonly OPEN_CHANNEL: ActionType<ChannelRequest, string> = { id: 'OPEN_CHANNEL' };
 
 }

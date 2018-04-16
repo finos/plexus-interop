@@ -1,43 +1,43 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Event } from "../Event";
-import { EventBus } from "../EventBus";
-import { Subscription, Logger, LoggerFactory, Observer, GUID, StateMaschine, StateMaschineBase } from "@plexus-interop/common";
-import { Observable } from "rxjs/Observable";
-import "rxjs/add/observable/fromEvent";
-import "rxjs/add/operator/filter";
-import "rxjs/add/operator/map";
-import "rxjs/add/operator/publish";
-import { IFrameHostMessage } from "./model/IFrameHostMessage";
-import { SubscribeRequest } from "./model/SubscribeRequest";
-import { ResponseType } from "./model/ResponseType";
-import { MessageType } from "./model/MessageType";
-import { PartialObserver } from "rxjs/Observer";
-import { Defaults } from "@plexus-interop/transport-common";
+import { Event } from '../Event';
+import { EventBus } from '../EventBus';
+import { Subscription, Logger, LoggerFactory, Observer, GUID, StateMaschine, StateMaschineBase } from '@plexus-interop/common';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/publish';
+import { IFrameHostMessage } from './model/IFrameHostMessage';
+import { SubscribeRequest } from './model/SubscribeRequest';
+import { ResponseType } from './model/ResponseType';
+import { MessageType } from './model/MessageType';
+import { PartialObserver } from 'rxjs/Observer';
+import { Defaults } from '@plexus-interop/transport-common';
 
 enum State {
-    CREATED = "CREATED",
-    CONNECTED = "CONNECTED",
-    CLOSED = "CLOSED"
+    CREATED = 'CREATED',
+    CONNECTED = 'CONNECTED',
+    CLOSED = 'CLOSED'
 }
 
 export class CrossDomainEventBus implements EventBus {
 
-    private readonly log: Logger = LoggerFactory.getLogger("CrossDomainEventBus");
+    private readonly log: Logger = LoggerFactory.getLogger('CrossDomainEventBus');
 
     private readonly singleOperationTimeOut: number = Defaults.OPERATION_TIMEOUT;
     private readonly pingTimeout: number = 10 * 6000;
@@ -62,16 +62,16 @@ export class CrossDomainEventBus implements EventBus {
         this.stateMaschine.throwIfNot(State.CREATED);
         this.createHostMessagesSubscription();
         return new Promise((resolve, reject) => {
-            this.log.info("Host iFrame created, sending ping message");
+            this.log.info('Host iFrame created, sending ping message');
             const message = this.hostMessage({}, MessageType.Ping, ResponseType.Single);
             this.sendAndSubscribe(message, {
                 next: m => {
-                    this.log.info("Success Ping response received");
+                    this.log.info('Success Ping response received');
                     this.stateMaschine.go(State.CONNECTED);
                     resolve(this);
                 },
                 error: e => {
-                    this.log.error("Failed to receive first Ping response", e);
+                    this.log.error('Failed to receive first Ping response', e);
                     reject(e);
                 }
             }, this.pingTimeout);
@@ -82,10 +82,10 @@ export class CrossDomainEventBus implements EventBus {
         this.stateMaschine.throwIfNot(State.CONNECTED);
         this.stateMaschine.go(State.CLOSED);
         if (this.hostIframeEventsSubscription) {
-            this.log.info("Unsubsribing from Host iFrame");
+            this.log.info('Unsubsribing from Host iFrame');
             this.hostIframeEventsSubscription.unsubscribe();
         }
-        this.emitters.forEach((v, k) => v.error("Disconnected from Host iFrame"));
+        this.emitters.forEach((v, k) => v.error('Disconnected from Host iFrame'));
         this.emitters.clear();
         this.observables.clear();
     }
@@ -172,8 +172,8 @@ export class CrossDomainEventBus implements EventBus {
     }
 
     private createHostMessagesSubscription(): void {
-        this.log.info("Creating subscription to Host iFrame");
-        this.hostIframeEventsSubscription = Observable.fromEvent<MessageEvent>(window, "message")
+        this.log.info('Creating subscription to Host iFrame');
+        this.hostIframeEventsSubscription = Observable.fromEvent<MessageEvent>(window, 'message')
             .filter(event => {
                 this.log.trace(`Received message from ${event.origin}`);
                 return event.origin === this.hostOrigin;
@@ -207,7 +207,7 @@ export class CrossDomainEventBus implements EventBus {
         switch (hostMessage.type.id) {
             case MessageType.Subscribe.id:
                 let message = hostMessage as IFrameHostMessage<SubscribeRequest, any>;
-                return message.type.id + "." + (message.requestPayload ? message.requestPayload.topic : message.responsePayload.key);
+                return message.type.id + '.' + (message.requestPayload ? message.requestPayload.topic : message.responsePayload.key);
             default:
                 return hostMessage.id;
         }
