@@ -74,7 +74,6 @@ export function verbose(): Option {
     return {
         shortName: 'v',
         longName: 'verbose',
-        exampleValue: 'true',
         isFlag: true,
         description: 'print verbose output'
     };

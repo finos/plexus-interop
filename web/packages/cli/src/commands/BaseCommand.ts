@@ -21,7 +21,7 @@ import * as commander from 'commander';
 export abstract class BaseCommand implements Command {
 
     public abstract name: () => string;
-    
+
     public abstract action(opts: any): Promise<void>;
 
     public usageExamples = () => ` $ plexus ${this.name()} ${this.optionsExampleArgs().join(' ')}`;
@@ -31,15 +31,15 @@ export abstract class BaseCommand implements Command {
     public options: () => Option[] = () => [];
 
     public optionArgs = (
-        optValues: any, 
-        separator?: string, 
+        optValues: any,
+        separator?: string,
         nameConverter: (k: string) => string = k => k): string[] => {
         return this.options().reduce<string[]>((seed, option) => {
             const value = optValues[option.longName];
             if (!value) {
                 return seed;
             }
-            const name = `--${nameConverter(option.longName)}`;            
+            const name = `--${nameConverter(option.longName)}`;
             if (option.isFlag) {
                 return seed.concat(`${name}`);
             } else {
@@ -51,9 +51,13 @@ export abstract class BaseCommand implements Command {
 
     public optionsExampleArgs = () => {
         return this.options()
-            .filter(o => !!o.exampleValue)
+            .filter(o => o.exampleValue || o.isFlag)
             .reduce<string[]>((seed, option) => {
-                return seed.concat([`-${option.shortName}`, option.exampleValue as string]);
+                if (option.isFlag) {
+                    return seed.concat(`-${option.shortName}`);
+                } else {
+                    return seed.concat([`-${option.shortName}`, option.exampleValue as string]);
+                }
             }, []);
     }
 
@@ -68,7 +72,7 @@ export abstract class BaseCommand implements Command {
         commandBuilder = commandBuilder.action(opts => {
             // need to do it manually :(
             // https://github.com/tj/commander.js/issues/44
-            this.log('Validating input args');         
+            this.log('Validating input args');
             const errors = this.validateRequiredOpts(this.options(), opts);
             if (errors.length > 0) {
                 this.fail(errors.join('\n'));
@@ -84,7 +88,7 @@ export abstract class BaseCommand implements Command {
         const examples = this.usageExamples();
         if (examples) {
             commandBuilder.on('--help', () => {
-                console.log('');                
+                console.log('');
                 console.log('  Examples:');
                 console.log('');
                 console.log(examples);
@@ -92,7 +96,7 @@ export abstract class BaseCommand implements Command {
             });
         }
     }
-    
+
     public fail(error: any): void {
         this.log('Finished with error', error);
         process.exit(1);
