@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 public abstract class CodeOutputGenerator {
 
 	public static final String JSON_META = "json_meta";
+
+	public static final String VALIDATE = "validate";
     
     public static final String PROTO = "proto";
     

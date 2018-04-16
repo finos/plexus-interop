@@ -34,6 +34,9 @@ public class PlexusGenConfig {
     @Parameter(names = {"-o", "--out"})
     private String outDir = "./out";
 
+    @Parameter(names = {"-of", "--outFile"})
+    private String outFile;
+
     @Parameter(names = {"-b", "--baseDir"})
     private String baseDir = ".";
 
@@ -67,6 +70,14 @@ public class PlexusGenConfig {
 
     public void setIncludeProtoDescriptors(boolean includeProtoDescriptors) {
         this.includeProtoDescriptors = includeProtoDescriptors;
+    }
+
+    public String getOutFile() {
+        return outFile;
+    }
+
+    public void setOutFile(String outFile) {
+        this.outFile = outFile;
     }
 
     public String getMessagesMetadata() {
@@ -136,12 +147,14 @@ public class PlexusGenConfig {
     @Override
     public String toString() {
         return "PlexusGenConfig{" +
-                "type='" + type + '\'' +
-                ", input='" + input + '\'' +
+                "input='" + input + '\'' +
                 ", outDir='" + outDir + '\'' +
+                ", outFile='" + outFile + '\'' +
                 ", baseDir='" + baseDir + '\'' +
                 ", namespace='" + namespace + '\'' +
                 ", protocPath='" + protocPath + '\'' +
+                ", verbose=" + verbose +
+                ", includeProtoDescriptors=" + includeProtoDescriptors +
                 '}';
     }
 }

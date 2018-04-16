@@ -14,33 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { baseDir, out, plexusEntryPoint, namespace, verbose } from './DefaultOptions';
+import { BaseJavaGenCommand } from './BaseJavaGenCommand';
+import { baseDir, outFile, verbose } from './DefaultOptions';
 import { Option } from './Option';
 import { getJavaExecPath, getJavaGenLibPath } from '../common/java';
-import { BaseCommand } from './BaseCommand';
 import { simpleSpawn } from '../common/process';
-import { getProtocExecPath } from '../common/protoc';
 
-export class GenCSharpCommand extends BaseCommand {
-    
-    public clientGenArgs: (opts: any) => string[] = opts => {
-        return ['--type=csharp', ...this.optionArgs(opts)];
+export class ValidateMetadataCommand extends BaseJavaGenCommand {
+
+    public plexusGenArgs: (opts: any) => string[] = opts => {
+        return ['--type=validate', ...this.optionArgs(opts, '=', name => name === 'out' ? 'outFile' : name)];
     }
 
-    public name = () => 'gen-csharp';
+    public generalDescription = () => 'validate metadata';
 
-    public generalDescription = () => 'generate C# client and messages definitions for specified entry point';
+    public name = () => 'validate';
 
-    public options: () => Option[] = () => [baseDir(), out('Generated'), plexusEntryPoint(), namespace('Plexus.Interop.Testing.Generated'), verbose()];
+    public options: () => Option[] = () => [baseDir(), outFile(), verbose()];
 
     public async action(opts: any): Promise<void> {
-
-        this.log('Generating interop client');
         const javaExecPath = await getJavaExecPath();
-        const protocExecPath = getProtocExecPath();
         const javaLibPath = getJavaGenLibPath();
-        await simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.clientGenArgs(opts), `--protoc=${protocExecPath}`], opts.verbose === 'true');
-        
+        await simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.plexusGenArgs(opts)], true);
+        this.log('No validation errors found');
     }
 
 }

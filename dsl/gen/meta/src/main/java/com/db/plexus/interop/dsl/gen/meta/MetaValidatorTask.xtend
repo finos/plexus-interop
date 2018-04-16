@@ -39,11 +39,11 @@ class MetaValidatorTask extends BaseGenTask {
         val issues = validator.getValidationIssues(rs)
         if (!issues.empty) {
             val issuesString = errorsString(issues);
-            if(config.isVerbose() || config.outDir == null) {
+            if(config.isVerbose() || config.getOutFile() == null) {
                 println(issuesString)
             }
-            if (config.outDir != null) {
-                FileUtils.writeStringToFile(new File(config.outDir), issuesString)
+            if (config.outFile != null) {
+                FileUtils.writeStringToFile(new File(config.outFile), issuesString)
             }
             if (validator.hasErrors(issues)) {
                 System.exit(1);
@@ -57,7 +57,6 @@ class MetaValidatorTask extends BaseGenTask {
         }
         val sorted = issues.sortWith(new IssuesComparator())
         val errorsBuilder = new StringBuilder()
-        errorsBuilder.append("Validation issues:").append("\n")
         issues.fold(errorsBuilder)[builder, issue | builder.append(issue.toString()).append("\n")]
         return errorsBuilder.toString()
     }
