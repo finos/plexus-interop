@@ -29,6 +29,7 @@ import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.junit.Test
 import org.junit.runner.RunWith
+import static org.hamcrest.CoreMatchers.*;
 
 import static org.junit.Assert.*
 import com.db.plexus.interop.dsl.gen.meta.MetaValidatorTask
@@ -41,22 +42,34 @@ class MetaValidatorTaskTest {
     protected ResourceSetValidator validator;
 
     @Inject
-    private XtextResourceSet resourceSet;
-
-    @Inject
     private MetaValidatorTask validatorTask;
 
     @Test
     def testValidMetadata() {
 
-        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/services.proto"), true)
-        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/messages.proto"), true)
+        val resourceSet = new XtextResourceSet()
+
         resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
         resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_c.interop"), true)
 
         val stringResult = validatorTask.errorsString(validator.getValidationIssues(resourceSet))
 
         assertEquals(validatorTask.successStringResult(), stringResult)
+    }
+
+    @Test
+    def testInvalidMetadata() {
+
+        val resourceSet = new XtextResourceSet()
+
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a_invalid.interop"), true)
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_c.interop"), true)
+
+        val stringResult = validatorTask.errorsString(validator.getValidationIssues(resourceSet))
+
+        assertThat(stringResult, containsString("ERROR:Couldn't resolve reference to Service 'com.db.plexus.interop.dsl.gen.test.services.ExampleService_NotExists"));
+        assertThat(stringResult, containsString("ERROR:Couldn't resolve reference to Method 'PointToPoint'"));
+
     }
 
 }

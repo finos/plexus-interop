@@ -58,7 +58,7 @@ class MetaValidatorTask extends BaseGenTask {
         val sorted = issues.sortWith(new IssuesComparator())
         val errorsBuilder = new StringBuilder()
         errorsBuilder.append("Validation issues:").append("\n")
-        issues.fold(new StringBuilder())[builder, issue | builder.append(issue.toString()).append("\n")]
+        issues.fold(errorsBuilder)[builder, issue | builder.append(issue.toString()).append("\n")]
         return errorsBuilder.toString()
     }
 
