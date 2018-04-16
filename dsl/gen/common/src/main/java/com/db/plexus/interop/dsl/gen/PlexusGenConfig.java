@@ -43,6 +43,9 @@ public class PlexusGenConfig {
     @Parameter(names = {"-pc", "--protoc"})
     private String protocPath = "protoc";
 
+    @Parameter(names = {"-v", "--verbose"})
+    private boolean verbose;
+
     @Parameter(names = {"-d", "--descriptors"})
     private boolean includeProtoDescriptors;
 
@@ -50,6 +53,13 @@ public class PlexusGenConfig {
 
     private String messagesMetadata;
 
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
 
     public boolean isIncludeProtoDescriptors() {
         return includeProtoDescriptors;

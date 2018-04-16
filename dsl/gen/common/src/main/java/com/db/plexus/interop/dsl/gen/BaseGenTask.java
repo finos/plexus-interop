@@ -61,11 +61,22 @@ public abstract class BaseGenTask implements GenTask {
         this.outDirUri = getOutDirUri(config);
         this.resourceBaseUri = getResourceBaseUri(config);
         loadResources(config);
-        this.validator.validateResources(resourceSet);
+        if (config.isVerbose()) {
+            printResources(this.resourceSet);
+        }
+        validateResources(this.resourceSet);
         doGenWithResources(config, this.resourceSet);
     }
 
-    protected abstract void doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException;
+    public void printResources(XtextResourceSet resourceSet) {
+        resourceSet.getResources().forEach(r ->  this.logger.info("Loaded resource: " + r.getURI()));
+    }
+
+    public void validateResources(XtextResourceSet resourceSet) {
+        this.validator.validateResources(resourceSet);
+    }
+
+    protected void doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException {}
 
     protected URI getWorkingDirUri() {
         return workingDirUri;
@@ -101,13 +112,17 @@ public abstract class BaseGenTask implements GenTask {
         FileUtils.processFiles(
                 new File(this.getBaseDirUri().toFileString()).getPath(),
                 this.inputFilesGlob(config),
-                (path) -> loadResource(path));
+                path -> {
+                    if (config.isVerbose()) {
+                        this.logger.info("Loading file: " + path.toAbsolutePath());
+                    }
+                    loadResource(path);
+                });
         EcoreUtil2.resolveAll(resourceSet);
     }
     
     private void loadResource(Path path) {
     	URI uri = URI.createFileURI(path.toString());
-    	this.logger.info("Loading file: " + uri);
     	resourceSet.getResource(uri, true);
     }
 

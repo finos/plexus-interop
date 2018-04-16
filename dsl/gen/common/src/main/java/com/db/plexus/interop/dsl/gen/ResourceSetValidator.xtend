@@ -39,18 +39,10 @@ public class ResourceSetValidator {
     protected Logger logger = Logger.getLogger("PlexusResourceSetValidator");
 		
 	public def validateResources(ResourceSet resourceSet) {
-		
-		EcoreUtil2.resolveAll(resourceSet)
 
-        val allIssues = new ArrayList<Issue>()
+        val allIssues = getValidationIssues(resourceSet)
 
-        for (Resource resource : resourceSet.getResources()) {
-            this.logger.info("Loaded resource: " + resource.getURI())
-            val issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl)
-            allIssues.addAll(issues)
-        }
-
-        val errors = allIssues.stream().filter[issue | issue.getSeverity() == Severity.ERROR].collect(Collectors.toList())
+        val errors = errors(allIssues)
 
         if (!errors.isEmpty()) {
             this.logger.severe(validationErrorsMessage(errors))
@@ -60,18 +52,42 @@ public class ResourceSetValidator {
             this.logger.severe(error.toString())
         }
 
-        val otherIssues = allIssues.stream().filter[issue | issue.getSeverity() != Severity.ERROR].collect(Collectors.toList())
+        val otherIssues = warnings(allIssues)
 
         if (!otherIssues.isEmpty()) {
             this.logger.warning(String.format("%d validation warnings found:", otherIssues.size()))
         }
+
         for (Issue warning : otherIssues) {
             this.logger.warning(warning.toString())
         }
+
         if (!errors.isEmpty()) {
             throw new CodeGenerationException(validationErrorsMessage(errors))
         }
-    }	
+    }
+
+    public def getValidationIssues(ResourceSet resourceSet) {
+        EcoreUtil2.resolveAll(resourceSet)
+        val allIssues = new ArrayList<Issue>()
+        for (Resource resource : resourceSet.getResources()) {
+            val issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl)
+            allIssues.addAll(issues)
+        }
+        return allIssues;
+    }
+
+    public def errors(List<Issue> issues) {
+        issues.stream().filter[issue | issue.getSeverity() == Severity.ERROR].collect(Collectors.toList())
+    }
+
+    public def hasErrors(List<Issue> issues) {
+        !issues.stream().filter[issue | issue.getSeverity() == Severity.ERROR].collect(Collectors.toList()).isEmpty
+    }
+
+    public def warnings(List<Issue> issues) {
+        issues.stream().filter[issue | issue.getSeverity() != Severity.ERROR].collect(Collectors.toList())
+    }
     
    	private def validationErrorsMessage(List<Issue> errors) {
         return String.format("%d validation errors found in loaded resources", errors.size())
