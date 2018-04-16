@@ -1,44 +1,44 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InvocationMetaInfo } from "@plexus-interop/protocol";
-import { UniqueId, TransportChannel, ChannelObserver } from "@plexus-interop/transport-common";
-import { RemoteInvocationInfo } from "@plexus-interop/client-api";
-import { MarshallerProvider } from "../../src/client/api/io/MarshallerProvider";
-import { Marshaller } from "../../src/client/api/io/Marshaller";
-import { Observer } from "@plexus-interop/common";
-import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
-import { clientProtocol as plexus, SuccessCompletion} from "@plexus-interop/protocol";
-import { Logger, LoggerFactory, BlockingQueue, BlockingQueueBase, CancellationToken } from "@plexus-interop/common";
+import { InvocationMetaInfo } from '@plexus-interop/protocol';
+import { UniqueId, TransportChannel, ChannelObserver } from '@plexus-interop/transport-common';
+import { RemoteInvocationInfo } from '@plexus-interop/client-api';
+import { MarshallerProvider } from '../../src/client/api/io/MarshallerProvider';
+import { Marshaller } from '../../src/client/api/io/Marshaller';
+import { Observer } from '@plexus-interop/common';
+import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
+import { clientProtocol as plexus, SuccessCompletion} from '@plexus-interop/protocol';
+import { Logger, LoggerFactory, BlockingQueue, BlockingQueueBase, CancellationToken } from '@plexus-interop/common';
 
 export function createInvocationInfo(): InvocationMetaInfo {
     return {
-        methodId: "1",
-        serviceId: "2",
+        methodId: '1',
+        serviceId: '2',
         connectionId: UniqueId.generateNew(),
-        applicationId: "3",
-        serviceAlias: "serviceAlias"
+        applicationId: '3',
+        serviceAlias: 'serviceAlias'
     };
 };
 
 export function createRemoteInvocationInfo(): RemoteInvocationInfo {
     return {
-        methodId: "actionId",
-        serviceId: "serviceId",
-        applicationId: "applicationId",
+        methodId: 'actionId',
+        serviceId: 'serviceId',
+        applicationId: 'applicationId',
         connectionId: UniqueId.generateNew()
     };
 };
@@ -64,18 +64,18 @@ export class MockMarshallerProvider implements MarshallerProvider {
 
 export class BufferedChannel implements TransportChannel {
 
-    private log: Logger = LoggerFactory.getLogger("Test Channel");
+    private log: Logger = LoggerFactory.getLogger('Test Channel');
 
     public readonly in: BlockingQueue<ArrayBuffer> = new BlockingQueueBase<ArrayBuffer>();
     public readonly out: BlockingQueue<ArrayBuffer> = new BlockingQueueBase<ArrayBuffer>();
     public readonly id: UniqueId = UniqueId.generateNew();
 
     constructor(private cancellationToken: CancellationToken) {
-        this.log.info("Created");
+        this.log.info('Created');
     }
 
     public open(observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
-        const subscription = new Subscription(() => this.cancellationToken.cancel("unsubscribed"));
+        const subscription = new Subscription(() => this.cancellationToken.cancel('unsubscribed'));
         this.listenToMessages(observer);
         observer.started(subscription);
     }
@@ -89,7 +89,7 @@ export class BufferedChannel implements TransportChannel {
             }
             observer.complete();
         } catch (error) {
-            console.error("Error on reading message", error);
+            console.error('Error on reading message', error);
             observer.error(error);
         }
     }
@@ -118,11 +118,11 @@ export class BufferedChannel implements TransportChannel {
     }
 
     public cancel(): void {
-        this.cancellationToken.cancel("Closed");
+        this.cancellationToken.cancel('Closed');
     }
 
     public async close(): Promise<SuccessCompletion> {
-        this.log.info("Close requested");
+        this.log.info('Close requested');
         return new SuccessCompletion();
     }
 

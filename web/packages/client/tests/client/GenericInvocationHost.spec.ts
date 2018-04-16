@@ -1,62 +1,62 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AcceptedInvocation } from "../../src/client/generic/AcceptedInvocation";
-import { Invocation } from "../../src/client/generic/Invocation";
-import { createInvocationInfo } from "./client-mocks";
-import { GenericInvocationsHost } from "../../src/client/api/generic/GenericInvocationsHost";
-import { StreamingInvocationClient } from "../../src/client/api/streaming/StreamingInvocationClient";
-import { UnaryHandlerConverter } from "../../src/client/api/unary/UnaryHandlerConverter";
-import { ServerStreamingInvocationHandler } from "../../src/client/api/streaming/ServerStreamingInvocationHandler";
-import { ServerStreamingConverter } from "../../src/client/api/streaming/ServerStreamingHandlerConveter";
-import { ServiceInfo } from "@plexus-interop/client-api";
-import { when, mock, instance, anything, verify } from "ts-mockito";
-import { GenericClientImpl } from "../../src/client/generic/GenericClientImpl";
-import { Observer } from "@plexus-interop/common";
-import { clientProtocol as plexus, SuccessCompletion } from "@plexus-interop/protocol";
-import { Subscription, AnonymousSubscription } from "rxjs/Subscription";
-import { ChannelObserver } from "@plexus-interop/transport-common";
-import { MethodInvocationContext } from "@plexus-interop/client-api";
-import { LogInvocationObserver } from "../LogInvocationObserver";
-import { InvocationObserver } from "../../src/client";
+import { AcceptedInvocation } from '../../src/client/generic/AcceptedInvocation';
+import { Invocation } from '../../src/client/generic/Invocation';
+import { createInvocationInfo } from './client-mocks';
+import { GenericInvocationsHost } from '../../src/client/api/generic/GenericInvocationsHost';
+import { StreamingInvocationClient } from '../../src/client/api/streaming/StreamingInvocationClient';
+import { UnaryHandlerConverter } from '../../src/client/api/unary/UnaryHandlerConverter';
+import { ServerStreamingInvocationHandler } from '../../src/client/api/streaming/ServerStreamingInvocationHandler';
+import { ServerStreamingConverter } from '../../src/client/api/streaming/ServerStreamingHandlerConveter';
+import { ServiceInfo } from '@plexus-interop/client-api';
+import { when, mock, instance, anything, verify } from 'ts-mockito';
+import { GenericClientImpl } from '../../src/client/generic/GenericClientImpl';
+import { Observer } from '@plexus-interop/common';
+import { clientProtocol as plexus, SuccessCompletion } from '@plexus-interop/protocol';
+import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
+import { ChannelObserver } from '@plexus-interop/transport-common';
+import { MethodInvocationContext } from '@plexus-interop/client-api';
+import { LogInvocationObserver } from '../LogInvocationObserver';
+import { InvocationObserver } from '../../src/client';
 
 declare var process: any;
 
-process.on("unhandledRejection", (reason: any, p: any) => {
+process.on('unhandledRejection', (reason: any, p: any) => {
     // tslint:disable-next-line:no-console
-    console.log("Unhandled Rejection at: Promise", p, "reason:", reason);
+    console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
 
-describe("GenericInvocationHost", () => {
+describe('GenericInvocationHost', () => {
 
-    it("It registers handlers of all types", () => {
+    it('It registers handlers of all types', () => {
 
         const serviceInfo: ServiceInfo = {
-            serviceId: "sid"
+            serviceId: 'sid'
         };
 
         const genericInvocationsHost = new GenericInvocationsHost(
-            "appId",
+            'appId',
             instance(mock(GenericClientImpl)),
             // bidi streaming
             [
                 {
                     serviceInfo,
                     handler: {
-                        methodId: "1",
+                        methodId: '1',
                         handle: (context: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                             return new LogInvocationObserver<ArrayBuffer>();
                         }
@@ -68,7 +68,7 @@ describe("GenericInvocationHost", () => {
                 {
                     serviceInfo,
                     handler: {
-                        methodId: "2",
+                        methodId: '2',
                         handle: (context: MethodInvocationContext, req: ArrayBuffer) => {
                             return Promise.resolve<ArrayBuffer>(new Uint8Array([]).buffer);
                         }
@@ -80,7 +80,7 @@ describe("GenericInvocationHost", () => {
                 {
                     serviceInfo,
                     handler: {
-                        methodId: "3",
+                        methodId: '3',
                         handle: (context: MethodInvocationContext, requestPayload: ArrayBuffer, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                         }
                     }
@@ -91,7 +91,7 @@ describe("GenericInvocationHost", () => {
 
     });
 
-    it("Can handle invocoming invocation and send response back", async (done) => {
+    it('Can handle invocoming invocation and send response back', async (done) => {
 
         const responsePayload = new Uint8Array([1, 2, 3]).buffer;
         const requestPayload = new Uint8Array([3, 2, 1]).buffer;
@@ -101,7 +101,7 @@ describe("GenericInvocationHost", () => {
             return new SuccessCompletion();
         }, async (context: MethodInvocationContext, request: ArrayBuffer) => {
             // tslint:disable-next-line:no-console
-            console.log("Doing important stuff ...");
+            console.log('Doing important stuff ...');
             return responsePayload;
         }, (invocation) => {
             verify(invocation.sendMessage(responsePayload)).called();
@@ -109,7 +109,7 @@ describe("GenericInvocationHost", () => {
 
     });
 
-    it("Closes invocation with error on if execution rejected", async (done) => {
+    it('Closes invocation with error on if execution rejected', async (done) => {
 
         const requestPayload = new Uint8Array([3, 2, 1]).buffer;
 
@@ -119,11 +119,11 @@ describe("GenericInvocationHost", () => {
             expect(completion.error).toBeDefined();
             done();
             return new SuccessCompletion();
-        }, (context: MethodInvocationContext, request: ArrayBuffer) => Promise.reject("Execution error"));
+        }, (context: MethodInvocationContext, request: ArrayBuffer) => Promise.reject('Execution error'));
 
     });
 
-    it("Closes invocation with error on if execution failed", async (done) => {
+    it('Closes invocation with error on if execution failed', async (done) => {
 
         const requestPayload = new Uint8Array([3, 2, 1]).buffer;
 
@@ -133,11 +133,11 @@ describe("GenericInvocationHost", () => {
             expect(completion.error).toBeDefined();
             done();
             return new SuccessCompletion();
-        }, (context: MethodInvocationContext, request: ArrayBuffer) => { throw new Error("Execution error"); });
+        }, (context: MethodInvocationContext, request: ArrayBuffer) => { throw new Error('Execution error'); });
 
     });
 
-    it("Can receive multiple messages, send multiple responses back and complete invocation", async (done) => {
+    it('Can receive multiple messages, send multiple responses back and complete invocation', async (done) => {
         const requestPayload = new Uint8Array([3, 2, 1]).buffer;
         const responsePayload = new Uint8Array([1, 2, 3]).buffer;
         setupHostedInvocation(requestPayload, async (completion: plexus.ICompletion) => {
@@ -162,13 +162,13 @@ describe("GenericInvocationHost", () => {
         }, 3);
     });
 
-    it("Can send multiple responses back and complete invocation with Server Streaming handler", (done) => {
+    it('Can send multiple responses back and complete invocation with Server Streaming handler', (done) => {
 
         const requestPayload = new Uint8Array([3, 2, 1]).buffer;
         const responsePayload = new Uint8Array([1, 2, 3]).buffer;
 
         const streamingHandler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> = {
-            methodId: "",
+            methodId: '',
             handle: (context: MethodInvocationContext, receivedRequest: ArrayBuffer, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                 expect(receivedRequest).toBe(requestPayload);
                 invocationHostClient.next(responsePayload);
@@ -201,7 +201,7 @@ function setupSimpleHostedInvocation(
     postHandler?: (invocation: Invocation) => void): void {
 
     const streamingHandler = new UnaryHandlerConverter().convert({
-        methodId: "",
+        methodId: '',
         handle: hostedAction
     });
 
