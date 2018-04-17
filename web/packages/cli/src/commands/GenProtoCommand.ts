@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { BaseJavaGenCommand } from './BaseJavaGenCommand';
-import { baseDir, out, plexusEntryPoint } from './DefaultOptions';
+import { baseDir, out, plexusEntryPoint, verbose } from './DefaultOptions';
 import { Option } from './Option';
 
 export class GenProtoCommand extends BaseJavaGenCommand {
@@ -28,6 +28,6 @@ export class GenProtoCommand extends BaseJavaGenCommand {
 
     public name = () => 'gen-proto';
 
-    public options: () => Option[] = () => [baseDir(), out(), plexusEntryPoint()];
+    public options: () => Option[] = () => [baseDir(), out(), plexusEntryPoint(), verbose()];
 
 }

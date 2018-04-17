@@ -49,6 +49,16 @@ export function out(defaultValue: string = path.join(process.cwd(), 'gen')): Opt
     };
 }
 
+export function outFile(): Option {
+    return {
+        shortName: 'o',
+        longName: 'out',
+        exampleValue: 'plexus.out.log',
+        description: 'output file',
+        isRequired: false
+    };
+}
+
 export function namespace(defaultValue: string = 'plexus'): Option {
     return {
         shortName: 'n',
@@ -64,9 +74,7 @@ export function verbose(): Option {
     return {
         shortName: 'v',
         longName: 'verbose',
-        exampleValue: 'true',
-        isRequired: true, 
-        description: 'print verbose code generation output',
-        defaultValue: `false`
+        isFlag: true,
+        description: 'print verbose output'
     };
 }

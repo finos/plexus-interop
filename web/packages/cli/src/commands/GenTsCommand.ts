@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { baseDir, out, plexusEntryPoint, namespace } from './DefaultOptions';
+import { baseDir, out, plexusEntryPoint, namespace, verbose } from './DefaultOptions';
 import { Option } from './Option';
 import { getJavaExecPath, getJavaGenLibPath } from '../common/java';
 import { BaseCommand } from './BaseCommand';
@@ -34,7 +34,7 @@ export class GenTsCommand extends BaseCommand {
 
     public generalDescription = () => 'generate Typescript client and messages definitions for specified entry point';
 
-    public options: () => Option[] = () => [baseDir(), out(), plexusEntryPoint(), namespace()];
+    public options: () => Option[] = () => [baseDir(), out(), plexusEntryPoint(), namespace(), verbose()];
 
     public async action(opts: any): Promise<void> {
         

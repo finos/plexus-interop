@@ -17,14 +17,15 @@
 export interface Option {
     shortName: string;
     longName: string;
-    exampleValue: string;
+    exampleValue?: string;
     description?: string;
+    isFlag?: boolean;
     isRequired?: boolean;
     defaultValue?: any;
 }
 
 export function getFlags(o: Option): string {
-    return !!o.isRequired ? 
-        `-${o.shortName}, --${o.longName} <${o.longName}>`
-            : `-${o.shortName}, --${o.longName}`;
+    return !!o.isRequired ? `-${o.shortName}, --${o.longName} <${o.longName}>`
+            : !!o.isFlag ? `-${o.shortName}, --${o.longName}` 
+                : `-${o.shortName}, --${o.longName} [${o.longName}]`;
 }
