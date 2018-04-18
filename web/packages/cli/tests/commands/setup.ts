@@ -22,6 +22,10 @@ export function getTestBaseDir(): string {
     return path.resolve(getBaseDir(), '../../../samples/greeting/registry');
 }
 
+export function getInvalidTestBaseDir(): string {
+    return path.resolve(getBaseDir(), '../../../dsl/gen/test/src/main/resources');
+}
+
 export function getTestClientInput(): string {
     return 'greeting_client.interop';
 }
