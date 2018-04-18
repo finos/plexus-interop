@@ -1,26 +1,26 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
-import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
-import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer } from "@plexus-interop/common";
-import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
+import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
+import { Arrays, Observer } from '@plexus-interop/common';
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from '@plexus-interop/client';
 
-import * as plexus from "../gen/plexus-messages";
+import * as plexus from '../gen/plexus-messages';
 
 
 
@@ -178,7 +178,7 @@ class ServiceAliasInvocationHandlerInternal {
 export class EchoServerClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "plexus.interop.testing.EchoServer"
+        applicationId: 'plexus.interop.testing.EchoServer'
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
@@ -223,47 +223,47 @@ export class EchoServerClientBuilder {
             .withClientDetails(this.clientDetails)
             .withUnaryInvocationHandler({
                 serviceInfo: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
                 handler: {
-                    methodId: "Unary",
+                    methodId: 'Unary',
                     handle: this.echoServiceHandler.onUnary.bind(this.echoServiceHandler)
                 }
             })
             .withServerStreamingInvocationHandler({
                 serviceInfo: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
                 handler: {
-                    methodId: "ServerStreaming",
+                    methodId: 'ServerStreaming',
                     handle: this.echoServiceHandler.onServerStreaming.bind(this.echoServiceHandler)
                 }
             })
             .withBidiStreamingInvocationHandler({
                 serviceInfo: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
                 handler: {
-                    methodId: "ClientStreaming",
+                    methodId: 'ClientStreaming',
                     handle: this.echoServiceHandler.onClientStreaming.bind(this.echoServiceHandler)
                 }
             })
             .withBidiStreamingInvocationHandler({
                 serviceInfo: {
-                    serviceId: "plexus.interop.testing.EchoService"
+                    serviceId: 'plexus.interop.testing.EchoService'
                 },
                 handler: {
-                    methodId: "DuplexStreaming",
+                    methodId: 'DuplexStreaming',
                     handle: this.echoServiceHandler.onDuplexStreaming.bind(this.echoServiceHandler)
                 }
             })
             .withUnaryInvocationHandler({
                 serviceInfo: {
-                    serviceId: "plexus.interop.testing.EchoService",
-                    serviceAlias: "ServiceAlias"
+                    serviceId: 'plexus.interop.testing.EchoService',
+                    serviceAlias: 'ServiceAlias'
                 },
                 handler: {
-                    methodId: "Unary",
+                    methodId: 'Unary',
                     handle: this.serviceAliasHandler.onUnary.bind(this.serviceAliasHandler)
                 }
             })

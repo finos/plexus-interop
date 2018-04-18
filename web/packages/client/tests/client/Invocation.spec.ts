@@ -1,36 +1,36 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericInvocation } from "../../src/client/generic/GenericInvocation";
-import { InvocationState } from "../../src/client/generic/InvocationState";
-import { clientProtocol as plexus } from "@plexus-interop/protocol";
-import { InvocationMetaInfo } from "@plexus-interop/protocol";
-import { UniqueId } from "@plexus-interop/transport-common";
-import { ClientProtocolHelper as modelHelper } from "@plexus-interop/protocol";
-import { randomPayload } from "../utils";
-import { AsyncHelper } from "@plexus-interop/common";
-import { CancellationToken } from "@plexus-interop/common";
-import { createInvocationInfo } from "./client-mocks";
-import { BufferedChannel } from "./client-mocks";
-import { DelegateInvocationObserver } from "../../src/index";
-import { LogInvocationObserver } from "../LogInvocationObserver";
-import { BufferedInvocationObserver } from "../BufferedInvocationObserver";
-import { InvocationObserver } from "../../src/client";
+import { GenericInvocation } from '../../src/client/generic/GenericInvocation';
+import { InvocationState } from '../../src/client/generic/InvocationState';
+import { clientProtocol as plexus } from '@plexus-interop/protocol';
+import { InvocationMetaInfo } from '@plexus-interop/protocol';
+import { UniqueId } from '@plexus-interop/transport-common';
+import { ClientProtocolHelper as modelHelper } from '@plexus-interop/protocol';
+import { randomPayload } from '../utils';
+import { AsyncHelper } from '@plexus-interop/common';
+import { CancellationToken } from '@plexus-interop/common';
+import { createInvocationInfo } from './client-mocks';
+import { BufferedChannel } from './client-mocks';
+import { DelegateInvocationObserver } from '../../src/index';
+import { LogInvocationObserver } from '../LogInvocationObserver';
+import { BufferedInvocationObserver } from '../BufferedInvocationObserver';
+import { InvocationObserver } from '../../src/client';
 
-describe("Invocation", () => {
+describe('Invocation', () => {
 
     let mockChannel: BufferedChannel;
     let invocationInfo: InvocationMetaInfo;
@@ -45,7 +45,7 @@ describe("Invocation", () => {
         inMessagesObserver = new BufferedInvocationObserver<ArrayBuffer>(token);
     });
 
-    it("Should request invocation start and go to STARTED state only when confirmation received", async () => {
+    it('Should request invocation start and go to STARTED state only when confirmation received', async () => {
 
         await prepareRequestedInvocation(new LogInvocationObserver());
 
@@ -55,7 +55,7 @@ describe("Invocation", () => {
 
     });
 
-    it("Should accept incoming invocation request and send confirmation", async () => {
+    it('Should accept incoming invocation request and send confirmation', async () => {
 
         const invocationAccepted = new Promise((resolve, reject) => {
             invocation.acceptInvocation(new DelegateInvocationObserver(new LogInvocationObserver(),
@@ -77,13 +77,13 @@ describe("Invocation", () => {
 
     });
 
-    it("Should reject API calls if invocation is not started", (done) => {
+    it('Should reject API calls if invocation is not started', (done) => {
 
         invocation.sendMessage(new ArrayBuffer(0)).catch(() => done());
 
     });
 
-    it("Should send message as header with length and body to channel", async () => {
+    it('Should send message as header with length and body to channel', async () => {
 
         await prepareRequestedInvocation(new LogInvocationObserver());
 
@@ -102,7 +102,7 @@ describe("Invocation", () => {
 
     });
 
-    it("Should receive confirmations and decrease counter", async () => {
+    it('Should receive confirmations and decrease counter', async () => {
 
         const invocationId = await prepareRequestedInvocation(new LogInvocationObserver());
 
@@ -124,7 +124,7 @@ describe("Invocation", () => {
 
     });
 
-    it("Should receive message and send confirmation back", async () => {
+    it('Should receive message and send confirmation back', async () => {
 
         await prepareRequestedInvocation(inMessagesObserver);
 
@@ -149,7 +149,7 @@ describe("Invocation", () => {
 
     });
 
-    it("Should send 'Send completion' message before closing channel", async () => {
+    it('Should send \'Send completion\' message before closing channel', async () => {
 
         await prepareRequestedInvocation(new LogInvocationObserver());
 
@@ -186,7 +186,7 @@ describe("Invocation", () => {
 
     async function closeInvocation(): Promise<void> {
         // tslint:disable-next-line:no-console
-        console.log("Cancelling invocation");
+        console.log('Cancelling invocation');
         const closePromise = invocation.close();
         addToInbox(modelHelper.sendCompletionPayload({}));
         await closePromise;

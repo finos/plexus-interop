@@ -1,92 +1,92 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistry } from "../../src/metadata/interop/model/InteropRegistry";
-import { ExtendedMap } from "@plexus-interop/common";
-import { Application } from "../../src/metadata/interop/model/Application";
-import { Message } from "../../src/metadata/interop/model/Message";
-import { Service } from "../../src/metadata/interop/model/Service";
-import { DynamicMarshallerFactory } from "../../src/io/DynamicMarshallerFactory";
-import * as fs from "fs";
-import { JsonInteropRegistryProvider } from "../../src/metadata/interop/json/JsonInteropRegistryProvider";
+import { InteropRegistry } from '../../src/metadata/interop/model/InteropRegistry';
+import { ExtendedMap } from '@plexus-interop/common';
+import { Application } from '../../src/metadata/interop/model/Application';
+import { Message } from '../../src/metadata/interop/model/Message';
+import { Service } from '../../src/metadata/interop/model/Service';
+import { DynamicMarshallerFactory } from '../../src/io/DynamicMarshallerFactory';
+import * as fs from 'fs';
+import { JsonInteropRegistryProvider } from '../../src/metadata/interop/json/JsonInteropRegistryProvider';
 
-describe("DynamicMarshallerFactory", () => {
+describe('DynamicMarshallerFactory', () => {
 
-    const metadataJson = fs.readFileSync("tests/metadata/json/test-interop.json", "utf8");    
+    const metadataJson = fs.readFileSync('tests/metadata/json/test-interop.json', 'utf8');    
     const registry = new JsonInteropRegistryProvider(metadataJson).getCurrent();
 
     const messages = ExtendedMap.create<string, Message>();
-    const messageId = "plexus.interop.testing.EchoRequest";
+    const messageId = 'plexus.interop.testing.EchoRequest';
 
     const validMessage = {
-        stringField: "stringData",
+        stringField: 'stringData',
         boolField: true,
         enumField: 1,
         repeatedDoubleField: [1, 2, 3],
         subMessageField: {
-            stringField: "stringData"
+            stringField: 'stringData'
         }
     };  
 
     const invalidTypeMessage = {
-        stringField: "stringData",
-        boolField: "true"
+        stringField: 'stringData',
+        boolField: 'true'
     };    
 
     const invalidEnumValueMessage = {
-        stringField: "stringData",
+        stringField: 'stringData',
         enumField: 10
     };    
 
     const sut = new DynamicMarshallerFactory(registry);
 
-    it("Creates Marshaller for existing Message", () => {
+    it('Creates Marshaller for existing Message', () => {
         const marshaller = sut.getMarshaller(messageId);
         expect(marshaller).toBeDefined();
     });
 
-    it("Reuse same Marshaller for next calls", () => {
+    it('Reuse same Marshaller for next calls', () => {
         expect(sut.getMarshaller(messageId))
             .toBe(sut.getMarshaller(messageId));
     });
 
-    it("It creates Marshaller with validation support", () => {
+    it('It creates Marshaller with validation support', () => {
         const marshaller = sut.getMarshaller(messageId);
         marshaller.validate(validMessage);        
     });
 
-    it("Raises an Error for Marshaller request on not existing Message", () => {
+    it('Raises an Error for Marshaller request on not existing Message', () => {
         try {
-            sut.getMarshaller("Do not exist");
-            fail("Should fail");
+            sut.getMarshaller('Do not exist');
+            fail('Should fail');
         } catch (error) {  
         }
     });
 
-    it("Creates Marshaller which fail on messages with wrong type", () => {
+    it('Creates Marshaller which fail on messages with wrong type', () => {
         const marshaller = sut.getMarshaller(messageId);
         expect(() => marshaller.validate(invalidTypeMessage)).toThrowError();
     });
 
-    it("Creates Marshaller which fail on messages with wrong enum value", () => {
+    it('Creates Marshaller which fail on messages with wrong enum value', () => {
         const marshaller = sut.getMarshaller(messageId);
         expect(() => marshaller.validate(invalidEnumValueMessage)).toThrowError();
     });
 
-    it("Creates Marshaller encoding/decoding support", () => {
+    it('Creates Marshaller encoding/decoding support', () => {
         const marshaller = sut.getMarshaller(messageId);  
         const encoded = marshaller.encode(validMessage);
         expect(encoded).toBeDefined();

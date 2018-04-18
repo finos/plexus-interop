@@ -1,5 +1,5 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 public abstract class CodeOutputGenerator {
 
 	public static final String JSON_META = "json_meta";
+
+	public static final String VALIDATE = "validate";
     
     public static final String PROTO = "proto";
     

@@ -1,5 +1,5 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,9 @@ public class PlexusGenConfig {
     @Parameter(names = {"-o", "--out"})
     private String outDir = "./out";
 
+    @Parameter(names = {"-of", "--outFile"})
+    private String outFile;
+
     @Parameter(names = {"-b", "--baseDir"})
     private String baseDir = ".";
 
@@ -43,6 +46,9 @@ public class PlexusGenConfig {
     @Parameter(names = {"-pc", "--protoc"})
     private String protocPath = "protoc";
 
+    @Parameter(names = {"-v", "--verbose"})
+    private boolean verbose;
+
     @Parameter(names = {"-d", "--descriptors"})
     private boolean includeProtoDescriptors;
 
@@ -50,6 +56,13 @@ public class PlexusGenConfig {
 
     private String messagesMetadata;
 
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
 
     public boolean isIncludeProtoDescriptors() {
         return includeProtoDescriptors;
@@ -57,6 +70,14 @@ public class PlexusGenConfig {
 
     public void setIncludeProtoDescriptors(boolean includeProtoDescriptors) {
         this.includeProtoDescriptors = includeProtoDescriptors;
+    }
+
+    public String getOutFile() {
+        return outFile;
+    }
+
+    public void setOutFile(String outFile) {
+        this.outFile = outFile;
     }
 
     public String getMessagesMetadata() {
@@ -126,12 +147,14 @@ public class PlexusGenConfig {
     @Override
     public String toString() {
         return "PlexusGenConfig{" +
-                "type='" + type + '\'' +
-                ", input='" + input + '\'' +
+                "input='" + input + '\'' +
                 ", outDir='" + outDir + '\'' +
+                ", outFile='" + outFile + '\'' +
                 ", baseDir='" + baseDir + '\'' +
                 ", namespace='" + namespace + '\'' +
                 ", protocPath='" + protocPath + '\'' +
+                ", verbose=" + verbose +
+                ", includeProtoDescriptors=" + includeProtoDescriptors +
                 '}';
     }
 }

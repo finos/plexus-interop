@@ -17,3 +17,9 @@ node plexus.js gen-ts -b ../../../samples/greeting/registry -i greeting_client.i
 node plexus.js gen-csharp -b -b ../../../samples/greeting/registry -i greeting_client.interop
 ```
 
+# Validate Metadata
+
+```
+node plexus.js validate -b ../../../samples/greeting/registry
+```
+

@@ -1,44 +1,44 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryProvider } from "../InteropRegistryProvider";
-import { InteropRegistry } from "../model/InteropRegistry";
-import { Observable } from "rxjs/Observable";
-import "rxjs/add/observable/of";
-import "rxjs/add/operator/map";
-import { RegistryDto } from "./RegistryDto";
-import { ExtendedArray, Logger, LoggerFactory, ExtendedMap, toMap } from "@plexus-interop/common";
-import { Message } from "../model/Message";
-import { ServiceDto } from "./ServiceDto";
-import { Service } from "../model/Service";
-import { Method } from "../model/Method";
-import { MethodType } from "../model/MethodType";
-import { MethodTypeDto } from "./MethodTypeDto";
-import { Application } from "../model/Application";
-import { ConsumedServiceDto } from "./ConsumedServiceDto";
-import { ConsumedService } from "../model/ConsumedService";
-import { MatchPatternFactory } from "../model/MatchPatternFactory";
-import { ConsumedMethod } from "../model/ConsumedMethod";
-import { ProvidedMethod } from "../model/ProvidedMethod";
-import { ProvidedServiceDto } from "./ProvidedServiceDto";
-import { ProvidedService } from "../model/ProvidedService";
-import { ApplicationDto } from "./ApplicationDto";
-import { OptionDto } from "./OptionDto";
-import { MessagesNamespace, isMessage, isEnum } from "./MessagesNamespace";
-import { Enum } from "../model/Enum";
+import { InteropRegistryProvider } from '../InteropRegistryProvider';
+import { InteropRegistry } from '../model/InteropRegistry';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/map';
+import { RegistryDto } from './RegistryDto';
+import { ExtendedArray, Logger, LoggerFactory, ExtendedMap, toMap } from '@plexus-interop/common';
+import { Message } from '../model/Message';
+import { ServiceDto } from './ServiceDto';
+import { Service } from '../model/Service';
+import { Method } from '../model/Method';
+import { MethodType } from '../model/MethodType';
+import { MethodTypeDto } from './MethodTypeDto';
+import { Application } from '../model/Application';
+import { ConsumedServiceDto } from './ConsumedServiceDto';
+import { ConsumedService } from '../model/ConsumedService';
+import { MatchPatternFactory } from '../model/MatchPatternFactory';
+import { ConsumedMethod } from '../model/ConsumedMethod';
+import { ProvidedMethod } from '../model/ProvidedMethod';
+import { ProvidedServiceDto } from './ProvidedServiceDto';
+import { ProvidedService } from '../model/ProvidedService';
+import { ApplicationDto } from './ApplicationDto';
+import { OptionDto } from './OptionDto';
+import { MessagesNamespace, isMessage, isEnum } from './MessagesNamespace';
+import { Enum } from '../model/Enum';
 
 export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
@@ -48,7 +48,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
     private current: InteropRegistry;
 
     public constructor(jsonMetadata: string, $jsonMetadata?: Observable<string>) {
-        this.log = LoggerFactory.getLogger("JsonInteropRegistryProvider");
+        this.log = LoggerFactory.getLogger('JsonInteropRegistryProvider');
         this.current = this.parseRegistry(jsonMetadata);
         this.$registry = ($jsonMetadata || Observable.of(jsonMetadata))
             .map(this.parseRegistry.bind(this));
@@ -175,7 +175,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
             return {
                 method: service.methods.get(pm.name) as Method,
                 providedService,
-                title: this.getOptionValueOrDefault(pm.options, "interop.ProvidedMethodOptions.title", pm.name)
+                title: this.getOptionValueOrDefault(pm.options, 'interop.ProvidedMethodOptions.title', pm.name)
             } as ProvidedMethod;
         })
             .forEach(pm => methods.set(pm.method.name, pm));
@@ -223,7 +223,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
             case MethodTypeDto.DuplexStreaming:
                 return MethodType.DuplexStreaming;
             default:
-                throw new Error("Unsupported method type: " + methodTypeDto);
+                throw new Error('Unsupported method type: ' + methodTypeDto);
         }
     }
 

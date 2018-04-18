@@ -1,28 +1,28 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AsyncHandler } from "../AsyncHandler";
-import { TransportConnection } from "@plexus-interop/transport-common";
-import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { Completion, ErrorCompletion, ClientError } from "@plexus-interop/protocol";
-import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
-import { ClientRequestProcessor } from "./ClientRequestProcessor";
-import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
-import { AuthenticationHandler } from "./AuthenticationHandler";
-import { TasksTracker } from "./TasksTracker";
+import { AsyncHandler } from '../AsyncHandler';
+import { TransportConnection } from '@plexus-interop/transport-common';
+import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { Completion, ErrorCompletion, ClientError } from '@plexus-interop/protocol';
+import { AppLifeCycleManager } from '../lifecycle/AppLifeCycleManager';
+import { ClientRequestProcessor } from './ClientRequestProcessor';
+import { ApplicationConnection } from '../lifecycle/ApplicationConnection';
+import { AuthenticationHandler } from './AuthenticationHandler';
+import { TasksTracker } from './TasksTracker';
 
 export class ClientConnectionProcessor implements AsyncHandler<TransportConnection, Completion> {
 
@@ -47,18 +47,18 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                     log.debug(`Received new channel [${channelStrId}]`);
                     if (!sourceConnection) {
                         try {
-                            log.debug("First channel, trying to setup connection");
+                            log.debug('First channel, trying to setup connection');
                             const appDescriptor = await this.authenticationProcessor.handle([connection, channel]);
                             const appConnection = await this.appLifeCycleManager.acceptConnection(connection, {
                                 applicationId: appDescriptor.applicationId as string,
                                 instanceId: appDescriptor.instanceId
                             }, c => {
-                                log.error("Connection dropped");
+                                log.error('Connection dropped');
                             });
                             sourceConnection = appConnection;
-                            log.trace("Connected to client");
+                            log.trace('Connected to client');
                         } catch (error) {
-                            log.error("Unable to authenticate client connection", error);
+                            log.error('Unable to authenticate client connection', error);
                             connection.disconnect(new ErrorCompletion(new ClientError(error)));
                             reject(error);
                         }
@@ -88,8 +88,8 @@ export class ClientConnectionProcessor implements AsyncHandler<TransportConnecti
                 error: e => {
                     log.error(`Error received from source connection`, e);
                     this.completeAndDisconnect(connection, requestsTracker, log)
-                        .catch(completeErr => log.error("Failed to complete pending requests", e))
-                        .then(() => log.debug("Pending requests completed"));
+                        .catch(completeErr => log.error('Failed to complete pending requests', e))
+                        .then(() => log.debug('Pending requests completed'));
                     reject(new ErrorCompletion(e));
                 }
             });

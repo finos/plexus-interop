@@ -1,5 +1,5 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ import com.db.plexus.interop.dsl.gen.js.JsGenTask;
 import com.db.plexus.interop.dsl.gen.csharp.CsharpGenTask;
 import com.db.plexus.interop.dsl.gen.csharp.CsharpProtoGenTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenTask;
+import com.db.plexus.interop.dsl.gen.meta.MetaValidatorTask;
 import com.db.plexus.interop.dsl.gen.ts.TsGenTask;
 import com.db.plexus.interop.dsl.gen.proto.ProtoGenTask;
 import com.db.plexus.interop.dsl.gen.util.FileUtils;
@@ -47,7 +48,9 @@ public class Main {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         final PlexusGenConfig genConfig = new ParametersParser().parse(args);
-        log.info("Running generator with parameters: " + genConfig.toString());
+        if (genConfig.isVerbose()) {
+            log.info("Running generator with parameters: " + genConfig.toString());
+        }
         Path workDirPath = Paths.get("").toAbsolutePath();
         URI workDir = URI.createFileURI(workDirPath.toString()).appendSegment("");
         URI baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
@@ -82,6 +85,10 @@ public class Main {
             case CodeOutputGenerator.PROTO_CSHARP:
                 GenTask protoCSharpGenTask = injector.getInstance(CsharpProtoGenTask.class);
                 protoCSharpGenTask.doGen(genConfig);
+                break;
+            case CodeOutputGenerator.VALIDATE:
+                GenTask validatorTask = injector.getInstance(MetaValidatorTask.class);
+                validatorTask.doGen(genConfig);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type " + type);

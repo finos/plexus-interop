@@ -1,35 +1,35 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FramedTransport, FramedTransportChannel } from "../../../src/transport/frame";
-import { UniqueId } from "@plexus-interop/protocol";
-import { TestUtils } from "./util";
-import { mock, instance, when, anything } from "ts-mockito";
-import { CancellationToken, AsyncHelper } from "@plexus-interop/common";
-import { Observer } from "@plexus-interop/common";
-import { LogObserver } from "../../LogObserver";
-import { TestBufferedInMemoryFramedTransport } from "../TestBufferedInMemoryFramedTransport";
-import { Frame } from "../../../src/transport/frame/model/Frame";
-import { AnonymousSubscription } from "rxjs/Subscription";
-import { DelegateChannelObserver } from "../../../src/common/DelegateChannelObserver";
-import { Queue } from "typescript-collections";
+import { FramedTransport, FramedTransportChannel } from '../../../src/transport/frame';
+import { UniqueId } from '@plexus-interop/protocol';
+import { TestUtils } from './util';
+import { mock, instance, when, anything } from 'ts-mockito';
+import { CancellationToken, AsyncHelper } from '@plexus-interop/common';
+import { Observer } from '@plexus-interop/common';
+import { LogObserver } from '../../LogObserver';
+import { TestBufferedInMemoryFramedTransport } from '../TestBufferedInMemoryFramedTransport';
+import { Frame } from '../../../src/transport/frame/model/Frame';
+import { AnonymousSubscription } from 'rxjs/Subscription';
+import { DelegateChannelObserver } from '../../../src/common/DelegateChannelObserver';
+import { Queue } from 'typescript-collections';
 
-describe("FramedTransportChannel", () => {
+describe('FramedTransportChannel', () => {
 
-    it("Concatenates message from frames", (done) => {
+    it('Concatenates message from frames', (done) => {
 
         const mockFrameTransport = new TestBufferedInMemoryFramedTransport();
 
@@ -52,12 +52,12 @@ describe("FramedTransportChannel", () => {
 
     });
 
-    it("Reports error to observable if can't read frame", (done) => {
+    it('Reports error to observable if can\'t read frame', (done) => {
 
         const mockFrameTransport: FramedTransport = mock(TestBufferedInMemoryFramedTransport);
 
         TestUtils.framedMessage().forEach(frame => {
-            when(mockFrameTransport.open(anything())).thenReturn(Promise.reject(new Error("Transport error")));
+            when(mockFrameTransport.open(anything())).thenReturn(Promise.reject(new Error('Transport error')));
         });
 
         const sut = new FramedTransportChannel(UniqueId.generateNew(), instance(mockFrameTransport), async () => { }, new CancellationToken());
@@ -65,10 +65,10 @@ describe("FramedTransportChannel", () => {
             startFailed: () => {},            
             started: () => {},
             next: () => {
-                fail("Not expected");
+                fail('Not expected');
             },
             complete: () => {
-                fail("Not expected");
+                fail('Not expected');
             },
             error: (e) => {
                 expect(e).toBeDefined();
@@ -78,7 +78,7 @@ describe("FramedTransportChannel", () => {
 
     });
 
-    it("Rejects request if already opened", async (done) => {
+    it('Rejects request if already opened', async (done) => {
 
         const mockFrameTransport = new TestBufferedInMemoryFramedTransport();
 
@@ -106,7 +106,7 @@ describe("FramedTransportChannel", () => {
             .catch(() => done());
     });
 
-    it("Sends big message by frames", async (done) => {
+    it('Sends big message by frames', async (done) => {
 
         const mockFrameTransport = new TestBufferedInMemoryFramedTransport(UniqueId.generateNew(), new Queue<Frame>(), new Queue<Frame>(), 3);
         const dataArray = [1, 2, 3, 4, 5];

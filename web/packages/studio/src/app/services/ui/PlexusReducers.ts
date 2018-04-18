@@ -1,26 +1,26 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 import { InteropClient } from '../core/InteropClient';
-import { App as Application, ConsumedMethod, ProvidedMethod } from "@plexus-interop/broker";
+import { App as Application, ConsumedMethod, ProvidedMethod } from '@plexus-interop/broker';
 import { TypedAction } from './TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from './AppActions';
 import { Action } from '@ngrx/store';
-import { UrlParamsProvider } from "@plexus-interop/common";
+import { UrlParamsProvider } from '@plexus-interop/common';
 import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
 import {
     AppConnectedActionParams,
@@ -30,9 +30,9 @@ import {
     StudioState,
 } from './AppModel';
 
-const mode = UrlParamsProvider.getParam("mode");
+const mode = UrlParamsProvider.getParam('mode');
 
-const defaultUrl = UrlParamsProvider.getParam("baseUrl") || (mode === "dev" ? "http://localhost:8080" : undefined);
+const defaultUrl = UrlParamsProvider.getParam('baseUrl') || (mode === 'dev' ? 'http://localhost:8080' : undefined);
 
 const initialState: StudioState = {
     loading: false,

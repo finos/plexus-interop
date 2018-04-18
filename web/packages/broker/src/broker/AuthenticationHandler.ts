@@ -1,25 +1,25 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AsyncHandler } from "../AsyncHandler";
-import { TransportChannel, TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { ClientProtocolHelper, clientProtocol as plexus, ErrorCompletion, ClientError } from "@plexus-interop/protocol";
-import { Logger, LoggerFactory } from "@plexus-interop/common";
-import { ApplicationDescriptor } from "../lifecycle/ApplicationDescriptor";
-import { AppRegistryService } from "../metadata/apps/AppRegistryService";
+import { AsyncHandler } from '../AsyncHandler';
+import { TransportChannel, TransportConnection, UniqueId } from '@plexus-interop/transport-common';
+import { ClientProtocolHelper, clientProtocol as plexus, ErrorCompletion, ClientError } from '@plexus-interop/protocol';
+import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { ApplicationDescriptor } from '../lifecycle/ApplicationDescriptor';
+import { AppRegistryService } from '../metadata/apps/AppRegistryService';
 
 /**
  * Responsible for handling of first channel with Authentication Details
@@ -64,7 +64,7 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
                         reject(new Error(errorMsg));
                     } else {
                         channel.sendLastMessage(ClientProtocolHelper.connectResponsePayload({ connectionId: connection.uuid() }))
-                            .catch(e => log.error("Failed to sent connection details", e));
+                            .catch(e => log.error('Failed to sent connection details', e));
                         const instanceId = UniqueId.fromProperties(clientToBrokerMessage.applicationInstanceId as plexus.IUniqueId);
                         log.debug(`Received connection request with instance ID ${instanceId.toString()}`);
                         resolve({
@@ -76,7 +76,7 @@ export class AuthenticationHandler implements AsyncHandler<[TransportConnection,
                 },
 
                 error: e => {
-                    log.error("Error from source channel received", e);
+                    log.error('Error from source channel received', e);
                     reject(e);
                 },
 

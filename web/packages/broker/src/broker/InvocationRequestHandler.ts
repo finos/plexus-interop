@@ -1,34 +1,34 @@
 /**
- * Copyright 2017 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion, Completion, UniqueId } from "@plexus-interop/protocol";
-import { ApplicationConnectionDescriptor } from "../lifecycle/ApplicationConnectionDescriptor";
-import { Observable } from "rxjs/Observable";
-import { InteropRegistryService } from "../metadata/interop/InteropRegistryService";
-import { AppLifeCycleManager } from "../lifecycle/AppLifeCycleManager";
-import { TransportChannel, Defaults } from "@plexus-interop/transport-common";
-import { LoggerFactory, Logger, BufferedObserver, Observer } from "@plexus-interop/common";
-import { ConsumedMethodReference } from "../metadata/interop/model/ConsumedMethodReference";
-import { ProvidedMethodReference } from "../metadata/interop/model/ProvidedMethodReference";
-import { ApplicationConnection } from "../lifecycle/ApplicationConnection";
-import { Types } from "../util/Types";
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion, Completion, UniqueId } from '@plexus-interop/protocol';
+import { ApplicationConnectionDescriptor } from '../lifecycle/ApplicationConnectionDescriptor';
+import { Observable } from 'rxjs/Observable';
+import { InteropRegistryService } from '../metadata/interop/InteropRegistryService';
+import { AppLifeCycleManager } from '../lifecycle/AppLifeCycleManager';
+import { TransportChannel, Defaults } from '@plexus-interop/transport-common';
+import { LoggerFactory, Logger, BufferedObserver, Observer } from '@plexus-interop/common';
+import { ConsumedMethodReference } from '../metadata/interop/model/ConsumedMethodReference';
+import { ProvidedMethodReference } from '../metadata/interop/model/ProvidedMethodReference';
+import { ApplicationConnection } from '../lifecycle/ApplicationConnection';
+import { Types } from '../util/Types';
 
 export class InvocationRequestHandler {
 
-    private log: Logger = LoggerFactory.getLogger("InvocationRequestHandler");
+    private log: Logger = LoggerFactory.getLogger('InvocationRequestHandler');
 
     constructor(
         private readonly registryService: InteropRegistryService,
@@ -70,7 +70,7 @@ export class InvocationRequestHandler {
                     complete: () => targetChannelObserver.complete(),
                     error: e => targetChannelObserver.error(e),
                     started: () => { },
-                    startFailed: e => this.log.error("Failed to start target channel", e)
+                    startFailed: e => this.log.error('Failed to start target channel', e)
                 });
 
                 this.log.trace(`Sending InvocationStarting to source`);
@@ -96,7 +96,7 @@ export class InvocationRequestHandler {
                     return new ErrorCompletion(error);
                 }
 
-                this.log.info("Completed");
+                this.log.info('Completed');
                 return new SuccessCompletion();
 
             } catch (error) {
@@ -130,7 +130,7 @@ export class InvocationRequestHandler {
                     try {
                         await targetChannel.sendMessage(messagePayload);
                     } catch (e) {
-                        this.log.error("Unable to send message", e);
+                        this.log.error('Unable to send message', e);
                         reject(e);
                     }
                 },
@@ -169,7 +169,7 @@ export class InvocationRequestHandler {
     private async resolveTargetConnection(methodReference: ConsumedMethodReference | ProvidedMethodReference, sourceConnection: ApplicationConnectionDescriptor): Promise<ApplicationConnection> {
         if (!Types.isConsumedMethodReference(methodReference)) {
             if (!methodReference.providedService) {
-                throw new Error("Provided Service information is required");
+                throw new Error('Provided Service information is required');
             }
             let appConnection;
             if (methodReference.providedService && methodReference.providedService.connectionId) {
@@ -182,7 +182,7 @@ export class InvocationRequestHandler {
                 appConnection = this.appLifeCycleManager.getOrSpawnConnection(methodReference.providedService.applicationId);
             }
             if (!appConnection) {
-                throw new Error("Requested application is not online");
+                throw new Error('Requested application is not online');
             }
             return appConnection;
         } else {
