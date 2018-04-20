@@ -1,0 +1,10 @@
+apply plugin: 'application'
+
+dependencies {
+    compile project(':dsl:interop-lang')
+    compile "org.eclipse.xtext:org.eclipse.xtext.ide:${xtextVersion}"
+    compile "org.eclipse.xtext:org.eclipse.xtext.xbase.ide:${xtextVersion}"
+}
+
+mainClassName = 'org.eclipse.xtext.ide.server.ServerLauncher'
+applicationName = 'interop-lang-server'
