@@ -1,0 +1,8 @@
+
+task installServer(type: Copy) {
+	dependsOn(':dsl:interop-lang.ide:installDist')
+    from "../interop-lang.ide/build/install/interop-lang-server"
+    into "interop-lang-server"
+}
+
+build.dependsOn installServer
