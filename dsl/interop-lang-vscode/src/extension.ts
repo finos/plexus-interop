@@ -12,6 +12,10 @@ export function activate(context: ExtensionContext) {
 	const executable = 'interop-lang-server' + extension;
     const command = context.asAbsolutePath(path.join('interop-lang-server', 'bin', executable));
     const serverOptions = { command };
+
+    if (isDebugMode()) {
+        console.error('Extension is running in debug mode');
+    }
     
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{scheme: 'file', language: 'interop'}],
@@ -25,4 +29,12 @@ export function activate(context: ExtensionContext) {
 	
     context.subscriptions.push(disposable);
     
+}
+
+function isDebugMode(): boolean {
+	let args = (process as any).execArgv;
+	if (args) {
+		return args.some((arg) => /^--debug=?/.test(arg) || /^--debug-brk=?/.test(arg) || /^--inspect-brk=?/.test(arg));
+	}
+	return false;
 }

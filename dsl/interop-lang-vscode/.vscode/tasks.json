@@ -6,6 +6,6 @@
     "isShellCommand": true,
     "args": ["run", "compile", "--loglevel", "silent"],
     "showOutput": "silent",
-    "isWatching": true,
+    "isBackground": true,
     "problemMatcher": "$tsc-watch"
 }

@@ -42,8 +42,13 @@ class InteropLangUtils {
 	
 	def public Message getDescriptorsContainer(InteropOption option) {
 		val name = option.descriptorContainerName
-		val description = option.eResource.resourceSet.descriptorResourceDescription		
-		return description.getExportedObjects(ProtobufPackage.Literals.MESSAGE, name, false).findFirst[x|true].EObjectOrProxy as Message
+		val description = option.eResource.resourceSet.descriptorResourceDescription
+		if (description == null) {
+			return null;
+		}
+		val objects = description.getExportedObjects(ProtobufPackage.Literals.MESSAGE, name, false)
+		val message = objects.findFirst[x|true];
+		return if (message != null) message.EObjectOrProxy as Message else null
 	}
 	
 	def public IResourceDescription getDescriptorResourceDescription(ResourceSet resourceSet) {
