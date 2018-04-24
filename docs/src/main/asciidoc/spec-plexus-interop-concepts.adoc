@@ -233,7 +233,7 @@ discoveryRequest:: discover criteria, defined in https://github.com/symphonyoss/
 *Returns*
 
 [horizontal]
-discoveryResponse:: discovered remote method implementations if any, discovered method instances can be passed to corresponding invocation methods
+discoveryResponse:: discovered remote method implementations if any, containing extensive information on method provider. Discovered method instances can be passed to corresponding invocation methods.
 
 *Examples*
 
