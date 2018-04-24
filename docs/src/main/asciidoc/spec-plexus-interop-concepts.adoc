@@ -104,7 +104,7 @@ send/receive messages to/from broker.
 
 Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository. Please see Web API definition with examples below.
 
-===== Send Point to Point Request (structured)
+===== Send Point to Point Request
 
 ```
 Executes Point-to-Point invocation with structured request/response.
