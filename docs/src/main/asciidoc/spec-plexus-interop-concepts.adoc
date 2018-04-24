@@ -98,11 +98,74 @@ methods.
 
 ==== Generic Client API
 
-Technology-specific library which implements core functionality of interop client. It converts method calls to interop
+Technology-specific API implementation which provides core functionality of interop client. It converts method calls to interop
 protocol messages and vice versa according to specification and uses pluggable transport implementation to
 send/receive messages to/from broker.
 
-Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository.
+Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository. Please see Web API definition with examples below.
+
+===== Send Point to Point Request (structured)
+
+```
+Executes Point-to-Point invocation with structured request/response.
+```
+[source,javascript]
+-------------------
+sendUnaryRequest<Req, Res>(
+    invocationInfo: GenericRequest,
+    request: Req,
+    responseHandler: ValueHandler<Res>,
+    requestMarshaller: Marshaller<Req>,
+    responseMarshaller: Marshaller<Res>): Promise<InvocationClient>;
+-------------------
+
+*Parameters*
+
+* *invocationInfo* - details of remote action to execute
+* *request* - simple object representing request details
+* *responseHandler* - response/error handler
+* *requestMarshaller* - request type marshaller, responsible for serialization of request object to binary format
+* *responseMarshaller* - response type marshaller, responsible for deserialization of response object from binary format
+
+*Returns*
+
+* *invocationClient* - provides ability to cancel invocation, telling remote side that response no longer required
+
+*Examples*
+
+Invoke remote action without specifying of remote app details:
+
+[source,javascript]
+-------------------
+const invocationInfo: GenericRequest = {
+    serviceId: 'CcyRateService',
+    methodId: 'GetRate'
+};
+const responseHandler = {
+    value: pairRate => console.log(`Received rate ${pairRate.rate}`),
+    error: e => console.error('Failed to get rate', e)
+};
+interopClient.sendUnaryRequest<ICcyPair, ICcyPairRate>(
+    invocationInfo,
+    { ccyPairName: 'EURUSD' },
+    responseHandler,
+    new ProtoMarshaller(CcyPair),
+    new ProtoMarshaller(CcyPairRate));
+-------------------
+Invoke remote action specifying remote app details:
+[source,javascript]
+-------------------
+const invocationInfo: GenericRequest = {
+    serviceId: 'CcyRateService',
+    methodId: 'GetRate',
+    // provider's app id, defined in metadata
+    applicationId: 'RateProvider',
+    // optional, if we want to pass invocation to particular running instance
+    connectionId: remoteAppGuid
+};
+
+// same as in example above ...
+-------------------
 
 ==== Interop Protocol
 
