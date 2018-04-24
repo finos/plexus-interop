@@ -170,10 +170,55 @@ const invocationInfo: GenericRequest = {
 // same as in example above ...
 -------------------
 
+===== Send Binary Request
+
+```
+Executes Point-to-Point invocation with binary request/response. Acts in the same way as "Send Request", skipping serialization/deserialization steps.
+```
+[source,javascript]
+-------------------
+sendRawUnaryRequest(
+    invocationInfo: GenericRequest,
+    request: ArrayBuffer,
+    responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
+-------------------
+
+*Parameters*
+
+[horizontal]
+invocationInfo:: details of remote action to execute
+request:: array buffer representing request details
+responseHandler:: response/error handler
+
+*Returns*
+
+[horizontal]
+invocationClient:: provides ability to cancel invocation, telling remote side that response no longer required
+
+*Examples*
+
+- Invoke remote action on any available provider:
+
+[source,javascript]
+-------------------
+const invocationInfo: GenericRequest = {
+    serviceId: 'CcyRateService',
+    methodId: 'GetRate'
+};
+const responseHandler = {
+    value: binaryResponse => console.log(`Received bytes ${binaryResponse.length}`),
+    error: e => console.error('Failed to get rate', e)
+};
+client.sendRawUnaryRequest<ICcyPair, ICcyPairRate>(
+    invocationInfo,
+    binaryMarshaller.encode({ccyPairName: 'EURUSD'}),
+    responseHandler);
+-------------------
+
 ===== Discover Methods
 
 ```
-Discovers available invocation handlers.
+Discovers available method invocation handlers.
 ```
 [source,javascript]
 -------------------
@@ -263,7 +308,7 @@ service CcyPairBroadcastService {
 application ListenerApp {
     // listen to message from any provider
     provides CcyPairBroadcastService {onCcyPairRate;}
-    // or listen providers from specific namespace
+    // or setup listener for providers from specific namespace
     // provides CcyPairBroadcastService to com.acme.* {onCcyPairRate;}
 }
 -------------------
