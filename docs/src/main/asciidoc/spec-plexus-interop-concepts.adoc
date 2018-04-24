@@ -133,7 +133,7 @@ sendUnaryRequest<Req, Res>(
 
 *Examples*
 
-Invoke remote action without specifying of remote app details:
+- Invoke remote action on any available provider:
 
 [source,javascript]
 -------------------
@@ -145,14 +145,15 @@ const responseHandler = {
     value: pairRate => console.log(`Received rate ${pairRate.rate}`),
     error: e => console.error('Failed to get rate', e)
 };
-interopClient.sendUnaryRequest<ICcyPair, ICcyPairRate>(
+client.sendUnaryRequest<ICcyPair, ICcyPairRate>(
     invocationInfo,
     { ccyPairName: 'EURUSD' },
     responseHandler,
-    new ProtoMarshaller(CcyPair),
-    new ProtoMarshaller(CcyPairRate));
+    new JsonMarshaller(CcyPair),
+    new JsonMarshaller(CcyPairRate));
 -------------------
-Invoke remote action specifying remote app details:
+- Invoke remote action on particular provider:
+
 [source,javascript]
 -------------------
 const invocationInfo: GenericRequest = {
@@ -163,8 +164,78 @@ const invocationInfo: GenericRequest = {
     // optional, if we want to pass invocation to particular running instance
     connectionId: remoteAppGuid
 };
-
 // same as in example above ...
+-------------------
+
+===== Discover Method Implementations
+
+```
+Discovers available invocation handlers.
+```
+[source,javascript]
+-------------------
+discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
+-------------------
+
+*Parameters*
+
+- *discoveryRequest* - discover criteria, defined in https://github.com/symphonyoss/plexus-interop/blob/master/protocol/plexus.interop.proto[client protocol]. All fields are optional, providing flexibility to search under different criteria.
+
+*Returns*
+
+- *discoveryResponse* - discovered remote method implementations if any, discovered method instances can be passed to corresponding invocation methods
+
+*Examples*
+
+- Discover by input message and invoke first available implementation:
+
+[source,javascript]
+-------------------
+const discoveryResponse = await client.discoverMethod({
+    inputMessageId: 'plexus.interop.CcyPair',
+});
+client.sendUnaryRequest<ICcyPair, ICcyPairRate>(
+    discoveryResponse.methods[0],
+    { ccyPairName: 'EURUSD' },
+    responseHandler,
+    new JsonMarshaller(CcyPair),
+    new JsonMarshaller(CcyPairRate));
+-------------------
+
+NOTE: *MethodDiscoveryRequest* supports various of options, you can use any combinations of them.
+
+- Discover by response type:
+
+[source,javascript]
+-------------------
+const discoveryResponse = await client.discoverMethod({
+    outputMessageId: 'plexus.interop.CcyPairRate'
+});
+-------------------
+
+- Discover only online method handlers:
+
+[source,javascript]
+-------------------
+const discoveryResponse = await client.discoverMethod({
+    outputMessageId: 'plexus.interop.CcyPairRate',
+    // return only already connected providers
+    discoveryMode: DiscoveryMode.Online
+});
+-------------------
+
+- Discover by method reference:
+
+[source,javascript]
+-------------------
+const discoveryResponse = await client.discoverMethod({
+    consumedMethod: {
+        consumedService: {
+            serviceId: 'CcyRateService'
+        },
+        methodId: 'GetRate'
+    }
+});
 -------------------
 
 ==== Interop Protocol
