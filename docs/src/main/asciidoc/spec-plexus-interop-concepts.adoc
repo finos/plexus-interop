@@ -104,7 +104,7 @@ send/receive messages to/from broker.
 
 Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository. Please see Web API definition with examples below.
 
-===== Send Point to Point Request
+===== Send Request
 
 ```
 Executes Point-to-Point invocation with structured request/response.
@@ -121,15 +121,17 @@ sendUnaryRequest<Req, Res>(
 
 *Parameters*
 
-* *invocationInfo* - details of remote action to execute
-* *request* - simple object representing request details
-* *responseHandler* - response/error handler
-* *requestMarshaller* - request type marshaller, responsible for serialization of request object to binary format
-* *responseMarshaller* - response type marshaller, responsible for deserialization of response object from binary format
+[horizontal]
+invocationInfo:: details of remote action to execute
+request:: simple object representing request details
+responseHandler:: response/error handler
+requestMarshaller:: request type marshaller, responsible for serialization of request object to binary format
+responseMarshaller:: response type marshaller, responsible for deserialization of response object from binary format
 
 *Returns*
 
-* *invocationClient* - provides ability to cancel invocation, telling remote side that response no longer required
+[horizontal]
+invocationClient:: provides ability to cancel invocation, telling remote side that response no longer required
 
 *Examples*
 
@@ -152,6 +154,7 @@ client.sendUnaryRequest<ICcyPair, ICcyPairRate>(
     new JsonMarshaller(CcyPair),
     new JsonMarshaller(CcyPairRate));
 -------------------
+
 - Invoke remote action on particular provider:
 
 [source,javascript]
@@ -179,11 +182,13 @@ discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscover
 
 *Parameters*
 
-- *discoveryRequest* - discover criteria, defined in https://github.com/symphonyoss/plexus-interop/blob/master/protocol/plexus.interop.proto[client protocol]. All fields are optional, providing flexibility to search under different criteria.
+[horizontal]
+discoveryRequest:: discover criteria, defined in https://github.com/symphonyoss/plexus-interop/blob/master/protocol/plexus.interop.proto[client protocol]. All fields are optional, providing flexibility to search under different criteria.
 
 *Returns*
 
-- *discoveryResponse* - discovered remote method implementations if any, discovered method instances can be passed to corresponding invocation methods
+[horizontal]
+discoveryResponse:: discovered remote method implementations if any, discovered method instances can be passed to corresponding invocation methods
 
 *Examples*
 
@@ -236,6 +241,67 @@ const discoveryResponse = await client.discoverMethod({
         methodId: 'GetRate'
     }
 });
+-------------------
+
+- Implementing "broadcast" communication using discovery.
+
+Using `discoveryMethod` as low level API we can easily implement sending of broadcast messages using following steps:
+
+. Define method with `Empty` return type to be handled by listener components
++
+[source,javascript]
+-------------------
+service CcyPairBroadcastService {
+    rpc onCcyPairRate (CcyPairRate) returns (Empty);
+}
+-------------------
+
+. Setup all listener apps as provider of this action. Also we can define specific Provider instances or even companies we would like to listen events from:
++
+[source,javascript]
+-------------------
+application ListenerApp {
+    // listen to message from any provider
+    provides CcyPairBroadcastService {onCcyPairRate;}
+    // or listen providers from specific namespace
+    // provides CcyPairBroadcastService to com.acme.* {onCcyPairRate;}
+}
+-------------------
+
+. Setup consumer app to consume this action
++
+[source,javascript]
+-------------------
+application RateProviderApp {
+    consumes CcyPairBroadcastService {onCcyPairRate;}
+}
+-------------------
+
+. Use online discovery to publish new rate to all connected consumers:
++
+[source,javascript]
+-------------------
+async function broadcast(rate: CcyPairRate): Promise<void> {
+    const discoveryResponse = await client.discoverMethod({
+        consumedMethod: {
+            consumedService: {
+                serviceId: 'CcyPairBroadcastService'
+            },
+            methodId: 'onCcyPairRate'
+        },
+        discoveryMode: DiscoveryMode.Online
+    });
+    const responseHandler = {
+        value: () => console.log('Delivered')
+    };
+    discoveryResponse.methods.forEach(method => {
+        client.sendUnaryRequest<ICcyPairRate, Empty>(
+            method,
+            rate,
+            responseHandler,
+            new JsonMarshaller(CcyPairRate));
+    });
+}
 -------------------
 
 ==== Interop Protocol
