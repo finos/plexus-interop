@@ -170,7 +170,7 @@ const invocationInfo: GenericRequest = {
 // same as in example above ...
 -------------------
 
-===== Discover Method Implementations
+===== Discover Methods
 
 ```
 Discovers available invocation handlers.
