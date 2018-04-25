@@ -477,7 +477,7 @@ const serviceInfo = { serviceId: 'CcyRateService' };
 clientBuilder.onUnary<ICcyPair, ICcyPairRate>(serviceInfo, {
     methodId: 'GetRate',
     handle: async (invocationContext: MethodInvocationContext, request: ICcyPair) => {
-        const rate: ICcyPairRate =  await internalRateService.getRate(request.ccyPairName);
+        const rate: ICcyPairRate = await internalRateService.getRate(request.ccyPairName);
         return rate;
     }
 };
