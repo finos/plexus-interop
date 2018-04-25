@@ -304,7 +304,7 @@ client.sendUnaryRequest<ICcyPair, ICcyPairRate>(
 );
 -------------------
 
-NOTE: *MethodDiscoveryRequest* supports various of options, you can use any combinations of them.
+NOTE: *Discovery Request* supports various of options, you can use any combinations of them.
 
 - Discover by response type:
 
@@ -321,7 +321,6 @@ const discoveryResponse = await client.discoverMethod({
 -------------------
 const discoveryResponse = await client.discoverMethod({
     outputMessageId: 'plexus.interop.CcyPairRate',
-    // return only already connected providers
     discoveryMode: DiscoveryMode.Online
 });
 -------------------
@@ -399,6 +398,57 @@ async function broadcast(rate: CcyPairRate): Promise<void> {
     });
 }
 -------------------
+
+===== Discover Services
+
+Discovers available service implementations. Provides ability to use few methods from particular provider together.
+
+[source,javascript]
+-------------------
+discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse>;
+-------------------
+
+*Parameters*
+
+[horizontal]
+discoveryRequest:: discover criteria, defined in https://github.com/symphonyoss/plexus-interop/blob/master/protocol/plexus.interop.proto[client protocol]. All fields are optional, providing flexibility to search under different criteria.
+
+*Returns*
+
+[horizontal]
+discoveryResponse:: discovered remote service implementations if any, containing extensive information on method provider. Discovered method instances can be passed to corresponding invocation methods.
+
+*Examples*
+
+- Discover service, lookup for pair of methods to be used together:
++
+[source,javascript]
+-------------------
+const discoveryResponse = client.discoverService({
+    consumedService: {
+        serviceId: 'CcyRateService'
+    }
+});
+// choose service implementation, by provider id/service alias/other details
+const service: DiscoveredService = serviceDiscoveryResponse
+    .services
+    .find(s => providedService.applicationId === 'RateProviderApp');
+// choose required methods and invoke them as described above in 'Discover Methods' examples
+const getRateMethod = service.methods.find(m => m.methodId === 'GetRate');
+const getRateStreamMethod = service.methods.find(m => m.methodId === 'GetRateStream');
+-------------------
+
+- Discover only online service providers
++
+[service,javascript]
+--------------------
+const discoveryResponse = client.discoverService({
+    consumedService: {
+        serviceId: 'CcyRateService'
+    },
+    discoveryMode: DiscoveryMode.Online
+});
+--------------------
 
 ==== Interop Protocol
 
