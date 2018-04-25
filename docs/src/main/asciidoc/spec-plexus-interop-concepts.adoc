@@ -208,9 +208,11 @@ const discoveryResponse = await client.discoverMethod({
 client.sendUnaryRequest<ICcyPair, ICcyPairRate>(
     discoveryResponse.methods[0],
     { ccyPairName: 'EURUSD' },
-    responseHandler,
-    new JsonMarshaller(CcyPair),
-    new JsonMarshaller(CcyPairRate));
+    {
+        value: pairRate => console.log(`Received rate ${pairRate.rate}`),
+        error: e => console.error('Failed to get rate', e)
+    }
+);
 -------------------
 
 NOTE: *MethodDiscoveryRequest* supports various of options, you can use any combinations of them.
@@ -304,8 +306,7 @@ async function broadcast(rate: CcyPairRate): Promise<void> {
         client.sendUnaryRequest<ICcyPairRate, Empty>(
             method,
             rate,
-            responseHandler,
-            new JsonMarshaller(CcyPairRate));
+            responseHandler);
     });
 }
 -------------------
