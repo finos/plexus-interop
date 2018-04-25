@@ -450,6 +450,39 @@ const discoveryResponse = client.discoverService({
 });
 --------------------
 
+===== Register Unary Handler
+
+Registers handler for provided unary method.
+
+[source,javascript]
+-------------------
+onUnary(
+    serviceInfo: ServiceInfo,
+    handler: UnaryInvocationHandler<Req, Res>): void;
+-------------------
+
+*Parameters*
+
+[horizontal]
+serviceInfo:: implemented service details
+handler:: method details and provided implementation
+
+*Examples*
+
+- Register unary invocation handler
++
+[source,javascript]
+-------------------
+const serviceInfo = { serviceId: 'CcyRateService' };
+clientBuilder.onUnary<ICcyPair, ICcyPairRate>(serviceInfo, {
+    methodId: 'GetRate',
+    handle: async (invocationContext: MethodInvocationContext, request: ICcyPair) => {
+        const rate: ICcyPairRate =  await internalRateService.getRate(request.ccyPairName);
+        return rate;
+    }
+};
+-------------------
+
 ==== Interop Protocol
 
 Interop Protocol is a language for conversations between client and broker through transport channels.
