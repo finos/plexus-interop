@@ -63,7 +63,7 @@ by other applications. Broker validates and routes such calls to target applicat
 
 ==== Application Lifecycle Manager
 
-Component inside broker which tracks active connections and can trigger launch of an application on demand by sending a
+Component inside Broker which tracks active connections and can trigger launch of an application on demand by sending a
 request to the appropriate Application Launcher.
 
 ==== Application Launcher
@@ -75,8 +75,25 @@ usually has custom launch steps like auto-updating or accepting terms & conditio
 in a vendor-specific app launcher.
 
 On method call broker can either route the call to an online application instance or trigger launch of a new
-instance. Each application can specify its launcher in interop registry and broker will delegate launch to
-the specified launcher.
+instance. There are several strategies of routing launch requests from Broker to App Launcher, called _Launch Behaviors_:
+
+* *Default* - Pass invocation to already running provider instance or launch new one if no online providers found.
+* *Always* - Create new app instance on each invocation.
+* *Never* - Pass invocation to already running instance, return error if no online providers found.
+
+Launch Behaviors can be specified per action in Interop Registry, please see example below:
+[source,javascript]
+-------------------
+application RateProviderApp {
+    provides CcyPairBroadcastService {
+        option launch_on_call = ALWAYS;
+        GetRate;
+    }
+}
+-------------------
+
+Each application can specify its Launcher in Interop Registry and broker will delegate launch to
+the specified Launcher.
 
 ==== Client
 
@@ -106,9 +123,8 @@ Currently .NET and TypeScript/JavaScript libraries are provided as a part of thi
 
 ===== Send Request
 
-```
 Executes Point-to-Point invocation with structured request/response.
-```
+
 [source,javascript]
 -------------------
 sendUnaryRequest<Req, Res>(
@@ -172,9 +188,8 @@ const invocationInfo: GenericRequest = {
 
 ===== Send Binary Request
 
-```
 Executes Point-to-Point invocation with binary request/response. Acts in the same way as "Send Request", skipping serialization/deserialization steps.
-```
+
 [source,javascript]
 -------------------
 sendRawUnaryRequest(
@@ -217,9 +232,8 @@ client.sendRawUnaryRequest<ICcyPair, ICcyPairRate>(
 
 ===== Discover Methods
 
-```
 Discovers available method invocation handlers.
-```
+
 [source,javascript]
 -------------------
 discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
