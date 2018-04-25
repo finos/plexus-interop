@@ -440,15 +440,15 @@ const getRateStreamMethod = service.methods.find(m => m.methodId === 'GetRateStr
 
 - Discover only online service providers
 +
-[service,javascript]
---------------------
+[source,javascript]
+-------------------
 const discoveryResponse = client.discoverService({
     consumedService: {
         serviceId: 'CcyRateService'
     },
     discoveryMode: DiscoveryMode.Online
 });
---------------------
+-------------------
 
 ===== Register Unary Handler
 
@@ -509,8 +509,7 @@ handler:: method details and provided implementation
 const serviceInfo = { serviceId: 'CcyRateService' };
 clientBuilder.onUnary<ICcyPair, ICcyPairRate>(serviceInfo, {
     methodId: 'GetRateStream',
-    handle: (
-            invocationContext: MethodInvocationContext,
+    handle: (invocationContext: MethodInvocationContext,
             request: ICcyPair,
             hostClient: StreamingInvocationClient<ICcyPairRate>) => {
         const rate: ICcyPairRate = await internalRateService.getRate(request.ccyPairName);
@@ -523,6 +522,50 @@ clientBuilder.onUnary<ICcyPair, ICcyPairRate>(serviceInfo, {
     }
 };
 -------------------
+
+===== Register Bidirectional Streaming Handler
+
+Registers handler for provided bidirectional streaming method.
+
+[source,javascript]
+-------------------
+onBidiStreaming<Req,Res>(
+    serviceInfo: ServiceInfo,
+    handler: BidiStreamingInvocationHandler<Req, Res>): void;
+-------------------
+
+*Parameters*
+
+[horizontal]
+serviceInfo:: implemented service details
+handler:: method details and provided implementation
+
+*Examples*
+
+- Register bidirectional handler:
++
+[source,javascript]
+-------------------
+const serviceInfo = { serviceId: 'CcyRateService' };
+clientBuilder.onBidiStreaming<ICcyPair, ICcyPairRate>(serviceInfo, {
+    methodId: 'GetRateStream',
+    handle: (invocationContext: MethodInvocationContext,
+            hostClient: StreamingInvocationClient<ICcyPairRate>) => {
+        const ccyPairs = [];
+        // send rate for each requested pair every second
+        setInterval(() => {
+            ccyPairs.forEach(pair => {
+                hostClient.next(internalRateService.getRate(pair)
+            });
+        }, 1000);
+        // client's stream observer
+        return {
+            next: ccyPair => ccyPairs.push(ccyPair)
+        };
+    }
+};
+-------------------
+
 
 ==== Interop Protocol
 
