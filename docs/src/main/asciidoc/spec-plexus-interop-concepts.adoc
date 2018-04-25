@@ -128,8 +128,8 @@ Executes Point-to-Point invocation, client receives response from server.
 [source,javascript]
 -------------------
 sendUnaryRequest<Req, Res>(
-    invocationInfo: GenericRequest,
-    request: Req,
+    invocationInfo: InvocationDescriptor,
+    requestMessage: Req,
     responseHandler: ValueHandler<Res>): Promise<InvocationClient>;
 -------------------
 
@@ -137,7 +137,7 @@ sendUnaryRequest<Req, Res>(
 
 [horizontal]
 invocationInfo:: details of remote action to execute
-request:: simple object representing request details
+requestMessage:: simple object representing request details
 responseHandler:: response/error handler
 
 *Returns*
@@ -151,12 +151,12 @@ invocationClient:: provides ability to cancel invocation, to notificate remote s
 
 [source,javascript]
 -------------------
-const invocationInfo: GenericRequest = {
+const invocationInfo: InvocationDescriptor = {
     serviceId: 'CcyRateService',
     methodId: 'GetRate'
 };
-const request = { ccyPairName: 'EURUSD' };
-client.sendUnaryRequest<ICcyPair, ICcyPairRate>(invocationInfo, request, {
+const requestMessage = { ccyPairName: 'EURUSD' };
+client.sendUnaryRequest<ICcyPair, ICcyPairRate>(invocationInfo, requestMessage, {
     value: pairRate => console.log(`Received rate ${pairRate.rate}`),
     error: e => console.error('Failed to get rate', e)
 });
@@ -166,7 +166,7 @@ client.sendUnaryRequest<ICcyPair, ICcyPairRate>(invocationInfo, request, {
 
 [source,javascript]
 -------------------
-const invocationInfo: GenericRequest = {
+const invocationInfo: InvocationDescriptor = {
     serviceId: 'CcyRateService',
     methodId: 'GetRate',
     // provider's app id, defined in metadata
@@ -183,9 +183,9 @@ Executes Server Streaming invocation, client receives stream of messages from se
 
 [source,javascript]
 ------------------
-sendServerStreamingRequest<Req,Res>(
-    invocationInfo: GenericRequest,
-    request: Req,
+sendServerStreamingRequest<Req, Res>(
+    invocationInfo: InvocationDescriptor,
+    requestMessage: Req,
     responseObserver: InvocationObserver<Res>): Promise<InvocationClient>;
 ------------------
 
@@ -193,7 +193,7 @@ sendServerStreamingRequest<Req,Res>(
 
 [horizontal]
 invocationInfo:: details of remote action to execute
-request:: simple object representing request details
+requestMessage:: simple object representing request details
 responseObserver:: response stream observer
 
 *Returns*
@@ -207,12 +207,12 @@ invocationClient:: provides ability to cancel invocation, to notificate remote s
 +
 [source,javascript]
 -------------------
-const invocationInfo: GenericRequest = {
+const invocationInfo: InvocationDescriptor = {
     serviceId: 'CcyRateService',
     methodId: 'GetRateStream'
 };
-const request = { ccyPairName: 'EURUSD' };
-client.sendServerStreamingRequest<ICcyPair, ICcyPairRate>(invocationInfo, request, {
+const requestMessage = { ccyPairName: 'EURUSD' };
+client.sendServerStreamingRequest<ICcyPair, ICcyPairRate>(invocationInfo, requestMessage, {
     next: pairRate => console.log(`Received rate ${pairRate.rate}`),
     complete: () => console.log('Invocation completed'),
     error: e => console.error('Failed to get rate', e)
@@ -225,8 +225,8 @@ Executes Bidirectional Streaming invocation. Client and Server communicates usin
 
 [source,javascript]
 -------------------
-sendBidirectionalStreamingRequest<Req,Res>(
-    invocationInfo: GenericRequest,
+sendBidirectionalStreamingRequest<Req, Res>(
+    invocationInfo: InvocationDescriptor,
     responseObserver: InvocationObserver<Res>): Promise<StreamingInvocationClient<Req>>;
 -------------------
 
@@ -247,7 +247,7 @@ streamingInvocationClient:: invocation client, provides ability to send stream o
 +
 [source,javascript]
 -------------------
-const invocationInfo: GenericRequest = {
+const invocationInfo: InvocationDescriptor = {
     serviceId: 'CcyRateService',
     methodId: 'GetRateBidiStream'
 };
@@ -456,7 +456,7 @@ Registers handler for provided unary method.
 
 [source,javascript]
 -------------------
-onUnary(
+onUnary<Req, Res>(
     serviceInfo: ServiceInfo,
     handler: UnaryInvocationHandler<Req, Res>): void;
 -------------------
@@ -489,7 +489,7 @@ Registers handler for provided server streaming method.
 
 [source,javascript]
 -------------------
-onServerStreaming<Req,Res>(
+onServerStreaming<Req, Res>(
     serviceInfo: ServiceInfo,
     handler: ServerStreamingInvocationHandler<Req, Res>): void;
 -------------------
@@ -509,7 +509,7 @@ handler:: method details and provided implementation
 const serviceInfo = { serviceId: 'CcyRateService' };
 clientBuilder.onUnary<ICcyPair, ICcyPairRate>(serviceInfo, {
     methodId: 'GetRateStream',
-    handle: (invocationContext: MethodInvocationContext,
+    handle: async (invocationContext: MethodInvocationContext,
             request: ICcyPair,
             hostClient: StreamingInvocationClient<ICcyPairRate>) => {
         const rate: ICcyPairRate = await internalRateService.getRate(request.ccyPairName);
@@ -529,7 +529,7 @@ Registers handler for provided bidirectional streaming method.
 
 [source,javascript]
 -------------------
-onBidiStreaming<Req,Res>(
+onBidiStreaming<Req, Res>(
     serviceInfo: ServiceInfo,
     handler: BidiStreamingInvocationHandler<Req, Res>): void;
 -------------------
