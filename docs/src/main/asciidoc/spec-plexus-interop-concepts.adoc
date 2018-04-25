@@ -123,7 +123,7 @@ Currently .NET and TypeScript/JavaScript libraries are provided as a part of thi
 
 ===== Send Unary Request
 
-Executes Point-to-Point invocation with structured request/response.
+Executes Point-to-Point invocation, client receives response from server.
 
 [source,javascript]
 -------------------
@@ -179,7 +179,7 @@ const invocationInfo: GenericRequest = {
 
 ===== Send Server Streaming Request
 
-Executes Server Streaming invocation, with structured request/response.
+Executes Server Streaming invocation, client receives stream of messages from server.
 
 [source,javascript]
 ------------------
@@ -219,6 +219,52 @@ client.sendServerStreamingRequest<ICcyPair, ICcyPairRate>(invocationInfo, reques
 });
 -------------------
 
+===== Send Bidirectional Streaming Request
+
+Executes Bidirectional Streaming invocation. Client and Server communicates using streams of messages.
+
+[source,javascript]
+-------------------
+sendBidirectionalStreamingRequest<Req,Res>(
+    invocationInfo: GenericRequest,
+    responseObserver: InvocationObserver<Res>): Promise<StreamingInvocationClient<Req>>;
+-------------------
+
+*Parameters*
+
+[horizontal]
+invocationInfo:: details of remote action to execute
+responseObserver:: response stream observer
+
+*Returns*
+
+[horizontal]
+streamingInvocationClient:: invocation client, provides ability to send stream of messages, complete or cancel invocation.
+
+*Examples*
+
+- Bidirectional communication, client updates server on requested ccy pairs and receives stream of rates from server:
++
+[source,javascript]
+-------------------
+const invocationInfo: GenericRequest = {
+    serviceId: 'CcyRateService',
+    methodId: 'GetRateBidiStream'
+};
+const invocation = await client.sendBidirectionalStreamingRequest<ICcyPair, ICcyPairRate>(
+    invocationInfo,
+    {
+        next: pairRate => console.log(`Received rate ${pairRate.rate}`),
+        streamCompleted: () => console.log('Remote stream completed'),
+        complete: () => console.log('Invocation completed'),
+        error: e => console.error('Failed to get rate', e)
+    });
+invocation.next({ ccyPairName: 'EURUSD' });
+// ask for other ccy pair rates later
+invocation.next({ ccyPairName: 'EURGBP' });
+// notify server that no more pairs be requested
+invocation.complete();
+-------------------
 
 ===== Discover Methods
 
