@@ -483,6 +483,47 @@ clientBuilder.onUnary<ICcyPair, ICcyPairRate>(serviceInfo, {
 };
 -------------------
 
+===== Register Server Streaming Handler
+
+Registers handler for provided server streaming method.
+
+[source,javascript]
+-------------------
+onServerStreaming<Req,Res>(
+    serviceInfo: ServiceInfo,
+    handler: ServerStreamingInvocationHandler<Req, Res>): void;
+-------------------
+
+*Parameters*
+
+[horizontal]
+serviceInfo:: implemented service details
+handler:: method details and provided implementation
+
+*Examples*
+
+- Register stream handler:
++
+[source,javascript]
+-------------------
+const serviceInfo = { serviceId: 'CcyRateService' };
+clientBuilder.onUnary<ICcyPair, ICcyPairRate>(serviceInfo, {
+    methodId: 'GetRateStream',
+    handle: (
+            invocationContext: MethodInvocationContext,
+            request: ICcyPair,
+            hostClient: StreamingInvocationClient<ICcyPairRate>) => {
+        const rate: ICcyPairRate = await internalRateService.getRate(request.ccyPairName);
+        hostClient.next(rate);
+        // send other rate
+        const otherRate: ICcyPairRate = await internalRateService.getRate(request.ccyPairName);
+        hostClient.next(otherRate);
+        // complete streaming
+        hostClient.complete();
+    }
+};
+-------------------
+
 ==== Interop Protocol
 
 Interop Protocol is a language for conversations between client and broker through transport channels.
