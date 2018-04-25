@@ -542,8 +542,18 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#quick-starts">Quick starts</a>
 <ul class="sectlevel3">
 <li><a href="#prerequisites">Prerequisites</a></li>
-<li><a href="#quick-start-web">Quick Start - Web</a></li>
-<li><a href="#quick-start-dotnet">Quick Start - .NET</a></li>
+<li><a href="#quick-start-web">Quick Start - Web</a>
+<ul class="sectlevel4">
+<li><a href="#run-example">Run example</a></li>
+<li><a href="#modify-example">Modify example</a></li>
+</ul>
+</li>
+<li><a href="#quick-start-dotnet">Quick Start - .NET</a>
+<ul class="sectlevel4">
+<li><a href="#run-example-2">Run example</a></li>
+<li><a href="#modify-example-2">Modify example</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#concepts">Concepts</a>
@@ -583,7 +593,18 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#client">Client</a></li>
 <li><a href="#client-message-marshaller">Client Message Marshaller</a></li>
 <li><a href="#generated-client-api">Generated Client API</a></li>
-<li><a href="#generic-client-api">Generic Client API</a></li>
+<li><a href="#generic-client-api">Generic Client API</a>
+<ul class="sectlevel4">
+<li><a href="#send-unary-request">Send Unary Request</a></li>
+<li><a href="#register-unary-handler">Register Unary Handler</a></li>
+<li><a href="#discover-methods">Discover Methods</a></li>
+<li><a href="#discover-services">Discover Services</a></li>
+<li><a href="#send-server-streaming-request">Send Server Streaming Request</a></li>
+<li><a href="#register-server-streaming-handler">Register Server Streaming Handler</a></li>
+<li><a href="#send-bidirectional-streaming-request">Send Bidirectional Streaming Request</a></li>
+<li><a href="#register-bidirectional-streaming-handler">Register Bidirectional Streaming Handler</a></li>
+</ul>
+</li>
 <li><a href="#interop-protocol">Interop Protocol</a></li>
 <li><a href="#transport-protocol">Transport Protocol</a></li>
 <li><a href="#transport-connection">Transport Connection</a></li>
@@ -596,7 +617,12 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#reference-metadata-definition-language">Interop Registry</a>
 <ul class="sectlevel3">
 <li><a href="#messages-and-services">Messages and Services</a></li>
-<li><a href="#application-interop-manifests">Application Interop Manifests</a></li>
+<li><a href="#application-interop-manifests">Application Interop Manifests</a>
+<ul class="sectlevel4">
+<li><a href="#consumes">Consumes</a></li>
+<li><a href="#provides">Provides</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -897,7 +923,7 @@ Once launched the app will show the information about connection and incoming re
 <p>In this guide both consumer and provider are written in TypeScript language and run in <a href="https://electron.atom.io/">Electron</a> container.</p>
 </div>
 <div class="sect4">
-<h5 id="run-the-example">Run the example</h5>
+<h5 id="run-example">Run example</h5>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -1322,7 +1348,7 @@ application <span class="constant">WebCcyPairRateViewer</span> {
 <p>In this guide both consumer and provider are .NET console apps written in C# language running under <a href="https://www.microsoft.com/net/download/core#/runtime">.NET Core</a>.</p>
 </div>
 <div class="sect4">
-<h5 id="run-example">Run example</h5>
+<h5 id="run-example-2">Run example</h5>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -2441,7 +2467,7 @@ by other applications. Broker validates and routes such calls to target applicat
 <div class="sect3">
 <h4 id="application-lifecycle-manager">Application Lifecycle Manager</h4>
 <div class="paragraph">
-<p>Component inside broker which tracks active connections and can trigger launch of an application on demand by sending a
+<p>Component inside Broker which tracks active connections and can trigger launch of an application on demand by sending a
 request to the appropriate Application Launcher.</p>
 </div>
 </div>
@@ -2456,8 +2482,37 @@ in a vendor-specific app launcher.</p>
 </div>
 <div class="paragraph">
 <p>On method call broker can either route the call to an online application instance or trigger launch of a new
-instance. Each application can specify its launcher in interop registry and broker will delegate launch to
-the specified launcher.</p>
+instance. There are several strategies of routing launch requests from Broker to App Launcher, called <em>Launch Behaviors</em>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Default</strong> - Pass invocation to already running provider instance or launch new one if no online providers found.</p>
+</li>
+<li>
+<p><strong>Always</strong> - Create new app instance on each invocation.</p>
+</li>
+<li>
+<p><strong>Never</strong> - Pass invocation to already running instance, return error if no online providers found.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Launch Behaviors can be specified per action in Interop Registry, please see example below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">application RateProviderApp {
+    provides CcyPairBroadcastService {
+        option launch_on_call = ALWAYS;
+        GetRate;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each application can specify its Launcher in Interop Registry and broker will delegate launch to
+the specified Launcher.</p>
 </div>
 </div>
 <div class="sect3">
@@ -2481,20 +2536,776 @@ it communicates with broker using interop protocol, transport protocol and wire 
 <div class="paragraph">
 <p>For each consumed service a proxy class is generated which allows invocation of service methods.</p>
 </div>
+<div class="listingblock">
+<div class="title">Executing action using generated  proxy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const rate: ICcyPairRate = client.getCcyRateService().getRate({ <span class="key">ccyPairName</span>: <span class="string"><span class="delimiter">'</span><span class="content">EURUSD</span><span class="delimiter">'</span></span> });</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>For each provided service an interface is generated which should be implemented to provide implementations for service
 methods.</p>
+</div>
+<div class="listingblock">
+<div class="title">Registering handler for provided service</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">clientBuilder.withCcyRateServiceProvider({
+    <span class="key">onGetRate</span>: (invocattionContext: InvocationContext, <span class="key">pair</span>: ICcyPair) =&gt; {
+        <span class="keyword">return</span> internalService.getRate(pair);
+    }
+});</code></pre>
+</div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="generic-client-api">Generic Client API</h4>
 <div class="paragraph">
-<p>Technology-specific library which implements core functionality of interop client. It converts method calls to interop
+<p>Technology-specific API implementation which provides core functionality of interop client. It converts method calls to interop
 protocol messages and vice versa according to specification and uses pluggable transport implementation to
 send/receive messages to/from broker.</p>
 </div>
 <div class="paragraph">
-<p>Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository.</p>
+<p>Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository. Please see Web API definition with examples below.</p>
+</div>
+<div class="sect4">
+<h5 id="send-unary-request">Send Unary Request</h5>
+<div class="paragraph">
+<p>Executes Point-to-Point invocation, client receives response from server.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">sendUnaryRequest&lt;Req, Res&gt;(
+    invocationInfo: InvocationDescriptor,
+    <span class="key">requestMessage</span>: Req,
+    <span class="key">responseHandler</span>: ValueHandler&lt;Res&gt;): Promise&lt;InvocationClient&gt;;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Parameters</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+invocationInfo
+</td>
+<td class="hdlist2">
+<p>details of remote action to execute</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+requestMessage
+</td>
+<td class="hdlist2">
+<p>simple object representing request details</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+responseHandler
+</td>
+<td class="hdlist2">
+<p>response/error handler</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Returns</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+invocationClient
+</td>
+<td class="hdlist2">
+<p>provides ability to cancel invocation, to notificate remote side that response no longer required</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Invoke remote action on any available provider:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const invocationInfo: InvocationDescriptor = {
+    <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span>,
+    <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">GetRate</span><span class="delimiter">'</span></span>
+};
+const requestMessage = { <span class="key">ccyPairName</span>: <span class="string"><span class="delimiter">'</span><span class="content">EURUSD</span><span class="delimiter">'</span></span> };
+client.sendUnaryRequest&lt;ICcyPair, ICcyPairRate&gt;(invocationInfo, requestMessage, {
+    <span class="key">value</span>: pairRate =&gt; console.log(<span class="error">`</span>Received rate <span class="predefined">$</span>{pairRate.rate}<span class="error">`</span>),
+    <span class="key">error</span>: e =&gt; console.error(<span class="string"><span class="delimiter">'</span><span class="content">Failed to get rate</span><span class="delimiter">'</span></span>, e)
+});</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Invoke remote action on particular provider:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const invocationInfo: InvocationDescriptor = {
+    <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span>,
+    <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">GetRate</span><span class="delimiter">'</span></span>,
+    <span class="comment">// provider's app id, defined in metadata</span>
+    <span class="key">applicationId</span>: <span class="string"><span class="delimiter">'</span><span class="content">RateProvider</span><span class="delimiter">'</span></span>,
+    <span class="comment">// optional, if we want to pass invocation to particular running instance</span>
+    <span class="key">connectionId</span>: remoteAppGuid
+};
+<span class="comment">// same as in example above ...</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="register-unary-handler">Register Unary Handler</h5>
+<div class="paragraph">
+<p>Registers handler for provided unary method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">onUnary&lt;Req, Res&gt;(
+    serviceInfo: ServiceInfo,
+    <span class="key">handler</span>: UnaryInvocationHandler&lt;Req, Res&gt;): <span class="keyword">void</span>;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Parameters</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+serviceInfo
+</td>
+<td class="hdlist2">
+<p>implemented service details</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+handler
+</td>
+<td class="hdlist2">
+<p>method details and provided implementation</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Register unary invocation handler</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const serviceInfo = { <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span> };
+clientBuilder.onUnary&lt;ICcyPair, ICcyPairRate&gt;(serviceInfo, {
+    <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">GetRate</span><span class="delimiter">'</span></span>,
+    <span class="key">handle</span>: async (invocationContext: MethodInvocationContext, <span class="key">request</span>: ICcyPair) =&gt; {
+        const rate: ICcyPairRate = await internalRateService.getRate(request.ccyPairName);
+        <span class="keyword">return</span> rate;
+    }
+};</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="discover-methods">Discover Methods</h5>
+<div class="paragraph">
+<p>Discovers available method invocation handlers.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise&lt;MethodDiscoveryResponse&gt;;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Parameters</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+discoveryRequest
+</td>
+<td class="hdlist2">
+<p>discover criteria, defined in <a href="https://github.com/symphonyoss/plexus-interop/blob/master/protocol/plexus.interop.proto">client protocol</a>. All fields are optional, providing flexibility to search under different criteria.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Returns</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+discoveryResponse
+</td>
+<td class="hdlist2">
+<p>discovered remote method implementations if any, containing extensive information on method provider. Discovered method instances can be passed to corresponding invocation methods.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Discover by input message and invoke first available implementation:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const discoveryResponse = await client.discoverMethod({
+    <span class="key">inputMessageId</span>: <span class="string"><span class="delimiter">'</span><span class="content">plexus.interop.CcyPair</span><span class="delimiter">'</span></span>,
+});
+client.sendUnaryRequest&lt;ICcyPair, ICcyPairRate&gt;(
+    discoveryResponse.methods[<span class="integer">0</span>],
+    { <span class="key">ccyPairName</span>: <span class="string"><span class="delimiter">'</span><span class="content">EURUSD</span><span class="delimiter">'</span></span> },
+    {
+        <span class="key">value</span>: pairRate =&gt; console.log(<span class="error">`</span>Received rate <span class="predefined">$</span>{pairRate.rate}<span class="error">`</span>),
+        <span class="key">error</span>: e =&gt; console.error(<span class="string"><span class="delimiter">'</span><span class="content">Failed to get rate</span><span class="delimiter">'</span></span>, e)
+    }
+);</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<strong>Discovery Request</strong> supports various of options, you can use any combinations of them.
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Discover by response type:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const discoveryResponse = await client.discoverMethod({
+    <span class="key">outputMessageId</span>: <span class="string"><span class="delimiter">'</span><span class="content">plexus.interop.CcyPairRate</span><span class="delimiter">'</span></span>
+});</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Discover only online method handlers:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const discoveryResponse = await client.discoverMethod({
+    <span class="key">outputMessageId</span>: <span class="string"><span class="delimiter">'</span><span class="content">plexus.interop.CcyPairRate</span><span class="delimiter">'</span></span>,
+    <span class="key">discoveryMode</span>: DiscoveryMode.Online
+});</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Discover by method reference:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const discoveryResponse = await client.discoverMethod({
+    <span class="key">consumedMethod</span>: {
+        <span class="key">consumedService</span>: {
+            <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span>
+        },
+        <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">GetRate</span><span class="delimiter">'</span></span>
+    }
+});</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Implementing "broadcast" communication using discovery.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Using <code>discoveryMethod</code> as low level API we can easily implement sending of broadcast messages using following steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Define method with <code>Empty</code> return type to be handled by listener components</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">service CcyPairBroadcastService {
+    rpc onCcyPairRate (CcyPairRate) returns (Empty);
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Setup all listener apps as provider of this action. Also we can define specific Provider instances or even companies we would like to listen events from:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">application ListenerApp {
+    <span class="comment">// listen to message from any provider</span>
+    provides CcyPairBroadcastService {onCcyPairRate;}
+    <span class="comment">// or setup listener for providers from specific namespace</span>
+    <span class="comment">// provides CcyPairBroadcastService to com.acme.* {onCcyPairRate;}</span>
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Setup broadcast publisher app to consume this action</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">application RateProviderApp {
+    consumes CcyPairBroadcastService {onCcyPairRate;}
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Use online discovery to publish new rate to all connected consumers:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">async <span class="keyword">function</span> <span class="function">broadcast</span>(rate: CcyPairRate): Promise&lt;<span class="keyword">void</span>&gt; {
+    const discoveryResponse = await client.discoverMethod({
+        <span class="key">consumedMethod</span>: {
+            <span class="key">consumedService</span>: {
+                <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyPairBroadcastService</span><span class="delimiter">'</span></span>
+            },
+            <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">onCcyPairRate</span><span class="delimiter">'</span></span>
+        },
+        <span class="key">discoveryMode</span>: DiscoveryMode.Online
+    });
+    const responseHandler = {
+        <span class="key">value</span>: () =&gt; console.log(<span class="string"><span class="delimiter">'</span><span class="content">Delivered</span><span class="delimiter">'</span></span>)
+    };
+    discoveryResponse.methods.forEach(method =&gt; {
+        client.sendUnaryRequest&lt;ICcyPairRate, Empty&gt;(
+            method,
+            rate,
+            responseHandler);
+    });
+}</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect4">
+<h5 id="discover-services">Discover Services</h5>
+<div class="paragraph">
+<p>Discovers available service implementations. Provides ability to use few methods from particular provider together.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise&lt;ServiceDiscoveryResponse&gt;;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Parameters</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+discoveryRequest
+</td>
+<td class="hdlist2">
+<p>discover criteria, defined in <a href="https://github.com/symphonyoss/plexus-interop/blob/master/protocol/plexus.interop.proto">client protocol</a>. All fields are optional, providing flexibility to search under different criteria.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Returns</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+discoveryResponse
+</td>
+<td class="hdlist2">
+<p>discovered remote service implementations if any, containing extensive information on method provider. Discovered method instances can be passed to corresponding invocation methods.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Discover service, lookup for pair of methods to be used together:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const discoveryResponse = client.discoverService({
+    <span class="key">consumedService</span>: {
+        <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span>
+    }
+});
+<span class="comment">// choose service implementation, by provider id/service alias/other details</span>
+const service: DiscoveredService = serviceDiscoveryResponse
+    .services
+    .find(s =&gt; providedService.applicationId === <span class="string"><span class="delimiter">'</span><span class="content">RateProviderApp</span><span class="delimiter">'</span></span>);
+<span class="comment">// choose required methods and invoke them as described above in 'Discover Methods' examples</span>
+const getRateMethod = service.methods.find(m =&gt; m.methodId === <span class="string"><span class="delimiter">'</span><span class="content">GetRate</span><span class="delimiter">'</span></span>);
+const getRateStreamMethod = service.methods.find(m =&gt; m.methodId === <span class="string"><span class="delimiter">'</span><span class="content">GetRateStream</span><span class="delimiter">'</span></span>);</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Discover only online service providers</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const discoveryResponse = client.discoverService({
+    <span class="key">consumedService</span>: {
+        <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span>
+    },
+    <span class="key">discoveryMode</span>: DiscoveryMode.Online
+});</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="send-server-streaming-request">Send Server Streaming Request</h5>
+<div class="paragraph">
+<p>Executes Server Streaming invocation, client receives stream of messages from server.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">sendServerStreamingRequest&lt;Req, Res&gt;(
+    invocationInfo: InvocationDescriptor,
+    <span class="key">requestMessage</span>: Req,
+    <span class="key">responseObserver</span>: InvocationObserver&lt;Res&gt;): Promise&lt;InvocationClient&gt;;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Parameters</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+invocationInfo
+</td>
+<td class="hdlist2">
+<p>details of remote action to execute</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+requestMessage
+</td>
+<td class="hdlist2">
+<p>simple object representing request details</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+responseObserver
+</td>
+<td class="hdlist2">
+<p>response stream observer</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Returns</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+invocationClient
+</td>
+<td class="hdlist2">
+<p>provides ability to cancel invocation, to notificate remote side that response no longer required</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Receive stream or rates from provider:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const invocationInfo: InvocationDescriptor = {
+    <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span>,
+    <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">GetRateStream</span><span class="delimiter">'</span></span>
+};
+const requestMessage = { <span class="key">ccyPairName</span>: <span class="string"><span class="delimiter">'</span><span class="content">EURUSD</span><span class="delimiter">'</span></span> };
+client.sendServerStreamingRequest&lt;ICcyPair, ICcyPairRate&gt;(invocationInfo, requestMessage, {
+    <span class="key">next</span>: pairRate =&gt; console.log(<span class="error">`</span>Received rate <span class="predefined">$</span>{pairRate.rate}<span class="error">`</span>),
+    <span class="key">complete</span>: () =&gt; console.log(<span class="string"><span class="delimiter">'</span><span class="content">Invocation completed</span><span class="delimiter">'</span></span>),
+    <span class="key">error</span>: e =&gt; console.error(<span class="string"><span class="delimiter">'</span><span class="content">Failed to get rate</span><span class="delimiter">'</span></span>, e)
+});</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="register-server-streaming-handler">Register Server Streaming Handler</h5>
+<div class="paragraph">
+<p>Registers handler for provided server streaming method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">onServerStreaming&lt;Req, Res&gt;(
+    serviceInfo: ServiceInfo,
+    <span class="key">handler</span>: ServerStreamingInvocationHandler&lt;Req, Res&gt;): <span class="keyword">void</span>;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Parameters</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+serviceInfo
+</td>
+<td class="hdlist2">
+<p>implemented service details</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+handler
+</td>
+<td class="hdlist2">
+<p>method details and provided implementation</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Register stream handler:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const serviceInfo = { <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span> };
+clientBuilder.onUnary&lt;ICcyPair, ICcyPairRate&gt;(serviceInfo, {
+    <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">GetRateStream</span><span class="delimiter">'</span></span>,
+    <span class="key">handle</span>: async (invocationContext: MethodInvocationContext,
+            <span class="key">request</span>: ICcyPair,
+            <span class="key">hostClient</span>: StreamingInvocationClient&lt;ICcyPairRate&gt;) =&gt; {
+        const rate: ICcyPairRate = await internalRateService.getRate(request.ccyPairName);
+        hostClient.next(rate);
+        <span class="comment">// send other rate</span>
+        const otherRate: ICcyPairRate = await internalRateService.getRate(request.ccyPairName);
+        hostClient.next(otherRate);
+        <span class="comment">// complete streaming</span>
+        hostClient.complete();
+    }
+};</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="send-bidirectional-streaming-request">Send Bidirectional Streaming Request</h5>
+<div class="paragraph">
+<p>Executes Bidirectional Streaming invocation. Client and Server communicates using streams of messages.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">sendBidirectionalStreamingRequest&lt;Req, Res&gt;(
+    invocationInfo: InvocationDescriptor,
+    <span class="key">responseObserver</span>: InvocationObserver&lt;Res&gt;): Promise&lt;StreamingInvocationClient&lt;Req&gt;&gt;;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Parameters</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+invocationInfo
+</td>
+<td class="hdlist2">
+<p>details of remote action to execute</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+responseObserver
+</td>
+<td class="hdlist2">
+<p>response stream observer</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Returns</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+streamingInvocationClient
+</td>
+<td class="hdlist2">
+<p>invocation client, provides ability to send stream of messages, complete or cancel invocation.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Bidirectional communication, client updates server on requested ccy pairs and receives stream of rates from server:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const invocationInfo: InvocationDescriptor = {
+    <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span>,
+    <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">GetRateBidiStream</span><span class="delimiter">'</span></span>
+};
+const invocation = await client.sendBidirectionalStreamingRequest&lt;ICcyPair, ICcyPairRate&gt;(
+    invocationInfo,
+    {
+        <span class="key">next</span>: pairRate =&gt; console.log(<span class="error">`</span>Received rate <span class="predefined">$</span>{pairRate.rate}<span class="error">`</span>),
+        <span class="key">streamCompleted</span>: () =&gt; console.log(<span class="string"><span class="delimiter">'</span><span class="content">Remote stream completed</span><span class="delimiter">'</span></span>),
+        <span class="key">complete</span>: () =&gt; console.log(<span class="string"><span class="delimiter">'</span><span class="content">Invocation completed</span><span class="delimiter">'</span></span>),
+        <span class="key">error</span>: e =&gt; console.error(<span class="string"><span class="delimiter">'</span><span class="content">Failed to get rate</span><span class="delimiter">'</span></span>, e)
+    });
+invocation.next({ <span class="key">ccyPairName</span>: <span class="string"><span class="delimiter">'</span><span class="content">EURUSD</span><span class="delimiter">'</span></span> });
+<span class="comment">// ask for other ccy pair rates later</span>
+invocation.next({ <span class="key">ccyPairName</span>: <span class="string"><span class="delimiter">'</span><span class="content">EURGBP</span><span class="delimiter">'</span></span> });
+<span class="comment">// notify server that no more pairs be requested</span>
+invocation.complete();</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="register-bidirectional-streaming-handler">Register Bidirectional Streaming Handler</h5>
+<div class="paragraph">
+<p>Registers handler for provided bidirectional streaming method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">onBidiStreaming&lt;Req, Res&gt;(
+    serviceInfo: ServiceInfo,
+    <span class="key">handler</span>: BidiStreamingInvocationHandler&lt;Req, Res&gt;): <span class="keyword">void</span>;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Parameters</strong></p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+serviceInfo
+</td>
+<td class="hdlist2">
+<p>implemented service details</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+handler
+</td>
+<td class="hdlist2">
+<p>method details and provided implementation</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Register bidirectional handler:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const serviceInfo = { <span class="key">serviceId</span>: <span class="string"><span class="delimiter">'</span><span class="content">CcyRateService</span><span class="delimiter">'</span></span> };
+clientBuilder.onBidiStreaming&lt;ICcyPair, ICcyPairRate&gt;(serviceInfo, {
+    <span class="key">methodId</span>: <span class="string"><span class="delimiter">'</span><span class="content">GetRateStream</span><span class="delimiter">'</span></span>,
+    <span class="key">handle</span>: (invocationContext: MethodInvocationContext,
+            <span class="key">hostClient</span>: StreamingInvocationClient&lt;ICcyPairRate&gt;) =&gt; {
+        const ccyPairs = [];
+        <span class="comment">// send rate for each requested pair every second</span>
+        setInterval(() =&gt; {
+            ccyPairs.forEach(pair =&gt; {
+                hostClient.next(internalRateService.getRate(pair)
+            });
+        }, <span class="integer">1000</span>);
+        <span class="comment">// client's stream observer</span>
+        <span class="keyword">return</span> {
+            <span class="key">next</span>: ccyPair =&gt; ccyPairs.push(ccyPair)
+        };
+    }
+};</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect3">
@@ -2791,7 +3602,7 @@ all mapping are correct and consistent.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-04-05 14:38:17 MSK
+Last updated 2018-04-25 15:15:31 MSK
 </div>
 </div>
 </body>
