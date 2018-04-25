@@ -364,7 +364,7 @@ application ListenerApp {
 }
 -------------------
 
-. Setup consumer app to consume this action
+. Setup broadcast publisher app to consume this action
 +
 [source,javascript]
 -------------------
