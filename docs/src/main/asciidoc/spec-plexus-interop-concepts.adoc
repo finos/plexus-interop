@@ -121,7 +121,7 @@ send/receive messages to/from broker.
 
 Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository. Please see Web API definition with examples below.
 
-===== Send Request
+===== Send Unary Request
 
 Executes Point-to-Point invocation with structured request/response.
 
@@ -176,6 +176,49 @@ const invocationInfo: GenericRequest = {
 };
 // same as in example above ...
 -------------------
+
+===== Send Server Streaming Request
+
+Executes Server Streaming invocation, with structured request/response.
+
+[source,javascript]
+------------------
+sendServerStreamingRequest<Req,Res>(
+    invocationInfo: GenericRequest,
+    request: Req,
+    responseObserver: InvocationObserver<Res>): Promise<InvocationClient>;
+------------------
+
+*Parameters*
+
+[horizontal]
+invocationInfo:: details of remote action to execute
+request:: simple object representing request details
+responseObserver:: response stream observer
+
+*Returns*
+
+[horizontal]
+invocationClient:: provides ability to cancel invocation, to notificate remote side that response no longer required
+
+*Examples*
+
+- Receive stream or rates from provider:
++
+[source,javascript]
+-------------------
+const invocationInfo: GenericRequest = {
+    serviceId: 'CcyRateService',
+    methodId: 'GetRateStream'
+};
+const request = { ccyPairName: 'EURUSD' };
+client.sendServerStreamingRequest<ICcyPair, ICcyPairRate>(invocationInfo, request, {
+    next: pairRate => console.log(`Received rate ${pairRate.rate}`),
+    complete: () => console.log('Invocation completed'),
+    error: e => console.error('Failed to get rate', e)
+});
+-------------------
+
 
 ===== Discover Methods
 
