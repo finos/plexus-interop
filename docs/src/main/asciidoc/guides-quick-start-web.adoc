@@ -4,7 +4,7 @@
 
 In this guide both consumer and provider are written in TypeScript language and run in https://electron.atom.io/[Electron] container.
 
-===== Run the example
+===== Run example
 
 include::guides-quick-start-launch-broker-step.adoc[]
 

@@ -80,6 +80,7 @@ function getExePath(): string[] {
 
 function getDefaultDownloadUrl(platform: string): string {
     switch (platform) {
+        case 'win32-ia32':
         case 'win32-x32':
         case 'win32-x64':
             return 'https://github.com/google/protobuf/releases/download/v3.5.1/protoc-3.5.1-win32.zip';
