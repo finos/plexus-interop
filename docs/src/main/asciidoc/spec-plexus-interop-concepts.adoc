@@ -130,9 +130,7 @@ Executes Point-to-Point invocation with structured request/response.
 sendUnaryRequest<Req, Res>(
     invocationInfo: GenericRequest,
     request: Req,
-    responseHandler: ValueHandler<Res>,
-    requestMarshaller: Marshaller<Req>,
-    responseMarshaller: Marshaller<Res>): Promise<InvocationClient>;
+    responseHandler: ValueHandler<Res>): Promise<InvocationClient>;
 -------------------
 
 *Parameters*
@@ -141,13 +139,11 @@ sendUnaryRequest<Req, Res>(
 invocationInfo:: details of remote action to execute
 request:: simple object representing request details
 responseHandler:: response/error handler
-requestMarshaller:: request type marshaller, responsible for serialization of request object to binary format
-responseMarshaller:: response type marshaller, responsible for deserialization of response object from binary format
 
 *Returns*
 
 [horizontal]
-invocationClient:: provides ability to cancel invocation, telling remote side that response no longer required
+invocationClient:: provides ability to cancel invocation, to notificate remote side that response no longer required
 
 *Examples*
 
@@ -159,16 +155,11 @@ const invocationInfo: GenericRequest = {
     serviceId: 'CcyRateService',
     methodId: 'GetRate'
 };
-const responseHandler = {
+const request = { ccyPairName: 'EURUSD' };
+client.sendUnaryRequest<ICcyPair, ICcyPairRate>(invocationInfo, request, {
     value: pairRate => console.log(`Received rate ${pairRate.rate}`),
     error: e => console.error('Failed to get rate', e)
-};
-client.sendUnaryRequest<ICcyPair, ICcyPairRate>(
-    invocationInfo,
-    { ccyPairName: 'EURUSD' },
-    responseHandler,
-    new JsonMarshaller(CcyPair),
-    new JsonMarshaller(CcyPairRate));
+});
 -------------------
 
 - Invoke remote action on particular provider:
@@ -184,50 +175,6 @@ const invocationInfo: GenericRequest = {
     connectionId: remoteAppGuid
 };
 // same as in example above ...
--------------------
-
-===== Send Binary Request
-
-Executes Point-to-Point invocation with binary request/response. Acts in the same way as "Send Request", skipping serialization/deserialization steps.
-
-[source,javascript]
--------------------
-sendRawUnaryRequest(
-    invocationInfo: GenericRequest,
-    request: ArrayBuffer,
-    responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
--------------------
-
-*Parameters*
-
-[horizontal]
-invocationInfo:: details of remote action to execute
-request:: array buffer representing request details
-responseHandler:: response/error handler
-
-*Returns*
-
-[horizontal]
-invocationClient:: provides ability to cancel invocation, telling remote side that response no longer required
-
-*Examples*
-
-- Invoke remote action on any available provider:
-
-[source,javascript]
--------------------
-const invocationInfo: GenericRequest = {
-    serviceId: 'CcyRateService',
-    methodId: 'GetRate'
-};
-const responseHandler = {
-    value: binaryResponse => console.log(`Received bytes ${binaryResponse.length}`),
-    error: e => console.error('Failed to get rate', e)
-};
-client.sendRawUnaryRequest<ICcyPair, ICcyPairRate>(
-    invocationInfo,
-    binaryMarshaller.encode({ccyPairName: 'EURUSD'}),
-    responseHandler);
 -------------------
 
 ===== Discover Methods
