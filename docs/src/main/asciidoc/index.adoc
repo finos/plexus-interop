@@ -1,6 +1,6 @@
 = Plexus Interop
 :toc2:
-:toclevels: 3
+:toclevels: 4
 
 [[getting-started]]
 == Getting Started

@@ -48,6 +48,7 @@ export function getJreDownloadUrl(): string {
 
 function getDefaultDownloadUrl(platform: string): string {
     switch (platform) {
+        case 'win32-ia32':
         case 'win32-x32':
             return 'http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jre-8u161-windows-i586.tar.gz';
         case 'win32-x64':
