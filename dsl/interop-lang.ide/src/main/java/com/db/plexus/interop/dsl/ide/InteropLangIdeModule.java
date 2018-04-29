@@ -16,8 +16,30 @@
  */
 package com.db.plexus.interop.dsl.ide;
 
+import com.db.plexus.interop.dsl.ide.assist.InteropContentProposalProvider;
+import com.db.plexus.interop.dsl.ide.assist.InteropCrossRefProposalProvider;
+import com.google.inject.Binder;
+import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
+import org.eclipse.xtext.ide.editor.contentassist.IdeCrossrefProposalProvider;
+
 /**
- * Use this class to register ide components.
+ * Use this class to register custom ide components.
  */
 public class InteropLangIdeModule extends AbstractInteropLangIdeModule {
+
+    /**
+     * It is used, please do not delete, Xtext like reflection a lot
+     */
+    public void configureContentAssistProvider(Binder binder) {
+        binder.bind(IdeContentProposalProvider.class)
+                .to(InteropContentProposalProvider.class);
+    }
+
+    /**
+     * It is used also
+     */
+    public void configureCrossRefProposalProvider(Binder binder) {
+        binder.bind(IdeCrossrefProposalProvider.class).to(InteropCrossRefProposalProvider.class);
+    }
+
 }

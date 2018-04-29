@@ -28,7 +28,7 @@
         </dict>
         <dict>
             <key>include</key>
-            <string>#keywords</string>
+            <string>#keywords</string> 
         </dict>
 	</array>
     <key>repository</key>
