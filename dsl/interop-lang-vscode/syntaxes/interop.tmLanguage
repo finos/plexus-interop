@@ -11,12 +11,81 @@
 	<key>patterns</key>
 	<array>
 		<dict>
-			<key>name</key>
-			<string>keyword.control.interop</string>
-			<key>match</key>
-			<string>\b(application|provides|consumes)\b</string>
-		</dict>
+            <key>include</key>
+            <string>#comments</string>
+        </dict>
+        <dict>
+            <key>include</key>
+            <string>#imports</string>
+        </dict>
+        <dict>
+            <key>include</key>
+            <string>#package</string>
+        </dict>
 	</array>
+    <key>repository</key>
+    <dict>
+      <key>comments</key>
+      <dict>
+        <key>patterns</key>
+        <array>
+          <dict>
+            <key>name</key>
+            <string>comment.block.interop</string>
+            <key>begin</key>
+            <string>/\*</string>
+            <key>end</key>
+            <string>\*/</string>
+          </dict>
+          <dict>
+            <key>name</key>
+            <string>comment.line.double-slash.interop</string>
+            <key>begin</key>
+            <string>//</string>
+            <key>end</key>
+            <string>$\n?</string>
+          </dict>
+        </array>
+      </dict>
+      <!-- Imports --> 
+      <key>imports</key>
+      <dict>
+        <key>match</key>
+        <string>\s*(import)\s+("[^"]+")\s*;</string>
+        <key>captures</key>
+        <dict>
+          <key>1</key>
+          <dict>
+            <key>name</key>
+            <string>keyword.other.interop</string>
+          </dict>
+          <key>2</key>
+          <dict>
+            <key>name</key>
+            <string>string.unquoted.interop.package</string>
+          </dict>
+        </dict>
+      </dict>
+      <!-- Package -->
+      <key>package</key>
+      <dict>
+        <key>match</key>
+        <string>\s*(package)\s+([\w.]+)\s*;</string>
+        <key>captures</key>
+        <dict>
+          <key>1</key>
+          <dict>
+            <key>name</key>
+            <string>keyword.other.interop</string>
+          </dict>
+          <key>2</key>
+          <dict>
+            <key>name</key>
+            <string>string.unquoted.interop.package</string>
+          </dict>
+        </dict>
+      </dict>
+    </dict>
 	<key>scopeName</key>
 	<string>text.interop</string>
 </dict>
