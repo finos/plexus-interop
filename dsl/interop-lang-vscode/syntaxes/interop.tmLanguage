@@ -22,9 +22,14 @@
             <key>include</key>
             <string>#package</string>
         </dict>
+        <dict>
+            <key>include</key>
+            <string>#keywords</string>
+        </dict>
 	</array>
     <key>repository</key>
     <dict>
+      <!-- Comments -->  
       <key>comments</key>
       <dict>
         <key>patterns</key>
@@ -46,6 +51,14 @@
             <string>$\n?</string>
           </dict>
         </array>
+      </dict>
+      <!-- Interop Keywords -->
+      <key>keywords</key>
+      <dict>
+        <key>match</key>
+        <string>\b(application|consumes|provides|from|to|option|as)\b</string>
+        <key>name</key>
+        <string>keyword.other.interop</string>
       </dict>
       <!-- Imports --> 
       <key>imports</key>
