@@ -14,17 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.db.plexus.interop.dsl.ide
+package com.db.plexus.interop.dsl.ide;
 
-import com.db.plexus.interop.dsl.InteropLangRuntimeModule
-import com.db.plexus.interop.dsl.InteropLangStandaloneSetup
-import com.google.inject.Guice
-import org.eclipse.xtext.util.Modules2
-
-class InteropLangIdeSetup extends InteropLangStandaloneSetup {
-
-	override createInjector() {
-		Guice.createInjector(Modules2.mixin(new InteropLangRuntimeModule, new InteropLangIdeModule))
-	}
-	
+/**
+ * Use this class to register ide components.
+ */
+public class InteropLangIdeModule extends AbstractInteropLangIdeModule {
 }
