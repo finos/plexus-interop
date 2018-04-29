@@ -30,6 +30,10 @@
             <key>include</key>
             <string>#keywords</string> 
         </dict>
+        <dict>
+            <key>include</key>
+            <string>#string</string> 
+        </dict>
 	</array>
     <key>repository</key>
     <dict>
@@ -60,9 +64,18 @@
       <key>keywords</key>
       <dict>
         <key>match</key>
-        <string>\b(application|consumes|provides|from|to|option|as)\b</string>
+        <string>\b(application|consumes|provides)\b</string>
         <key>name</key>
         <string>keyword.other.interop</string>
+      </dict>
+      <key>string</key>
+      <dict>
+        <key>begin</key>
+        <string>"</string>
+        <key>end</key>
+        <string>"</string>
+        <key>name</key>
+        <string>string.quoted.double.interop</string>
       </dict>
       <!-- Imports --> 
       <key>imports</key>
