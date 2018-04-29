@@ -37,7 +37,7 @@ import org.eclipse.xtext.ide.server.ServerModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-public class DebugLanguageServerLauncher {
+public class DebugServerLauncher {
 
     public static void main(String[] args) throws InterruptedException, IOException, ExecutionException {
         final Injector injector = Guice.createInjector(new InteropLangServerModule());

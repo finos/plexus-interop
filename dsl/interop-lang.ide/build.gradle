@@ -6,5 +6,5 @@ dependencies {
     compile "org.eclipse.xtext:org.eclipse.xtext.xbase.ide:${xtextVersion}"
 }
 
-mainClassName = 'org.eclipse.xtext.ide.server.ServerLauncher'
+mainClassName = 'com.db.plexus.interop.dsl.ide.server.StdIOServerLauncher'
 applicationName = 'interop-lang-server'
