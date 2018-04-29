@@ -20,6 +20,10 @@
         </dict>
         <dict>
             <key>include</key>
+            <string>#app-name</string>
+        </dict>
+        <dict>
+            <key>include</key>
             <string>#package</string>
         </dict>
         <dict>
@@ -78,6 +82,25 @@
             <string>string.unquoted.interop.package</string>
           </dict>
         </dict>
+      </dict>
+      <!-- App Name-->
+      <key>app-name</key>
+      <dict>
+        <key>match</key>
+        <string>\s*(application)\s+([\w]+)\s*{</string>
+        <key>captures</key>
+        <dict>
+          <key>1</key>
+          <dict>
+            <key>name</key>
+            <string>keyword.other.interop</string>
+          </dict>
+          <key>2</key>
+          <dict>
+            <key>name</key>
+            <string>entity.name.class.message.interop</string>
+          </dict>
+        </dict>                        
       </dict>
       <!-- Package -->
       <key>package</key>
