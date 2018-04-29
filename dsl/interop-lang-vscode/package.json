@@ -26,6 +26,13 @@
                 ],
                 "configuration": "./interop.configuration.json"
             }
+        ],
+        "grammars": [
+            {
+                "language": "interop",
+                "scopeName": "text.interop",
+                "path": "./syntaxes/interop.tmLanguage"
+            }
         ]
     },
     "scripts": {

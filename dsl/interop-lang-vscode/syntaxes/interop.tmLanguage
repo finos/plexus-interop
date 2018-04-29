@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>*.interop</string>
+	</array>
+	<key>name</key>
+	<string>interop</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>name</key>
+			<string>keyword.control.interop</string>
+			<key>match</key>
+			<string>\b(application|provides|consumes)\b</string>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>text.interop</string>
+</dict>
+</plist>
