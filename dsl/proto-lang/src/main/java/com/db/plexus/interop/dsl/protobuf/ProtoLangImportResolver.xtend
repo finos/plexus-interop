@@ -23,6 +23,8 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.xtext.resource.IResourceDescriptionsProvider
 import java.util.ArrayList
+import org.eclipse.emf.ecore.resource.Resource
+import java.util.stream.Collectors
 
 @Singleton
 class ProtoLangImportResolver {
@@ -61,6 +63,17 @@ class ProtoLangImportResolver {
 			.getResourceDescriptions(resourceSet)
 			.getResourceDescription(resource.URI) 		
 	}
+
+    def public importCandidates(Resource resource) {
+        resource.resourceSet
+            .resources
+            .toList
+            .stream
+            .filter([x| !x.equals(resource)])
+            .flatMap([res| config.getBaseURIs().stream().map([url| res.getURI().deresolve(url)])])
+            .filter([uri| !uri.hasAbsolutePath])
+            .collect(Collectors.toList())
+    }
 	
 	def public getResolveCandidates(String importString) {
 		val result = new ArrayList<URI>()
