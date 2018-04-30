@@ -26,6 +26,7 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.IResourceDescriptionsProvider
 import com.google.inject.Singleton
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 
 @Singleton
 class InteropLangUtils {
@@ -38,14 +39,21 @@ class InteropLangUtils {
 
 	@Inject
 	protected ProtoLangImportResolver importResolver
-		
-	
-	def public Message getDescriptorsContainer(InteropOption option) {
+
+    @Inject
+    protected IQualifiedNameProvider qualifiedNameProvider
+
+    def public Message getDescriptorsContainer(InteropOption option) {
 		val name = option.descriptorContainerName
-		val description = option.eResource.resourceSet.descriptorResourceDescription
-		if (description == null) {
-			return null;
-		}
+        val resourceSet = option.eResource.resourceSet
+		val description = resourceSet.descriptorResourceDescription
+        if (description == null) {
+            val descriptorResource = importResolver.resolveResource(resourceSet, DESCRIPTOR_RESOURCE_PATH)
+            val message = descriptorResource.allContents
+                .filter(typeof(Message))
+                .findFirst[m | name.equals(qualifiedNameProvider.getFullyQualifiedName(m))]
+		    return message;
+        }
 		val objects = description.getExportedObjects(ProtobufPackage.Literals.MESSAGE, name, false)
 		val message = objects.findFirst[x|true];
 		return if (message != null) message.EObjectOrProxy as Message else null
