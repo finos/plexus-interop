@@ -67,12 +67,17 @@ class ProtoLangImportResolver {
     def public importCandidates(Resource resource) {
         resource.resourceSet
             .resources
-            .toList
             .stream
             .filter([x| !x.equals(resource)])
-            .flatMap([res| config.getBaseURIs().stream().map([url| res.getURI().deresolve(url)])])
+            .flatMap([res| config.getBaseURIs().stream().map([url| deresolve(url, res.getURI)])])
             .filter([uri| !uri.hasAbsolutePath])
             .collect(Collectors.toList())
+    }
+
+	def public URI deresolve(URI base, URI uri) {
+        val normalizedBase = URI.createURI(URI.decode(base.toString))
+        val normalizedUri = URI.createURI(URI.decode(uri.toString))
+        return normalizedUri.deresolve(normalizedBase)
     }
 	
 	def public getResolveCandidates(String importString) {
