@@ -19,45 +19,15 @@ package com.db.plexus.interop.dsl.ide.assist;
 import com.db.plexus.interop.dsl.ConsumedService;
 import com.db.plexus.interop.dsl.ProvidedService;
 import com.db.plexus.interop.dsl.protobuf.Method;
-import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver;
 import com.db.plexus.interop.dsl.protobuf.Service;
+import com.db.plexus.interop.ide.assist.ImportContentProvider;
 import com.google.common.base.Predicate;
-import com.google.inject.Inject;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.*;
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistContext;
-import org.eclipse.xtext.ide.editor.contentassist.ContentAssistEntry;
-import org.eclipse.xtext.ide.editor.contentassist.IIdeContentProposalAcceptor;
-import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
-import org.eclipse.xtext.impl.RuleCallImpl;
 import org.eclipse.xtext.resource.IEObjectDescription;
 
-public class InteropContentProposalProvider extends IdeContentProposalProvider {
-
-    @Inject
-    private ProtoLangImportResolver importResolver;
-
-    @Override
-    protected void _createProposals(Assignment assignment, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
-        final AbstractElement terminal = assignment.getTerminal();
-        if (terminal instanceof RuleCallImpl) {
-            final String feature = assignment.getFeature();
-            final String operator = assignment.getOperator();
-            if ("importURI".equals(feature) && "=".equals(operator)) {
-                importResolver.importCandidates(context.getResource())
-                        .stream()
-                        .map(uri -> uri.toFileString().replace("\\", "/"))
-                        .map(uriString -> "\"" + uriString + "\"")
-                        .forEach(value -> {
-                            final ContentAssistEntry proposal = getProposalCreator()
-                                    .createProposal(value, context);
-                            acceptor.accept(proposal, getProposalPriorities().getDefaultPriority(proposal));
-                        });
-                return;
-            }
-        }
-        super._createProposals(assignment, context, acceptor);
-    }
+public class InteropContentProposalProvider extends ImportContentProvider {
 
     protected Predicate<IEObjectDescription> getCrossrefFilter(final CrossReference reference, final ContentAssistContext context) {
 

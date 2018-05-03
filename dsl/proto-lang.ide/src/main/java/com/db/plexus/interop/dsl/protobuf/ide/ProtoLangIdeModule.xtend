@@ -16,9 +16,15 @@
  */
 package com.db.plexus.interop.dsl.protobuf.ide
 
+import com.google.inject.Binder
+import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
+import com.db.plexus.interop.ide.assist.ImportContentProvider
 
 class ProtoLangIdeModule extends AbstractProtoLangIdeModule {
 
-
+    def configureContentAssistProvider(Binder binder) {
+        binder.bind(typeof(IdeContentProposalProvider))
+            .to(typeof(ImportContentProvider));
+    }
 
 }
