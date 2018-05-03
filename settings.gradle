@@ -1,7 +1,9 @@
 include ':docs'
 
 include ':dsl:model'
+include ':dsl:ide-common'
 include ':dsl:proto-lang'
+include ':dsl:proto-lang.ide'
 include ':dsl:interop-lang'
 include ':dsl:interop-lang.ide'
 include ':dsl:interop-lang-vscode'

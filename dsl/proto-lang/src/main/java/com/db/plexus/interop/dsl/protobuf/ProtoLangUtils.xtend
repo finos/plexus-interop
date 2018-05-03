@@ -23,6 +23,7 @@ import com.google.inject.Inject
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.emf.ecore.resource.ResourceSet
 import com.google.inject.Singleton
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 
 @Singleton
 class ProtoLangUtils {
@@ -35,13 +36,24 @@ class ProtoLangUtils {
 
 	@Inject
 	protected ProtoLangImportResolver importResolver
-		
+
+	@Inject
+	protected IQualifiedNameProvider qualifiedNameProvider
+
 	def public Message getDescriptorsContainer(Option option) {
 		val name = option.descriptorContainerName
 		if (name === null) {
 			return null
 		}
-		val description = option.eResource.resourceSet.descriptorResourceDescription		
+		val resourceSet = option.eResource.resourceSet
+		val description = resourceSet.descriptorResourceDescription
+		if (description == null) {
+			val descriptorResource = importResolver.resolveResource(resourceSet, DESCRIPTOR_RESOURCE_PATH)
+			val message = descriptorResource.allContents
+				.filter(typeof(Message))
+				.findFirst[m | name.equals(qualifiedNameProvider.getFullyQualifiedName(m))]
+			return message;
+		}
 		return description.getExportedObjects(ProtobufPackage.Literals.MESSAGE, name, false).findFirst[x|true].EObjectOrProxy as Message
 	}
 	

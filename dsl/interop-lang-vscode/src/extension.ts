@@ -8,18 +8,47 @@ import { LanguageClient, LanguageClientOptions, ServerOptions, StreamInfo } from
 
 export function activate(context: ExtensionContext) {
     
-    const clientOptions: LanguageClientOptions = {
-        documentSelector: [{scheme: 'file', language: 'interop'}],
-        synchronize: {
-            configurationSection: 'languageServerExample',
-            fileEvents: workspace.createFileSystemWatcher('**/*.*')
-        }
-    }
+    const interopClientOptions: LanguageClientOptions = {
+        documentSelector: [
+            {scheme: 'file', language: 'interop'}
+        ]
+    };
     
+    const interopClient = createLangClient(
+            'interop-lang-server', 
+            'PLEXUS_INTEROP_LS_PORT',
+            context,
+            interopClientOptions);
+    
+    context.subscriptions.push(interopClient.start());
+
+
+    const protoClientOptions: LanguageClientOptions = {
+        documentSelector: [
+            {scheme: 'file', language: 'proto'}
+        ]
+    };
+    
+    const protoClient = createLangClient(
+        'proto-lang-server', 
+        'PLEXUS_PROTO_LS_PORT',
+        context,
+        protoClientOptions);
+
+    context.subscriptions.push(protoClient.start());
+    
+}
+
+function createLangClient(
+        title: string, 
+        debugPortEnv: string, 
+        context: ExtensionContext, 
+        clientOptions: LanguageClientOptions) {
+
     let serverOptions;
-    if (process.env.PLEXUS_INTEROP_LS_PORT) {
-        const serverPort = process.env.PLEXUS_INTEROP_LS_PORT;
-        console.error(`Connecting to LS using ${serverPort} port`);
+    if (process.env[debugPortEnv]) {
+        const serverPort = process.env[debugPortEnv];
+        console.error(`Connecting to ${title} using ${serverPort} port`);
         serverOptions = async () => {
             const socket = net.connect({
                 port: serverPort
@@ -32,15 +61,12 @@ export function activate(context: ExtensionContext) {
         };
     } else {
         const extension = process.platform == 'win32' ? '.bat' : '';
-        const executable = 'interop-lang-server' + extension;
-        const command = context.asAbsolutePath(path.join('interop-lang-server', 'bin', executable));
+        const executable = title + extension;
+        const command = context.asAbsolutePath(path.join(title, 'bin', executable));
         serverOptions = { command };
     }   
     
-    const disposable = new LanguageClient('Plexus Interop Server', serverOptions, clientOptions).start();
-
-    context.subscriptions.push(disposable);
-    
+    return new LanguageClient(title, serverOptions, clientOptions);
 }
 
 function isDebugMode(): boolean {

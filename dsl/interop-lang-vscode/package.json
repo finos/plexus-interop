@@ -25,6 +25,16 @@
                     ".interop"
                 ],
                 "configuration": "./interop.configuration.json"
+            },
+            {
+                "id": "proto",
+                "aliases": [
+                    "proto"
+                ],
+                "extensions": [
+                    ".proto"
+                ],
+                "configuration": "./interop.configuration.json"
             }
         ],
         "grammars": [
@@ -32,6 +42,11 @@
                 "language": "interop",
                 "scopeName": "text.interop",
                 "path": "./syntaxes/interop.tmLanguage"
+            },
+            {
+                "language": "proto",
+                "scopeName": "text.proto",
+                "path": "./syntaxes/proto.tmLanguage"
             }
         ]
     },

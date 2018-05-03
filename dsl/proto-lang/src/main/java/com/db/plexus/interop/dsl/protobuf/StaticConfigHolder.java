@@ -14,24 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.db.plexus.interop.dsl.protobuf
+package com.db.plexus.interop.dsl.protobuf;
 
-import com.google.inject.Injector
-import org.eclipse.emf.ecore.EPackage
-
-/**
- * Initialization support for running Xtext languages without Equinox extension registry.
- */
-class ProtoLangStandaloneSetup extends ProtoLangStandaloneSetupGenerated {	
-		
-	static def doSetup() {		
-	}	
-
-	override register(Injector injector) {
-		if (!EPackage.Registry.INSTANCE.containsKey(ProtobufPackage.eNS_URI)) {
-			EPackage.Registry.INSTANCE.put(ProtobufPackage.eNS_URI, ProtobufPackage.eINSTANCE);
-		}
-		StaticConfigHolder.protoLangConfig = injector.getInstance(typeof(ProtoLangConfig))
-		super.register(injector)			
-	}
+public class StaticConfigHolder {
+    public static ProtoLangConfig protoLangConfig;
 }

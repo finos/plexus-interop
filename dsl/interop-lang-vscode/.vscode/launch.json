@@ -12,7 +12,8 @@
 				"${workspaceRoot}/out/src/**/*.js"
 			],
             "env": {
-                "PLEXUS_INTEROP_LS_PORT": "5555"
+                "PLEXUS_INTEROP_LS_PORT": "5555",
+                "PLEXUS_PROTO_LS_PORT": "5556"
             }
         }
     ]

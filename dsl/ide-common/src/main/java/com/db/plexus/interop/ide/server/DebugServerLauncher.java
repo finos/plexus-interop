@@ -14,7 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.db.plexus.interop.dsl.ide.server;
+
+package com.db.plexus.interop.ide.server;
+
+import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.jsonrpc.MessageConsumer;
+import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.xtext.ide.server.LanguageServerImpl;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -28,24 +34,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
-import org.eclipse.lsp4j.jsonrpc.Launcher;
-import org.eclipse.lsp4j.jsonrpc.MessageConsumer;
-import org.eclipse.lsp4j.services.LanguageClient;
-import org.eclipse.xtext.ide.server.LanguageServerImpl;
-import org.eclipse.xtext.ide.server.ServerModule;
-
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-
 public class DebugServerLauncher {
 
-    public static void main(String[] args) throws InterruptedException, IOException, ExecutionException {
-        final Injector injector = Guice.createInjector(new InteropLangServerModule());
-        final LanguageServerImpl languageServer = injector.getInstance(InteropLanguageServer.class);
+    public static void launch(LanguageServerImpl languageServer, int port) throws InterruptedException, ExecutionException, IOException {
         Launcher<LanguageClient> launcher = createSocketLauncher(
                 languageServer,
                 LanguageClient.class,
-                new InetSocketAddress("localhost", 5555),
+                new InetSocketAddress("localhost", port),
                 Executors.newCachedThreadPool(),
                 consumer -> consumer);
         languageServer.connect(launcher.getRemoteProxy());

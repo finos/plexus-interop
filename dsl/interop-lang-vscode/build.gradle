@@ -5,4 +5,10 @@ task installServer(type: Copy) {
     into "interop-lang-server"
 }
 
-build.dependsOn installServer
+task installProtoServer(type: Copy) {
+    dependsOn(':dsl:proto-lang.ide:installDist')
+    from "../proto-lang.ide/build/install/proto-lang-server"
+    into "proto-lang-server"
+}
+
+build.dependsOn installServer, installProtoServer
