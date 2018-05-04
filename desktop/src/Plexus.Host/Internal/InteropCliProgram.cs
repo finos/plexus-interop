@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.CommandLineTool
+ namespace Plexus.Host.Internal
 {
-    using Plexus.Host;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using Plexus.Interop.CommandLineTool.Internal.Generated;
+    using Plexus.Host.Internal.Generated;
+    using Plexus.Interop;
     using UniqueId = Plexus.UniqueId;
 
-    public sealed class InteropCliProgram : IProgram
+    internal sealed class InteropCliProgram : IProgram
     {
         private static readonly ILogger Log = LogManager.GetLogger<InteropCliProgram>();
 

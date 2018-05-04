@@ -49,13 +49,12 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Plexus.Host.Contracts\Plexus.Host.Contracts.csproj" />
-    <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />
-    <ProjectReference Include="..\Plexus.Interop.CommandLineTool\Plexus.Interop.CommandLineTool.csproj" />    
+    <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />    
     <ProjectReference Include="..\Plexus.Logging.NLog\Plexus.Logging.NLog.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Samples.Metadata\Plexus.Interop.Samples.Metadata.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeAssets>Build</IncludeAssets>
     </ProjectReference>
   </ItemGroup>
   

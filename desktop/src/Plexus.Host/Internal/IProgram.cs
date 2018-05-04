@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,6 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Runtime.CompilerServices;
+ namespace Plexus.Host.Internal
+{
+    using System.Threading.Tasks;
 
-[assembly:InternalsVisibleTo("Plexus.Interop.Broker.Host.Tests")]
+    internal interface IProgram
+    {
+        string Name { get; }
+        
+        string InstanceKey { get; }
+
+        InstanceAwareness InstanceAwareness { get; }
+
+        Task<Task> StartAsync();
+
+        Task ShutdownAsync();
+    }
+}

@@ -17,7 +17,6 @@
 namespace Plexus.Host
 {
     using CommandLine;
-    using Plexus.Interop.CommandLineTool;
     using System;
     using System.Diagnostics;
     using System.IO;
