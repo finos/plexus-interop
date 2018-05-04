@@ -16,13 +16,14 @@
  */
 namespace Plexus.Host
 {
+    using CommandLine;
+    using Plexus.Host.Args;
+    using Plexus.Interop.Broker.Host;
+    using Plexus.Interop.CommandLineTool;
     using System;
-    using System.Collections.Generic;
-    using System.CommandLine;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -34,143 +35,64 @@ namespace Plexus.Host
         public static int Main(string[] args)
         {
             InitializeProcess();
-            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
             return new Program().RunAsync(args).GetResult();
         }
 
         public async Task<int> RunAsync(string[] args)
         {
-            var command = CliCommand.None;
-            var workingDir = Directory.GetCurrentDirectory();
-            var metadataDir = "metadata";
-            string pluginPath = null;
-            IReadOnlyList<string> pluginArgs = new string[0];
-            IReadOnlyList<string> appIds = new string[0];
-            string pid = null;
-
-            try
-            {                
-                var result = ArgumentSyntax.Parse(args, syntax =>
-                {
-                    syntax.ApplicationName = "plexus";
-                    syntax.ErrorOnUnexpectedArguments = false;
-                    syntax.HandleHelp = true;
-                    syntax.HandleErrors = true;
-                    syntax.HandleResponseFiles = true;
-
-                    syntax.DefineCommand("broker", ref command, CliCommand.Broker, "Start interop broker");
-                    syntax.DefineOption(
-                        "d|directory",
-                        ref workingDir,
-                        false,
-                        "Working directory for interop broker");
-                    syntax.DefineOption(
-                        "m|metadata",
-                        ref metadataDir,
-                        false,
-                        "Directory to seek for metadata files: apps.json and interop.json");
-
-                    syntax.DefineCommand("launch", ref command, CliCommand.Launch, "Launch app through the running broker");
-                    syntax.DefineOption(
-                        "d|directory",
-                        ref workingDir,
-                        false,
-                        "Working directory for interop broker");
-                    syntax.DefineParameterList("application", ref appIds, "Application IDs");
-
-                    var loadCommand = syntax.DefineCommand("load", ref command, CliCommand.Load, "Load plugin dll");
-                    loadCommand.IsHidden = true;
-                    syntax.DefineOption(
-                        "p|plugin",
-                        ref pluginPath,
-                        true,
-                        "Path to plugin");
-                    syntax.DefineOption(
-                        "d|directory",
-                        ref workingDir,
-                        false,
-                        "Working directory for plugin process");
-                    syntax.DefineParameterList("pluginCmd", ref pluginArgs, "Plugin arguments");
-
-                    var stopCommand = syntax.DefineCommand("stop", ref command, CliCommand.Stop, "Stop currently running plexus process(es)");
-                    stopCommand.IsHidden = true;
-                    syntax.DefineParameter("pid", ref pid, "Process ID to stop");
-                });
-
-                switch (command)
-                {
-                    case CliCommand.None:
-                        result.ReportError("<command> required");
-                        return 1;
-                    case CliCommand.Broker:
-                        return await StartBrokerAsync(workingDir, metadataDir).ConfigureAwait(false);
-                    case CliCommand.Stop:
-                        return await StopProcess(pid).ConfigureAwait(false);
-                    case CliCommand.Load:
-                        if (string.IsNullOrEmpty(pluginPath))
-                        {
-                            result.ReportError("<plugin> option required");
-                            return 1;
-                        }
-                        return await LoadAndRunProgramAsync(pluginPath, pluginArgs, workingDir);
-                    case CliCommand.Launch:
-                        if (appIds.Count == 0)
-                        {
-                            result.ReportError("At least one <application> must be specified");
-                            return 1;
-                        }
-                        return await LaunchAppAsync(workingDir, appIds);
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Unhandled exception: " + ex);
-                return 1;
-            }
+            return await Parser.Default
+                .ParseArguments<BrokerOptions, StartOptions, LaunchOptions, StopOptions>(args)
+                .MapResult(
+                    (BrokerOptions opts) => StartBrokerAsync(opts),
+                    (StartOptions opts) => StartBrokerAsync(opts),
+                    (LaunchOptions opts) => LaunchAppAsync(opts),
+                    (StopOptions opts) => StopBrokerAsync(),
+                    errs => Task.FromResult(1));
         }
 
-        private static async Task<int> LoadAndRunProgramAsync(
-            string programPath,
-            IEnumerable<string> programArgs,
-            string workingDir)
+        private static async Task<int> LoadAndRunProgramAsync(IProgram program)
         {
-            using (var loader = new ProgramLoader(programPath, programArgs, workingDir))
+            using (var loader = new ProgramLoader(program))
             {
                 return await loader.LoadAndRunAsync().ConfigureAwait(false);
             }
         }
 
-        private static async Task<int> LaunchAppAsync(string workingDir, IEnumerable<string> appIds)
+        private static async Task<int> LaunchAppAsync(LaunchOptions opts)
         {
-            var commandLineToolPluginPath = Path.Combine(
-                Path.GetDirectoryName(typeof(Program).Assembly.Location),
-                "Plexus.Interop.CommandLineTool.dll");
-            var args = new List<string> {"launch"};
-            args.AddRange(appIds);
-            return await LoadAndRunProgramAsync(commandLineToolPluginPath, args, workingDir).ConfigureAwait(false);
+            var program = new InteropCliProgram(opts.ApplicationIds);
+            return await LoadAndRunProgramAsync(program).ConfigureAwait(false);
         }
 
-        private static async Task<int> StartBrokerAsync(string workingDir, string metadataDir)
+        private static async Task<int> StartBrokerAsync(StartOptions opts)
         {
-            var fullMetadataDir = Path.GetFullPath(metadataDir);
-            var brokerPluginPath = Path.Combine(
-                Path.GetDirectoryName(typeof(Program).Assembly.Location),
-                "Plexus.Interop.Broker.Host.dll");
-            var args = new List<string> { "start", "-m", fullMetadataDir };
-            return await LoadAndRunProgramAsync(brokerPluginPath, args, workingDir).ConfigureAwait(false);
+            var program = new BrokerProgram(opts.Metadata);
+            return await LoadAndRunProgramAsync(program).ConfigureAwait(false);
         }
-        
-        private static async Task<int> StopProcess(string pidArg)
+
+        private static async Task<int> StopBrokerAsync()
         {
-            var processes = Process.GetProcesses().Where(x =>
-                string.Equals(x.ProcessName, "plexus") || string.Equals(x.ProcessName, "plexus.exe"));
-            processes = processes.Where(x => x.Id != Process.GetCurrentProcess().Id);
-            if (!string.IsNullOrEmpty(pidArg) && int.TryParse(pidArg, out var pid))
+            const string lockFileName = "plexus-interop-broker-lock";
+            var pid = -1;
+            if (File.Exists(lockFileName))
             {
-                processes = processes.Where(x => x.Id == pid);
+                using (var stream = new FileStream(lockFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var streamReader = new StreamReader(stream))
+                {
+                    if (!int.TryParse(streamReader.ReadToEnd(), out pid))
+                    {
+                        pid = -1;
+                    }
+                }
             }
+
+            if (pid == -1)
+            {
+                Console.WriteLine("Plexus Broker is not running in current directory {0}", Directory.GetCurrentDirectory());
+                return 0;
+            }
+
+            var processes = Process.GetProcesses().Where(x => x.Id == pid);
 
             async Task ShutdownProcessAsync(Process process)
             {
@@ -204,20 +126,6 @@ namespace Plexus.Host
             await Task.WhenAll(tasks).IgnoreExceptions().ConfigureAwait(false);
 
             return 0;
-        }
-
-        private static Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            try
-            {
-                var baseDir = Path.GetDirectoryName(args.RequestingAssembly.Location);
-                var path = Path.Combine(baseDir, new AssemblyName(args.Name).Name + ".dll");
-                return File.Exists(path) ? Assembly.LoadFrom(path) : null;
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         private static void InitializeProcess()

@@ -20,7 +20,13 @@
 
     public interface IProgram
     {
-        Task<Task> StartAsync(string[] args);
+        string Name { get; }
+        
+        string InstanceKey { get; }
+
+        InstanceAwareness InstanceAwareness { get; }
+
+        Task<Task> StartAsync();
 
         Task ShutdownAsync();
     }

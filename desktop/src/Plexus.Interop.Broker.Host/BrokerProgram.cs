@@ -20,23 +20,32 @@ namespace Plexus.Interop.Broker.Host
     using System.Threading;
     using System.Threading.Tasks;
 
-    public sealed class Program : IProgram
+    public sealed class BrokerProgram : IProgram
     {
-        private static readonly ILogger Log = LogManager.GetLogger<Program>();
-
         private int _stopped;
         private IBroker _broker;
 
-        public async Task<Task> StartAsync(string[] args)
+        private readonly string _metadataDir;
+
+        public BrokerProgram(string metadataDir)
         {
-            var brokerArgs = BrokerArguments.Parse(args);
-            _broker = BrokerFactory.Instance.Create(brokerArgs.MetadataDir);
+            _metadataDir = metadataDir;
+        }
+
+        public string Name { get; } = "Interop Broker";
+
+        public string InstanceKey { get; } = "plexus-interop-broker";
+
+        public InstanceAwareness InstanceAwareness { get; } = InstanceAwareness.SingleInstancePerDirectory;
+
+        public async Task<Task> StartAsync()
+        {
+            _broker = BrokerFactory.Instance.Create(_metadataDir);
             if (_stopped == 1)
             {
                 return Task.FromResult(0);
             }
             await _broker.StartAsync().ConfigureAwait(false);
-            Log.Debug("Broker process started");
             return _broker.Completion;
         }
 
@@ -44,7 +53,6 @@ namespace Plexus.Interop.Broker.Host
         {
             if (Interlocked.Exchange(ref _stopped, 1) == 0 && _broker != null)
             {
-                Log.Debug("Shutting down");
                 _broker.Stop();
                 await _broker.Completion.ConfigureAwait(false);
             }

@@ -18,64 +18,47 @@
 {
     using Plexus.Logging.NLog;
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
 
     internal sealed class ProgramLoader : IDisposable
-    {
+    {        
         private static readonly TimeSpan ShutdownTimeout = TimeoutConstants.Timeout5Sec;
 
-        private readonly string[] _args;
         private readonly LoggingInitializer _loggingInitializer;
         private readonly ILogger _log;
-        private readonly string _path;
-        private readonly string _workingDir;
-        private IProgram _program;
+        private readonly IProgram _program;
         private int _isShuttingDown;
 
-        public ProgramLoader(
-            string path, 
-            IEnumerable<string> args, 
-            string workingDir)
+        public ProgramLoader(IProgram program)
         {
-            _path = Path.GetFullPath(path);
-            _workingDir = Path.GetFullPath(workingDir ?? Directory.GetCurrentDirectory());
-            _args = args.ToArray();
+            _program = program;
             _loggingInitializer = new LoggingInitializer();
             _log = LogManager.GetLogger<ProgramLoader>();
         }
 
         public async Task<int> LoadAndRunAsync()
         {
-            _log.Info("Loading {0} {1}", _path, string.Join(" ", _args));
-            InstancePerDirectoryLock instancePerDirectoryLock = null;
-            var curDir = Directory.GetCurrentDirectory();
-            Directory.SetCurrentDirectory(_workingDir);
+            LockFile lockFile = null;
             try
             {
-                var assembly = Assembly.LoadFrom(_path);
-                var attribute =
-                    (EntryPointAttribute) assembly.GetCustomAttributes(typeof(EntryPointAttribute)).SingleOrDefault();
+                _log.Info("Starting {0}", _program.Name);
 
-                if (attribute == null)
+                if (_program.InstanceAwareness == InstanceAwareness.SingleInstancePerDirectory)
                 {
-                    throw new InvalidOperationException(
-                        $"Cannot find assembly attribute {typeof(EntryPointAttribute)} on assembly {_path}");
-                }
-
-                if (attribute.InstanceAwareness == InstanceAwareness.SingleInstancePerDirectory)
-                {
-                    _log.Debug("Checking if another instance of {0} is already running in directory {1}", attribute.InstanceKey, _workingDir);
-                    instancePerDirectoryLock = new InstancePerDirectoryLock(attribute.InstanceKey ?? string.Empty);
-                    var isFirstInstance = instancePerDirectoryLock.TryEnter(500);
+                    var workingDir = Directory.GetCurrentDirectory();
+                    _log.Info("Checking if another instance of {0} is already running in directory {1}", 
+                        _program.Name, workingDir);
+                    var lockFileName = _program.InstanceKey + "-lock";                    
+                    lockFile = new LockFile(lockFileName, Process.GetCurrentProcess().Id.ToString());
+                    _log.Info("Trying to acquire lock file {0}", lockFile.Name);
+                    var isFirstInstance = lockFile.TryEnter(500);
                     if (!isFirstInstance)
                     {
-                        _log.Info("Another instance of {0} is already running in directory {1}. Exiting.", attribute.InstanceKey, _workingDir);
+                        _log.Info("Another instance of {0} is already running in directory {1}. Exiting.",
+                            _program.InstanceKey, workingDir);
                         return 1;
                     }
                 }
@@ -84,46 +67,31 @@
                 if (!string.IsNullOrWhiteSpace(parentProcessVar) && int.TryParse(parentProcessVar, out var parentPid))
                 {
                     var parentProcess = Process.GetProcessById(parentPid);
-                    if (parentProcess != null)
-                    {
-                        AttachToParent(parentProcess);
-                    }
+                    AttachToParent(parentProcess);
                 }
 
                 RegisterShutdownEvent();
 
-                var programType = attribute.EntryClass;
-                _log.Debug("Starting {0} with args: {1}", programType, string.Join(" ", _args));
-                try
-                {
-                    _program = (IProgram) Activator.CreateInstance(programType);
-                    _log.Info("Program {0} created", programType);
-                    var task = await _program.StartAsync(_args).ConfigureAwait(false);
-                    _log.Info("Program {0} started", programType);
-                    await task.ConfigureAwait(false);
-                    _log.Info("Program {0} completed", programType);
-                }
-                catch (Exception ex)
-                {
-                    _log.Error(ex, "Unhandled exception in program {0}", programType);
-                    return 1;
-                }
+                var task = await _program.StartAsync().ConfigureAwait(false);
+                _log.Info("{0} started", _program.Name);
+                await task.ConfigureAwait(false);
+                _log.Info("{0} completed", _program.Name);
             }
             catch (Exception ex)
             {
-                _log.Error(ex, "Unhandled exception while starting program {0}", _path);
+                _log.Error(ex, "Unhandled exception while running {0}", _program.Name);
                 return 1;
             }
             finally
-            {                   
-                if (instancePerDirectoryLock != null)
+            {
+                if (lockFile != null)
                 {
-                    _log.Debug("Releasing lock");
-                    instancePerDirectoryLock.Dispose();
+                    _log.Info("Releasing lock file {0}", lockFile.Name);
+                    lockFile.Dispose();
                 }
-                Directory.SetCurrentDirectory(curDir);
             }
-            _log.Info("Program completed successfully: {0} {1}", _path, string.Join(" ", _args));
+
+            _log.Info("{0} completed successfully", _program.Name);
             return 0;
         }
 

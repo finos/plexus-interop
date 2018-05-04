@@ -15,12 +15,5 @@
  * limitations under the License.
  */
 ﻿using System.Runtime.CompilerServices;
-using Plexus.Host;
-using Plexus.Interop.Broker.Host;
 
 [assembly:InternalsVisibleTo("Plexus.Interop.Broker.Host.Tests")]
-
-[assembly:EntryPoint( 
-    typeof(Program), 
-    InstanceAwareness.SingleInstancePerDirectory, 
-    "plexus-interop-broker")]

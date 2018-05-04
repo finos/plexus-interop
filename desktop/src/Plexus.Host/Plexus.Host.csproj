@@ -17,12 +17,15 @@
 
     <AssemblyName>plexus</AssemblyName>
     <IsPackable>false</IsPackable>
+    <Copyright>Copyright © Plexus Interop Deutsche Bank AG 2017-2018</Copyright>
+    <Product>Plexus Interop Broker</Product>
   </PropertyGroup>
   
   <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish" />
   
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="0.1.0-preview2-180215-2" />
+    <PackageReference Include="CommandLineParser" Version="2.2.1" />
+    <PackageReference Include="System.Console" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
     <PackageReference Include="System.IO.Pipes" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
@@ -30,6 +33,8 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Host.Contracts\Plexus.Host.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Broker.Host\Plexus.Interop.Broker.Host.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.CommandLineTool\Plexus.Interop.CommandLineTool.csproj" />
     <ProjectReference Include="..\Plexus.Logging.NLog\Plexus.Logging.NLog.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />    
   </ItemGroup>

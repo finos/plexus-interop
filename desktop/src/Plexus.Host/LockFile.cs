@@ -22,15 +22,18 @@
     using System.Text;
     using System.Threading;
 
-    internal sealed class InstancePerDirectoryLock : IDisposable
+    internal sealed class LockFile : IDisposable
     {
-        private readonly string _lockFileName;
+        private readonly string _lockFileContent;
         private FileStream _fileStream;
 
-        public InstancePerDirectoryLock(string lockName)
+        public LockFile(string lockFileName, string lockFileContent)
         {
-            _lockFileName = string.Join("-", lockName, "lock");
+            Name = lockFileName;
+            _lockFileContent = lockFileContent;
         }
+
+        public string Name { get; }
 
         public bool TryEnter(int timeoutMs)
         {
@@ -40,8 +43,8 @@
             {
                 try
                 {
-                    _fileStream = File.Open(_lockFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-                    var bytes = Encoding.UTF8.GetBytes(Process.GetCurrentProcess().Id.ToString());
+                    _fileStream = new FileStream(Name, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                    var bytes = Encoding.UTF8.GetBytes(_lockFileContent);
                     _fileStream.Write(bytes, 0, bytes.Length);
                     _fileStream.Flush(true);
                 }
@@ -63,9 +66,9 @@
             _fileStream.Dispose();
             try
             {
-                if (File.Exists(_lockFileName))
+                if (File.Exists(Name))
                 {
-                    File.Delete(_lockFileName);
+                    File.Delete(Name);
                 }
             }
             catch

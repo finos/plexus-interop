@@ -17,36 +17,48 @@
  namespace Plexus.Interop.CommandLineTool
 {
     using Plexus.Host;
-    using Plexus.Interop.CommandLineTool.Internal;
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using Plexus.Interop.CommandLineTool.Internal.Generated;
     using UniqueId = Plexus.UniqueId;
 
-    public sealed class Program : IProgram
+    public sealed class InteropCliProgram : IProgram
     {
-        private static readonly ILogger Log = LogManager.GetLogger<Program>();
+        private static readonly ILogger Log = LogManager.GetLogger<InteropCliProgram>();
 
         private readonly ICommandLineToolClient _client = new CommandLineToolClient(s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
 
-        public async Task<Task> StartAsync(string[] args)
+        private readonly string[] _ids;
+
+        public InteropCliProgram(IEnumerable<string> ids)
         {
-            var options = CommandLineToolArguments.Parse(args);
-            if (options.ApplicationIds.Count == 0)
+            _ids = ids.ToArray();
+        }
+
+        public string Name { get; } = "Interop CLI";
+
+        public string InstanceKey { get; } = "interop-cli";
+
+        public InstanceAwareness InstanceAwareness { get; } = InstanceAwareness.MultiInstance;
+
+        public async Task<Task> StartAsync()
+        {
+            if (_ids.Length == 0)
             {
                 return TaskConstants.Completed;
             }
             await _client.ConnectAsync().ConfigureAwait(false);
-            return ProcessAsync(options);
+            return ProcessAsync();
         }
 
-        private async Task ProcessAsync(CommandLineToolArguments options)
+        private async Task ProcessAsync()
         {
             try
             {
-                await Task.WhenAll(options.ApplicationIds.Select(LaunchAppAsync)).ConfigureAwait(false);
+                await Task.WhenAll(_ids.Select(LaunchAppAsync)).ConfigureAwait(false);
             }
             finally
             {
