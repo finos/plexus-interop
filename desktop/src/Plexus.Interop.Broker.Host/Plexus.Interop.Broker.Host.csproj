@@ -25,20 +25,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="plexus.cmd" />
-    <None Remove="GenBrokerMetadata.cmd" />
-    <None Remove="LaunchBroker.cmd" />
-    <None Remove="LaunchBroker.sh" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="plexus.cmd" />
-    <Content Include="GenBrokerMetadata.cmd" />
-    <Content Include="LaunchBroker.cmd" />
-    <Content Include="LaunchBroker.sh" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Plexus.Host.Contracts\Plexus.Host.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />

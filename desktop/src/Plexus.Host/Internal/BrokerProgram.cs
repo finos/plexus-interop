@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Broker.Host
+namespace Plexus.Host.Internal
 {
-    using Plexus.Host;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Interop;
 
-    public sealed class BrokerProgram : IProgram
+    internal sealed class BrokerProgram : IProgram
     {
         private int _stopped;
         private IBroker _broker;

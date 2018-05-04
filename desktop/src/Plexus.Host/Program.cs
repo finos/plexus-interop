@@ -17,8 +17,6 @@
 namespace Plexus.Host
 {
     using CommandLine;
-    using Plexus.Host.Args;
-    using Plexus.Interop.Broker.Host;
     using Plexus.Interop.CommandLineTool;
     using System;
     using System.Diagnostics;
@@ -27,6 +25,7 @@ namespace Plexus.Host
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Host.Internal;
 
     public sealed class Program
     {

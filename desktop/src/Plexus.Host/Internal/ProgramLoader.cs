@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Host
+﻿namespace Plexus.Host.Internal
 {
-    using Plexus.Logging.NLog;
     using System;
     using System.Diagnostics;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Logging.NLog;
 
     internal sealed class ProgramLoader : IDisposable
     {        

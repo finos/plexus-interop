@@ -14,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Host
+﻿namespace Plexus.Host.Internal
 {
-    internal enum CliCommand
+    using CommandLine;
+
+    [Verb("stop", HelpText = "Stop interop broker.")]
+    internal sealed class StopOptions
     {
-        None,
-        Broker,
-        Stop,
-        Load,
-        Launch,
     }
 }

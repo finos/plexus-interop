@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <AssemblyName>plexus</AssemblyName>
 
     <TargetFramework>netcoreapp2.0</TargetFramework>
 
@@ -13,15 +14,31 @@
     <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'win-x86'">x86</PlatformTarget>
     <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'osx-x64'">x64</PlatformTarget>
 
-    <PublishDir>../../../bin/$(RuntimeIdentifier)/broker</PublishDir>
+    <RepoRootDir>../../../</RepoRootDir>
+    <ArtifactsDir>$(RepoRootDir)bin/$(RuntimeIdentifier)/</ArtifactsDir>
+    <PublishDir>$(ArtifactsDir)broker/</PublishDir>
+    <ArtifactsSamplesDir>$(ArtifactsDir)samples/greeting/</ArtifactsSamplesDir>
+    <QuickStartSamplesDir>$(ArtifactsDir)samples/quick-start/</QuickStartSamplesDir>
 
-    <AssemblyName>plexus</AssemblyName>
-    <IsPackable>false</IsPackable>
-    <Copyright>Copyright © Plexus Interop Deutsche Bank AG 2017-2018</Copyright>
-    <Product>Plexus Interop Broker</Product>
+    <IsPackable>true</IsPackable>
+    <NuspecFile>$(MSBuildThisFileDirectory)Plexus.Interop.Broker.Redist.nuspec</NuspecFile>    
   </PropertyGroup>
   
   <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish" />
+  
+  <ItemGroup>
+    <None Remove="GenBrokerMetadata.cmd" />
+    <None Remove="LaunchBroker.cmd" />
+    <None Remove="LaunchBroker.sh" />
+    <None Remove="plexus.cmd" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="GenBrokerMetadata.cmd" />
+    <Content Include="LaunchBroker.cmd" />
+    <Content Include="LaunchBroker.sh" />
+    <Content Include="plexus.cmd" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.2.1" />
@@ -33,7 +50,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Host.Contracts\Plexus.Host.Contracts.csproj" />
-    <ProjectReference Include="..\Plexus.Interop.Broker.Host\Plexus.Interop.Broker.Host.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />
     <ProjectReference Include="..\Plexus.Interop.CommandLineTool\Plexus.Interop.CommandLineTool.csproj" />
     <ProjectReference Include="..\Plexus.Logging.NLog\Plexus.Logging.NLog.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />    
@@ -44,5 +61,25 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish">
+    <Copy SourceFiles="plexus.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
+
+    <Copy SourceFiles="plexus.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
+  </Target>
+
+  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>$(NuspecProperties);id=Plexus.Interop.Broker.Redist-$(RuntimeIdentifier)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
+    </PropertyGroup>
+    <Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />
+  </Target>
 
 </Project>

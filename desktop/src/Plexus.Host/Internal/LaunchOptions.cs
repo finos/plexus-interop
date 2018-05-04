@@ -14,19 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Host.Args
+﻿namespace Plexus.Host.Internal
 {
-    using global::CommandLine;
+    using System.Collections.Generic;
+    using CommandLine;
 
-    [Verb("start", HelpText = "Start interop broker.")]
-    internal class StartOptions
+    [Verb("launch", HelpText = "Launch interop application.")]
+    internal sealed class LaunchOptions
     {
-        [Option('m', "metadata", Required = false, HelpText = "Directory to seek for metadata files: apps.json and interop.json.")]
-        public string Metadata { get; set; }
-    }
-
-    [Verb("broker", HelpText = "Start interop broker.")]
-    internal class BrokerOptions : StartOptions
-    {
+        [Option('a', "application", Required = true, HelpText = "Identifier of application.", Separator = ',')]
+        public IEnumerable<string> ApplicationIds { get; set; }
     }
 }
