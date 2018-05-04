@@ -64,6 +64,20 @@
           </dict>
         </array>
       </dict>
+      <!-- Method Keywords -->
+      <key>methodKeywords</key>
+      <dict>
+        <key>match</key>
+        <string>\s*(stream|returns)\s*</string>
+        <key>captures</key>
+        <dict>
+          <key>1</key>
+          <dict>
+            <key>name</key>
+            <string>keyword.other.proto</string>
+          </dict>
+        </dict>
+      </dict>
       <!-- Syntax -->
       <key>syntax</key>
       <dict>
@@ -108,6 +122,10 @@
           <dict>
             <key>include</key>
             <string>#comments</string>
+          </dict>
+          <dict>
+            <key>include</key>
+            <string>#methodKeywords</string>
           </dict>
         </array>
       </dict>
