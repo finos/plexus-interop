@@ -42,7 +42,9 @@ export function activate(context: ExtensionContext) {
         ]
     };
     
-    process.env['PROTO_LANG_SERVER_OPTS'] = '-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=9999,suspend=y,quiet=y';
+    if (!!process.env.PROTO_LANG_DEBUG_STDIO) {
+        process.env['PROTO_LANG_SERVER_OPTS'] = '-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=9999,suspend=n,quiet=y';
+    }
 
     const protoClient = createLangClient(
         'proto-lang-server', 

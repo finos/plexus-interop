@@ -17,12 +17,8 @@
 package com.db.plexus.interop.dsl.protobuf.server;
 
 import com.google.inject.AbstractModule;
-import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.xtext.ide.ExecutorServiceProvider;
-import org.eclipse.xtext.ide.server.DefaultProjectDescriptionFactory;
-import org.eclipse.xtext.ide.server.IProjectDescriptionFactory;
-import org.eclipse.xtext.ide.server.IWorkspaceConfigFactory;
-import org.eclipse.xtext.ide.server.ProjectWorkspaceConfigFactory;
+import org.eclipse.xtext.ide.server.*;
 import org.eclipse.xtext.resource.IContainer;
 import org.eclipse.xtext.resource.IResourceServiceProvider;
 import org.eclipse.xtext.resource.ResourceServiceProviderServiceLoader;
@@ -34,7 +30,7 @@ public class ProtoLangServerModule extends AbstractModule {
 
     protected void configure() {
         this.binder().bind(ExecutorService.class).toProvider(ExecutorServiceProvider.class);
-        this.bind(LanguageServer.class).to(ProtoLanguageServer.class);
+        this.bind(LanguageServerImpl.class).to(ProtoLanguageServer.class);
         this.bind(IResourceServiceProvider.Registry.class).toProvider(ResourceServiceProviderServiceLoader.class);
         this.bind(IWorkspaceConfigFactory.class).to(ProjectWorkspaceConfigFactory.class);
         this.bind(IProjectDescriptionFactory.class).to(DefaultProjectDescriptionFactory.class);

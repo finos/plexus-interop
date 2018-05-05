@@ -17,7 +17,6 @@
 package com.db.plexus.interop.dsl.ide.server;
 
 import com.google.inject.AbstractModule;
-import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.xtext.ide.ExecutorServiceProvider;
 import org.eclipse.xtext.ide.server.*;
 import org.eclipse.xtext.resource.IContainer;
@@ -31,7 +30,7 @@ public class InteropLangServerModule extends AbstractModule {
 
     protected void configure() {
         this.binder().bind(ExecutorService.class).toProvider(ExecutorServiceProvider.class);
-        this.bind(LanguageServer.class).to(InteropLanguageServer.class);
+        this.bind(LanguageServerImpl.class).to(InteropLanguageServer.class);
         this.bind(IResourceServiceProvider.Registry.class).toProvider(ResourceServiceProviderServiceLoader.class);
         this.bind(IWorkspaceConfigFactory.class).to(ProjectWorkspaceConfigFactory.class);
         this.bind(IProjectDescriptionFactory.class).to(DefaultProjectDescriptionFactory.class);
