@@ -1,3 +1,13 @@
+plugins {
+    id "com.moowork.node" version "1.2.0"
+}
+
+node {
+    version = '8.5.0'
+    npmVersion = '5.7.1'
+    nodeModulesDir = projectDir
+    download = true
+}
 
 task installServer(type: Copy) {
 	dependsOn(':dsl:interop-lang.ide:installDist')
@@ -11,4 +21,16 @@ task installProtoServer(type: Copy) {
     into "proto-lang-server"
 }
 
-build.dependsOn installServer, installProtoServer
+task npmVersion(type: NpmTask) {
+    args = ['--version']
+}
+
+task npmRunInstall(type: NpmTask, dependsOn: npmVersion) {
+    args = ['install', '--no-package-lock']
+}
+
+task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'installProtoServer', 'installServer']) {
+    args =  ['run', 'build']
+}
+
+build.dependsOn npmBuild
