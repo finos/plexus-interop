@@ -68,8 +68,8 @@
         "vscode:prepublish": "tsc -p ./",
         "build": "tsc -p ./",
         "watch": "tsc -w -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "preinstall": "node ../../web/scripts/replace-auth-vars.js --install"
+        "postinstall": "node ../../web/scripts/replace-lock-registry.js --backward && node ./node_modules/vscode/bin/install",
+        "preinstall": "node ../../web/scripts/replace-lock-registry.js && node ../../web/scripts/replace-auth-vars.js --install"
     },
     "devDependencies": {
         "typescript": "^2.1.5",
