@@ -5,7 +5,7 @@ plugins {
 
 def ciBuild = System.env['BuildRunner'] != null
 def ciPublishBuild = ciBuild && (System.env['APPVEYOR_REPO_TAG'] == "true" || System.env['NPM_PUBLISH'] == "true")
-def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows();
+def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows()
 def e2eTestsEnabled = isWindows && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_WEB_TESTS'] != 'true'
 def ciFullBuild = ciBuild && e2eTestsEnabled
 def npmPackageVersion = System.getenv("PLEXUS_BUILD_NPM_PACKAGE_VERSION") ?: (System.getenv("APPVEYOR_REPO_TAG_NAME") ?: System.getenv("PackageVersion")) 
@@ -36,11 +36,11 @@ tasks["license"].dependsOn licenseFormatTS
 licenseFormat.dependsOn licenseFormatTS
 
 task npmVersion(type: NpmTask) {
-    args = ['--version'];
+    args = ['--version']
 }
 
 task npmRunInstall(type: NpmTask, dependsOn: npmVersion) {
-    args = ['install', '--no-package-lock'];
+    args = ['install', '--no-package-lock']
 }
 
 task preNpmBuild {

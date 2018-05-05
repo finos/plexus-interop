@@ -1,18 +1,28 @@
 {
     "name": "plexus-interop-vscode",
     "displayName": "Plexus Interop",
-    "description": "Plexus Interop Language Support",
+    "description": "Plexus Interop Language support for Visual Studio Code",
     "version": "0.0.1",
     "publisher": "Plexus Interop",
     "engines": {
-        "vscode": "^1.8.0"
+        "vscode": "^1.1.0"
     },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/symphonyoss/plexus-interop/tree/master/dsl/interop-lang-vscode/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/symphonyoss/plexus-interop.git"
+	},
     "categories": [
         "Languages"
     ],
+    "keywords": ["plexus", "interop"],
     "activationEvents": [
         "onLanguage:interop", "onLanguage:proto"
     ],
+    "bugs": {
+        "url": "https://github.com/symphonyoss/plexus-interop/issues"
+    },
     "main": "./out/src/extension",
     "contributes": {
         "languages": [
