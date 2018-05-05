@@ -3,7 +3,7 @@
     "displayName": "Plexus Interop",
     "description": "Plexus Interop Language support for Visual Studio Code",
     "version": "0.0.1",
-    "publisher": "Plexus Interop",
+    "publisher": "plexus-interop",
     "engines": {
         "vscode": "^1.8.0"
     },

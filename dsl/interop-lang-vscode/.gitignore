@@ -3,3 +3,4 @@ interop-lang-server/
 proto-lang-server/
 out/
 build/
+*.vsix
