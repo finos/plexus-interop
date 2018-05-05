@@ -11,7 +11,7 @@
         "Languages"
     ],
     "activationEvents": [
-        "onLanguage:interop"
+        "onLanguage:interop", "onLanguage:proto"
     ],
     "main": "./out/src/extension",
     "contributes": {

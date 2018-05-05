@@ -30,7 +30,7 @@ export function activate(context: ExtensionContext) {
     
     const interopClient = createLangClient(
             'interop-lang-server', 
-            'PLEXUS_INTEROP_LS_PORT',
+            process.env.PLEXUS_INTEROP_LS_PORT,
             context,
             interopClientOptions);
     
@@ -42,9 +42,11 @@ export function activate(context: ExtensionContext) {
         ]
     };
     
+    process.env['PROTO_LANG_SERVER_OPTS'] = '-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=9999,suspend=y,quiet=y';
+
     const protoClient = createLangClient(
         'proto-lang-server', 
-        'PLEXUS_PROTO_LS_PORT',
+        process.env.PLEXUS_PROTO_LS_PORT,
         context,
         protoClientOptions);
 
@@ -54,17 +56,16 @@ export function activate(context: ExtensionContext) {
 
 function createLangClient(
         title: string, 
-        debugPortEnv: string, 
+        serverPort: string, 
         context: ExtensionContext, 
         clientOptions: LanguageClientOptions) {
 
     let serverOptions;
-    if (process.env[debugPortEnv]) {
-        const serverPort = process.env[debugPortEnv];
+    if (serverPort) {
         console.error(`Connecting to ${title} using ${serverPort} port`);
         serverOptions = async () => {
             const socket = net.connect({
-                port: serverPort
+                port: Number.parseInt(serverPort)
             });
             const result: StreamInfo = {
                 writer: socket,
