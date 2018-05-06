@@ -67,7 +67,7 @@ public class FileUtils {
         public FileVisitResult visitFile(Path file,
                                          BasicFileAttributes attrs) {
         	Path name = file.getFileName();
-            if ((file != null && matcher.matches(file)) || (name != null && matcher.matches(name))) {
+            if (matcher.matches(file) || (name != null && matcher.matches(name))) {
                 fileHandler.accept(file);
             }
             return CONTINUE;
