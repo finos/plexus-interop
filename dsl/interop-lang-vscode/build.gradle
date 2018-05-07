@@ -9,6 +9,10 @@ node {
     download = true
 }
 
+def ciBuild = System.env['BuildRunner'] != null
+def ciPublishBuild = ciBuild && (System.env['APPVEYOR_REPO_TAG'] == "true" || System.env['PLEXUS_BUILD_VSCODE_PUBLISH'] == "true")
+def packageVersion = System.getenv("PLEXUS_BUILD_VSCODE_PACKAGE_VERSION") ?: (System.getenv("APPVEYOR_REPO_TAG_NAME") ?: System.getenv("PackageVersion")) 
+
 task installServer(type: Copy) {
 	dependsOn(':dsl:interop-lang.ide:installDist')
     from "../interop-lang.ide/build/install/interop-lang-server"
@@ -29,8 +33,18 @@ task npmRunInstall(type: NpmTask, dependsOn: npmVersion) {
     args = ['install', '--no-package-lock']
 }
 
-task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'installProtoServer', 'installServer']) {
-    args =  ['run', 'build']
+task preNpmBuild {
+    doLast {
+        println "VSCode Package version: $packageVersion"
+	    println "CI Publish: $ciPublishBuild"
+    }
+}
+
+task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'installProtoServer', 'installServer', 'preNpmBuild']) {
+    environment = [
+        'PLEXUS_BUILD_NPM_PACKAGE_VERSION': packageVersion
+    ]
+    args = ciPublishBuild ? ['run', 'ci-publish'] : ['run', 'build']
 }
 
 build.dependsOn npmBuild

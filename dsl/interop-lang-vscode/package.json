@@ -69,11 +69,16 @@
         "build": "tsc -p ./",
         "watch": "tsc -w -p ./",
         "postinstall": "node ../../web/scripts/replace-lock-registry.js --backward && node ./node_modules/vscode/bin/install",
+        "bump-version": "cross-var npm --no-git-tag-version version $PLEXUS_BUILD_VSCODE_PACKAGE_VERSION",
+        "publish": "cross-var vscode publish -p $PLEXUS_BUILD_VSCODE_AUTH_TOKEN",
+        "ci-publish": "npm run bump-version && npm run publish",
         "preinstall": "node ../../web/scripts/replace-lock-registry.js && node ../../web/scripts/replace-auth-vars.js --install"
     },
     "devDependencies": {
         "typescript": "^2.1.5",
         "vscode": "1.1.14",
+        "vsce": "1.40.0",
+        "cross-var": "1.1.0",
         "@types/node": "^6.0.40"
     },
     "dependencies": {

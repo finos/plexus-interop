@@ -1,0 +1,5 @@
+**/*.ts
+**/tsconfig.json
+.vscode
+build
+.gradle
