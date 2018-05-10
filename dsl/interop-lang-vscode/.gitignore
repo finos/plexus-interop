@@ -4,3 +4,4 @@ proto-lang-server/
 out/
 build/
 *.vsix
+.npmrc

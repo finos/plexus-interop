@@ -70,7 +70,7 @@
         "watch": "tsc -w -p ./",
         "postinstall": "node ../../web/scripts/replace-lock-registry.js --backward && node ./node_modules/vscode/bin/install",
         "ci-publish": "cross-var vsce publish $PLEXUS_BUILD_VSCODE_PACKAGE_VERSION -p $PLEXUS_BUILD_VSCODE_AUTH_TOKEN",
-        "preinstall": "node ../../web/scripts/replace-lock-registry.js && node ../../web/scripts/replace-auth-vars.js --install"
+        "preinstall": "node ../../web/scripts/replace-lock-registry.js"
     },
     "devDependencies": {
         "typescript": "^2.1.5",
