@@ -8,10 +8,10 @@
         "vscode": "^1.8.0"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/symphonyoss/plexus-interop/tree/master/dsl/interop-lang-vscode/README.md",
+    "homepage": "https://github.com/finos-plexus/plexus-interop/tree/master/dsl/interop-lang-vscode/README.md",
     "repository": {
         "type": "git",
-        "url": "https://github.com/symphonyoss/plexus-interop.git"
+        "url": "https://github.com/finos-plexus/plexus-interop.git"
     },
     "categories": [
         "Languages"
@@ -25,7 +25,7 @@
         "onLanguage:proto"
     ],
     "bugs": {
-        "url": "https://github.com/symphonyoss/plexus-interop/issues"
+        "url": "https://github.com/finos-plexus/plexus-interop/issues"
     },
     "main": "./out/src/extension",
     "contributes": {
