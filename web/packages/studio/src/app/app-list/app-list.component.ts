@@ -51,7 +51,8 @@ export class AppListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.apps = this.store
       .select(state => state.plexus.apps)
-      .map(this.toAppInfos);
+      .map(this.sortApps.bind(this))
+      .map(this.toAppInfos.bind(this));
     this.subsctiptionsRegistry.add(
       this.activatedRoute.queryParams
         .combineLatest(this.apps)
@@ -68,10 +69,16 @@ export class AppListComponent implements OnInit, OnDestroy {
         }));
   }
 
+  sortApps(apps: Application[]): Application[] {
+    return apps.sort((a, b) => {
+      return a.id.localeCompare(b.id);
+    });
+  }
+
   toAppInfo(app: Application): AppUiInfo {
     return {
       ...app,
-      label: app.id + (!!app.displayName ? ' - ' + app.displayName : '')
+      label: app.id + (!!app.displayName ? ` (${app.displayName})` : '')
     };
   }
 
