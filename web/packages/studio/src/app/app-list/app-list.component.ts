@@ -25,6 +25,10 @@ import * as fromRoot from '../services/ui/RootReducers';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 
+interface AppUiInfo extends Application {
+  label: string;
+}
+
 @Component({
   selector: 'app-app-list',
   templateUrl: './app-list.component.html',
@@ -33,7 +37,7 @@ import { Store } from '@ngrx/store';
 })
 export class AppListComponent implements OnInit, OnDestroy {
 
-  apps: Observable<Application[]>;
+  apps: Observable<AppUiInfo[]>;
 
   private logger = LoggerFactory.getLogger(AppListComponent.name);
 
@@ -45,7 +49,9 @@ export class AppListComponent implements OnInit, OnDestroy {
     private subsctiptionsRegistry: SubscriptionsRegistry) { }
 
   ngOnInit() {
-    this.apps = this.store.select(state => state.plexus.apps);
+    this.apps = this.store
+      .select(state => state.plexus.apps)
+      .map(this.toAppInfos);
     this.subsctiptionsRegistry.add(
       this.activatedRoute.queryParams
         .combineLatest(this.apps)
@@ -60,6 +66,17 @@ export class AppListComponent implements OnInit, OnDestroy {
             }
           }
         }));
+  }
+
+  toAppInfo(app: Application): AppUiInfo {
+    return {
+      ...app,
+      label: app.id + (!!app.displayName ? ' - ' + app.displayName : '')
+    };
+  }
+
+  toAppInfos(apps: Application[]): AppUiInfo[] {
+    return apps.map(this.toAppInfo);
   }
 
   ngOnDestroy() {
