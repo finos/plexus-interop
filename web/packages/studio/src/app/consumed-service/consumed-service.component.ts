@@ -23,7 +23,7 @@ import * as fromRoot from '../services/ui/RootReducers';
 import { Router } from '@angular/router';
 import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
 import { InteropRegistryService, ConsumedMethod } from '@plexus-interop/broker';
-import { DiscoveredMethod, InvocationRequestInfo, MethodType, StreamingInvocationClient } from '@plexus-interop/client';
+import { DiscoveredMethod, InvocationRequestInfo, MethodType, StreamingInvocationClient, ConsumedService } from '@plexus-interop/client';
 import { UniqueId } from '@plexus-interop/protocol';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { createInvocationLogger } from '../services/core/invocation-utils';
@@ -45,6 +45,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
   private interopClient: InteropClient;
   private discoveredMethods: DiscoveredMethod[];
   private consumedMethod: ConsumedMethod;
+  private title: string;
 
   private selectedDiscoveredMethod: DiscoveredMethod;
 
@@ -86,6 +87,7 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
           this.interopClient = state.services.interopClient;
           this.registryService = state.services.interopRegistryService;
           this.consumedMethod = state.consumedMethod.method;
+          this.title = this.getTitle(this.consumedMethod);
           this.createDefaultMessage();          
           this.messageContentControl.setValidators([
             plexusMessageValidator('messageContentControl', this.interopClient, this.consumedMethod)
@@ -95,6 +97,14 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.unsubscribeAll();
+  }
+
+  getTitle(consumedMethod: ConsumedMethod): string {
+    return `Consumed Method - ${consumedMethod.consumedService.service.id}${this.getLabel(consumedMethod.consumedService.service)}.${consumedMethod.method.name}`;
+  }
+
+  getLabel(service: ConsumedService): string {
+    return !!service.serviceAlias ? `(${service.serviceAlias})` : ''; 
   }
 
   handleResponse(responseJson: string, logger: Logger) {
