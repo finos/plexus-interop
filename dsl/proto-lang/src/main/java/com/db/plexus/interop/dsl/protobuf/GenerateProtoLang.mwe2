@@ -34,6 +34,7 @@ Workflow {
     component = XtextGenerator {
         configuration = {
             project = StandardProjectConfig {
+
                 baseName = "proto-lang"
                 rootPath = rootPath
                 mavenLayout = true
@@ -41,10 +42,15 @@ Workflow {
                 runtimeTest = {
                     enabled = true
                 }
+
+                genericIde = {
+                    enabled = true
+                }
                                 
                 web = {
                     enabled = false
-                }                            
+                }
+
             }            
             code = {
                 encoding = "UTF-8"

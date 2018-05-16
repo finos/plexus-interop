@@ -38,7 +38,10 @@ export class DefaultMessageGenerator {
         const defaultPayload: any = {};
         for (let fieldName in message.fields) {
             const field = message.fields[fieldName];
-            if (field.rule && field.rule === 'repeated') {
+            if (field.keyType) {
+                // primitive 'map' support
+                defaultPayload[fieldName] = {};
+            } else if (field.rule && field.rule === 'repeated') {
                 defaultPayload[fieldName] = [];
             } else if (this.isPrimitive(field.type)) {
                 switch (field.type) {

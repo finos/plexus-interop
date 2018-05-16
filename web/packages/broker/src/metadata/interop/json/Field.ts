@@ -19,6 +19,7 @@ import { Options } from './Options';
 export interface Field {
     type: string;
     id: number;
+    keyType?: string;
     rule?: 'repeated';
     options?: Options;
 }
