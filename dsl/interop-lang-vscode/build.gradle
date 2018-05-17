@@ -55,7 +55,7 @@ task npmVersion(type: NpmTask) {
 }
 
 task npmRunInstall(type: NpmTask, dependsOn: npmVersion) {
-    args = ['install', '--no-package-lock']
+    args = ['install']
 }
 
 tasks.npmRunInstall.dependsOn("genNpmrc")
