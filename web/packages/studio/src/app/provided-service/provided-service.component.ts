@@ -18,7 +18,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppActions } from '../services/ui/AppActions';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
-import { ProvidedMethod } from '@plexus-interop/broker';
+import { ProvidedMethod, ProvidedService } from '@plexus-interop/broker';
 import { InteropClient } from '../services/core/InteropClient';
 import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
@@ -47,6 +47,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
   requesId: number = 0;
+  title: string = '';
 
   constructor(
     private actions: AppActions,
@@ -60,6 +61,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
       .filter(plexus => !!plexus.services.interopClient && !!plexus.providedMethod)
       .subscribe(plexus => {
         this.providedMethod = plexus.providedMethod.method;
+        this.title = this.getTitle(this.providedMethod);
         this.interopClient = plexus.services.interopClient;
         this.messageContent = this.createDefaultPayload();
         this.messageContentControl.setValidators([
@@ -80,6 +82,14 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
   handleError(e: any, log) {
     log.error(`Error received`, e);
+  }
+
+  getTitle(providedMethod: ProvidedMethod): string {
+    return `Provided Method - ${providedMethod.providedService.service.id}${this.getAlias(providedMethod.providedService)}.${providedMethod.method.name}`;
+  }
+
+  getAlias(provideService: ProvidedService): string {
+    return !!provideService.alias ? `(${provideService.alias})` : '';
   }
 
   handleCompleted(log) {

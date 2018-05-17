@@ -30,7 +30,6 @@ yarn-error.log
 coverage
 **/dist
 **/target/
-package-lock.json
 
 ### VS Code ###
 **/*/symbols.json

@@ -271,7 +271,7 @@ class CsharpCodeGenerator  {
 						
 						private readonly IClientCallInvoker _callInvoker;
 												
-						public «consumedService.service.name.toFirstUpper»Proxy(IClientCallInvoker callInvoker) {
+						public «consumedService.aliasOrName»Proxy(IClientCallInvoker callInvoker) {
 							_callInvoker = callInvoker;
 						}						
 						

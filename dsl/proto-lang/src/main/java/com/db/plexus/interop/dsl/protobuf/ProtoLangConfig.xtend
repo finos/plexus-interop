@@ -28,7 +28,7 @@ class ProtoLangConfig {
 	
 	private boolean strictMode = true; 
 	
-	def Iterable<URI> getBaseURIs() {
+	def List<URI> getBaseURIs() {
 		baseURIs
 	}
 	

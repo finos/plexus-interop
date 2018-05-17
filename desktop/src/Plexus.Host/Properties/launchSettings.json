@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "Samples Broker": {
+      "commandName": "Executable",
+      "executablePath": ".\\plexus.cmd",
+      "commandLineArgs": "broker",
+      "workingDirectory": "$(ArtifactsSamplesDir)"
+    },
+    "QuickStart Broker": {
+      "commandName": "Executable",
+      "executablePath": ".\\plexus.cmd",
+      "commandLineArgs": "broker",
+      "workingDirectory": "$(QuickStartSamplesDir)"
+    }
+  }
+}
