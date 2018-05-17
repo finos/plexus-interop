@@ -1,0 +1,11 @@
+apply plugin: 'application'
+
+dependencies {
+    compile project(':dsl:proto-lang')
+    compile project(':dsl:ide-common')
+    compile "org.eclipse.xtext:org.eclipse.xtext.ide:${xtextVersion}"
+    compile "org.eclipse.xtext:org.eclipse.xtext.xbase.ide:${xtextVersion}"
+}
+
+mainClassName = 'com.db.plexus.interop.dsl.protobuf.server.StdIOServerLauncher'
+applicationName = 'proto-lang-server'

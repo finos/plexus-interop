@@ -25,7 +25,7 @@ import com.db.plexus.interop.dsl.protobuf.ProtobufPackage
 import com.google.inject.Injector
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
-
+import static com.db.plexus.interop.dsl.GlobalLangConfigHolder.*;
 /**
  * Initialization support for running Xtext languages without Equinox extension registry.
  */
@@ -33,9 +33,7 @@ class InteropLangStandaloneSetup extends InteropLangStandaloneSetupGenerated {
 	
 	private Injector protoLangInjector
 	private Injector interopLangInjector
-	private ProtoLangConfig protoLangConfig
-	private ProtoLangConfig interopLangConfig
-	
+
 	def Injector getInteropLangInjector() { 
 		return interopLangInjector	
 	}

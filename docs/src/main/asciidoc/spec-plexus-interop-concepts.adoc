@@ -476,7 +476,7 @@ handler:: method details and provided implementation
 [source,javascript]
 -------------------
 const serviceInfo = { serviceId: 'CcyRateService' };
-clientBuilder.onUnary<ICcyPair, ICcyPairRate>(serviceInfo, {
+clientBuilder.onServerStreaming<ICcyPair, ICcyPairRate>(serviceInfo, {
     methodId: 'GetRateStream',
     handle: async (invocationContext: MethodInvocationContext,
             request: ICcyPair,

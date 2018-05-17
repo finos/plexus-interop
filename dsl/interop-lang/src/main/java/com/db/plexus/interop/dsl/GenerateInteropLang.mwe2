@@ -44,11 +44,9 @@ Workflow {
 				runtimeTest = {
 					enabled = true
 				}
-				
-				web = {
-					enabled = false
-				}						
-
+                genericIde = {
+                    enabled = true
+                }
 			}
 			code = {
 				preferXtendStubs = true

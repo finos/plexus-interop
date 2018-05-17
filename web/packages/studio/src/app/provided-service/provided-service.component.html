@@ -1,4 +1,5 @@
 <div>
+  <h5><p>{{title}}</p></h5>
   <div class="form-group">
     <label for="messageContentInput">Enter response JSON:</label>
     <textarea id="response-content-area" [class.is-invalid]="messageContentControl && messageContentControl.invalid" [(ngModel)]="messageContent"

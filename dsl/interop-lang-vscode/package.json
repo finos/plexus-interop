@@ -1,0 +1,85 @@
+{
+    "name": "plexus-interop-vscode",
+    "displayName": "Plexus Interop",
+    "description": "Plexus Interop Language support for Visual Studio Code",
+    "version": "0.0.1",
+    "publisher": "plexus-interop",
+    "engines": {
+        "vscode": "^1.8.0"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/finos-plexus/plexus-interop/tree/master/dsl/interop-lang-vscode/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/finos-plexus/plexus-interop.git"
+    },
+    "categories": [
+        "Languages"
+    ],
+    "keywords": [
+        "plexus",
+        "interop"
+    ],
+    "activationEvents": [
+        "onLanguage:interop",
+        "onLanguage:proto"
+    ],
+    "bugs": {
+        "url": "https://github.com/finos-plexus/plexus-interop/issues"
+    },
+    "main": "./out/src/extension",
+    "contributes": {
+        "languages": [
+            {
+                "id": "interop",
+                "aliases": [
+                    "interop"
+                ],
+                "extensions": [
+                    ".interop"
+                ],
+                "configuration": "./interop.configuration.json"
+            },
+            {
+                "id": "proto",
+                "aliases": [
+                    "proto"
+                ],
+                "extensions": [
+                    ".proto"
+                ],
+                "configuration": "./interop.configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "interop",
+                "scopeName": "text.interop",
+                "path": "./syntaxes/interop.tmLanguage"
+            },
+            {
+                "language": "proto",
+                "scopeName": "text.proto",
+                "path": "./syntaxes/proto.tmLanguage"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "build": "tsc -p ./",
+        "watch": "tsc -w -p ./",
+        "postinstall": "node ../../web/scripts/replace-lock-registry.js --backward && node ./node_modules/vscode/bin/install",
+        "ci-publish": "cross-var vsce publish $PLEXUS_BUILD_VSCODE_PACKAGE_VERSION -p $PLEXUS_BUILD_VSCODE_AUTH_TOKEN",
+        "preinstall": "node ../../web/scripts/replace-lock-registry.js"
+    },
+    "devDependencies": {
+        "typescript": "^2.1.5",
+        "vscode": "1.1.14",
+        "vsce": "1.40.0",
+        "cross-var": "1.1.0",
+        "@types/node": "^6.0.40"
+    },
+    "dependencies": {
+        "vscode-languageclient": "3.2.0"
+    }
+}
