@@ -18,7 +18,6 @@
 {
     using Plexus.Interop.Protocol.Invocation;
     using Plexus.Pools;
-    using System.Collections.Generic;
 
     internal sealed class InvocationStartRequested : PooledObject<InvocationStartRequested>, IInvocationStartRequested
     {
@@ -30,7 +29,9 @@
 
         public string ConsumerApplicationId { get; set; }
 
-        public UniqueId ConsumerConnectionId { get; set; }        
+        public UniqueId ConsumerConnectionId { get; set; }
+
+        public UniqueId ConsumerApplicationInstanceId { get; set; }
 
         public T Handle<T, TArgs>(BrokerToClientRequestHandler<T, TArgs> handler, TArgs args = default)
         {
@@ -43,33 +44,39 @@
             MethodId = default;
             ConsumerApplicationId = default;
             ConsumerConnectionId = default;
+            ConsumerApplicationInstanceId = default;
             ServiceAlias = default;
         }
 
         public override string ToString()
         {
-            return $"{{Type: {typeof(InvocationStartRequested).Name}, {nameof(ServiceId)}: {ServiceId}, {nameof(MethodId)}: {MethodId}, {nameof(ConsumerApplicationId)}: {ConsumerApplicationId}, {nameof(ConsumerConnectionId)}: {ConsumerConnectionId}, {nameof(ServiceAlias)}: {ServiceAlias}}}";
+            return $"{nameof(ServiceId)}: {ServiceId}, {nameof(MethodId)}: {MethodId}, {nameof(ServiceAlias)}: {ServiceAlias}, {nameof(ConsumerApplicationId)}: {ConsumerApplicationId}, {nameof(ConsumerConnectionId)}: {ConsumerConnectionId}, {nameof(ConsumerApplicationInstanceId)}: {ConsumerApplicationInstanceId}";
+        }
+
+        private bool Equals(InvocationStartRequested other)
+        {
+            return string.Equals(ServiceId, other.ServiceId) && string.Equals(MethodId, other.MethodId) && ServiceAlias.Equals(other.ServiceAlias) && string.Equals(ConsumerApplicationId, other.ConsumerApplicationId) && ConsumerConnectionId.Equals(other.ConsumerConnectionId) && ConsumerApplicationInstanceId.Equals(other.ConsumerApplicationInstanceId);
         }
 
         public override bool Equals(object obj)
         {
-            return obj is InvocationStartRequested requested &&
-                   ServiceId == requested.ServiceId &&
-                   MethodId == requested.MethodId &&
-                   ConsumerApplicationId == requested.ConsumerApplicationId &&
-                   ConsumerConnectionId.Equals(requested.ConsumerConnectionId) &&
-                   ServiceAlias.Equals(requested.ServiceAlias);
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is InvocationStartRequested requested && Equals(requested);
         }
 
         public override int GetHashCode()
         {
-            var hashCode = -1849578967;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ServiceId);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(MethodId);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ConsumerApplicationId);
-            hashCode = hashCode * -1521134295 + EqualityComparer<UniqueId>.Default.GetHashCode(ConsumerConnectionId);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Maybe<string>>.Default.GetHashCode(ServiceAlias);
-            return hashCode;
+            unchecked
+            {
+                var hashCode = (ServiceId != null ? ServiceId.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (MethodId != null ? MethodId.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ ServiceAlias.GetHashCode();
+                hashCode = (hashCode * 397) ^ (ConsumerApplicationId != null ? ConsumerApplicationId.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ ConsumerConnectionId.GetHashCode();
+                hashCode = (hashCode * 397) ^ ConsumerApplicationInstanceId.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

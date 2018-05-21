@@ -170,7 +170,7 @@ namespace Plexus.Interop.Broker.Internal
                     resolveMode = ResolveMode.SingleLaunchingInstance;
                 }
 
-                resolveTask = _appLifecycleManager.ResolveConnectionAsync(appId, resolveMode);
+                resolveTask = _appLifecycleManager.ResolveConnectionAsync(appId, resolveMode, source.Info);
             }
             var resolvedConnection = await resolveTask.ConfigureAwait(false);
             return resolvedConnection.AppConnection;
@@ -228,7 +228,7 @@ namespace Plexus.Interop.Broker.Internal
                 appId = candidate.ProvidedService.Application.Id;
             }
             var resolvedConnection = await _appLifecycleManager
-                .ResolveConnectionAsync(appId, resolveMode)
+                .ResolveConnectionAsync(appId, resolveMode, source.Info)
                 .ConfigureAwait(false);
 
             return resolvedConnection.AppConnection;
@@ -265,6 +265,7 @@ namespace Plexus.Interop.Broker.Internal
                 reference.MethodId,
                 reference.ProvidedService.ServiceAlias,
                 sourceConnection.Info.ApplicationId,
+                sourceConnection.Info.ApplicationInstanceId,
                 sourceConnection.Id);
         }
 
@@ -275,6 +276,7 @@ namespace Plexus.Interop.Broker.Internal
                 reference.MethodId,
                 reference.ConsumedService.ServiceAlias,
                 sourceConnection.Info.ApplicationId,
+                sourceConnection.Info.ApplicationInstanceId,
                 sourceConnection.Id);
         }
 

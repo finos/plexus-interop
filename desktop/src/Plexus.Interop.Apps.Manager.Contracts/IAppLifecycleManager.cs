@@ -26,7 +26,7 @@
 
         Task StopAsync();
 
-        IAppConnection AcceptConnection(ITransportConnection connection, AppConnectionDescriptor info);
+        IAppConnection AcceptConnection(ITransportConnection connection, AppConnectionDescriptor connectionInfo);
 
         void RemoveConnection(IAppConnection connection);
 
@@ -38,6 +38,6 @@
 
         bool CanBeLaunched(string appId);
 
-        Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode);               
+        Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
     }
 }

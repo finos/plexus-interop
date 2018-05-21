@@ -277,6 +277,7 @@ namespace Plexus.Interop.Internal
                         request.ServiceAlias),
                     new InvocationSourceDescriptor(
                         request.ConsumerApplicationId,
+                        request.ConsumerApplicationInstanceId,
                         request.ConsumerConnectionId));
             await callHandler.HandleAsync(invocationInfo, channel).ConfigureAwait(false);
         }

@@ -35,9 +35,9 @@ message AppLaunchRequest {
 }
 
 message AppLaunchReferrer {
-	string referrer_app_id = 1;
-	UniqueId referrer_app_instance_id = 2;	
-	UniqueId referrer_connection_instance_id = 3;
+	string app_id = 1;
+	UniqueId app_instance_id = 2;	
+	UniqueId connection_id = 3;
 }
 
 message AppLaunchResponse {

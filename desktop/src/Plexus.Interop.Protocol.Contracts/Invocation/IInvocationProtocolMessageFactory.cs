@@ -25,6 +25,7 @@
             string methodId,
             Maybe<string> providerServiceAlias,
             string consumerApplicationId,
+            UniqueId consumerApplicationInstanceId,
             UniqueId consumerConnectionId);
 
         IInvocationStarted CreateInvocationStarted();
