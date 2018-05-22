@@ -1,0 +1,11 @@
+syntax="proto3";
+
+package interop;
+
+import "interop/unique_id.proto";
+
+message AppConnectionDescriptor {
+    UniqueId connection_id = 1;
+    string app_id = 2;
+    UniqueId app_instance_id = 3;
+}
