@@ -166,6 +166,7 @@
                             msg.MethodId.ConvertFromProtoStrict(),
                             msg.ServiceAlias.ConvertFromProto(),
                             msg.ConsumerApplicationId.ConvertFromProtoStrict(),
+                            msg.ConsumerApplicationInstanceId.ConvertFromProtoStrict(),
                             msg.ConsumerConnectionId.ConvertFromProtoStrict());
                     default:
                         throw new InvalidOperationException();
@@ -292,6 +293,8 @@
                 obj.ServiceId = message.ServiceId.ConvertToProtoStrict();
                 obj.ServiceAlias = message.ServiceAlias.ConvertToProto();
                 obj.ConsumerApplicationId = message.ConsumerApplicationId.ConvertToProtoStrict();
+                obj.ConsumerApplicationInstanceId =
+                    obj.ConsumerApplicationInstanceId.MergeFrom(message.ConsumerApplicationInstanceId);
                 obj.ConsumerConnectionId = obj.ConsumerConnectionId.MergeFrom(message.ConsumerConnectionId);
                 envelope.InvocationStartRequested = obj;
                 return envelope.Serialize();
