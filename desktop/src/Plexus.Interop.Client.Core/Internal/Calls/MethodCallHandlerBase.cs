@@ -42,7 +42,11 @@
             try
             {
                 await invocation.StartCompletion.ConfigureAwait(false);
-                var context = new MethodCallContext(info.Source.ApplicationId, info.Source.ConnectionId, cancellation.Token);
+                var context = new MethodCallContext(
+                    info.Source.ApplicationId, 
+                    info.Source.ApplicationInstanceId, 
+                    info.Source.ConnectionId, 
+                    cancellation.Token);
                 await HandleCoreAsync(invocation, context).ConfigureAwait(false);
                 invocation.Out.TryComplete();
             }

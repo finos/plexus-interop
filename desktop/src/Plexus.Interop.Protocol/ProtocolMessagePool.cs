@@ -76,6 +76,7 @@
             string methodId,
             Maybe<string> providerServiceAlias,
             string consumerApplicationId,
+            UniqueId consumerApplicationInstanceId,
             UniqueId consumerConnectionId)
         {
             var obj = InvocationStartRequested.Rent();
@@ -83,6 +84,7 @@
             obj.MethodId = methodId;
             obj.ServiceAlias = providerServiceAlias;
             obj.ConsumerApplicationId = consumerApplicationId;
+            obj.ConsumerApplicationInstanceId = consumerApplicationInstanceId;
             obj.ConsumerConnectionId = consumerConnectionId;
             return obj;
         }

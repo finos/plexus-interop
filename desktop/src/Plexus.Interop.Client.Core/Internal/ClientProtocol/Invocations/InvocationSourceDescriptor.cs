@@ -16,40 +16,50 @@
  */
 ﻿namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
-    using System.Collections.Generic;
-
     internal sealed class InvocationSourceDescriptor
     {
         public InvocationSourceDescriptor(
             string applicationId,
+            UniqueId applicationInstanceId,
             UniqueId connectionId)
         {
             ApplicationId = applicationId;
             ConnectionId = connectionId;
+            ApplicationInstanceId = applicationInstanceId;
         }
 
         public string ApplicationId { get; }
 
         public UniqueId ConnectionId { get; }
 
+        public UniqueId ApplicationInstanceId { get; }
+
+        private bool Equals(InvocationSourceDescriptor other)
+        {
+            return string.Equals(ApplicationId, other.ApplicationId) && ConnectionId.Equals(other.ConnectionId) && string.Equals(ApplicationInstanceId, other.ApplicationInstanceId);
+        }
+
         public override bool Equals(object obj)
         {
-            return obj is InvocationSourceDescriptor descriptor &&
-                   ApplicationId == descriptor.ApplicationId &&
-                   ConnectionId.Equals(descriptor.ConnectionId);
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is InvocationSourceDescriptor && Equals((InvocationSourceDescriptor) obj);
         }
 
         public override int GetHashCode()
         {
-            var hashCode = 1157153738;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ApplicationId);
-            hashCode = hashCode * -1521134295 + EqualityComparer<UniqueId>.Default.GetHashCode(ConnectionId);
-            return hashCode;
+            unchecked
+            {
+                var hashCode = (ApplicationId != null ? ApplicationId.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ ConnectionId.GetHashCode();
+                hashCode = (hashCode * 397) ^ ApplicationInstanceId.GetHashCode();
+                return hashCode;
+            }
         }
 
         public override string ToString()
         {
-            return $"{nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}";
+            return $"{nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}";
         }
     }
 }
