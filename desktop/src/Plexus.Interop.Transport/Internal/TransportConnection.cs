@@ -47,7 +47,7 @@ namespace Plexus.Interop.Transport.Internal
             _transportReceiveProcessor = transportReceiveProcessor;
             _headerFactory = headerFactory;
             _incomingMessageHandler = new TransportChannelHeaderHandler<Task, ChannelMessage>(HandleIncomingAsync, HandleIncomingAsync, HandleIncomingAsync);
-            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
+            Completion = ProcessAsync().LogCompletion(_log);
         }
 
         public UniqueId Id { get; }
@@ -62,7 +62,7 @@ namespace Plexus.Interop.Transport.Internal
             {
                 return false;
             }
-            TaskRunner.RunInBackground(CompleteSendingAsync).IgnoreAwait(_log);
+            CompleteSendingAsync().IgnoreAwait(_log);
             return true;
         }
 
@@ -72,7 +72,7 @@ namespace Plexus.Interop.Transport.Internal
             {
                 return false;
             }
-            TaskRunner.RunInBackground(() => TerminateSendingAsync(error)).IgnoreAwait(_log);
+            TerminateSendingAsync(error).IgnoreAwait(_log);
             return true;
         }
 
