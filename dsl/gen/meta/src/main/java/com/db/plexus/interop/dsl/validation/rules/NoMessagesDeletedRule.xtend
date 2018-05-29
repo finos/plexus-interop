@@ -19,8 +19,6 @@ package com.db.plexus.interop.dsl.validation.rules
 import org.eclipse.xtext.resource.XtextResourceSet
 import com.db.plexus.interop.dsl.gen.GenUtils
 import com.google.inject.Inject
-import org.eclipse.xtext.validation.Issue;
-import org.eclipse.xtext.diagnostics.Severity
 import static com.db.plexus.interop.dsl.validation.Issues.*;
 
 class NoMessagesDeletedRule implements UpdateRule {
@@ -39,7 +37,7 @@ class NoMessagesDeletedRule implements UpdateRule {
         val updatedIds = genUtils.getMessagesMap(updatedResourceSet.resources).keySet;
         return baseMessages.keySet
         .filter[id | !updatedIds.contains(id)]
-        .map([id | createError(id, getCode())])
+        .map([id | createError('''Message «id» is deleted''', getCode)])
         .toList()
     }
 

@@ -19,11 +19,9 @@ package com.db.plexus.interop.dsl.validation.rules
 import com.db.plexus.interop.dsl.gen.GenUtils
 import com.google.inject.Inject
 import org.eclipse.xtext.resource.XtextResourceSet
-import org.eclipse.xtext.validation.Issue;
-import org.eclipse.xtext.diagnostics.Severity
 import static com.db.plexus.interop.dsl.validation.Issues.*;
 
-class NoMessageFieldsDeletedRule implements UpdateRule {
+class NoFieldsDeletedRule implements UpdateRule {
 
     val GenUtils genUtils;
 
@@ -35,11 +33,11 @@ class NoMessageFieldsDeletedRule implements UpdateRule {
     override getCode() '''message-field-deleted'''
 
     override validate(XtextResourceSet baseResourceSet, XtextResourceSet updatedResourceSet) {
-        val baseFields = genUtils.getFieldsMap(baseResourceSet.resources);
-        val updatedFieldIds = genUtils.getFieldsMap(updatedResourceSet.resources).keySet;
+        val baseFields = genUtils.getFieldsMap(baseResourceSet.resources)
+        val updatedFieldIds = genUtils.getFieldsMap(updatedResourceSet.resources).keySet
         return baseFields.keySet
         .filter[id | !updatedFieldIds.contains(id)]
-        .map([id | createError('''Message field «id» deleted''', getCode)])
+        .map[id | createError('''Message field «id» is deleted''', getCode)]
         .toList()
     }
 

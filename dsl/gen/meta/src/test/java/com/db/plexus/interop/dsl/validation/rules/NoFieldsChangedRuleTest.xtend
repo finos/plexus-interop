@@ -31,10 +31,10 @@ import org.eclipse.xtext.diagnostics.Severity
 
 @RunWith(XtextRunner)
 @InjectWith(InteropLangInjectionProvider)
-class NoMessageFieldsDeletedRuleTest {
+class NoFieldsChangedRuleTest {
 
     @Inject
-    var NoMessageFieldsDeletedRule rule
+    var NoFieldsChangedRule rule
 
     @Test
     def testSameResourceSetIsPositive() {
@@ -45,22 +45,22 @@ class NoMessageFieldsDeletedRuleTest {
     }
 
     @Test
-    def testFailingOnDeletedMessage() {
+    def testFailingOnChangedFields() {
 
         val baseResource = new XtextResourceSet()
         baseResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/messages.proto"), true)
         EcoreUtil2.resolveAll(baseResource)
 
         val updatedResource = new XtextResourceSet()
-        updatedResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/missed_message_field.proto"), true)
+        updatedResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/updated_message_fields.proto"), true)
         EcoreUtil2.resolveAll(updatedResource)
 
         val issues = rule.validate(baseResource, updatedResource)
-        assertThat(issues, hasSize(1))
+        assertThat(issues, hasSize(3))
 
         val issue = issues.get(0)
         assertThat(issue.getCode(), is(equalTo(rule.getCode())))
-        assertThat(issue.getMessage(), containsString("sint"))
+        assertThat(issue.getMessage(), containsString("_field changed"))
         assertThat(issue.getSeverity(), is(equalTo(Severity.ERROR)))
 
     }
