@@ -101,6 +101,16 @@ public class GenUtils {
                     ));
     }
 
+    def Map<String, Field> getFieldsMap(Resource... resources) {
+        return getMessages(resources)
+            .stream()
+            .flatMap([m | getFields(m).stream()])
+            .collect(Collectors.toMap(
+                        [f | f.getFullName],
+                        [f | f]
+                ));
+    }
+
     def String getType(Field field) {
         val typeRef = field.getTypeReference();
         switch typeRef {
