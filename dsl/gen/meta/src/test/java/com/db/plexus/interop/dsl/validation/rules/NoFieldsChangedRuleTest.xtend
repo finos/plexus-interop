@@ -56,11 +56,11 @@ class NoFieldsChangedRuleTest {
         EcoreUtil2.resolveAll(updatedResource)
 
         val issues = rule.validate(baseResource, updatedResource)
-        assertThat(issues, hasSize(3))
+        assertThat(issues, hasSize(4))
 
         val issue = issues.get(0)
         assertThat(issue.getCode(), is(equalTo(rule.getCode())))
-        assertThat(issue.getMessage(), containsString("_field changed"))
+        assertThat(issue.getMessage(), containsString("_field updated"))
         assertThat(issue.getSeverity(), is(equalTo(Severity.ERROR)))
 
     }

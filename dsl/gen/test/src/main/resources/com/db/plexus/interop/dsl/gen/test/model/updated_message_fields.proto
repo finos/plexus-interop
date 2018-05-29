@@ -27,7 +27,8 @@ message Request {
     bool string_field = 1;
     // primitive to complex
     Request boolean_field = 2;
-    sint32 sint_field = 3;
+    // non repeated to repeated
+    repeated sint32 sint_field = 3;
     uint32 uint_field = 4;
     // complex to complex
     Response request_field = 5;

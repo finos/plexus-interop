@@ -42,18 +42,23 @@ class NoFieldsChangedRule implements UpdateRule {
         return baseFields.entrySet
         .filter[fieldEntry | updatedFieldIds.contains(fieldEntry.key)]
         .filter[fieldEntry | !fieldsEqual(fieldEntry.value, updatedFields.get(fieldEntry.key))]
-        .map([fieldEntry | createError('''Message field «fieldEntry.key» changed''', getCode)])
+        .map([fieldEntry | createError('''Message field «fieldEntry.key» updated''', getCode)])
         .toList()
     }
 
     def fieldsEqual(Field first, Field second) {
         if (!first.number.equals(second.number)) {
-            return false;
+            return false
+        }
+        val labelsEqual = (first.label == null && second.label == null)
+            || (first.label.equals(second.label));
+        if (!labelsEqual) {
+            return false
         }
         val firstType = first.typeReference
         val secondType = second.typeReference
         if (!firstType.class.equals(secondType.class)) {
-            return false;
+            return false
         }
         switch (firstType) {
             PrimitiveFieldType: return firstType.value.equals((secondType as PrimitiveFieldType).value),
