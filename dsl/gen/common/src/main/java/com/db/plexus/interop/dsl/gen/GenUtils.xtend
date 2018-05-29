@@ -46,6 +46,7 @@ import com.db.plexus.interop.dsl.protobuf.BoolConstant
 import com.db.plexus.interop.dsl.protobuf.DecimalConstant
 import com.db.plexus.interop.dsl.InteropLangUtils
 import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils
+import java.util.Map
 
 public class GenUtils {
 		
@@ -89,6 +90,15 @@ public class GenUtils {
         return Arrays.stream(resources)
         .flatMap([resource | getMessages(resource).stream()])
         .collect(Collectors.toList());
+    }
+
+    def Map<String, Message> getMessagesMap(Resource... resources) {
+        return getMessages(resources)
+            .stream()
+            .collect(Collectors.toMap(
+                            [m | getFullName(m)],
+                            [m | m as Message]
+                    ));
     }
 
     def String getType(Field field) {
