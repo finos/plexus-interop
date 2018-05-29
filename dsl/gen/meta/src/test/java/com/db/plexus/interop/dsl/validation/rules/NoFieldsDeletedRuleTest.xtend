@@ -31,17 +31,14 @@ import org.eclipse.xtext.diagnostics.Severity
 
 @RunWith(XtextRunner)
 @InjectWith(InteropLangInjectionProvider)
-class NoFieldsDeletedRuleTest {
+class NoFieldsDeletedRuleTest extends BaseRuleTest {
 
     @Inject
     var NoFieldsDeletedRule rule
 
     @Test
-    def testSameResourceSetIsPositive() {
-        val resourceSet = new XtextResourceSet()
-        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
-        EcoreUtil2.resolveAll(resourceSet)
-        assertThat(rule.validate(resourceSet, resourceSet), hasSize(0))
+    def testFalsePositive() {
+        super.testFalsePositive(this.rule)
     }
 
     @Test

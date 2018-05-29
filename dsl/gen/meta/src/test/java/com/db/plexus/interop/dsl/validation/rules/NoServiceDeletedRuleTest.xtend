@@ -31,10 +31,10 @@ import org.eclipse.xtext.diagnostics.Severity
 
 @RunWith(XtextRunner)
 @InjectWith(InteropLangInjectionProvider)
-class NoFieldsChangedRuleTest extends BaseRuleTest {
+class NoServicesDeletedRuleTest extends BaseRuleTest {
 
     @Inject
-    var NoFieldsChangedRule rule
+    var NoServicesDeletedRule rule
 
     @Test
     def testFalsePositive() {
@@ -42,22 +42,22 @@ class NoFieldsChangedRuleTest extends BaseRuleTest {
     }
 
     @Test
-    def testFailingOnChangedFields() {
+    def testFailingOnDeletedService() {
 
         val baseResource = new XtextResourceSet()
-        baseResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/messages.proto"), true)
+        baseResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/services.proto"), true)
         EcoreUtil2.resolveAll(baseResource)
 
         val updatedResource = new XtextResourceSet()
-        updatedResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/updated_message_fields.proto"), true)
+        updatedResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/deleted_service.proto"), true)
         EcoreUtil2.resolveAll(updatedResource)
 
         val issues = rule.validate(baseResource, updatedResource)
-        assertThat(issues, hasSize(4))
+        assertThat(issues, hasSize(1))
 
         val issue = issues.get(0)
         assertThat(issue.getCode(), is(equalTo(rule.getCode())))
-        assertThat(issue.getMessage(), containsString("_field updated"))
+        assertThat(issue.getMessage(), containsString("deleted"))
         assertThat(issue.getSeverity(), is(equalTo(Severity.ERROR)))
 
     }
