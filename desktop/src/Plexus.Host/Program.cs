@@ -119,7 +119,7 @@ namespace Plexus.Host
                 Console.WriteLine($"Plexus process {process.Id} exited with code {exitCode}");
             }
 
-            var tasks = processes.Select(x => TaskRunner.RunInBackground(() => ShutdownProcessAsync(x)));
+            var tasks = processes.Select(ShutdownProcessAsync);
 
             await Task.WhenAll(tasks).IgnoreExceptions().ConfigureAwait(false);
 

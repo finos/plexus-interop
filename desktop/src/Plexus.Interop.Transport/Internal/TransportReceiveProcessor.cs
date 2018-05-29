@@ -42,7 +42,7 @@ namespace Plexus.Interop.Transport.Internal
             _handler = new TransportHeaderHandler<Task, Maybe<IPooledBuffer>>(
                 HandleConnetionHeaderAsync,
                 HandleChannelHeaderAsync);
-            _buffer.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            _buffer.Out.PropagateCompletionFrom(ProcessAsync());
             In.Completion.LogCompletion(_log);
         }
 

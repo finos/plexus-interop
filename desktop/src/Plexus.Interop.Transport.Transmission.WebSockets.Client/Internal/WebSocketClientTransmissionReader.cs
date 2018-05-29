@@ -44,7 +44,7 @@
             _webSocket.Closed += OnClosed;
             _webSocket.Error += OnError;
 
-            Completion = TaskRunner.RunInBackground(ProcessAsync);            
+            Completion = ProcessAsync();
         }
 
         public Task Completion { get; }

@@ -37,7 +37,7 @@ namespace Plexus.Interop.Broker.Internal
             Id = _connection.Id;
             _log = LogManager.GetLogger<AppConnectionProcessor>(Id.ToString());
             _clientRequestHandler = clientRequestHandler;
-            Completion = TaskRunner.RunInBackground(ProcessAsync);
+            Completion = ProcessAsync();
         }
 
         public UniqueId Id { get; }
