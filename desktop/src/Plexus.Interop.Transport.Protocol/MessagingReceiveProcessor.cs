@@ -41,7 +41,7 @@ namespace Plexus.Interop.Transport.Protocol
             _connection = connection.In;
             _deserializer = deserializer;
             In.Completion.LogCompletion(_log);
-            _buffer.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            _buffer.Out.PropagateCompletionFrom(ProcessAsync());
         }
 
         public UniqueId Id { get; }
