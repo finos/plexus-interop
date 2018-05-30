@@ -99,7 +99,7 @@ public class GenUtils {
         return getServices(resources)
         .stream()
         .flatMap[s | s.getMethods().stream().map[m | {
-                    val methodId = s.getFullName() + m.name;
+                    val methodId = s.getFullName() + "." + m.name;
                     return methodId -> m;
                 }]]
         .collect(Collectors.toMap([key], [value]));

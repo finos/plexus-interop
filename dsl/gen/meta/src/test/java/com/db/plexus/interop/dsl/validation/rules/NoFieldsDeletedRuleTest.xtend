@@ -42,7 +42,7 @@ class NoFieldsDeletedRuleTest extends BaseRuleTest {
     }
 
     @Test
-    def testFailingOnDeletedField() {
+    def testNegative() {
 
         val baseResource = new XtextResourceSet()
         baseResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/messages.proto"), true)

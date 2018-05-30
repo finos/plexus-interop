@@ -12,6 +12,7 @@ class BaseRuleTest {
         val resourceSet = new XtextResourceSet()
         resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
         EcoreUtil2.resolveAll(resourceSet)
-        assertThat(rule.validate(resourceSet, resourceSet), hasSize(0))
+        val issues = rule.validate(resourceSet, resourceSet);
+        assertThat(issues, hasSize(0))
     }
 }

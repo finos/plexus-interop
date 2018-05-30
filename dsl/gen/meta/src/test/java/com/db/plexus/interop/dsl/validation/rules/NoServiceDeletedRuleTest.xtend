@@ -42,7 +42,7 @@ class NoServicesDeletedRuleTest extends BaseRuleTest {
     }
 
     @Test
-    def testFailingOnDeletedService() {
+    def testNegative() {
 
         val baseResource = new XtextResourceSet()
         baseResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/services.proto"), true)

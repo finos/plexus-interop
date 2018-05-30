@@ -31,10 +31,10 @@ import org.eclipse.xtext.diagnostics.Severity
 
 @RunWith(XtextRunner)
 @InjectWith(InteropLangInjectionProvider)
-class NoMessagesDeletedRuleTest extends BaseRuleTest {
+class NoMethodTypesChangedRuleTest extends BaseRuleTest {
 
     @Inject
-    var NoMessagesDeletedRule rule
+    var NoMethodTypesChangedRule rule
 
     @Test
     def testFalsePositive() {
@@ -45,19 +45,19 @@ class NoMessagesDeletedRuleTest extends BaseRuleTest {
     def testNegative() {
 
         val baseResource = new XtextResourceSet()
-        baseResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/messages.proto"), true)
+        baseResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/services.proto"), true)
         EcoreUtil2.resolveAll(baseResource)
 
         val updatedResource = new XtextResourceSet()
-        updatedResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/model/missed_message.proto"), true)
+        updatedResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/updated_service_methods.proto"), true)
         EcoreUtil2.resolveAll(updatedResource)
 
         val issues = rule.validate(baseResource, updatedResource)
-        assertThat(issues, hasSize(1))
+        assertThat(issues, hasSize(4))
 
         val issue = issues.get(0)
         assertThat(issue.getCode(), is(equalTo(rule.getCode())))
-        assertThat(issue.getMessage(), containsString("Response"))
+        assertThat(issue.getMessage(), containsString("is updated"))
         assertThat(issue.getSeverity(), is(equalTo(Severity.ERROR)))
 
     }

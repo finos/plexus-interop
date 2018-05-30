@@ -31,10 +31,10 @@ import org.eclipse.xtext.diagnostics.Severity
 
 @RunWith(XtextRunner)
 @InjectWith(InteropLangInjectionProvider)
-class NoServiceMethodsDeletedRuleTest extends BaseRuleTest {
+class NoMethodsDeletedRuleTest extends BaseRuleTest {
 
     @Inject
-    var NoServiceMethodsDeletedRule rule
+    var NoMethodsDeletedRule rule
 
     @Test
     def testFalsePositive() {
@@ -42,7 +42,7 @@ class NoServiceMethodsDeletedRuleTest extends BaseRuleTest {
     }
 
     @Test
-    def testFailingOnDeletedService() {
+    def testNegative() {
 
         val baseResource = new XtextResourceSet()
         baseResource.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/services/services.proto"), true)

@@ -21,7 +21,7 @@ import com.db.plexus.interop.dsl.gen.GenUtils
 import com.google.inject.Inject
 import static com.db.plexus.interop.dsl.validation.Issues.*;
 
-class NoServiceMethodsDeletedRule implements UpdateRule {
+class NoMethodsDeletedRule implements UpdateRule {
 
     val GenUtils genUtils;
 
