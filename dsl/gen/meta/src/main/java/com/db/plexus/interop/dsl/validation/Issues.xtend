@@ -37,19 +37,33 @@ public class Issues {
     }
 
     def static issuesToString(List<Issue> issues) {
-        if (issues.isEmpty) {
+        if(issues.isEmpty) {
             return successStringResult()
         }
         val errorsBuilder = new StringBuilder()
-        issues.fold(errorsBuilder)[builder, issue | builder.append(issue.toString()).append("\n")]
+        issues.fold(errorsBuilder) [builder, issue | builder.append(issueToString(issue)).append("\n")]
         return errorsBuilder.toString()
+    }
+
+    def static issueToString(Issue issue) {
+        val result = new StringBuilder(issue.severity.name());
+        result.append(": ").append(issue.getMessage());
+        result.append(" [");
+        if(issue.getUriToProblem() != null) {
+            result.append(issue.getUriToProblem().trimFragment());
+        }
+        if(issue.lineNumber != null || issue.column != null) {
+            result.append(" line : ")
+            .append(issue.lineNumber).append(" column : ").append(issue.column);
+        }
+        return result.append("]").toString();
     }
 
     def static boolean hasErrors(List<Issue> issues) {
         return !issues.stream()
-            .filter[issue | issue.getSeverity() == Severity.ERROR]
-            .collect(Collectors.toList)
-            .isEmpty
+        .filter[issue | issue.getSeverity() == Severity.ERROR]
+        .collect(Collectors.toList)
+        .isEmpty
     }
 
     def static successStringResult() { "No issues found" }
@@ -58,10 +72,10 @@ public class Issues {
 
 class IssuesComparator implements Comparator<Issue> {
     override int compare (Issue function1, Issue function2) {
-        if (function1.getSeverity() == function2.getSeverity()) {
+        if(function1.getSeverity() == function2.getSeverity()) {
             return 0;
         } else {
-            return if (function1.getSeverity() == Severity.ERROR) 1 else -1;
+            return if(function1.getSeverity() == Severity.ERROR) 1 else -1;
         }
     }
 }
