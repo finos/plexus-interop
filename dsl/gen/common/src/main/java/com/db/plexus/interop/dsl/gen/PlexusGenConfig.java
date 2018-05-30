@@ -52,11 +52,8 @@ public class PlexusGenConfig {
     @Parameter(names = {"-d", "--descriptors"})
     private boolean includeProtoDescriptors;
 
-    @Parameter(names = {"--source"})
-    private String source;
-
-    @Parameter(names = {"--target"})
-    private String target;
+    @Parameter(names = {"-tb", "--targetBaseDir"})
+    private String targetBaseDir;
 
     private List<String> externalDependencies = new ArrayList<>();
 
@@ -150,20 +147,12 @@ public class PlexusGenConfig {
         this.namespace = namespace;
     }
 
-    public String getSource() {
-        return source;
+    public String getTargetBaseDir() {
+        return targetBaseDir;
     }
 
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
+    public void setTargetBaseDir(String targetBaseDir) {
+        this.targetBaseDir = targetBaseDir;
     }
 
     @Override
@@ -178,8 +167,7 @@ public class PlexusGenConfig {
                 ", protocPath='" + protocPath + '\'' +
                 ", verbose=" + verbose +
                 ", includeProtoDescriptors=" + includeProtoDescriptors +
-                ", source='" + source + '\'' +
-                ", target='" + target + '\'' +
+                ", target='" + targetBaseDir + '\'' +
                 ", externalDependencies=" + externalDependencies +
                 ", messagesMetadata='" + messagesMetadata + '\'' +
                 '}';

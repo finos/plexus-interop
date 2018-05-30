@@ -16,14 +16,10 @@
  */
 package com.db.plexus.interop.dsl.gen.metadata.tests
 
-import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import com.db.plexus.interop.dsl.gen.ResourceSetValidator
-import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenerator
 import com.db.plexus.interop.dsl.gen.test.InteropLangInjectionProvider
 import com.db.plexus.interop.dsl.gen.test.ResourceUtils
 import com.google.inject.Inject
-import java.nio.file.Files
-import java.nio.file.Paths
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
@@ -68,8 +64,8 @@ class MetaValidatorTaskTest {
 
         val stringResult = issuesToString(validator.getValidationIssues(resourceSet))
 
-        assertThat(stringResult, containsString("ERROR:Couldn't resolve reference to Service 'com.db.plexus.interop.dsl.gen.test.services.ExampleService_NotExists"));
-        assertThat(stringResult, containsString("ERROR:Couldn't resolve reference to Method 'PointToPoint'"));
+        assertThat(stringResult, containsString("ERROR: Couldn't resolve reference to Service 'com.db.plexus.interop.dsl.gen.test.services.ExampleService_NotExists"));
+        assertThat(stringResult, containsString("ERROR: Couldn't resolve reference to Method 'PointToPoint'"));
 
     }
 

@@ -22,10 +22,7 @@ import com.db.plexus.interop.dsl.gen.util.FileUtils
 import java.io.File
 import com.db.plexus.interop.dsl.gen.BaseGenTask
 import org.eclipse.xtext.resource.XtextResourceSet
-import org.eclipse.xtext.validation.Issue;
-import java.util.List
 import static com.db.plexus.interop.dsl.validation.Issues.*;
-
 
 class MetaValidatorTask extends BaseGenTask {
 

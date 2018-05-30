@@ -33,8 +33,8 @@ class MetaPatchValidatorTask extends BaseGenTask {
     override doGen(PlexusGenConfig config) {
 
         val workingDirUri = getWorkingDir()
-        val sourceBaseDir = getRelativeURI(config.source, workingDirUri)
-        val targetBaseDir = getRelativeURI(config.target, workingDirUri)
+        val sourceBaseDir = getRelativeURI(config.baseDir, workingDirUri)
+        val targetBaseDir = getRelativeURI(config.targetBaseDir, workingDirUri)
 
         val sourceResourceSet = new XtextResourceSet
         val targetResourceSet = new XtextResourceSet
