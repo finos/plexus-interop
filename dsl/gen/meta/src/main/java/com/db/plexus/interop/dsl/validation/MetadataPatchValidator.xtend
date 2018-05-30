@@ -18,11 +18,30 @@ package com.db.plexus.interop.dsl.validation
 
 import org.eclipse.xtext.resource.XtextResourceSet
 import static com.db.plexus.interop.dsl.gen.GenUtils.*
+import com.db.plexus.interop.dsl.validation.rules.UpdateRule
+import com.google.inject.Inject
+import java.util.Set
+import org.eclipse.xtext.EcoreUtil2
+import java.util.stream.Collectors
+import org.eclipse.xtext.validation.Issue
+import java.util.List
 
 class MetadataPatchValidator {
 
-    def validatePatch(XtextResourceSet baseResourceSet, XtextResourceSet updatedResourceSet) {
+    val Set<UpdateRule> updateRules;
 
+    @Inject
+    new (Set<UpdateRule> rules) {
+        this.updateRules = rules;
+    }
+
+    def List<Issue> validatePatch(XtextResourceSet baseResourceSet, XtextResourceSet updatedResourceSet) {
+        EcoreUtil2.resolveAll(baseResourceSet)
+        EcoreUtil2.resolveAll(updatedResourceSet)
+        updateRules
+        .stream()
+        .flatMap[rule | rule.validate(baseResourceSet, updatedResourceSet).stream()]
+        .collect(Collectors.toList)
     }
 
 }

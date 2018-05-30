@@ -18,9 +18,10 @@ package com.db.plexus.interop.dsl.validation
 
 import org.eclipse.xtext.diagnostics.Severity
 import org.eclipse.xtext.validation.Issue;
-import org.eclipse.xtext.diagnostics.Severity
+import java.util.Comparator
+import java.util.List
 
-class Issues {
+public class Issues {
 
     def static Issue createError(String message, String code) {
         val issue = new Issue.IssueImpl();
@@ -30,4 +31,29 @@ class Issues {
         return issue
     }
 
+    def static Comparator<Issue> issuesComparator() {
+        new IssuesComparator()
+    }
+
+    def static issuesToString(List<Issue> issues) {
+        if (issues.isEmpty) {
+            return successStringResult()
+        }
+        val errorsBuilder = new StringBuilder()
+        issues.fold(errorsBuilder)[builder, issue | builder.append(issue.toString()).append("\n")]
+        return errorsBuilder.toString()
+    }
+
+    def static successStringResult() { "No issues found" }
+
+}
+
+class IssuesComparator implements Comparator<Issue> {
+    override int compare (Issue function1, Issue function2) {
+        if (function1.getSeverity() == function2.getSeverity()) {
+            return 0;
+        } else {
+            return if (function1.getSeverity() == Severity.ERROR) 1 else -1;
+        }
+    }
 }
