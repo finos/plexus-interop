@@ -55,7 +55,7 @@ public abstract class BaseGenTask implements GenTask {
         this.outDirUri = getRelativeURI(config.getOutDir(), this.workingDirUri);
         this.resourceBaseUri = detectResourceBaseUri();
         final XtextResourceSet resourceSet = new XtextResourceSet();
-        loadResources(resourceSet, config.isVerbose(), inputFilesGlob(config));
+        loadResources(resourceSet, getBaseDirUri(), config.isVerbose(), inputFilesGlob(config));
         if (config.isVerbose()) {
             printResources(resourceSet);
         }
@@ -111,9 +111,9 @@ public abstract class BaseGenTask implements GenTask {
                 .collect(Collectors.toList());
     }
 
-    protected void loadResources(XtextResourceSet resourceSet, boolean isVerbose, String inputGlob) throws IOException {
+    protected void loadResources(XtextResourceSet resourceSet, URI baseDirUri, boolean isVerbose, String inputGlob) throws IOException {
         FileUtils.processFiles(
-                new File(this.getBaseDirUri().toFileString()).getPath(),
+                new File(baseDirUri.toFileString()).getPath(),
                 inputGlob,
                 path -> {
                     if (isVerbose) {

@@ -33,14 +33,14 @@ class MetaPatchValidatorTask extends BaseGenTask {
     override doGen(PlexusGenConfig config) {
 
         val workingDirUri = getWorkingDir()
-        val sourceDir = getRelativeURI(config.source, workingDirUri)
-        val outDirUri = getRelativeURI(config.target, workingDirUri)
+        val sourceBaseDir = getRelativeURI(config.source, workingDirUri)
+        val targetBaseDir = getRelativeURI(config.target, workingDirUri)
 
         val sourceResourceSet = new XtextResourceSet
         val targetResourceSet = new XtextResourceSet
 
-        loadResources(sourceResourceSet, config.isVerbose, "*.interop");
-        loadResources(targetResourceSet, config.isVerbose, "*.interop");
+        loadResources(sourceResourceSet, sourceBaseDir, config.isVerbose, "*.interop");
+        loadResources(targetResourceSet, targetBaseDir, config.isVerbose, "*.interop");
 
         val issues = metadataPatchValidator.validatePatch(targetResourceSet, sourceResourceSet)
         if (!issues.empty) {
