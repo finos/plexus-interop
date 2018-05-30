@@ -91,7 +91,8 @@ public class GenUtils {
         .stream()
         .collect(Collectors.toMap(
                         [getFullName],
-                        [s | s]
+                        [it],
+                        [value, duplicate | value]
                 ));
     }
 
@@ -102,7 +103,7 @@ public class GenUtils {
                     val methodId = s.getFullName() + "." + m.name;
                     return methodId -> m;
                 }]]
-        .collect(Collectors.toMap([key], [value]));
+        .collect(Collectors.toMap([key], [value], [value, duplicate | value]));
     }
 
     def static List<Message> getMessages(Resource... resources) {
@@ -114,14 +115,17 @@ public class GenUtils {
     def Map<String, Message> getMessagesMap(Resource... resources) {
         return getMessages(resources)
         .stream()
-        .collect(Collectors.toMap([getFullName], [it]));
+        .collect(Collectors.toMap([getFullName], [it], [f, s | f]));
     }
 
     def Map<String, Field> getFieldsMap(Resource... resources) {
         return getMessages(resources)
         .stream()
-        .flatMap([m | getFields(m).stream()])
-        .collect(Collectors.toMap([getFullName], [it]));
+        .flatMap([m | getFields(m).stream().map[f | f -> m]])
+        .collect(Collectors.toMap(
+                        [pair | pair.value.getFullName + "." + pair.key.name],
+                        [key],
+                        [value, duplicate | value]));
     }
 
     def String getType(Field field) {

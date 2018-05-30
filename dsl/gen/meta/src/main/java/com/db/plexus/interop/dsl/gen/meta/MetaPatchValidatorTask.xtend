@@ -39,8 +39,8 @@ class MetaPatchValidatorTask extends BaseGenTask {
         val sourceResourceSet = new XtextResourceSet
         val targetResourceSet = new XtextResourceSet
 
-        loadResources(sourceResourceSet, sourceBaseDir, config.isVerbose, "*.interop");
-        loadResources(targetResourceSet, targetBaseDir, config.isVerbose, "*.interop");
+        loadResources(sourceResourceSet, sourceBaseDir, config.isVerbose, "*.{proto,interop}");
+        loadResources(targetResourceSet, targetBaseDir, config.isVerbose, "*.{proto,interop}");
 
         val issues = metadataPatchValidator.validatePatch(targetResourceSet, sourceResourceSet)
         if (!issues.empty) {

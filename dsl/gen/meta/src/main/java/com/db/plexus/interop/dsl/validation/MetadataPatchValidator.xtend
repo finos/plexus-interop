@@ -17,7 +17,6 @@
 package com.db.plexus.interop.dsl.validation
 
 import org.eclipse.xtext.resource.XtextResourceSet
-import static com.db.plexus.interop.dsl.gen.GenUtils.*
 import com.db.plexus.interop.dsl.validation.rules.UpdateRule
 import com.google.inject.Inject
 import java.util.Set
