@@ -112,7 +112,7 @@ public class Main {
         Path workDirPath = Paths.get("").toAbsolutePath();
         URI workDir = URI.createFileURI(workDirPath.toString()).appendSegment("");
         URI baseDir = config.getBaseDir() != null ? URI.createFileURI(config.getBaseDir()).resolve(workDir).appendSegment("") : null;
-        final InteropLangStandaloneSetup setup = new InteropLangStandaloneSetup();
+        final InteropLangStandaloneSetup setup = new CLIStandaloneSetup();
         final Injector injector = setup.createInjectorAndDoEMFRegistration();
         if (baseDir != null) {
             setup.addBaseURI(baseDir);
