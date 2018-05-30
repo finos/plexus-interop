@@ -32,6 +32,7 @@ import org.junit.runner.RunWith
 import static org.hamcrest.CoreMatchers.*;
 
 import static org.junit.Assert.*
+import static com.db.plexus.interop.dsl.validation.Issues.*;
 import com.db.plexus.interop.dsl.gen.meta.MetaValidatorTask
 
 @RunWith(XtextRunner)
@@ -52,9 +53,9 @@ class MetaValidatorTaskTest {
         resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
         resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_c.interop"), true)
 
-        val stringResult = validatorTask.errorsString(validator.getValidationIssues(resourceSet))
+        val stringResult = issuesToString(validator.getValidationIssues(resourceSet))
 
-        assertEquals(validatorTask.successStringResult(), stringResult)
+        assertEquals(successStringResult(), stringResult)
     }
 
     @Test
@@ -65,7 +66,7 @@ class MetaValidatorTaskTest {
         resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a_invalid.interop"), true)
         resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_c.interop"), true)
 
-        val stringResult = validatorTask.errorsString(validator.getValidationIssues(resourceSet))
+        val stringResult = issuesToString(validator.getValidationIssues(resourceSet))
 
         assertThat(stringResult, containsString("ERROR:Couldn't resolve reference to Service 'com.db.plexus.interop.dsl.gen.test.services.ExampleService_NotExists"));
         assertThat(stringResult, containsString("ERROR:Couldn't resolve reference to Method 'PointToPoint'"));
