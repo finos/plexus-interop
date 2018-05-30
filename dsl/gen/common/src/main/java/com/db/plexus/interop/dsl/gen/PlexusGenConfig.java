@@ -52,6 +52,12 @@ public class PlexusGenConfig {
     @Parameter(names = {"-d", "--descriptors"})
     private boolean includeProtoDescriptors;
 
+    @Parameter(names = {"-s", "--source"})
+    private String source;
+
+    @Parameter(names = {"-t", "--target"})
+    private String target;
+
     private List<String> externalDependencies = new ArrayList<>();
 
     private String messagesMetadata;
@@ -144,10 +150,27 @@ public class PlexusGenConfig {
         this.namespace = namespace;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
     @Override
     public String toString() {
         return "PlexusGenConfig{" +
-                "input='" + input + '\'' +
+                "type='" + type + '\'' +
+                ", input='" + input + '\'' +
                 ", outDir='" + outDir + '\'' +
                 ", outFile='" + outFile + '\'' +
                 ", baseDir='" + baseDir + '\'' +
@@ -155,6 +178,10 @@ public class PlexusGenConfig {
                 ", protocPath='" + protocPath + '\'' +
                 ", verbose=" + verbose +
                 ", includeProtoDescriptors=" + includeProtoDescriptors +
+                ", source='" + source + '\'' +
+                ", target='" + target + '\'' +
+                ", externalDependencies=" + externalDependencies +
+                ", messagesMetadata='" + messagesMetadata + '\'' +
                 '}';
     }
 }

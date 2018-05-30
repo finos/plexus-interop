@@ -1,13 +1,13 @@
 /**
  * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,19 +45,14 @@ public class Main {
     private static Logger log = Logger.getLogger("Generator");
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        System.setProperty("java.util.logging.SimpleFormatter.format",
-                "[%1$tF %1$tT] [%4$-7s] %5$s %n");
+        setupLogger();
         final PlexusGenConfig genConfig = new ParametersParser().parse(args);
         if (genConfig.isVerbose()) {
             log.info("Running generator with parameters: " + genConfig.toString());
         }
-        Path workDirPath = Paths.get("").toAbsolutePath();
-        URI workDir = URI.createFileURI(workDirPath.toString()).appendSegment("");
-        URI baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
-        final InteropLangStandaloneSetup setup = new InteropLangStandaloneSetup();
-        final Injector injector = setup.createInjectorAndDoEMFRegistration();
-        setup.addBaseURI(baseDir);
+        final CLISetup cliSetup = createSetup(genConfig);
         final String type = genConfig.getType();
+        final Injector injector = cliSetup.injector;
         switch (type) {
             case ApplicationCodeGenerator.TS:
                 GenTask tsGenTask = injector.getInstance(TsGenTask.class);
@@ -69,8 +64,8 @@ public class Main {
                 break;
             case CodeOutputGenerator.JSON_META:
                 genConfig.setIncludeProtoDescriptors(true);
-                enhanceMetadata(genConfig, workDir, baseDir, setup, injector);
-                GenTask metaJsonGenTask = injector.getInstance(MetaJsonGenTask.class);
+                enhanceMetadata(genConfig, cliSetup.workDir, cliSetup.baseDir, cliSetup.interopLangSetup, injector);
+                GenTask metaJsonGenTask = cliSetup.injector.getInstance(MetaJsonGenTask.class);
                 metaJsonGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.PROTO:
@@ -78,7 +73,7 @@ public class Main {
                 protoGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.CSHARP:
-                enhanceMetadata(genConfig, workDir, baseDir, setup, injector);
+                enhanceMetadata(genConfig, cliSetup.workDir, cliSetup.baseDir, cliSetup.interopLangSetup, injector);
                 GenTask cSharpGenTask = injector.getInstance(CsharpGenTask.class);
                 cSharpGenTask.doGen(genConfig);
                 break;
@@ -95,6 +90,11 @@ public class Main {
         }
     }
 
+    private static void setupLogger() {
+        System.setProperty("java.util.logging.SimpleFormatter.format",
+                "[%1$tF %1$tT] [%4$-7s] %5$s %n");
+    }
+
     private static void enhanceMetadata(PlexusGenConfig genConfig, URI workDir, URI baseDir, InteropLangStandaloneSetup setup, Injector injector) throws IOException, URISyntaxException {
         GenTask preProcessTask = injector.getInstance(CsharpProtoGenTask.class);
         File temp = FileUtils.createTempDir();
@@ -106,6 +106,18 @@ public class Main {
         setup.removeBaseURI(baseDir);
         baseDir = URI.createFileURI(genConfig.getBaseDir()).resolve(workDir).appendSegment("");
         setup.addBaseURI(baseDir);
+    }
+
+    private static CLISetup createSetup(PlexusGenConfig config) {
+        Path workDirPath = Paths.get("").toAbsolutePath();
+        URI workDir = URI.createFileURI(workDirPath.toString()).appendSegment("");
+        URI baseDir = config.getBaseDir() != null ? URI.createFileURI(config.getBaseDir()).resolve(workDir).appendSegment("") : null;
+        final InteropLangStandaloneSetup setup = new InteropLangStandaloneSetup();
+        final Injector injector = setup.createInjectorAndDoEMFRegistration();
+        if (baseDir != null) {
+            setup.addBaseURI(baseDir);
+        }
+        return new CLISetup(injector, baseDir, workDir, setup);
     }
 
 }
