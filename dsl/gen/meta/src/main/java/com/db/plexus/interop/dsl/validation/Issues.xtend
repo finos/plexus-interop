@@ -20,6 +20,7 @@ import org.eclipse.xtext.diagnostics.Severity
 import org.eclipse.xtext.validation.Issue;
 import java.util.Comparator
 import java.util.List
+import java.util.stream.Collectors
 
 public class Issues {
 
@@ -42,6 +43,13 @@ public class Issues {
         val errorsBuilder = new StringBuilder()
         issues.fold(errorsBuilder)[builder, issue | builder.append(issue.toString()).append("\n")]
         return errorsBuilder.toString()
+    }
+
+    def static boolean hasErrors(List<Issue> issues) {
+        return !issues.stream()
+            .filter[issue | issue.getSeverity() == Severity.ERROR]
+            .collect(Collectors.toList)
+            .isEmpty
     }
 
     def static successStringResult() { "No issues found" }

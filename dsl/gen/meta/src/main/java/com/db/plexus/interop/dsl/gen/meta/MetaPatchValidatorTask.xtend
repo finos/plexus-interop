@@ -17,39 +17,42 @@
 package com.db.plexus.interop.dsl.gen.meta
 
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
-import java.io.IOException
-import com.db.plexus.interop.dsl.gen.util.FileUtils
-import java.io.File
 import com.db.plexus.interop.dsl.gen.BaseGenTask
 import org.eclipse.xtext.resource.XtextResourceSet
-import org.eclipse.xtext.validation.Issue;
-import java.util.List
 import static com.db.plexus.interop.dsl.validation.Issues.*;
+import com.db.plexus.interop.dsl.validation.MetadataPatchValidator
+import com.google.inject.Inject
 
+class MetaPatchValidatorTask extends BaseGenTask {
 
-class MetaValidatorTask extends BaseGenTask {
+    public static val NAME = "validate-patch"
 
-    override doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
-        val issues = validator.getValidationIssues(rs)
-        if(!issues.empty) {
-            val issuesString = issuesToString(issues.sortWith(issuesComparator));
-            if(config.isVerbose() || config.getOutFile() == null) {
+    @Inject
+    var MetadataPatchValidator metadataPatchValidator
+
+    override doGen(PlexusGenConfig config) {
+
+        val workingDirUri = getWorkingDir()
+        val sourceDir = getRelativeURI(config.source, workingDirUri)
+        val outDirUri = getRelativeURI(config.target, workingDirUri)
+
+        val sourceResourceSet = new XtextResourceSet
+        val targetResourceSet = new XtextResourceSet
+
+        loadResources(sourceResourceSet, config.isVerbose, "*.interop");
+        loadResources(targetResourceSet, config.isVerbose, "*.interop");
+
+        val issues = metadataPatchValidator.validatePatch(targetResourceSet, sourceResourceSet)
+        if (!issues.empty) {
+            if(config.isVerbose()) {
+                val issuesString = issuesToString(issues.sortWith(issuesComparator));
                 println(issuesString)
             }
-            if(config.outFile != null) {
-                FileUtils.writeStringToFile(new File(config.outFile), issuesString)
-            }
-            if(hasErrors(issues)) {
+            if (hasErrors(issues)) {
                 System.exit(1);
             }
         }
+
     }
 
-    override validateResources(XtextResourceSet resourceSet) {
-        // skip default validation
-    }
-
-    override inputFilesGlob(PlexusGenConfig config) {
-        "*.interop"
-    }
 }

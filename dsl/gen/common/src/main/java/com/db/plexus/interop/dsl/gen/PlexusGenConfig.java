@@ -52,10 +52,10 @@ public class PlexusGenConfig {
     @Parameter(names = {"-d", "--descriptors"})
     private boolean includeProtoDescriptors;
 
-    @Parameter(names = {"-s", "--source"})
+    @Parameter(names = {"--source"})
     private String source;
 
-    @Parameter(names = {"-t", "--target"})
+    @Parameter(names = {"--target"})
     private String target;
 
     private List<String> externalDependencies = new ArrayList<>();
