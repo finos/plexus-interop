@@ -95,6 +95,16 @@ public class GenUtils {
                 ));
     }
 
+    def getServiceMethodsMap(Resource... resources) {
+        return getServices(resources)
+        .stream()
+        .flatMap[s | s.getMethods().stream().map[m | {
+                    val methodId = s.getFullName() + m.name;
+                    return methodId -> m;
+                }]]
+        .collect(Collectors.toMap([key], [value]));
+    }
+
     def static List<Message> getMessages(Resource... resources) {
         return Arrays.stream(resources)
         .flatMap([resource | getMessages(resource).stream()])
@@ -104,20 +114,14 @@ public class GenUtils {
     def Map<String, Message> getMessagesMap(Resource... resources) {
         return getMessages(resources)
         .stream()
-        .collect(Collectors.toMap(
-                        [getFullName],
-                        [m | m as Message]
-                ));
+        .collect(Collectors.toMap([getFullName], [it]));
     }
 
     def Map<String, Field> getFieldsMap(Resource... resources) {
         return getMessages(resources)
         .stream()
         .flatMap([m | getFields(m).stream()])
-        .collect(Collectors.toMap(
-                        [getFullName],
-                        [f | f]
-                ));
+        .collect(Collectors.toMap([getFullName], [it]));
     }
 
     def String getType(Field field) {

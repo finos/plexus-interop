@@ -22,7 +22,7 @@ import org.eclipse.xtext.validation.Issue;
 import java.util.List;
 
 /**
- * Checks incremental update of full Metadata
+ * Checks incremental full metadata update
  */
 public interface UpdateRule {
 
