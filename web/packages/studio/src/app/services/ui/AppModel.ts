@@ -17,7 +17,7 @@
 import { ProvidedMethod } from '@plexus-interop/broker';
 import { InteropClient } from '../core/InteropClient';
 import { TransportConnectionProvider } from '../core/TransportConnectionProvider';
-import { App as Application, ConsumedMethod } from '@plexus-interop/broker';
+import { Application, ConsumedMethod } from '@plexus-interop/broker';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { TransportConnection } from '@plexus-interop/transport-common';
 import { MethodDiscoveryResponse } from '@plexus-interop/client-api';

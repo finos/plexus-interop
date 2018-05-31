@@ -16,7 +16,7 @@
  */
 import { SubscriptionsRegistry } from './../services/ui/SubscriptionsRegistry';
 import { InteropServiceFactory, RegistryUrls } from '../services/core/InteropServiceFactory';
-import { App as Application } from '@plexus-interop/broker';
+import { Application } from '@plexus-interop/broker';
 import { Subscription } from 'rxjs/Subscription';
 import { AppActions } from '../services/ui/AppActions';
 import { Component, OnInit, OnDestroy } from '@angular/core';
