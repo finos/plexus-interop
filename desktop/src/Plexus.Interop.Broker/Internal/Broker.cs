@@ -55,6 +55,7 @@ namespace Plexus.Interop.Internal
             _workingDir = Directory.GetCurrentDirectory();
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var studioDir = Path.Combine(binDir, "studio");
+            Log.Info("Studio dir: {0}", studioDir);
             metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
             _transportServers = new[]
             {

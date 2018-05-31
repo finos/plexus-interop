@@ -19,9 +19,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Hosting.Server.Features;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Plexus.Channels;
+    using Plexus.Pools;
     using Plexus.Processes;
     using System;
     using System.Collections.Generic;
@@ -30,9 +32,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using System.Net;
     using System.Net.Sockets;
     using System.Net.WebSockets;
+    using System.Threading;
     using System.Threading.Tasks;
+    using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
-    internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer, IWebSocketHandler
+    internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer
     {        
         private const int AcceptedConnectionsBufferSize = 20;
         private const string ServerName = "ws-v1";
@@ -48,6 +52,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             _stateWriter = new ServerStateWriter(ServerName, workingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
+
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         protected override ILogger Log { get; } = LogManager.GetLogger<WebSocketTransmissionServer>();
 
@@ -94,31 +100,85 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 .UseKestrel()
                 .UseUrls(url)
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseStartup<WebSocketServer>()
-                .ConfigureServices(Configure)
-                .Configure(app =>
-                {
-                    foreach (var (urlpath, physicalpath) in _staticFileMappings)
-                    {
-                        if (!Directory.Exists(physicalpath))
-                        {
-                            continue;
-                        }
-                        app.UseStaticFiles(new StaticFileOptions
-                        {
-                            FileProvider = new PhysicalFileProvider(physicalpath),
-                            RequestPath = urlpath
-                        });
-                    }
-                })
+                .Configure(Configure)
                 .Build();
             Log.Trace("Starting server host: {0}", url);
             await _host.RunAsync(CancellationToken).ConfigureAwait(false);
         }
 
-        public void Configure(IServiceCollection s)
+        private void Configure(IApplicationBuilder app)
         {
-            s.AddSingleton<IWebSocketHandler>(this);
+            Log.Debug("Configure");
+
+            var loggerFactory = app.ApplicationServices.GetRequiredService<IMsLoggerFactory>();
+
+            LogManager.ConfigureLogging(loggerFactory);
+
+            var lifetime = app.ApplicationServices.GetRequiredService<IApplicationLifetime>();
+
+            lifetime.ApplicationStarted.Register(OnListeningStarted, false);
+
+            app.UseWebSockets(new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromSeconds(5),
+                ReceiveBufferSize = PooledBuffer.MaxSize
+            });
+
+            app.Use(async (context, next) =>
+            {
+                if (context.WebSockets.IsWebSocketRequest)
+                {
+                    try
+                    {
+                        Log.Trace("Websocket connection received");
+                        var connectionTask = await AcceptWebsocketConnectionAsync(context).ConfigureAwait(false);
+                        await connectionTask.ConfigureAwait(false);
+                        Log.Trace("Websocket connection completed");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Trace("Websocket connection terminated with exception: {0}", ex.FormatTypeAndMessage());
+                        throw;
+                    }
+                }
+                else
+                {
+                    Log.Trace("Non-websocket request received");
+                    await next().ConfigureAwait(false);
+                }
+            });
+
+            foreach (var (urlpath, physicalpath) in _staticFileMappings)
+            {
+                if (!Directory.Exists(physicalpath))
+                {
+                    continue;
+                }
+
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    RequestPath = urlpath,
+                    FileProvider = new PhysicalFileProvider(physicalpath),                    
+                });
+            }
+        }
+
+        private async Task<Task> AcceptWebsocketConnectionAsync(HttpContext context)
+        {
+            Task connectionTask;
+            await _semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                Log.Trace("Accepting websocket connection");
+                var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);                
+                connectionTask = await AcceptConnectionAsync(webSocket).ConfigureAwait(false);
+                Log.Trace("Websocket connection accepted");
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+            return connectionTask;
         }
     }
 }
