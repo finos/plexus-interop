@@ -20,9 +20,17 @@ import { GenJsonCommand } from './GenJsonCommand';
 import { GenProtoCommand } from './GenProtoCommand';
 import { GenCSharpCommand } from './GenCSharpCommand';
 import { ValidateMetadataCommand } from './ValidateMetadataCommand';
+import { ValidateMetadataPatchCommand } from './ValidateMetadataPatchCommand';
 
 export function commands(): Command[] {
-    return [new GenTsCommand(), new GenJsonCommand(), new GenProtoCommand(), new GenCSharpCommand(), new ValidateMetadataCommand()];
+    return [
+        new GenTsCommand(), 
+        new GenJsonCommand(), 
+        new GenProtoCommand(), 
+        new GenCSharpCommand(), 
+        new ValidateMetadataCommand(),
+        new ValidateMetadataPatchCommand()
+    ];
 }
 
 export function printGeneralHelp(): void {

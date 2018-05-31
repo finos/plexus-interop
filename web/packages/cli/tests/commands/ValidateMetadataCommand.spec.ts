@@ -21,7 +21,7 @@ import { readTextFile } from '../../src/common/files';
 
 describe('Metadata Validation CLI', () => {
 
-    it('Generates JSON with all metadata', async () => {
+    it('Validates metadata and prints error to file', async () => {
 
         const testName = 'generated-json';
         const genCommand = new ValidateMetadataCommand();
@@ -41,7 +41,7 @@ describe('Metadata Validation CLI', () => {
         const firstContent = await readTextFile(outFile);
 
         expect(firstContent)
-            .toContain('ERROR:Couldn\'t resolve reference to Service \'com.db.plexus.interop.dsl.gen.test.services.ExampleService_NotExists\'');
+            .toContain('Couldn\'t resolve reference to Service \'com.db.plexus.interop.dsl.gen.test.services.ExampleService_NotExists\'');
 
     }, 15000);
 

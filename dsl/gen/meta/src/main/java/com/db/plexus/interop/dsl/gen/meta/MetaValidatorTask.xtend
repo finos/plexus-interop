@@ -18,47 +18,28 @@ package com.db.plexus.interop.dsl.gen.meta
 
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
 import java.io.IOException
-import com.google.inject.Inject
 import com.db.plexus.interop.dsl.gen.util.FileUtils
 import java.io.File
-import java.util.ArrayList
-import java.util.Arrays
 import com.db.plexus.interop.dsl.gen.BaseGenTask
 import org.eclipse.xtext.resource.XtextResourceSet
-import java.util.logging.Logger;
-import static com.db.plexus.interop.dsl.gen.util.ProcessUtils.*
-import com.db.plexus.interop.dsl.gen.util.ProcessResult
-import org.eclipse.xtext.validation.Issue;
-import javax.print.attribute.standard.Severity
-import java.util.List
-import java.util.Comparator
+import static com.db.plexus.interop.dsl.validation.Issues.*;
 
 class MetaValidatorTask extends BaseGenTask {
 
     override doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
         val issues = validator.getValidationIssues(rs)
-        if (!issues.empty) {
-            val issuesString = errorsString(issues);
+        if(!issues.empty) {
+            val issuesString = issuesToString(issues.sortWith(issuesComparator));
             if(config.isVerbose() || config.getOutFile() == null) {
                 println(issuesString)
             }
-            if (config.outFile != null) {
+            if(config.outFile != null) {
                 FileUtils.writeStringToFile(new File(config.outFile), issuesString)
             }
-            if (validator.hasErrors(issues)) {
+            if(hasErrors(issues)) {
                 System.exit(1);
             }
         }
-    }
-
-    def errorsString(List<Issue> issues) {
-        if (issues.isEmpty) {
-            return successStringResult()
-        }
-        val sorted = issues.sortWith(new IssuesComparator())
-        val errorsBuilder = new StringBuilder()
-        issues.fold(errorsBuilder)[builder, issue | builder.append(issue.toString()).append("\n")]
-        return errorsBuilder.toString()
     }
 
     override validateResources(XtextResourceSet resourceSet) {
@@ -67,18 +48,5 @@ class MetaValidatorTask extends BaseGenTask {
 
     override inputFilesGlob(PlexusGenConfig config) {
         "*.interop"
-    }
-
-    public def successStringResult() { "No issues found" }
-
-}
-
-class IssuesComparator implements Comparator<Issue> {
-    override int compare (Issue function1, Issue function2) {
-        if (function1.getSeverity() == function2.getSeverity()) {
-            return 0;
-        } else {
-            return if (function1.getSeverity() == Severity.ERROR) 1 else -1;
-        }
     }
 }

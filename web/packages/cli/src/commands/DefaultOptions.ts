@@ -17,6 +17,17 @@
 import { Option } from './Option';
 import * as path from 'path';
 
+export function targetBaseDir(): Option {
+    return {
+        shortName: 'tb',
+        longName: 'targetBaseDir',
+        exampleValue: 'target/folder',
+        description: 'target metadata base directory',
+        isRequired: true,        
+        defaultValue: process.cwd()
+    };
+}
+
 export function baseDir(): Option {
     return {
         shortName: 'b',

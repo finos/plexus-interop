@@ -81,10 +81,6 @@ public class ResourceSetValidator {
         issues.stream().filter[issue | issue.getSeverity() == Severity.ERROR].collect(Collectors.toList())
     }
 
-    public def hasErrors(List<Issue> issues) {
-        !issues.stream().filter[issue | issue.getSeverity() == Severity.ERROR].collect(Collectors.toList()).isEmpty
-    }
-
     public def warnings(List<Issue> issues) {
         issues.stream().filter[issue | issue.getSeverity() != Severity.ERROR].collect(Collectors.toList())
     }
