@@ -16,15 +16,16 @@
  */
 ﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 {
+    using System.Collections.Generic;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
 
     public sealed class WebSocketTransmissionServerFactory
     {
         public static WebSocketTransmissionServerFactory Instance = new WebSocketTransmissionServerFactory();
 
-        public ITransmissionServer Create(string workingDir)
+        public ITransmissionServer Create(string workingDir, IReadOnlyCollection<(string UrlPath, string PhysicalPath)> staticFileMappings = null)
         {
-            return new WebSocketTransmissionServer(workingDir);
+            return new WebSocketTransmissionServer(workingDir, staticFileMappings);
         }
     }
 }

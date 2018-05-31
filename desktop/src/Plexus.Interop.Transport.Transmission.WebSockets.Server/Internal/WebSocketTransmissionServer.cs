@@ -16,17 +16,21 @@
  */
 namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Hosting.Server.Features;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.FileProviders;
+    using Plexus.Channels;
+    using Plexus.Processes;
+    using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Net.WebSockets;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Hosting.Server.Features;
-    using Microsoft.Extensions.DependencyInjection;
-    using Plexus.Channels;
-    using Plexus.Processes;
 
     internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer, IWebSocketHandler
     {        
@@ -36,9 +40,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private IWebHost _host;
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
         private readonly IServerStateWriter _stateWriter;
+        private readonly IReadOnlyCollection<(string UrlPath, string PhysicalPath)> _staticFileMappings;
 
-        public WebSocketTransmissionServer(string workingDir)
+        public WebSocketTransmissionServer(string workingDir, IReadOnlyCollection<(string UrlPath, string PhysicalPath)> staticFileMappings = null)
         {
+            _staticFileMappings = staticFileMappings ?? Array.Empty<(string, string)>();
             _stateWriter = new ServerStateWriter(ServerName, workingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
@@ -90,6 +96,21 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<WebSocketServer>()
                 .ConfigureServices(Configure)
+                .Configure(app =>
+                {
+                    foreach (var (urlpath, physicalpath) in _staticFileMappings)
+                    {
+                        if (!Directory.Exists(physicalpath))
+                        {
+                            continue;
+                        }
+                        app.UseStaticFiles(new StaticFileOptions
+                        {
+                            FileProvider = new PhysicalFileProvider(physicalpath),
+                            RequestPath = urlpath
+                        });
+                    }
+                })
                 .Build();
             Log.Trace("Starting server host: {0}", url);
             await _host.RunAsync(CancellationToken).ConfigureAwait(false);
