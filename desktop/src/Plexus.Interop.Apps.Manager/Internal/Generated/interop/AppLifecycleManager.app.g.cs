@@ -76,7 +76,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		}
 	
 		public partial interface IAppLifecycleServiceImpl:
-			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IResolveAppImpl
+			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IResolveAppImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IGetLifecycleEventStreamImpl
 		{ }
 		
 		private sealed partial class AppLifecycleServiceBinder {
@@ -94,6 +95,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
 				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse>(global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.ResolveAppMethodId, _impl.ResolveApp);
+				builder = builder.WithServerStreamingMethod<global::Plexus.Interop.Apps.Internal.Generated.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent>(global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.GetLifecycleEventStreamMethodId, _impl.GetLifecycleEventStream);
 				return builder; 							
 			}
 		}
@@ -101,21 +103,29 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		public sealed partial class AppLifecycleServiceImpl: IAppLifecycleServiceImpl
 		{
 			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> _resolveAppHandler;
+			private readonly ServerStreamingMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> _getLifecycleEventStreamHandler;
 			
 			public AppLifecycleServiceImpl(
-				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> resolveAppHandler
+				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> resolveAppHandler,
+				ServerStreamingMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> getLifecycleEventStreamHandler
 			) {
 				_resolveAppHandler = resolveAppHandler;
+				_getLifecycleEventStreamHandler = getLifecycleEventStreamHandler;
 			}
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> ResolveApp(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest request, MethodCallContext context) {
 				return _resolveAppHandler(request, context);
 			}
+			
+			public Task GetLifecycleEventStream(global::Plexus.Interop.Apps.Internal.Generated.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> responseStream, MethodCallContext context) {
+				return _getLifecycleEventStreamHandler(request, responseStream, context);
+			}
 		}					
 		
 		public sealed partial class AppLifecycleServiceImpl<T>: IAppLifecycleServiceImpl
 			where T:
-			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IResolveAppImpl
+			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IResolveAppImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IGetLifecycleEventStreamImpl
 		{
 			private readonly T _impl;
 			
@@ -125,6 +135,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> ResolveApp(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest request, MethodCallContext context) {
 				return _impl.ResolveApp(request, context);
+			}
+			
+			public Task GetLifecycleEventStream(global::Plexus.Interop.Apps.Internal.Generated.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> responseStream, MethodCallContext context) {
+				return _impl.GetLifecycleEventStream(request, responseStream, context);
 			}
 		}
 		
