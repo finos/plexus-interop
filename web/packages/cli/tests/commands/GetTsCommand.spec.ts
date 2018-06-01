@@ -47,4 +47,12 @@ describe('Typescript Client generation CLI', () => {
 
     }, 15000);
 
+    it('Handles different proto files', () => {
+        const genCommand = new GenTsCommand();
+        expect(genCommand.protoRegexp.test('src/authservice.proto')).toBeTruthy();
+        expect(genCommand.protoRegexp.test('authservice.proto')).toBeTruthy();
+        expect(genCommand.protoRegexp.test('AuthService_v1.proto')).toBeTruthy();
+        expect(genCommand.protoRegexp.test('src/auth_service.proto')).toBeTruthy();
+    });
+
 });

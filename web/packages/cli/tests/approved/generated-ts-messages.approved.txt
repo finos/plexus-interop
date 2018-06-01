@@ -4502,6 +4502,7 @@ $root.google = (function() {
              * @property {boolean} [deprecated] MessageOptions deprecated
              * @property {boolean} [mapEntry] MessageOptions mapEntry
              * @property {Array.<google.protobuf.IUninterpretedOption>} [uninterpretedOption] MessageOptions uninterpretedOption
+             * @property {string} [".interop.messageId"] MessageOptions .interop.messageId
              */
 
             /**
@@ -4560,6 +4561,14 @@ $root.google = (function() {
             MessageOptions.prototype.uninterpretedOption = $util.emptyArray;
 
             /**
+             * MessageOptions .interop.messageId.
+             * @member {string}.interop.messageId
+             * @memberof google.protobuf.MessageOptions
+             * @instance
+             */
+            MessageOptions.prototype[".interop.messageId"] = "";
+
+            /**
              * Creates a new MessageOptions instance using the specified properties.
              * @function create
              * @memberof google.protobuf.MessageOptions
@@ -4594,6 +4603,8 @@ $root.google = (function() {
                 if (message.uninterpretedOption != null && message.uninterpretedOption.length)
                     for (var i = 0; i < message.uninterpretedOption.length; ++i)
                         $root.google.protobuf.UninterpretedOption.encode(message.uninterpretedOption[i], writer.uint32(/* id 999, wireType 2 =*/7994).fork()).ldelim();
+                if (message[".interop.messageId"] != null && message.hasOwnProperty(".interop.messageId"))
+                    writer.uint32(/* id 9650, wireType 2 =*/77202).string(message[".interop.messageId"]);
                 return writer;
             };
 
@@ -4644,6 +4655,9 @@ $root.google = (function() {
                         if (!(message.uninterpretedOption && message.uninterpretedOption.length))
                             message.uninterpretedOption = [];
                         message.uninterpretedOption.push($root.google.protobuf.UninterpretedOption.decode(reader, reader.uint32()));
+                        break;
+                    case 9650:
+                        message[".interop.messageId"] = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -4701,6 +4715,9 @@ $root.google = (function() {
                             return "uninterpretedOption." + error;
                     }
                 }
+                if (message[".interop.messageId"] != null && message.hasOwnProperty(".interop.messageId"))
+                    if (!$util.isString(message[".interop.messageId"]))
+                        return ".interop.messageId: string expected";
                 return null;
             };
 
@@ -4734,6 +4751,8 @@ $root.google = (function() {
                         message.uninterpretedOption[i] = $root.google.protobuf.UninterpretedOption.fromObject(object.uninterpretedOption[i]);
                     }
                 }
+                if (object[".interop.messageId"] != null)
+                    message[".interop.messageId"] = String(object[".interop.messageId"]);
                 return message;
             };
 
@@ -4757,6 +4776,7 @@ $root.google = (function() {
                     object.noStandardDescriptorAccessor = false;
                     object.deprecated = false;
                     object.mapEntry = false;
+                    object[".interop.messageId"] = "";
                 }
                 if (message.messageSetWireFormat != null && message.hasOwnProperty("messageSetWireFormat"))
                     object.messageSetWireFormat = message.messageSetWireFormat;
@@ -4771,6 +4791,8 @@ $root.google = (function() {
                     for (var j = 0; j < message.uninterpretedOption.length; ++j)
                         object.uninterpretedOption[j] = $root.google.protobuf.UninterpretedOption.toObject(message.uninterpretedOption[j], options);
                 }
+                if (message[".interop.messageId"] != null && message.hasOwnProperty(".interop.messageId"))
+                    object[".interop.messageId"] = message[".interop.messageId"];
                 return object;
             };
 
@@ -5893,6 +5915,7 @@ $root.google = (function() {
              * @interface IServiceOptions
              * @property {boolean} [deprecated] ServiceOptions deprecated
              * @property {Array.<google.protobuf.IUninterpretedOption>} [uninterpretedOption] ServiceOptions uninterpretedOption
+             * @property {string} [".interop.serviceId"] ServiceOptions .interop.serviceId
              */
 
             /**
@@ -5927,6 +5950,14 @@ $root.google = (function() {
             ServiceOptions.prototype.uninterpretedOption = $util.emptyArray;
 
             /**
+             * ServiceOptions .interop.serviceId.
+             * @member {string}.interop.serviceId
+             * @memberof google.protobuf.ServiceOptions
+             * @instance
+             */
+            ServiceOptions.prototype[".interop.serviceId"] = "";
+
+            /**
              * Creates a new ServiceOptions instance using the specified properties.
              * @function create
              * @memberof google.protobuf.ServiceOptions
@@ -5955,6 +5986,8 @@ $root.google = (function() {
                 if (message.uninterpretedOption != null && message.uninterpretedOption.length)
                     for (var i = 0; i < message.uninterpretedOption.length; ++i)
                         $root.google.protobuf.UninterpretedOption.encode(message.uninterpretedOption[i], writer.uint32(/* id 999, wireType 2 =*/7994).fork()).ldelim();
+                if (message[".interop.serviceId"] != null && message.hasOwnProperty(".interop.serviceId"))
+                    writer.uint32(/* id 9650, wireType 2 =*/77202).string(message[".interop.serviceId"]);
                 return writer;
             };
 
@@ -5996,6 +6029,9 @@ $root.google = (function() {
                         if (!(message.uninterpretedOption && message.uninterpretedOption.length))
                             message.uninterpretedOption = [];
                         message.uninterpretedOption.push($root.google.protobuf.UninterpretedOption.decode(reader, reader.uint32()));
+                        break;
+                    case 9650:
+                        message[".interop.serviceId"] = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -6044,6 +6080,9 @@ $root.google = (function() {
                             return "uninterpretedOption." + error;
                     }
                 }
+                if (message[".interop.serviceId"] != null && message.hasOwnProperty(".interop.serviceId"))
+                    if (!$util.isString(message[".interop.serviceId"]))
+                        return ".interop.serviceId: string expected";
                 return null;
             };
 
@@ -6071,6 +6110,8 @@ $root.google = (function() {
                         message.uninterpretedOption[i] = $root.google.protobuf.UninterpretedOption.fromObject(object.uninterpretedOption[i]);
                     }
                 }
+                if (object[".interop.serviceId"] != null)
+                    message[".interop.serviceId"] = String(object[".interop.serviceId"]);
                 return message;
             };
 
@@ -6089,8 +6130,10 @@ $root.google = (function() {
                 var object = {};
                 if (options.arrays || options.defaults)
                     object.uninterpretedOption = [];
-                if (options.defaults)
+                if (options.defaults) {
                     object.deprecated = false;
+                    object[".interop.serviceId"] = "";
+                }
                 if (message.deprecated != null && message.hasOwnProperty("deprecated"))
                     object.deprecated = message.deprecated;
                 if (message.uninterpretedOption && message.uninterpretedOption.length) {
@@ -6098,6 +6141,8 @@ $root.google = (function() {
                     for (var j = 0; j < message.uninterpretedOption.length; ++j)
                         object.uninterpretedOption[j] = $root.google.protobuf.UninterpretedOption.toObject(message.uninterpretedOption[j], options);
                 }
+                if (message[".interop.serviceId"] != null && message.hasOwnProperty(".interop.serviceId"))
+                    object[".interop.serviceId"] = message[".interop.serviceId"];
                 return object;
             };
 
@@ -6124,6 +6169,7 @@ $root.google = (function() {
              * @property {boolean} [deprecated] MethodOptions deprecated
              * @property {google.protobuf.MethodOptions.IdempotencyLevel} [idempotencyLevel] MethodOptions idempotencyLevel
              * @property {Array.<google.protobuf.IUninterpretedOption>} [uninterpretedOption] MethodOptions uninterpretedOption
+             * @property {string} [".interop.methodId"] MethodOptions .interop.methodId
              */
 
             /**
@@ -6166,6 +6212,14 @@ $root.google = (function() {
             MethodOptions.prototype.uninterpretedOption = $util.emptyArray;
 
             /**
+             * MethodOptions .interop.methodId.
+             * @member {string}.interop.methodId
+             * @memberof google.protobuf.MethodOptions
+             * @instance
+             */
+            MethodOptions.prototype[".interop.methodId"] = "";
+
+            /**
              * Creates a new MethodOptions instance using the specified properties.
              * @function create
              * @memberof google.protobuf.MethodOptions
@@ -6196,6 +6250,8 @@ $root.google = (function() {
                 if (message.uninterpretedOption != null && message.uninterpretedOption.length)
                     for (var i = 0; i < message.uninterpretedOption.length; ++i)
                         $root.google.protobuf.UninterpretedOption.encode(message.uninterpretedOption[i], writer.uint32(/* id 999, wireType 2 =*/7994).fork()).ldelim();
+                if (message[".interop.methodId"] != null && message.hasOwnProperty(".interop.methodId"))
+                    writer.uint32(/* id 9650, wireType 2 =*/77202).string(message[".interop.methodId"]);
                 return writer;
             };
 
@@ -6240,6 +6296,9 @@ $root.google = (function() {
                         if (!(message.uninterpretedOption && message.uninterpretedOption.length))
                             message.uninterpretedOption = [];
                         message.uninterpretedOption.push($root.google.protobuf.UninterpretedOption.decode(reader, reader.uint32()));
+                        break;
+                    case 9650:
+                        message[".interop.methodId"] = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -6297,6 +6356,9 @@ $root.google = (function() {
                             return "uninterpretedOption." + error;
                     }
                 }
+                if (message[".interop.methodId"] != null && message.hasOwnProperty(".interop.methodId"))
+                    if (!$util.isString(message[".interop.methodId"]))
+                        return ".interop.methodId: string expected";
                 return null;
             };
 
@@ -6338,6 +6400,8 @@ $root.google = (function() {
                         message.uninterpretedOption[i] = $root.google.protobuf.UninterpretedOption.fromObject(object.uninterpretedOption[i]);
                     }
                 }
+                if (object[".interop.methodId"] != null)
+                    message[".interop.methodId"] = String(object[".interop.methodId"]);
                 return message;
             };
 
@@ -6359,6 +6423,7 @@ $root.google = (function() {
                 if (options.defaults) {
                     object.deprecated = false;
                     object.idempotencyLevel = options.enums === String ? "IDEMPOTENCY_UNKNOWN" : 0;
+                    object[".interop.methodId"] = "";
                 }
                 if (message.deprecated != null && message.hasOwnProperty("deprecated"))
                     object.deprecated = message.deprecated;
@@ -6369,6 +6434,8 @@ $root.google = (function() {
                     for (var j = 0; j < message.uninterpretedOption.length; ++j)
                         object.uninterpretedOption[j] = $root.google.protobuf.UninterpretedOption.toObject(message.uninterpretedOption[j], options);
                 }
+                if (message[".interop.methodId"] != null && message.hasOwnProperty(".interop.methodId"))
+                    object[".interop.methodId"] = message[".interop.methodId"];
                 return object;
             };
 
