@@ -14,18 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
-{
-    using System.Collections.Generic;
-    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
+package com.db.plexus.interop.dsl.gen.cli
 
-    public sealed class WebSocketTransmissionServerFactory
-    {
-        public static WebSocketTransmissionServerFactory Instance = new WebSocketTransmissionServerFactory();
+import com.google.inject.Injector
+import org.eclipse.emf.common.util.URI;
+import com.db.plexus.interop.dsl.InteropLangStandaloneSetup
 
-        public ITransmissionServer Create(string workingDir, IReadOnlyCollection<(string UrlPath, string PhysicalPath)> staticFileMappings = null)
-        {
-            return new WebSocketTransmissionServer(workingDir, staticFileMappings);
-        }
+class CLISetup {
+
+    public val Injector injector;
+    public val URI baseDir;
+    public val URI workDir;
+    public val InteropLangStandaloneSetup interopLangSetup;
+
+    new (Injector injector, URI baseDir, URI workDir, InteropLangStandaloneSetup interopLangSetup) {
+        this.injector = injector
+        this.baseDir = baseDir
+        this.workDir = workDir
+        this.interopLangSetup = interopLangSetup
     }
 }

@@ -46,49 +46,86 @@ import com.db.plexus.interop.dsl.protobuf.BoolConstant
 import com.db.plexus.interop.dsl.protobuf.DecimalConstant
 import com.db.plexus.interop.dsl.InteropLangUtils
 import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils
+import java.util.Map
 
 public class GenUtils {
-		
-	public static final String INTEROP_OPTIONS_RESOURCE_PATH = "interop/options.proto"
-	public static final String INTEROP_DESCRIPTOR_RESOURCE_PATH = InteropLangUtils.DESCRIPTOR_RESOURCE_PATH
-	public static final String PROTOBUF_DESCRIPTOR_RESOURCE_PATH = ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH
-		 
-	public static final QualifiedName ROOT_PACKAGE_NAME = QualifiedName.create("")
-	public static final QualifiedName INTEROP_PACKAGE_NAME = ROOT_PACKAGE_NAME.append("interop")
-	public static final QualifiedName INTEROP_SERVICE_ID_OPTION_NAME = INTEROP_PACKAGE_NAME.append("service_id")  
-	public static final QualifiedName INTEROP_MESSAGE_ID_OPTION_NAME = INTEROP_PACKAGE_NAME.append("message_id")
-	
-	public static final QualifiedName INTEROP_PROVIDED_SERVICE_TITLE_OPTION_NAME = INTEROP_PACKAGE_NAME.append(QualifiedName.create("ProvidedServiceOptions", "title"))		
-	public static final QualifiedName INTEROP_PROVIDED_METHOD_TITLE_OPTION_NAME = INTEROP_PACKAGE_NAME.append(QualifiedName.create("ProvidedMethodOptions", "title"))
-	
-	@Inject
-	IQualifiedNameProvider qualifiedNameProvider
-	
-	def static getOptionList(EObject obj) {
-		return obj.eContents.filter(typeof(Option)).toList()
-	}
-	
-	def static getValueAsString(Option option) {		
-		val constant = option.value
-		return switch (constant) {
-			IntConstant: return constant.value.toString
-			EnumConstant: return constant.value.name
-			StringConstant: return constant.value
-			BoolConstant: return constant.value.toString
-			DecimalConstant: return constant.value.toString			 
-		}		
-	}	
-	
+
+    public static final String INTEROP_OPTIONS_RESOURCE_PATH = "interop/options.proto"
+    public static final String INTEROP_DESCRIPTOR_RESOURCE_PATH = InteropLangUtils.DESCRIPTOR_RESOURCE_PATH
+    public static final String PROTOBUF_DESCRIPTOR_RESOURCE_PATH = ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH
+
+    public static final QualifiedName ROOT_PACKAGE_NAME = QualifiedName.create("")
+    public static final QualifiedName INTEROP_PACKAGE_NAME = ROOT_PACKAGE_NAME.append("interop")
+    public static final QualifiedName INTEROP_SERVICE_ID_OPTION_NAME = INTEROP_PACKAGE_NAME.append("service_id")
+    public static final QualifiedName INTEROP_MESSAGE_ID_OPTION_NAME = INTEROP_PACKAGE_NAME.append("message_id")
+
+    public static final QualifiedName INTEROP_PROVIDED_SERVICE_TITLE_OPTION_NAME = INTEROP_PACKAGE_NAME.append(QualifiedName.create("ProvidedServiceOptions", "title"))
+    public static final QualifiedName INTEROP_PROVIDED_METHOD_TITLE_OPTION_NAME = INTEROP_PACKAGE_NAME.append(QualifiedName.create("ProvidedMethodOptions", "title"))
+
+    @Inject
+    IQualifiedNameProvider qualifiedNameProvider
+
+    def static getOptionList(EObject obj) {
+        return obj.eContents.filter(typeof(Option)).toList()
+    }
+
+    def static getValueAsString(Option option) {
+        val constant = option.value
+        return switch (constant) {
+            IntConstant: return constant.value.toString
+            EnumConstant: return constant.value.name
+            StringConstant: return constant.value
+            BoolConstant: return constant.value.toString
+            DecimalConstant: return constant.value.toString
+        }
+    }
+
     def static List<Service> getServices(Resource... resources) {
         return Arrays.stream(resources)
         .flatMap([resource | getServices(resource).stream()])
         .collect(Collectors.toList());
     }
 
+    def getServicesMap(Resource... resources) {
+        return getServices(resources)
+        .stream()
+        .collect(Collectors.toMap(
+                        [getFullName],
+                        [it],
+                        [value, duplicate | value]
+                ));
+    }
+
+    def getServiceMethodsMap(Resource... resources) {
+        return getServices(resources)
+        .stream()
+        .flatMap[s | s.getMethods().stream().map[m | {
+                    val methodId = s.getFullName() + "." + m.name;
+                    return methodId -> m;
+                }]]
+        .collect(Collectors.toMap([key], [value], [value, duplicate | value]));
+    }
+
     def static List<Message> getMessages(Resource... resources) {
         return Arrays.stream(resources)
         .flatMap([resource | getMessages(resource).stream()])
         .collect(Collectors.toList());
+    }
+
+    def Map<String, Message> getMessagesMap(Resource... resources) {
+        return getMessages(resources)
+        .stream()
+        .collect(Collectors.toMap([getFullName], [it], [f, s | f]));
+    }
+
+    def Map<String, Field> getFieldsMap(Resource... resources) {
+        return getMessages(resources)
+        .stream()
+        .flatMap([m | getFields(m).stream().map[f | f -> m]])
+        .collect(Collectors.toMap(
+                        [pair | pair.value.getFullName + "." + pair.key.name],
+                        [key],
+                        [value, duplicate | value]));
     }
 
     def String getType(Field field) {
@@ -101,11 +138,11 @@ public class GenUtils {
     }
 
     def static String getAliasOrName(ProvidedService providedService) {
-        return if (providedService.alias != null) providedService.alias else providedService.service.name
+        return if(providedService.alias != null) providedService.alias else providedService.service.name
     }
 
     def static String getAliasOrName(ConsumedService service) {
-        return if (service.alias != null) service.alias else service.service.name
+        return if(service.alias != null) service.alias else service.service.name
     }
 
     def static boolean isPrimitive(Field field) {
@@ -115,9 +152,9 @@ public class GenUtils {
             default: false
         }
     }
-    
+
     def getQualifiedName(EObject obj) {
-    	return qualifiedNameProvider.getFullyQualifiedName(obj)
+        return qualifiedNameProvider.getFullyQualifiedName(obj)
     }
 
     def getFullName(EObject obj) {
@@ -240,8 +277,8 @@ public class GenUtils {
 
     def String getTitle(ProvidedService providedService) {
         val titleOption = providedService.elements
-        	.filter(typeof(Option))
-        	.findFirst[o | getQualifiedName(o.descriptor).equals(INTEROP_PROVIDED_SERVICE_TITLE_OPTION_NAME)];
+        .filter(typeof(Option))
+        .findFirst[o | getQualifiedName(o.descriptor).equals(INTEROP_PROVIDED_SERVICE_TITLE_OPTION_NAME)];
         if(titleOption === null) {
             return providedService.service.name
         }
@@ -253,7 +290,7 @@ public class GenUtils {
             return providedMethod.method.name
         }
         val titleOption = providedMethod.options
-        	.findFirst[o | getQualifiedName(o.descriptor).equals(INTEROP_PROVIDED_METHOD_TITLE_OPTION_NAME)];
+        .findFirst[o | getQualifiedName(o.descriptor).equals(INTEROP_PROVIDED_METHOD_TITLE_OPTION_NAME)];
         if(titleOption === null) {
             return providedMethod.method.name
         }
@@ -272,10 +309,10 @@ public class GenUtils {
         }
         return "Unary"
     }
-    
+
     def static String getAsString(Constant constant) {
-    	if (constant instanceof StringConstant) {
-    		return constant.value
-    	}
+        if(constant instanceof StringConstant) {
+            return constant.value
+        }
     }
 }

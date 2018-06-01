@@ -19,6 +19,7 @@ namespace Plexus.Interop.Internal
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps;
     using Plexus.Interop.Broker;
@@ -52,11 +53,19 @@ namespace Plexus.Interop.Internal
         public Broker(string metadataDir = null, IRegistryProvider registryProvider = null)
         {
             _workingDir = Directory.GetCurrentDirectory();
-            metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");            
+            var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var studioDir = Path.Combine(binDir, "studio");
+            Log.Info("Studio dir: {0}", studioDir);
+            metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
             _transportServers = new[]
             {
-                TransportServerFactory.Instance.Create(PipeTransmissionServerFactory.Instance.Create(_workingDir), DefaultTransportSerializationProvider),
-                TransportServerFactory.Instance.Create(WebSocketTransmissionServerFactory.Instance.Create(_workingDir), DefaultTransportSerializationProvider)
+                TransportServerFactory.Instance.Create(
+                    PipeTransmissionServerFactory.Instance.Create(_workingDir), DefaultTransportSerializationProvider),
+                TransportServerFactory.Instance.Create(
+                    WebSocketTransmissionServerFactory.Instance.Create(
+                        _workingDir,
+                        new[] {("/metadata", metadataDir), ("/studio", studioDir)}),
+                    DefaultTransportSerializationProvider)
             };
             _connectionListener = new ServerConnectionListener(_transportServers);
             registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));

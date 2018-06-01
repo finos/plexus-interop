@@ -14,18 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
-{
-    using System.Collections.Generic;
-    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
+package com.db.plexus.interop.dsl.validation.rules
 
-    public sealed class WebSocketTransmissionServerFactory
-    {
-        public static WebSocketTransmissionServerFactory Instance = new WebSocketTransmissionServerFactory();
+import org.eclipse.xtext.resource.XtextResourceSet
+import com.db.plexus.interop.dsl.gen.test.ResourceUtils
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import org.eclipse.xtext.EcoreUtil2
 
-        public ITransmissionServer Create(string workingDir, IReadOnlyCollection<(string UrlPath, string PhysicalPath)> staticFileMappings = null)
-        {
-            return new WebSocketTransmissionServer(workingDir, staticFileMappings);
-        }
+class BaseRuleTest {
+
+    def testFalsePositive(UpdateRule rule) {
+        val resourceSet = new XtextResourceSet()
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
+        EcoreUtil2.resolveAll(resourceSet)
+        val issues = rule.validate(resourceSet, resourceSet);
+        assertThat(issues, hasSize(0))
     }
 }

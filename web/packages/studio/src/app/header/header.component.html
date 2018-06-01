@@ -14,7 +14,7 @@
 
     <div class="form-inline connection-status" *ngIf="!!currentApp">
       <span class="navbar-text mr-2">Application: </span>
-      <a id="open-current-app-btn" title="Go to App home page" href="javascript:" (click)="openCurrentApp()">{{currentApp?.displayName}} - {{connectionId$ | async}}</a>
+      <a id="open-current-app-btn" title="Go to App home page" href="javascript:" (click)="openCurrentApp()">{{currentApp?.id}} - {{connectionId$ | async}}</a>
       <a id="disconnect-from-app-btn" title="Disconnect from current App" class="nav-link" href="javascript:" (click)="disconnectFromApp()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>

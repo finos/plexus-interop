@@ -14,18 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
+﻿namespace Plexus.Host.Internal
 {
-    using System.Collections.Generic;
-    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
+    using CommandLine;
 
-    public sealed class WebSocketTransmissionServerFactory
+    [Verb("studio", HelpText = "Start Plexus Studio.")]
+    internal sealed class StudioOptions
     {
-        public static WebSocketTransmissionServerFactory Instance = new WebSocketTransmissionServerFactory();
-
-        public ITransmissionServer Create(string workingDir, IReadOnlyCollection<(string UrlPath, string PhysicalPath)> staticFileMappings = null)
-        {
-            return new WebSocketTransmissionServer(workingDir, staticFileMappings);
-        }
     }
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { InteropClient } from '../core/InteropClient';
-import { App as Application, ConsumedMethod, ProvidedMethod } from '@plexus-interop/broker';
+import { Application, ConsumedMethod, ProvidedMethod } from '@plexus-interop/broker';
 import { TypedAction } from './TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
 import { AppActions } from './AppActions';

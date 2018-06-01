@@ -14,18 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
-{
-    using System.Collections.Generic;
-    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
+package com.db.plexus.interop.dsl.gen.cli
 
-    public sealed class WebSocketTransmissionServerFactory
-    {
-        public static WebSocketTransmissionServerFactory Instance = new WebSocketTransmissionServerFactory();
+import com.db.plexus.interop.dsl.InteropLangStandaloneSetup
+import com.google.inject.Guice
+import com.db.plexus.interop.dsl.InteropLangRuntimeModule
+import com.db.plexus.interop.dsl.validation.rules.RulesModule
 
-        public ITransmissionServer Create(string workingDir, IReadOnlyCollection<(string UrlPath, string PhysicalPath)> staticFileMappings = null)
-        {
-            return new WebSocketTransmissionServer(workingDir, staticFileMappings);
-        }
+class CLIStandaloneSetup extends InteropLangStandaloneSetup {
+
+    override def createInjector() {
+        Guice.createInjector(new InteropLangRuntimeModule(), new RulesModule());
     }
+
 }

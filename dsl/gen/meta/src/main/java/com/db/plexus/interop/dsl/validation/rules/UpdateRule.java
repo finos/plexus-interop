@@ -14,15 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
-{
-    using System.Net.WebSockets;
-    using System.Threading.Tasks;
+package com.db.plexus.interop.dsl.validation.rules;
 
-    internal interface IWebSocketHandler
-    {
-        void OnListeningStarted();
+import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.validation.Issue;
 
-        Task<Task> AcceptConnectionAsync(WebSocket socket);        
-    }
+import java.util.List;
+
+/**
+ * Checks incremental full metadata update
+ */
+public interface UpdateRule {
+
+    String getCode();
+
+    List<Issue> validate(XtextResourceSet baseResourceSet, XtextResourceSet updatedResourceSet);
+
 }
