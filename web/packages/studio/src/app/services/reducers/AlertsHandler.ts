@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { App as Application } from '@plexus-interop/broker';
+import { Application } from '@plexus-interop/broker';
 import { TypedAction } from '../ui/TypedAction';
 import { Action } from '@ngrx/store';
 

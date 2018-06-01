@@ -17,7 +17,7 @@
 import { SubscriptionsRegistry } from './../services/ui/SubscriptionsRegistry';
 import { OnDestroy } from '@angular/core';
 import { LoggerFactory } from '@plexus-interop/common';
-import { App as Application } from '@plexus-interop/broker';
+import { Application } from '@plexus-interop/broker';
 import { Observable } from 'rxjs/Observable';
 import { AppActions } from '../services/ui/AppActions';
 import { Component, OnInit } from '@angular/core';
@@ -78,7 +78,7 @@ export class AppListComponent implements OnInit, OnDestroy {
   toAppInfo(app: Application): AppUiInfo {
     return {
       ...app,
-      label: app.id + (!!app.displayName ? ` (${app.displayName})` : '')
+      label: app.id
     };
   }
 

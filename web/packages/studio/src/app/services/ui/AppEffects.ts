@@ -17,7 +17,7 @@
 import { LoggerFactory } from '@plexus-interop/common';
 import { logger, State } from './RootReducers';
 import { TransportConnectionFactory } from '../core/TransportConnectionFactory';
-import { App as Application, ConsumedMethod } from '@plexus-interop/broker';
+import { Application, ConsumedMethod } from '@plexus-interop/broker';
 import {
     Alert,
     AppConnectedActionParams,
@@ -89,8 +89,7 @@ export class Effects {
             try {
 
                 const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(baseUrl);
-                const appRegistryService = await this.interopServiceFactory.getAppRegistryService(baseUrl);
-                const apps = appRegistryService.getApplications();
+                const apps = interopRegistryService.getRegistry().applications.valuesArray();
                 this.log.info(`Successfully loaded metadata from ${baseUrl}`);
 
                 const сonnectionProvider = await this.transportConnectionFactory.getConnectionProvider(baseUrl);
