@@ -31,5 +31,22 @@
         IReadOnlyCollection<IProvidedService> IApplication.ProvidedServices => ProvidedServices;
 
         public Maybe<LaunchMode> LaunchMode { get; set; }
+
+        private bool Equals(Application other)
+        {
+            return string.Equals(Id, other.Id);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is Application && Equals((Application) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Id != null ? Id.GetHashCode() : 0);
+        }
     }
 }

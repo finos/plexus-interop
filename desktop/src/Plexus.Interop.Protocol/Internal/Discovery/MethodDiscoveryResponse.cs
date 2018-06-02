@@ -39,7 +39,7 @@
 
         public override string ToString()
         {
-            return $"{nameof(Methods)}: {Methods}";
+            return $"{nameof(Methods)}: {Methods.FormatEnumerableObjects()}";
         }
 
         private bool Equals(MethodDiscoveryResponse other)

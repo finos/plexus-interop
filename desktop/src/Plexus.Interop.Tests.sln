@@ -3,25 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Tests", "Plexus.Interop.Tests\Plexus.Interop.Tests.csproj", "{BCD5FBE3-0282-4803-86F3-6C71B1737AD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Tests", "Plexus.Interop.Tests\Plexus.Interop.Tests.csproj", "{BCD5FBE3-0282-4803-86F3-6C71B1737AD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Transport.Pipes.Tests", "Plexus.Interop.Transport.Pipes.Tests\Plexus.Interop.Transport.Pipes.Tests.csproj", "{9F37DA8C-5E39-4563-9B93-D9F8502483FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Transport.Pipes.Tests", "Plexus.Interop.Transport.Pipes.Tests\Plexus.Interop.Transport.Pipes.Tests.csproj", "{9F37DA8C-5E39-4563-9B93-D9F8502483FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Transport.Protocol.Tests", "Plexus.Interop.Transport.Protocol.Tests\Plexus.Interop.Transport.Protocol.Tests.csproj", "{33EA817C-49E0-4262-9DBD-00675A14A8CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Transport.Protocol.Tests", "Plexus.Interop.Transport.Protocol.Tests\Plexus.Interop.Transport.Protocol.Tests.csproj", "{33EA817C-49E0-4262-9DBD-00675A14A8CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Transport.Transmission.Pipes.Tests", "Plexus.Interop.Transport.Transmission.Pipes.Tests\Plexus.Interop.Transport.Transmission.Pipes.Tests.csproj", "{80A4F4AA-7DEF-4FAC-AD43-E3D6D5B0D45C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Transport.Transmission.Pipes.Tests", "Plexus.Interop.Transport.Transmission.Pipes.Tests\Plexus.Interop.Transport.Transmission.Pipes.Tests.csproj", "{80A4F4AA-7DEF-4FAC-AD43-E3D6D5B0D45C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Transport.Transmission.WebSockets.Tests", "Plexus.Interop.Transport.Transmission.WebSockets.Tests\Plexus.Interop.Transport.Transmission.WebSockets.Tests.csproj", "{A6709CA7-1F52-43B6-A065-791E233136C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Transport.Transmission.WebSockets.Tests", "Plexus.Interop.Transport.Transmission.WebSockets.Tests\Plexus.Interop.Transport.Transmission.WebSockets.Tests.csproj", "{A6709CA7-1F52-43B6-A065-791E233136C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Transport.WebSockets.Tests", "Plexus.Interop.Transport.WebSockets.Tests\Plexus.Interop.Transport.WebSockets.Tests.csproj", "{D77E9C9B-4B5C-421A-BA35-EAB5AED86F56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Transport.WebSockets.Tests", "Plexus.Interop.Transport.WebSockets.Tests\Plexus.Interop.Transport.WebSockets.Tests.csproj", "{D77E9C9B-4B5C-421A-BA35-EAB5AED86F56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Utils.Tests", "Plexus.Utils.Tests\Plexus.Utils.Tests.csproj", "{2C430728-C292-4510-9497-7A5D71278DF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Utils.Tests", "Plexus.Utils.Tests\Plexus.Utils.Tests.csproj", "{2C430728-C292-4510-9497-7A5D71278DF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Client.Marshalling.Protobuf.Tests", "Plexus.Interop.Client.Marshalling.Protobuf.Tests\Plexus.Interop.Client.Marshalling.Protobuf.Tests.csproj", "{0493D415-3127-405B-8ADA-5E54FD3D048C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Client.Marshalling.Protobuf.Tests", "Plexus.Interop.Client.Marshalling.Protobuf.Tests\Plexus.Interop.Client.Marshalling.Protobuf.Tests.csproj", "{0493D415-3127-405B-8ADA-5E54FD3D048C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Metamodel.Json.Tests", "Plexus.Interop.Metamodel.Json.Tests\Plexus.Interop.Metamodel.Json.Tests.csproj", "{613C39E3-D987-407C-BAA2-97630CB11BF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Metamodel.Json.Tests", "Plexus.Interop.Metamodel.Json.Tests\Plexus.Interop.Metamodel.Json.Tests.csproj", "{613C39E3-D987-407C-BAA2-97630CB11BF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Protocol.Protobuf.Tests", "Plexus.Interop.Protocol.Protobuf.Tests\Plexus.Interop.Protocol.Protobuf.Tests.csproj", "{BC0A00B4-647F-4F88-B07D-3F0AE48A710E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Protocol.Protobuf.Tests", "Plexus.Interop.Protocol.Protobuf.Tests\Plexus.Interop.Protocol.Protobuf.Tests.csproj", "{BC0A00B4-647F-4F88-B07D-3F0AE48A710E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plexus.Interop.Broker.Core.Tests", "Plexus.Interop.Broker.Core.Tests\Plexus.Interop.Broker.Core.Tests.csproj", "{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -156,5 +158,17 @@ Global
 		{BC0A00B4-647F-4F88-B07D-3F0AE48A710E}.Release|x64.Build.0 = Release|x64
 		{BC0A00B4-647F-4F88-B07D-3F0AE48A710E}.Release|x86.ActiveCfg = Release|x86
 		{BC0A00B4-647F-4F88-B07D-3F0AE48A710E}.Release|x86.Build.0 = Release|x86
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Debug|x64.ActiveCfg = Debug|x64
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Debug|x64.Build.0 = Debug|x64
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Debug|x86.ActiveCfg = Debug|x86
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Debug|x86.Build.0 = Debug|x86
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Release|x64.ActiveCfg = Release|x64
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Release|x64.Build.0 = Release|x64
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Release|x86.ActiveCfg = Release|x86
+		{CB9C7C41-DCFD-45FC-9036-7B0A44075EF1}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 EndGlobal

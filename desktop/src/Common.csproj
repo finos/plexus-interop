@@ -11,5 +11,6 @@
     <RepositoryUrl>https://github.com/symphonyoss/plexus-interop</RepositoryUrl>
     <PackageTags>plexus interop symphonyoss</PackageTags>
     <Description>Plexus Interop is metadata-centric language-agnostic desktop app-to-app interoperability framework with extensible model for launching new instances of desktop Apps on demand.</Description>
+    <TieredCompilation>true</TieredCompilation>
   </PropertyGroup>
 </Project>
