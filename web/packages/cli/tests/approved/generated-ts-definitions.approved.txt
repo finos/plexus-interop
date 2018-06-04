@@ -1610,6 +1610,9 @@ export namespace google {
 
             /** MessageOptions uninterpretedOption */
             uninterpretedOption?: google.protobuf.IUninterpretedOption[];
+
+            /** MessageOptions .interop.messageId */
+            ".interop.messageId"?: string;
         }
 
         /** Represents a MessageOptions. */
@@ -2146,6 +2149,9 @@ export namespace google {
 
             /** ServiceOptions uninterpretedOption */
             uninterpretedOption?: google.protobuf.IUninterpretedOption[];
+
+            /** ServiceOptions .interop.serviceId */
+            ".interop.serviceId"?: string;
         }
 
         /** Represents a ServiceOptions. */
@@ -2245,6 +2251,9 @@ export namespace google {
 
             /** MethodOptions uninterpretedOption */
             uninterpretedOption?: google.protobuf.IUninterpretedOption[];
+
+            /** MethodOptions .interop.methodId */
+            ".interop.methodId"?: string;
         }
 
         /** Represents a MethodOptions. */
