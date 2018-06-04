@@ -29,6 +29,7 @@ import 'rxjs/add/operator/first';
   providers: [SubscriptionsRegistry]
 })
 export class MetadataLoaderComponent implements OnInit, OnDestroy {
+
   public metadataUrl: string;
 
   constructor(
@@ -39,7 +40,7 @@ export class MetadataLoaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    let metadataUrlObs = this.store.select(state => state.plexus.metadataUrl);
+    const metadataUrlObs = this.store.select(state => state.plexus.metadataUrl);
     this.subscriptions.add(metadataUrlObs.first().subscribe(metadataUrl => {
       this.metadataUrl = metadataUrl;
     }));
