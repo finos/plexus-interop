@@ -22,7 +22,7 @@ import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
 import { FormGroup, FormControl, FormBuilder, Validators, ValidationErrors } from '@angular/forms';
 import 'rxjs/add/operator/first';
-import { TransportType, ConnectionDetails } from '../services/ui/AppModel';
+import { TransportType, ConnectionDetails, transportTypes as types } from '../services/ui/AppModel';
 
 @Component({
   selector: 'app-metadata-loader',
@@ -38,11 +38,7 @@ export class MetadataLoaderComponent implements OnInit, OnDestroy {
   proxyHostUrl: FormControl = new FormControl('', [this.requiredCrossWebConfig.bind(this)]);
   wsUrl: FormControl = new FormControl('', [this.requiredWsConfig.bind(this)]);
 
-  transportTypes = [
-    { key: TransportType.NATIVE_WS, label: 'Web Socket Transport' },
-    { key: TransportType.WEB_CROSS, label: 'Cross Domain Web Transport' },
-    { key: TransportType.WEB_SAME_BROADCAST, label: 'Same Domain Web Transport' }
-  ];
+  transportTypes = types;
 
   connectionFormGroup: FormGroup = this.builder.group({
     metadataUrl: this.metadataUrl,

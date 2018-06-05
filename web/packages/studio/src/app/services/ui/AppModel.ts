@@ -42,12 +42,12 @@ export interface ConnectionDetails {
     generalConfig: GeneralConnectionConfig;
     webConfig?: WebConnectionConfig;
     wsConfig?: WebSocketConnectionConfig;
-    connected: boolean;    
+    connected: boolean;
 }
 
 export interface GeneralConnectionConfig {
     transportType: TransportType;
-    metadataUrl: string;    
+    metadataUrl: string;
 }
 
 export interface WebSocketConnectionConfig {
@@ -95,6 +95,12 @@ export enum TransportType {
     WEB_CROSS = 'web-cross',
     NATIVE_WS = 'native-ws'
 }
+
+export const transportTypes: { key: TransportType, label: string }[] = [
+    { key: TransportType.NATIVE_WS, label: 'Web Socket Transport' },
+    { key: TransportType.WEB_CROSS, label: 'Cross Domain Web Transport' },
+    { key: TransportType.WEB_SAME_BROADCAST, label: 'Same Domain Web Transport' }
+];
 
 export enum AlertType {
     INFO, SUCCESS, USER_FAIL, ERROR

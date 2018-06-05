@@ -80,7 +80,7 @@ export class TransportConnectionFactory {
     }
 
     private createSameOriginWebTransportProvider(connectionDetails: ConnectionDetails): TransportConnectionProvider {
-        if (connectionDetails
+        if (!connectionDetails.webConfig
             || !connectionDetails.webConfig.appsMetadataUrl
             || !connectionDetails.generalConfig.metadataUrl) {
             throw new Error('Proxy Host/Metadata/Apps URLs are mandatory');

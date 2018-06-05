@@ -29,7 +29,7 @@ import { ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { ConnectionDetails } from '../services/ui/AppModel';
+import { ConnectionDetails, transportTypes as types, transportTypes } from '../services/ui/AppModel';
 
 @Component({
   selector: 'app-header',
@@ -43,6 +43,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   application$: Observable<Application>;
   connectionId$: Observable<string>;
   connectionDetails$: Observable<ConnectionDetails>;
+  transportLabel$: Observable<string>;
 
   public currentApp: Application;
 
@@ -60,8 +61,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.application$ = this.store.select(state => state.plexus.connectedApp);
     this.connected$ = this.store.select(state => state.plexus.connectionDetails.connected);
     this.connectionDetails$ = this.store.select(state => state.plexus.connectionDetails);
+    this.transportLabel$ = this.connectionDetails$.map(details => this.findLabel(details.generalConfig.transportType));
     this.connectionId$ = this.store.select(state => state.plexus.services.interopClient).map(client => client ? client.getConnectionStrId() : 'NOT CONNECTED');
     this.subscriptions.add(this.application$.subscribe(app => this.currentApp = app));
+  }
+
+  findLabel(typeKey) {
+    const type = transportTypes.find(v => v.key == typeKey);
+    return type ? type.label : 'NOT_FOUND';
   }
 
   ngOnDestroy() {
@@ -83,6 +90,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   openModal(content) {
-    this.modalService.open(content);
+    this.modalService.open(content, { size: 'lg' });
   }
 }

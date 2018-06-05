@@ -79,6 +79,7 @@ export async function connectionSetupEffect(
         };
     } catch (error) {
         const msg = `Connection not successful. Please check your connection setup.`;
+        console.error('Failed to connect', error);
         if (params.silentOnFailure) {
             log.info(msg);
         } else {
