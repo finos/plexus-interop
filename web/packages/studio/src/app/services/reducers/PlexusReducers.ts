@@ -16,19 +16,23 @@
  */
 import { InteropClient } from '../core/InteropClient';
 import { Application, ConsumedMethod, ProvidedMethod } from '@plexus-interop/broker';
-import { TypedAction } from './TypedAction';
+import { TypedAction, getPayload } from './TypedAction';
 import { InteropRegistryService } from '@plexus-interop/broker';
-import { AppActions } from './AppActions';
+import { AppActions } from '../ui/AppActions';
 import { Action } from '@ngrx/store';
 import { UrlParamsProvider } from '@plexus-interop/common';
 import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
+import { GeneralConnectionConfig } from '../ui/AppModel';
+import { connectionDetailsReducer } from './ConnectionDetailsReducer';
+
 import {
     AppConnectedActionParams,
     ConsumedMethodState,
-    MetadataLoadActionParams,
+    ConnectionSetupActionParams,
     PlexusConnectedActionParams,
     StudioState,
-} from './AppModel';
+    TransportType,
+} from '../ui/AppModel';
 
 const mode = UrlParamsProvider.getParam('mode');
 
@@ -36,8 +40,13 @@ const defaultUrl = UrlParamsProvider.getParam('baseUrl') || (mode === 'dev' ? 'h
 
 const initialState: StudioState = {
     loading: false,
-    connected: false,
-    metadataUrl: defaultUrl,
+    connectioDetails: {
+        generalConfig: {
+            metadataUrl: null,
+            transportType: TransportType.NATIVE_WS
+        },
+        connected: false
+    },
     connectedApp: undefined,
     consumedMethod: undefined,
     providedMethod: undefined,
@@ -49,26 +58,24 @@ const initialState: StudioState = {
     }
 };
 
-function getPayload<T>(action: Action): T {
-    return (<TypedAction<T>>action).payload;
-};
+
 
 export function reducer(
     state: StudioState = initialState,
     action: Action
 ): StudioState {
     switch (action.type) {
-        case AppActions.METADATA_LOAD_START:
+        case AppActions.CONNECTION_SETUP_START:
             return {
                 ...initialState,
-                metadataUrl: getPayload<MetadataLoadActionParams>(action).baseUrl,
+                connectioDetails: connectionDetailsReducer(state.connectioDetails, action),
                 loading: true
             };
-        case AppActions.METADATA_LOAD_SUCCESS:
+        case AppActions.CONNECTION_SETUP_SUCCESS:
             let payload = getPayload<PlexusConnectedActionParams>(action);
             return {
                 ...state,
-                connected: true,
+                connectioDetails: connectionDetailsReducer(state.connectioDetails, action),
                 apps: payload.apps,
                 services: {
                     ...state.services,
@@ -77,7 +84,7 @@ export function reducer(
                 },
                 loading: false
             };
-        case AppActions.METADATA_LOAD_FAILED:
+        case AppActions.CONNECTION_SETUP_FAILED:
             return {
                 ...initialState
             };

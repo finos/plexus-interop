@@ -14,18 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export class UrlResolver {
+import { Action } from '@ngrx/store';
 
-    public getProxyHostUrl(baseUrl: string): string {
-        return `${baseUrl}/host/proxyHost.html`;
-    }    
+export interface TypedAction<P> extends Action {
+    payload: P;
+};
 
-    public getInteropMetadataUrl(baseUrl: string): string {
-        return `${baseUrl}/interop.json`;
-    } 
-
-    public getAppMetadataUrl(baseUrl: string): string {
-        return `${baseUrl}/apps.json`;
-    }
-
-}
+export function getPayload<T>(action: Action): T {
+    return (<TypedAction<T>>action).payload;
+};

@@ -29,14 +29,35 @@ export interface ServicesSnapshot {
 }
 
 export interface StudioState {
+    connectioDetails: ConnectionDetails;
     loading: boolean,
-    connected: boolean;
-    metadataUrl: string;
     connectedApp: Application;
     consumedMethod: ConsumedMethodState,
     providedMethod: ProvidedMethodState,
     apps: Application[],
     services: ServicesSnapshot
+}
+
+export interface ConnectionDetails {
+    generalConfig: GeneralConnectionConfig;
+    webConfig?: WebConnectionConfig;
+    wsConfig?: WebSocketConnectionConfig;
+    connected: boolean;    
+}
+
+export interface GeneralConnectionConfig {
+    transportType: TransportType;
+    metadataUrl: string;    
+}
+
+export interface WebSocketConnectionConfig {
+    wsUrl: string
+}
+
+export interface WebConnectionConfig {
+    proxyHostUrl: string,
+    // TODO deprecated, interop json + launcher should be used instead
+    appsMetadataUrl: string
 }
 
 export interface ConsumedMethodState {
@@ -59,14 +80,20 @@ export interface AppConnectedActionParams {
     application: Application
 }
 
-export interface MetadataLoadActionParams {
-    baseUrl: string,
+export interface ConnectionSetupActionParams {
+    connectioDetails: ConnectionDetails,
     silentOnFailure: boolean
 }
 
 export interface Alert {
     message: string,
     type: AlertType
+};
+
+export enum TransportType {
+    WEB_SAME_BROADCAST = 'web-same-broadcast',
+    WEB_CROSS = 'web-cross',
+    NATIVE_WS = 'native-ws'
 }
 
 export enum AlertType {

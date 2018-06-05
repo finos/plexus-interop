@@ -36,6 +36,5 @@ export class DefaultConnectionDetailsService implements ConnectionDetailsService
         return this.getConnectionDetails()
             .then(details => `http://localhost:${details.ws.port}/metadata/interop.json`);
     }
-
     
 }

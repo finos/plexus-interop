@@ -40,10 +40,10 @@ export class MetadataLoaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const metadataUrlObs = this.store.select(state => state.plexus.metadataUrl);
-    this.subscriptions.add(metadataUrlObs.first().subscribe(metadataUrl => {
-      this.metadataUrl = metadataUrl;
-    }));
+    // const metadataUrlObs = this.store.select(state => state.plexus.metadataUrl);
+    // this.subscriptions.add(metadataUrlObs.first().subscribe(metadataUrl => {
+    //   this.metadataUrl = metadataUrl;
+    // }));
   }
 
   ngOnDestroy() {
@@ -53,7 +53,7 @@ export class MetadataLoaderComponent implements OnInit, OnDestroy {
   connect(metadataUrl: string) {
     const checkAbsPath = /^https?:\/\//i
     this.store.dispatch({
-      type: AppActions.METADATA_LOAD_START,
+      type: AppActions.CONNECTION_SETUP_START,
       payload: {
         baseUrl: checkAbsPath.test(metadataUrl) ? metadataUrl : window.location.origin + metadataUrl,
         silentOnFailure: false

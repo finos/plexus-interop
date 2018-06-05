@@ -4,10 +4,12 @@
   </a>
 
   <div class="connection-statuses">
+    
     <div class="form-inline connection-status" *ngIf="connected$ | async">
-      <span class="navbar-text mr-2">Metadata loaded from:</span>
-      <a id="open-metadata-details-btn" title="See more details" target="_blank" href="javascript:" (click)="openModal(metadataModal)">{{metadataUrl$ | async}}</a>
-      <a id="disconnect-from-metdata-btn" title="Reset metadata URL" class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
+      <a id="open-metadata-details-btn" title="See more details" target="_blank" href="javascript:" (click)="openModal(metadataModal)">
+        {{(connectionDetails$ | async).connected}}
+      </a>
+      <a id="disconnect-from-metdata-btn" title="Reset connection configuration" class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
     </div>
@@ -18,7 +20,7 @@
       <a id="disconnect-from-app-btn" title="Disconnect from current App" class="nav-link" href="javascript:" (click)="disconnectFromApp()">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
-          </div>
+    </div>
   </div>
 </nav>
 
@@ -30,8 +32,9 @@
     </button>
   </div>
   <div class="modal-body container-fluid">
+
     <div class="row">
-      <span class="col-sm-2"> Apps: </span>
+      <span class="col-sm-2"> Type: </span>
       <a id="apps-json-link" class="col-sm-10" title="{{metadataUrls?.apps}}" target="_blank" href="{{metadataUrls?.apps}}">{{metadataUrls?.apps}}</a>
     </div>
 

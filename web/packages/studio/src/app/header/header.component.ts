@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { SubscriptionsRegistry } from './../services/ui/SubscriptionsRegistry';
-import { InteropServiceFactory, RegistryUrls } from '../services/core/InteropServiceFactory';
+import { InteropServiceFactory } from '../services/core/InteropServiceFactory';
 import { Application } from '@plexus-interop/broker';
 import { Subscription } from 'rxjs/Subscription';
 import { AppActions } from '../services/ui/AppActions';
@@ -29,6 +29,7 @@ import { ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { ConnectionDetails } from '../services/ui/AppModel';
 
 @Component({
   selector: 'app-header',
@@ -41,9 +42,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   connected$: Observable<boolean>;
   application$: Observable<Application>;
   connectionId$: Observable<string>;
+  connectionDetails$: Observable<ConnectionDetails>;
 
   public currentApp: Application;
-  metadataUrls: RegistryUrls;
 
   constructor(
     private actions: AppActions,
@@ -55,14 +56,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.metadataUrl$ = this.store.select(state => state.plexus.metadataUrl);
+    this.metadataUrl$ = this.store.select(state => state.plexus.connectioDetails.generalConfig.metadataUrl);
     this.application$ = this.store.select(state => state.plexus.connectedApp);
-    this.connected$ = this.store.select(state => state.plexus.connected);
+    this.connected$ = this.store.select(state => state.plexus.connectioDetails.connected);
+    this.connectionDetails$ = this.store.select(state => state.plexus.connectioDetails);
     this.connectionId$ = this.store.select(state => state.plexus.services.interopClient).map(client => client ? client.getConnectionStrId() : 'NOT CONNECTED');
     this.subscriptions.add(this.application$.subscribe(app => this.currentApp = app));
-    this.subscriptions.add(this.metadataUrl$.combineLatest(this.connected$.filter(i => i)).subscribe(([metadata, _]) => {
-      this.metadataUrls = this.interopServiceFactory.getMetadataUrls(metadata);
-    }));
   }
 
   ngOnDestroy() {

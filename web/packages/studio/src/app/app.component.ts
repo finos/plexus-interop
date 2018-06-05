@@ -20,14 +20,14 @@ import { LoggerFactory, LogLevel, Logger, TimeUtils } from '@plexus-interop/comm
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ElementRef, Renderer2 } from '@angular/core';
 import { State } from './services/ui/RootReducers';
-import { AfterViewChecked, AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { AfterViewChecked } from '@angular/core/src/metadata/lifecycle_hooks';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit {
+export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   @ViewChild('plexusLogsArea') logsTextArea: ElementRef;
 
@@ -43,46 +43,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterV
   private logger: Logger;
 
   public ngOnInit(): void {
-
-    LoggerFactory.setLogLevel(LogLevel.DEBUG);
-
-    this.loggerDelegateRegistration = LoggerFactory.registerDelegate({
-      log: (logLevel: LogLevel, msg: string, args: any[]) => {
-
-        if (!this.logsEnabled) {
-          return;
-        }
-
-        if (logLevel <= LogLevel.DEBUG) {
-          // Too many logs in output
-          return;
-        }
-
-        let message = `[${TimeUtils.format(new Date())}] ${LogLevel[logLevel]} ${msg}`;
-        args = this.filterEmptyArgs(args);
-        if (args.length > 0) {
-          message += '\nArguments: ' + JSON.stringify(args);
-        }
-
-        if (this.plexusLogs) {
-          this.plexusLogs = `${this.plexusLogs}\n${message}`;
-        } else {
-          this.plexusLogs = message;
-        }
-
-      }
-    });
-
+    LoggerFactory.setLogLevel(LogLevel.INFO);
+    this.loggerDelegateRegistration = this.createUiLoggerDelegate();
     this.logger = LoggerFactory.getLogger();
     this.logger.info('Welcome to Plexus Studio!');
-
-    this.store.dispatch({
-      type: AppActions.AUTO_CONNECT
-    });
-
-  }
-
-  public ngAfterViewInit(): void {
+    this.logger.info('Trying to detect connection to Plexus ...');
+    this.store.dispatch({ type: AppActions.AUTO_CONNECT });
   }
 
   public ngAfterViewChecked(): void {
@@ -110,5 +76,29 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked, AfterV
   private filterEmptyArgs(arr: any[]): any[] {
     arr = arr || [];
     return arr.filter(el => !!el && !(Array.isArray(el) && el.length === 0));
+  }
+
+  private createUiLoggerDelegate(): { unregister: () => void } {
+    return LoggerFactory.registerDelegate({
+      log: (logLevel: LogLevel, msg: string, args: any[]) => {
+        if (!this.logsEnabled) {
+          return;
+        }
+        if (logLevel <= LogLevel.DEBUG) {
+          // Too many logs in output
+          return;
+        }
+        let message = `[${TimeUtils.format(new Date())}] ${LogLevel[logLevel]} ${msg}`;
+        args = this.filterEmptyArgs(args);
+        if (args.length > 0) {
+          message += '\nArguments: ' + JSON.stringify(args);
+        }
+        if (this.plexusLogs) {
+          this.plexusLogs = `${this.plexusLogs}\n${message}`;
+        } else {
+          this.plexusLogs = message;
+        }
+      }
+    });
   }
 }
