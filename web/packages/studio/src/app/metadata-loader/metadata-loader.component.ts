@@ -20,7 +20,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators, ValidationErrors } from '@angular/forms';
 import 'rxjs/add/operator/first';
 import { TransportType } from '../services/ui/AppModel';
 
@@ -32,13 +32,19 @@ import { TransportType } from '../services/ui/AppModel';
 })
 export class MetadataLoaderComponent implements OnInit, OnDestroy {
 
-  metadataUrl: FormControl = new FormControl('', [Validators.required]);
+  transportType: FormControl = new FormControl(TransportType.NATIVE_WS, [Validators.required]);
+  metadataUrl: FormControl = new FormControl('', [Validators.required, Validators.minLength(1)]);
   appsUrl: FormControl = new FormControl('', [this.requiredWebConfig.bind(this)]);
   proxyHostUrl: FormControl = new FormControl('', [this.requiredCrossWebConfig.bind(this)]);
-  transportType: FormControl = new FormControl(TransportType.NATIVE_WS, [Validators.required]);
   wsUrl: FormControl = new FormControl('', [this.requiredWsConfig.bind(this)]);
 
-  connectioFormGroup: FormGroup = this.builder.group({
+  transportTypes = [
+    { key: TransportType.NATIVE_WS, label: 'Web Socket Transport' },
+    { key: TransportType.WEB_CROSS, label: 'Cross Domain Web Transport' },
+    { key: TransportType.WEB_SAME_BROADCAST, label: 'Same Domain Web Transport' }
+  ];
+
+  connectionFormGroup: FormGroup = this.builder.group({
     metadataUrl: this.metadataUrl,
     appsUrl: this.appsUrl,
     proxyHostUrl: this.proxyHostUrl,
@@ -56,13 +62,19 @@ export class MetadataLoaderComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const connectionDetailsObs = this.store.select(state => state.plexus.connectioDetails);
-    this.subscriptions.add(connectionDetailsObs.subscribe(connectioDetails => {
-      this.metadataUrl.setValue(connectioDetails.generalConfig.metadataUrl);
-      this.appsUrl.setValue(connectioDetails.webConfig ? connectioDetails.webConfig.appsMetadataUrl : '');
-      this.proxyHostUrl.setValue(connectioDetails.webConfig ? connectioDetails.webConfig.proxyHostUrl : '');
-      this.transportType.setValue(connectioDetails.generalConfig.transportType);
-      this.wsUrl.setValue(connectioDetails.wsConfig ? connectioDetails.wsConfig.wsUrl : '');
+    this.subscriptions.add(connectionDetailsObs.subscribe(details => {
+      this.metadataUrl.setValue(details.generalConfig ? details.generalConfig.metadataUrl : '');
+      this.appsUrl.setValue(details.webConfig ? details.webConfig.appsMetadataUrl : '');
+      this.proxyHostUrl.setValue(details.webConfig ? details.webConfig.proxyHostUrl : '');
+      this.transportType.setValue(details.generalConfig.transportType);
+      this.wsUrl.setValue(details.wsConfig ? details.wsConfig.wsUrl : '');
     }));
+  }
+
+  triggerValidation(): void {
+    for (var i in this.connectionFormGroup.controls) {
+      this.connectionFormGroup.controls[i].updateValueAndValidity();
+    }
   }
 
   ngOnDestroy() {

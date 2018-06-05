@@ -34,10 +34,6 @@ import {
     TransportType,
 } from '../ui/AppModel';
 
-const mode = UrlParamsProvider.getParam('mode');
-
-const defaultUrl = UrlParamsProvider.getParam('baseUrl') || (mode === 'dev' ? 'http://localhost:8080' : undefined);
-
 const initialState: StudioState = {
     loading: false,
     connectioDetails: {
@@ -57,8 +53,6 @@ const initialState: StudioState = {
         сonnectionProvider: undefined
     }
 };
-
-
 
 export function reducer(
     state: StudioState = initialState,
