@@ -31,7 +31,7 @@ const log: Logger = LoggerFactory.getLogger('ConnectionEffects');
 export async function autoConnectEffect(state: StudioState) {
     const metadataUrl = await lookupMetadataUrl();
     if (metadataUrl) {
-        const wsUrl = requestParams.getWsUrl();
+        const wsUrl = await lookupWsUrl();
         const proxyHostUrl = await lookupHostProxyUrl();
         const appsMetadataUrl = await lookupAppsUrl();
         const payload: ConnectionSetupActionParams = {
@@ -107,6 +107,15 @@ async function lookupTransportType(): Promise<TransportType> {
 function lookupHostProxyUrl(): Promise<string> {
     return nullable(requestParams.getHostProxyUrl())
         .catch(() => StudioExtensions.getProxyHostUrl())
+        .catch(() => null);
+}
+
+function lookupWsUrl(): Promise<string> {
+    return nullable(requestParams.getWsUrl())
+        .catch(async () => {
+            const details = await discoveryService.getConnectionDetails();
+            return `ws://127.0.0.1:${details.ws.port}`;
+        })
         .catch(() => null);
 }
 
