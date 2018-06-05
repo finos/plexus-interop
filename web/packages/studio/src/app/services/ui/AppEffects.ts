@@ -46,7 +46,7 @@ import { DiscoveryMode } from '@plexus-interop/client-api';
 import { UrlParamsProvider } from '@plexus-interop/common';
 import { TransportType } from '../ui/AppModel';
 import { StudioExtensions } from '../extensions/StudioExtensions';
-import { autoConnectEffect } from '../effects/ConnectionEffects';
+import { autoConnectEffect, connectionSetupEffect } from '../effects/ConnectionEffects';
 
 @Injectable()
 export class Effects {
@@ -62,42 +62,7 @@ export class Effects {
     @Effect() connectToPlexus$: Observable<Action> = this
         .actions$
         .ofType<TypedAction<ConnectionSetupActionParams>>(AppActions.CONNECTION_SETUP_START)
-        .mergeMap(async action => {
-
-            const params = action.payload;
-            const connectionDetails = params.connectioDetails;
-            const metadataUrl = connectionDetails.generalConfig.metadataUrl;
-
-            try {
-
-                const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(metadataUrl);
-                const apps = interopRegistryService.getRegistry().applications.valuesArray();
-                this.log.info(`Successfully loaded metadata from ${metadataUrl}`);
-
-                const сonnectionProvider = await this.transportConnectionFactory.getConnectionProvider(connectionDetails);
-                this.log.info(`Connection provider created`);
-
-                return {
-                    type: AppActions.CONNECTION_SETUP_SUCCESS,
-                    payload: {
-                        apps,
-                        interopRegistryService,
-                        сonnectionProvider
-                    }
-                };
-
-            } catch (error) {
-                const msg = `Connection not successful. Please enter correct metadata base url.`;
-                if (params.silentOnFailure) {
-                    this.log.info(msg);
-                } else {
-                    this.log.error(msg);
-                    return {
-                        type: AppActions.DISCONNECT_FROM_PLEXUS
-                    };
-                };
-            }
-        });
+        .mergeMap(async action => connectionSetupEffect(action.payload));
 
     @Effect() plexusConnected$: Observable<Action> = this
         .actions$
@@ -137,7 +102,6 @@ export class Effects {
             return {
                 type: AppActions.CONNECT_TO_APP_SUCCESS,
                 payload: { interopClient, application }
-
             };
         });
 
