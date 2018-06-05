@@ -31,6 +31,13 @@ message AppLaunchRequest {
 	string launch_params_json = 2;
 	AppLaunchMode launch_mode = 3;
 	UniqueId suggested_app_instance_id = 4;
+	AppLaunchReferrer referrer = 5;
+}
+
+message AppLaunchReferrer {
+	string app_id = 1;
+	UniqueId app_instance_id = 2;	
+	UniqueId connection_id = 3;
 }
 
 message AppLaunchResponse {

@@ -47,7 +47,7 @@ namespace Plexus.Interop.Transport.Transmission.Streams
             _stream = stream;
             Out = _writer.Out;
             In = _reader.In;
-            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
+            Completion = ProcessAsync().LogCompletion(_log);
         }
 
         public UniqueId Id { get; }

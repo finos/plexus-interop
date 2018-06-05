@@ -27,5 +27,7 @@
         string ConsumerApplicationId { get; }
 
         UniqueId ConsumerConnectionId { get; }
+
+        UniqueId ConsumerApplicationInstanceId { get; }
     }
 }

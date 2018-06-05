@@ -38,7 +38,7 @@ namespace Plexus.Interop.Transport.Protocol
             _connection = connection;
             _log = LogManager.GetLogger<MessagingSendProcessor>(Id.ToString());
             _serializer = serializer;            
-            _connection.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            _connection.Out.PropagateCompletionFrom(ProcessAsync());
             Completion = _connection.Out.Completion.LogCompletion(_log);
         }
 

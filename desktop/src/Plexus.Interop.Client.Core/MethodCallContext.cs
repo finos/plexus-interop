@@ -22,15 +22,19 @@
     {
         internal MethodCallContext(            
             string consumerApplicationId,
+            UniqueId consumerApplicationInstanceId,
             UniqueId consumerConnectionId, 
             CancellationToken cancellationToken)
         {            
             ConsumerApplicationId = consumerApplicationId;
+            ConsumerApplicationInstanceId = consumerApplicationInstanceId;
             ConsumerConnectionId = consumerConnectionId;
-            CancellationToken = cancellationToken;
+            CancellationToken = cancellationToken;            
         }        
 
         public string ConsumerApplicationId { get; }
+
+        public UniqueId ConsumerApplicationInstanceId { get; }
 
         public UniqueId ConsumerConnectionId { get; }
 
@@ -38,7 +42,7 @@
 
         public override string ToString()
         {
-            return $"{nameof(ConsumerApplicationId)}: {ConsumerApplicationId}, {nameof(ConsumerConnectionId)}: {ConsumerConnectionId}";
+            return $"{nameof(ConsumerApplicationId)}: {ConsumerApplicationId}, {nameof(ConsumerConnectionId)}: {ConsumerConnectionId}, {nameof(ConsumerApplicationInstanceId)}: {ConsumerApplicationInstanceId}";
         }
     }
 }

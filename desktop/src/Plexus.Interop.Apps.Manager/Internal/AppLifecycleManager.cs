@@ -70,11 +70,11 @@ namespace Plexus.Interop.Apps.Internal
 
         public IAppConnection AcceptConnection(
             ITransportConnection connection,
-            AppConnectionDescriptor info)
+            AppConnectionDescriptor connectionInfo)
         {
             lock (_connections)
             {
-                var clientConnection = new AppConnection(connection, info);
+                var clientConnection = new AppConnection(connection, connectionInfo);
                 if (_connections.ContainsKey(clientConnection.Id))
                 {
                     throw new InvalidOperationException($"Connection id already exists: {clientConnection.Id}");
@@ -165,9 +165,9 @@ namespace Plexus.Interop.Apps.Internal
             return FilterCanBeLaunched(new[] { appId }).Contains(appId);
         }
 
-        public async Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode)
+        public async Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo)
         {
-            Log.Debug("Resolving connection for app {0} with mode {1}", appId, mode);
+            Log.Debug("Resolving connection for app {0} with mode {1} by request from {{{2}}}", appId, mode, referrerConnectionInfo);
             Task<IAppConnection> connectionTask;
             UniqueId suggestedInstanceId = default;
             lock (_connections)
@@ -193,11 +193,11 @@ namespace Plexus.Interop.Apps.Internal
                 {
                     suggestedInstanceId = UniqueId.Generate();
                     Log.Debug("Resolving connection for app {0} with mode {1} to new instance with suggested id {2}", appId, mode, suggestedInstanceId);
-                    connectionTask = LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode);
+                    connectionTask = LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo);
                 }
             }
             var resolvedConnection = await connectionTask.ConfigureAwait(false);
-            Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}}", appId, mode, resolvedConnection);
+            Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}} by request from {{{3}}}", appId, mode, resolvedConnection, referrerConnectionInfo);
             return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Id);
         }
         
@@ -213,7 +213,12 @@ namespace Plexus.Interop.Apps.Internal
             ResolveAppRequest request, MethodCallContext context)
         {
             Log.Debug("Resolving app by request {{{0}}} from {{{1}}}", request, context);
-            var resolvedConnection = await ResolveConnectionAsync(request.AppId, Convert(request.AppResolveMode)).ConfigureAwait(false);
+            var referrerConnectionInfo = new AppConnectionDescriptor(
+                context.ConsumerConnectionId, 
+                context.ConsumerApplicationId,
+                context.ConsumerApplicationInstanceId);
+            var resolvedConnection = await ResolveConnectionAsync(
+                request.AppId, Convert(request.AppResolveMode),referrerConnectionInfo).ConfigureAwait(false);
             var info = resolvedConnection.AppConnection.Info;
             Log.Info("App connection {{{0}}} resolved by request from {{{1}}}", resolvedConnection, context);
             var response = new ResolveAppResponse
@@ -233,7 +238,11 @@ namespace Plexus.Interop.Apps.Internal
             return response;
         }
 
-        private async Task<IAppConnection> LaunchAndWaitConnectionAsync(string appId, UniqueId suggestedAppInstanceId, ResolveMode resolveMode)
+        private async Task<IAppConnection> LaunchAndWaitConnectionAsync(
+            string appId, 
+            UniqueId suggestedAppInstanceId,
+            ResolveMode resolveMode, 
+            AppConnectionDescriptor referrerConnectionInfo)
         {
             var appInstanceId = suggestedAppInstanceId;
             Log.Info("Launching {0}", appId);
@@ -251,7 +260,7 @@ namespace Plexus.Interop.Apps.Internal
                     appConnectionTaskList.Add(connectionPromise.Task);
                 }
 
-                appInstanceId = await LaunchAsync(appId, appInstanceId, resolveMode).ConfigureAwait(false);
+                appInstanceId = await LaunchAsync(appId, appInstanceId, resolveMode, referrerConnectionInfo).ConfigureAwait(false);
 
                 deferredConnectionKey = (appInstanceId, appId);
 
@@ -288,7 +297,11 @@ namespace Plexus.Interop.Apps.Internal
             }
         }
 
-        private async Task<UniqueId> LaunchAsync(string appId, UniqueId suggestedAppInstanceId, ResolveMode resolveMode)
+        private async Task<UniqueId> LaunchAsync(
+            string appId, 
+            UniqueId suggestedAppInstanceId, 
+            ResolveMode resolveMode,
+            AppConnectionDescriptor referrerConnectionInfo)
         {            
             var appDto = _appsDto.Apps.FirstOrDefault(x => string.Equals(x.Id, appId));
             if (appDto == null)
@@ -306,20 +319,36 @@ namespace Plexus.Interop.Apps.Internal
             var launchMethodReference =
                 ProvidedMethodReference.Create("interop.AppLauncherService", "Launch", appDto.LauncherId);
 
+            var referrer = new AppLaunchReferrer
+            {
+                AppId = referrerConnectionInfo.ApplicationId,
+                AppInstanceId = new Generated.UniqueId()
+                {
+                    Hi = referrerConnectionInfo.ApplicationInstanceId.Hi,
+                    Lo = referrerConnectionInfo.ApplicationInstanceId.Lo,
+                },
+                ConnectionId = new Generated.UniqueId()
+                {
+                    Hi = referrerConnectionInfo.ConnectionId.Hi,
+                    Lo = referrerConnectionInfo.ConnectionId.Lo,
+                }
+            };
+
+            var request = new AppLaunchRequest
+            {
+                AppId = appId,
+                LaunchParamsJson = appDto.LauncherParams.ToString(),
+                SuggestedAppInstanceId = new Generated.UniqueId
+                {
+                    Hi = suggestedAppInstanceId.Hi,
+                    Lo = suggestedAppInstanceId.Lo
+                },
+                LaunchMode = Convert(resolveMode),
+                Referrer = referrer
+            };
+
             var response = await _client.CallInvoker
-                .CallUnary<AppLaunchRequest, AppLaunchResponse>(
-                    launchMethodReference.CallDescriptor,
-                    new AppLaunchRequest
-                    {
-                        AppId = appId,
-                        LaunchParamsJson = appDto.LauncherParams.ToString(),
-                        SuggestedAppInstanceId = new Generated.UniqueId
-                        {
-                            Hi = suggestedAppInstanceId.Hi,
-                            Lo = suggestedAppInstanceId.Lo
-                        },
-                        LaunchMode = Convert(resolveMode)
-                    })
+                .CallUnary<AppLaunchRequest, AppLaunchResponse>(launchMethodReference.CallDescriptor, request)
                 .ConfigureAwait(false);
 
             var appInstanceId = UniqueId.FromHiLo(response.AppInstanceId.Hi, response.AppInstanceId.Lo);

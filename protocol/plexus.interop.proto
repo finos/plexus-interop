@@ -137,6 +137,9 @@ message InvocationStartRequested {
 
 	// Source connection id
 	.plexus.UniqueId consumer_connection_id = 5;
+
+	// Source application instance id
+	.plexus.UniqueId consumer_application_instance_id = 6;
 }
 
 // target -> broker -> source

@@ -39,7 +39,7 @@
             _log = LogManager.GetLogger<WebSocketServerTransmissionWriter>(Id.ToString());
             _webSocket = webSocket;
             _cancellationToken = cancellationToken;
-            Completion = TaskRunner.RunInBackground(ProcessAsync);
+            Completion = ProcessAsync();
         }
 
         public UniqueId Id { get; }

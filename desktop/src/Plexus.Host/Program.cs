@@ -17,6 +17,7 @@
 namespace Plexus.Host
 {
     using CommandLine;
+    using Plexus.Host.Internal;
     using System;
     using System.Diagnostics;
     using System.IO;
@@ -24,7 +25,6 @@ namespace Plexus.Host
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Host.Internal;
 
     public sealed class Program
     {
@@ -39,14 +39,15 @@ namespace Plexus.Host
         public async Task<int> RunAsync(string[] args)
         {
             return await Parser.Default
-                .ParseArguments<BrokerOptions, StartOptions, LaunchOptions, StopOptions>(args)
+                .ParseArguments<BrokerOptions, StartOptions, LaunchOptions, StopOptions, StudioOptions>(args)
                 .MapResult(
                     (BrokerOptions opts) => StartBrokerAsync(opts),
                     (StartOptions opts) => StartBrokerAsync(opts),
                     (LaunchOptions opts) => LaunchAppAsync(opts),
                     (StopOptions opts) => StopBrokerAsync(),
+                    (StudioOptions opts) => StartStudioAsync(),
                     errs => Task.FromResult(1));
-        }
+        }        
 
         private static async Task<int> LoadAndRunProgramAsync(IProgram program)
         {
@@ -119,11 +120,38 @@ namespace Plexus.Host
                 Console.WriteLine($"Plexus process {process.Id} exited with code {exitCode}");
             }
 
-            var tasks = processes.Select(x => TaskRunner.RunInBackground(() => ShutdownProcessAsync(x)));
+            var tasks = processes.Select(ShutdownProcessAsync);
 
             await Task.WhenAll(tasks).IgnoreExceptions().ConfigureAwait(false);
 
             return 0;
+        }
+
+        private static Task<int> StartStudioAsync()
+        {
+            var dir = Directory.GetCurrentDirectory();
+            var addressFile = Path.Combine(dir, "servers", "ws-v1", "address");
+            if (!File.Exists(addressFile))
+            {
+                throw new InvalidOperationException($"Broker is not running in the current folder {dir}");
+            }
+            var wsUri = new Uri(File.ReadAllText(addressFile));
+            var baseUriBuilder = new UriBuilder(wsUri)
+            {
+                Scheme = "http",
+                Path = "metadata"
+            };
+            var baseUri = baseUriBuilder.Uri;
+            var uriBuilder = new UriBuilder(wsUri)
+            {
+                Scheme = "http",
+                Path = "studio/index.html",               
+                Query = $"transport=native-ws&wsUrl={wsUri}&baseUrl={baseUri}"
+            };
+            var uri = uriBuilder.Uri;
+            Console.WriteLine("Starting " + uri);
+            Process.Start(new ProcessStartInfo(uri.ToString()) {UseShellExecute = true});
+            return Task.FromResult(0);
         }
 
         private static void InitializeProcess()

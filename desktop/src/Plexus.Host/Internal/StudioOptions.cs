@@ -14,15 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
+﻿namespace Plexus.Host.Internal
 {
-    using System.Net.WebSockets;
-    using System.Threading.Tasks;
+    using CommandLine;
 
-    internal interface IWebSocketHandler
+    [Verb("studio", HelpText = "Start Plexus Studio.")]
+    internal sealed class StudioOptions
     {
-        void OnListeningStarted();
-
-        Task<Task> AcceptConnectionAsync(WebSocket socket);        
     }
 }
