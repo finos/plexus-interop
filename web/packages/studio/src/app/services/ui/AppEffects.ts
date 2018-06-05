@@ -62,7 +62,7 @@ export class Effects {
     @Effect() connectToPlexus$: Observable<Action> = this
         .actions$
         .ofType<TypedAction<ConnectionSetupActionParams>>(AppActions.CONNECTION_SETUP_START)
-        .mergeMap(async action => connectionSetupEffect(action.payload));
+        .mergeMap(async action => connectionSetupEffect(action.payload, this.transportConnectionFactory, this.interopServiceFactory));
 
     @Effect() plexusConnected$: Observable<Action> = this
         .actions$
@@ -178,10 +178,10 @@ export class Effects {
     constructor(
         private http: Http,
         private actions$: Actions,
+        private transportConnectionFactory: TransportConnectionFactory,
         private interopServiceFactory: InteropServiceFactory,
         private interopClientFactory: InteropClientFactory,
         private store: Store<State>,
-        private transportConnectionFactory: TransportConnectionFactory,
         private router: Router
     ) { }
 }

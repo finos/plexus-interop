@@ -17,13 +17,16 @@
 import { StudioState, ConnectionSetupActionParams, TransportType } from '../ui/AppModel';
 import { AppActions } from '../ui/AppActions';
 import { StudioExtensions } from '../extensions/StudioExtensions';
-import { UrlParamsProvider } from '@plexus-interop/common';
+import { UrlParamsProvider, Logger, LoggerFactory } from '@plexus-interop/common';
 import { DefaultConnectionDetailsService } from '@plexus-interop/client';
 import { TypedAction } from '../reducers/TypedAction';
-import { ConnectionRequestParams } from './ConnectionRequestParams';
+import { ConnectionRequestParams } from '../ui/ConnectionRequestParams';
+import { TransportConnectionFactory } from '../core/TransportConnectionFactory';
+import { InteropServiceFactory } from '../core/InteropServiceFactory';
 
 const discoveryService: DefaultConnectionDetailsService = new DefaultConnectionDetailsService();
 const requestParams = new ConnectionRequestParams()
+const log: Logger = LoggerFactory.getLogger('ConnectionEffects');
 
 export async function autoConnectEffect(state: StudioState) {
     const metadataUrl = await lookupMetadataUrl();
@@ -52,15 +55,20 @@ export async function autoConnectEffect(state: StudioState) {
     }
 }
 
-export async function connectionSetupEffect(params: ConnectionSetupActionParams) {
+export async function connectionSetupEffect(
+    params: ConnectionSetupActionParams,
+    transportConnectionFactory: TransportConnectionFactory,
+    interopServiceFactory: InteropServiceFactory,
+) {
     const connectionDetails = params.connectioDetails;
     const metadataUrl = connectionDetails.generalConfig.metadataUrl;
     try {
-        const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(metadataUrl);
+        const interopRegistryService = await interopServiceFactory.getInteropRegistryService(metadataUrl);
         const apps = interopRegistryService.getRegistry().applications.valuesArray();
-        this.log.info(`Successfully loaded metadata from ${metadataUrl}`);
-        const сonnectionProvider = await this.transportConnectionFactory.getConnectionProvider(connectionDetails);
-        this.log.info(`Connection provider created`);
+        log.info(`Successfully loaded metadata from ${metadataUrl}`);
+
+        const сonnectionProvider = await transportConnectionFactory.getConnectionProvider(connectionDetails);
+        log.info(`Connection provider created`);
         return {
             type: AppActions.CONNECTION_SETUP_SUCCESS,
             payload: {
@@ -70,11 +78,11 @@ export async function connectionSetupEffect(params: ConnectionSetupActionParams)
             }
         };
     } catch (error) {
-        const msg = `Connection not successful. Please enter correct metadata base url.`;
+        const msg = `Connection not successful. Please check your connection setup.`;
         if (params.silentOnFailure) {
-            this.log.info(msg);
+            log.info(msg);
         } else {
-            this.log.error(msg);
+            log.error(msg);
             return {
                 type: AppActions.DISCONNECT_FROM_PLEXUS
             };
