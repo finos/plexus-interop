@@ -20,7 +20,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import 'rxjs/add/operator/first';
+import { TransportType } from '../services/ui/AppModel';
 
 @Component({
   selector: 'app-metadata-loader',
@@ -30,24 +32,59 @@ import 'rxjs/add/operator/first';
 })
 export class MetadataLoaderComponent implements OnInit, OnDestroy {
 
-  public metadataUrl: string;
+  metadataUrl: FormControl = new FormControl('', [Validators.required]);
+  appsUrl: FormControl = new FormControl('', [this.requiredWebConfig.bind(this)]);
+  proxyHostUrl: FormControl = new FormControl('', [this.requiredCrossWebConfig.bind(this)]);
+  transportType: FormControl = new FormControl(TransportType.NATIVE_WS, [Validators.required]);
+  wsUrl: FormControl = new FormControl('', [this.requiredWsConfig.bind(this)]);
+
+  connectioFormGroup: FormGroup = this.builder.group({
+    metadataUrl: this.metadataUrl,
+    appsUrl: this.appsUrl,
+    proxyHostUrl: this.proxyHostUrl,
+    transportType: this.transportType,
+    wsUrl: this.wsUrl
+  });
 
   constructor(
     private actions: AppActions,
     private store: Store<fromRoot.State>,
     private router: Router,
-    private subscriptions: SubscriptionsRegistry) {
+    private subscriptions: SubscriptionsRegistry,
+    private builder: FormBuilder) {
   }
 
   ngOnInit() {
-    // const metadataUrlObs = this.store.select(state => state.plexus.metadataUrl);
-    // this.subscriptions.add(metadataUrlObs.first().subscribe(metadataUrl => {
-    //   this.metadataUrl = metadataUrl;
-    // }));
+    const connectionDetailsObs = this.store.select(state => state.plexus.connectioDetails);
+    this.subscriptions.add(connectionDetailsObs.subscribe(connectioDetails => {
+      this.metadataUrl.setValue(connectioDetails.generalConfig.metadataUrl);
+      this.appsUrl.setValue(connectioDetails.webConfig ? connectioDetails.webConfig.appsMetadataUrl : '');
+      this.proxyHostUrl.setValue(connectioDetails.webConfig ? connectioDetails.webConfig.proxyHostUrl : '');
+      this.transportType.setValue(connectioDetails.generalConfig.transportType);
+      this.wsUrl.setValue(connectioDetails.wsConfig ? connectioDetails.wsConfig.wsUrl : '');
+    }));
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribeAll();
+  }
+
+  requiredCrossWebConfig(formControl: FormControl) {
+    const value = formControl.value as string;
+    const valid = this.transportType.value !== TransportType.WEB_CROSS || (!!value && value.length > 0);
+    return valid ? null : { required: true };
+  }
+
+  requiredWsConfig(formControl: FormControl) {
+    const value = formControl.value as string;
+    const valid = this.transportType.value !== TransportType.NATIVE_WS || (!!value && value.length > 0);
+    return valid ? null : { required: true };
+  }
+
+  requiredWebConfig(formControl: FormControl) {
+    const value = formControl.value as string;
+    const valid = this.transportType.value === TransportType.NATIVE_WS || (!!value && value.length > 0);
+    return valid ? null : { required: true };
   }
 
   connect(metadataUrl: string) {
