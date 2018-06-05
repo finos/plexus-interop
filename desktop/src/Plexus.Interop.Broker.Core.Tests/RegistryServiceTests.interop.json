@@ -1,0 +1,92 @@
+﻿{
+  "services": [
+    {
+      "id": "interop.AppLauncherService",
+      "methods": [
+        {
+          "name": "Launch",
+          "request": "interop.AppLaunchRequest",
+          "response": "interop.AppLaunchResponse",
+          "type": "Unary"
+        }
+      ]
+    },
+    {
+      "id": "interop.AppLifecycleService",
+      "methods": [
+        {
+          "name": "ResolveApp",
+          "request": "interop.ResolveAppRequest",
+          "response": "interop.ResolveAppResponse",
+          "type": "Unary"
+        },
+        {
+          "name": "GetLifecycleEventStream",
+          "request": "google.protobuf.Empty",
+          "response": "interop.AppLifecycleEvent",
+          "type": "ServerStreaming"
+        }
+      ]
+    }
+  ],    
+  "applications": [
+    {
+      "id": "plexus.tests.App1",
+      "consumes": [
+        {
+          "service": "interop.AppLifecycleService",
+          "methods": [
+            {
+              "name": "GetLifecycleEventStream"
+            }
+          ],
+          "from": [
+            "interop.*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plexus.tests.Launcher1",
+      "provides": [
+        {
+          "service": "interop.AppLauncherService",
+          "methods": [
+            {
+              "name": "Launch"
+            }
+          ],
+          "to": [
+            "interop.AppLifecycleManager"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "interop.AppLifecycleManager",
+      "consumes": [
+        {
+          "service": "interop.AppLauncherService",
+          "methods": [
+            {
+              "name": "Launch"
+            }
+          ]
+        }
+      ],
+      "provides": [
+        {
+          "service": "interop.AppLifecycleService",
+          "methods": [
+            {
+              "name": "ResolveApp"
+            },
+            {
+              "name": "GetLifecycleEventStream"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

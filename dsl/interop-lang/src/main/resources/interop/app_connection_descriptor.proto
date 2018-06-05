@@ -15,14 +15,14 @@
 // limitations under the License.
 //
 
+syntax="proto3";
+
 package interop;
 
-import "interop/app_launcher_service.proto";
-import "interop/app_lifecycle_service.proto";
+import "interop/unique_id.proto";
 
-application AppLifecycleManager {
-
-	consumes AppLauncherService { Launch; }
-
-	provides AppLifecycleService { ResolveApp; GetLifecycleEventStream; }
+message AppConnectionDescriptor {
+    UniqueId connection_id = 1;
+    string app_id = 2;
+    UniqueId app_instance_id = 3;
 }

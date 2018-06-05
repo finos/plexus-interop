@@ -5,8 +5,8 @@
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.1;net45;net46</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.1</TargetFrameworks>
-    
-    <RootNamespace>Plexus.Interop.Protocol.Protobuf</RootNamespace>
+
+    <RootNamespace>Plexus.Interop.Broker.Core</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -18,16 +18,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Plexus.Interop.Protocol.Protobuf\Plexus.Interop.Protocol.Protobuf.csproj" />
-    <ProjectReference Include="..\Plexus.Interop.Protocol\Plexus.Interop.Protocol.csproj" />
-    <ProjectReference Include="..\Plexus.Utils.Testing\Plexus.Utils.Testing.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Broker.Core\Plexus.Interop.Broker.Core.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Testing\Plexus.Interop.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="xunit.runner.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Update="RegistryServiceTests.interop.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-  <Import Project="..\Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems" Label="Shared" />
 </Project>

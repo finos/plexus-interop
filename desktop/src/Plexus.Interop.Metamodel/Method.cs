@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Metamodel
+namespace Plexus.Interop.Metamodel
 {
     public sealed class Method : IMethod
     {
@@ -27,5 +27,25 @@
         public IMessage OutputMessage { get; set; }
 
         public IService Service { get; set; }
+
+        private bool Equals(Method other)
+        {
+            return string.Equals(Name, other.Name) && Equals(Service, other.Service);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is Method && Equals((Method) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ (Service != null ? Service.GetHashCode() : 0);
+            }
+        }
     }
 }
