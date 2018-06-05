@@ -29,7 +29,7 @@ export interface ServicesSnapshot {
 }
 
 export interface StudioState {
-    connectioDetails: ConnectionDetails;
+    connectionDetails: ConnectionDetails;
     loading: boolean,
     connectedApp: Application;
     consumedMethod: ConsumedMethodState,
@@ -81,7 +81,7 @@ export interface AppConnectedActionParams {
 }
 
 export interface ConnectionSetupActionParams {
-    connectioDetails: ConnectionDetails,
+    connectionDetails: ConnectionDetails,
     silentOnFailure: boolean
 }
 

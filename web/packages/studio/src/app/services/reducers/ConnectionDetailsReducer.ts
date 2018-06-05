@@ -6,7 +6,7 @@ import { getPayload } from './TypedAction';
 export function connectionDetailsReducer(state: ConnectionDetails, action: Action): ConnectionDetails {
     switch (action.type) {
         case AppActions.CONNECTION_SETUP_START:
-            const payload = getPayload<ConnectionSetupActionParams>(action).connectioDetails;
+            const payload = getPayload<ConnectionSetupActionParams>(action).connectionDetails;
             return {
                 ...payload,
                 connected: false

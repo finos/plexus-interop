@@ -81,7 +81,7 @@ export class Effects {
                 await services.interopClient.disconnect();
             }
 
-            this.log.info(`Disconnect from metadata - success!`);
+            this.log.info(`Disconnected from Plexus`);
 
             this.router.navigate(['/']);
 

@@ -36,7 +36,7 @@ import {
 
 const initialState: StudioState = {
     loading: false,
-    connectioDetails: {
+    connectionDetails: {
         generalConfig: {
             metadataUrl: null,
             transportType: TransportType.NATIVE_WS
@@ -62,14 +62,14 @@ export function reducer(
         case AppActions.CONNECTION_SETUP_START:
             return {
                 ...initialState,
-                connectioDetails: connectionDetailsReducer(state.connectioDetails, action),
+                connectionDetails: connectionDetailsReducer(state.connectionDetails, action),
                 loading: true
             };
         case AppActions.CONNECTION_SETUP_SUCCESS:
             let payload = getPayload<PlexusConnectedActionParams>(action);
             return {
                 ...state,
-                connectioDetails: connectionDetailsReducer(state.connectioDetails, action),
+                connectionDetails: connectionDetailsReducer(state.connectionDetails, action),
                 apps: payload.apps,
                 services: {
                     ...state.services,
@@ -88,7 +88,9 @@ export function reducer(
             };
         case AppActions.DISCONNECT_FROM_PLEXUS_SUCCESS:
             return {
-                ...initialState
+                ...initialState,
+                // keep entered/discovered connection details
+                connectionDetails: state.connectionDetails
             };
         case AppActions.DISCONNECT_FROM_APP:
             return {

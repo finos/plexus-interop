@@ -35,7 +35,7 @@ export async function autoConnectEffect(state: StudioState) {
         const proxyHostUrl = await lookupHostProxyUrl();
         const appsMetadataUrl = await lookupAppsUrl();
         const payload: ConnectionSetupActionParams = {
-            connectioDetails: {
+            connectionDetails: {
                 generalConfig: {
                     metadataUrl,
                     transportType: await lookupTransportType()
@@ -60,7 +60,7 @@ export async function connectionSetupEffect(
     transportConnectionFactory: TransportConnectionFactory,
     interopServiceFactory: InteropServiceFactory,
 ) {
-    const connectionDetails = params.connectioDetails;
+    const connectionDetails = params.connectionDetails;
     const metadataUrl = connectionDetails.generalConfig.metadataUrl;
     try {
         const interopRegistryService = await interopServiceFactory.getInteropRegistryService(metadataUrl);

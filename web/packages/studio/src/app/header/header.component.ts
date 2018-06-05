@@ -56,10 +56,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.metadataUrl$ = this.store.select(state => state.plexus.connectioDetails.generalConfig.metadataUrl);
+    this.metadataUrl$ = this.store.select(state => state.plexus.connectionDetails.generalConfig.metadataUrl);
     this.application$ = this.store.select(state => state.plexus.connectedApp);
-    this.connected$ = this.store.select(state => state.plexus.connectioDetails.connected);
-    this.connectionDetails$ = this.store.select(state => state.plexus.connectioDetails);
+    this.connected$ = this.store.select(state => state.plexus.connectionDetails.connected);
+    this.connectionDetails$ = this.store.select(state => state.plexus.connectionDetails);
     this.connectionId$ = this.store.select(state => state.plexus.services.interopClient).map(client => client ? client.getConnectionStrId() : 'NOT CONNECTED');
     this.subscriptions.add(this.application$.subscribe(app => this.currentApp = app));
   }
