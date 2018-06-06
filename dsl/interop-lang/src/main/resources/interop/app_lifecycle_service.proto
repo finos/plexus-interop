@@ -21,9 +21,12 @@ package interop;
 
 import "interop/unique_id.proto";
 import "interop/app_launch_mode.proto";
+import "interop/app_connection_descriptor.proto";
+import "google/protobuf/empty.proto";
 
 service AppLifecycleService {
 	rpc ResolveApp (ResolveAppRequest) returns (ResolveAppResponse);
+	rpc GetLifecycleEventStream (google.protobuf.Empty) returns (stream AppLifecycleEvent);
 }
 
 message ResolveAppRequest {
@@ -35,4 +38,19 @@ message ResolveAppResponse {
 	UniqueId app_instance_id = 1;
 	UniqueId app_connection_id = 2;
 	bool is_new_instance_launched = 3;
+}
+
+message AppLifecycleEvent {	
+	oneof event {
+		AppConnectedEvent connected = 1;
+		AppDisconnectedEvent disconnected = 2;
+	}
+}
+
+message AppConnectedEvent {
+	AppConnectionDescriptor connection_descriptor = 1;
+}
+
+message AppDisconnectedEvent {
+	AppConnectionDescriptor connection_descriptor = 1;	
 }

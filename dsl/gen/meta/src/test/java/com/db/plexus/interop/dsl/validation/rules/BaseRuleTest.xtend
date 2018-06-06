@@ -14,15 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
-{
-    using System.Net.WebSockets;
-    using System.Threading.Tasks;
+package com.db.plexus.interop.dsl.validation.rules
 
-    internal interface IWebSocketHandler
-    {
-        void OnListeningStarted();
+import org.eclipse.xtext.resource.XtextResourceSet
+import com.db.plexus.interop.dsl.gen.test.ResourceUtils
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import org.eclipse.xtext.EcoreUtil2
 
-        Task<Task> AcceptConnectionAsync(WebSocket socket);        
+class BaseRuleTest {
+
+    def testFalsePositive(UpdateRule rule) {
+        val resourceSet = new XtextResourceSet()
+        resourceSet.getResource(ResourceUtils.resolveURI("com/db/plexus/interop/dsl/gen/test/components/component_a.interop"), true)
+        EcoreUtil2.resolveAll(resourceSet)
+        val issues = rule.validate(resourceSet, resourceSet);
+        assertThat(issues, hasSize(0))
     }
 }

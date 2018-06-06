@@ -14,18 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { App as Application } from '@plexus-interop/broker';
-import { TypedAction } from '../ui/TypedAction';
+import { Application } from '@plexus-interop/broker';
+import { TypedAction } from './TypedAction';
 import { Action } from '@ngrx/store';
 
 export class Actions {
-
     public static readonly ALERT_INFO = 'ALERT_INFO';
-
     public static readonly ALERT_ERROR = 'ALERT_ERROR';
-    
     public static readonly ALERT_USER_FAIL = 'ALERT_USER_FAIL';
-
 }
 
 export enum AlertType {
@@ -51,7 +47,6 @@ export function reducer(
 ): State {
     let stringAction = <TypedAction<string>>action;
     let type: AlertType;
-
     switch (action.type) {
         case Actions.ALERT_INFO:
             type = AlertType.INFO
@@ -63,7 +58,6 @@ export function reducer(
             type = AlertType.INFO
             break;
     }
-
     return {
         alerts: [...state.alerts, { message: stringAction.payload, type: type }]
     };

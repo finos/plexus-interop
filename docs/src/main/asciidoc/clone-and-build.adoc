@@ -1,7 +1,7 @@
 [source, bash]
 ----
 # Clone the repository
-git clone https://github.com/symphonyoss/plexus-interop.git
+git clone https://github.com/finos-plexus/plexus-interop.git
 # Build
 cd plexus-interop
 gradlew build --info

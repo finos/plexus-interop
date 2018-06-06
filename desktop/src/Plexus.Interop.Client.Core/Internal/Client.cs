@@ -297,34 +297,28 @@ namespace Plexus.Interop.Internal
             return new MethodDiscoveryQuery(query.MethodReference, inputMessageId, outputMessageId);
         }
 
-        private Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverInternalAsync(
+        private async Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverInternalAsync(
             MethodDiscoveryQuery query, bool online = false)
         {
-            var task = TaskRunner.RunInBackground(async () =>
-            {
-                _log.Debug("Method discovery {0}", query);
-                var response = await _discoveryService.DiscoverAsync(query, online).ConfigureAwait(false);
-                _log.Debug("Method discovery response: {0}", response);
-                return response;
-            });
+            _log.Debug("Method discovery {0}", query);
+            var task = _discoveryService.DiscoverAsync(query, online);            
             _runningTasks[task] = Nothing.Instance;
-            ((Task)task).ContinueWithSynchronously((Action<Task>)OnTaskCompleted);
-            return task;
+            ((Task)task).ContinueWithSynchronously((Action<Task>)OnTaskCompleted).IgnoreAwait();
+            var response = await task.ConfigureAwait(false);
+            _log.Debug("Method discovery response: {0}", response);
+            return response;
         }
 
-        private Task<IReadOnlyCollection<DiscoveredService>> DiscoverInternalAsync(
+        private async Task<IReadOnlyCollection<DiscoveredService>> DiscoverInternalAsync(
             ServiceDiscoveryQuery query, bool online = false)
         {
-            var task = TaskRunner.RunInBackground(async () =>
-            {
-                _log.Debug("Service discovery {0}", query);
-                var response = await _discoveryService.DiscoverAsync(query, online).ConfigureAwait(false);
-                _log.Debug("Service discovery response: {0}", response.FormatEnumerable());
-                return response;
-            });
+            _log.Debug("Service discovery {0}", query);
+            var task = _discoveryService.DiscoverAsync(query, online);            
             _runningTasks[task] = Nothing.Instance;
-            ((Task)task).ContinueWithSynchronously((Action<Task>)OnTaskCompleted);
-            return task;
+            ((Task)task).ContinueWithSynchronously((Action<Task>)OnTaskCompleted).IgnoreAwait();
+            var response = await task.ConfigureAwait(false);
+            _log.Debug("Service discovery response: {0}", response.FormatEnumerable());
+            return response;
         }
     }
 }

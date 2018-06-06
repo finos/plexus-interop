@@ -42,7 +42,7 @@
             _log = LogManager.GetLogger<StreamTransmissionWriter>(id.ToString());
             _stream = stream;
             _cancellationToken = cancellationToken;
-            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
+            Completion = ProcessAsync().LogCompletion(_log);
         }
 
         public Task Completion { get; }

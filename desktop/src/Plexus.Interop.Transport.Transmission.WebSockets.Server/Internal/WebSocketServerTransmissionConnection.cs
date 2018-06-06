@@ -39,7 +39,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             _webSocket = webSocket;
             _writer = new WebSocketServerTransmissionWriter(_webSocket, _cancellation.Token);
             _reader = new WebSocketServerTransmissionReader(_webSocket, _cancellation.Token);
-            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
+            Completion = ProcessAsync().LogCompletion(_log);
         }
 
         public UniqueId Id { get; }

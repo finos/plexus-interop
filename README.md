@@ -1,4 +1,4 @@
-# Plexus Interop [![Symphony Software Foundation - Incubating](https://cdn.rawgit.com/symphonyoss/contrib-toolbox/master/images/ssf-badge-incubating.svg)](https://symphonyoss.atlassian.net/wiki/display/FM/Incubating) [![Plexus Interop MyGet Build Status](https://www.myget.org/BuildSource/Badge/plexus?identifier=bd2cfabe-2a11-4584-9a39-80251218fd94)](https://www.myget.org/) [![AppVeyor Plexus Interop CI status](https://ci.appveyor.com/api/projects/status/0874cjl293akb11e/branch/master?svg=true)](https://ci.appveyor.com/project/ssf-admin/plexus-interop/branch/master)
+# Plexus Interop [![FINOS - Incubating](https://cdn.rawgit.com/finos/contrib-toolbox/master/images/badge-incubating.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Incubating) [![AppVeyor Plexus Interop CI status](https://ci.appveyor.com/api/projects/status/sfjvccbssn9hwbkh/branch/master?svg=true)](https://ci.appveyor.com/project/finos-admin/plexus-interop/branch/master) [![Plexus Interop MyGet Build Status](https://www.myget.org/BuildSource/Badge/plexus?identifier=bd2cfabe-2a11-4584-9a39-80251218fd94)](https://www.myget.org/)
 
 ## Overview
 
@@ -25,7 +25,7 @@ based on the their runtime-metadata (e.g. container type, launch command, comman
 ![Key components and high level architecture](./docs/src/main/asciidoc/images/architecture.png "Key components and high level architecture")
 
 ## Raising an Issue
-* Please raise issues to the project mailing list <plexus-interop@symphony.foundation> issue tracker. Some people from project teams currently can't access build-in github issue tracker from corporate network.
+* Please raise issues to the project mailing list <plx@finos.org> ([Web Archive](https://groups.google.com/a/finos.org/forum/#!forum/plx)). Some people from project teams currently can't access build-in github issue tracker from corporate network.
 * Please also tag the new issue with either "Bug" or "Enhancement".
  
 ## Repository Overview

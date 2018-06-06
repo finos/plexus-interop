@@ -37,8 +37,8 @@ You may check other call types by choosing other options in the "Greeting Client
 
 Source code for sample flow is here:
 
-* Sample Interop Registry - https://github.com/symphonyoss/plexus-interop/tree/master/samples/greeting/registry/
-* .NET Greeting Client - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingClient/Program.cs
-* .NET Greeting Server - https://github.com/symphonyoss/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingServer/Program.cs
-* Web Greeting Server - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/web-example/src/greeting/server/Main.ts
-* Electron App Launcher - https://github.com/symphonyoss/plexus-interop/tree/master/web/packages/electron-launcher/src/launcher/
+* Sample Interop Registry - https://github.com/finos-plexus/plexus-interop/tree/master/samples/greeting/registry/
+* .NET Greeting Client - https://github.com/finos-plexus/plexus-interop/master/desktop/src/Plexus.Interop.Samples.GreetingClient/Program.cs
+* .NET Greeting Server - https://github.com/finos-plexus/plexus-interop/tree/master/desktop/src/Plexus.Interop.Samples.GreetingServer/Program.cs
+* Web Greeting Server - https://github.com/finos-plexus/plexus-interop/tree/master/web/packages/web-example/src/greeting/server/Main.ts
+* Electron App Launcher - https://github.com/finos-plexus/plexus-interop/tree/master/web/packages/electron-launcher/src/launcher/

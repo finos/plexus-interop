@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Broker.Internal
+namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Interop.Metamodel;
     using Plexus.Interop.Protocol;
@@ -168,6 +168,7 @@
         {
             IReadOnlyCollection<IProvidedMethod> GetMatchingProvidedMethodsInternal(IApplication a)
             {
+                Log.Debug("Retrieving the methods visible for {0}", application.Id);
                 var all = _registry.Applications.Values.SelectMany(x => x.ProvidedServices);
                 var matched = application.ConsumedServices
                     .Join(all, x => x.Service, y => y.Service, (consumed, provided) => (consumed, provided))
@@ -177,8 +178,10 @@
                     .SelectMany(x =>
                         x.consumed.Methods.Values
                             .Join(x.provided.Methods.Values, c => c.Method, p => p.Method, (c, p) => p))
-                    .Distinct();                
-                return matched.ToList();
+                    .Distinct()
+                    .ToList();
+                Log.Debug("Retrieved {0} methods visible for {1}", matched.Count, application.Id);
+                return matched;
             }
 
             _registryLock.EnterReadLock();

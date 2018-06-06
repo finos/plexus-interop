@@ -5,9 +5,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && npm run copy-to-bin",
     "test": "ng test",
     "lint": "echo 'Not implemented'",
+    "copy-to-bin": "copyfiles dist/* ../../../bin/win-x86/broker/studio -u 1",
     "e2e": "ng e2e",
     "republish": "echo 'Not implemented'"
   },
@@ -60,6 +61,7 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "5.8.0",
+    "copyfiles": "^1.2.0",    
     "typescript": "2.6.1"
   }
 }

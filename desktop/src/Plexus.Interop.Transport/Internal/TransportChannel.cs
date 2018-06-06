@@ -40,7 +40,7 @@
             _log = LogManager.GetLogger<TransportChannel>($"{connectionId}.{channelId}");
             _incomingMessageHandler = new TransportChannelHeaderHandler<Task, ChannelMessage>(HandleIncomingAsync, HandleIncomingAsync, HandleIncomingAsync);
             _sendProcessor = new TransportChannelSendProcessor(connectionId, channelId, output, headerFactory);
-            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
+            Completion = ProcessAsync().LogCompletion(_log);
         }
 
         public UniqueId Id { get; }

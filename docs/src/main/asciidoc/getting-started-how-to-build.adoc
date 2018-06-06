@@ -2,7 +2,7 @@ To build Plexus Interop components on your machine clone the repository and run 
 
 [source, bash]
 -----
-git clone https://github.com/symphonyoss/plexus-interop.git
+git clone https://github.com/finos-plexus/plexus-interop.git
 cd plexus-interop
 gradlew build --console plain --no-daemon
 -----

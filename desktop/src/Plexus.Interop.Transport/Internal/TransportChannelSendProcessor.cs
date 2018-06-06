@@ -42,7 +42,7 @@
             _headerFactory = headerFactory;
             _out = @out;
             _buffer.Out.PropagateTerminationFrom(_out.Completion);
-            Completion = TaskRunner.RunInBackground(ProcessAsync).LogCompletion(_log);
+            Completion = ProcessAsync().LogCompletion(_log);
             Completion.PropagateCompletionToPromise(_initialized);
         }
 

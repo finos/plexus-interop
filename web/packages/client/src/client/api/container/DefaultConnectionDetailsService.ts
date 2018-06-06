@@ -31,5 +31,10 @@ export class DefaultConnectionDetailsService implements ConnectionDetailsService
             return Promise.reject('Container is not providing \'self.plexus.getConnectionDetails(): Promise<ConnectionDetails>\' API');
         }
     }
+
+    public getMetadataUrl(): Promise<string> {
+        return this.getConnectionDetails()
+            .then(details => `http://localhost:${details.ws.port}/metadata/interop.json`);
+    }
     
 }

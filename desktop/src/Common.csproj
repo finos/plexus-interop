@@ -6,10 +6,11 @@
     <Company>Deutsche Bank AG</Company>
     <Product>Plexus Interop</Product>
     <Copyright>Copyright © Plexus Interop Deutsche Bank AG 2017-2018</Copyright>
-    <PackageLicenseUrl>https://github.com/symphonyoss/plexus-interop/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://symphonyoss.github.io/plexus-interop</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/symphonyoss/plexus-interop</RepositoryUrl>
-    <PackageTags>plexus interop symphonyoss</PackageTags>
+    <PackageLicenseUrl>https://github.com/finos-plexus/plexus-interop/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>http://finos-plexus.github.io/plexus-interop</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/finos-plexus/plexus-interop</RepositoryUrl>
+    <PackageTags>plexus interop finos</PackageTags>
     <Description>Plexus Interop is metadata-centric language-agnostic desktop app-to-app interoperability framework with extensible model for launching new instances of desktop Apps on demand.</Description>
+    <TieredCompilation>true</TieredCompilation>
   </PropertyGroup>
 </Project>

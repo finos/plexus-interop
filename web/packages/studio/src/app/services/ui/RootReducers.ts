@@ -25,7 +25,7 @@ import {
 import { environment } from '../../../environments/environment';
 
 import * as fromRouter from '@ngrx/router-store';
-import * as fromPlexus from './PlexusReducers';
+import * as fromPlexus from '../reducers/PlexusReducers';
 import { LoggerFactory } from '@plexus-interop/common';
 
 export interface State {

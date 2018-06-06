@@ -25,6 +25,8 @@ import { removeSync, mkdirsSync, listFiles } from '../common/files';
 import { GenProtoCommand } from './GenProtoCommand';
 
 export class GenTsCommand extends BaseCommand {
+
+    public readonly protoRegexp: RegExp = /.+\.proto$/;
     
     public clientGenArgs: (opts: any) => string[] = opts => {
         return ['--type=ts', ...this.optionArgs(opts)];
@@ -49,7 +51,7 @@ export class GenTsCommand extends BaseCommand {
 
         this.log('Generating proto messages JS definitions');
         const jsFilePath =  path.join(opts.out, 'plexus-messages.js');
-        const protoFiles = await listFiles(protoFilesDir, /.+\.proto/g);
+        const protoFiles = await listFiles(protoFilesDir, this.protoRegexp);
         await genJsStaticModule(jsFilePath, protoFiles, opts.namespace);
 
         this.log('Deleting proto definitions');

@@ -39,7 +39,7 @@ namespace Plexus.Interop.Transport.Internal
             _sendProcessor = new MessagingSendProcessor(connection, serializer);
             _log = LogManager.GetLogger<TransportSendProcessor>(_sendProcessor.Id.ToString());
             _transportHeaderFactory = transportHeaderFactory;            
-            _sendProcessor.Out.PropagateCompletionFrom(TaskRunner.RunInBackground(ProcessAsync));
+            _sendProcessor.Out.PropagateCompletionFrom(ProcessAsync());
             Completion = _sendProcessor.Completion.LogCompletion(_log);
         }
 

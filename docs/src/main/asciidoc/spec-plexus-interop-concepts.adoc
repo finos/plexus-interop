@@ -238,7 +238,7 @@ discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscover
 *Parameters*
 
 [horizontal]
-discoveryRequest:: discover criteria, defined in https://github.com/symphonyoss/plexus-interop/blob/master/protocol/plexus.interop.proto[client protocol]. All fields are optional, providing flexibility to search under different criteria.
+discoveryRequest:: discover criteria, defined in https://github.com/finos-plexus/plexus-interop/blob/master/protocol/plexus.interop.proto[client protocol]. All fields are optional, providing flexibility to search under different criteria.
 
 *Returns*
 
@@ -371,7 +371,7 @@ discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDisco
 *Parameters*
 
 [horizontal]
-discoveryRequest:: discover criteria, defined in https://github.com/symphonyoss/plexus-interop/blob/master/protocol/plexus.interop.proto[client protocol]. All fields are optional, providing flexibility to search under different criteria.
+discoveryRequest:: discover criteria, defined in https://github.com/finos-plexus/plexus-interop/blob/master/protocol/plexus.interop.proto[client protocol]. All fields are optional, providing flexibility to search under different criteria.
 
 *Returns*
 

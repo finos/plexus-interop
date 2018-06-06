@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,12 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export enum TransportType {
+import { getTestBaseDir } from './setup';
+import { ValidateMetadataPatchCommand } from '../../src/commands/ValidateMetadataPatchCommand';
 
-    WEB_SAME_BROADCAST = 'web-same-broadcast',
+describe('Metadata Patch Validation', () => {
 
-    WEB_CROSS = 'web-cross',
-    
-    NATIVE_WS = 'native-ws'
+    it('Doesn\'t fail on valid update', async () => {
 
-};
+        const genCommand = new ValidateMetadataPatchCommand();
+        
+        await genCommand.action({
+            baseDir: getTestBaseDir(),
+            targetBaseDir: getTestBaseDir()
+        });   
+
+    }, 15000);
+
+});

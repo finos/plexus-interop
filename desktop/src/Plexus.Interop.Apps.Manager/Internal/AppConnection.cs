@@ -16,12 +16,12 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Plexus.Channels;
     using Plexus.Interop.Apps;
     using Plexus.Interop.Transport;
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     internal sealed class AppConnection : IAppConnection
     {
@@ -34,7 +34,7 @@ namespace Plexus.Interop.Apps.Internal
             _log = LogManager.GetLogger<AppConnection>(Id.ToString());
             Info = appInfo;
             _connection = connection;
-            Completion = TaskRunner.RunInBackground(ProcessAsync);
+            Completion = ProcessAsync();
         }
 
         private async Task ProcessAsync()

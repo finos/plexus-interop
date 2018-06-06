@@ -21,6 +21,7 @@ export class StudioExtensions {
     private static connectionProvider?: TransportConnectionProvider;
     private static proxyHostUrlProvider?: () => Promise<string>;
     private static metadataUrlProvider?: () => Promise<string>;
+    private static appsUrlProvider?: () => Promise<string>;
 
     public static setMetadataUrlProvider(provider: () => Promise<string>): void {
         StudioExtensions.metadataUrlProvider = provider;
@@ -44,6 +45,10 @@ export class StudioExtensions {
 
     public static async getMetadataUrl(): Promise<string> {
         return StudioExtensions.metadataUrlProvider ? StudioExtensions.metadataUrlProvider() : Promise.reject('Not provided');
+    }
+
+    public static async getAppsUrl(): Promise<string> {
+        return StudioExtensions.appsUrlProvider ? StudioExtensions.appsUrlProvider() : Promise.reject('Not provided');
     }
 
 }
