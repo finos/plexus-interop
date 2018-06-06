@@ -25,7 +25,7 @@ based on the their runtime-metadata (e.g. container type, launch command, comman
 ![Key components and high level architecture](./docs/src/main/asciidoc/images/architecture.png "Key components and high level architecture")
 
 ## Raising an Issue
-* Please raise issues to the project mailing list <plexus-interop@symphony.foundation> issue tracker. Some people from project teams currently can't access build-in github issue tracker from corporate network.
+* Please raise issues to the project mailing list <plx@finos.org> ([Web Archive](https://groups.google.com/a/finos.org/forum/#!forum/plx)). Some people from project teams currently can't access build-in github issue tracker from corporate network.
 * Please also tag the new issue with either "Bug" or "Enhancement".
  
 ## Repository Overview

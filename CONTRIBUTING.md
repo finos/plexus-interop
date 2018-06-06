@@ -2,20 +2,20 @@
 Thanks for your interest in the project! Here is some basic information about how to contribute.
  
 # Contributor License Agreement (CLA)
-All contributions to [Symphony Software Foundation](https://symphony.foundation/) projects must be made under a [Contributor License Agreement](https://symphonyoss.atlassian.net/wiki/display/FM/Legal+Requirements#LegalRequirements-ContributorLicenseAgreement) that authorizes the Foundation to distribute your code under the Apache License. Contributions must also meet the Foundation's [license and notice requirements](https://symphonyoss.atlassian.net/wiki/display/FM/Legal+Requirements) that must also be met.
+All contributions to [Fintech Open Source Foundation](https://www.finos.org/) projects must be made under a [Contributor License Agreement](https://finosfoundation.atlassian.net/wiki/spaces/FINOS/pages/75530375/Legal+Requirements) that must also be met.
  
 Pull requests (PRs) submitted to the project cannot be accepted until you have a CLA in place with the Foundation.
  
 # Contributing Issues
  
 ## Raising an Issue
-* Please raise issues to the project mailing list <plexus-interop@symphony.foundation> issue tracker. Some people from project teams currently can't access build-in github issue tracker from corporate network.
+* Please raise issues to the project mailing list <plx@finos.org> ([Web Archive](https://groups.google.com/a/finos.org/forum/#!forum/plx)). Some people from project teams currently can't access build-in github issue tracker from corporate network.
 * Please also tag the new issue with either "Bug" or "Enhancement".
  
 # Contributing Pull Requests (Code & Docs)
 To make review of PRs easier, please:
  
- * For major enhancements before working on any PR, please review the proposal with the project group via mailing list <plexus-interop@symphony.foundation> to align it with roadmap.
+ * For major enhancements before working on any PR, please review the proposal with the project group via mailing list <plx@finos.org> to align it with roadmap.
  * Please make sure your PRs will merge cleanly - PRs that don't are unlikely to be accepted.
  * For code contributions, follow the general structure of the existing code.
  * For documentation contributions, follow the general structure, language, and tone of the existing docs.

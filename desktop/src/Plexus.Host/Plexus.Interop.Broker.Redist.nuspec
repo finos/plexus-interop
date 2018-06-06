@@ -5,9 +5,8 @@
     <version>$version$</version>
     <title>$id$</title>
     <authors>Plexus Interop Deutsche Bank AG</authors>
-    <owners>symphonyoss</owners>
-    <licenseUrl>https://github.com/symphonyoss/plexus-interop/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/symphonyoss/plexus-interop</projectUrl>
+    <licenseUrl>https://github.com/finos-plexus/plexus-interop/blob/master/LICENSE</licenseUrl>
+    <projectUrl>http://finos-plexus.github.io/plexus-interop</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Plexus Interop Broker Binaries</description>
     <copyright>Copyright 2017</copyright>
