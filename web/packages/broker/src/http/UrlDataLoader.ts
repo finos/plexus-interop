@@ -26,7 +26,7 @@ export class UrlDataLoader {
 
     public async fetchData(url: string): Promise<string> {
         this.log.trace(`Fetching data from [${url}]`);
-        const response = await request.get(url);
+        const response = await request.get(url).withCredentials();
         this.log.trace(`Received response with ${response.status} status`);
         return response.text;
     }
