@@ -1,7 +1,39 @@
-<div class="input-group">
-  <span class="input-group-addon" id="basic-addon1">Enter metadata host</span>
-  <input id="metadata-url-input" type="text" class="form-control" (keyup.enter)="connect(metadataUrl)" placeholder="Enter metadata URL" aria-label="Enter metadata URL" [(ngModel)]="metadataUrl">
-  <span class="input-group-btn">
-    <button id="connect-metadata-btn" class="btn btn-primary" type="button" (click)="connect(metadataUrl)">Connect</button>
-  </span>
-</div>
+<form [formGroup]="connectionFormGroup">
+
+  <div class="form-group">
+    <label for="transportType">Transport Type</label>
+    <select id="transport-type-dropdown" class="form-control" formControlName="transportType" (change)="triggerValidation()">
+      <option id="transport-type-{{typeEntry.key}}" *ngFor="let typeEntry of transportTypes"
+        [ngValue]="typeEntry.key">
+        {{typeEntry.label}}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-group" [hidden]="transportType.value != 'native-ws'">
+      <label for="wsUrl">Web Socket URL</label>    
+      <input type="text" name="wsUrl" id="metadataUrl" class="form-control" [formControl]="wsUrl">
+  </div>
+
+  <div class="form-group" [hidden]="transportType.value == 'native-ws'">
+      <label for="appsUrl">Apps Metadata URL</label>    
+      <input type="text" name="appsUrl" id="metadataUrl" class="form-control" [formControl]="appsUrl">
+  </div>
+
+  <div class="form-group" [hidden]="transportType.value != 'web-cross'">
+      <label for="proxyHostUrl">Proxy Host URL</label>    
+      <input type="text" name="proxyHostUrl" id="proxyHostUrl" class="form-control" [formControl]="proxyHostUrl">
+  </div>
+
+  <div class="form-group">
+    <label for="metadataUrl">Metadata URL</label>    
+    <input type="text" name="metadataUrl" id="metadataUrl" class="form-control" [formControl]="metadataUrl">
+  </div>
+
+  <button id="connect-btn" class="btn-primary" type="button" [disabled]="!connectionFormGroup.valid" (click)="connect()">Connect</button>
+  
+  <div [hidden]="connectionFormGroup.valid">
+    <small class="text-danger">Please fill all required fields</small>
+  </div>
+
+</form>

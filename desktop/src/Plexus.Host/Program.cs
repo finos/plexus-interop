@@ -136,17 +136,11 @@ namespace Plexus.Host
                 throw new InvalidOperationException($"Broker is not running in the current folder {dir}");
             }
             var wsUri = new Uri(File.ReadAllText(addressFile));
-            var baseUriBuilder = new UriBuilder(wsUri)
-            {
-                Scheme = "http",
-                Path = "metadata"
-            };
-            var baseUri = baseUriBuilder.Uri;
             var uriBuilder = new UriBuilder(wsUri)
             {
                 Scheme = "http",
                 Path = "studio/index.html",               
-                Query = $"transport=native-ws&wsUrl={wsUri}&baseUrl={baseUri}"
+                Query = $"transport=native-ws&wsUrl={wsUri}"
             };
             var uri = uriBuilder.Uri;
             Console.WriteLine("Starting " + uri);

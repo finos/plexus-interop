@@ -14,18 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export class UrlResolver {
+import { UrlParamsProvider } from "@plexus-interop/common";
 
-    public getProxyHostUrl(baseUrl: string): string {
-        return `${baseUrl}/host/proxyHost.html`;
-    }    
+export class ConnectionRequestParams {
 
-    public getInteropMetadataUrl(baseUrl: string): string {
-        return `${baseUrl}/interop.json`;
-    } 
+    public getWsUrl(): string {
+        return UrlParamsProvider.getParam('wsUrl');
+    }
 
-    public getAppMetadataUrl(baseUrl: string): string {
-        return `${baseUrl}/apps.json`;
+    public getHostProxyUrl(): string {
+        return UrlParamsProvider.getParam('hostProxyUrl');
+    }
+
+    public getMetadataUrl(): string {
+        return UrlParamsProvider.getParam('metadataUrl');
+    }
+
+    public getAppsUrl(): string {
+        return UrlParamsProvider.getParam('appsUrl');
     }
 
 }

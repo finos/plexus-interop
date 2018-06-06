@@ -21,12 +21,12 @@ import { Application, ConsumedMethod } from '@plexus-interop/broker';
 import {
     Alert,
     AppConnectedActionParams,
-    MetadataLoadActionParams,
+    ConnectionSetupActionParams,
     PlexusConnectedActionParams,
     ServicesSnapshot,
     StudioState,
 } from './AppModel';
-import { TypedAction } from './TypedAction';
+import { TypedAction } from '../reducers/TypedAction';
 import { InteropClientFactory } from '../core/InteropClientFactory';
 import { AppRegistryService } from '@plexus-interop/broker';
 import { InteropServiceFactory } from '../core/InteropServiceFactory';
@@ -44,8 +44,9 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Router } from '@angular/router';
 import { DiscoveryMode } from '@plexus-interop/client-api';
 import { UrlParamsProvider } from '@plexus-interop/common';
-import { TransportType } from '../core/TransportType';
+import { TransportType } from '../ui/AppModel';
 import { StudioExtensions } from '../extensions/StudioExtensions';
+import { autoConnectEffect, connectionSetupEffect } from '../effects/ConnectionEffects';
 
 @Injectable()
 export class Effects {
@@ -56,64 +57,19 @@ export class Effects {
         .actions$
         .ofType(AppActions.AUTO_CONNECT)
         .withLatestFrom(this.store.select(state => state.plexus))
-        .mergeMap(async ([action, state]) => {
-            let metadataUrl;
-            try {
-                metadataUrl = await StudioExtensions.getMetadataUrl();
-            } catch (error) {
-                this.log.debug('Metadata URL extension not provided');
-                metadataUrl = state.metadataUrl;
-            }
-            if (metadataUrl) {
-                const payload: MetadataLoadActionParams = {
-                    baseUrl: metadataUrl,
-                    silentOnFailure: true
-                };
-                return {
-                    type: AppActions.METADATA_LOAD_START,
-                    payload: payload
-                };
-            } else {
-                return { type: AppActions.DO_NOTHING };
-            }
-        });
+        .mergeMap(async ([action, state]) => autoConnectEffect(state));
 
     @Effect() connectToPlexus$: Observable<Action> = this
         .actions$
-        .ofType<TypedAction<MetadataLoadActionParams>>(AppActions.METADATA_LOAD_START)
-        .mergeMap(async action => {
+        .ofType<TypedAction<ConnectionSetupActionParams>>(AppActions.CONNECTION_SETUP_START)
+        .mergeMap(async action => connectionSetupEffect(action.payload, this.transportConnectionFactory, this.interopServiceFactory));
 
-            const params = action.payload;
-            const baseUrl = params.baseUrl;
-
-            try {
-
-                const interopRegistryService = await this.interopServiceFactory.getInteropRegistryService(baseUrl);
-                const apps = interopRegistryService.getRegistry().applications.valuesArray();
-                this.log.info(`Successfully loaded metadata from ${baseUrl}`);
-
-                const сonnectionProvider = await this.transportConnectionFactory.getConnectionProvider(baseUrl);
-                this.log.info(`Connection provider created`);
-
-                return {
-                    type: AppActions.METADATA_LOAD_SUCCESS,
-                    payload: {
-                        apps,
-                        interopRegistryService,
-                        сonnectionProvider
-                    }
-                };
-            } catch (error) {
-                const msg = `Connection not successful. Please enter correct metadata base url.`;
-                if (params.silentOnFailure) {
-                    this.log.info(msg);
-                } else {
-                    this.log.error(msg);
-                    return {
-                        type: AppActions.DISCONNECT_FROM_PLEXUS
-                    };
-                };
-            }
+    @Effect() plexusConnected$: Observable<Action> = this
+        .actions$
+        .ofType(AppActions.CONNECTION_SETUP_SUCCESS)
+        .map(_ => {
+            this.router.navigate(['/apps'], { queryParamsHandling: 'merge' });
+            return { type: AppActions.DO_NOTHING };
         });
 
     @Effect() disconnectMetadata = this.actions$
@@ -125,20 +81,11 @@ export class Effects {
                 await services.interopClient.disconnect();
             }
 
-            this.log.info(`Disconnect from metadata - success!`);
+            this.log.info(`Disconnected from Plexus`);
 
             this.router.navigate(['/']);
 
             return { type: AppActions.DISCONNECT_FROM_PLEXUS_SUCCESS };
-        });
-
-    @Effect() plexusConnected$: Observable<Action> = this
-        .actions$
-        .ofType(AppActions.METADATA_LOAD_SUCCESS)
-        .map(_ => {
-            this.router.navigate(['/apps'], { queryParamsHandling: 'merge' });
-
-            return { type: AppActions.DO_NOTHING };
         });
 
     @Effect() connectToApp$: Observable<TypedAction<AppConnectedActionParams>> = this
@@ -155,7 +102,6 @@ export class Effects {
             return {
                 type: AppActions.CONNECT_TO_APP_SUCCESS,
                 payload: { interopClient, application }
-
             };
         });
 
@@ -232,10 +178,10 @@ export class Effects {
     constructor(
         private http: Http,
         private actions$: Actions,
+        private transportConnectionFactory: TransportConnectionFactory,
         private interopServiceFactory: InteropServiceFactory,
         private interopClientFactory: InteropClientFactory,
         private store: Store<State>,
-        private transportConnectionFactory: TransportConnectionFactory,
         private router: Router
     ) { }
 }

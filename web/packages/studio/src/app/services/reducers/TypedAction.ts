@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export enum TransportType {
+import { Action } from '@ngrx/store';
 
-    WEB_SAME_BROADCAST = 'web-same-broadcast',
+export interface TypedAction<P> extends Action {
+    payload: P;
+};
 
-    WEB_CROSS = 'web-cross',
-    
-    NATIVE_WS = 'native-ws'
-
+export function getPayload<T>(action: Action): T {
+    return (<TypedAction<T>>action).payload;
 };

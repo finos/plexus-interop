@@ -20,7 +20,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
+import { FormGroup, FormControl, FormBuilder, Validators, ValidationErrors } from '@angular/forms';
 import 'rxjs/add/operator/first';
+import { TransportType, ConnectionDetails, transportTypes as types } from '../services/ui/AppModel';
 
 @Component({
   selector: 'app-metadata-loader',
@@ -29,32 +31,90 @@ import 'rxjs/add/operator/first';
   providers: [SubscriptionsRegistry]
 })
 export class MetadataLoaderComponent implements OnInit, OnDestroy {
-  public metadataUrl: string;
+
+  transportType: FormControl = new FormControl(TransportType.NATIVE_WS, [Validators.required]);
+  metadataUrl: FormControl = new FormControl('', [Validators.required, Validators.minLength(1)]);
+  appsUrl: FormControl = new FormControl('', [this.requiredWebConfig.bind(this)]);
+  proxyHostUrl: FormControl = new FormControl('', [this.requiredCrossWebConfig.bind(this)]);
+  wsUrl: FormControl = new FormControl('', [this.requiredWsConfig.bind(this)]);
+
+  transportTypes = types;
+
+  connectionFormGroup: FormGroup = this.builder.group({
+    metadataUrl: this.metadataUrl,
+    appsUrl: this.appsUrl,
+    proxyHostUrl: this.proxyHostUrl,
+    transportType: this.transportType,
+    wsUrl: this.wsUrl
+  });
 
   constructor(
     private actions: AppActions,
     private store: Store<fromRoot.State>,
     private router: Router,
-    private subscriptions: SubscriptionsRegistry) {
+    private subscriptions: SubscriptionsRegistry,
+    private builder: FormBuilder) {
   }
 
   ngOnInit() {
-    let metadataUrlObs = this.store.select(state => state.plexus.metadataUrl);
-    this.subscriptions.add(metadataUrlObs.first().subscribe(metadataUrl => {
-      this.metadataUrl = metadataUrl;
+    const connectionDetailsObs = this.store.select(state => state.plexus.connectionDetails);
+    this.subscriptions.add(connectionDetailsObs.subscribe(details => {
+      this.metadataUrl.setValue(details.generalConfig ? details.generalConfig.metadataUrl : '');
+      this.appsUrl.setValue(details.webConfig ? details.webConfig.appsMetadataUrl : '');
+      this.proxyHostUrl.setValue(details.webConfig ? details.webConfig.proxyHostUrl : '');
+      this.transportType.setValue(details.generalConfig ? details.generalConfig.transportType : '');
+      this.wsUrl.setValue(details.wsConfig ? details.wsConfig.wsUrl : '');
     }));
+  }
+
+  triggerValidation(): void {
+    for (var i in this.connectionFormGroup.controls) {
+      this.connectionFormGroup.controls[i].updateValueAndValidity();
+    }
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribeAll();
   }
 
+  requiredCrossWebConfig(formControl: FormControl) {
+    const value = formControl.value as string;
+    const valid = this.transportType.value !== TransportType.WEB_CROSS || (!!value && value.length > 0);
+    return valid ? null : { required: true };
+  }
+
+  requiredWsConfig(formControl: FormControl) {
+    const value = formControl.value as string;
+    const valid = this.transportType.value !== TransportType.NATIVE_WS || (!!value && value.length > 0);
+    return valid ? null : { required: true };
+  }
+
+  requiredWebConfig(formControl: FormControl) {
+    const value = formControl.value as string;
+    const valid = this.transportType.value === TransportType.NATIVE_WS || (!!value && value.length > 0);
+    return valid ? null : { required: true };
+  }
+
   connect(metadataUrl: string) {
-    const checkAbsPath = /^https?:\/\//i
+    const wsConfig = !!this.wsUrl.value ? { wsUrl: this.wsUrl.value } : null;
+    const webConfig = (this.appsUrl.value || this.proxyHostUrl.value)
+      ? {
+        proxyHostUrl: this.proxyHostUrl.value,
+        appsMetadataUrl: this.appsUrl.value
+      } : null;
+    const connectionDetails: ConnectionDetails = {
+      generalConfig: {
+        metadataUrl: this.metadataUrl.value,
+        transportType: this.transportType.value,
+      },
+      wsConfig,
+      webConfig,
+      connected: false
+    };
     this.store.dispatch({
-      type: AppActions.METADATA_LOAD_START,
+      type: AppActions.CONNECTION_SETUP_START,
       payload: {
-        baseUrl: checkAbsPath.test(metadataUrl) ? metadataUrl : window.location.origin + metadataUrl,
+        connectionDetails,
         silentOnFailure: false
       }
     });

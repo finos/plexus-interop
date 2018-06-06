@@ -15,3 +15,4 @@
  * limitations under the License.
  */
 export * from './ContainerAwareClientAPIBuilder';
+export * from './DefaultConnectionDetailsService';
