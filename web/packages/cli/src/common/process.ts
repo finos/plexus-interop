@@ -33,12 +33,13 @@ export function simpleSpawn(execPath: string, args: string[] = [], printOutput: 
         });
         child.on('exit', (code, signal) => {
             if (code !== 0) {
-                reject(new Error(`Child process completed with error code: ${code}`));
+                reject(new Error(`Child process completed with error code: ${code}, please use --verbose flag to see whole output`));
             } else {
                 resolve();
             }
         });
         child.on('error', error => {
+            console.error('Process finished with error', error);
             reject(error);
         });
     });

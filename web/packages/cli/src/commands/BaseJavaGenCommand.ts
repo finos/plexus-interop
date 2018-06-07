@@ -25,7 +25,7 @@ export abstract class BaseJavaGenCommand extends BaseCommand {
     public async action(opts: any): Promise<void> {
         const javaExecPath = await getJavaExecPath();
         const javaLibPath = getJavaGenLibPath();
-        return simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.plexusGenArgs(opts)], opts.verbose === 'true');
+        return simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.plexusGenArgs(opts)], !!opts.verbose);
     }
 
 }
