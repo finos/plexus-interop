@@ -98,6 +98,15 @@ interface InvokationObserver {
 }
 
 /**
+ * Allows to subscribe to streaming invokation.
+ */
+interface StreamObserver {
+  onNext(result: Result): void;
+  onError(error: InvokationError): void;
+  onCompleted(): void;
+}
+
+/**
  * A Desktop Agent is a desktop component (or aggregate of components) that serves as a
  * launcher and message router (broker) for applications in its domain.
  * 
@@ -114,6 +123,11 @@ interface DesktopAgent {
    * For fire-and-forget cases observer can be omited.
    */
   invoke(target: Target, context: Context, observer?: InvokationObserver): Cancellable;
+
+  /**
+   * Sends the given context to the given target and listens for stream of responses.
+   */
+  invokeStream(target: Target, context: Context, observer: StreamObserver): Cancellable;  
 
   /**
    * Listens to incoming Intents from the Agent.
