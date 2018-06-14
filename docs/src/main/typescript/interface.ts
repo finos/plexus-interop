@@ -17,10 +17,14 @@ interface InvokationError extends Error {
   type: InvokationErrorType;
 }
 
-enum ResolveError {
-  NoAppsFound = "NoAppsFound",
+enum ResolveErrorType {
   ResolverUnavailable = "ResolverUnavailable",
-  ResolverTimeout = "ResolverTimeout"
+  ResolverTimeout = "ResolverTimeout",
+  ResolverInternalError = "ResolverInternalError"
+}
+
+interface ResolveError extends Error {
+  type: ResolveErrorType;
 }
 
 /**
@@ -29,6 +33,35 @@ enum ResolveError {
 enum AppState {
   Launchable = 0,
   Running = 1
+}
+
+/**
+ * Resolve parameters allows resolving intents either by intent name or by context or both.
+ */
+interface ResolveParameters {
+  context?: Context,                // Optional. Can be specified for resolving intents by context.
+  intentName?: IntentName,          // Optional. Can be specified for resolving intents by name.
+  state?: AppState                  // Optional. Can be specified for resolving either already running app instances or launchable or both. 
+}
+
+/**
+ * Specifies intent resolved by Agent. 
+ * Can be casted to Target and invoked.
+ */
+interface Intent {
+  intentName: IntentName,
+  applicationName: AppIdentifier,   // Resolved application name.  
+  state: AppState,                  // Resolved application state.
+  instance?: AppInstanceIdentifier, // Optional. Undefined if application is not running (i.e. its state = Launchable).
+  properties: Property[]            // Custom properties of the resolved intent, e.g. user-friendly title and icon to show on UI.
+}
+
+/**
+ * Custom property.
+ */
+interface Property {
+  name: string,
+  value: object                    
 }
 
 /**
@@ -42,6 +75,11 @@ interface Target {
   instance?: AppInstanceIdentifier, // Optional. Can be undefined when constructed directly if target app instance is unknown and caller let Agent decide which instance should handle the invokation. If specified then Agent will route the context to this exact app instance.
   state?: AppState                  // Optional. Can be undefined when constructed directly if target app state doesn't matter for caller. If state=Launchable then Agent will launch new instance of target app. If state=Running then Agent will route context to the already running instance.
 }
+
+// Intent can be casted to Target.
+var intent: Intent;
+var target: Target;
+target = intent;
 
 /**
  * Allows cancelling asynchronous operation.
@@ -84,13 +122,14 @@ interface DesktopAgent {
   listen(intent: IntentName, handler: (context: Context) => Promise<Result>): Cancellable;  
 
   /**
-   * Resolves a intent & context pair to a list of App names/metadata.
+   * Resolves a list of potential invokation targets by the given parameters.
    *
-   * Resolve is effectively granting programmatic access to the Desktop Agent's resolver. 
+   * Resolve is effectively granting programmatic access to the Desktop Agent's resolver.
    * Returns a promise that resolves to an Array. The resolved dataset & metadata is Desktop Agent-specific.
-   * If the resolution errors, it returns an `Error` with a string from the `ResolveError` enumeration.
+   * If the resolution errors, it returns error of type `ResolveError`.
    */
-  resolve(intent: IntentName, context: Context): Promise<Array<Target>>;
+  resolve(resolveParameters: ResolveParameters): Promise<Intent[]>;
+
 
   /**
    * Publishes context to other apps on the desktop.
