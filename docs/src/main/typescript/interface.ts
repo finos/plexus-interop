@@ -1,6 +1,7 @@
 type Context = Object;
 type Result = Object;
 type IntentName = String;
+type TopicName = String;
 type AppIdentifier = String;
 type AppInstanceIdentifier = String;
 
@@ -130,14 +131,13 @@ interface DesktopAgent {
    */
   resolve(resolveParameters: ResolveParameters): Promise<Intent[]>;
 
+  /**
+   * Broadcasts context to all the listeners of the specified topic.
+   */
+  broadcast(topic: TopicName, context: Context): void;
 
   /**
-   * Publishes context to other apps on the desktop.
+   * Subscribes for incoming context broadcast on the specified topic.
    */
-  broadcast(context: Context): void;
-
-  /**
-   * Listens to incoming context broadcast from the Desktop Agent.
-   */
-  contextListener(handler: (context: Context) => void): Cancellable;
+  subscribe(topic: TopicName, handler: (context: Context) => void): Cancellable;
 }
