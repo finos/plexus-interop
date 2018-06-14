@@ -1,12 +1,20 @@
 type Context = Object;
+type Result = Object;
 type IntentName = String;
 type AppIdentifier = String;
+type AppInstanceIdentifier = String;
 
-enum OpenError {
+enum InvokationErrorType {
   AppNotFound = "AppNotFound",
   ErrorOnLaunch = "ErrorOnLaunch",
-  AppTimeout = "AppTimeout",
-  ResolverUnavailable = "ResolverUnavailable"
+  AppTimeout = "AppTimeout",  
+  HandlerInternalError = "HandlerInternalError",
+  ResolverUnavailable = "ResolverUnavailable",
+  ResolverInternalError = "ResolverInternalError"
+}
+
+interface InvokationError extends Error {
+  type: InvokationErrorType;
 }
 
 enum ResolveError {
@@ -15,37 +23,39 @@ enum ResolveError {
   ResolverTimeout = "ResolverTimeout"
 }
 
-interface Intent {
-  intent: IntentName;
-  context: Context;
-  /**
-   * Name of app to target for the Intent. Use if creating an explicit intent
-   * that bypasses resolver and goes directly to an app.
-   */
-  target?: AppIdentifier;
-  
-  /**
-   * Dispatches the intent with the Desktop Agent.
-   * 
-   * Accepts context data and target (if an explicit Intent) as optional args.
-   * Returns a Promise - resolving if the intent successfully results in launching an App.
-   * If the resolution errors, it returns an `Error` with a string from the `ResolveError` enumeration.
-   */
-  send(context: Context, target?: AppIdentifier): Promise<void>
+/**
+ * Specified whether the target app is already running or it can be launched by invokation.
+ */
+enum AppState {
+  Launchable = 0,
+  Running = 1
 }
 
 /**
- * App metadata is Desktop Agent specific - but should support a name property.
+ * Specifies invokation target. Can be resolved from Agent or constructed directly.
+ * Caller can specify the concrete instance of app which should handle the invokation.
+ * Caller can specify if he want to route the invokation to already running or launchable instance.
  */
-interface AppMetadata {
-  name: AppIdentifier;
+interface Target {
+  intentName: IntentName,           
+  applicationName?: AppIdentifier,  // Optional. Can be undefined when constructed directly if target app is unknown and caller let Agent decide which app should handle the invokation.
+  instance?: AppInstanceIdentifier, // Optional. Can be undefined when constructed directly if target app instance is unknown and caller let Agent decide which instance should handle the invokation. If specified then Agent will route the context to this exact app instance.
+  state?: AppState                  // Optional. Can be undefined when constructed directly if target app state doesn't matter for caller. If state=Launchable then Agent will launch new instance of target app. If state=Running then Agent will route context to the already running instance.
 }
 
-interface Listener {
-  /**
-   * Unsubscribe the listener object.
-   */
-  unsubscribe();
+/**
+ * Allows cancelling asynchronous operation.
+ */
+interface Cancellable {
+  cancel(): void;
+}
+
+/**
+ * Allows to subscribe to invokation result (successful or not).
+ */
+interface InvokationObserver {
+  onError(error: InvokationError): void;
+  onCompleted(result: Result): void;
 }
 
 /**
@@ -59,11 +69,19 @@ interface Listener {
  */
 interface DesktopAgent {
   /**
-   * Launches/links to an app by name.
+   * Sends the given context to the given target. 
    * 
-   * If opening errors, it returns an `Error` with a string from the `OpenError` enumeration.
+   * Specified observer receives either result object or error object after invokation completed.
+   * For fire-and-forget cases observer can be omited.
    */
-  open(name: String, context: Context): Promise<void>;
+  invoke(target: Target, context: Context, observer?: InvokationObserver): Cancellable;
+
+  /**
+   * Listens to incoming Intents from the Agent.
+   * 
+   * Handler function returns promise to allow asynchornous execution.
+   */
+  listen(intent: IntentName, handler: (context: Context) => Promise<Result>): Cancellable;  
 
   /**
    * Resolves a intent & context pair to a list of App names/metadata.
@@ -72,7 +90,7 @@ interface DesktopAgent {
    * Returns a promise that resolves to an Array. The resolved dataset & metadata is Desktop Agent-specific.
    * If the resolution errors, it returns an `Error` with a string from the `ResolveError` enumeration.
    */
-  resolve(intent: IntentName, context: Context): Promise<Array<AppMetadata>>;
+  resolve(intent: IntentName, context: Context): Promise<Array<Target>>;
 
   /**
    * Publishes context to other apps on the desktop.
@@ -80,17 +98,7 @@ interface DesktopAgent {
   broadcast(context: Context): void;
 
   /**
-   * Constructs a new intent
-   */
-  intent(intent: IntentName, context: Context, target: String): Intent;
-
-  /**
-   * Listens to incoming Intents from the Agent.
-   */
-  intentListener(intent: IntentName, handler: (context: Context) => void): Listener;
-
-  /**
    * Listens to incoming context broadcast from the Desktop Agent.
    */
-  contextListener(handler: (context: Context) => void): Listener;
+  contextListener(handler: (context: Context) => void): Cancellable;
 }
