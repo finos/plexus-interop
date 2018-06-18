@@ -23,7 +23,7 @@
     {
         public static WebSocketTransmissionServerFactory Instance = new WebSocketTransmissionServerFactory();
 
-        public ITransmissionServer Create(string workingDir, IReadOnlyCollection<(string UrlPath, string PhysicalPath)> staticFileMappings = null)
+        public ITransmissionServer Create(string workingDir, IReadOnlyDictionary<string, string> staticFileMappings = null)
         {
             return new WebSocketTransmissionServer(workingDir, staticFileMappings);
         }
