@@ -7,7 +7,7 @@
 
     <div class="form-inline connection-status" *ngIf="connected$ | async">
       <a id="open-metadata-details-btn" target="_blank" href="javascript:" (click)="openModal(metadataModal)">
-          Connected with: {{transportLabel$ | async}}
+          Metadata Loaded
       </a>
       <a id="disconnect-from-metdata-btn" title="Reset connection configuration" class="nav-link" href="javascript:" (click)="disconnectFromPlexus()">
         <i class="fa fa-times" aria-hidden="true"></i>
