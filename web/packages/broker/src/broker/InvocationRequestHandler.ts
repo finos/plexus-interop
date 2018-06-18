@@ -187,8 +187,9 @@ export class InvocationRequestHandler {
             return appConnection;
         } else {
             const targetMethods = this.registryService.getMatchingProvidedMethods(sourceConnection.applicationId, methodReference);
-            const targetAppIds = targetMethods.map(method => method.providedService.application.id);
-            const appConnection = await this.appLifeCycleManager.getOrSpawnConnectionForOneOf(targetAppIds);
+            const targetAppIds = targetMethods
+                .map(method => method.providedService.application.id);
+            const appConnection = await this.appLifeCycleManager.getOrSpawnConnectionForOneOf(targetAppIds, sourceConnection.instanceId);
             return appConnection;
         }
     }

@@ -26,7 +26,7 @@ export interface AppLifeCycleManager {
 
     getOrSpawnConnection(applicationId: string): Promise<ApplicationConnection>;
 
-    getOrSpawnConnectionForOneOf(applicationIds: string[]): Promise<ApplicationConnection>;
+    getOrSpawnConnectionForOneOf(applicationIds: string[], excludedInstance?: string): Promise<ApplicationConnection>;
 
     acceptConnection(connection: TransportConnection, appDescriptor: ApplicationDescriptor, connectionDropped: (connection: ApplicationConnection) => void): Promise<ApplicationConnection>;
 
