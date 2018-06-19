@@ -14,9 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './api';
-export * from './bus';
-export * from './metadata';
-export * from './launcher';
-export * from './io';
-export * from './ws/WebSocketDataProvider';
+
+import { DefaultConnectionDetailsService } from '@plexus-interop/client';
+import { readWsUrl } from '../common/utils';
+import { WebSocketDataProvider } from '@plexus-interop/broker';
+import { expect } from 'chai';
+
+describe('WebSocket metadata loader', () => {
+
+    it('Loads metadata from default url', async () => {
+        debugger;
+        const wsUrl = readWsUrl();
+        const metadataUrl = new DefaultConnectionDetailsService().getDefaultUrl(wsUrl);
+        const loader = new WebSocketDataProvider();
+        const metadata = await loader.getSingleMessage(metadataUrl);
+        expect(metadata).contains('applications');
+    });
+
+});
