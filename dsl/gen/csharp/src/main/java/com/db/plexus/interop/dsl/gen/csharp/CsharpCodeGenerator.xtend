@@ -425,9 +425,6 @@ class CsharpCodeGenerator  {
 		if (option !== null) {
 			ns = (option.value as StringConstant).value 						
 		}
-		if (config.namespace !== null) {
-			ns = config.namespace;
-		}
 		return ns
 	}
 

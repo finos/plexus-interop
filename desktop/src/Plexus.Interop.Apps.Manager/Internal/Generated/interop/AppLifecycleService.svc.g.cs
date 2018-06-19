@@ -49,7 +49,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		}
 		
 		public partial interface IGetLifecycleEventStreamProxy {
-			IServerStreamingMethodCall<global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> GetLifecycleEventStream(global::Plexus.Interop.Apps.Internal.Generated.Empty request);
+			IServerStreamingMethodCall<global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> GetLifecycleEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
 		}
 		
 		public partial interface IResolveAppImpl {
@@ -57,22 +57,22 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		}
 		
 		public partial interface IGetLifecycleEventStreamImpl {
-			Task GetLifecycleEventStream(global::Plexus.Interop.Apps.Internal.Generated.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> responseStream, MethodCallContext context);
+			Task GetLifecycleEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> responseStream, MethodCallContext context);
 		}
 		
 		public sealed partial class Descriptor {
 		
 			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> ResolveAppMethod {get; private set; }
-			public ServerStreamingMethod<global::Plexus.Interop.Apps.Internal.Generated.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> GetLifecycleEventStreamMethod {get; private set; }
+			public ServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> GetLifecycleEventStreamMethod {get; private set; }
 			
 			public Descriptor() {				
 				ResolveAppMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse>(Id, ResolveAppMethodId);
-				GetLifecycleEventStreamMethod = Method.ServerStreaming<global::Plexus.Interop.Apps.Internal.Generated.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent>(Id, GetLifecycleEventStreamMethodId);
+				GetLifecycleEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent>(Id, GetLifecycleEventStreamMethodId);
 			}
 		
 			public Descriptor(string alias) {
 				ResolveAppMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse>(Id, alias, ResolveAppMethodId);
-				GetLifecycleEventStreamMethod = Method.ServerStreaming<global::Plexus.Interop.Apps.Internal.Generated.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent>(Id, alias, GetLifecycleEventStreamMethodId);
+				GetLifecycleEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent>(Id, alias, GetLifecycleEventStreamMethodId);
 			}
 		}
 	}

@@ -125,8 +125,9 @@ public class ProtoGenTask extends BaseGenTask {
 				val uriStr = r.URI.toString()
 				val isProto = uriStr.endsWith(".proto")
 				val isDescriptorProto = isProto && (uriStr.endsWith(GenUtils.PROTOBUF_DESCRIPTOR_RESOURCE_PATH) || uriStr.endsWith(GenUtils.INTEROP_DESCRIPTOR_RESOURCE_PATH))
-				val needAddCustomOptions = !isDescriptorProto
-				val needAddPlexusOptions = !isDescriptorProto && !uriStr.endsWith(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)
+				var isBuiltIn = r.URI.segmentCount > 2 && r.URI.segment(r.URI.segmentCount - 2).equals("protobuf") && r.URI.segment(r.URI.segmentCount - 3).equals("google")
+				val needAddCustomOptions = !isBuiltIn && !isDescriptorProto
+				val needAddPlexusOptions = !isBuiltIn && !isDescriptorProto && !uriStr.endsWith(GenUtils.INTEROP_OPTIONS_RESOURCE_PATH)
 
 				val root = r.contents.get(0) as Proto
 				val firstDefinition = root.elements.findFirst[x|x instanceof NamedElement]

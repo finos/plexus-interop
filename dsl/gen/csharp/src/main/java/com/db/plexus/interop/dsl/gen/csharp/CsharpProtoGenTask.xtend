@@ -37,23 +37,26 @@ class CsharpProtoGenTask extends ProtoGenTask {
 	 			
 	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException {
 		var namespace = config.namespace;
-		if (config.namespace !== null) {
+		if (namespace !== null) {
 			if (namespace.startsWith("internal_access:")) {
 				namespace = namespace.substring("internal_access:".length)
+			}
+			if (!namespace.isEmpty) {
+				val description = utils.getDescriptorResourceDescription(resourceSet)
+				val optionDescriptor = description.getExportedObjects(
+					ProtobufPackage.Literals.FIELD, 
+					CSHARP_NAMESPACE_OPTION_DESCRIPTOR_NAME, 
+					false
+				)
+				.findFirst[x | true].EObjectOrProxy as Field
+				val csharpNamespaceOption = ProtobufFactory.eINSTANCE.createOption()
+				csharpNamespaceOption.isCustom = false
+				csharpNamespaceOption.descriptor = optionDescriptor
+				val stringConstant = ProtobufFactory.eINSTANCE.createStringConstant()
+				stringConstant.value = namespace
+				csharpNamespaceOption.value = stringConstant	
+				super.customOptions.add(csharpNamespaceOption)			
 			}		
-			val description = utils.getDescriptorResourceDescription(resourceSet)
-			val optionDescriptor = description.getExportedObjects(
-				ProtobufPackage.Literals.FIELD, 
-				CSHARP_NAMESPACE_OPTION_DESCRIPTOR_NAME, 
-				false
-			).findFirst[x | true].EObjectOrProxy as Field
-			val csharpNamespaceOption = ProtobufFactory.eINSTANCE.createOption()
-			csharpNamespaceOption.isCustom = false
-			csharpNamespaceOption.descriptor = optionDescriptor
-			val stringConstant = ProtobufFactory.eINSTANCE.createStringConstant()
-			stringConstant.value = namespace
-			csharpNamespaceOption.value = stringConstant	
-			super.customOptions.add(csharpNamespaceOption)		
 		}
 
 		super.doGenWithResources(config, resourceSet)
