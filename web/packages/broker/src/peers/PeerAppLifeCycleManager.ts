@@ -83,8 +83,8 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         return appConnection;
     }
 
-    public async getOrSpawnConnection(applicationId: string): Promise<ApplicationConnection> {
-        return this.getOrSpawnConnectionForOneOf([applicationId]);
+    public async getOrSpawnConnection(applicationId: string, excludedInstance?: string): Promise<ApplicationConnection> {
+        return this.getOrSpawnConnectionForOneOf([applicationId], excludedInstance);
     }
 
     public async spawnConnection(applicationId: string): Promise<ApplicationConnection> {

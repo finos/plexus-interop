@@ -56,5 +56,9 @@ export class UniqueId {
 }
 
 function longToString(x: number | Long | undefined): string {
-    return x ? x.toString(16).toUpperCase() : 'undefined';
+    return x ? padLeft(x.toString(16).toUpperCase(), '0', 16) : 'undefined';
+}
+
+function padLeft(text: string, padChar: string, size: number): string {
+    return (new String(padChar).repeat(size) + text).substr((size * -1), size);
 }
