@@ -83,8 +83,8 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         return appConnection;
     }
 
-    public async getOrSpawnConnection(applicationId: string): Promise<ApplicationConnection> {
-        return this.getOrSpawnConnectionForOneOf([applicationId]);
+    public async getOrSpawnConnection(applicationId: string, excludedInstance?: string): Promise<ApplicationConnection> {
+        return this.getOrSpawnConnectionForOneOf([applicationId], excludedInstance);
     }
 
     public async spawnConnection(applicationId: string): Promise<ApplicationConnection> {
@@ -115,8 +115,10 @@ export class PeerAppLifeCycleManager implements AppLifeCycleManager {
         }
     }
 
-    public async getOrSpawnConnectionForOneOf(applicationIds: string[]): Promise<ApplicationConnection> {
+    public async getOrSpawnConnectionForOneOf(applicationIds: string[], excludedInstance?: string): Promise<ApplicationConnection> {
         const appConnections = this.getOnlineConnectionsInternal()
+            // do not match excluded if provided
+            .filter(connection => !excludedInstance || connection.descriptor.instanceId !== excludedInstance)
             .filter(connection => applicationIds.indexOf(connection.descriptor.applicationId) >= 0);
         return appConnections.length > 0 ? appConnections[0] : this.spawnConnection(applicationIds[0]);
     }
