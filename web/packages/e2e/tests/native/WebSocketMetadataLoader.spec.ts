@@ -17,18 +17,30 @@
 
 import { DefaultConnectionDetailsService } from '@plexus-interop/client';
 import { readWsUrl } from '../common/utils';
-import { WebSocketDataProvider } from '@plexus-interop/broker';
+import { WebSocketDataProvider, UrlInteropRegistryProvider } from '@plexus-interop/broker';
 import { expect } from 'chai';
+
+const wsUrl = readWsUrl();
+const metadataUrl = new DefaultConnectionDetailsService().getDefaultUrl(wsUrl);
 
 describe('WebSocket metadata loader', () => {
 
     it('Loads metadata from default url', async () => {
-        debugger;
-        const wsUrl = readWsUrl();
-        const metadataUrl = new DefaultConnectionDetailsService().getDefaultUrl(wsUrl);
         const loader = new WebSocketDataProvider();
         const metadata = await loader.getSingleMessage(metadataUrl);
         expect(metadata).contains('applications');
+    });
+
+});
+
+describe('URL Metadata Data loader', () => {
+
+    it('Loads and parses metadata from Web Socket URL', async () => {
+        const wsUrl = readWsUrl();        
+        const urlMetadataProvider = new UrlInteropRegistryProvider(metadataUrl);
+        await urlMetadataProvider.start();
+        const registry = urlMetadataProvider.getCurrent();
+        expect(registry.applications.valuesArray().length).to.be.greaterThan(0);
     });
 
 });
