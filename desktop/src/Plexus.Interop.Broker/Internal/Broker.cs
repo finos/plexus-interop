@@ -16,11 +16,6 @@
  */
 namespace Plexus.Interop.Internal
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading.Tasks;
     using Plexus.Interop.Apps;
     using Plexus.Interop.Broker;
     using Plexus.Interop.Metamodel;
@@ -31,6 +26,11 @@ namespace Plexus.Interop.Internal
     using Plexus.Interop.Transport.Transmission.Pipes;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using Plexus.Processes;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
 
@@ -56,7 +56,9 @@ namespace Plexus.Interop.Internal
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var studioDir = Path.Combine(binDir, "studio");
             Log.Info("Studio dir: {0}", studioDir);
-            metadataDir = metadataDir ?? Path.Combine(_workingDir, "metadata");
+            metadataDir = Path.GetFullPath(metadataDir ?? Path.Combine(_workingDir, "metadata"));            
+            Log.Info("Metadata dir: {0}", metadataDir);
+            var metadataFile = Path.Combine(metadataDir, "interop.json");
             _transportServers = new[]
             {
                 TransportServerFactory.Instance.Create(
@@ -64,7 +66,7 @@ namespace Plexus.Interop.Internal
                 TransportServerFactory.Instance.Create(
                     WebSocketTransmissionServerFactory.Instance.Create(
                         _workingDir,
-                        new[] {("/metadata", metadataDir), ("/studio", studioDir)}),
+                        new Dictionary<string, string>{ {"/metadata/interop", metadataFile }, {"/studio", studioDir }}),
                     DefaultTransportSerializationProvider)
             };
             _connectionListener = new ServerConnectionListener(_transportServers);

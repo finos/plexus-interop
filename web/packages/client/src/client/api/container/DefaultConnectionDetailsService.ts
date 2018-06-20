@@ -21,7 +21,7 @@ import { Logger, LoggerFactory } from '@plexus-interop/common';
 export class DefaultConnectionDetailsService implements ConnectionDetailsService {
 
     private readonly log: Logger = LoggerFactory.getLogger('DefaultConnectionDetailsService');
-    
+
     public getConnectionDetails(): Promise<ConnectionDetails> {
         const globalObj = self as any;
         if (globalObj.plexus && globalObj.plexus.getConnectionDetails) {
@@ -34,7 +34,11 @@ export class DefaultConnectionDetailsService implements ConnectionDetailsService
 
     public getMetadataUrl(): Promise<string> {
         return this.getConnectionDetails()
-            .then(details => `http://localhost:${details.ws.port}/metadata/interop.json`);
+            .then(details => this.getDefaultUrl(`ws://127.0.0.1:${details.ws.port}`));
     }
-    
+
+    public getDefaultUrl(baseUrl: string): string {
+        return `${baseUrl}/metadata/interop`;
+    }
+
 }

@@ -14,18 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseCommand } from './BaseCommand';
-import { getJavaExecPath, getJavaGenLibPath } from '../common/java';
-import { simpleSpawn } from '../common/process';
+import { UniqueId } from '../../src/dto/UniqueId';
 
-export abstract class BaseJavaGenCommand extends BaseCommand {
-
-    public abstract plexusGenArgs: (opts: any) => string[];
-
-    public async action(opts: any): Promise<void> {
-        const javaExecPath = await getJavaExecPath();
-        const javaLibPath = getJavaGenLibPath();
-        return simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.plexusGenArgs(opts)], !!opts.verbose);
-    }
-
-}
+describe('UniqueId', () => {
+    it('Converts guid to string and back', () => {
+        const id = UniqueId.generateNew();
+        const strId = id.toString();
+        expect(UniqueId.fromString(strId).toString()).toBe(strId);
+    });
+    it('Converts id to 32 lengh string', () => {
+        const id = UniqueId.generateNew();
+        const strId = id.toString();
+        expect(id.toString().length).toBe(32);
+    });
+});

@@ -90,7 +90,10 @@ export function reducer(
             return {
                 ...initialState,
                 // keep entered/discovered connection details
-                connectionDetails: state.connectionDetails
+                connectionDetails: {  
+                    ...state.connectionDetails,
+                    connected: false
+                }
             };
         case AppActions.DISCONNECT_FROM_APP:
             return {

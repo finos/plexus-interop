@@ -12,12 +12,7 @@
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "pretest": "yarn lint",
-    "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/websocket-transport@0.1.2",
-    "postunpublish": "echo 'Unpublished'",
-    "prerepublish": "echo 'Republishing started...'",
-    "republish": "npm run unpublish && npm publish",
-    "postrepublish": "echo 'Package republished successfully!'"
+    "test": "yarn unit"
   },
   "dependencies": {
     "long": "^3.2.0",
