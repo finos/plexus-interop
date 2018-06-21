@@ -113,10 +113,9 @@ class Enum extends ComplexType, ProtoDefinition, MessageElement {
 interface EnumElement {	
 }
 
-class EnumValue extends EnumElement {
-	String name
+class EnumValue extends EnumElement, NamedElement {
 	Integer value
-	contains Option[] options	
+	contains Option[] options
 }
 
 class Service extends ProtoDefinition {		

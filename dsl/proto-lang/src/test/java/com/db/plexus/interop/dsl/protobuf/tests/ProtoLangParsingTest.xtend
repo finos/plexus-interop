@@ -69,6 +69,26 @@ class ProtoLangParsingTest {
 		loadAndValidateResource("com/db/plexus/interop/dsl/protobuf/tests/scoping/test1.proto", 3)
 	}
 	
+	@Test
+	def void loadEnumValuesNamingProto() {
+		val resourceUri = "com/db/plexus/interop/dsl/protobuf/tests/enum_values_naming.proto"
+		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource(resourceUri).toURI().toString())
+		System.out.println("Parsing " + uri)
+		Assert.assertEquals(0, rs.resources.length)
+		rs.getResource(uri, true)
+		EcoreUtil2.resolveAll(rs);
+		val allResources = rs.resources
+		val issues = new LinkedList<Issue>()		
+		for (r : allResources) {
+			validateResource(r, issues)
+		}
+		Assert.assertEquals(8, issues.length)
+		System.out.println(issues.length + " expected issues found: ")
+		for (issue : issues) {
+			System.out.println(issue);
+		}			
+	}
+	
 	def loadAndValidateResource(String resourceUri, int expectedResourceCount) {
 		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource(resourceUri).toURI().toString())
 		System.out.println("Parsing " + uri)

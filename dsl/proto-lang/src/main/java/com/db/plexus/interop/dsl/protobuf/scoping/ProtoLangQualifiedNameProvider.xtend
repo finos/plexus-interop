@@ -23,6 +23,7 @@ import java.util.LinkedList
 import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider
 import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.naming.QualifiedName
+import com.db.plexus.interop.dsl.protobuf.EnumValue
 
 class ProtoLangQualifiedNameProvider extends DefaultDeclarativeQualifiedNameProvider {
 	
@@ -37,6 +38,10 @@ class ProtoLangQualifiedNameProvider extends DefaultDeclarativeQualifiedNameProv
 			packageSegments.addAll(converter.toQualifiedName((package as Package).importedNamespace).segments)			
 		}
 		return QualifiedName.create(packageSegments);		
+	}
+	
+	def qualifiedName(EnumValue ele) {	
+		return getFullyQualifiedName(ele.eContainer.eContainer).append(ele.name)	
 	}
 }
 		
