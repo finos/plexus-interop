@@ -34,6 +34,8 @@ import com.db.plexus.interop.dsl.protobuf.Field
 import com.db.plexus.interop.dsl.protobuf.Proto
 import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
 import com.db.plexus.interop.dsl.protobuf.Method
+import com.db.plexus.interop.dsl.protobuf.EnumValue
+import com.db.plexus.interop.dsl.protobuf.Enum
 
 /**
  * This class contains custom validation rules. 
@@ -79,7 +81,21 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 				}
 			}
 		}
-	}	
+	}
+	
+	@Check
+	def checkEnumValueFullNameIsUnique(NamedElement element) {
+		val name = qualifiedNameProvider.getFullyQualifiedName(element)
+		val resourceDescriptions = resourceDescriptionsProvider.getResourceDescriptions(element.eResource());
+		val resourceDescription = resourceDescriptions.getResourceDescription(element.eResource().getURI());
+		for (IContainer c : containermanager.getVisibleContainers(resourceDescription, resourceDescriptions)) {
+			for (IEObjectDescription od : c.getExportedObjectsByType(ProtobufPackage.Literals.ENUM_VALUE)) {
+				if (name.equals(od.getQualifiedName()) && !od.EObjectOrProxy.equals(element)) {
+					error("\"" + (od.EObjectOrProxy as EnumValue).name + "\" must be unique within \"" + od.qualifiedName.skipLast(1) + "\", not just within \"" + (od.EObjectOrProxy.eContainer as Enum).name + "\", because enum values use C++ scoping rules, meaning that enum values are siblings of their type, not children of it.", ProtobufPackage.Literals.NAMED_ELEMENT__NAME);
+				}
+			}
+		}
+	}
 	
 	@Check
 	def checkImport(Import ele) {
@@ -138,6 +154,9 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		if (!protoLangConfig.strictMode) {
 			return
 		}
+		if (ele instanceof EnumValue) {
+			return		
+		}
 		val name = ele.name
 		var isValid = name.length > 0 && Character.isLetter(name.charAt(0)) && Character.isUpperCase(name.charAt(0))
 		for (var i=0; isValid && i<name.length; i++) {			
@@ -146,6 +165,23 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		}
 		if (!isValid) {
 			val message = 'Name of ' + ele.eClass.name + ' "' + name + '" is not valid. Only letters and digits allowed. First symbol must be upper-cased letter.'
+			error(message, ele, ProtobufPackage.Literals.NAMED_ELEMENT__NAME)		
+		}
+	}
+	
+	@Check
+	def checkEnumValueName(EnumValue ele) {
+		if (!protoLangConfig.strictMode) {
+			return
+		}
+		val name = ele.name
+		var isValid = true
+		for (var i=0; isValid && i<name.length; i++) {			
+			val c = name.charAt(i)
+			isValid = (Character.isLetter(c) && Character.isUpperCase(name.charAt(0))) || Character.isDigit(c) || c == UNDERSCORE_CHAR
+		}
+		if (!isValid) {
+			val message = 'Name of ' + ele.eClass.name + ' "' + name + '" is not valid. Only letters, digits and underscores allowed. All letters must be upper-cased.'
 			error(message, ele, ProtobufPackage.Literals.NAMED_ELEMENT__NAME)		
 		}
 	}

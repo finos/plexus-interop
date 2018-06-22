@@ -14,10 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './api';
-export * from './bus';
-export * from './metadata';
-export * from './http';
-export * from './launcher';
-export * from './io';
-export * from './ws/WebSocketDataProvider';
+export * from './Application';
+export * from './AppRegistry';

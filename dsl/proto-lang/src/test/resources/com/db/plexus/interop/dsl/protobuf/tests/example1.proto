@@ -47,9 +47,9 @@ extend google.protobuf.MethodOptions {
 }
 
 enum Enum2 {
-	value1 = 1;
-	value2 = 2;
-	value3 = 3;
+	VALUE_1 = 1;
+	VALUE_2 = 2;
+	VALUE_3 = 3;
 }
 
 message Message1 {
@@ -90,7 +90,7 @@ message Message2 {
 	}
 
 	message SubMessage2 {
-		SubMessage1.SubMessage1 sub_sub_field_1 = 1 [(tests.string_option)="aaa", (.com.db.plexus.interop.dsl.protobuf.tests.enum_option) = value2];
+		SubMessage1.SubMessage1 sub_sub_field_1 = 1 [(tests.string_option)="aaa", (.com.db.plexus.interop.dsl.protobuf.tests.enum_option) = VALUE_2];
 		SubMessage1 sub_field_1 = 2;
 	}
 
