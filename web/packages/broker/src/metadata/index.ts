@@ -19,6 +19,7 @@ export * from './apps/json/UrlAppRegistryProvider';
 export * from './apps/AppRegistryProvider';
 export * from './apps/AppRegistryService';
 export { Application as App } from './apps/model/Application';
+export { AppRegistry } from './apps/model';
 export * from './interop/InteropRegistryProvider';
 export * from './interop/json/JsonInteropRegistryProvider';
 export * from './interop/json/UrlInteropRegistryProvider';

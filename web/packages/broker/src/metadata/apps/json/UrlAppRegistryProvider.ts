@@ -25,11 +25,11 @@ export class UrlAppRegistryProvider implements AppRegistryProvider {
 
     private readonly log: Logger = LoggerFactory.getLogger('UrlAppRegistryProvider');
 
-    private urlDataLoader: UrlDataLoader = new UrlDataLoader();
+    protected urlDataLoader: UrlDataLoader = new UrlDataLoader();
 
-    private jsonAppRegistryProvider: JsonAppRegistryProvider;
+    protected started: boolean = false;    
 
-    private started: boolean = false;
+    protected jsonAppRegistryProvider: JsonAppRegistryProvider;
 
     public constructor(
         private readonly url: string,

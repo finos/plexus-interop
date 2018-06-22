@@ -24,8 +24,8 @@ import 'rxjs/add/operator/map';
 
 export class JsonAppRegistryProvider implements AppRegistryProvider {
 
-    private readonly $registry: Observable<AppRegistry>;
-    private current: AppRegistry;
+    protected readonly $registry: Observable<AppRegistry>;
+    protected current: AppRegistry;
 
     public constructor(jsonMetadata: string, $jsonMetadata?: Observable<string>) {
         this.current = this.parseRegistry(jsonMetadata);
@@ -44,7 +44,7 @@ export class JsonAppRegistryProvider implements AppRegistryProvider {
         return this.current;
     }
 
-    private parseRegistry(json: string): AppRegistry {
+    protected parseRegistry(json: string): AppRegistry {
         const appsDto: { apps: Application[] } = JSON.parse(json);
         return {
             apps: toMap(appsDto.apps, app => app.id, app => app)
