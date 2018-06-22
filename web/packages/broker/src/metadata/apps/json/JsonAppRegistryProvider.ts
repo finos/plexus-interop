@@ -24,7 +24,7 @@ import 'rxjs/add/operator/map';
 
 export class JsonAppRegistryProvider implements AppRegistryProvider {
 
-    protected readonly $registry: Observable<AppRegistry>;
+    protected $registry: Observable<AppRegistry>;
     protected current: AppRegistry;
 
     public constructor(jsonMetadata: string, $jsonMetadata?: Observable<string>) {
