@@ -31,6 +31,7 @@
     "@plexus-interop/client": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
     "@types/core-js": "^0.9.43",
+    "arraybuffer-slice": "^0.1.2",
     "bootstrap": "^4.0.0-beta.2",
     "bootswatch": "4.0.0-beta.2",
     "core-js": "^2.4.1",
