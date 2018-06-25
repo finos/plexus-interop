@@ -751,6 +751,10 @@ array-unique@^0.3.2:
   version "0.3.2"
   resolved "https://registry.npmjs.org/array-unique/-/array-unique-0.3.2.tgz#a894b75d4bc4f6cd679ef3244a9fd8f46ae2d428"
 
+arraybuffer-slice@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/arraybuffer-slice/-/arraybuffer-slice-0.1.2.tgz?dl=https://registry.yarnpkg.com/arraybuffer-slice/-/arraybuffer-slice-0.1.2.tgz#19582c4b0d1b073eaba87af0b8a3be3b9a6098f7"
+
 arraybuffer.slice@0.0.6:
   version "0.0.6"
   resolved "https://registry.npmjs.org/arraybuffer.slice/-/arraybuffer.slice-0.0.6.tgz#f33b2159f0532a3f3107a272c0ccfbd1ad2979ca"
