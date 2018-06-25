@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import 'core-js/es6/map';
+import { ObjectUtils } from '../js/ObjectUtils';
 
 export class ExtendedMap<K, V> extends Map<K, V> {
 
@@ -23,9 +24,7 @@ export class ExtendedMap<K, V> extends Map<K, V> {
     }
 
     public static create<K, V>(): ExtendedMap<K, V> {
-        const instance: any = new Map<K, V>();
-        // tslint:disable-next-line:no-string-literal
-        instance['__proto__'] = ExtendedMap.prototype;
+        const instance = ObjectUtils.setPrototypeOf(new Map<K, V>(), ExtendedMap.prototype);
         return instance as ExtendedMap<K, V>;
     }
 
