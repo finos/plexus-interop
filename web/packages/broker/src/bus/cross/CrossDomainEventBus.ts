@@ -40,7 +40,7 @@ export class CrossDomainEventBus implements EventBus {
     private readonly log: Logger = LoggerFactory.getLogger('CrossDomainEventBus');
 
     private readonly singleOperationTimeOut: number = Defaults.OPERATION_TIMEOUT;
-    private readonly pingTimeout: number = 10 * 6000;
+    private readonly pingTimeout: number = 1000;
 
     private readonly emitters: Map<string, Observer<any>> = new Map<string, Observer<any>>();
     private readonly observables: Map<string, Observable<any>> = new Map<string, Observable<any>>();
@@ -61,21 +61,9 @@ export class CrossDomainEventBus implements EventBus {
     public init(): Promise<EventBus> {
         this.stateMaschine.throwIfNot(State.CREATED);
         this.createHostMessagesSubscription();
-        return new Promise((resolve, reject) => {
-            this.log.info('Host iFrame created, sending ping message');
-            const message = this.hostMessage({}, MessageType.Ping, ResponseType.Single);
-            this.sendAndSubscribe(message, {
-                next: m => {
-                    this.log.info('Success Ping response received');
-                    this.stateMaschine.go(State.CONNECTED);
-                    resolve(this);
-                },
-                error: e => {
-                    this.log.error('Failed to receive first Ping response', e);
-                    reject(e);
-                }
-            }, this.pingTimeout);
-        });
+        this.log.info('Host iFrame created, sending ping messages');        
+        return this.chainRetries(20, () => this.sendPingToHost(this.pingTimeout))
+            .then(() => this);
     }
 
     public async disconnect(): Promise<void> {
@@ -156,6 +144,32 @@ export class CrossDomainEventBus implements EventBus {
                 }
             }).subscribe(observer);
 
+    }
+
+    private chainRetries(times: number, fn: () => Promise<void>): Promise<void> {
+        let res = fn();
+        for (let index = 0; index < times; index++) {
+            res = res.catch(fn);
+        }
+        return res;
+    }
+
+    private sendPingToHost(timeout: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.log.info('Sending ping message');        
+            const message = this.hostMessage({}, MessageType.Ping, ResponseType.Single);
+            this.sendAndSubscribe(message, {
+                next: m => {
+                    this.log.info('Success Ping response received');
+                    this.stateMaschine.go(State.CONNECTED);
+                    resolve();
+                },
+                error: e => {
+                    this.log.warn('Failed to receive Ping response', e);
+                    reject(e);
+                }
+            }, timeout);
+        });
     }
 
     private postToIFrame(message: any): void {
