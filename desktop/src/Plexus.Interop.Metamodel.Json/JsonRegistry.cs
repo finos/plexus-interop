@@ -26,7 +26,7 @@ namespace Plexus.Interop.Metamodel.Json
     {
         public static IRegistry LoadRegistry(string fileName)
         {
-            using (var stream = File.Open(fileName, FileMode.Open))
+            using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 return LoadRegistry(stream);
             }

@@ -19,6 +19,7 @@ namespace Plexus.Interop.Metamodel.Json.Internal
     using Newtonsoft.Json;
     using System.Collections.Generic;
     using System.IO;
+    using System.Text;
 
     internal sealed class RegistryDto
     {
@@ -30,8 +31,9 @@ namespace Plexus.Interop.Metamodel.Json.Internal
 
         public static RegistryDto LoadFromFile(string filePath)
         {
-            using (var file = File.OpenText(filePath))
-            using (var reader = new JsonTextReader(file))
+            using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
+            using (var reader = new JsonTextReader(streamReader))
             {
                 var serializer = new JsonSerializer();
                 return serializer.Deserialize<RegistryDto>(reader);
