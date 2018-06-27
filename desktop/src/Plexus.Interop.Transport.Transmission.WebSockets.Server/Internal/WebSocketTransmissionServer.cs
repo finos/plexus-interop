@@ -151,10 +151,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                         {
                             using (var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false))
                             {
-                                using (var stream = File.OpenText(physicalPath))
+                                using (var stream = File.Open(physicalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                                using (var streamReader = new StreamReader(stream))
                                 {
                                     var bytes = Encoding.UTF8.GetBytes(
-                                        await stream.ReadToEndAsync().ConfigureAwait(false));
+                                        await streamReader.ReadToEndAsync().ConfigureAwait(false));
                                     await webSocket
                                         .SendAsync(
                                             new ArraySegment<byte>(bytes),
