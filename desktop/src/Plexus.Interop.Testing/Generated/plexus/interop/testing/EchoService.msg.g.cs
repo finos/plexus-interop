@@ -52,7 +52,7 @@ namespace Plexus.Interop.Testing.Generated {
             "Y2hvUmVxdWVzdC5TdWJNZXNzYWdlGmoKClN1Yk1lc3NhZ2USEwoLYnl0ZXNf",
             "ZmllbGQYASABKAwSFAoMc3RyaW5nX2ZpZWxkGAIgASgJOjGS2wQtcGxleHVz",
             "LmludGVyb3AudGVzdGluZy5FY2hvUmVxdWVzdC5TdWJNZXNzYWdlIicKB1N1",
-            "YkVudW0SDQoJdmFsdWVfb25lEAASDQoJdmFsdWVfdHdvEAE6JpLbBCJwbGV4",
+            "YkVudW0SDQoJVkFMVUVfT05FEAASDQoJVkFMVUVfVFdPEAE6JpLbBCJwbGV4",
             "dXMuaW50ZXJvcC50ZXN0aW5nLkVjaG9SZXF1ZXN0MqcDCgtFY2hvU2Vydmlj",
             "ZRJRCgVVbmFyeRIjLnBsZXh1cy5pbnRlcm9wLnRlc3RpbmcuRWNob1JlcXVl",
             "c3QaIy5wbGV4dXMuaW50ZXJvcC50ZXN0aW5nLkVjaG9SZXF1ZXN0El0KD1Nl",
@@ -366,8 +366,8 @@ namespace Plexus.Interop.Testing.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static partial class Types {
       public enum SubEnum {
-        [pbr::OriginalName("value_one")] ValueOne = 0,
-        [pbr::OriginalName("value_two")] ValueTwo = 1,
+        [pbr::OriginalName("VALUE_ONE")] ValueOne = 0,
+        [pbr::OriginalName("VALUE_TWO")] ValueTwo = 1,
       }
 
       public sealed partial class SubMessage : pb::IMessage<SubMessage> {

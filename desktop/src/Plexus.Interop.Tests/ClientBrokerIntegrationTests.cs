@@ -750,7 +750,7 @@ namespace Plexus.Interop
         }
 
         [Fact]
-        public void InvocationShouldNotTriggerSubsequentLaunchWhenMethodLaunchModeSetToDefault()
+        public void InvocationShouldTriggerLaunchWithSingleInstanceModeByDefault()
         {
             var serverInvokedCount = 0;
 
@@ -802,7 +802,7 @@ namespace Plexus.Interop
                 WriteLog("Call 1 completed");
                 await Task.WhenAll(call1.AsTask(), call2.AsTask());
                 WriteLog("Call 2 completed");
-                serverCreatedCount.ShouldBe(1);
+                serverCreatedCount.ShouldBe(2);
                 serverInvokedCount.ShouldBe(2);
             });
         }

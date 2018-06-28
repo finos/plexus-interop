@@ -1,149 +1,5 @@
 {
-	"messages": [
-		{
-			"id": "plexus.interop.testing.EchoRequest",
-			"fields": [
-				{
-					"name": "string_field",
-					"num": 1,
-					"primitive": true,
-					"type": "string"
-				},
-				{
-					"name": "int64_field",
-					"num": 2,
-					"primitive": true,
-					"type": "int64"
-				},
-				{
-					"name": "uint32_field",
-					"num": 3,
-					"primitive": true,
-					"type": "uint32"
-				},
-				{
-					"name": "repeated_double_field",
-					"num": 4,
-					"primitive": true,
-					"type": "double"
-				},
-				{
-					"name": "enum_field",
-					"num": 5,
-					"primitive": false,
-					"type": "plexus.interop.testing.EchoRequest.SubEnum"
-				},
-				{
-					"name": "sub_message_field",
-					"num": 6,
-					"primitive": false,
-					"type": "plexus.interop.testing.EchoRequest.SubMessage"
-				},
-				{
-					"name": "repeated_sub_message_field",
-					"num": 7,
-					"primitive": false,
-					"type": "plexus.interop.testing.EchoRequest.SubMessage"
-				}
-			]
-		},
-		{
-			"id": "plexus.interop.testing.EchoRequest.SubMessage",
-			"fields": [
-				{
-					"name": "bytes_field",
-					"num": 1,
-					"primitive": true,
-					"type": "bytes"
-				},
-				{
-					"name": "string_field",
-					"num": 2,
-					"primitive": true,
-					"type": "string"
-				}
-			]
-		},
-		{
-			"id": "plexus.interop.testing.GreetingRequest",
-			"fields": [
-				{
-					"name": "name",
-					"num": 1,
-					"primitive": true,
-					"type": "string"
-				}
-			]
-		},
-		{
-			"id": "plexus.interop.testing.GreetingResponse",
-			"fields": [
-				{
-					"name": "greeting",
-					"num": 1,
-					"primitive": true,
-					"type": "string"
-				}
-			]
-		},
-		{
-			"id": "interop.AppLaunchRequest",
-			"fields": [
-				{
-					"name": "app_id",
-					"num": 1,
-					"primitive": true,
-					"type": "string"
-				},
-				{
-					"name": "launch_params_json",
-					"num": 2,
-					"primitive": true,
-					"type": "string"
-				},
-				{
-					"name": "launch_mode",
-					"num": 3,
-					"primitive": false,
-					"type": "interop.AppLaunchMode"
-				},
-				{
-					"name": "suggested_app_instance_id",
-					"num": 4,
-					"primitive": false,
-					"type": "interop.UniqueId"
-				}
-			]
-		},
-		{
-			"id": "interop.AppLaunchResponse",
-			"fields": [
-				{
-					"name": "app_instance_id",
-					"num": 1,
-					"primitive": false,
-					"type": "interop.UniqueId"
-				}
-			]
-		},
-		{
-			"id": "interop.UniqueId",
-			"fields": [
-				{
-					"name": "lo",
-					"num": 1,
-					"primitive": true,
-					"type": "fixed64"
-				},
-				{
-					"name": "hi",
-					"num": 2,
-					"primitive": true,
-					"type": "fixed64"
-				}
-			]
-		}
-    ],
+	"messages": [],
 	"services": [
 		{
 			"id": "plexus.interop.testing.EchoService",
@@ -172,6 +28,12 @@
 					"response": "plexus.interop.testing.EchoRequest",
 					"type": "DuplexStreaming"
 				}
+			],
+			"options": [
+				{
+					"id": "interop.service_id",
+					"value": "plexus.interop.testing.EchoService"
+				}
 			]
 		},
 		{
@@ -183,6 +45,12 @@
 					"response": "plexus.interop.testing.GreetingResponse",
 					"type": "Unary"
 				}
+			],
+			"options": [
+				{
+					"id": "interop.service_id",
+					"value": "plexus.interop.testing.GreetingService"
+				}
 			]
 		},
 		{
@@ -193,6 +61,12 @@
 					"request": "interop.AppLaunchRequest",
 					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
+				}
+			],
+			"options": [
+				{
+					"id": "interop.service_id",
+					"value": "interop.AppLauncherService"
 				}
 			]
 		}
