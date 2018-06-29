@@ -51,10 +51,6 @@ export class FieldNamesValidator {
                     // map field, stop
                     return;
                 }
-                if (this.messageGenerator.loookupEnumByFieldName(messageId, key)) {
-                    // enum field, stop
-                    return;
-                }
                 if (this.isObject(value)) {
                     this.collectObjFieldNames(messageId, value, result, key + ".");
                 }
