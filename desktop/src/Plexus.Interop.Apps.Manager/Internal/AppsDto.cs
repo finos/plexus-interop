@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps.Internal
+namespace Plexus.Interop.Apps.Internal
 {
     using Newtonsoft.Json;
     using System.Collections.Generic;
     using System.IO;
+    using System.Text;
 
     internal sealed class AppsDto
     {
@@ -27,11 +28,12 @@
 
         public static AppsDto Load(string filePath)
         {
-            using (var file = File.OpenText(filePath))
-            using (var reader = new JsonTextReader(file))
+            using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
+            using (var jsonReader = new JsonTextReader(streamReader))
             {
                 var serializer = new JsonSerializer();
-                return serializer.Deserialize<AppsDto>(reader);
+                return serializer.Deserialize<AppsDto>(jsonReader);
             }
         }
     }

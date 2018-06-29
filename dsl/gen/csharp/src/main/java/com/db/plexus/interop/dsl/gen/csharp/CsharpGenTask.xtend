@@ -47,6 +47,9 @@ class CsharpGenTask extends BaseGenTask {
 		var internalAccessArg = ""		
 		if (config.namespace !== null && config.namespace.startsWith("internal_access:")) {
 			config.namespace = config.namespace.substring("internal_access:".length)
+			if (config.namespace.isEmpty) {
+				config.namespace = null
+			}
 			accessModifier = "internal"	
 			internalAccessArg = "internal_access:"			
 		}
@@ -57,8 +60,12 @@ class CsharpGenTask extends BaseGenTask {
 		val resources = resourceSet.resources;
 
 		for (resource : resources) {
+			val isBuiltIn = resource.URI.segmentCount > 2 
+				&& resource.URI.segment(resource.URI.segmentCount - 3).equals("google") 
+				&& resource.URI.segment(resource.URI.segmentCount - 2).equals("protobuf")
 			if (!resource.URI.toString.endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH) 
-				&& !resource.URI.toString.endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH))
+				&& !resource.URI.toString.endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH)
+				&& !isBuiltIn)
 			{
 				var newUri = resource.URI.resolve(workingDirUri)
 				var path = newUri.toFileString
@@ -66,7 +73,7 @@ class CsharpGenTask extends BaseGenTask {
 					newUri = newUri.deresolve(baseDirUri).resolve(outDirUri)
 				} else {
 					newUri = newUri.deresolve(resourceBaseUri).resolve(outDirUri)
-				}			
+				}
 				if (newUri.toString.endsWith(".proto")) {
 					val newPath = newUri.toFileString				
 					val file = new File(newPath)

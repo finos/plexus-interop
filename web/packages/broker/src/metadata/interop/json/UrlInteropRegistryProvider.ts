@@ -20,12 +20,16 @@ import { InteropRegistry } from '../model/InteropRegistry';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { UrlDataLoader } from '../../../http/UrlDataLoader';
 import { JsonInteropRegistryProvider } from './JsonInteropRegistryProvider';
+import { WebSocketDataProvider } from '../../../ws/WebSocketDataProvider';
+import 'rxjs/add/operator/throttleTime';
 
 export class UrlInteropRegistryProvider implements InteropRegistryProvider {
 
     private readonly log: Logger = LoggerFactory.getLogger('UrlInteropRegistryProvider');
 
     private urlDataLoader: UrlDataLoader = new UrlDataLoader();
+
+    private webSocketDataProvider: WebSocketDataProvider = new WebSocketDataProvider();
 
     private jsonInteropRegistryProvider: JsonInteropRegistryProvider;
 
@@ -51,9 +55,28 @@ export class UrlInteropRegistryProvider implements InteropRegistryProvider {
             return Promise.reject('Already started');
         }
         this.log.debug(`Starting to load metadata from [${this.url}] with ${this.interval} interval`);
+        const isWebSocket = this.url.startsWith('ws');
+        if (isWebSocket) {
+            await this.startWithWebSocket();
+        } else {
+            await this.startWithHttp();
+        }
+    }
+
+    private async startWithHttp(): Promise<void> {
         const response = await this.urlDataLoader.fetchData(this.url);
         if (this.interval > 0) {
             this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response, this.urlDataLoader.fetchWithInterval(this.url, this.interval));
+        } else {
+            this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response);
+        }
+        this.started = true;
+    }
+
+    private async startWithWebSocket(): Promise<void> {
+        const response = await this.webSocketDataProvider.getSingleMessage(this.url);
+        if (this.interval > 0) {
+            this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response, this.webSocketDataProvider.getData(this.url).throttleTime(this.interval));
         } else {
             this.jsonInteropRegistryProvider = new JsonInteropRegistryProvider(response);
         }

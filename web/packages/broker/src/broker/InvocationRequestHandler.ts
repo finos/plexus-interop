@@ -179,7 +179,7 @@ export class InvocationRequestHandler {
                 appConnection = onlineApps.find(a => connectionId.equals(a.connection.uuid()));
             } else if (methodReference.providedService && methodReference.providedService.applicationId) {
                 this.log.trace(`Looking for app by app id [${methodReference.providedService.applicationId}]`);                
-                appConnection = this.appLifeCycleManager.getOrSpawnConnection(methodReference.providedService.applicationId);
+                appConnection = this.appLifeCycleManager.getOrSpawnConnection(methodReference.providedService.applicationId, sourceConnection.instanceId);
             }
             if (!appConnection) {
                 throw new Error('Requested application is not online');
@@ -187,8 +187,9 @@ export class InvocationRequestHandler {
             return appConnection;
         } else {
             const targetMethods = this.registryService.getMatchingProvidedMethods(sourceConnection.applicationId, methodReference);
-            const targetAppIds = targetMethods.map(method => method.providedService.application.id);
-            const appConnection = await this.appLifeCycleManager.getOrSpawnConnectionForOneOf(targetAppIds);
+            const targetAppIds = targetMethods
+                .map(method => method.providedService.application.id);
+            const appConnection = await this.appLifeCycleManager.getOrSpawnConnectionForOneOf(targetAppIds, sourceConnection.instanceId);
             return appConnection;
         }
     }

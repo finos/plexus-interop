@@ -77,19 +77,27 @@ namespace Plexus.Interop.Metamodel.Json
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Exception during loading interop registry from {0}", _jsonFileName);
+                Log.Error(ex, "Exception during handling change event of file {0}", _jsonFileName);
             }
         }
 
         private void OnReloadTimerTick(object state)
         {
-            lock (_timerLock)
+            try
             {
-                _reloadTimer.Dispose();
-                _reloadTimer = null;
+                lock (_timerLock)
+                {
+                    _reloadTimer.Dispose();
+                    _reloadTimer = null;
+                }
+
+                Current = LoadRegistry(_jsonFileName);
+                Updated(Current);
             }
-            Current = LoadRegistry(_jsonFileName);
-            Updated(Current);
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception during loading interop registry from {0}", _jsonFileName);
+            }
         }
 
         private static IRegistry LoadRegistry(string jsonFileName)

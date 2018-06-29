@@ -19,9 +19,12 @@
         "sourceMap": true,
         "pretty": true,
         "lib": [
-            "es6", "dom"
+            "es6",
+            "dom"
         ],
         "types": [
+            "node",
+            "jest",
             "long"
         ],
         "baseUrl": "."

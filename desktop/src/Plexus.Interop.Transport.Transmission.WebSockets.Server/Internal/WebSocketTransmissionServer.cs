@@ -32,6 +32,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using System.Net;
     using System.Net.Sockets;
     using System.Net.WebSockets;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
@@ -44,11 +45,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private IWebHost _host;
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
         private readonly IServerStateWriter _stateWriter;
-        private readonly IReadOnlyCollection<(string UrlPath, string PhysicalPath)> _staticFileMappings;
+        private readonly IReadOnlyDictionary<string, string> _staticFileMappings;
 
-        public WebSocketTransmissionServer(string workingDir, IReadOnlyCollection<(string UrlPath, string PhysicalPath)> staticFileMappings = null)
+        public WebSocketTransmissionServer(string workingDir, IReadOnlyDictionary<string, string> staticFileMappings = null)
         {
-            _staticFileMappings = staticFileMappings ?? Array.Empty<(string, string)>();
+            _staticFileMappings = staticFileMappings ?? new Dictionary<string, string>();
             _stateWriter = new ServerStateWriter(ServerName, workingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
@@ -98,6 +99,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             var url = $"http://{localhostIp}:0";
             _host = new WebHostBuilder()
                 .UseKestrel()
+                .SuppressStatusMessages(true)
                 .UseUrls(url)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .Configure(Configure)
@@ -124,43 +126,83 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 ReceiveBufferSize = PooledBuffer.MaxSize
             });
 
-            app.Use(async (context, next) =>
+            foreach (var pair in _staticFileMappings)
             {
-                if (context.WebSockets.IsWebSocketRequest)
-                {
-                    try
-                    {
-                        Log.Trace("Websocket connection received");
-                        var connectionTask = await AcceptWebsocketConnectionAsync(context).ConfigureAwait(false);
-                        await connectionTask.ConfigureAwait(false);
-                        Log.Trace("Websocket connection completed");
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Trace("Websocket connection terminated with exception: {0}", ex.FormatTypeAndMessage());
-                        throw;
-                    }
-                }
-                else
-                {
-                    Log.Trace("Non-websocket request received");
-                    await next().ConfigureAwait(false);
-                }
-            });
-
-            foreach (var (urlpath, physicalpath) in _staticFileMappings)
-            {
-                if (!Directory.Exists(physicalpath))
+                if (!Directory.Exists(pair.Value))
                 {
                     continue;
                 }
 
                 app.UseStaticFiles(new StaticFileOptions
                 {
-                    RequestPath = urlpath,
-                    FileProvider = new PhysicalFileProvider(physicalpath),                    
+                    RequestPath = pair.Key,
+                    FileProvider = new PhysicalFileProvider(pair.Value)
                 });
             }
+
+            app.Use(async (context, next) =>
+            {
+                if (context.WebSockets.IsWebSocketRequest)
+                {
+                    var urlPath = context.Request.Path.ToString().TrimEnd('/');
+                    if (_staticFileMappings.TryGetValue(urlPath, out var physicalPath))
+                    {
+                        if (File.Exists(physicalPath))
+                        {
+                            using (var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false))
+                            {
+                                using (var stream = File.Open(physicalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                                using (var streamReader = new StreamReader(stream))
+                                {
+                                    var bytes = Encoding.UTF8.GetBytes(
+                                        await streamReader.ReadToEndAsync().ConfigureAwait(false));
+                                    await webSocket
+                                        .SendAsync(
+                                            new ArraySegment<byte>(bytes),
+                                            WebSocketMessageType.Text,
+                                            true,
+                                            CancellationToken.None)
+                                        .ConfigureAwait(false);
+                                }
+
+                                await webSocket
+                                    .CloseAsync(
+                                        WebSocketCloseStatus.NormalClosure,
+                                        "Normal Close",
+                                        CancellationToken.None)
+                                    .ConfigureAwait(false);
+                            }
+
+                            return;
+                        }                        
+                    }
+
+                    if (string.IsNullOrEmpty(urlPath))
+                    {
+                        try
+                        {
+                            Log.Trace("Websocket connection received");
+                            var connectionTask = await AcceptWebsocketConnectionAsync(context).ConfigureAwait(false);
+                            await connectionTask.ConfigureAwait(false);
+                            Log.Trace("Websocket connection completed");
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Trace("Websocket connection terminated with exception: {0}", ex.FormatTypeAndMessage());
+                            throw;
+                        }
+
+                        return;
+                    }
+
+                    Log.Trace("Unknown websocket request received: {0}", context.Request.Path);
+                }
+                else
+                {
+                    Log.Trace("Unknown request received: {0}", context.Request.Path);
+                }
+                await next().ConfigureAwait(false);
+            });
         }
 
         private async Task<Task> AcceptWebsocketConnectionAsync(HttpContext context)

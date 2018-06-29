@@ -25,8 +25,7 @@ namespace Plexus.Interop.Apps.Internal
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
-    using UniqueId = Plexus.UniqueId;
+    using Google.Protobuf.WellKnownTypes;
 
     internal sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager, Generated.AppLifecycleManagerClient.IAppLifecycleServiceImpl
     {        
@@ -259,7 +258,7 @@ namespace Plexus.Interop.Apps.Internal
         }
         
         Task Generated.AppLifecycleService.IGetLifecycleEventStreamImpl.GetLifecycleEventStream(
-            Generated.Empty request, IWritableChannel<Generated.AppLifecycleEvent> responseStream, MethodCallContext context)
+            Empty request, IWritableChannel<Generated.AppLifecycleEvent> responseStream, MethodCallContext context)
         {            
             lock (_appLifecycleEventSubscribers)
             {

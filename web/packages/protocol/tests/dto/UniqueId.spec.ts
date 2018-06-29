@@ -14,10 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './api';
-export * from './bus';
-export * from './metadata';
-export * from './http';
-export * from './launcher';
-export * from './io';
-export * from './ws/WebSocketDataProvider';
+import { UniqueId } from '../../src/dto/UniqueId';
+
+describe('UniqueId', () => {
+    it('Converts guid to string and back', () => {
+        const id = UniqueId.generateNew();
+        const strId = id.toString();
+        expect(UniqueId.fromString(strId).toString()).toBe(strId);
+    });
+    it('Converts id to 32 lengh string', () => {
+        const id = UniqueId.generateNew();
+        const strId = id.toString();
+        expect(id.toString().length).toBe(32);
+    });
+});
