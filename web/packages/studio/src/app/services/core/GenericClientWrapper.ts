@@ -23,6 +23,7 @@ import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler, wrapGenericHostClient, toGenericObserver } from './StringHandlers';
 import { Observer, flatMap } from '@plexus-interop/common';
 import { clientProtocol as plexus } from '@plexus-interop/protocol';
+import { FieldNamesValidator } from './FieldNamesValidator';
 
 type DiscoveredMetaInfo = {
     inputMessageId: string,
@@ -39,6 +40,8 @@ type ConsumedMetaInfo = {
 
 export class GenericClientWrapper implements InteropClient {
 
+    private fieldsNamesValidator: FieldNamesValidator;
+
     public constructor(
         private readonly appId: string,
         private readonly genericClient: GenericClientApi,
@@ -48,6 +51,7 @@ export class GenericClientWrapper implements InteropClient {
         private readonly serverStreamingHandlers: Map<string, ServerStreamingStringHandler>,
         private readonly bidiHandlers: Map<string, BidiStreamingStringHandler>,
         private readonly defaultGenerator: DefaultMessageGenerator) {
+        this.fieldsNamesValidator = new FieldNamesValidator(this.interopRegistryService);
     }
 
     public getConnectionStrId(): string {
@@ -58,7 +62,8 @@ export class GenericClientWrapper implements InteropClient {
         const { inputMessageId } = this.toMetaInfo(methodToInvoke);
         const requestEncoder = this.encoderProvider.getMarshaller(inputMessageId);
         const requestData = JSON.parse(payload);
-        return requestEncoder.validate(requestData);
+        requestEncoder.validate(requestData);
+        this.fieldsNamesValidator.validate(inputMessageId, requestData);
     }
 
     public disconnect(): Promise<void> {
@@ -265,10 +270,10 @@ export class GenericClientWrapper implements InteropClient {
         }
         return discoveredMethods;
     }
-    
+
 }
 
-export function methodHash(methodInfo: {serviceId: string, methodId: string, serviceAlias?: string}): string {
+export function methodHash(methodInfo: { serviceId: string, methodId: string, serviceAlias?: string }): string {
     const alias = methodInfo.serviceAlias || 'default';
     return `${methodInfo.serviceId}.${alias}.${methodInfo.methodId}`;
 }

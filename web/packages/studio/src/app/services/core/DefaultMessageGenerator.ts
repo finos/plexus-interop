@@ -66,9 +66,7 @@ export class DefaultMessageGenerator {
             } else if (skipMessageType) {
                 return {};
             } else {
-                const messageType = this.lookupMessage(field.type)
-                    || this.lookupMessage(`${messageId}.${field.type}`)
-                    || this.lookupMessage(`${this.getNamespace(messageId)}.${field.type}`);
+                const messageType = this.lookupMessageByFieldType(messageId, field.type);
                 if (messageType) {
                     return this.generateObj(messageType.id, true);
                 } else {
@@ -78,7 +76,13 @@ export class DefaultMessageGenerator {
         }
     }
 
-    private isArray(field: any): boolean {
+    public lookupMessageByFieldType(messageId: string, fieldType: string): Message | null {
+        return this.lookupMessage(fieldType)
+            || this.lookupMessage(`${messageId}.${fieldType}`)
+            || this.lookupMessage(`${this.getNamespace(messageId)}.${fieldType}`)
+    }
+
+    public isArray(field: any): boolean {
         return field.rule && field.rule === 'repeated';
     }
 
@@ -121,7 +125,7 @@ export class DefaultMessageGenerator {
         return this.interopRegistryProvider.getRegistry().messages.get(id);
     }
 
-    private isPrimitive(type: string): boolean {
+    public isPrimitive(type: string): boolean {
         return this.primitiveTypes.indexOf(type) !== -1;
     }
 
