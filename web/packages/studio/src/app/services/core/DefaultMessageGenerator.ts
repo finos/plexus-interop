@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService, Enum, Message } from '@plexus-interop/broker';
+import { InteropRegistryService, Enum, Message, InteropRegistry } from '@plexus-interop/broker';
 
 export class DefaultMessageGenerator {
 
-    public constructor(private readonly interopRegistryService: InteropRegistryService) { }
+    public constructor(private readonly interopRegistryProvider: { getRegistry: () => InteropRegistry }) { }
 
     // https://developers.google.com/protocol-buffers/docs/reference/proto3-spec    
     private readonly primitiveTypes = [
@@ -30,7 +30,7 @@ export class DefaultMessageGenerator {
         return JSON.stringify(this.generateObj(messageId));
     }
 
-    private generateObj(messageId: string, skipMessageType: boolean = false): any {
+    public generateObj(messageId: string, skipMessageType: boolean = false): any {
         const message = this.lookupMessage(messageId);
         if (!message) {
             throw new Error(`${messageId} is not found`);
@@ -92,7 +92,7 @@ export class DefaultMessageGenerator {
     }
 
     private lookupEnum(id: string): Enum | null {
-        const enums = this.interopRegistryService.getRegistry().enums;
+        const enums = this.interopRegistryProvider.getRegistry().enums;
         if (enums) {
             return enums.get(id);
         }
@@ -100,7 +100,7 @@ export class DefaultMessageGenerator {
     }
 
     private lookupMessage(id: string): Message | null {
-        return this.interopRegistryService.getRegistry().messages.get(id);
+        return this.interopRegistryProvider.getRegistry().messages.get(id);
     }
 
     private isPrimitive(type: string): boolean {
