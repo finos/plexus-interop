@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService, Enum, Message, InteropRegistry } from '@plexus-interop/broker';
+import { InteropRegistryService, Enum, Message, InteropRegistry, Field } from '@plexus-interop/broker';
 
 export class DefaultMessageGenerator {
 
@@ -58,9 +58,7 @@ export class DefaultMessageGenerator {
             return this.getPrimitiveDefault(field.type);
         } else {
             // enum or message
-            const enumRef = this.lookupEnum(field.type)
-                || this.lookupEnum(`${messageId}.${field.type}`)
-                || this.lookupEnum(`${this.getNamespace(messageId)}.${field.type}`)
+            const enumRef = this.loookupEnumByFieldType(messageId, field.type);
             if (enumRef) {
                 return this.anyValue(enumRef.values);
             } else if (skipMessageType) {
@@ -80,6 +78,22 @@ export class DefaultMessageGenerator {
         return this.lookupMessage(fieldType)
             || this.lookupMessage(`${messageId}.${fieldType}`)
             || this.lookupMessage(`${this.getNamespace(messageId)}.${fieldType}`)
+    }
+
+    public loookupEnumByFieldType(messageId: string, fieldType: string): Enum | null {
+        return this.lookupEnum(fieldType)
+            || this.lookupEnum(`${messageId}.${fieldType}`)
+            || this.lookupEnum(`${this.getNamespace(messageId)}.${fieldType}`)
+    }
+
+    public loookupEnumByFieldName(messageId: string, fieldName: string): Enum | null {
+        const message = this.lookupMessage(messageId);
+        const field = message.fields[fieldName]
+        if (field) {
+            return this.loookupEnumByFieldType(messageId, field.type);
+        } else {
+            return null;
+        }
     }
 
     public isArray(field: any): boolean {
@@ -127,6 +141,20 @@ export class DefaultMessageGenerator {
 
     public isPrimitive(type: string): boolean {
         return this.primitiveTypes.indexOf(type) !== -1;
+    }
+
+    public isMap(field: any): boolean {
+        return !!field.keyType;
+    }
+
+    public isMapByName(messageId: string, fieldName: string): boolean {
+        const message = this.lookupMessage(messageId);
+        const field = message.fields[fieldName]
+        if (field) {
+            return !!field.keyType;
+        } else {
+            return false;
+        }
     }
 
 }

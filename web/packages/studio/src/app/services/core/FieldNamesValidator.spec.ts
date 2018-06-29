@@ -38,6 +38,11 @@ describe('Field names validator', () => {
             messageField: {
                 type: fieldMessageId,
                 id: 4
+            },
+            mapField: {
+                keyType: "string",
+                type: "string",
+                id: 5
             }
         }
     };
@@ -45,8 +50,42 @@ describe('Field names validator', () => {
     it('Should pass object with correct fields', () => {
         new FieldNamesValidator(setupRegistry([fieldMessage, message])).validate(id, {
             int32Field: 0,
-            stringField: "123"
-        })
+            stringField: "123",
+            stringArrayField: ["123"],
+            messageField: {
+                stringField: "1234"
+            }
+        });
+    });
+
+    it('Should fail on object with incorrect field', () => {
+        try {
+            new FieldNamesValidator(setupRegistry([fieldMessage, message])).validate(id, {
+                int32Field_x: 0
+            });
+            fail('Expected to fail');    
+        } catch (error) {
+        }        
+    });
+
+    it('Should fail on object with incorrect nested field', () => {
+        try {
+            new FieldNamesValidator(setupRegistry([fieldMessage, message])).validate(id, {
+                messageField: {
+                    stringField_x: "1234"
+                }
+            });
+            fail('Expected to fail');    
+        } catch (error) {
+        }        
+    });
+
+    it('Should pass object with Map field', () => {
+        new FieldNamesValidator(setupRegistry([fieldMessage, message])).validate(id, {
+            mapField: {
+                someKey: "1234"
+            }
+        });      
     });
 
 });

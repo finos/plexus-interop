@@ -32,14 +32,14 @@ export class FieldNamesValidator {
     public validate(messageId: string, payload: any): void {
         const message = this.registryProvider.getRegistry().messages.get(messageId);
         const existingFieldNames = this.collectFieldNames(message);
-        const actualFieldNames = this.collectObjFieldNames(payload);
+        const actualFieldNames = this.collectObjFieldNames(messageId, payload);
         actualFieldNames.difference(existingFieldNames);
         if (!actualFieldNames.isEmpty()) {
             throw `[${actualFieldNames.toArray().join(",")}] field(s) do not exist`;
         }
     }
 
-    public collectObjFieldNames(object: any, result: Set<string> = new Set<string>(), prefix: string = ""): Set<string> {
+    public collectObjFieldNames(messageId: string, object: any, result: Set<string> = new Set<string>(), prefix: string = ""): Set<string> {
         if (Array.isArray(object) || !object) {
             return result;
         }
@@ -47,8 +47,16 @@ export class FieldNamesValidator {
             if (object.hasOwnProperty(key)) {
                 result.add(prefix + key);
                 const value = object[key];
+                if (this.messageGenerator.isMapByName(messageId, key)) {
+                    // map field, stop
+                    return;
+                }
+                if (this.messageGenerator.loookupEnumByFieldName(messageId, key)) {
+                    // enum field, stop
+                    return;
+                }
                 if (this.isObject(value)) {
-                    this.collectObjFieldNames(value, result, key + ".");
+                    this.collectObjFieldNames(messageId, value, result, key + ".");
                 }
             }
         });
