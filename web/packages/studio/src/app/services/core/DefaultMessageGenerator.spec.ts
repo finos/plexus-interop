@@ -67,6 +67,35 @@ describe('DefaultMessageGenerator', () => {
         expect(generated.enumField).toBe(1);
     });
 
+    it('Should generate object with message field', () => {
+        
+        const fieldMessageId = "field.message.id";
+        const fieldMessage = {
+            id: fieldMessageId,
+            fields: {
+                stringField: {
+                    type: "string",
+                    id: 1
+                }
+            }
+        };
+
+        const messageId = 'test';
+        const message: Message = {
+            id: messageId,
+            fields: {
+                messageField: {
+                    type: fieldMessageId,
+                    id: 1
+                }
+            }
+        };
+
+        const generated = new DefaultMessageGenerator(setupRegistry([message, fieldMessage])).generateObj(messageId);
+        expect(generated.messageField.stringField).toBe('stringValue');
+
+    });
+
 });
 
 function setupRegistry(messages: Message[], enums: Enum[] = []): { getRegistry: () => InteropRegistry } {
