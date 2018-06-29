@@ -29,7 +29,6 @@ import static org.hamcrest.CoreMatchers.*;
 
 import static org.junit.Assert.*
 import static com.db.plexus.interop.dsl.validation.Issues.*;
-import com.db.plexus.interop.dsl.gen.meta.MetaValidatorTask
 
 @RunWith(XtextRunner)
 @InjectWith(InteropLangInjectionProvider)
@@ -37,9 +36,6 @@ class MetaValidatorTaskTest {
 
     @Inject
     protected ResourceSetValidator validator;
-
-    @Inject
-    private MetaValidatorTask validatorTask;
 
     @Test
     def testValidMetadata() {

@@ -36,7 +36,7 @@ class MetaJsonGenTask extends BaseGenTask {
         val resources = rs.getResources()
         val protoFilePaths = getProtoFilePaths(resources, config)
         var messagesJson = "[]";
-        if(!protoFilePaths.isEmpty() && config.getProtocPath() != null) {
+        if(!protoFilePaths.isEmpty() && config.getProtocPath() !== null) {
             val pbJsArgs = new ArrayList(Arrays.asList(config.getProtocPath()));
             pbJsArgs.addAll(this.protoArgs())
             pbJsArgs.addAll(protoFilePaths);

@@ -69,7 +69,7 @@ class InteropLangScopeProvider extends AbstractInteropLangScopeProvider {
 		if (context instanceof InteropOption && reference == ProtobufPackage.Literals.OPTION__DESCRIPTOR) {
 			val option = context as InteropOption
 			val optionMsg = utils.getDescriptorsContainer(option)
-			if (optionMsg == null) {
+			if (optionMsg === null) {
 				return super.getScope(context, reference);
 			}
 			if (option.isCustom) {

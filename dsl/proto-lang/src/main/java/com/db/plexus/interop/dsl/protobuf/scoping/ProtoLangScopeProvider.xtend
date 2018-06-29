@@ -91,8 +91,7 @@ class ProtoLangScopeProvider extends AbstractProtoLangScopeProvider {
 				val typeRef = descriptor.typeReference as ComplexFieldType
 				val type = typeRef.value
 				if (type instanceof Enum) {
-					val ^enum = type as Enum
-					val values = ^enum.elements.filter(typeof(EnumValue))
+					val values = type.elements.filter(typeof(EnumValue))
 					return Scopes.scopeFor(values, [x|QualifiedName.create(x.name)], IScope.NULLSCOPE)
 				}
 			}
