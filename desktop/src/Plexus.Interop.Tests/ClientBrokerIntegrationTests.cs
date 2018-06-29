@@ -802,7 +802,7 @@ namespace Plexus.Interop
                 WriteLog("Call 1 completed");
                 await Task.WhenAll(call1.AsTask(), call2.AsTask());
                 WriteLog("Call 2 completed");
-                serverCreatedCount.ShouldBe(2);
+                serverCreatedCount.ShouldBe(1);
                 serverInvokedCount.ShouldBe(2);
             });
         }
