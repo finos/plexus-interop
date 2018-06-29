@@ -36,7 +36,7 @@ describe('DefaultMessageGenerator', () => {
                 boolField: {
                     type: 'bool',
                     id: 3
-                } 
+                }
             }
         };
         const generated = new DefaultMessageGenerator(setupRegistry([message])).generateObj(id);
@@ -68,7 +68,7 @@ describe('DefaultMessageGenerator', () => {
     });
 
     it('Should generate object with message field', () => {
-        
+
         const fieldMessageId = "field.message.id";
         const fieldMessage = {
             id: fieldMessageId,
@@ -96,11 +96,84 @@ describe('DefaultMessageGenerator', () => {
 
     });
 
+    it('Should generate one test element for array fields', () => {
+
+        const messageId = 'test';
+
+        const enumId = 'test.enum';
+        const testEnum: Enum = {
+            id: enumId,
+            values: {
+                "ONE": 1
+            }
+        };
+
+        const fieldMessageId = "field.message.id";
+        const fieldMessage = {
+            id: fieldMessageId,
+            fields: {
+                stringField: {
+                    type: "string",
+                    id: 1
+                }
+            }
+        };
+
+        const complexMessageId = "complex.message.id";
+        const complexMessage = {
+            id: complexMessageId,
+            fields: {
+                messageField: {
+                    type: fieldMessageId,
+                    id: 1
+                }
+            }
+        };
+
+        const message: Message = {
+            id: messageId,
+            fields: {
+                enumArrayField: {
+                    rule: 'repeated',
+                    type: enumId,
+                    id: 1
+                },
+                stringArrayField: {
+                    rule: 'repeated',
+                    type: 'string',
+                    id: 2
+                },
+                // simple message 
+                messageArrayField: {
+                    rule: 'repeated',
+                    type: fieldMessageId,
+                    id: 3
+                },
+                complexMessageArrayField: {
+                    rule: 'repeated',
+                    type: complexMessageId,
+                    id: 4
+                }
+            }
+        };
+
+        const generated = new DefaultMessageGenerator(setupRegistry([message, fieldMessage, complexMessage], [testEnum])).generateObj(messageId);
+        expect(generated.stringArrayField).toEqual(['stringValue']);
+        expect(generated.enumArrayField).toEqual([1]);
+        expect(generated.messageArrayField).toEqual([{ stringField: 'stringValue' }]);
+        expect(generated.complexMessageArrayField).toEqual([
+            {
+                messageField: {}
+            }
+        ]);
+
+    });
+
 });
 
 function setupRegistry(messages: Message[], enums: Enum[] = []): { getRegistry: () => InteropRegistry } {
-    
-    const messagesMap = ExtendedMap.create<string, Message>();    
+
+    const messagesMap = ExtendedMap.create<string, Message>();
     messages.forEach(m => messagesMap.set(m.id, m));
 
     const enumsMap = ExtendedMap.create<string, Enum>();

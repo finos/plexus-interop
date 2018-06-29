@@ -38,41 +38,59 @@ export class DefaultMessageGenerator {
         const defaultPayload: any = {};
         for (let fieldName in message.fields) {
             const field = message.fields[fieldName];
-            if (field.keyType) {
-                // primitive 'map' support
-                defaultPayload[fieldName] = {};
-            } else if (field.rule && field.rule === 'repeated') {
-                defaultPayload[fieldName] = [];
-            } else if (this.isPrimitive(field.type)) {
-                switch (field.type) {
-                    case 'string':
-                        defaultPayload[fieldName] = 'stringValue';
-                        break;
-                    case 'bool':
-                        defaultPayload[fieldName] = false;
-                        break;
-                    default:
-                        defaultPayload[fieldName] = 0;
-                }
+            defaultPayload[fieldName] = this.isArray(field) ?
+                this.generateArrayValue(messageId, field, skipMessageType)
+                : this.generateNonArrayValue(messageId, field, skipMessageType)
+        }
+        return defaultPayload;
+    }
+
+    private generateArrayValue(messageId: string, field: any, skipMessageType: boolean): any {
+        return [this.generateNonArrayValue(messageId, field, skipMessageType)];
+    }
+
+    private generateNonArrayValue(messageId: string, field: any, skipMessageType: boolean): any {
+        if (field.keyType) {
+            // map
+            return {};
+        } else if (this.isPrimitive(field.type)) {
+            // primitive
+            return this.getPrimitiveDefault(field.type);
+        } else {
+            // enum or message
+            const enumRef = this.lookupEnum(field.type)
+                || this.lookupEnum(`${messageId}.${field.type}`)
+                || this.lookupEnum(`${this.getNamespace(messageId)}.${field.type}`)
+            if (enumRef) {
+                return this.anyValue(enumRef.values);
+            } else if (skipMessageType) {
+                return {};
             } else {
-                const enumRef = this.lookupEnum(field.type) 
-                    || this.lookupEnum(`${messageId}.${field.type}`) 
-                    || this.lookupEnum(`${this.getNamespace(messageId)}.${field.type}`)
-                if (enumRef) {
-                    defaultPayload[fieldName] = this.anyValue(enumRef.values);
-                } else if (skipMessageType) {
-                    defaultPayload[fieldName] = [];
+                const messageType = this.lookupMessage(field.type)
+                    || this.lookupMessage(`${messageId}.${field.type}`)
+                    || this.lookupMessage(`${this.getNamespace(messageId)}.${field.type}`);
+                if (messageType) {
+                    return this.generateObj(messageType.id, true);
                 } else {
-                    const subMessage = this.lookupMessage(field.type) 
-                        || this.lookupMessage(`${messageId}.${field.type}`) 
-                        || this.lookupMessage(`${this.getNamespace(messageId)}.${field.type}`);
-                    if (subMessage) {
-                        defaultPayload[fieldName] = this.generateObj(subMessage.id, true);
-                    }
+                    return {};
                 }
             }
         }
-        return defaultPayload;
+    }
+
+    private isArray(field: any): boolean {
+        return field.rule && field.rule === 'repeated';
+    }
+
+    private getPrimitiveDefault(type: string): any {
+        switch (type) {
+            case 'string':
+                return 'stringValue';
+            case 'bool':
+                return false;
+            default:
+                return 0;
+        }
     }
 
     private anyValue(o: any): any {
