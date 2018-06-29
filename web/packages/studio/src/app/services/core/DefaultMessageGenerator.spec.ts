@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService, Message, InteropRegistry, Service, Application } from '@plexus-interop/broker';
+import { InteropRegistryService, Message, InteropRegistry, Service, Application, Enum } from '@plexus-interop/broker';
 import { ExtendedMap } from '@plexus-interop/common';
 import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 
@@ -39,23 +39,52 @@ describe('DefaultMessageGenerator', () => {
                 } 
             }
         };
-        const generated = new DefaultMessageGenerator(setupRegistry(message)).generateObj(id);
+        const generated = new DefaultMessageGenerator(setupRegistry([message])).generateObj(id);
         expect(generated.stringField).toBe('stringValue');
         expect(generated.int32Field).toBe(0);
         expect(generated.boolField).toBe(false);
     });
 
+    it('Should generate object with enum field', () => {
+        const messageId = 'test';
+        const enumId = 'test.enum';
+        const testEnum: Enum = {
+            id: enumId,
+            values: {
+                "ONE": 1
+            }
+        };
+        const message: Message = {
+            id: messageId,
+            fields: {
+                enumField: {
+                    type: enumId,
+                    id: 1
+                }
+            }
+        };
+        const generated = new DefaultMessageGenerator(setupRegistry([message], [testEnum])).generateObj(messageId);
+        expect(generated.enumField).toBe(1);
+    });
+
 });
 
-function setupRegistry(message: Message): { getRegistry: () => InteropRegistry } {
-    const messages = ExtendedMap.create<string, Message>();
-    messages.set(message.id, message);
+function setupRegistry(messages: Message[], enums: Enum[] = []): { getRegistry: () => InteropRegistry } {
+    
+    const messagesMap = ExtendedMap.create<string, Message>();    
+    messages.forEach(m => messagesMap.set(m.id, m));
+
+    const enumsMap = ExtendedMap.create<string, Enum>();
+    enums.forEach(e => enumsMap.set(e.id, e));
+
     const registry = {
-        messages,
+        messages: messagesMap,
+        enums: enumsMap,
         applications: ExtendedMap.create<string, Application>(),
         services: ExtendedMap.create<string, Service>(),
         rawMessages: {}
     };
+
     return {
         getRegistry: () => registry
     };
