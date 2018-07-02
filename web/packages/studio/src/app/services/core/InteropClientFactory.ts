@@ -83,7 +83,14 @@ export class InteropClientFactory {
 
         this.log.info(`Connected as ${appId}`);
 
-        const clientWrapper = new GenericClientWrapper(appId, client, interopRegistryService, marshallerFactory, unaryHandlers, serverStreamingHandlers, bidiStreamingHandlers, new DefaultMessageGenerator(interopRegistryService));
+        const clientWrapper = new GenericClientWrapper(
+            appId, 
+            client, 
+            interopRegistryService, 
+            marshallerFactory, unaryHandlers, 
+            serverStreamingHandlers, 
+            bidiStreamingHandlers, new DefaultMessageGenerator(interopRegistryService));
+        
         clientWrapper.resetInvocationHandlers();
 
         return clientWrapper;
