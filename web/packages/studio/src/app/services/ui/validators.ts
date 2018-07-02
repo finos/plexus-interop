@@ -19,7 +19,7 @@ import { ConsumedMethod, ProvidedMethod } from '@plexus-interop/broker';
 import { DiscoveredMethod } from '@plexus-interop/client';
 import { ValidatorFn, AbstractControl } from '@angular/forms';
 
-export function plexusMessageValidator(fieldName: string, client: InteropClient, methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod): ValidatorFn {
+export function plexusMessageValidator(formFieldName: string, client: InteropClient, methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } => {
         const value = control.value;
         try {
@@ -27,7 +27,7 @@ export function plexusMessageValidator(fieldName: string, client: InteropClient,
             return null;
         } catch (error) {
             const errors = {};
-            errors[fieldName] = `${error}`;
+            errors[formFieldName] = `${error}`;
             return errors;
         }
     };
