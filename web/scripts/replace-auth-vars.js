@@ -73,6 +73,7 @@ if (!!buildRunner) {
         }
 
         const disableStrictSsl = process.env['NPM_STRICT_SSL'] === 'false';
+        const enableAlwaysAuth = process.env['NPM_ALWAYS_AUTH'] === 'true';
 
         fs.readFile(templateFile, 'utf8', function (err,data) {
             if (err) {
@@ -85,6 +86,11 @@ if (!!buildRunner) {
             if (disableStrictSsl) {
                 console.log('Updating strict ssl setting');
                 data += `\nstrict-ssl=false`;
+            }
+
+            if (enableAlwaysAuth) {
+                console.log('Enabling always auth');
+                data += `\nalways-auth=true`;
             }
             
             fs.writeFile('.npmrc', data, 'utf8', function (err) {
