@@ -21,17 +21,17 @@ type TopicName = String;
 type AppIdentifier = String;
 type AppInstanceIdentifier = String;
 
-enum InvokationErrorType {
+enum InvocationErrorType {
   AppNotFound = "AppNotFound",
   ErrorOnLaunch = "ErrorOnLaunch",
-  AppTimeout = "AppTimeout",  
-  HandlerInternalError = "HandlerInternalError",
+  AppTimeout = "AppTimeout",
+  AppInternalError = "AppInternalError",
   ResolverUnavailable = "ResolverUnavailable",
   ResolverInternalError = "ResolverInternalError"
 }
 
-interface InvokationError extends Error {
-  type: InvokationErrorType;
+interface InvocationError extends Error {
+  type: InvocationErrorType;
 }
 
 enum ResolveErrorType {
@@ -45,11 +45,11 @@ interface ResolveError extends Error {
 }
 
 /**
- * Specified whether the target app is already running or it can be launched by invokation.
+ * Specified whether the target app is already running or it can be launched by invocation.
  */
 enum AppState {
-  Launchable = 0,
-  Running = 1
+  Launchable = "Launchable",
+  Running = "Running"
 }
 
 /**
@@ -62,6 +62,14 @@ interface ResolveParameters {
 }
 
 /**
+ * Indicates type of response
+ */
+enum IntentType {
+  Simple = "Simple",
+  Streaming = "Streaming"
+}
+
+/**
  * Specifies intent resolved by Agent. 
  * Can be casted to Target and invoked.
  */
@@ -70,6 +78,7 @@ interface Intent {
   applicationName: AppIdentifier,   // Resolved application name.  
   state: AppState,                  // Resolved application state.
   instance?: AppInstanceIdentifier, // Optional. Undefined if application is not running (i.e. its state = Launchable).
+  type: IntentType,                 // Resolved intent type  
   properties: Property[]            // Custom properties of the resolved intent, e.g. user-friendly title and icon to show on UI.
 }
 
@@ -78,18 +87,18 @@ interface Intent {
  */
 interface Property {
   name: string,
-  value: object                    
+  value: object
 }
 
 /**
- * Specifies invokation target. Can be resolved from Agent or constructed directly.
- * Caller can specify the concrete instance of app which should handle the invokation.
- * Caller can specify if he want to route the invokation to already running or launchable instance.
+ * Specifies invocation target. Can be resolved from Agent or constructed directly.
+ * Caller can specify the concrete instance of app which should handle the invocation.
+ * Caller can specify if he want to route the invocation to already running or launchable instance.
  */
 interface Target {
-  intentName: IntentName,           
-  applicationName?: AppIdentifier,  // Optional. Can be undefined when constructed directly if target app is unknown and caller let Agent decide which app should handle the invokation.
-  instance?: AppInstanceIdentifier, // Optional. Can be undefined when constructed directly if target app instance is unknown and caller let Agent decide which instance should handle the invokation. If specified then Agent will route the context to this exact app instance.
+  intentName: IntentName,
+  applicationName?: AppIdentifier,  // Optional. Can be undefined when constructed directly if target app is unknown and caller let Agent decide which app should handle the invocation.
+  instance?: AppInstanceIdentifier, // Optional. Can be undefined when constructed directly if target app instance is unknown and caller let Agent decide which instance should handle the invocation. If specified then Agent will route the context to this exact app instance.
   state?: AppState                  // Optional. Can be undefined when constructed directly if target app state doesn't matter for caller. If state=Launchable then Agent will launch new instance of target app. If state=Running then Agent will route context to the already running instance.
 }
 
@@ -99,67 +108,118 @@ var target: Target;
 target = intent;
 
 /**
- * Allows cancelling asynchronous operation.
+ * Token which propogates information that operation should be cancelled.
  */
-interface Cancellable {
-  cancel(): void;
+interface CancellationToken {
+  isCancelled(): boolean;
+  // listens for cancellation of this token 
+  listen(callback: (reason: any) => void): Listener;
 }
 
 /**
- * Allows to subscribe to invokation result (successful or not).
+ * Allows to subscribe to invocation result (successful or not).
  */
-interface InvokationObserver {
-  onError(error: InvokationError): void;
+interface InvocationObserver {
+  onError(error: InvocationError): void;
   onCompleted(result: Result): void;
 }
 
 /**
- * Allows to subscribe to streaming invokation.
+ * Allows to subscribe to streaming invocation.
  */
 interface StreamObserver {
   onNext(result: Result): void;
-  onError(error: InvokationError): void;
+  onError(error: InvocationError): void;
   onCompleted(): void;
 }
 
+interface IntentObserver {
+  intentAdded(intent: Intent);
+  intentRemoved(intent: Intent);
+}
+
 /**
- * A Desktop Agent is a desktop component (or aggregate of components) that serves as a
+ * Allows to dispose subscriptions.
+ */
+interface Listener {
+  unsubscribe();
+}
+
+interface InvocationHandler { 
+
+  intentName: IntentName, 
+
+  /**
+  * Implements logic of intent handling.
+  * CancellationToken will signal when caller cancelled the request allowing intent handler to cancel long running operations.
+  */  
+  handle(context: Context, cancellationToken: CancellationToken): Promise<Result>;
+}
+
+interface StreamingInvocationHandler {
+
+  intentName: IntentName, 
+
+  /**
+  * Implements logic of streaming intent handling.
+  * CancellationToken will signal when caller cancelled the request allowing intent handler to cancel long running operations.
+  */  
+  handle(context: Context, cancellationToken: CancellationToken, observer: StreamObserver): void;
+}
+
+/**
+ * Desktop Agent is a desktop component (or aggregate of components) that serves as a
  * launcher and message router (broker) for applications in its domain.
  * 
- * A Desktop Agent can be connected to one or more App Directories and will use directories for application
- * identity and discovery. Typically, a Desktop Agent will contain the proprietary logic of
+ * Desktop Agent can be connected to one or more App Directories and will use directories for application
+ * identity and discovery. Typically, a Desktop agent will contain the proprietary logic of
  * a given platform, handling functionality like explicit application interop workflows where
  * security, consistency, and implementation requirements are proprietary.
  */
 interface DesktopAgent {
+
+  /**
+  * Connects the current App Instance to interop, all intent handlers are provided during connect.
+  * Returns InteropClient instance which can be used to interoperate with desktop agent.
+  */
+  connect(
+    applicationName: AppIdentifier, 
+    invocationHandlers?: InvocationHandler[], 
+    streamingInvocationHandlers?: StreamingInvocationHandler[]): Promise<InteropClient>;
+}
+
+/**
+ * InteropClient is an interface for interoperating with Desktop Agent.
+ * Each instance of InteropClient reprensents a connection from app to Desktop Agent.
+ */
+interface InteropClient {
+
   /**
    * Sends the given context to the given target. 
    * 
-   * Specified observer receives either result object or error object after invokation completed.
+   * Specified observer receives either result object or error object after invocation completed.
    * For fire-and-forget cases observer can be omited.
    */
-  invoke(target: Target, context: Context, observer?: InvokationObserver): Cancellable;
+  invoke(target: Target, context: Context, cancellationToken?: CancellationToken): Promise<Result>;
 
   /**
    * Sends the given context to the given target and listens for stream of responses.
    */
-  invokeStream(target: Target, context: Context, observer: StreamObserver): Cancellable;  
+  invokeStream(target: Target, context: Context, observer: StreamObserver): Listener;
 
   /**
-   * Listens to incoming Intents from the Agent.
-   * 
-   * Handler function returns promise to allow asynchornous execution.
-   */
-  listen(intent: IntentName, handler: (context: Context) => Promise<Result>): Cancellable;  
-
-  /**
-   * Resolves a list of potential invokation targets by the given parameters.
+   * Resolves a list of potential invocation targets by the given parameters.
    *
    * Resolve is effectively granting programmatic access to the Desktop Agent's resolver.
    * Returns a promise that resolves to an Array. The resolved dataset & metadata is Desktop Agent-specific.
    * If the resolution errors, it returns error of type `ResolveError`.
    */
   resolve(resolveParameters: ResolveParameters): Promise<Intent[]>;
+
+  /**
+   * Listens for invocation targets for given parameters.
+   */
+  listenIntents(resolveParameters: ResolveParameters, IntentObserver: IntentObserver): Listener;
 
   /**
    * Broadcasts context to all the listeners of the specified topic.
@@ -169,5 +229,11 @@ interface DesktopAgent {
   /**
    * Subscribes for incoming context broadcast on the specified topic.
    */
-  subscribe(topic: TopicName, handler: (context: Context) => void): Cancellable;
+  subscribe(topic: TopicName, handler: (context: Context) => void): Listener;
+
+  /**
+   * Disconnects client from Interop, no more actions received/all subscriptions closed/all further invocations rejected
+   */
+  disconnect(): Promise<void>;
+
 }
