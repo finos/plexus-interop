@@ -49,10 +49,10 @@ public class Issues {
         val result = new StringBuilder(issue.severity.name());
         result.append(": ").append(issue.getMessage());
         result.append(" [");
-        if(issue.getUriToProblem() != null) {
+        if(issue.getUriToProblem() !== null) {
             result.append(issue.getUriToProblem().trimFragment());
         }
-        if(issue.lineNumber != null || issue.column != null) {
+        if(issue.lineNumber !== null || issue.column !== null) {
             result.append(" line : ")
             .append(issue.lineNumber).append(" column : ").append(issue.column);
         }

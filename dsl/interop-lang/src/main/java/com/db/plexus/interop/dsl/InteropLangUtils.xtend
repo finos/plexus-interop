@@ -47,7 +47,7 @@ class InteropLangUtils {
 		val name = option.descriptorContainerName
         val resourceSet = option.eResource.resourceSet
 		val description = resourceSet.descriptorResourceDescription
-        if (description == null) {
+        if (description === null) {
             val descriptorResource = importResolver.resolveResource(resourceSet, DESCRIPTOR_RESOURCE_PATH)
             val message = descriptorResource.allContents
                 .filter(typeof(Message))
@@ -56,7 +56,7 @@ class InteropLangUtils {
         }
 		val objects = description.getExportedObjects(ProtobufPackage.Literals.MESSAGE, name, false)
 		val message = objects.findFirst[x|true];
-		return if (message != null) message.EObjectOrProxy as Message else null
+		return if (message !== null) message.EObjectOrProxy as Message else null
 	}
 	
 	def public IResourceDescription getDescriptorResourceDescription(ResourceSet resourceSet) {

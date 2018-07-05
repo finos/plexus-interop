@@ -138,11 +138,11 @@ public class GenUtils {
     }
 
     def static String getAliasOrName(ProvidedService providedService) {
-        return if(providedService.alias != null) providedService.alias else providedService.service.name
+        return if(providedService.alias !== null) providedService.alias else providedService.service.name
     }
 
     def static String getAliasOrName(ConsumedService service) {
-        return if(service.alias != null) service.alias else service.service.name
+        return if(service.alias !== null) service.alias else service.service.name
     }
 
     def static boolean isPrimitive(Field field) {
@@ -221,6 +221,16 @@ public class GenUtils {
         return Arrays.stream(resources)
         .flatMap([resource | getApplications(resource).stream()])
         .collect(Collectors.toList());
+    }
+
+    def getApplicationsMap(Resource... resources) {
+        return getApplications(resources)
+        .stream()
+        .collect(Collectors.toMap(
+                        [getFullName],
+                        [it],
+                        [value, duplicate | value]
+                ));
     }
 
     def static List<Application> getApplications(Resource resource) {

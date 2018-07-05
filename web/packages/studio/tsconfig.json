@@ -8,9 +8,12 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
-    "types": ["core-js"],
+    "types": [
+      "jest"
+    ],
     "lib": [
-      "es2015", "dom"
+      "es2015",
+      "dom"
     ]
   }
 }
