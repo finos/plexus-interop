@@ -21,6 +21,15 @@ type TopicName = String;
 type AppIdentifier = String;
 type AppInstanceIdentifier = String;
 
+/**
+ * Promise with explicitly defined error type.
+ */
+class TypedPromise<T, E> extends Promise<T> {
+  public constructor(executor: (resolve: (value: T) => void, reject: (reason: E) => void) => void) {
+    super(executor);
+  }
+}
+
 enum InvocationErrorType {
   AppNotFound = "AppNotFound",
   ErrorOnLaunch = "ErrorOnLaunch",
@@ -200,7 +209,7 @@ interface InteropClient {
    * Specified observer receives either result object or error object after invocation completed.
    * For fire-and-forget cases observer can be omited.
    */
-  invoke(target: Target, context: Context, cancellationToken?: CancellationToken): Promise<Result>;
+  invoke(target: Target, context: Context, cancellationToken?: CancellationToken): TypedPromise<Result, InvocationError>;
 
   /**
    * Sends the given context to the given target and listens for stream of responses.
