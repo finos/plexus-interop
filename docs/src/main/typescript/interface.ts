@@ -21,15 +21,6 @@ type TopicName = String;
 type AppIdentifier = String;
 type AppInstanceIdentifier = String;
 
-/**
- * Promise with explicitly defined error type.
- */
-class TypedPromise<T, E> extends Promise<T> {
-  public constructor(executor: (resolve: (value: T) => void, reject: (reason: E) => void) => void) {
-    super(executor);
-  }
-}
-
 enum InvocationErrorType {
   AppNotFound = "AppNotFound",
   ErrorOnLaunch = "ErrorOnLaunch",
@@ -198,8 +189,9 @@ interface InteropClient {
 
   /**
    * Sends the given context to the given target. 
+   * If the invocation fails, it returns error of type 'InvocationError'
    */
-  invoke(target: Target, context: Context, cancellationToken?: CancellationToken): TypedPromise<Result, InvocationError>;
+  invoke(target: Target, context: Context, cancellationToken?: CancellationToken): Promise<Result>;
 
   /**
    * Sends the given context to the given target and listens for stream of responses.
@@ -211,8 +203,9 @@ interface InteropClient {
    *
    * Resolve is effectively granting programmatic access to the Desktop Agent's resolver.
    * Returns a promise that resolves to an Array. The resolved dataset & metadata is Desktop Agent-specific.
+   * If the resolution errors, it returns error of type `ResolveError`.
    */
-  resolve(resolveParameters: ResolveParameters): TypedPromise<Intent[], ResolveError>;
+  resolve(resolveParameters: ResolveParameters): Promise<Intent[]>;
 
   /**
    * Listens for invocation targets for given parameters.
