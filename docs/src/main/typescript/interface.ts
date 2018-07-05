@@ -126,25 +126,18 @@ interface CancellationToken {
 }
 
 /**
- * Allows to subscribe to invocation result (successful or not).
- */
-interface InvocationObserver {
-  onError(error: InvocationError): void;
-  onCompleted(result: Result): void;
-}
-
-/**
  * Allows to subscribe to streaming invocation.
  */
 interface StreamObserver {
-  onNext(result: Result): void;
-  onError(error: InvocationError): void;
-  onCompleted(): void;
+  next(result: Result): void;
+  error(error: InvocationError): void;
+  completed(): void;
 }
 
 interface IntentObserver {
-  intentAdded(intent: Intent);
-  intentRemoved(intent: Intent);
+  intentAdded(intent: Intent): void;
+  intentRemoved(intent: Intent): void;
+  error(error: ResolveError): void;
 }
 
 /**
@@ -154,25 +147,25 @@ interface Listener {
   unsubscribe();
 }
 
-interface InvocationHandler { 
+interface InvocationHandler {
 
-  intentName: IntentName, 
+  intentName: IntentName,
 
   /**
   * Implements logic of intent handling.
   * CancellationToken will signal when caller cancelled the request allowing intent handler to cancel long running operations.
-  */  
+  */
   handle(context: Context, cancellationToken: CancellationToken): Promise<Result>;
 }
 
 interface StreamingInvocationHandler {
 
-  intentName: IntentName, 
+  intentName: IntentName,
 
   /**
   * Implements logic of streaming intent handling.
   * CancellationToken will signal when caller cancelled the request allowing intent handler to cancel long running operations.
-  */  
+  */
   handle(context: Context, cancellationToken: CancellationToken, observer: StreamObserver): void;
 }
 
@@ -192,8 +185,8 @@ interface DesktopAgent {
   * Returns InteropClient instance which can be used to interoperate with desktop agent.
   */
   connect(
-    applicationName: AppIdentifier, 
-    invocationHandlers?: InvocationHandler[], 
+    applicationName: AppIdentifier,
+    invocationHandlers?: InvocationHandler[],
     streamingInvocationHandlers?: StreamingInvocationHandler[]): Promise<InteropClient>;
 }
 
@@ -205,9 +198,6 @@ interface InteropClient {
 
   /**
    * Sends the given context to the given target. 
-   * 
-   * Specified observer receives either result object or error object after invocation completed.
-   * For fire-and-forget cases observer can be omited.
    */
   invoke(target: Target, context: Context, cancellationToken?: CancellationToken): TypedPromise<Result, InvocationError>;
 
@@ -221,14 +211,13 @@ interface InteropClient {
    *
    * Resolve is effectively granting programmatic access to the Desktop Agent's resolver.
    * Returns a promise that resolves to an Array. The resolved dataset & metadata is Desktop Agent-specific.
-   * If the resolution errors, it returns error of type `ResolveError`.
    */
-  resolve(resolveParameters: ResolveParameters): Promise<Intent[]>;
+  resolve(resolveParameters: ResolveParameters): TypedPromise<Intent[], ResolveError>;
 
   /**
    * Listens for invocation targets for given parameters.
    */
-  listenIntents(resolveParameters: ResolveParameters, IntentObserver: IntentObserver): Listener;
+  listenIntents(resolveParameters: ResolveParameters, intentObserver: IntentObserver): Listener;
 
   /**
    * Broadcasts context to all the listeners of the specified topic.
