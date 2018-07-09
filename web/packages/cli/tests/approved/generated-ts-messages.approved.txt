@@ -70,7 +70,7 @@ $root.interop = (function() {
 
             /**
              * Calls Unary.
-             * @function unary
+             * @function .unary
              * @memberof interop.samples.GreetingService
              * @instance
              * @param {interop.samples.IGreetingRequest} request GreetingRequest message or plain object
@@ -103,7 +103,7 @@ $root.interop = (function() {
 
             /**
              * Calls ServerStreaming.
-             * @function serverStreaming
+             * @function .serverStreaming
              * @memberof interop.samples.GreetingService
              * @instance
              * @param {interop.samples.IGreetingRequest} request GreetingRequest message or plain object
@@ -136,7 +136,7 @@ $root.interop = (function() {
 
             /**
              * Calls ClientStreaming.
-             * @function clientStreaming
+             * @function .clientStreaming
              * @memberof interop.samples.GreetingService
              * @instance
              * @param {interop.samples.IGreetingRequest} request GreetingRequest message or plain object
@@ -169,7 +169,7 @@ $root.interop = (function() {
 
             /**
              * Calls DuplexStreaming.
-             * @function duplexStreaming
+             * @function .duplexStreaming
              * @memberof interop.samples.GreetingService
              * @instance
              * @param {interop.samples.IGreetingRequest} request GreetingRequest message or plain object
@@ -200,14 +200,13 @@ $root.interop = (function() {
              * Properties of a GreetingRequest.
              * @memberof interop.samples
              * @interface IGreetingRequest
-             * @property {string|null} [name] GreetingRequest name
+             * @property {string} [name] GreetingRequest name
              */
 
             /**
              * Constructs a new GreetingRequest.
              * @memberof interop.samples
              * @classdesc Represents a GreetingRequest.
-             * @implements IGreetingRequest
              * @constructor
              * @param {interop.samples.IGreetingRequest=} [properties] Properties to set
              */
@@ -220,7 +219,7 @@ $root.interop = (function() {
 
             /**
              * GreetingRequest name.
-             * @member {string} name
+             * @member {string}name
              * @memberof interop.samples.GreetingRequest
              * @instance
              */
@@ -358,14 +357,13 @@ $root.interop = (function() {
              * Properties of a GreetingResponse.
              * @memberof interop.samples
              * @interface IGreetingResponse
-             * @property {string|null} [greeting] GreetingResponse greeting
+             * @property {string} [greeting] GreetingResponse greeting
              */
 
             /**
              * Constructs a new GreetingResponse.
              * @memberof interop.samples
              * @classdesc Represents a GreetingResponse.
-             * @implements IGreetingResponse
              * @constructor
              * @param {interop.samples.IGreetingResponse=} [properties] Properties to set
              */
@@ -378,7 +376,7 @@ $root.interop = (function() {
 
             /**
              * GreetingResponse greeting.
-             * @member {string} greeting
+             * @member {string}greeting
              * @memberof interop.samples.GreetingResponse
              * @instance
              */
