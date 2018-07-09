@@ -118,11 +118,11 @@ export namespace interop {
         interface IGreetingRequest {
 
             /** GreetingRequest name */
-            name?: (string|null);
+            name?: string;
         }
 
         /** Represents a GreetingRequest. */
-        class GreetingRequest implements IGreetingRequest {
+        class GreetingRequest {
 
             /**
              * Constructs a new GreetingRequest.
@@ -191,11 +191,11 @@ export namespace interop {
         interface IGreetingResponse {
 
             /** GreetingResponse greeting */
-            greeting?: (string|null);
+            greeting?: string;
         }
 
         /** Represents a GreetingResponse. */
-        class GreetingResponse implements IGreetingResponse {
+        class GreetingResponse {
 
             /**
              * Constructs a new GreetingResponse.
