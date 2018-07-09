@@ -901,6 +901,29 @@
 	            "suggestedAppInstanceId": {
 	              "type": "UniqueId",
 	              "id": 4
+	            },
+	            "referrer": {
+	              "type": "AppLaunchReferrer",
+	              "id": 5
+	            }
+	          }
+	        },
+	        "AppLaunchReferrer": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchReferrer"
+	          },
+	          "fields": {
+	            "appId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 2
+	            },
+	            "connectionId": {
+	              "type": "UniqueId",
+	              "id": 3
 	            }
 	          }
 	        },

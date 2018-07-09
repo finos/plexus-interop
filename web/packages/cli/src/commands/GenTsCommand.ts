@@ -27,6 +27,7 @@ import { GenProtoCommand } from './GenProtoCommand';
 export class GenTsCommand extends BaseCommand {
 
     public readonly protoRegexp: RegExp = /.+\.proto$/;
+    public readonly descriptorPathRegexp: RegExp = /.*google[\/\\]+protobuf[\/\\]+descriptor.proto|.*interop[\/\\]+options.proto$/;
     
     public clientGenArgs: (opts: any) => string[] = opts => {
         return ['--type=ts', ...this.optionArgs(opts)];
@@ -51,7 +52,8 @@ export class GenTsCommand extends BaseCommand {
 
         this.log('Generating proto messages JS definitions');
         const jsFilePath =  path.join(opts.out, 'plexus-messages.js');
-        const protoFiles = await listFiles(protoFilesDir, this.protoRegexp);
+        const protoFiles = (await listFiles(protoFilesDir, this.protoRegexp))
+            .filter(f => !this.isProtoDescriptorPath(f));
         await genJsStaticModule(jsFilePath, protoFiles, opts.namespace);
 
         this.log('Deleting proto definitions');
@@ -66,6 +68,10 @@ export class GenTsCommand extends BaseCommand {
         const javaLibPath = getJavaGenLibPath();
         await simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.clientGenArgs(opts)], opts.verbose === 'true');
         
+    }
+
+    public isProtoDescriptorPath(path: string): boolean {
+        return this.descriptorPathRegexp.test(path);
     }
 
 }
