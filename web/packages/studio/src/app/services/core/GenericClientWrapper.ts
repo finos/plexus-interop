@@ -58,12 +58,9 @@ export class GenericClientWrapper implements InteropClient {
         return this.genericClient.getConnectionId().toString();
     }
 
-    public validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod, payload: string): void {
-        const { inputMessageId } = this.toMetaInfo(methodToInvoke);
-        const requestEncoder = this.encoderProvider.getMarshaller(inputMessageId);
-        const requestData = JSON.parse(payload);
-        requestEncoder.validate(requestData);
-        this.fieldsNamesValidator.validate(inputMessageId, requestData);
+    public validateRequest(method: DiscoveredMethod | ConsumedMethod | ProvidedMethod, payload: string): void {
+        const { inputMessageId, outputMessageId } = this.toMetaInfo(method);
+        this.validateRequestByMessageId(this.isProvided(method) ? outputMessageId : inputMessageId, payload);
     }
 
     public disconnect(): Promise<void> {
@@ -76,6 +73,13 @@ export class GenericClientWrapper implements InteropClient {
             methodId,
             serviceAlias
         }), handler);
+    }
+
+    private validateRequestByMessageId(messageId: string, payload: any): void {
+        const requestEncoder = this.encoderProvider.getMarshaller(messageId);
+        const requestData = JSON.parse(payload);
+        requestEncoder.validate(requestData);
+        this.fieldsNamesValidator.validate(messageId, requestData);
     }
 
     private isConsumed(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod): methodToInvoke is ConsumedMethod {
@@ -107,6 +111,10 @@ export class GenericClientWrapper implements InteropClient {
                 methodId: method.method.name
             };
         }
+    }
+
+    private isProvided(method: DiscoveredMethod | ConsumedMethod | ProvidedMethod): boolean {
+        return !this.isConsumed(method) && !this.isDiscovered(method);
     }
 
     public async sendUnaryRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod, requestJson: string, responseHandler: ValueHandler<string>): Promise<InvocationClient> {
