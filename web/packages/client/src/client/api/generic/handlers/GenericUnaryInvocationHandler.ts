@@ -14,11 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BidiStreamingInvocationHandler } from '../streaming/BidiStreamingInvocationHandler';
-import { BaseInvocationHandler } from './BaseInvocationHandler';
+import { UnaryInvocationHandler } from './UnaryInvocationHandler';
 
-export interface GenericBidiStreamingInvocationHandler extends BaseInvocationHandler {
-
-    handler: BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>;
-
+export interface GenericUnaryInvocationHandler extends UnaryInvocationHandler<ArrayBuffer, ArrayBuffer> {
 }

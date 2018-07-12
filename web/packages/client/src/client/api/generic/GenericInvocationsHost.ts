@@ -20,9 +20,9 @@ import { ClientDtoUtils } from '../../ClientDtoUtils';
 import { Invocation } from '../../../client/generic/Invocation';
 import { BidiStreamingInvocationHandler } from '../streaming/BidiStreamingInvocationHandler';
 import { StreamingInvocationHost } from '../streaming/StreamingInvocationHost';
-import { GenericBidiStreamingInvocationHandler } from './GenericBidiStreamingInvocationHandler';
-import { GenericUnaryInvocationHandler } from './GenericUnaryInvocationHandler';
-import { GenericServerStreamingInvocationHandler } from './GenericServerStreamingInvocationHandler';
+import { GenericBidiStreamingInvocationHandler } from './handlers/GenericBidiStreamingInvocationHandler';
+import { GenericUnaryInvocationHandler } from './handlers/GenericUnaryInvocationHandler';
+import { GenericServerStreamingInvocationHandler } from './handlers/GenericServerStreamingInvocationHandler';
 import { UnaryHandlerConverter } from '../unary/UnaryHandlerConverter';
 import { ServerStreamingConverter } from '../streaming/ServerStreamingHandlerConveter';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
@@ -49,11 +49,11 @@ export class GenericInvocationsHost {
             error: (e) => this.log.error('Error on invocations subscription', e),
             complete: () => this.log.debug('Invocations subscription completed')
         })
-            .then(() => this.log.debug('Started to listen invocations'))
-            .catch((e) => {
-                this.log.error('Error on opening invocations subscription', e);
-                throw e;
-            });
+        .then(() => this.log.debug('Started to listen invocations'))
+        .catch((e) => {
+            this.log.error('Error on opening invocations subscription', e);
+            throw e;
+        });
     }
     
     private registerHandlers(): void {

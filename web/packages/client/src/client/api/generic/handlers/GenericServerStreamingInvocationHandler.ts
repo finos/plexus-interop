@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SimpleUnaryInvocationHandler } from '../unary/SimpleUnaryInvocationHandler';
 import { BaseInvocationHandler } from './BaseInvocationHandler';
+import { ServerStreamingInvocationHandler } from '../../streaming/ServerStreamingInvocationHandler';
 
-export interface GenericUnaryInvocationHandler extends BaseInvocationHandler {
+export interface GenericServerStreamingInvocationHandler extends BaseInvocationHandler {
 
-    handler: SimpleUnaryInvocationHandler<ArrayBuffer, ArrayBuffer>;
+    handler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>;
 
 }

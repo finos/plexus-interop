@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BidiStreamingInvocationHandler } from './streaming/BidiStreamingInvocationHandler';
-
-export interface InvocationHandlerConverter<T, Req, Res> {
-    convert(baseHandler: T): BidiStreamingInvocationHandler<Req, Res>;
-}
+export * from './BaseInvocationHandler';
+export * from './UnaryInvocationHandler';
+export * from './GenericUnaryInvocationHandler';
+export * from './GenericBidiStreamingInvocationHandler';
+export * from './UnaryInvocationHandler';
+export * from './InvocationHandlersRegistry';

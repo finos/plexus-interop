@@ -22,16 +22,16 @@ import { InvocationHandlerConverter } from '../InvocationHandlerConverter';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { MethodInvocationContext } from '@plexus-interop/client-api';
 
-export class UnaryHandlerConverter implements InvocationHandlerConverter<SimpleUnaryInvocationHandler<ArrayBuffer, ArrayBuffer>> {
+export class UnaryHandlerConverter<Req, Res> implements InvocationHandlerConverter<SimpleUnaryInvocationHandler<Req, Res>, Req, Res> {
 
     public constructor(private readonly log: Logger = LoggerFactory.getLogger('UnaryHandlerConverter')) { }
 
-    public convert(unary: SimpleUnaryInvocationHandler<ArrayBuffer, ArrayBuffer>): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
+    public convert(unary: SimpleUnaryInvocationHandler<Req, Res>): BidiStreamingInvocationHandler<Req, Res> {
         return {
             methodId: unary.methodId,
-            handle: (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
+            handle: (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<Res>) => {
                 return {
-                    next: (request: ArrayBuffer) => {
+                    next: (request: Req) => {
                         try {
                             unary.handle(invocationContext, request).then(async (response) => {
                                 try {
