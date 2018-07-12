@@ -22,14 +22,14 @@ import { ClientDtoUtils } from '../../ClientDtoUtils';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { MethodInvocationContext } from '@plexus-interop/client-api';
 
-export class ServerStreamingConverter implements InvocationHandlerConverter<ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>> {
+export class ServerStreamingConverter<Req, Res> implements InvocationHandlerConverter<ServerStreamingInvocationHandler<Req, Res>, Req, Res> {
 
-    public constructor(private readonly log: Logger = LoggerFactory.getLogger('ServerStreamingConverter')) {}
+    public constructor(private readonly log: Logger = LoggerFactory.getLogger('ServerStreamingConverter')) { }
 
-    public convert(baseHandler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
+    public convert(baseHandler: ServerStreamingInvocationHandler<Req, Res>): BidiStreamingInvocationHandler<Req, Res> {
         return {
             methodId: baseHandler.methodId,
-            handle: (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
+            handle: (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<Res>) => {
                 return {
                     next: (request) => {
                         try {

@@ -32,22 +32,31 @@ export class InvocationHandlersRegistry {
     protected log: Logger = LoggerFactory.getLogger('GenericInvocationHost');
 
     // tslint:disable-next-line:typedef
-    protected readonly typeAwareHandlers = new Map<string, BidiStreamingInvocationHandler<any, any>>(); 
+    protected readonly typeAwareHandlers = new Map<string, BidiStreamingInvocationHandler<any, any>>();
     // tslint:disable-next-line:typedef
-    protected readonly genericHandlers = new Map<string, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>>(); 
+    protected readonly genericHandlers = new Map<string, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>>();
 
-    public constructor(private readonly marshallerProvider: MarshallerProvider) {}
+    public constructor(private readonly marshallerProvider: MarshallerProvider) { }
 
     public registerUnaryGenericHandler(handler: GenericUnaryInvocationHandler): void {
         this.registerBidiStreamingGenericHandler({
             serviceInfo: handler.serviceInfo,
-            handler: new UnaryHandlerConverter(this.log).convert(handler.handler)
+            handler: new UnaryHandlerConverter<ArrayBuffer, ArrayBuffer>(this.log).convert(handler.handler)
         });
-    } 
+    }
 
     public registerUnaryHandler(handler: UnaryInvocationHandler<any, any>, requestType: any, responseType: any): void {
-        this.registerUnaryGenericHandler(toGenericUnaryHandler(handler, requestType, responseType, this.marshallerProvider));        
-    }   
+        const actionRef: ActionReference = {
+            serviceId: handler.serviceInfo.serviceId,
+            serviceAlias: handler.serviceInfo.serviceAlias,
+            methodId: handler.handler.methodId
+        };
+        this.typeAwareHandlers.set(this.actionHash(actionRef), {
+            methodId: handler.handler.methodId,
+            handle: new UnaryHandlerConverter<any, any>(this.log).convert(handler.handler).handle
+        });
+        this.registerUnaryGenericHandler(toGenericUnaryHandler(handler, requestType, responseType, this.marshallerProvider));
+    }
 
     public registerBidiStreamingGenericHandler(invocationHandler: GenericBidiStreamingInvocationHandler): void {
         const actionRef: ActionReference = {
