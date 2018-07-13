@@ -23,9 +23,9 @@ import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocat
 import { StreamingInvocationClientImpl } from './handlers/streaming/StreamingInvocationClientImpl';
 import { InvocationClient } from './../InvocationClient';
 import { ValueHandler } from './../ValueHandler';
-import { ClientError, SuccessCompletion, ClientProtocolHelper, ErrorCompletion } from '@plexus-interop/protocol';
+import { ClientError } from '@plexus-interop/protocol';
 import { InvocationRequestInfo } from '@plexus-interop/protocol';
-import { Logger, LoggerFactory, Arrays, AnonymousSubscription } from '@plexus-interop/common';
+import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
 import { MarshallerProvider } from '../io/MarshallerProvider';
 import { Completion } from '@plexus-interop/client-api';
 import { UniqueId } from '@plexus-interop/transport-common';
@@ -40,7 +40,6 @@ import { LoggingInvocationObserver } from '../LoggingInvocationObserver';
 import { InternalGenericClientApi } from './internal/InternalGenericClientApi';
 import { InvocationExecutor } from './InvocationExecutor';
 import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
-import { BaseInvocation } from '../../generic/BaseInvocation';
 
 export class GenericClientApiImpl implements InternalGenericClientApi {
 
@@ -184,9 +183,9 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
     public invokeUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayload: any): Promise<any> {
         return new InvocationExecutor(this.handlersRegistry).invokeUnaryHandler(consumerAppId, actionReference, requestPayload);
     }
-    
+
     public invokeRawUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer> {
-        throw new Error('Method not implemented.');
+        return new InvocationExecutor(this.handlersRegistry).invokeRawUnaryHandler(consumerAppId, actionReference, requestPayloadBuffer);
     }
 
     private isDiscovered(request: InvocationRequestInfo | ProvidedMethodReference): request is ProvidedMethodReference {
