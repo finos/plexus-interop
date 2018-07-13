@@ -197,7 +197,7 @@ describe('GenericClientApi', () => {
 
     });
 
-    it('It can send few messages and complete invocation by Streaming client', async () => {
+    it('Can send few messages and complete invocation by Streaming client', async () => {
 
         const mockInvocation = mock(RequestedInvocation);
 
@@ -237,7 +237,34 @@ describe('GenericClientApi', () => {
 
     });
 
-    it('It can receive message, completion and complete invocation with Streaming client', async (done) => {
+    it('Can invoke own registered handler', done => {
+
+        const mockMarshaller = new MockMarshallerProvider();
+        const registry = new InvocationHandlersRegistry(mockMarshaller);
+
+        const serviceInfo = {
+            serviceId: 'service'
+        };
+        const methodId = 'method';
+        const requestPayload = 'test';
+
+        registry.registerUnaryHandler({
+            serviceInfo,
+            methodId,
+            handle: async (context, request) => {
+                expect(request).toBe(requestPayload);
+                done();
+            }
+        }, {}, {});
+
+        const mockGenericClient = mock(GenericClientImpl);
+        const clientApi = new GenericClientApiImpl(instance(mockGenericClient), mockMarshaller, registry);
+
+        clientApi.invokeUnaryHandler('app', {serviceId: serviceInfo.serviceId, methodId}, requestPayload);
+
+    });
+
+    it('Can receive message, completion and complete invocation with Streaming client', async (done) => {
 
         const mockInvocation = mock(RequestedInvocation);
 
