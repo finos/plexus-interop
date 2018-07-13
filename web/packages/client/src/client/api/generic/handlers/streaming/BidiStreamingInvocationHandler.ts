@@ -14,8 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ServiceInfo } from '@plexus-interop/client-api';
+import { StreamingInvocationClient } from './StreamingInvocationClient';
+import { MethodInvocationContext, ServiceInfo } from '@plexus-interop/client-api';
+import { InvocationObserver } from '../../../../';
 
-export interface BaseInvocationHandler {
+export interface BidiStreamingInvocationHandler<Req, Res> {
+
     serviceInfo: ServiceInfo;
+
+    methodId: string;
+
+    handle(invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<Res>): InvocationObserver<Req>;
+
 }

@@ -18,9 +18,10 @@ import { InvocationHandlerConverter } from '../InvocationHandlerConverter';
 import { ServerStreamingInvocationHandler } from './ServerStreamingInvocationHandler';
 import { BidiStreamingInvocationHandler } from './BidiStreamingInvocationHandler';
 import { StreamingInvocationClient } from './StreamingInvocationClient';
-import { ClientDtoUtils } from '../../ClientDtoUtils';
-import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { ClientDtoUtils } from '../../../../ClientDtoUtils';
+import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
 import { MethodInvocationContext } from '@plexus-interop/client-api';
+import { MarshallerProvider } from '../../../io/MarshallerProvider';
 
 export class ServerStreamingConverter<Req, Res> implements InvocationHandlerConverter<ServerStreamingInvocationHandler<Req, Res>, Req, Res> {
 
@@ -28,6 +29,7 @@ export class ServerStreamingConverter<Req, Res> implements InvocationHandlerConv
 
     public convert(baseHandler: ServerStreamingInvocationHandler<Req, Res>): BidiStreamingInvocationHandler<Req, Res> {
         return {
+            serviceInfo: baseHandler.serviceInfo,
             methodId: baseHandler.methodId,
             handle: (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<Res>) => {
                 return {
@@ -46,4 +48,29 @@ export class ServerStreamingConverter<Req, Res> implements InvocationHandlerConv
             }
         };
     }
+}
+
+export function toGenericStreamingHandler(
+    handler: ServerStreamingInvocationHandler<any, any>,
+    requestType: any,
+    responseType: any,
+    marshallerProvider: MarshallerProvider): ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
+
+
+    const requestMarshaller = marshallerProvider.getMarshaller(requestType);
+    const responseMarshaller = marshallerProvider.getMarshaller(responseType);
+
+    return {
+        ...handler,
+        handle: (invocationContext: MethodInvocationContext, requestPayload: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>) => {
+            const payload = requestMarshaller.decode(new Uint8Array(requestPayload));
+            handler.handle(invocationContext, payload, {
+                next: response => hostClient.next(Arrays.toArrayBuffer(responseMarshaller.encode(response))),
+                complete: hostClient.complete.bind(hostClient),
+                error: hostClient.error.bind(hostClient),
+                cancel: hostClient.cancel.bind(hostClient)
+            });
+        }
+    };
+
 }

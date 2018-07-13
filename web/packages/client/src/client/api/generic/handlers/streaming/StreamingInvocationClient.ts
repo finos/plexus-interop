@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseInvocationHandler } from './BaseInvocationHandler';
-import { ServerStreamingInvocationHandler } from '../../streaming/ServerStreamingInvocationHandler';
+import { InvocationClient } from '../../../InvocationClient';
 
-export interface GenericServerStreamingInvocationHandler extends BaseInvocationHandler {
+export interface StreamingInvocationClient<T> extends InvocationClient {
 
-    handler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>;
+    next(value: T): Promise<void>;
+
+    complete(): Promise<void>;
 
 }

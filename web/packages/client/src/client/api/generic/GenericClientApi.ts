@@ -16,7 +16,7 @@
  */
 import { ServiceDiscoveryRequest } from '@plexus-interop/client-api';
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
-import { StreamingInvocationClient } from './../streaming/StreamingInvocationClient';
+import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocationClient';
 import { InvocationClient } from './../InvocationClient';
 import { ValueHandler } from './../ValueHandler';
 import { InvocationRequestInfo } from '@plexus-interop/protocol';

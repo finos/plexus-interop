@@ -14,20 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { MarshallerProvider } from '../../..';
+import { Arrays } from '@plexus-interop/common';
+import { UnaryInvocationHandler } from './UnaryInvocationHandler';
 import { BidiStreamingInvocationHandler } from '../streaming/BidiStreamingInvocationHandler';
-import { SimpleUnaryInvocationHandler } from './SimpleUnaryInvocationHandler';
 import { StreamingInvocationClient } from '../streaming/StreamingInvocationClient';
-import { ClientDtoUtils } from '../../ClientDtoUtils';
 import { InvocationHandlerConverter } from '../InvocationHandlerConverter';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { MethodInvocationContext } from '@plexus-interop/client-api';
+import { ClientDtoUtils } from '../../../../ClientDtoUtils';
 
-export class UnaryHandlerConverter<Req, Res> implements InvocationHandlerConverter<SimpleUnaryInvocationHandler<Req, Res>, Req, Res> {
+export function toGenericUnaryHandler(
+    handler: UnaryInvocationHandler<any, any>,
+    requestType: any,
+    responseType: any,
+    marshallerProvider: MarshallerProvider): UnaryInvocationHandler<ArrayBuffer, ArrayBuffer> {
+
+    const requestMarshaller = marshallerProvider.getMarshaller(requestType);
+    const responseMarshaller = marshallerProvider.getMarshaller(responseType);
+
+    return {
+        ...handler,
+        handle: async (invocationContext, request: ArrayBuffer) => {
+            const payload = requestMarshaller.decode(new Uint8Array(request));
+            const rawResponse = await handler.handle(invocationContext, payload);
+            return Arrays.toArrayBuffer(responseMarshaller.encode(rawResponse));
+        }
+    };
+
+}
+
+export class UnaryHandlerConverter<Req, Res> implements InvocationHandlerConverter<UnaryInvocationHandler<Req, Res>, Req, Res> {
 
     public constructor(private readonly log: Logger = LoggerFactory.getLogger('UnaryHandlerConverter')) { }
 
-    public convert(unary: SimpleUnaryInvocationHandler<Req, Res>): BidiStreamingInvocationHandler<Req, Res> {
+    public convert(unary: UnaryInvocationHandler<Req, Res>): BidiStreamingInvocationHandler<Req, Res> {
         return {
+            serviceInfo: unary.serviceInfo,
             methodId: unary.methodId,
             handle: (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<Res>) => {
                 return {

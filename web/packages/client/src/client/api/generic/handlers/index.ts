@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './BaseInvocationHandler';
-export * from './UnaryInvocationHandler';
-export * from './GenericUnaryInvocationHandler';
-export * from './GenericBidiStreamingInvocationHandler';
-export * from './UnaryInvocationHandler';
+export * from './streaming';
+export * from './unary';
+export * from './InvocationHandlerConverter';
 export * from './InvocationHandlersRegistry';

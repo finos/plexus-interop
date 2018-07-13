@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 import { BidiStreamingInvocationHandler } from './BidiStreamingInvocationHandler';
-import { Invocation } from '../../../client/generic/Invocation';
+import { Invocation } from '../../../../../client/generic/Invocation';
 import { StreamingInvocationClientImpl } from './StreamingInvocationClientImpl';
 import { Logger, Observer, LoggerFactory, CancellationToken } from '@plexus-interop/common';
-import { ClientDtoUtils } from '../../ClientDtoUtils';
+import { ClientDtoUtils } from '../../../../ClientDtoUtils';
 import { MethodInvocationContext } from '@plexus-interop/client-api';
 import { UniqueId } from '@plexus-interop/transport-common';
-import { InvocationObserver } from '../../generic/InvocationObserver';
+import { InvocationObserver } from '../../../../generic/InvocationObserver';
 
 export class StreamingInvocationHost {
 

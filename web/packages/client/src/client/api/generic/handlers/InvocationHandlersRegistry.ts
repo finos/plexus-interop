@@ -14,22 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericUnaryInvocationHandler } from './GenericUnaryInvocationHandler';
-import { GenericBidiStreamingInvocationHandler } from './GenericBidiStreamingInvocationHandler';
-import { BidiStreamingInvocationHandler } from '../../streaming/BidiStreamingInvocationHandler';
+import { BidiStreamingInvocationHandler, ServerStreamingInvocationHandler } from './streaming';
 import { ActionReference } from '@plexus-interop/client-api';
 import { MarshallerProvider } from '@plexus-interop/client';
-import { UnaryHandlerConverter } from '../../unary/UnaryHandlerConverter';
+import { UnaryHandlerConverter, toGenericUnaryHandler } from './unary/converters';
 import { LoggerFactory, Logger } from '@plexus-interop/common';
-import { UnaryInvocationHandler } from './UnaryInvocationHandler';
-import { toGenericUnaryHandler } from './typedHandlerConverters';
+import { UnaryInvocationHandler } from './unary/UnaryInvocationHandler';
+import { ServerStreamingConverter, toGenericStreamingHandler } from './streaming/converters';
+
+type HandlerActionRef = {
+    serviceInfo: {
+        serviceId: string,
+        serviceAlias?: string
+    },
+    methodId: string
+};
 
 /**
  * Holder for both typed/untyped invocation handlers
  */
 export class InvocationHandlersRegistry {
 
-    protected log: Logger = LoggerFactory.getLogger('GenericInvocationHost');
+    protected log: Logger = LoggerFactory.getLogger('InvocationHandler');
 
     // tslint:disable-next-line:typedef
     protected readonly typeAwareHandlers = new Map<string, BidiStreamingInvocationHandler<any, any>>();
@@ -38,33 +44,30 @@ export class InvocationHandlersRegistry {
 
     public constructor(private readonly marshallerProvider: MarshallerProvider) { }
 
-    public registerUnaryGenericHandler(handler: GenericUnaryInvocationHandler): void {
-        this.registerBidiStreamingGenericHandler({
-            serviceInfo: handler.serviceInfo,
-            handler: new UnaryHandlerConverter<ArrayBuffer, ArrayBuffer>(this.log).convert(handler.handler)
-        });
+    public registerServerStreamingHandler(handler: ServerStreamingInvocationHandler<any, any>, requestType: any, responseType: any): void {
+        this.typeAwareHandlers.set(
+            this.actionHash(this.toActionRef(handler)),
+            new ServerStreamingConverter<any, any>(this.log).convert(handler));
+        this.registerServerStreamingGenericHandler(toGenericStreamingHandler(handler, requestType, responseType, this.marshallerProvider));
+    }
+
+    public registerServerStreamingGenericHandler(handler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): void {
+        this.registerBidiStreamingGenericHandler(new ServerStreamingConverter(this.log).convert(handler));
+    }
+
+    public registerUnaryGenericHandler(handler: UnaryInvocationHandler<ArrayBuffer, ArrayBuffer>): void {
+        this.registerBidiStreamingGenericHandler(new UnaryHandlerConverter<ArrayBuffer, ArrayBuffer>(this.log).convert(handler));
     }
 
     public registerUnaryHandler(handler: UnaryInvocationHandler<any, any>, requestType: any, responseType: any): void {
-        const actionRef: ActionReference = {
-            serviceId: handler.serviceInfo.serviceId,
-            serviceAlias: handler.serviceInfo.serviceAlias,
-            methodId: handler.handler.methodId
-        };
-        this.typeAwareHandlers.set(this.actionHash(actionRef), {
-            methodId: handler.handler.methodId,
-            handle: new UnaryHandlerConverter<any, any>(this.log).convert(handler.handler).handle
-        });
+        this.typeAwareHandlers.set(
+            this.actionHash(this.toActionRef(handler)), 
+            new UnaryHandlerConverter<any, any>(this.log).convert(handler));
         this.registerUnaryGenericHandler(toGenericUnaryHandler(handler, requestType, responseType, this.marshallerProvider));
     }
 
-    public registerBidiStreamingGenericHandler(invocationHandler: GenericBidiStreamingInvocationHandler): void {
-        const actionRef: ActionReference = {
-            serviceId: invocationHandler.serviceInfo.serviceId,
-            serviceAlias: invocationHandler.serviceInfo.serviceAlias,
-            methodId: invocationHandler.handler.methodId
-        };
-        this.genericHandlers.set(this.actionHash(actionRef), invocationHandler.handler);
+    public registerBidiStreamingGenericHandler(handler: BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): void {
+        this.genericHandlers.set(this.actionHash(this.toActionRef(handler)), handler);
     }
 
     public getTypeAwareBidiStreamingHandler(actionRef: ActionReference): BidiStreamingInvocationHandler<any, any> | undefined {
@@ -78,6 +81,14 @@ export class InvocationHandlersRegistry {
     private actionHash(actionRef: ActionReference): string {
         const alias = actionRef.serviceAlias || 'default';
         return `${actionRef.serviceId}.${alias}.${actionRef.methodId}`;
+    }
+
+    private toActionRef(handlerRef: HandlerActionRef): ActionReference {
+        return {
+            serviceId: handlerRef.serviceInfo.serviceId,
+            serviceAlias: handlerRef.serviceInfo.serviceAlias,
+            methodId: handlerRef.methodId
+        };
     }
 
 }
