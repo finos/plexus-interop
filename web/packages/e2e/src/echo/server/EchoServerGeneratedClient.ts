@@ -28,7 +28,7 @@ import * as plexus from '../gen/plexus-messages';
  * Main client API
  *
  */
-export interface EchoServerClient extends GenericClientApi  {
+export interface EchoServerClient extends GenericClientApi {
 
 
 }
@@ -75,103 +75,6 @@ export abstract class ServiceAliasInvocationHandler {
 }
 
 /**
- * Internal invocation handler delegate for EchoService
- *
- */
-class EchoServiceInvocationHandlerInternal {
-
-    public constructor(private readonly clientHandler: EchoServiceInvocationHandler) {}
-
-    public onUnary(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
-        return this.clientHandler
-            .onUnary(invocationContext, requestFromBinaryConverter(request))
-            .then(response => responseToBinaryConverter(response));
-    }
-    
-    public onServerStreaming(invocationContext: MethodInvocationContext, request: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>): void {
-        const responseToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
-        this.clientHandler
-            .onServerStreaming(invocationContext, requestFromBinaryConverter(request), {
-                next: (response) => hostClient.next(responseToBinaryConverter(response)),
-                complete: hostClient.complete.bind(hostClient),
-                error: hostClient.error.bind(hostClient),
-                cancel: hostClient.cancel.bind(hostClient)
-            });
-    }
-    
-    public onClientStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): InvocationObserver<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
-        const baseObserver = this.clientHandler
-            .onClientStreaming(invocationContext, {
-                next: (response) => hostClient.next(responseToBinaryConverter(response)),
-                complete: hostClient.complete.bind(hostClient),
-                error: hostClient.error.bind(hostClient),
-                cancel: hostClient.cancel.bind(hostClient)
-            });
-        return {
-            next: (value) => baseObserver.next(requestFromBinaryConverter(value)),
-            complete: baseObserver.complete.bind(baseObserver),
-            error: baseObserver.error.bind(baseObserver),
-            streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
-        };
-    }
-    
-    public onDuplexStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>): InvocationObserver<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
-        const baseObserver = this.clientHandler
-            .onDuplexStreaming(invocationContext, {
-                next: (response) => hostClient.next(responseToBinaryConverter(response)),
-                complete: hostClient.complete.bind(hostClient),
-                error: hostClient.error.bind(hostClient),
-                cancel: hostClient.cancel.bind(hostClient)
-            });
-        return {
-            next: (value) => baseObserver.next(requestFromBinaryConverter(value)),
-            complete: baseObserver.complete.bind(baseObserver),
-            error: baseObserver.error.bind(baseObserver),
-            streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
-        };
-    }
-}
-
-/**
- * Internal invocation handler delegate for ServiceAlias
- *
- */
-class ServiceAliasInvocationHandlerInternal {
-
-    public constructor(private readonly clientHandler: ServiceAliasInvocationHandler) {}
-
-    public onUnary(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
-        return this.clientHandler
-            .onUnary(invocationContext, requestFromBinaryConverter(request))
-            .then(response => responseToBinaryConverter(response));
-    }
-}
-
-/**
  * Client API builder
  *
  */
@@ -183,9 +86,9 @@ export class EchoServerClientBuilder {
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
-    private echoServiceHandler: EchoServiceInvocationHandlerInternal;
-    
-    private serviceAliasHandler: ServiceAliasInvocationHandlerInternal;
+    private echoServiceHandler: EchoServiceInvocationHandler;
+
+    private serviceAliasHandler: ServiceAliasInvocationHandler;
 
     public withClientDetails(clientId: ClientConnectRequest): EchoServerClientBuilder {
         this.clientDetails = clientId;
@@ -203,12 +106,12 @@ export class EchoServerClientBuilder {
     }
 
     public withEchoServiceInvocationsHandler(invocationsHandler: EchoServiceInvocationHandler): EchoServerClientBuilder {
-        this.echoServiceHandler = new EchoServiceInvocationHandlerInternal(invocationsHandler);
+        this.echoServiceHandler = invocationsHandler;
         return this;
     }
-    
+
     public withServiceAliasInvocationsHandler(invocationsHandler: ServiceAliasInvocationHandler): EchoServerClientBuilder {
-        this.serviceAliasHandler = new ServiceAliasInvocationHandlerInternal(invocationsHandler);
+        this.serviceAliasHandler = invocationsHandler;
         return this;
     }
 
@@ -221,55 +124,55 @@ export class EchoServerClientBuilder {
         return new ContainerAwareClientAPIBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
-            .withUnaryInvocationHandler({
+            .withTypeAwareUnaryHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService'
                 },
-                handler: {
-                    methodId: 'Unary',
-                    handle: this.echoServiceHandler.onUnary.bind(this.echoServiceHandler)
-                }
-            })
-            .withServerStreamingInvocationHandler({
+                methodId: 'Unary',
+                handle: this.echoServiceHandler.onUnary.bind(this.echoServiceHandler)
+            },
+                plexus.plexus.interop.testing.EchoRequest,
+                plexus.plexus.interop.testing.EchoRequest)
+            .withTypeAwareServerStreamingHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService'
                 },
-                handler: {
-                    methodId: 'ServerStreaming',
-                    handle: this.echoServiceHandler.onServerStreaming.bind(this.echoServiceHandler)
-                }
-            })
-            .withBidiStreamingInvocationHandler({
+                methodId: 'ServerStreaming',
+                handle: this.echoServiceHandler.onServerStreaming.bind(this.echoServiceHandler)
+            },
+                plexus.plexus.interop.testing.EchoRequest,
+                plexus.plexus.interop.testing.EchoRequest)
+            .withTypeAwareBidiStreamingHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService'
                 },
-                handler: {
-                    methodId: 'ClientStreaming',
-                    handle: this.echoServiceHandler.onClientStreaming.bind(this.echoServiceHandler)
-                }
-            })
-            .withBidiStreamingInvocationHandler({
+                methodId: 'ClientStreaming',
+                handle: this.echoServiceHandler.onClientStreaming.bind(this.echoServiceHandler)
+            },
+                plexus.plexus.interop.testing.EchoRequest,
+                plexus.plexus.interop.testing.EchoRequest)
+            .withTypeAwareBidiStreamingHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService'
                 },
-                handler: {
-                    methodId: 'DuplexStreaming',
-                    handle: this.echoServiceHandler.onDuplexStreaming.bind(this.echoServiceHandler)
-                }
-            })
-            .withUnaryInvocationHandler({
+                methodId: 'DuplexStreaming',
+                handle: this.echoServiceHandler.onDuplexStreaming.bind(this.echoServiceHandler)
+            },
+                plexus.plexus.interop.testing.EchoRequest,
+                plexus.plexus.interop.testing.EchoRequest)
+            .withTypeAwareUnaryHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService',
                     serviceAlias: 'ServiceAlias'
                 },
-                handler: {
-                    methodId: 'Unary',
-                    handle: this.serviceAliasHandler.onUnary.bind(this.serviceAliasHandler)
-                }
-            })
+                methodId: 'Unary',
+                handle: this.serviceAliasHandler.onUnary.bind(this.serviceAliasHandler)
+            },
+                plexus.plexus.interop.testing.EchoRequest,
+                plexus.plexus.interop.testing.EchoRequest)
             .connect()
-            .then(genericClient => new EchoServerClientImpl(
+            .then((genericClient: GenericClientApi) => new EchoServerClientImpl(
                 genericClient
-));
+            ));
     }
 }
