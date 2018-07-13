@@ -14,36 +14,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BidiStreamingInvocationHandler } from './BidiStreamingInvocationHandler';
 import { Invocation } from '../../../../../client/generic/Invocation';
 import { StreamingInvocationClientImpl } from './StreamingInvocationClientImpl';
 import { Logger, Observer, LoggerFactory, CancellationToken } from '@plexus-interop/common';
 import { ClientDtoUtils } from '../../../../ClientDtoUtils';
-import { MethodInvocationContext } from '@plexus-interop/client-api';
+import { MethodInvocationContext, ActionReference } from '@plexus-interop/client-api';
 import { UniqueId } from '@plexus-interop/transport-common';
 import { InvocationObserver } from '../../../../generic/InvocationObserver';
+import { InvocationHandlersRegistry } from '../InvocationHandlersRegistry';
 
 export class StreamingInvocationHost {
 
     private logger: Logger = LoggerFactory.getLogger('StreamingInvocationHost');
 
     public constructor(
-        private readonly handlersRegistry: Map<String, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>>,
+        private readonly handlersRegistry: InvocationHandlersRegistry,
         private readonly invocation: Invocation) { }
 
-    public execute(): void {
+    public executeTypeAwareHandler(): void {
+        this.execute(true);
+    }
+
+    public executeGenericHandler(): void {
+        this.execute(false);
+    }
+
+    private execute(isTypeAware: boolean): void {
 
         this.logger.debug('Handling invocation started');
-        let baseRequestObserver: null | Observer<ArrayBuffer> = null;
+        let baseRequestObserver: null | Observer<any> = null;
         const invocationCancellationToken = new CancellationToken();
         this.invocation.open({
 
             started: (s) => {
                 this.logger.trace('Invocation opened');
                 const metaInfo = this.invocation.getMetaInfo();
+                const actionRef: ActionReference = {
+                    serviceAlias: metaInfo.serviceAlias,
+                    methodId: metaInfo.methodId as string,
+                    serviceId: metaInfo.serviceId as string
+                };
                 const hash = ClientDtoUtils.targetInvocationHash(metaInfo);
                 this.logger = LoggerFactory.getLogger(`Invocation Host [${hash}]`);
-                const invocationHandler = this.handlersRegistry.get(hash);
+                const invocationHandler = isTypeAware ? this.handlersRegistry.getTypeAwareBidiStreamingHandler(actionRef) : this.handlersRegistry.getRawBidiStreamingHandler(actionRef);
                 if (invocationHandler) {
                     const invocationContext = new MethodInvocationContext(metaInfo.consumerApplicationId as string, metaInfo.consumerConnectionId as UniqueId, invocationCancellationToken);
                     baseRequestObserver = invocationHandler.handle(invocationContext, new StreamingInvocationClientImpl(this.invocation, this.logger));
@@ -54,25 +67,29 @@ export class StreamingInvocationHost {
 
             startFailed: (e) => this.logger.error('Could not open invocation', e),
 
-            next: (requestPayload: ArrayBuffer) => {
-                this.logger.trace(`Received message of ${requestPayload.byteLength} bytes`);
-                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<ArrayBuffer>).next(requestPayload));
+            next: (requestPayload: any) => {
+                if (!isTypeAware) {
+                    this.logger.trace(`Received message of ${requestPayload.byteLength} bytes`);
+                } else {
+                    this.logger.trace(`Received message object`);
+                }
+                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<any>).next(requestPayload));
             },
 
             complete: () => {
                 this.logger.trace('Received remote completion');
-                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<ArrayBuffer>).complete());
+                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<any>).complete());
             },
 
             streamCompleted: () => {
                 this.logger.trace('Received remote stream completion');
-                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as InvocationObserver<ArrayBuffer>).streamCompleted());
+                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as InvocationObserver<any>).streamCompleted());
             },
 
             error: invocationError => {
                 this.logger.error(`Received invocation error, passing to client`, invocationError);
                 invocationCancellationToken.cancel('Invocation error received');
-                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<ArrayBuffer>).error(invocationError));
+                this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<any>).error(invocationError));
             }
         });
     }
