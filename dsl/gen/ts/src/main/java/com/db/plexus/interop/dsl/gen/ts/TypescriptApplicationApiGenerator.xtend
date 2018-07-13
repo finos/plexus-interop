@@ -132,23 +132,6 @@ class «app.name»ClientImpl extends GenericClientApiBase implements «app.name�
     }
 «ENDFOR»
 
-«FOR providedService : providedServices SEPARATOR '\n' »
-    /**
-     * Internal invocation handler delegate for «providedService.aliasOrName.toFirstUpper»
-     *
-     */
-    class «providedService.aliasOrName.toFirstUpper»InvocationHandlerInternal {
-
-        public constructor(private readonly clientHandler: «providedService.aliasOrName.toFirstUpper»InvocationHandler) {}
-
-        «FOR providedMethod : providedService.methods SEPARATOR '\n'»
-        public «genericClientHandlerSignature(providedMethod.method, genConfig)» {
-            «handlerMethodImpl(providedMethod.method, genConfig)»
-        }
-        «ENDFOR»
-    }
-«ENDFOR»
-
 /**
  * Client API builder
  *
@@ -162,7 +145,7 @@ export class «app.name»ClientBuilder {
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
     «FOR providedElement : providedServices SEPARATOR '\n' »
-        private «providedElement.aliasOrName.toFirstLower»Handler: «providedElement.aliasOrName.toFirstUpper»InvocationHandlerInternal;
+        private «providedElement.aliasOrName.toFirstLower»Handler: «providedElement.aliasOrName.toFirstUpper»InvocationHandler;
     «ENDFOR»
 
     public withClientDetails(clientId: ClientConnectRequest): «app.name»ClientBuilder {
@@ -182,7 +165,7 @@ export class «app.name»ClientBuilder {
 
     «FOR providedMethod : providedServices SEPARATOR '\n' »
     public with«providedMethod.aliasOrName.toFirstUpper»InvocationsHandler(invocationsHandler: «providedMethod.aliasOrName.toFirstUpper»InvocationHandler): «app.name»ClientBuilder {
-        this.«providedMethod.aliasOrName.toFirstLower»Handler = new «providedMethod.aliasOrName.toFirstUpper»InvocationHandlerInternal(invocationsHandler);
+        this.«providedMethod.aliasOrName.toFirstLower»Handler = invocationsHandler;
         return this;
     }
     «ENDFOR»
@@ -202,7 +185,7 @@ export class «app.name»ClientBuilder {
                 «ENDFOR»
             «ENDFOR»
             .connect()
-            .then(genericClient => new «app.name»ClientImpl(
+            .then((genericClient: GenericClientApi) => new «app.name»ClientImpl(
                 genericClient«IF !consumedServices.isEmpty»,«ENDIF»
                 «FOR consumedService : consumedServices SEPARATOR ","»
                 new «consumedService.aliasOrName.toFirstUpper»ProxyImpl(genericClient)
@@ -215,20 +198,20 @@ export class «app.name»ClientBuilder {
     def invocationHandlerBuilder(Method rpcMethod, ProvidedService providedService, PlexusGenConfig genConfig) {
         switch (rpcMethod) {
             case rpcMethod.isPointToPoint: '''
-            .withUnaryInvocationHandler({
+            .withTypeAwareUnaryHandler({
                 «handlerBuilderParam(rpcMethod, providedService, genConfig)»
-            })
+            }, «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»)
             '''
             case rpcMethod.isBidiStreaming
                     || rpcMethod.isClientStreaming: '''
-            .withBidiStreamingInvocationHandler({
+            .withTypeAwareBidiStreamingHandler({
                 «handlerBuilderParam(rpcMethod, providedService, genConfig)»
-            })
+            }, «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»)
             '''
             case rpcMethod.isServerStreaming: '''
-            .withServerStreamingInvocationHandler({
+            .withTypeAwareServerStreamingHandler({
                 «handlerBuilderParam(rpcMethod, providedService, genConfig)»
-            })
+            }, «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»)
             '''
         }
     }
@@ -239,10 +222,8 @@ export class «app.name»ClientBuilder {
                 serviceId: "«rpcMethod.service.fullName»"«IF providedService.alias !== null»,
                 serviceAlias: "«providedService.alias»"«ENDIF»
             },
-            handler: {
-                methodId: "«rpcMethod.name»",
-                handle: this.«providedService.aliasOrName.toFirstLower»Handler.on«rpcMethod.name».bind(this.«providedService.aliasOrName.toFirstLower»Handler)
-            }
+            methodId: "«rpcMethod.name»",
+            handle: this.«providedService.aliasOrName.toFirstLower»Handler.on«rpcMethod.name».bind(this.«providedService.aliasOrName.toFirstLower»Handler)
         '''
     }
 
