@@ -238,7 +238,7 @@ describe('GenericClientApi', () => {
 
     });
 
-    it('Can invoke own registered handler', done => {
+    it('Can invoke own registered handler', async () => {
 
         const mockMarshaller = new MockMarshallerProvider();
         const registry = new InvocationHandlersRegistry(mockMarshaller);
@@ -254,18 +254,20 @@ describe('GenericClientApi', () => {
             methodId,
             handle: async (context, request) => {
                 expect(request).toBe(requestPayload);
-                done();
+                return request;
             }
         }, {}, {});
 
         const mockGenericClient = mock(GenericClientImpl);
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), mockMarshaller, registry);
 
-        clientApi.invokeUnaryHandler('app', { serviceId: serviceInfo.serviceId, methodId }, requestPayload);
-
+        const response = await clientApi.invokeUnaryHandler('app', { serviceId: serviceInfo.serviceId, methodId }, requestPayload);
+        
+        expect(response).toBe(requestPayload);
+        
     });
 
-    it('Can invoke own registered generic handler', done => {
+    it('Can invoke own registered generic handler', async () => {
 
         const mockMarshaller = new MockMarshallerProvider();
         const registry = new InvocationHandlersRegistry(mockMarshaller);
@@ -281,15 +283,15 @@ describe('GenericClientApi', () => {
             methodId,
             handle: async (context, request) => {
                 expect(new Uint8Array(request)).toEqual(new Uint8Array(requestPayload));
-                done();
-                return new ArrayBuffer(0);
+                return request;
             }
         });
 
         const mockGenericClient = mock(GenericClientImpl);
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), mockMarshaller, registry);
 
-        clientApi.invokeRawUnaryHandler('app', { serviceId: serviceInfo.serviceId, methodId }, requestPayload);
+        const response = await clientApi.invokeRawUnaryHandler('app', { serviceId: serviceInfo.serviceId, methodId }, requestPayload);
+        expect(new Uint8Array(response)).toEqual(new Uint8Array(requestPayload));
 
     });
 
