@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './GenericClientFactory';
-export * from './GenericClient';
-export * from './Invocation';
-export { InvocationMetaInfo as InvocationMetaInfo } from '@plexus-interop/protocol';
-export * from './GenericClientFactory';
-export * from './GenericClient';
-export * from './InvocationObserver';
-export * from './BaseInvocation';
-export * from './InvocationChannelObserver';
-export * from './InvocationObserverConverter';
+import { InternalActionInvoker } from './InternalActionInvoker';
+import { GenericClientApi } from '..';
+
+/**
+ * Invokes registered action handlers
+ */
+export interface InternalGenericClientApi extends InternalActionInvoker, GenericClientApi {
+}

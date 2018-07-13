@@ -14,13 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './GenericClientFactory';
-export * from './GenericClient';
-export * from './Invocation';
-export { InvocationMetaInfo as InvocationMetaInfo } from '@plexus-interop/protocol';
-export * from './GenericClientFactory';
-export * from './GenericClient';
-export * from './InvocationObserver';
-export * from './BaseInvocation';
-export * from './InvocationChannelObserver';
-export * from './InvocationObserverConverter';
+import { UniqueId } from '@plexus-interop/transport-common';
+import { InvocationMetaInfo } from '@plexus-interop/protocol';
+import { AnonymousSubscription } from '@plexus-interop/common';
+import { InvocationChannelObserver } from './InvocationChannelObserver';
+import { clientProtocol as plexus } from '@plexus-interop/protocol';
+
+export interface BaseInvocation<Req, Res> {
+    uuid(): UniqueId;
+    sendMessage(data: Req): Promise<void>;
+    open(observer: InvocationChannelObserver<AnonymousSubscription, Res>): void;
+    close(completion?: plexus.ICompletion): Promise<plexus.ICompletion>;
+    getMetaInfo(): InvocationMetaInfo;
+}

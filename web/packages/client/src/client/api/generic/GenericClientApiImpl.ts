@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericClientApi, Feature } from './GenericClientApi';
+import { Feature } from './GenericClientApi';
 import { GenericClient } from '../../../client/generic/GenericClient';
 import { ServiceDiscoveryRequest } from '@plexus-interop/client-api';
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
@@ -23,13 +23,13 @@ import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocat
 import { StreamingInvocationClientImpl } from './handlers/streaming/StreamingInvocationClientImpl';
 import { InvocationClient } from './../InvocationClient';
 import { ValueHandler } from './../ValueHandler';
-import { ClientError } from '@plexus-interop/protocol';
+import { ClientError, SuccessCompletion, ClientProtocolHelper, ErrorCompletion } from '@plexus-interop/protocol';
 import { InvocationRequestInfo } from '@plexus-interop/protocol';
-import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
+import { Logger, LoggerFactory, Arrays, AnonymousSubscription } from '@plexus-interop/common';
 import { MarshallerProvider } from '../io/MarshallerProvider';
 import { Completion } from '@plexus-interop/client-api';
 import { UniqueId } from '@plexus-interop/transport-common';
-import { ProvidedMethodReference } from '@plexus-interop/client-api';
+import { ProvidedMethodReference, ActionReference } from '@plexus-interop/client-api';
 import { Invocation } from '../../generic/Invocation';
 import { MethodDiscoveryRequest } from '@plexus-interop/client-api';
 import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
@@ -37,14 +37,20 @@ import { GenericRequest } from '@plexus-interop/client-api';
 import { InvocationObserver } from '../../generic';
 import { DelegateInvocationObserver } from '../../api/DelegateInvocationObserver';
 import { LoggingInvocationObserver } from '../LoggingInvocationObserver';
+import { InternalGenericClientApi } from './internal/InternalGenericClientApi';
+import { InvocationExecutor } from './InvocationExecutor';
+import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
+import { BaseInvocation } from '../../generic/BaseInvocation';
 
-export class GenericClientApiImpl implements GenericClientApi {
+export class GenericClientApiImpl implements InternalGenericClientApi {
 
     private readonly log: Logger = LoggerFactory.getLogger('GenericClientApi');
 
     constructor(
         private readonly genericClient: GenericClient,
-        private readonly marshallerProvider: MarshallerProvider) { }
+        private readonly marshallerProvider: MarshallerProvider,
+        private readonly handlersRegistry: InvocationHandlersRegistry
+    ) { }
 
     public supported(feature: Feature): boolean {
         return true;
@@ -173,6 +179,14 @@ export class GenericClientApiImpl implements GenericClientApi {
 
     public disconnect(completion?: Completion): Promise<void> {
         return this.genericClient.disconnect(completion);
+    }
+
+    public invokeUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayload: any): Promise<any> {
+        return new InvocationExecutor(this.handlersRegistry).invokeUnaryHandler(consumerAppId, actionReference, requestPayload);
+    }
+    
+    public invokeRawUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer> {
+        throw new Error('Method not implemented.');
     }
 
     private isDiscovered(request: InvocationRequestInfo | ProvidedMethodReference): request is ProvidedMethodReference {

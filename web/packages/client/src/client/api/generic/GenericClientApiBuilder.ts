@@ -27,7 +27,10 @@ import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistr
 import { BidiStreamingInvocationHandler } from './handlers/streaming/BidiStreamingInvocationHandler';
 import { ServerStreamingInvocationHandler } from './handlers/streaming/ServerStreamingInvocationHandler';
 import { UnaryInvocationHandler } from './handlers/unary/UnaryInvocationHandler';
+import { InternalGenericClientApi } from './internal/InternalGenericClientApi';
 
+
+// tslint:disable:member-ordering
 export class GenericClientApiBuilder {
 
     protected log: Logger = LoggerFactory.getLogger('GenericClientApiBuilder');
@@ -36,9 +39,15 @@ export class GenericClientApiBuilder {
     protected applicationInstanceId?: UniqueId;
     protected handlersRegistry: InvocationHandlersRegistry;
     protected transportConnectionProvider: () => Promise<TransportConnection>;
+    protected clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi> = async client => client;
 
     constructor(protected marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider()) {
         this.handlersRegistry = new InvocationHandlersRegistry(this.marshallerProvider);
+    }
+
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): GenericClientApiBuilder {
+        this.clientApiDecorator = clientApiDecorator;
+        return this;
     }
 
     public withApplicationId(appId: string): GenericClientApiBuilder {
@@ -109,7 +118,8 @@ export class GenericClientApiBuilder {
             .then(genericClient => {
                 const actionsHost = new GenericInvocationsHost(genericClient, this.handlersRegistry);
                 return actionsHost.start()
-                    .then(() => new GenericClientApiImpl(genericClient, this.marshallerProvider));
+                    .then(() => new GenericClientApiImpl(genericClient, this.marshallerProvider, this.handlersRegistry))
+                    .then(client => this.clientApiDecorator(client));
             })
             .catch(error => {
                 this.log.error('Unable to create client', error);

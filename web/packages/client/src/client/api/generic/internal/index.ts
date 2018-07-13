@@ -14,13 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './GenericClientFactory';
-export * from './GenericClient';
-export * from './Invocation';
-export { InvocationMetaInfo as InvocationMetaInfo } from '@plexus-interop/protocol';
-export * from './GenericClientFactory';
-export * from './GenericClient';
-export * from './InvocationObserver';
-export * from './BaseInvocation';
-export * from './InvocationChannelObserver';
-export * from './InvocationObserverConverter';
+export * from './InternalActionInvoker';
+export * from './InternalGenericClientApi';

@@ -17,8 +17,8 @@
 import { GenericClient } from '../../../client/generic/GenericClient';
 import { Invocation } from '../../../client/generic/Invocation';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
-import { StreamingInvocationHost } from './handlers/streaming/StreamingInvocationHost';
 import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
+import { InvocationExecutor } from './InvocationExecutor';
 
 export class GenericInvocationsHost {
 
@@ -44,8 +44,7 @@ export class GenericInvocationsHost {
     }
 
     private handleInvocation(invocation: Invocation): void {
-        this.log.trace(`Received invocation`);
-        new StreamingInvocationHost(this.handlersRegistry, invocation).executeGenericHandler();
+        new InvocationExecutor(this.handlersRegistry).handleGenericInvocation(invocation);
     }
 
 }

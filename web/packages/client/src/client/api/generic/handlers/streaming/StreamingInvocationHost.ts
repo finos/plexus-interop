@@ -22,33 +22,33 @@ import { MethodInvocationContext, ActionReference } from '@plexus-interop/client
 import { UniqueId } from '@plexus-interop/transport-common';
 import { InvocationObserver } from '../../../../generic/InvocationObserver';
 import { InvocationHandlersRegistry } from '../InvocationHandlersRegistry';
+import { BaseInvocation } from '../../../../generic/BaseInvocation';
 
 export class StreamingInvocationHost {
 
     private logger: Logger = LoggerFactory.getLogger('StreamingInvocationHost');
 
     public constructor(
-        private readonly handlersRegistry: InvocationHandlersRegistry,
-        private readonly invocation: Invocation) { }
+        private readonly handlersRegistry: InvocationHandlersRegistry) { }
 
-    public executeTypeAwareHandler(): void {
-        this.execute(true);
+    public executeTypeAwareHandler(invocation: BaseInvocation<any, any>): void {
+        this.execute(true, invocation);
     }
 
-    public executeGenericHandler(): void {
-        this.execute(false);
+    public executeGenericHandler(invocation: Invocation): void {
+        this.execute(false, invocation);
     }
 
-    private execute(isTypeAware: boolean): void {
+    private execute(isTypeAware: boolean, invocation: BaseInvocation<any, any>): void {
 
         this.logger.debug('Handling invocation started');
         let baseRequestObserver: null | Observer<any> = null;
         const invocationCancellationToken = new CancellationToken();
-        this.invocation.open({
+        invocation.open({
 
             started: (s) => {
                 this.logger.trace('Invocation opened');
-                const metaInfo = this.invocation.getMetaInfo();
+                const metaInfo = invocation.getMetaInfo();
                 const actionRef: ActionReference = {
                     serviceAlias: metaInfo.serviceAlias,
                     methodId: metaInfo.methodId as string,
@@ -59,7 +59,7 @@ export class StreamingInvocationHost {
                 const invocationHandler = isTypeAware ? this.handlersRegistry.getTypeAwareBidiStreamingHandler(actionRef) : this.handlersRegistry.getRawBidiStreamingHandler(actionRef);
                 if (invocationHandler) {
                     const invocationContext = new MethodInvocationContext(metaInfo.consumerApplicationId as string, metaInfo.consumerConnectionId as UniqueId, invocationCancellationToken);
-                    baseRequestObserver = invocationHandler.handle(invocationContext, new StreamingInvocationClientImpl(this.invocation, this.logger));
+                    baseRequestObserver = invocationHandler.handle(invocationContext, new StreamingInvocationClientImpl(invocation, this.logger));
                 } else {
                     this.logger.error(`No handler found for hash [${hash}]`);
                 }

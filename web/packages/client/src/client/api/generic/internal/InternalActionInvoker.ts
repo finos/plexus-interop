@@ -19,21 +19,23 @@ import { ActionReference } from '@plexus-interop/client-api';
 /**
  * Invokes registered action handlers
  */
-export interface ActionInvoker {
+export interface InternalActionInvoker {
 
     /**
      * Invokes registered action handler, applying serialization/deserialization logic on request/response
      * 
+     * @param consumerAppId Consumer application 
      * @param actionReference Action reference
      * @param requestPayload Request Payload (structured object)
      */
-    invokeUnaryHandler(actionReference: ActionReference, requestPayload: any): Promise<any>;
+    invokeUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayload: any): Promise<any>;
 
     /**
      * Invokes registered action handler
      * 
+     * @param consumerAppId Consumer application
      * @param actionReference Action reference
      * @param requestPayloadBuffer Request payload  
      */
-    invokeRawUnaryHandler(actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer>;
+    invokeRawUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer>;
 }
