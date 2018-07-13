@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericClientApi } from './GenericClientApi';
+import { GenericClientApi, Feature } from './GenericClientApi';
 import { UniqueId, InvocationRequestInfo, Completion } from '@plexus-interop/protocol';
 import { GenericRequest, ServiceDiscoveryRequest, MethodDiscoveryRequest, MethodDiscoveryResponse, ServiceDiscoveryResponse } from '@plexus-interop/client-api';
 import { ValueHandler, InvocationClient } from '../';
@@ -28,6 +28,10 @@ import { InvocationObserver } from '../../generic';
 export abstract class GenericClientApiBase implements GenericClientApi {
 
     public constructor(protected readonly client: GenericClientApi) { }
+    
+    public supported(apiFeature: Feature): boolean {
+        return this.client.supported(apiFeature);
+    }
 
     public getConnectionId(): UniqueId {
         return this.client.getConnectionId();

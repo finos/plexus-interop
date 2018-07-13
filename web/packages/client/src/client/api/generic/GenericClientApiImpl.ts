@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericClientApi } from './GenericClientApi';
+import { GenericClientApi, Feature } from './GenericClientApi';
 import { GenericClient } from '../../../client/generic/GenericClient';
 import { ServiceDiscoveryRequest } from '@plexus-interop/client-api';
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
@@ -45,6 +45,10 @@ export class GenericClientApiImpl implements GenericClientApi {
     constructor(
         private readonly genericClient: GenericClient,
         private readonly marshallerProvider: MarshallerProvider) { }
+
+    public supported(feature: Feature): boolean {
+        return true;
+    }
 
     public getConnectionId(): UniqueId {
         return this.genericClient.getConnectionId();
