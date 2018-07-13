@@ -16,11 +16,11 @@
  */
 import { BidiStreamingInvocationHandler, ServerStreamingInvocationHandler } from './streaming';
 import { ActionReference } from '@plexus-interop/client-api';
-import { MarshallerProvider } from '@plexus-interop/client';
 import { UnaryHandlerConverter, toGenericUnaryHandler } from './unary/converters';
 import { LoggerFactory, Logger } from '@plexus-interop/common';
 import { UnaryInvocationHandler } from './unary/UnaryInvocationHandler';
 import { ServerStreamingConverter, toGenericStreamingHandler } from './streaming/converters';
+import { MarshallerProvider } from '../../io/MarshallerProvider';
 
 type HandlerActionRef = {
     serviceInfo: {

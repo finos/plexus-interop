@@ -32,7 +32,7 @@ export function createInvocationInfo(): InvocationMetaInfo {
         applicationId: '3',
         serviceAlias: 'serviceAlias'
     };
-};
+}
 
 export function createRemoteInvocationInfo(): RemoteInvocationInfo {
     return {
