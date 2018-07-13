@@ -18,7 +18,7 @@ import { GenericClientApi } from './GenericClientApi';
 import { UniqueId, InvocationRequestInfo, Completion } from '@plexus-interop/protocol';
 import { GenericRequest, ServiceDiscoveryRequest, MethodDiscoveryRequest, MethodDiscoveryResponse, ServiceDiscoveryResponse } from '@plexus-interop/client-api';
 import { ValueHandler, InvocationClient } from '../';
-import { StreamingInvocationClient } from '../streaming/StreamingInvocationClient';
+import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocationClient';
 import { InvocationObserver } from '../../generic';
 
 /**
@@ -27,7 +27,7 @@ import { InvocationObserver } from '../../generic';
  */
 export abstract class GenericClientApiBase implements GenericClientApi {
 
-    public constructor(private readonly client: GenericClientApi) { }
+    public constructor(protected readonly client: GenericClientApi) { }
 
     public getConnectionId(): UniqueId {
         return this.client.getConnectionId();
