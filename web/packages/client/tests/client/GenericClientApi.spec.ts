@@ -24,6 +24,7 @@ import { clientProtocol as plexus, Completion, ErrorCompletion, SuccessCompletio
 import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
 import { ChannelObserver } from '@plexus-interop/transport-common';
 import { InvocationHandlersRegistry } from '../../src';
+import { Arrays } from '@plexus-interop/common';
 
 describe('GenericClientApi', () => {
 
@@ -260,7 +261,35 @@ describe('GenericClientApi', () => {
         const mockGenericClient = mock(GenericClientImpl);
         const clientApi = new GenericClientApiImpl(instance(mockGenericClient), mockMarshaller, registry);
 
-        clientApi.invokeUnaryHandler('app', {serviceId: serviceInfo.serviceId, methodId}, requestPayload);
+        clientApi.invokeUnaryHandler('app', { serviceId: serviceInfo.serviceId, methodId }, requestPayload);
+
+    });
+
+    it('Can invoke own registered generic handler', done => {
+
+        const mockMarshaller = new MockMarshallerProvider();
+        const registry = new InvocationHandlersRegistry(mockMarshaller);
+
+        const serviceInfo = {
+            serviceId: 'service'
+        };
+        const methodId = 'method';
+        const requestPayload = Arrays.toArrayBuffer(new Uint8Array([123]));
+
+        registry.registerUnaryGenericHandler({
+            serviceInfo,
+            methodId,
+            handle: async (context, request) => {
+                expect(new Uint8Array(request)).toEqual(new Uint8Array(requestPayload));
+                done();
+                return new ArrayBuffer(0);
+            }
+        });
+
+        const mockGenericClient = mock(GenericClientImpl);
+        const clientApi = new GenericClientApiImpl(instance(mockGenericClient), mockMarshaller, registry);
+
+        clientApi.invokeRawUnaryHandler('app', { serviceId: serviceInfo.serviceId, methodId }, requestPayload);
 
     });
 
