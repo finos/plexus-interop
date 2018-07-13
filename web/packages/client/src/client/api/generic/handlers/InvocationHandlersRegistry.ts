@@ -19,7 +19,7 @@ import { ActionReference } from '@plexus-interop/client-api';
 import { UnaryHandlerConverter, toGenericUnaryHandler } from './unary/converters';
 import { LoggerFactory, Logger } from '@plexus-interop/common';
 import { UnaryInvocationHandler } from './unary/UnaryInvocationHandler';
-import { ServerStreamingConverter, toGenericStreamingHandler } from './streaming/converters';
+import { ServerStreamingConverter, toGenericStreamingHandler, toGenericBidiStreamingHandler } from './streaming/converters';
 import { MarshallerProvider } from '../../io/MarshallerProvider';
 
 type HandlerActionRef = {
@@ -64,6 +64,10 @@ export class InvocationHandlersRegistry {
             this.actionHash(this.toActionRef(handler)), 
             new UnaryHandlerConverter<any, any>(this.log).convert(handler));
         this.registerUnaryGenericHandler(toGenericUnaryHandler(handler, requestType, responseType, this.marshallerProvider));
+    }
+
+    public registerBidiStreamingHandler(handler: BidiStreamingInvocationHandler<any, any>, requestType: any, responseType: any): void {
+        this.registerBidiStreamingGenericHandler(toGenericBidiStreamingHandler(handler, requestType, responseType, this.marshallerProvider));
     }
 
     public registerBidiStreamingGenericHandler(handler: BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): void {

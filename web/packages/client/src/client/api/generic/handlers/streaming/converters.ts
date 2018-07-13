@@ -51,20 +51,19 @@ export class ServerStreamingConverter<Req, Res> implements InvocationHandlerConv
 }
 
 export function toGenericStreamingHandler(
-    handler: ServerStreamingInvocationHandler<any, any>,
+    typedHandler: ServerStreamingInvocationHandler<any, any>,
     requestType: any,
     responseType: any,
     marshallerProvider: MarshallerProvider): ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
-
 
     const requestMarshaller = marshallerProvider.getMarshaller(requestType);
     const responseMarshaller = marshallerProvider.getMarshaller(responseType);
 
     return {
-        ...handler,
+        ...typedHandler,
         handle: (invocationContext: MethodInvocationContext, requestPayload: ArrayBuffer, hostClient: StreamingInvocationClient<ArrayBuffer>) => {
-            const payload = requestMarshaller.decode(new Uint8Array(requestPayload));
-            handler.handle(invocationContext, payload, {
+            const typedPayload = requestMarshaller.decode(new Uint8Array(requestPayload));
+            typedHandler.handle(invocationContext, typedPayload, {
                 next: response => hostClient.next(Arrays.toArrayBuffer(responseMarshaller.encode(response))),
                 complete: hostClient.complete.bind(hostClient),
                 error: hostClient.error.bind(hostClient),
@@ -73,4 +72,30 @@ export function toGenericStreamingHandler(
         }
     };
 
+}
+
+export function toGenericBidiStreamingHandler(
+    typedHandler: BidiStreamingInvocationHandler<any, any>,
+    requestType: any,
+    responseType: any,
+    marshallerProvider: MarshallerProvider): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
+    const requestMarshaller = marshallerProvider.getMarshaller(requestType);
+    const responseMarshaller = marshallerProvider.getMarshaller(responseType);
+    return {
+        ...typedHandler,
+        handle: (invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<ArrayBuffer>) => {
+            const baseObserver = typedHandler.handle(invocationContext, {
+                next: typedResponse => hostClient.next(Arrays.toArrayBuffer(responseMarshaller.encode(typedResponse))),
+                complete: hostClient.complete.bind(hostClient),
+                error: hostClient.error.bind(hostClient),
+                cancel: hostClient.cancel.bind(hostClient)
+            });
+            return {
+                next: (requestPayload: ArrayBuffer) => baseObserver.next(requestMarshaller.decode(new Uint8Array(requestPayload))),
+                complete: baseObserver.complete.bind(baseObserver),
+                error: baseObserver.error.bind(baseObserver),
+                streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
+            };
+        }
+    };
 }

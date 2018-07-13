@@ -62,13 +62,28 @@ export class GenericClientApiBuilder {
         return this;
     }
 
+    public withTypeAwareBidiStreamingHandler(handler: BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>, requestType: any, responseType: any): GenericClientApiBuilder {
+        this.handlersRegistry.registerBidiStreamingHandler(handler, requestType, responseType);
+        return this;
+    }
+
     public withServerStreamingHandler(handler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): GenericClientApiBuilder {
         this.handlersRegistry.registerServerStreamingGenericHandler(handler);
         return this;
     }
 
+    public withTypeAwareServerStreamingHandler(handler: ServerStreamingInvocationHandler<any, any>, requestType: any, responseType: any): GenericClientApiBuilder {
+        this.handlersRegistry.registerServerStreamingHandler(handler, requestType, responseType);
+        return this;
+    }
+
     public withUnaryHandler(handler: UnaryInvocationHandler<ArrayBuffer, ArrayBuffer>): GenericClientApiBuilder {
         this.handlersRegistry.registerUnaryGenericHandler(handler);
+        return this;
+    }
+
+    public withTypeAwareUnaryHandler(handler: UnaryInvocationHandler<any, any>, requestType: any, responseType: any): GenericClientApiBuilder {
+        this.handlersRegistry.registerUnaryHandler(handler, requestType, responseType);
         return this;
     }
 
