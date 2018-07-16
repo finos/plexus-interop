@@ -22,17 +22,18 @@ import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAP
 
 import * as plexus from '../gen/plexus-messages';
 
+
+
 /**
  * Main client API
- *
  */
-export interface EchoServerClient extends GenericClientApi {
+export interface EchoServerClient extends GenericClientApi  {
+
 
 }
 
 /**
  * Client's API internal implementation
- *
  */
 class EchoServerClientImpl extends GenericClientApiBase implements EchoServerClient {
 
@@ -42,22 +43,21 @@ class EchoServerClientImpl extends GenericClientApiBase implements EchoServerCli
         super(genericClient);
     }
 
+
 }
 
 /**
  * Client invocation handler for EchoService, to be implemented by Client
- *
  */
 export abstract class EchoServiceInvocationHandler {
 
     public abstract onUnary(invocationContext: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
-
+    
     public abstract onServerStreaming(invocationContext: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): void;
-
+    
     public abstract onClientStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>;
-
+    
     public abstract onDuplexStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>): InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>;
-
 }
 
 /**
@@ -66,7 +66,6 @@ export abstract class EchoServiceInvocationHandler {
 export abstract class ServiceAliasInvocationHandler {
 
     public abstract onUnary(invocationContext: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
-
 }
 
 /**
@@ -81,7 +80,7 @@ export class EchoServerClientBuilder {
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
     private echoServiceHandler: EchoServiceInvocationHandler;
-
+    
     private serviceAliasHandler: ServiceAliasInvocationHandler;
 
     public withClientDetails(clientId: ClientConnectRequest): EchoServerClientBuilder {
@@ -103,7 +102,7 @@ export class EchoServerClientBuilder {
         this.echoServiceHandler = invocationsHandler;
         return this;
     }
-
+    
     public withServiceAliasInvocationsHandler(invocationsHandler: ServiceAliasInvocationHandler): EchoServerClientBuilder {
         this.serviceAliasHandler = invocationsHandler;
         return this;
@@ -124,36 +123,28 @@ export class EchoServerClientBuilder {
                 },
                 methodId: 'Unary',
                 handle: this.echoServiceHandler.onUnary.bind(this.echoServiceHandler)
-            },
-                plexus.plexus.interop.testing.EchoRequest,
-                plexus.plexus.interop.testing.EchoRequest)
+            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
             .withTypeAwareServerStreamingHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService'
                 },
                 methodId: 'ServerStreaming',
                 handle: this.echoServiceHandler.onServerStreaming.bind(this.echoServiceHandler)
-            },
-                plexus.plexus.interop.testing.EchoRequest,
-                plexus.plexus.interop.testing.EchoRequest)
+            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
             .withTypeAwareBidiStreamingHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService'
                 },
                 methodId: 'ClientStreaming',
                 handle: this.echoServiceHandler.onClientStreaming.bind(this.echoServiceHandler)
-            },
-                plexus.plexus.interop.testing.EchoRequest,
-                plexus.plexus.interop.testing.EchoRequest)
+            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
             .withTypeAwareBidiStreamingHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService'
                 },
                 methodId: 'DuplexStreaming',
                 handle: this.echoServiceHandler.onDuplexStreaming.bind(this.echoServiceHandler)
-            },
-                plexus.plexus.interop.testing.EchoRequest,
-                plexus.plexus.interop.testing.EchoRequest)
+            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
             .withTypeAwareUnaryHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService',
@@ -161,12 +152,10 @@ export class EchoServerClientBuilder {
                 },
                 methodId: 'Unary',
                 handle: this.serviceAliasHandler.onUnary.bind(this.serviceAliasHandler)
-            },
-                plexus.plexus.interop.testing.EchoRequest,
-                plexus.plexus.interop.testing.EchoRequest)
+            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
             .connect()
             .then((genericClient: GenericClientApi) => new EchoServerClientImpl(
                 genericClient
-            ));
+));
     }
 }

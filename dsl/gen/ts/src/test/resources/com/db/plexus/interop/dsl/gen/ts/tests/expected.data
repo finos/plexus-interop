@@ -1,10 +1,10 @@
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
-import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
-import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer } from "@plexus-interop/common";
-import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
+import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
+import { Arrays, Observer } from '@plexus-interop/common';
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from '@plexus-interop/client';
 
-import * as plexus from "./plexus-messages";
+import * as plexus from './plexus-messages';
 
 /**
  *  Proxy interface of ExampleService service, to be consumed by Client API
@@ -12,11 +12,11 @@ import * as plexus from "./plexus-messages";
 export abstract class ExampleServiceProxy {
 
     public abstract pointToPoint(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>;
-    
+
     public abstract serverStreaming(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest, responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<InvocationClient>;
-    
+
     public abstract clientToServer(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>>;
-    
+
     public abstract bidiStreaming(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>>;
 
 }
@@ -39,21 +39,21 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
 
     public pointToPoint(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse> {
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "PointToPoint",
-            serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"
+            methodId: 'PointToPoint',
+            serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
         };
         return new Promise((resolve, reject) => {
             this.genericClient.sendUnaryRequest(invocationInfo, request, {
                 value: responsePayload => resolve(responsePayload),
                 error: e => reject(e)
-            });
-        }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response);
+            }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response);
+        });
     }
 
     public serverStreaming(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest, responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<InvocationClient> {
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "ServerStreaming",
-            serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"
+            methodId: 'ServerStreaming',
+            serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
         };
         return this.genericClient.sendServerStreamingRequest(
             invocationInfo,
@@ -65,8 +65,8 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
 
     public clientToServer(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>> {
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "ClientToServer",
-            serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"
+            methodId: 'ClientToServer',
+            serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
         };
         return this.genericClient.sendBidirectionalStreamingRequest(
             invocationInfo,
@@ -76,8 +76,8 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
 
     public bidiStreaming(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>> {
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "BidiStreaming",
-            serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"
+            methodId: 'BidiStreaming',
+            serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
         };
         return this.genericClient.sendBidirectionalStreamingRequest(
             invocationInfo,
@@ -96,16 +96,16 @@ export class NoLaunchExampleServiceProxyImpl implements NoLaunchExampleServicePr
 
     public pointToPoint(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse> {
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "PointToPoint",
-            serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService",
-            serviceAlias: "NoLaunchExampleService"
+            methodId: 'PointToPoint',
+            serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService',
+            serviceAlias: 'NoLaunchExampleService'
         };
         return new Promise((resolve, reject) => {
             this.genericClient.sendUnaryRequest(invocationInfo, request, {
                 value: responsePayload => resolve(responsePayload),
                 error: e => reject(e)
-            });
-        }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response);
+            }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response);
+        });
     }
 
 }
@@ -172,7 +172,7 @@ export abstract class ExampleServiceInvocationHandler {
 export class ComponentAClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "com.db.plexus.interop.dsl.gen.test.components.ComponentA"
+        applicationId: 'com.db.plexus.interop.dsl.gen.test.components.ComponentA'
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
@@ -217,38 +217,38 @@ export class ComponentAClientBuilder {
             .withClientDetails(this.clientDetails)
             .withTypeAwareUnaryHandler({
                 serviceInfo: {
-                    serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService",
-                    serviceAlias: "NoLaunchExampleService"
+                    serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService',
+                    serviceAlias: 'NoLaunchExampleService'
                 },
-                methodId: "PointToPoint",
+                methodId: 'PointToPoint',
                 handle: this.noLaunchExampleServiceHandler.onPointToPoint.bind(this.noLaunchExampleServiceHandler)
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
             .withTypeAwareUnaryHandler({
                 serviceInfo: {
-                    serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"
+                    serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
                 },
-                methodId: "PointToPoint",
+                methodId: 'PointToPoint',
                 handle: this.exampleServiceHandler.onPointToPoint.bind(this.exampleServiceHandler)
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
             .withTypeAwareServerStreamingHandler({
                 serviceInfo: {
-                    serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"
+                    serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
                 },
-                methodId: "ServerStreaming",
+                methodId: 'ServerStreaming',
                 handle: this.exampleServiceHandler.onServerStreaming.bind(this.exampleServiceHandler)
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
             .withTypeAwareBidiStreamingHandler({
                 serviceInfo: {
-                    serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"
+                    serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
                 },
-                methodId: "ClientToServer",
+                methodId: 'ClientToServer',
                 handle: this.exampleServiceHandler.onClientToServer.bind(this.exampleServiceHandler)
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
             .withTypeAwareBidiStreamingHandler({
                 serviceInfo: {
-                    serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"
+                    serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
                 },
-                methodId: "BidiStreaming",
+                methodId: 'BidiStreaming',
                 handle: this.exampleServiceHandler.onBidiStreaming.bind(this.exampleServiceHandler)
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
             .connect()

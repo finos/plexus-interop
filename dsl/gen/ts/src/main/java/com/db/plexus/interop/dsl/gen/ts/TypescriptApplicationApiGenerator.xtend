@@ -134,7 +134,7 @@ class «app.name»ClientImpl extends GenericClientApiBase implements «app.name�
 export class «app.name»ClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: "«app.fullName»"
+        applicationId: '«app.fullName»'
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
@@ -214,22 +214,22 @@ export class «app.name»ClientBuilder {
     def handlerBuilderParam(Method rpcMethod, ProvidedService providedService, PlexusGenConfig genConfig) {
         return '''
             serviceInfo: {
-                serviceId: "«rpcMethod.service.fullName»"«IF providedService.alias !== null»,
-                serviceAlias: "«providedService.alias»"«ENDIF»
+                serviceId: '«rpcMethod.service.fullName»'«IF providedService.alias !== null»,
+                serviceAlias: '«providedService.alias»'«ENDIF»
             },
-            methodId: "«rpcMethod.name»",
+            methodId: '«rpcMethod.name»',
             handle: this.«providedService.aliasOrName.toFirstLower»Handler.on«rpcMethod.name».bind(this.«providedService.aliasOrName.toFirstLower»Handler)
         '''
     }
 
     def imports(PlexusGenConfig genConfig) '''
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
-import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
-import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer } from "@plexus-interop/common";
-import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
+import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
+import { Arrays, Observer } from '@plexus-interop/common';
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from '@plexus-interop/client';
 
-import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
+import * as plexus from '«genConfig.getExternalDependencies().get(0)»';
     '''
 
     def clientMethodSignature(ConsumedMethod methodLink, PlexusGenConfig genConfig) {
@@ -275,8 +275,8 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
                 this.genericClient.sendUnaryRequest(invocationInfo, request, {
                     value: responsePayload => resolve(responsePayload),
                     error: e => reject(e)
-                });
-            }, «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»);
+                }, «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»);
+            });
         '''
     }
 
@@ -308,9 +308,9 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         val rpcMethod = consumed.method
         return '''
             const invocationInfo: InvocationRequestInfo = {
-                methodId: "«rpcMethod.name»",
-                serviceId: "«rpcMethod.service.fullName»"«IF consumedService.alias !== null»,
-                serviceAlias: "«consumedService.alias»"«ENDIF»
+                methodId: '«rpcMethod.name»',
+                serviceId: '«rpcMethod.service.fullName»'«IF consumedService.alias !== null»,
+                serviceAlias: '«consumedService.alias»'«ENDIF»
             };
         '''
     }

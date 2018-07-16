@@ -28,11 +28,11 @@ import * as plexus from '../gen/plexus-messages';
 export abstract class EchoServiceProxy {
 
     public abstract unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
-
+    
     public abstract serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient>;
-
+    
     public abstract clientStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>>;
-
+    
     public abstract duplexStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>>;
 
 }
@@ -65,7 +65,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
             }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
         });
     }
-
+    
     public serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient> {
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'ServerStreaming',
@@ -78,7 +78,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
             plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest
         );
     }
-
+    
     public clientStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'ClientStreaming',
@@ -89,7 +89,7 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
             responseObserver,
             plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
     }
-
+    
     public duplexStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'DuplexStreaming',
@@ -120,8 +120,7 @@ export class ServiceAliasProxyImpl implements ServiceAliasProxy {
             this.genericClient.sendUnaryRequest(invocationInfo, request, {
                 value: responsePayload => resolve(responsePayload),
                 error: e => reject(e)
-            },
-                plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
+            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
         });
     }
 
@@ -129,19 +128,17 @@ export class ServiceAliasProxyImpl implements ServiceAliasProxy {
 
 /**
  * Main client API
- *
  */
-export interface EchoClientClient extends GenericClientApi {
+export interface EchoClientClient extends GenericClientApi  {
 
     getEchoServiceProxy(): EchoServiceProxy;
-
+    
     getServiceAliasProxy(): ServiceAliasProxy;
 
 }
 
 /**
  * Client's API internal implementation
- *
  */
 class EchoClientClientImpl extends GenericClientApiBase implements EchoClientClient {
 
@@ -156,16 +153,16 @@ class EchoClientClientImpl extends GenericClientApiBase implements EchoClientCli
     public getEchoServiceProxy(): EchoServiceProxy {
         return this.echoServiceProxy;
     }
-
+    
     public getServiceAliasProxy(): ServiceAliasProxy {
         return this.serviceAliasProxy;
     }
 
 }
 
+
 /**
  * Client API builder
- *
  */
 export class EchoClientClientBuilder {
 
@@ -174,6 +171,7 @@ export class EchoClientClientBuilder {
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
+
 
     public withClientDetails(clientId: ClientConnectRequest): EchoClientClientBuilder {
         this.clientDetails = clientId;
@@ -190,6 +188,7 @@ export class EchoClientClientBuilder {
         return this;
     }
 
+
     public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): EchoClientClientBuilder {
         this.transportConnectionProvider = provider;
         return this;
@@ -200,10 +199,10 @@ export class EchoClientClientBuilder {
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
             .connect()
-            .then(genericClient => new EchoClientClientImpl(
+            .then((genericClient: GenericClientApi) => new EchoClientClientImpl(
                 genericClient,
                 new EchoServiceProxyImpl(genericClient),
-                new ServiceAliasProxyImpl(genericClient)
-            ));
+                                new ServiceAliasProxyImpl(genericClient)
+                ));
     }
 }
