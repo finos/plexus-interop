@@ -22,8 +22,6 @@ import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAP
 
 import * as plexus from '../gen/plexus-messages';
 
-
-
 /**
  * Main client API
  *
@@ -44,7 +42,6 @@ class EchoServerClientImpl extends GenericClientApiBase implements EchoServerCli
     ) {
         super(genericClient);
     }
-
 
 }
 
