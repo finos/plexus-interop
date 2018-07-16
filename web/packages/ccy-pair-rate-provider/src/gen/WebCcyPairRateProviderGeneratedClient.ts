@@ -14,19 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
-import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
-import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
-import { Arrays, Observer } from '@plexus-interop/common';
-import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from '@plexus-interop/client';
+import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
+import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
+import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
+import { Arrays, Observer } from "@plexus-interop/common";
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
 
-import * as plexus from './plexus-messages';
+import * as plexus from "./plexus-messages";
 
 
 
 /**
  * Main client API
- *
  */
 export interface WebCcyPairRateProviderClient extends GenericClientApi  {
 
@@ -35,7 +34,6 @@ export interface WebCcyPairRateProviderClient extends GenericClientApi  {
 
 /**
  * Client's API internal implementation
- *
  */
 class WebCcyPairRateProviderClientImpl extends GenericClientApiBase implements WebCcyPairRateProviderClient {
 
@@ -50,47 +48,24 @@ class WebCcyPairRateProviderClientImpl extends GenericClientApiBase implements W
 
 /**
  * Client invocation handler for CcyPairRateService, to be implemented by Client
- *
  */
 export abstract class CcyPairRateServiceInvocationHandler {
 
     public abstract onGetRate(invocationContext: MethodInvocationContext, request: plexus.fx.ICcyPair): Promise<plexus.fx.ICcyPairRate>;
-
-}
-
-/**
- * Internal invocation handler delegate for CcyPairRateService
- *
- */
-class CcyPairRateServiceInvocationHandlerInternal {
-
-    public constructor(private readonly clientHandler: CcyPairRateServiceInvocationHandler) {}
-
-    public onGetRate(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.fx.ICcyPairRate) => Arrays.toArrayBuffer(plexus.fx.CcyPairRate.encode(from).finish());
-        const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.fx.CcyPair.decode(new Uint8Array(from));
-            return plexus.fx.CcyPair.toObject(decoded);
-        };
-        return this.clientHandler
-            .onGetRate(invocationContext, requestFromBinaryConverter(request))
-            .then(response => responseToBinaryConverter(response));
-    }
 }
 
 /**
  * Client API builder
- *
  */
 export class WebCcyPairRateProviderClientBuilder {
 
     private clientDetails: ClientConnectRequest = {
-        applicationId: 'vendor_a.fx.WebCcyPairRateProvider'
+        applicationId: "vendor_a.fx.WebCcyPairRateProvider"
     };
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
-    private ccyPairRateServiceHandler: CcyPairRateServiceInvocationHandlerInternal;
+    private ccyPairRateServiceHandler: CcyPairRateServiceInvocationHandler;
 
     public withClientDetails(clientId: ClientConnectRequest): WebCcyPairRateProviderClientBuilder {
         this.clientDetails = clientId;
@@ -108,7 +83,7 @@ export class WebCcyPairRateProviderClientBuilder {
     }
 
     public withCcyPairRateServiceInvocationsHandler(invocationsHandler: CcyPairRateServiceInvocationHandler): WebCcyPairRateProviderClientBuilder {
-        this.ccyPairRateServiceHandler = new CcyPairRateServiceInvocationHandlerInternal(invocationsHandler);
+        this.ccyPairRateServiceHandler = invocationsHandler;
         return this;
     }
 
@@ -121,17 +96,15 @@ export class WebCcyPairRateProviderClientBuilder {
         return new ContainerAwareClientAPIBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
-            .withUnaryInvocationHandler({
+            .withTypeAwareUnaryHandler({
                 serviceInfo: {
-                    serviceId: 'fx.CcyPairRateService'
+                    serviceId: "fx.CcyPairRateService"
                 },
-                handler: {
-                    methodId: 'GetRate',
-                    handle: this.ccyPairRateServiceHandler.onGetRate.bind(this.ccyPairRateServiceHandler)
-                }
-            })
+                methodId: "GetRate",
+                handle: this.ccyPairRateServiceHandler.onGetRate.bind(this.ccyPairRateServiceHandler)
+            }, plexus.fx.CcyPair, plexus.fx.CcyPairRate)
             .connect()
-            .then(genericClient => new WebCcyPairRateProviderClientImpl(
+            .then((genericClient: GenericClientApi) => new WebCcyPairRateProviderClientImpl(
                 genericClient
 ));
     }
