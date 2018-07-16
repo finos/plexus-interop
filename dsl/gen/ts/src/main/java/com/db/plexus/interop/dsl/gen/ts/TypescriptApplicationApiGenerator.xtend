@@ -85,7 +85,6 @@ class TypescriptApplicationApiGenerator extends ApplicationCodeGenerator {
 
 /**
  * Main client API
- *
  */
 export interface «app.name»Client extends GenericClientApi  {
 
@@ -97,7 +96,6 @@ export interface «app.name»Client extends GenericClientApi  {
 
 /**
  * Client's API internal implementation
- *
  */
 class «app.name»ClientImpl extends GenericClientApiBase implements «app.name»Client {
 
@@ -121,20 +119,17 @@ class «app.name»ClientImpl extends GenericClientApiBase implements «app.name�
 «FOR providedService : providedServices SEPARATOR '\n' »
     /**
      * Client invocation handler for «providedService.aliasOrName.toFirstUpper», to be implemented by Client
-     *
      */
     export abstract class «providedService.aliasOrName.toFirstUpper»InvocationHandler {
 
-        «FOR providedMethod : providedService.methods»
+        «FOR providedMethod : providedService.methods SEPARATOR '\n'»
         public abstract «clientHandlerSignature(providedMethod.method, genConfig)»;
-
         «ENDFOR»
     }
 «ENDFOR»
 
 /**
  * Client API builder
- *
  */
 export class «app.name»ClientBuilder {
 
@@ -275,59 +270,39 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
     def clientPointToPointImpl(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
         val rpcMethod = consumed.method
         return '''
-            «clientConverters(rpcMethod, genConfig)»
             «clientInvocationInfo(consumed, consumedService, genConfig)»
             return new Promise((resolve, reject) => {
-                this.genericClient.sendRawUnaryRequest(invocationInfo, requestToBinaryConverter(request), {
-                    value: (responsePayload: ArrayBuffer) => {
-                        resolve(responseFromBinaryConverter(responsePayload));
-                    },
-                    error: (e) => {
-                        reject(e);
-                    }
+                this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                    value: responsePayload => resolve(responsePayload),
+                    error: e => reject(e)
                 });
-            });
+            }, «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»);
         '''
     }
 
     def clientBidiStreamingImpl(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
         val rpcMethod = consumed.method
         return '''
-            «clientConverters(rpcMethod, genConfig)»
             «clientInvocationInfo(consumed, consumedService, genConfig)»
-            return this.genericClient.sendRawBidirectionalStreamingRequest(
+            return this.genericClient.sendBidirectionalStreamingRequest(
                 invocationInfo,
-                new InvocationObserverConverter<«responseType(rpcMethod, genConfig)», ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-                .then(baseClient =>  {
-                    return {
-                        next: (request: «requestType(rpcMethod, genConfig)») => baseClient.next(requestToBinaryConverter(request)),
-                        error: baseClient.error.bind(baseClient),
-                        complete: baseClient.complete.bind(baseClient),
-                        cancel: baseClient.cancel.bind(baseClient)
-                    };
-                });
+                responseObserver,
+                «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»);
         '''
     }
 
     def serverStreamingImpl(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
         val rpcMethod = consumed.method
         return '''
-            «clientConverters(rpcMethod, genConfig)»
             «clientInvocationInfo(consumed, consumedService, genConfig)»
-            return this.genericClient.sendRawServerStreamingRequest(
+            return this.genericClient.sendServerStreamingRequest(
                 invocationInfo,
-                requestToBinaryConverter(request),
-                new InvocationObserverConverter<«responseType(rpcMethod, genConfig)», ArrayBuffer>(responseObserver, responseFromBinaryConverter));
+                request,
+                responseObserver,
+                «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»
+            );
         '''
     }
-
-    def clientConverters(Method rpcMethod, PlexusGenConfig genConfig) '''
-        const requestToBinaryConverter = (from: «requestType(rpcMethod, genConfig)») => Arrays.toArrayBuffer(«requestTypeImpl(rpcMethod, genConfig)».encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = «responseTypeImpl(rpcMethod, genConfig)».decode(new Uint8Array(from));
-            return «responseTypeImpl(rpcMethod, genConfig)».toObject(decoded);
-        };
-     '''
 
     def clientInvocationInfo(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
         val rpcMethod = consumed.method
@@ -358,55 +333,4 @@ import * as plexus from "«genConfig.getExternalDependencies().get(0)»";
         }
     }
 
-    def handlerMethodImpl(Method rpcMethod, PlexusGenConfig genConfig) {
-        switch (rpcMethod) {
-            case rpcMethod.isPointToPoint: handlerPointToPointImpl(rpcMethod, genConfig)
-            case rpcMethod.isBidiStreaming
-                    || rpcMethod.isClientStreaming: handlerBidiStreamingImpl(rpcMethod, genConfig)
-            case rpcMethod.isServerStreaming: handlerServerStreamingImpl(rpcMethod, genConfig)
-        }
-    }
-
-    def handlerPointToPointImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
-        «handlerConverters(rpcMethod, genConfig)»
-        return this.clientHandler
-            .on«rpcMethod.name»(invocationContext, requestFromBinaryConverter(request))
-            .then(response => responseToBinaryConverter(response));
-    '''
-
-    def handlerBidiStreamingImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
-        «handlerConverters(rpcMethod, genConfig)»
-        const baseObserver = this.clientHandler
-            .on«rpcMethod.name»(invocationContext, {
-                next: (response) => hostClient.next(responseToBinaryConverter(response)),
-                complete: hostClient.complete.bind(hostClient),
-                error: hostClient.error.bind(hostClient),
-                cancel: hostClient.cancel.bind(hostClient)
-            });
-        return {
-            next: (value) => baseObserver.next(requestFromBinaryConverter(value)),
-            complete: baseObserver.complete.bind(baseObserver),
-            error: baseObserver.error.bind(baseObserver),
-            streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
-        };
-    '''
-
-    def handlerServerStreamingImpl(Method rpcMethod, PlexusGenConfig genConfig) '''
-        «handlerConverters(rpcMethod, genConfig)»
-        this.clientHandler
-            .on«rpcMethod.name»(invocationContext, requestFromBinaryConverter(request), {
-                next: (response) => hostClient.next(responseToBinaryConverter(response)),
-                complete: hostClient.complete.bind(hostClient),
-                error: hostClient.error.bind(hostClient),
-                cancel: hostClient.cancel.bind(hostClient)
-            });
-    '''
-
-    def handlerConverters(Method rpcMethod, PlexusGenConfig genConfig) '''
-        const responseToBinaryConverter = (from: «responseType(rpcMethod, genConfig)») => Arrays.toArrayBuffer(«responseTypeImpl(rpcMethod, genConfig)».encode(from).finish());
-        const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = «requestTypeImpl(rpcMethod, genConfig)».decode(new Uint8Array(from));
-            return «requestTypeImpl(rpcMethod, genConfig)».toObject(decoded);
-        };
-    '''
 }

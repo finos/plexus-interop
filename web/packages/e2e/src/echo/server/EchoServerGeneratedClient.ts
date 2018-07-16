@@ -28,7 +28,6 @@ import * as plexus from '../gen/plexus-messages';
  */
 export interface EchoServerClient extends GenericClientApi {
 
-
 }
 
 /**
@@ -63,7 +62,6 @@ export abstract class EchoServiceInvocationHandler {
 
 /**
  * Client invocation handler for ServiceAlias, to be implemented by Client
- *
  */
 export abstract class ServiceAliasInvocationHandler {
 
@@ -73,7 +71,6 @@ export abstract class ServiceAliasInvocationHandler {
 
 /**
  * Client API builder
- *
  */
 export class EchoServerClientBuilder {
 

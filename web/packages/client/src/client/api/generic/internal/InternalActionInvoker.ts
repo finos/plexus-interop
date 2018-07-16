@@ -17,7 +17,7 @@
 import { ActionReference } from '@plexus-interop/client-api';
 
 /**
- * Invokes registered action handlers
+ * Invokes registered action handlers on behalf of other app
  */
 export interface InternalActionInvoker {
 
