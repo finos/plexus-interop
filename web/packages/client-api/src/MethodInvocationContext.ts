@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReadOnlyCancellationToken } from '@plexus-interop/common';
+import { ReadOnlyCancellationToken, CancellationToken } from '@plexus-interop/common';
 import { UniqueId } from '@plexus-interop/protocol';
 
 export class MethodInvocationContext {
     constructor(
         public readonly consumerApplicationId: string,
-        public readonly consumerConnectionId: UniqueId,
-        public readonly cancellationToken: ReadOnlyCancellationToken
+        public readonly consumerConnectionId: UniqueId = UniqueId.generateNew(),
+        public readonly cancellationToken: ReadOnlyCancellationToken = new CancellationToken()
     ) { }
 }

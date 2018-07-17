@@ -18,4 +18,6 @@ export abstract class ReadOnlyCancellationToken {
 
     public abstract isCancelled(): boolean;
 
+    public abstract onCancel(callback: (reason: any) => void): void;
+
 }

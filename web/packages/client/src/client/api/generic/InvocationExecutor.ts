@@ -20,8 +20,8 @@ import { StreamingInvocationHost } from './handlers/streaming/StreamingInvocatio
 import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
 import { BaseInvocation } from '../../generic/BaseInvocation';
 import { UniqueId } from '@plexus-interop/transport-common';
-import { ActionReference } from '@plexus-interop/client-api';
-import { SuccessCompletion, ClientProtocolHelper, ErrorCompletion } from '@plexus-interop/protocol';
+import { ActionReference, MethodInvocationContext } from '@plexus-interop/client-api';
+import { SuccessCompletion, ClientProtocolHelper, ErrorCompletion, InvocationMetaInfo } from '@plexus-interop/protocol';
 
 export class InvocationExecutor {
 
@@ -39,14 +39,15 @@ export class InvocationExecutor {
         new StreamingInvocationHost(this.handlersRegistry).executeTypeAwareHandler(invocation);
     }
 
-    public invokeRawUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer> {
-        return this.internalInvokeUnaryHandler(consumerAppId, actionReference, requestPayloadBuffer, false);
-    }
-    public invokeUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayload: any): Promise<any> {
-        return this.internalInvokeUnaryHandler(consumerAppId, actionReference, requestPayload, true);
+    public invokeRawUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer> {
+        return this.internalInvokeUnaryHandler(invocationContext, actionReference, requestPayloadBuffer, false);
     }
 
-    public internalInvokeUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayload: any, isTyped: boolean): Promise<any> {
+    public invokeUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayload: any): Promise<any> {
+        return this.internalInvokeUnaryHandler(invocationContext, actionReference, requestPayload, true);
+    }
+
+    public internalInvokeUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayload: any, isTyped: boolean): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             const invocation: BaseInvocation<any, any> = {
                 uuid: () => UniqueId.generateNew(),
@@ -58,10 +59,12 @@ export class InvocationExecutor {
                     observer.complete();
                 },
                 getMetaInfo: () => {
-                    return {
+                    const metaInfo: InvocationMetaInfo = {
                         ...actionReference,
-                        consumerApplicationId: consumerAppId
+                        consumerApplicationId: invocationContext.consumerApplicationId,
+                        consumerConnectionId: invocationContext.consumerConnectionId
                     };
+                    return metaInfo;
                 },
                 close: async completion => {
                     if (!ClientProtocolHelper.isSuccessCompletion(completion || new SuccessCompletion())) {

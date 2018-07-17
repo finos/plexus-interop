@@ -16,7 +16,7 @@
  */
 import { Feature } from './GenericClientApi';
 import { GenericClient } from '../../../client/generic/GenericClient';
-import { ServiceDiscoveryRequest } from '@plexus-interop/client-api';
+import { ServiceDiscoveryRequest, MethodInvocationContext } from '@plexus-interop/client-api';
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
 import { ClientDtoUtils } from './../../ClientDtoUtils';
 import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocationClient';
@@ -180,12 +180,12 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         return this.genericClient.disconnect(completion);
     }
 
-    public invokeUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayload: any): Promise<any> {
-        return new InvocationExecutor(this.handlersRegistry).invokeUnaryHandler(consumerAppId, actionReference, requestPayload);
+    public invokeUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayload: any): Promise<any> {
+        return new InvocationExecutor(this.handlersRegistry).invokeUnaryHandler(invocationContext, actionReference, requestPayload);
     }
 
-    public invokeRawUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer> {
-        return new InvocationExecutor(this.handlersRegistry).invokeRawUnaryHandler(consumerAppId, actionReference, requestPayloadBuffer);
+    public invokeRawUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer> {
+        return new InvocationExecutor(this.handlersRegistry).invokeRawUnaryHandler(invocationContext, actionReference, requestPayloadBuffer);
     }
 
     private isDiscovered(request: InvocationRequestInfo | ProvidedMethodReference): request is ProvidedMethodReference {

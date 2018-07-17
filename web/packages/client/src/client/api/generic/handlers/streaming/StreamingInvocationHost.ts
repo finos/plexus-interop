@@ -31,19 +31,21 @@ export class StreamingInvocationHost {
     public constructor(
         private readonly handlersRegistry: InvocationHandlersRegistry) { }
 
-    public executeTypeAwareHandler(invocation: BaseInvocation<any, any>): void {
-        this.execute(true, invocation);
+    public executeTypeAwareHandler(invocation: BaseInvocation<any, any>, cancellationToken: CancellationToken = new CancellationToken()): void {
+        this.execute(true, invocation, cancellationToken);
     }
 
-    public executeGenericHandler(invocation: Invocation): void {
-        this.execute(false, invocation);
+    public executeGenericHandler(invocation: Invocation, cancellationToken: CancellationToken = new CancellationToken()): void {
+        this.execute(false, invocation, cancellationToken);
     }
 
-    private execute(isTypeAware: boolean, invocation: BaseInvocation<any, any>): void {
+    private execute(
+        isTypeAware: boolean, 
+        invocation: BaseInvocation<any, any>, 
+        cancellationToken: CancellationToken = new CancellationToken()): void {
 
         this.logger.debug('Handling invocation started');
         let baseRequestObserver: null | Observer<any> = null;
-        const invocationCancellationToken = new CancellationToken();
         invocation.open({
 
             started: (s) => {
@@ -58,7 +60,10 @@ export class StreamingInvocationHost {
                 this.logger = LoggerFactory.getLogger(`Invocation Host [${hash}]`);
                 const invocationHandler = isTypeAware ? this.handlersRegistry.getTypeAwareBidiStreamingHandler(actionRef) : this.handlersRegistry.getRawBidiStreamingHandler(actionRef);
                 if (invocationHandler) {
-                    const invocationContext = new MethodInvocationContext(metaInfo.consumerApplicationId as string, metaInfo.consumerConnectionId as UniqueId, invocationCancellationToken);
+                    const invocationContext = new MethodInvocationContext(
+                        metaInfo.consumerApplicationId as string, 
+                        metaInfo.consumerConnectionId as UniqueId, 
+                        cancellationToken);
                     baseRequestObserver = invocationHandler.handle(invocationContext, new StreamingInvocationClientImpl(invocation, this.logger));
                 } else {
                     this.logger.error(`No handler found for hash [${hash}]`);
@@ -88,7 +93,7 @@ export class StreamingInvocationHost {
 
             error: invocationError => {
                 this.logger.error(`Received invocation error, passing to client`, invocationError);
-                invocationCancellationToken.cancel('Invocation error received');
+                cancellationToken.cancel('Invocation error received');
                 this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<any>).error(invocationError));
             }
         });

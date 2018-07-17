@@ -15,17 +15,29 @@
  * limitations under the License.
  */
 import { ReadOnlyCancellationToken } from './ReadOnlyCancellationToken';
+import { Logger, LoggerFactory } from '../../logger';
+
+const logger: Logger = LoggerFactory.getLogger('CancellationToken');
+
+export type CancelListener = (reason: any) => void;
 
 export class CancellationToken implements ReadOnlyCancellationToken {
 
     private cancelled: boolean = false;
     private reason: string = 'Not defined';
+    private listeners: CancelListener[] = [];
 
-    constructor(private readonly baseToken?: CancellationToken) {}
+    constructor(private readonly baseToken?: CancellationToken) { }
 
     public throwIfCanceled(): void {
         if (this.isCancelled()) {
             throw Error(this.getReason());
+        }
+    }
+
+    public onCancel(callback: CancelListener): void {
+        if (this.listeners.indexOf(callback) === -1) {
+            this.listeners.push(callback);
         }
     }
 
@@ -40,6 +52,13 @@ export class CancellationToken implements ReadOnlyCancellationToken {
     public cancel(reason: string = 'Operation cancelled'): void {
         if (!this.cancelled) {
             this.reason = reason;
+            this.listeners.forEach(listener => {
+                try {
+                    listener(reason);
+                } catch (error) {
+                    logger.warn('Cancellation listener raised error', error);
+                }
+            });
             this.cancelled = true;
         }
     }

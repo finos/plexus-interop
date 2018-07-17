@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ActionReference } from '@plexus-interop/client-api';
+import { ActionReference, MethodInvocationContext } from '@plexus-interop/client-api';
 
 /**
  * Invokes registered action handlers on behalf of other app
@@ -24,18 +24,18 @@ export interface InternalActionInvoker {
     /**
      * Invokes registered action handler, applying serialization/deserialization logic on request/response
      * 
-     * @param consumerAppId Consumer application 
+     * @param invocationContext Method invocation context
      * @param actionReference Action reference
      * @param requestPayload Request Payload (structured object)
      */
-    invokeUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayload: any): Promise<any>;
+    invokeUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayload: any): Promise<any>;
 
     /**
      * Invokes registered action handler
      * 
-     * @param consumerAppId Consumer application
+     * @param invocationContext Method invocation context
      * @param actionReference Action reference
      * @param requestPayloadBuffer Request payload  
      */
-    invokeRawUnaryHandler(consumerAppId: string, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer>;
+    invokeRawUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer>;
 }
