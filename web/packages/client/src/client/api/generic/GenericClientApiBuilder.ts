@@ -20,29 +20,33 @@ import { GenericClientFactory } from '../../generic/GenericClientFactory';
 import { ClientConnectRequest } from '@plexus-interop/client-api';
 import { GenericClientApiImpl } from './GenericClientApiImpl';
 import { GenericInvocationsHost } from './GenericInvocationsHost';
-import { GenericUnaryInvocationHandler } from './GenericUnaryInvocationHandler';
-import { GenericBidiStreamingInvocationHandler } from './GenericBidiStreamingInvocationHandler';
-import { GenericServerStreamingInvocationHandler } from './GenericServerStreamingInvocationHandler';
 import { MarshallerProvider } from '../io/MarshallerProvider';
 import { ProtoMarshallerProvider } from '../io/ProtoMarshallerProvider';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
+import { BidiStreamingInvocationHandler } from './handlers/streaming/BidiStreamingInvocationHandler';
+import { ServerStreamingInvocationHandler } from './handlers/streaming/ServerStreamingInvocationHandler';
+import { UnaryInvocationHandler } from './handlers/unary/UnaryInvocationHandler';
+import { InternalGenericClientApi } from './internal/InternalGenericClientApi';
 
+
+// tslint:disable:member-ordering
 export class GenericClientApiBuilder {
 
     protected log: Logger = LoggerFactory.getLogger('GenericClientApiBuilder');
 
     protected applicationId: string;
     protected applicationInstanceId?: UniqueId;
-
+    protected handlersRegistry: InvocationHandlersRegistry;
     protected transportConnectionProvider: () => Promise<TransportConnection>;
-    protected marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider();
+    protected clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi> = async client => client;
 
-    protected readonly bidiStreamingInvocationHandlers: GenericBidiStreamingInvocationHandler[] = [];
-    protected readonly unaryInvocationHandlers: GenericUnaryInvocationHandler[] = [];
-    protected readonly serverStreamingInvocationHandlers: GenericServerStreamingInvocationHandler[] = [];
+    constructor(protected marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider()) {
+        this.handlersRegistry = new InvocationHandlersRegistry(this.marshallerProvider);
+    }
 
-    public withMarshallerProvider(marshallerProvider: MarshallerProvider): GenericClientApiBuilder {
-        this.marshallerProvider = marshallerProvider;
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): GenericClientApiBuilder {
+        this.clientApiDecorator = clientApiDecorator;
         return this;
     }
 
@@ -62,18 +66,33 @@ export class GenericClientApiBuilder {
         return this;
     }
 
-    public withBidiStreamingInvocationHandler(handler: GenericBidiStreamingInvocationHandler): GenericClientApiBuilder {
-        this.bidiStreamingInvocationHandlers.push(handler);
+    public withBidiStreamingHandler(handler: BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): GenericClientApiBuilder {
+        this.handlersRegistry.registerBidiStreamingGenericHandler(handler);
         return this;
     }
 
-    public withServerStreamingInvocationHandler(handler: GenericServerStreamingInvocationHandler): GenericClientApiBuilder {
-        this.serverStreamingInvocationHandlers.push(handler);
+    public withTypeAwareBidiStreamingHandler(handler: BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>, requestType: any, responseType: any): GenericClientApiBuilder {
+        this.handlersRegistry.registerBidiStreamingHandler(handler, requestType, responseType);
         return this;
     }
 
-    public withUnaryInvocationHandler(handler: GenericUnaryInvocationHandler): GenericClientApiBuilder {
-        this.unaryInvocationHandlers.push(handler);
+    public withServerStreamingHandler(handler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>): GenericClientApiBuilder {
+        this.handlersRegistry.registerServerStreamingGenericHandler(handler);
+        return this;
+    }
+
+    public withTypeAwareServerStreamingHandler(handler: ServerStreamingInvocationHandler<any, any>, requestType: any, responseType: any): GenericClientApiBuilder {
+        this.handlersRegistry.registerServerStreamingHandler(handler, requestType, responseType);
+        return this;
+    }
+
+    public withUnaryHandler(handler: UnaryInvocationHandler<ArrayBuffer, ArrayBuffer>): GenericClientApiBuilder {
+        this.handlersRegistry.registerUnaryGenericHandler(handler);
+        return this;
+    }
+
+    public withTypeAwareUnaryHandler(handler: UnaryInvocationHandler<any, any>, requestType: any, responseType: any): GenericClientApiBuilder {
+        this.handlersRegistry.registerUnaryHandler(handler, requestType, responseType);
         return this;
     }
 
@@ -85,7 +104,7 @@ export class GenericClientApiBuilder {
     public connect(): Promise<GenericClientApi> {
         if (!this.applicationInstanceId) {
             this.applicationInstanceId = UniqueId.generateNew();
-        }        
+        }
         const appInfo = {
             applicationId: this.applicationId,
             applicationInstanceId: this.applicationInstanceId
@@ -97,12 +116,10 @@ export class GenericClientApiBuilder {
                 return new GenericClientFactory(connection).createClient(appInfo);
             })
             .then(genericClient => {
-                const actionsHost = new GenericInvocationsHost(appInfo.applicationId, genericClient,
-                    this.bidiStreamingInvocationHandlers,
-                    this.unaryInvocationHandlers,
-                    this.serverStreamingInvocationHandlers);
+                const actionsHost = new GenericInvocationsHost(genericClient, this.handlersRegistry);
                 return actionsHost.start()
-                    .then(() => new GenericClientApiImpl(genericClient, this.marshallerProvider));
+                    .then(() => new GenericClientApiImpl(genericClient, this.marshallerProvider, this.handlersRegistry))
+                    .then(client => this.clientApiDecorator(client));
             })
             .catch(error => {
                 this.log.error('Unable to create client', error);

@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SimpleUnaryInvocationHandler } from '../unary/SimpleUnaryInvocationHandler';
-import { BaseInvocationHandler } from './BaseInvocationHandler';
+import { InvocationClient } from '../../../InvocationClient';
 
-export interface GenericUnaryInvocationHandler extends BaseInvocationHandler {
+export interface StreamingInvocationClient<T> extends InvocationClient {
 
-    handler: SimpleUnaryInvocationHandler<ArrayBuffer, ArrayBuffer>;
+    next(value: T): Promise<void>;
+
+    complete(): Promise<void>;
 
 }

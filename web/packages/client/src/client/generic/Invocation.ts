@@ -14,11 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseChannel } from '@plexus-interop/transport-common';
-import { InvocationMetaInfo } from '@plexus-interop/protocol';
-import { AnonymousSubscription } from '@plexus-interop/common';
-import { InvocationChannelObserver } from './InvocationChannelObserver';
+import { BaseInvocation } from './BaseInvocation';
 
-export interface Invocation extends BaseChannel<InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>> {
-    getMetaInfo(): InvocationMetaInfo;
+export interface Invocation extends BaseInvocation<ArrayBuffer, ArrayBuffer> {
 }

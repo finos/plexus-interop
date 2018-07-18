@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InvocationClient } from '../InvocationClient';
+import { InternalActionInvoker } from './InternalActionInvoker';
+import { GenericClientApi } from '..';
 
-export interface StreamingInvocationClient<T> extends InvocationClient {
-
-    next(value: T): Promise<void>;
-
-    complete(): Promise<void>;
-
+/**
+ * Extends public client with additioanal features
+ */
+export interface InternalGenericClientApi extends InternalActionInvoker, GenericClientApi {
 }

@@ -15,32 +15,19 @@
  * limitations under the License.
  */
 import { GenericClient } from '../../../client/generic/GenericClient';
-import { InvocationMetaInfo } from '@plexus-interop/protocol';
-import { ClientDtoUtils } from '../../ClientDtoUtils';
 import { Invocation } from '../../../client/generic/Invocation';
-import { BidiStreamingInvocationHandler } from '../streaming/BidiStreamingInvocationHandler';
-import { StreamingInvocationHost } from '../streaming/StreamingInvocationHost';
-import { GenericBidiStreamingInvocationHandler } from './GenericBidiStreamingInvocationHandler';
-import { GenericUnaryInvocationHandler } from './GenericUnaryInvocationHandler';
-import { GenericServerStreamingInvocationHandler } from './GenericServerStreamingInvocationHandler';
-import { UnaryHandlerConverter } from '../unary/UnaryHandlerConverter';
-import { ServerStreamingConverter } from '../streaming/ServerStreamingHandlerConveter';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
+import { InvocationExecutor } from './InvocationExecutor';
 
 export class GenericInvocationsHost {
 
     private log: Logger = LoggerFactory.getLogger('GenericInvocationHost');
 
-    // tslint:disable-next-line:typedef
-    public readonly handlersRegistry = new Map<String, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>>();
-
     constructor(
-        sourceApplicationId: string,
         private readonly genericClient: GenericClient,
-        private bidiStreamingHandlers: GenericBidiStreamingInvocationHandler[],
-        private unaryHandlers: GenericUnaryInvocationHandler[] = [],
-        private serverStreamingHandlers: GenericServerStreamingInvocationHandler[] = []) {
-        this.registerHandlers();
+        private readonly handlersRegistry: InvocationHandlersRegistry
+    ) {
     }
 
     public start(): Promise<void> {
@@ -55,33 +42,9 @@ export class GenericInvocationsHost {
                 throw e;
             });
     }
-    
-    private registerHandlers(): void {
-        this.unaryHandlers.forEach(unaryHandler =>
-            this.bidiStreamingHandlers.push({
-                serviceInfo: unaryHandler.serviceInfo,
-                handler: new UnaryHandlerConverter(this.log).convert(unaryHandler.handler)
-            }));
-        this.serverStreamingHandlers.forEach(serverStreamingHandler =>
-            this.bidiStreamingHandlers.push({
-                serviceInfo: serverStreamingHandler.serviceInfo,
-                handler: new ServerStreamingConverter(this.log).convert(serverStreamingHandler.handler)
-            }));
-        this.bidiStreamingHandlers.forEach((serviceHandler) => {
-            const invocationInfo: InvocationMetaInfo = {
-                serviceId: serviceHandler.serviceInfo.serviceId,
-                serviceAlias: serviceHandler.serviceInfo.serviceAlias,
-                methodId: serviceHandler.handler.methodId
-            };
-            const hash = ClientDtoUtils.targetInvocationHash(invocationInfo);
-            this.log.trace(`Registering handler for ${hash}`);
-            this.handlersRegistry.set(hash, serviceHandler.handler);
-        });
-    }
 
     private handleInvocation(invocation: Invocation): void {
-        this.log.trace(`Received invocation`);
-        new StreamingInvocationHost(this.handlersRegistry, invocation).execute();
+        new InvocationExecutor(this.handlersRegistry).handleGenericInvocation(invocation);
     }
 
 }

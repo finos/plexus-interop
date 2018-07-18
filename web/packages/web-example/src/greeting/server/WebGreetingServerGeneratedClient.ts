@@ -56,26 +56,6 @@ export abstract class GreetingServiceInvocationHandler {
 }
 
 /**
- * Internal invocation handler delegate for GreetingService
- *
- */
-class GreetingServiceInvocationHandlerInternal {
-
-    public constructor(private readonly clientHandler: GreetingServiceInvocationHandler) {}
-
-    public onUnary(invocationContext: MethodInvocationContext, request: ArrayBuffer): Promise<ArrayBuffer> {
-        const responseToBinaryConverter = (from: plexus.interop.samples.IGreetingResponse) => Arrays.toArrayBuffer(plexus.interop.samples.GreetingResponse.encode(from).finish());
-        const requestFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.interop.samples.GreetingRequest.decode(new Uint8Array(from));
-            return plexus.interop.samples.GreetingRequest.toObject(decoded);
-        };
-        return this.clientHandler
-            .onUnary(invocationContext, requestFromBinaryConverter(request))
-            .then(response => responseToBinaryConverter(response));
-    }
-}
-
-/**
  * Client API builder
  *
  */
@@ -88,7 +68,7 @@ export class WebGreetingServerClientBuilder {
 
     private transportConnectionProvider: () => Promise<TransportConnection>;
 
-    private greetingServiceHandler: GreetingServiceInvocationHandlerInternal;
+    private greetingServiceHandler: GreetingServiceInvocationHandler;
 
     public withClientDetails(clientId: ClientConnectRequest): WebGreetingServerClientBuilder {
         this.clientDetails = clientId;
@@ -96,7 +76,7 @@ export class WebGreetingServerClientBuilder {
     }
 
     public withGreetingServiceInvocationsHandler(invocationsHandler: GreetingServiceInvocationHandler): WebGreetingServerClientBuilder {
-        this.greetingServiceHandler = new GreetingServiceInvocationHandlerInternal(invocationsHandler);
+        this.greetingServiceHandler = invocationsHandler;
         return this;
     }
 
@@ -109,15 +89,13 @@ export class WebGreetingServerClientBuilder {
         return new GenericClientApiBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
-            .withUnaryInvocationHandler({
+            .withTypeAwareUnaryHandler({
                 serviceInfo: {
                     serviceId: 'interop.samples.GreetingService'
                 },
-                handler: {
-                    methodId: 'Unary',
-                    handle: this.greetingServiceHandler.onUnary.bind(this.greetingServiceHandler)
-                }
-            })
+                methodId: 'Unary',
+                handle: this.greetingServiceHandler.onUnary.bind(this.greetingServiceHandler)
+            }, plexus.interop.samples.GreetingRequest, plexus.interop.samples.GreetingResponse)
             .connect()
             .then(genericClient => new WebGreetingServerClientImpl(
                 genericClient

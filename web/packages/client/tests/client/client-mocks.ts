@@ -21,7 +21,7 @@ import { MarshallerProvider } from '../../src/client/api/io/MarshallerProvider';
 import { Marshaller } from '../../src/client/api/io/Marshaller';
 import { Observer } from '@plexus-interop/common';
 import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
-import { clientProtocol as plexus, SuccessCompletion} from '@plexus-interop/protocol';
+import { clientProtocol as plexus, SuccessCompletion } from '@plexus-interop/protocol';
 import { Logger, LoggerFactory, BlockingQueue, BlockingQueueBase, CancellationToken } from '@plexus-interop/common';
 
 export function createInvocationInfo(): InvocationMetaInfo {
@@ -32,7 +32,7 @@ export function createInvocationInfo(): InvocationMetaInfo {
         applicationId: '3',
         serviceAlias: 'serviceAlias'
     };
-};
+}
 
 export function createRemoteInvocationInfo(): RemoteInvocationInfo {
     return {
@@ -41,7 +41,7 @@ export function createRemoteInvocationInfo(): RemoteInvocationInfo {
         applicationId: 'applicationId',
         connectionId: UniqueId.generateNew()
     };
-};
+}
 
 export class MockMarshaller implements Marshaller {
 
@@ -80,20 +80,6 @@ export class BufferedChannel implements TransportChannel {
         observer.started(subscription);
     }
 
-    private async listenToMessages(observer: Observer<ArrayBuffer>): Promise<void> {
-        try {
-            while (!this.cancellationToken.isCancelled()) {
-                const message = await this.in.blockingDequeue(this.cancellationToken);
-                console.log(`Got in message from buffer ${message.byteLength} bytes`);
-                observer.next(message);
-            }
-            observer.complete();
-        } catch (error) {
-            console.error('Error on reading message', error);
-            observer.error(error);
-        }
-    }
-
     public addToInbox(data: ArrayBuffer): Promise<void> {
         this.log.debug(`Adding ${data.byteLength} bytes to inbox`);
         return this.in.enqueue(data);
@@ -128,6 +114,22 @@ export class BufferedChannel implements TransportChannel {
 
     public uuid(): UniqueId {
         return this.id;
+    }
+
+    private async listenToMessages(observer: Observer<ArrayBuffer>): Promise<void> {
+        try {
+            while (!this.cancellationToken.isCancelled()) {
+                const message = await this.in.blockingDequeue(this.cancellationToken);
+                // tslint:disable-next-line:no-console
+                console.log(`Got in message from buffer ${message.byteLength} bytes`);
+                observer.next(message);
+            }
+            observer.complete();
+        } catch (error) {
+            // tslint:disable-next-line:no-console
+            console.error('Error on reading message', error);
+            observer.error(error);
+        }
     }
 
 }

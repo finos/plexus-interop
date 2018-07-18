@@ -29,5 +29,6 @@ class RulesModule extends AbstractModule {
         rulesBinder.addBinding().to(typeof(NoMethodsDeletedRule))
         rulesBinder.addBinding().to(typeof(NoMethodTypesChangedRule))
         rulesBinder.addBinding().to(typeof(NoServicesDeletedRule))
+        rulesBinder.addBinding().to(typeof(NoAppsDeletedRule))
     }
 }

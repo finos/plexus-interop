@@ -14,11 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseInvocationHandler } from './BaseInvocationHandler';
-import { ServerStreamingInvocationHandler } from '../streaming/ServerStreamingInvocationHandler';
-
-export interface GenericServerStreamingInvocationHandler extends BaseInvocationHandler {
-
-    handler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>;
-
-}
+export * from './UnaryInvocationHandler';
+export * from './converters';

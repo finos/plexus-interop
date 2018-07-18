@@ -16,8 +16,6 @@
  */
 export * from './generic';
 export * from '@plexus-interop/client-api';
-export * from './streaming';
-export * from './unary';
 export * from './InvocationClient';
 export * from './ValueHandler';
 export * from './io';

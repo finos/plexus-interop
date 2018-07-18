@@ -14,10 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export abstract class ReadOnlyCancellationToken {
+import { ServiceInfo, MethodInvocationContext } from '@plexus-interop/client-api';
+ 
+export interface UnaryInvocationHandler<Req, Res> {
 
-    public abstract isCancelled(): boolean;
+    serviceInfo: ServiceInfo;
 
-    public abstract onCancel(callback: (reason: any) => void): void;
+    methodId: string;
+
+    handle(invocationContext: MethodInvocationContext, request: Req): Promise<Res>;
 
 }

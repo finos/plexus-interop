@@ -14,13 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { StreamingInvocationClient } from './StreamingInvocationClient';
-import { MethodInvocationContext } from '@plexus-interop/client-api';
-
-export interface ServerStreamingInvocationHandler<Req, Res> {
-
-    methodId: string;
-
-    handle(invocationContext: MethodInvocationContext, requestPayload: Req, invocationHostClient: StreamingInvocationClient<Res>): void;
-
-}
+export * from './InternalActionInvoker';
+export * from './InternalGenericClientApi';

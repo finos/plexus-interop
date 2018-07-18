@@ -54,87 +54,51 @@ export class EchoServiceProxyImpl implements EchoServiceProxy {
     constructor(private readonly genericClient: GenericClientApi) { }
 
     public unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
-        const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'Unary',
             serviceId: 'plexus.interop.testing.EchoService'
         };
         return new Promise((resolve, reject) => {
-            this.genericClient.sendRawUnaryRequest(invocationInfo, requestToBinaryConverter(request), {
-                value: (responsePayload: ArrayBuffer) => {
-                    resolve(responseFromBinaryConverter(responsePayload));
-                },
-                error: (e) => {
-                    reject(e);
-                }
-            });
+            this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                value: responsePayload => resolve(responsePayload),
+                error: e => reject(e)
+            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
         });
     }
     
     public serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient> {
-        const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'ServerStreaming',
             serviceId: 'plexus.interop.testing.EchoService'
         };
-        return this.genericClient.sendRawServerStreamingRequest(
+        return this.genericClient.sendServerStreamingRequest(
             invocationInfo,
-            requestToBinaryConverter(request),
-            new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter));
+            request,
+            responseObserver,
+            plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest
+        );
     }
     
     public clientStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
-        const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'ClientStreaming',
             serviceId: 'plexus.interop.testing.EchoService'
         };
-        return this.genericClient.sendRawBidirectionalStreamingRequest(
+        return this.genericClient.sendBidirectionalStreamingRequest(
             invocationInfo,
-            new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-            .then(baseClient =>  {
-                return {
-                    next: (request: plexus.plexus.interop.testing.IEchoRequest) => baseClient.next(requestToBinaryConverter(request)),
-                    error: baseClient.error.bind(baseClient),
-                    complete: baseClient.complete.bind(baseClient),
-                    cancel: baseClient.cancel.bind(baseClient)
-                };
-            });
+            responseObserver,
+            plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
     }
     
     public duplexStreaming(responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<StreamingInvocationClient<plexus.plexus.interop.testing.IEchoRequest>> {
-        const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'DuplexStreaming',
             serviceId: 'plexus.interop.testing.EchoService'
         };
-        return this.genericClient.sendRawBidirectionalStreamingRequest(
+        return this.genericClient.sendBidirectionalStreamingRequest(
             invocationInfo,
-            new InvocationObserverConverter<plexus.plexus.interop.testing.IEchoRequest, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-            .then(baseClient =>  {
-                return {
-                    next: (request: plexus.plexus.interop.testing.IEchoRequest) => baseClient.next(requestToBinaryConverter(request)),
-                    error: baseClient.error.bind(baseClient),
-                    complete: baseClient.complete.bind(baseClient),
-                    cancel: baseClient.cancel.bind(baseClient)
-                };
-            });
+            responseObserver,
+            plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
     }
 
 }
@@ -147,25 +111,16 @@ export class ServiceAliasProxyImpl implements ServiceAliasProxy {
     constructor(private readonly genericClient: GenericClientApi) { }
 
     public unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
-        const requestToBinaryConverter = (from: plexus.plexus.interop.testing.IEchoRequest) => Arrays.toArrayBuffer(plexus.plexus.interop.testing.EchoRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.plexus.interop.testing.EchoRequest.decode(new Uint8Array(from));
-            return plexus.plexus.interop.testing.EchoRequest.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'Unary',
             serviceId: 'plexus.interop.testing.EchoService',
             serviceAlias: 'ServiceAlias'
         };
         return new Promise((resolve, reject) => {
-            this.genericClient.sendRawUnaryRequest(invocationInfo, requestToBinaryConverter(request), {
-                value: (responsePayload: ArrayBuffer) => {
-                    resolve(responseFromBinaryConverter(responsePayload));
-                },
-                error: (e) => {
-                    reject(e);
-                }
-            });
+            this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                value: responsePayload => resolve(responsePayload),
+                error: e => reject(e)
+            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest);
         });
     }
 
@@ -173,7 +128,6 @@ export class ServiceAliasProxyImpl implements ServiceAliasProxy {
 
 /**
  * Main client API
- *
  */
 export interface EchoClientClient extends GenericClientApi  {
 
@@ -185,7 +139,6 @@ export interface EchoClientClient extends GenericClientApi  {
 
 /**
  * Client's API internal implementation
- *
  */
 class EchoClientClientImpl extends GenericClientApiBase implements EchoClientClient {
 
@@ -208,10 +161,8 @@ class EchoClientClientImpl extends GenericClientApiBase implements EchoClientCli
 }
 
 
-
 /**
  * Client API builder
- *
  */
 export class EchoClientClientBuilder {
 
@@ -248,7 +199,7 @@ export class EchoClientClientBuilder {
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
             .connect()
-            .then(genericClient => new EchoClientClientImpl(
+            .then((genericClient: GenericClientApi) => new EchoClientClientImpl(
                 genericClient,
                 new EchoServiceProxyImpl(genericClient),
                                 new ServiceAliasProxyImpl(genericClient)

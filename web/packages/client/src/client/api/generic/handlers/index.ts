@@ -14,12 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext } from '@plexus-interop/client-api';
-
-export interface SimpleUnaryInvocationHandler<Req, Res> {
-
-    methodId: string;
-
-    handle(invocationContext: MethodInvocationContext, request: Req): Promise<Res>;
-
-}
+export * from './streaming';
+export * from './unary';
+export * from './InvocationHandlerConverter';
+export * from './InvocationHandlersRegistry';
