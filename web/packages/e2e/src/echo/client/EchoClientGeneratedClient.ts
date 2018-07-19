@@ -164,7 +164,7 @@ class EchoClientClientImpl extends GenericClientApiBase implements EchoClientCli
 /**
  * Client API builder
  */
-export class EchoServerClientBuilder extends BaseClientApiBuilder<EchoClientClient> {
+export class EchoClientClientBuilder extends BaseClientApiBuilder<EchoClientClient> {
 
     public constructor() {
         super(new ContainerAwareClientAPIBuilder().withApplicationId('plexus.interop.testing.EchoClient'));

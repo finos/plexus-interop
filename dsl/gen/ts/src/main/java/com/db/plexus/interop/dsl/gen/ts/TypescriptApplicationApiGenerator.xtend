@@ -131,7 +131,7 @@ class «app.name»ClientImpl extends GenericClientApiBase implements «app.name�
 /**
  * Client API builder
  */
-export class EchoServerClientBuilder extends BaseClientApiBuilder<«app.name»Client> {
+export class «app.name»ClientBuilder extends BaseClientApiBuilder<«app.name»Client> {
 
     public constructor() {
         super(new ContainerAwareClientAPIBuilder().withApplicationId('«app.fullName»'));

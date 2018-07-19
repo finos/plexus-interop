@@ -169,7 +169,7 @@ export abstract class ExampleServiceInvocationHandler {
 /**
  * Client API builder
  */
-export class EchoServerClientBuilder extends BaseClientApiBuilder<ComponentAClient> {
+export class ComponentAClientBuilder extends BaseClientApiBuilder<ComponentAClient> {
 
     public constructor() {
         super(new ContainerAwareClientAPIBuilder().withApplicationId('com.db.plexus.interop.dsl.gen.test.components.ComponentA'));
