@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase, BaseClientApiBuilder } from '@plexus-interop/client';
+import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
@@ -28,6 +28,7 @@ import * as plexus from '../gen/plexus-messages';
  * Main client API
  */
 export interface EchoServerClient extends GenericClientApi  {
+
 
 }
 
@@ -91,6 +92,12 @@ export class EchoServerClientBuilder extends BaseClientApiBuilder<EchoServerClie
     }
 
     public connect(): Promise<EchoServerClient> {
+        if (!this.echoServiceHandler) {
+            return Promise.reject('Invocation handler for EchoService is not provided');
+        }
+        if (!this.serviceAliasHandler) {
+            return Promise.reject('Invocation handler for ServiceAlias is not provided');
+        }
         return this.genericBuilder
             .withTypeAwareUnaryHandler({
                 serviceInfo: {
@@ -129,7 +136,8 @@ export class EchoServerClientBuilder extends BaseClientApiBuilder<EchoServerClie
                 handle: this.serviceAliasHandler.onUnary.bind(this.serviceAliasHandler)
             }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
             .connect()
-            .then((genericClient: GenericClientApi) => new EchoServerClientImpl(
-                genericClient));
+            .then(genericClient => new EchoServerClientImpl(
+                genericClient
+));
     }
 }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase, InternalGenericClientApi } from '@plexus-interop/client';
+import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
@@ -160,18 +160,22 @@ class EchoClientClientImpl extends GenericClientApiBase implements EchoClientCli
 
 }
 
+
 /**
  * Client API builder
  */
-export class EchoClientClientBuilder extends BaseClientApiBuilder<EchoClientClient> {
+export class EchoServerClientBuilder extends BaseClientApiBuilder<EchoClientClient> {
 
     public constructor() {
         super(new ContainerAwareClientAPIBuilder().withApplicationId('plexus.interop.testing.EchoClient'));
     }
     
+
+
     public connect(): Promise<EchoClientClient> {
-        return this.genericBuilder.connect()
-            .then((genericClient: GenericClientApi) => new EchoClientClientImpl(
+        return this.genericBuilder
+            .connect()
+            .then(genericClient => new EchoClientClientImpl(
                     genericClient,
                     new EchoServiceProxyImpl(genericClient),
                     new ServiceAliasProxyImpl(genericClient)
