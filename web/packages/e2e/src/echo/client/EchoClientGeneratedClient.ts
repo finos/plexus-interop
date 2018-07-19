@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase, InternalGenericClientApi } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
@@ -160,49 +160,42 @@ class EchoClientClientImpl extends GenericClientApiBase implements EchoClientCli
 
 }
 
-
 /**
  * Client API builder
  */
-export class EchoClientClientBuilder {
+export class EchoClientClientBuilder implements BaseClientApiBuilder<EchoClientClient> {
 
-    private clientDetails: ClientConnectRequest = {
-        applicationId: 'plexus.interop.testing.EchoClient'
-    };
-
-    private transportConnectionProvider: () => Promise<TransportConnection>;
-
-
-    public withClientDetails(clientId: ClientConnectRequest): EchoClientClientBuilder {
-        this.clientDetails = clientId;
-        return this;
-    }
+    protected genericBuilder: GenericClientApiBuilder = 
+        new ContainerAwareClientAPIBuilder()
+        .withApplicationId('plexus.interop.testing.EchoClient');
 
     public withAppInstanceId(appInstanceId: UniqueId): EchoClientClientBuilder {
-        this.clientDetails.applicationInstanceId = appInstanceId;
+        this.genericBuilder = this.genericBuilder.withAppInstanceId(appInstanceId);
         return this;
     }
 
     public withAppId(appId: string): EchoClientClientBuilder {
-        this.clientDetails.applicationId = appId;
+        this.genericBuilder = this.genericBuilder.withApplicationId(appId);
         return this;
     }
 
-
     public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): EchoClientClientBuilder {
-        this.transportConnectionProvider = provider;
+        this.genericBuilder = this.genericBuilder.withTransportConnectionProvider(provider);
+        return this;
+    }
+
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): EchoClientClientBuilder {
+        this.genericBuilder = this.genericBuilder.withClientApiDecorator(clientApiDecorator);
         return this;
     }
 
     public connect(): Promise<EchoClientClient> {
-        return new ContainerAwareClientAPIBuilder()
-            .withTransportConnectionProvider(this.transportConnectionProvider)
-            .withClientDetails(this.clientDetails)
+        return this.genericBuilder
             .connect()
             .then((genericClient: GenericClientApi) => new EchoClientClientImpl(
                 genericClient,
-                new EchoServiceProxyImpl(genericClient),
-                                new ServiceAliasProxyImpl(genericClient)
+                    new EchoServiceProxyImpl(genericClient),
+                    new ServiceAliasProxyImpl(genericClient)
                 ));
     }
 }

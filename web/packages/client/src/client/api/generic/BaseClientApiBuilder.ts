@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './BaseClientApiBuilder';
-export * from './GenericClientApi';
-export * from './GenericClientApiImpl';
-export * from './GenericClientApiBase';
-export * from './GenericInvocationsHost';
-export * from './GenericClientApiBuilder';
-export * from './handlers';
-export * from './internal';
+import { InternalGenericClientApi } from './internal';
+import { GenericClientApi } from '..';
+import { TransportConnection } from '@plexus-interop/transport-common';
+
+export interface BaseClientApiBuilder<ClientType> {
+    connect(): Promise<ClientType>;
+    withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): BaseClientApiBuilder<ClientType>;
+    withTransportConnectionProvider(provider: () => Promise<TransportConnection>): BaseClientApiBuilder<ClientType>;
+}
