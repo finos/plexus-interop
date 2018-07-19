@@ -163,37 +163,16 @@ class EchoClientClientImpl extends GenericClientApiBase implements EchoClientCli
 /**
  * Client API builder
  */
-export class EchoClientClientBuilder implements BaseClientApiBuilder<EchoClientClient> {
+export class EchoClientClientBuilder extends BaseClientApiBuilder<EchoClientClient> {
 
-    protected genericBuilder: GenericClientApiBuilder = 
-        new ContainerAwareClientAPIBuilder()
-        .withApplicationId('plexus.interop.testing.EchoClient');
-
-    public withAppInstanceId(appInstanceId: UniqueId): EchoClientClientBuilder {
-        this.genericBuilder = this.genericBuilder.withAppInstanceId(appInstanceId);
-        return this;
+    public constructor() {
+        super(new ContainerAwareClientAPIBuilder().withApplicationId('plexus.interop.testing.EchoClient'));
     }
-
-    public withAppId(appId: string): EchoClientClientBuilder {
-        this.genericBuilder = this.genericBuilder.withApplicationId(appId);
-        return this;
-    }
-
-    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): EchoClientClientBuilder {
-        this.genericBuilder = this.genericBuilder.withTransportConnectionProvider(provider);
-        return this;
-    }
-
-    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): EchoClientClientBuilder {
-        this.genericBuilder = this.genericBuilder.withClientApiDecorator(clientApiDecorator);
-        return this;
-    }
-
+    
     public connect(): Promise<EchoClientClient> {
-        return this.genericBuilder
-            .connect()
+        return this.genericBuilder.connect()
             .then((genericClient: GenericClientApi) => new EchoClientClientImpl(
-                genericClient,
+                    genericClient,
                     new EchoServiceProxyImpl(genericClient),
                     new ServiceAliasProxyImpl(genericClient)
                 ));

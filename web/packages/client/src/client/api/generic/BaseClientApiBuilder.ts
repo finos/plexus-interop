@@ -14,12 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ClientApiBuilder } from './ClientApiBuilder';
 import { InternalGenericClientApi } from './internal';
-import { GenericClientApi } from '..';
+import { UniqueId } from '@plexus-interop/protocol';
+import { GenericClientApi } from './GenericClientApi';
+import { GenericClientApiBuilder } from './GenericClientApiBuilder';
 import { TransportConnection } from '@plexus-interop/transport-common';
 
-export interface BaseClientApiBuilder<ClientType> {
-    connect(): Promise<ClientType>;
-    withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): BaseClientApiBuilder<ClientType>;
-    withTransportConnectionProvider(provider: () => Promise<TransportConnection>): BaseClientApiBuilder<ClientType>;
-}
+export abstract class BaseClientApiBuilder<T> implements ClientApiBuilder<T> {
+
+    public constructor(protected genericBuilder: GenericClientApiBuilder) { }
+
+    public withAppInstanceId(appInstanceId: UniqueId): ClientApiBuilder<T> {
+        this.genericBuilder = this.genericBuilder.withAppInstanceId(appInstanceId);
+        return this;
+    }
+
+    public withAppId(appId: string): ClientApiBuilder<T> {
+        this.genericBuilder = this.genericBuilder.withApplicationId(appId);
+        return this;
+    }
+
+    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): ClientApiBuilder<T> {
+        this.genericBuilder = this.genericBuilder.withTransportConnectionProvider(provider);
+        return this;
+    }
+
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): ClientApiBuilder<T> {
+        this.genericBuilder = this.genericBuilder.withClientApiDecorator(clientApiDecorator);
+        return this;
+    }
+
+    public abstract connect(): Promise<T>;
+
+} 
