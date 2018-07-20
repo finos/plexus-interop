@@ -46,9 +46,9 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
     private readonly log: Logger = LoggerFactory.getLogger('GenericClientApi');
 
     constructor(
-        private readonly genericClient: GenericClient,
-        private readonly marshallerProvider: MarshallerProvider,
-        private readonly handlersRegistry: InvocationHandlersRegistry
+        protected readonly genericClient: GenericClient,
+        protected readonly marshallerProvider: MarshallerProvider,
+        protected readonly handlersRegistry: InvocationHandlersRegistry
     ) { }
 
     public supported(feature: Feature): boolean {
@@ -57,6 +57,10 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
 
     public getConnectionId(): UniqueId {
         return this.genericClient.getConnectionId();
+    }
+
+    public getMarshallerProvider(): MarshallerProvider {
+        return this.marshallerProvider;
     }
 
     public discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse> {
