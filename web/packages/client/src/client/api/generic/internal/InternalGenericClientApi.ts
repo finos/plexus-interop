@@ -16,9 +16,12 @@
  */
 import { InternalActionInvoker } from './InternalActionInvoker';
 import { GenericClientApi } from '..';
+import { MarshallerProvider } from '../../io/MarshallerProvider';
 
 /**
  * Extends public client with additioanal features
  */
 export interface InternalGenericClientApi extends InternalActionInvoker, GenericClientApi {
+
+    getMarshallerProvider(): MarshallerProvider;
 }

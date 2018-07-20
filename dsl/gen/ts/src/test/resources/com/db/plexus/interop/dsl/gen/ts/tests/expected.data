@@ -1,4 +1,4 @@
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
@@ -169,32 +169,15 @@ export abstract class ExampleServiceInvocationHandler {
 /**
  * Client API builder
  */
-export class ComponentAClientBuilder {
+export class ComponentAClientBuilder extends BaseClientApiBuilder<ComponentAClient> {
 
-    private clientDetails: ClientConnectRequest = {
-        applicationId: 'com.db.plexus.interop.dsl.gen.test.components.ComponentA'
-    };
-
-    private transportConnectionProvider: () => Promise<TransportConnection>;
+    public constructor() {
+        super(new ContainerAwareClientAPIBuilder().withApplicationId('com.db.plexus.interop.dsl.gen.test.components.ComponentA'));
+    }
 
     private noLaunchExampleServiceHandler: NoLaunchExampleServiceInvocationHandler;
 
     private exampleServiceHandler: ExampleServiceInvocationHandler;
-
-    public withClientDetails(clientId: ClientConnectRequest): ComponentAClientBuilder {
-        this.clientDetails = clientId;
-        return this;
-    }
-
-    public withAppInstanceId(appInstanceId: UniqueId): ComponentAClientBuilder {
-        this.clientDetails.applicationInstanceId = appInstanceId;
-        return this;
-    }
-
-    public withAppId(appId: string): ComponentAClientBuilder {
-        this.clientDetails.applicationId = appId;
-        return this;
-    }
 
     public withNoLaunchExampleServiceInvocationsHandler(invocationsHandler: NoLaunchExampleServiceInvocationHandler): ComponentAClientBuilder {
         this.noLaunchExampleServiceHandler = invocationsHandler;
@@ -206,15 +189,14 @@ export class ComponentAClientBuilder {
         return this;
     }
 
-    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): ComponentAClientBuilder {
-        this.transportConnectionProvider = provider;
-        return this;
-    }
-
     public connect(): Promise<ComponentAClient> {
-        return new ContainerAwareClientAPIBuilder()
-            .withTransportConnectionProvider(this.transportConnectionProvider)
-            .withClientDetails(this.clientDetails)
+        if (!this.noLaunchExampleServiceHandler) {
+            return Promise.reject('Invocation handler for NoLaunchExampleService is not provided');
+        }
+        if (!this.exampleServiceHandler) {
+            return Promise.reject('Invocation handler for ExampleService is not provided');
+        }
+        return this.genericBuilder
             .withTypeAwareUnaryHandler({
                 serviceInfo: {
                     serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService',
@@ -252,7 +234,7 @@ export class ComponentAClientBuilder {
                 handle: this.exampleServiceHandler.onBidiStreaming.bind(this.exampleServiceHandler)
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
             .connect()
-            .then((genericClient: GenericClientApi) => new ComponentAClientImpl(
+            .then(genericClient => new ComponentAClientImpl(
                 genericClient,
                 new ExampleServiceProxyImpl(genericClient),
                                 new NoLaunchExampleServiceProxyImpl(genericClient)

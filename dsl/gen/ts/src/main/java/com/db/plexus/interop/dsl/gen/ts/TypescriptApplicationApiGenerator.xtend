@@ -131,32 +131,15 @@ class «app.name»ClientImpl extends GenericClientApiBase implements «app.name�
 /**
  * Client API builder
  */
-export class «app.name»ClientBuilder {
+export class «app.name»ClientBuilder extends BaseClientApiBuilder<«app.name»Client> {
 
-    private clientDetails: ClientConnectRequest = {
-        applicationId: '«app.fullName»'
-    };
-
-    private transportConnectionProvider: () => Promise<TransportConnection>;
+    public constructor() {
+        super(new ContainerAwareClientAPIBuilder().withApplicationId('«app.fullName»'));
+    }
 
     «FOR providedElement : providedServices SEPARATOR '\n' »
         private «providedElement.aliasOrName.toFirstLower»Handler: «providedElement.aliasOrName.toFirstUpper»InvocationHandler;
     «ENDFOR»
-
-    public withClientDetails(clientId: ClientConnectRequest): «app.name»ClientBuilder {
-        this.clientDetails = clientId;
-        return this;
-    }
-
-    public withAppInstanceId(appInstanceId: UniqueId): «app.name»ClientBuilder {
-        this.clientDetails.applicationInstanceId = appInstanceId;
-        return this;
-    }
-
-    public withAppId(appId: string): «app.name»ClientBuilder {
-        this.clientDetails.applicationId = appId;
-        return this;
-    }
 
     «FOR providedMethod : providedServices SEPARATOR '\n' »
     public with«providedMethod.aliasOrName.toFirstUpper»InvocationsHandler(invocationsHandler: «providedMethod.aliasOrName.toFirstUpper»InvocationHandler): «app.name»ClientBuilder {
@@ -165,22 +148,20 @@ export class «app.name»ClientBuilder {
     }
     «ENDFOR»
 
-    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): «app.name»ClientBuilder {
-        this.transportConnectionProvider = provider;
-        return this;
-    }
-
     public connect(): Promise<«app.name»Client> {
-        return new ContainerAwareClientAPIBuilder()
-            .withTransportConnectionProvider(this.transportConnectionProvider)
-            .withClientDetails(this.clientDetails)
+        «FOR providedService : providedServices »
+        if (!this.«providedService.aliasOrName.toFirstLower»Handler) {
+            return Promise.reject('Invocation handler for «providedService.aliasOrName» is not provided');
+        }
+        «ENDFOR»
+        return this.genericBuilder
             «FOR providedService : providedServices »
                 «FOR providedMethod : providedService.methods»
                     «invocationHandlerBuilder(providedMethod.method, providedService, genConfig)»
                 «ENDFOR»
             «ENDFOR»
             .connect()
-            .then((genericClient: GenericClientApi) => new «app.name»ClientImpl(
+            .then(genericClient => new «app.name»ClientImpl(
                 genericClient«IF !consumedServices.isEmpty»,«ENDIF»
                 «FOR consumedService : consumedServices SEPARATOR ","»
                 new «consumedService.aliasOrName.toFirstUpper»ProxyImpl(genericClient)
@@ -223,7 +204,7 @@ export class «app.name»ClientBuilder {
     }
 
     def imports(PlexusGenConfig genConfig) '''
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';

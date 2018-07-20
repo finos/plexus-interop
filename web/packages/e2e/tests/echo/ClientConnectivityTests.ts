@@ -38,10 +38,7 @@ export class ClientConnectivityTests extends BaseEchoTest {
 
     public async testClientReceiveErrorIfProvideWrongId(): Promise<void> {
         const preparedBuilder = new EchoClientClientBuilder()
-            .withClientDetails({
-                applicationId: 'plexus.interop.testing.DoNotExist',
-                applicationInstanceId: UniqueId.generateNew()
-            })
+            .withAppId('plexus.interop.testing.DoNotExist')
             .withTransportConnectionProvider(() => this.connectionProvider().then(c => c.getConnection()));
         try {
             await preparedBuilder.connect();

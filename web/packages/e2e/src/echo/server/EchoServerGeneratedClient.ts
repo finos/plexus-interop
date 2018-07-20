@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
@@ -71,32 +71,15 @@ export abstract class ServiceAliasInvocationHandler {
 /**
  * Client API builder
  */
-export class EchoServerClientBuilder {
+export class EchoServerClientBuilder extends BaseClientApiBuilder<EchoServerClient> {
 
-    private clientDetails: ClientConnectRequest = {
-        applicationId: 'plexus.interop.testing.EchoServer'
-    };
-
-    private transportConnectionProvider: () => Promise<TransportConnection>;
+    public constructor() {
+        super(new ContainerAwareClientAPIBuilder().withApplicationId('plexus.interop.testing.EchoServer'));
+    }
 
     private echoServiceHandler: EchoServiceInvocationHandler;
     
     private serviceAliasHandler: ServiceAliasInvocationHandler;
-
-    public withClientDetails(clientId: ClientConnectRequest): EchoServerClientBuilder {
-        this.clientDetails = clientId;
-        return this;
-    }
-
-    public withAppInstanceId(appInstanceId: UniqueId): EchoServerClientBuilder {
-        this.clientDetails.applicationInstanceId = appInstanceId;
-        return this;
-    }
-
-    public withAppId(appId: string): EchoServerClientBuilder {
-        this.clientDetails.applicationId = appId;
-        return this;
-    }
 
     public withEchoServiceInvocationsHandler(invocationsHandler: EchoServiceInvocationHandler): EchoServerClientBuilder {
         this.echoServiceHandler = invocationsHandler;
@@ -108,15 +91,14 @@ export class EchoServerClientBuilder {
         return this;
     }
 
-    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): EchoServerClientBuilder {
-        this.transportConnectionProvider = provider;
-        return this;
-    }
-
     public connect(): Promise<EchoServerClient> {
-        return new ContainerAwareClientAPIBuilder()
-            .withTransportConnectionProvider(this.transportConnectionProvider)
-            .withClientDetails(this.clientDetails)
+        if (!this.echoServiceHandler) {
+            return Promise.reject('Invocation handler for EchoService is not provided');
+        }
+        if (!this.serviceAliasHandler) {
+            return Promise.reject('Invocation handler for ServiceAlias is not provided');
+        }
+        return this.genericBuilder
             .withTypeAwareUnaryHandler({
                 serviceInfo: {
                     serviceId: 'plexus.interop.testing.EchoService'
@@ -154,7 +136,7 @@ export class EchoServerClientBuilder {
                 handle: this.serviceAliasHandler.onUnary.bind(this.serviceAliasHandler)
             }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
             .connect()
-            .then((genericClient: GenericClientApi) => new EchoServerClientImpl(
+            .then(genericClient => new EchoServerClientImpl(
                 genericClient
 ));
     }
