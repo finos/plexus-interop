@@ -1,4 +1,13 @@
 <div class="row">
+    <div class="col-md-12">
+      <div id="apps-search-input-group" class="pb-3">
+        <div class="input-group col-md-12">
+          <input type="text" [value]="searchFilterValue | async" [formControl]="searchFilterControl" class="form-control input-lg" placeholder="Search services ..." />
+        </div>
+      </div>
+    </div>
+</div>
+<div class="row">
   <div class="col-sm-6">
     <h5>Consumed services</h5>
     <div class="p-2">
