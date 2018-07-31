@@ -20,6 +20,9 @@ import { Action } from 'redux';
 
 @Injectable()
 export class AppActions {
+
+    static APPS_FILTER_UPDATED = 'APPS_FILTER_UPDATED';
+    static SERVICE_FILTER_UPDATED = 'SERVICE_FILTER_UPDATED';
     
     static CONNECTION_SETUP_START = 'CONNECTION_SETUP_START';
     static CONNECTION_SETUP_FAILED = 'CONNECTION_SETUP_FAILED';   

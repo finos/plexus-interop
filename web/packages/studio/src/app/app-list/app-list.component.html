@@ -1,4 +1,13 @@
 <div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div id="apps-search-input-group" class="pb-3">
+        <div class="input-group col-md-12">
+          <input type="text" [value]="searchFilterValue | async" [formControl]="searchFilterControl" class="form-control input-lg" placeholder="Search ...." />
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="list-group">
     <a id="app-item {{app.id}}" class="list-group-item list-group-item-action" *ngFor="let app of apps | async" (click)="connectToApp(app)">{{app.label}}</a>
   </div>
