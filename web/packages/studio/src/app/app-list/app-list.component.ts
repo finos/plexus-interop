@@ -26,6 +26,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { FormControl } from '@angular/forms';
 import 'rxjs/add/operator/debounceTime';
+import { containsFilter } from '../services/ui/filters';
 
 interface AppUiInfo extends Application {
   label: string;
@@ -91,7 +92,7 @@ export class AppListComponent implements OnInit, OnDestroy {
   }
 
   applyFilter(apps: Application[], filter?: string): Application[] {
-    return filter && filter.trim().length > 0 ? apps.filter(a => a.id.toLowerCase().indexOf(filter.toLowerCase()) != -1) : apps;
+    return apps.filter(a => containsFilter(a.id, filter));
   }
 
   toAppInfo(app: Application): AppUiInfo {
