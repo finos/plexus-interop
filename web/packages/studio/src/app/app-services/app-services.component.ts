@@ -26,6 +26,8 @@ import * as fromRoot from '../services/ui/RootReducers';
 import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/observable/of';
+import { FormControl } from '@angular/forms';
+import { containsFilter } from '../services/ui/filters';
 
 @Component({
   selector: 'app-services',
@@ -45,11 +47,15 @@ export class AppServicesComponent implements OnInit {
 
   consumedServices: Observable<ConsumedService[]> = Observable.of([]);
   providedServices: Observable<ProvidedService[]> = Observable.of([]);
+  searchFilterValue: Observable<string>;
+  searchFilterControl: FormControl = new FormControl("");
 
   subscriptions: SubscriptionsRegistry;
   registryService: InteropRegistryService;
 
   public ngOnInit(): void {
+    this.searchFilterValue = this.store
+      .select(state => state.plexus.serviceFilter || '');
     this.consumedServices = this.store
       .select(state => state.plexus)
       .map(state => {
@@ -58,8 +64,8 @@ export class AppServicesComponent implements OnInit {
         }
         const services = state.services;
         const app = state.connectedApp;
-        const consumed = services.interopRegistryService.getConsumedServices(app.id);
-        return consumed;
+        return services.interopRegistryService
+          .getConsumedServices(app.id).filter(s => containsFilter(s.service.id, state.serviceFilter));
       });
     this.providedServices = this.store
       .select(state => state.plexus)
@@ -69,8 +75,15 @@ export class AppServicesComponent implements OnInit {
         }
         const services = state.services;
         const app = state.connectedApp;
-        return services.interopRegistryService.getProvidedServices(app.id);
+        return services.interopRegistryService.getProvidedServices(app.id)
+          .filter(s => containsFilter(s.service.id, state.serviceFilter));
       });
+    this.subscribtions.add(this.searchFilterControl
+      .valueChanges
+      .debounceTime(150)
+      .subscribe(newFilter => {
+        this.store.dispatch({ type: AppActions.SERVICE_FILTER_UPDATED, payload: newFilter });
+      }));
   }
 
   openProvided(method) {
