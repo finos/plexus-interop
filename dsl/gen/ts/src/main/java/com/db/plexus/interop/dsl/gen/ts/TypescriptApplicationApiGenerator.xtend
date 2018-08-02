@@ -131,11 +131,11 @@ class «app.name»ClientImpl extends GenericClientApiBase implements «app.name�
 /**
  * Client API builder
  */
-export class «app.name»ClientBuilder extends BaseClientApiBuilder<«app.name»Client> {
+export class «app.name»ClientBuilder implements ClientApiBuilder<«app.name»Client, «app.name»ClientBuilder> {
 
-    public constructor() {
-        super(new ContainerAwareClientAPIBuilder().withApplicationId('«app.fullName»'));
-    }
+    protected genericBuilder: GenericClientApiBuilder =
+        new ContainerAwareClientAPIBuilder()
+            .withApplicationId('«app.fullName»');
 
     «FOR providedElement : providedServices SEPARATOR '\n' »
         private «providedElement.aliasOrName.toFirstLower»Handler: «providedElement.aliasOrName.toFirstUpper»InvocationHandler;
@@ -147,6 +147,31 @@ export class «app.name»ClientBuilder extends BaseClientApiBuilder<«app.name»
         return this;
     }
     «ENDFOR»
+
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): «app.name»ClientBuilder {
+        this.genericBuilder.withClientApiDecorator(clientApiDecorator);
+        return this;
+    }
+
+    public withClientExtension(extension: (builder: ClientApiBuilder<«app.name»Client, «app.name»ClientBuilder>) => void): «app.name»ClientBuilder {
+        extension(this);
+        return this;
+    }
+
+    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): «app.name»ClientBuilder {
+        this.genericBuilder.withTransportConnectionProvider(provider);
+        return this;
+    }
+
+    public withAppInstanceId(appInstanceId: UniqueId): «app.name»ClientBuilder {
+        this.genericBuilder.withAppInstanceId(appInstanceId);
+        return this;
+    }
+
+    public withAppId(appId: string): «app.name»ClientBuilder {
+        this.genericBuilder.withApplicationId(appId);
+        return this;
+    }
 
     public connect(): Promise<«app.name»Client> {
         «FOR providedService : providedServices »
@@ -204,7 +229,7 @@ export class «app.name»ClientBuilder extends BaseClientApiBuilder<«app.name»
     }
 
     def imports(PlexusGenConfig genConfig) '''
-import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { InternalGenericClientApi, ClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
