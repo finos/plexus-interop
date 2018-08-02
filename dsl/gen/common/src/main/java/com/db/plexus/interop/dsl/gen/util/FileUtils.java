@@ -58,7 +58,7 @@ public class FileUtils {
         private final Consumer<Path> fileHandler;
 
         Finder(String pattern, Consumer<Path> fileHandler) {
-            matcher = new FilePathMatcher(pattern);
+            matcher = new CombinedFilePathMatcher(pattern);
             this.fileHandler = fileHandler;
         }
 
