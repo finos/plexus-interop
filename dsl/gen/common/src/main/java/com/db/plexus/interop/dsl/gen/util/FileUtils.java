@@ -58,15 +58,14 @@ public class FileUtils {
         private final Consumer<Path> fileHandler;
 
         Finder(String pattern, Consumer<Path> fileHandler) {
-            matcher = FileSystems.getDefault()
-                    .getPathMatcher("glob:" + pattern);
+            matcher = new FilePathMatcher(pattern);
             this.fileHandler = fileHandler;
         }
 
         @Override
         public FileVisitResult visitFile(Path file,
                                          BasicFileAttributes attrs) {
-        	Path name = file.getFileName();
+            Path name = file.getFileName();
             if (matcher.matches(file) || (name != null && matcher.matches(name))) {
                 fileHandler.accept(file);
             }
