@@ -1,0 +1,104 @@
+:imagesdir: ./images
+ifdef::env-github,env-browser[:outFileSuffix: .adoc]
+
+In this section we'll describe available tools which simplify development and testing process.
+
+==== Plexus Command Line Interface (CLI)
+
+Plexus Command Line Interface used for metadata validation and generating the strong-typed client code in different languages.
+
+===== Installation
+
+Plexus CLI tool can be installed using following command
+
+[source, bash]
+-----
+npm i @plexus-interop/cli --global
+-----
+
+If you work in restricted environment, then please consider adjusting following environment properties before installation:
+
+
+|===
+|Env variable name |Details
+
+|PLEXUS_JRE_DOWNLOAD_URL
+|Custom JRE package download URL
+
+|PLEXUS_CLI_JAVA_EXE_PATH
+|Full path to _java_ executable to be used from executed commands
+
+|PLEXUS_PROTOC_DOWNLOAD_URL
+|Custom Proto Compiler package download url
+
+|PLEXUS_CLI_PROTOC_EXE_PATH
+|Full path to _protoc_ executable to be used from executed commands
+|===
+
+===== Usage
+
+To list all available commands please use:
+
+[source, bash]
+-----
+plexus --help
+-----
+
+it will print all commands with their descriptions:
+
+[source, bash]
+-----
+  Usage: plexus [options] [command]
+
+  Options:
+
+    -V, --version             output the version number
+    -h, --help                output usage information
+
+  Commands:
+
+    gen-ts [options]          generate Typescript client and messages definitions for specified entry point
+    gen-json-meta [options]   generate metadata in JSON format
+    gen-proto [options]       generate proto definitions for specified entry point
+    gen-csharp [options]      generate C# client and messages definitions for specified entry point
+    validate [options]        validate metadata
+    validate-patch [options]  validate metadata update
+
+  Help for specific command:  plexus [command] --help
+-----
+
+to get help for specific command please use:
+
+[source, bash]
+-----
+plexus [command] --help
+-----
+
+==== Plexus Studio
+
+Plexus Studio is a Dev tool to explore and test Plexus Interop APIs defined in metadata. It can connect to Plexus Interop on behalf of any available application, handle invocations and invoke any consumed action.
+
+===== Invoke action workflow
+
+Let's take a look at simple workflow of simulating action invocation. It provides an ability to test your Provider application without installing/getting any information about possible Consumer applications. To invoke action please follow steps below:
+
+. Find required application in list and click on found item to connect on behalf of this Application:
++
+image::guide-studio-apps.png[Plexus Studio Apps]
+
+. Choose required Action from *Consumed Services* section
++
+image::guide-studio-app-consumer.png[Plexus Studio Consumer]
+
+. On *Consumed Action* screen you can:
+
+- Specify request payload in https://developers.google.com/protocol-buffers/docs/proto3#json[JSON format]
+- Discover available action providers
+- Choose target application
+- Send request and get response details
+
++
+image::guide-studio-app-consumed.png[Plexus Studio Consumed action]
+
+
+
