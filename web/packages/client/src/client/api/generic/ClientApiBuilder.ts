@@ -18,10 +18,11 @@ import { InternalGenericClientApi } from './internal';
 import { GenericClientApi } from './GenericClientApi';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 
-export interface ClientApiBuilder<T> {
-    connect(): Promise<T>;
-    withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): ClientApiBuilder<T>;
-    withTransportConnectionProvider(provider: () => Promise<TransportConnection>): ClientApiBuilder<T>;
-    withAppInstanceId(appInstanceId: UniqueId): ClientApiBuilder<T>;
-    withAppId(appId: string): ClientApiBuilder<T>;
+export interface ClientApiBuilder<ClientType, BuilderType extends ClientApiBuilder<ClientType, any>> {
+    connect(): Promise<ClientType>;
+    withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): BuilderType;
+    withClientExtension(extension: (builder: ClientApiBuilder<ClientType, BuilderType>) => void): BuilderType;
+    withTransportConnectionProvider(provider: () => Promise<TransportConnection>): BuilderType;
+    withAppInstanceId(appInstanceId: UniqueId): BuilderType;
+    withAppId(appId: string): BuilderType;
 }

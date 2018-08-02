@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 export * from './ClientApiBuilder';
-export * from './BaseClientApiBuilder';
 export * from './GenericClientApi';
 export * from './GenericClientApiImpl';
 export * from './GenericClientApiBase';

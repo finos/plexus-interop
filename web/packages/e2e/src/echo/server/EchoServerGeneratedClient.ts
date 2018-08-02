@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { InternalGenericClientApi, ClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
 import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from '@plexus-interop/client';
 
 import * as plexus from '../gen/plexus-messages';
-
 
 
 /**
@@ -71,11 +70,11 @@ export abstract class ServiceAliasInvocationHandler {
 /**
  * Client API builder
  */
-export class EchoServerClientBuilder extends BaseClientApiBuilder<EchoServerClient> {
+export class EchoServerClientBuilder implements ClientApiBuilder<EchoServerClient, EchoServerClientBuilder> {
 
-    public constructor() {
-        super(new ContainerAwareClientAPIBuilder().withApplicationId('plexus.interop.testing.EchoServer'));
-    }
+    protected genericBuilder: GenericClientApiBuilder = 
+        new ContainerAwareClientAPIBuilder()
+            .withApplicationId('plexus.interop.testing.EchoServer');
 
     private echoServiceHandler: EchoServiceInvocationHandler;
     
@@ -91,6 +90,31 @@ export class EchoServerClientBuilder extends BaseClientApiBuilder<EchoServerClie
         return this;
     }
 
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): EchoServerClientBuilder {
+        this.genericBuilder.withClientApiDecorator(clientApiDecorator);
+        return this;
+    }
+
+    public withClientExtension(extension: (builder: ClientApiBuilder<EchoServerClient, EchoServerClientBuilder>) => void): EchoServerClientBuilder {
+        extension(this);
+        return this;
+    }
+
+    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): EchoServerClientBuilder {
+        this.genericBuilder.withTransportConnectionProvider(provider);
+        return this;
+    }
+
+    public withAppInstanceId(appInstanceId: UniqueId): EchoServerClientBuilder {
+        this.genericBuilder.withAppInstanceId(appInstanceId);
+        return this;
+    }
+
+    public withAppId(appId: string): EchoServerClientBuilder {
+        this.genericBuilder.withApplicationId(appId);
+        return this;
+    }
+    
     public connect(): Promise<EchoServerClient> {
         if (!this.echoServiceHandler) {
             return Promise.reject('Invocation handler for EchoService is not provided');
