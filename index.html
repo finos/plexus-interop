@@ -564,6 +564,21 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#interop-broker">Interop Broker</a></li>
 </ul>
 </li>
+<li><a href="#tools">Tools</a>
+<ul class="sectlevel3">
+<li><a href="#plexus-command-line-interface-cli">Plexus Command Line Interface (CLI)</a>
+<ul class="sectlevel4">
+<li><a href="#installation">Installation</a></li>
+<li><a href="#usage">Usage</a></li>
+</ul>
+</li>
+<li><a href="#plexus-studio">Plexus Studio</a>
+<ul class="sectlevel4">
+<li><a href="#invoke-action-workflow">Invoke action workflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#invocation-workflow">Invocation workflow</a></li>
 <li><a href="#plexus-interop-integration-workflow">Plexus Interop integration workflow</a></li>
 <li><a href="#guides-how-to-write-custom-app-launcher">How to write custom App Launcher</a>
@@ -2026,6 +2041,161 @@ specifying the methods that can be called remotely with their parameters and ret
 </div>
 <div class="paragraph">
 <p>Note that Interop Broker is not talking with apps directly - it relies on Interop Transport, which can deliver serialized messages across app boundaries.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tools">Tools</h3>
+<div class="paragraph">
+<p>In this section we&#8217;ll describe available tools which simplify development and testing process.</p>
+</div>
+<div class="sect3">
+<h4 id="plexus-command-line-interface-cli">Plexus Command Line Interface (CLI)</h4>
+<div class="paragraph">
+<p>Plexus Command Line Interface used for metadata validation and generating the strong-typed client code in different languages.</p>
+</div>
+<div class="sect4">
+<h5 id="installation">Installation</h5>
+<div class="paragraph">
+<p>Plexus CLI tool can be installed using following command</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">npm i @plexus-interop/cli --global</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you work in restricted environment, then please consider adjusting following environment properties before installation:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Env variable name</th>
+<th class="tableblock halign-left valign-top">Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PLEXUS_JRE_DOWNLOAD_URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom JRE package download URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PLEXUS_CLI_JAVA_EXE_PATH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Full path to <em>java</em> executable to be used from executed commands</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PLEXUS_PROTOC_DOWNLOAD_URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom Proto Compiler package download url</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PLEXUS_CLI_PROTOC_EXE_PATH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Full path to <em>protoc</em> executable to be used from executed commands</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="usage">Usage</h5>
+<div class="paragraph">
+<p>To list all available commands please use:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">plexus --help</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>it will print all commands with their descriptions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">  Usage: plexus [options] [command]
+
+  Options:
+
+    -V, --version             output the version number
+    -h, --help                output usage information
+
+  Commands:
+
+    gen-ts [options]          generate Typescript client and messages definitions for specified entry point
+    gen-json-meta [options]   generate metadata in JSON format
+    gen-proto [options]       generate proto definitions for specified entry point
+    gen-csharp [options]      generate C# client and messages definitions for specified entry point
+    validate [options]        validate metadata
+    validate-patch [options]  validate metadata update
+
+  Help for specific command:  plexus [command] --help</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>to get help for specific command please use:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">plexus [command] --help</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="plexus-studio">Plexus Studio</h4>
+<div class="paragraph">
+<p>Plexus Studio is a Dev tool to explore and test Plexus Interop APIs defined in metadata. It can connect to Plexus Interop on behalf of any available application, handle invocations and invoke any consumed action.</p>
+</div>
+<div class="sect4">
+<h5 id="invoke-action-workflow">Invoke action workflow</h5>
+<div class="paragraph">
+<p>Let&#8217;s take a look at simple workflow of simulating action invocation. It provides an ability to test your Provider application without installing/getting any information about possible Consumer applications. To invoke action please follow steps below:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Find required application in list and click on found item to connect on behalf of this Application:</p>
+<div class="imageblock">
+<div class="content">
+<img src="images/guide-studio-apps.png" alt="Plexus Studio Apps">
+</div>
+</div>
+</li>
+<li>
+<p>Choose required Action from <strong>Consumed Services</strong> section</p>
+<div class="imageblock">
+<div class="content">
+<img src="images/guide-studio-app-consumer.png" alt="Plexus Studio Consumer">
+</div>
+</div>
+</li>
+<li>
+<p>On <strong>Consumed Action</strong> screen you can:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Specify request payload in <a href="https://developers.google.com/protocol-buffers/docs/proto3#json">JSON format</a></p>
+</li>
+<li>
+<p>Discover available action providers</p>
+</li>
+<li>
+<p>Choose target application</p>
+</li>
+<li>
+<p>Send request and get response details</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/guide-studio-app-consumed.png" alt="Plexus Studio Consumed action">
+</div>
+</div>
+</li>
+</ol>
+</div>
 </div>
 </div>
 </div>
@@ -3602,7 +3772,7 @@ all mapping are correct and consistent.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-05-07 10:43:52 MSK
+Last updated 2018-07-31 20:36:20 MSK
 </div>
 </div>
 </body>
