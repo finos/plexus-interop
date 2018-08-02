@@ -23,6 +23,7 @@ import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAP
 import * as plexus from '../gen/plexus-messages';
 
 
+
 /**
  * Main client API
  */
@@ -72,7 +73,7 @@ export abstract class ServiceAliasInvocationHandler {
  */
 export class EchoServerClientBuilder implements ClientApiBuilder<EchoServerClient, EchoServerClientBuilder> {
 
-    protected genericBuilder: GenericClientApiBuilder = 
+    protected genericBuilder: GenericClientApiBuilder =
         new ContainerAwareClientAPIBuilder()
             .withApplicationId('plexus.interop.testing.EchoServer');
 
@@ -114,7 +115,7 @@ export class EchoServerClientBuilder implements ClientApiBuilder<EchoServerClien
         this.genericBuilder.withApplicationId(appId);
         return this;
     }
-    
+
     public connect(): Promise<EchoServerClient> {
         if (!this.echoServiceHandler) {
             return Promise.reject('Invocation handler for EchoService is not provided');
