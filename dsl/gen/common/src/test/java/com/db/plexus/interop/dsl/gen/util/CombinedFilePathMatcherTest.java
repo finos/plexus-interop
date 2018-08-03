@@ -18,35 +18,19 @@ package com.db.plexus.interop.dsl.gen.util;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CombinedFilePathMatcherTest {
 
-    private static final Path INTEROP_CLIENT_PATH = getTestPath();
-
-    private static Path getTestPath() {
-        return new File(CombinedFilePathMatcher.class.getResource("/com/db/plexus/interop/dsl/gen/test/components/component_a.interop").getFile()).toPath();
-    }
+    private static final Path INTEROP_CLIENT_PATH = Paths.get("client.interop");
 
     @Test
     public void testMatchesGlob() {
         assertTrue(new CombinedFilePathMatcher("**").matches(INTEROP_CLIENT_PATH));
-    }
-
-    @Test
-    public void testMatchesFullPath() {
-        assertTrue(new CombinedFilePathMatcher(INTEROP_CLIENT_PATH.toAbsolutePath().toString()).matches(INTEROP_CLIENT_PATH));
-    }
-
-    @Test
-    public void testMatchesRelativePath() {
-        final Path relativePath = FileSystems.getDefault().getPath(".").toAbsolutePath().normalize().relativize(INTEROP_CLIENT_PATH);
-        assertTrue(new CombinedFilePathMatcher(relativePath.toString()).matches(INTEROP_CLIENT_PATH));
     }
 
     @Test
