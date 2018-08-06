@@ -14,11 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './ClientApiBuilder';
-export * from './GenericClientApi';
-export * from './GenericClientApiImpl';
-export * from './GenericClientApiBase';
-export * from './GenericInvocationsHost';
-export * from './GenericClientApiBuilder';
-export * from './handlers';
-export * from './internal';
+export function containsFilter(value: string, filter?: string): boolean {
+    return !(filter && filter.trim().length > 0) || value.toLowerCase().indexOf(filter.toLowerCase()) != -1;
+}

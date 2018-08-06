@@ -1,4 +1,4 @@
-import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { InternalGenericClientApi, ClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
@@ -109,13 +109,38 @@ class GreetingClientClientImpl extends GenericClientApiBase implements GreetingC
 /**
  * Client API builder
  */
-export class GreetingClientClientBuilder extends BaseClientApiBuilder<GreetingClientClient> {
+export class GreetingClientClientBuilder implements ClientApiBuilder<GreetingClientClient, GreetingClientClientBuilder> {
 
-    public constructor() {
-        super(new ContainerAwareClientAPIBuilder().withApplicationId('interop.samples.GreetingClient'));
+    protected genericBuilder: GenericClientApiBuilder =
+        new ContainerAwareClientAPIBuilder()
+            .withApplicationId('interop.samples.GreetingClient');
+
+
+
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): GreetingClientClientBuilder {
+        this.genericBuilder.withClientApiDecorator(clientApiDecorator);
+        return this;
     }
 
+    public withClientExtension(extension: (builder: ClientApiBuilder<GreetingClientClient, GreetingClientClientBuilder>) => void): GreetingClientClientBuilder {
+        extension(this);
+        return this;
+    }
 
+    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): GreetingClientClientBuilder {
+        this.genericBuilder.withTransportConnectionProvider(provider);
+        return this;
+    }
+
+    public withAppInstanceId(appInstanceId: UniqueId): GreetingClientClientBuilder {
+        this.genericBuilder.withAppInstanceId(appInstanceId);
+        return this;
+    }
+
+    public withAppId(appId: string): GreetingClientClientBuilder {
+        this.genericBuilder.withApplicationId(appId);
+        return this;
+    }
 
     public connect(): Promise<GreetingClientClient> {
         return this.genericBuilder

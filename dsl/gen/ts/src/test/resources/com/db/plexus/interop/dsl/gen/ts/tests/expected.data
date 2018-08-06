@@ -1,4 +1,4 @@
-import { BaseClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { InternalGenericClientApi, ClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
 import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
 import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
 import { Arrays, Observer } from '@plexus-interop/common';
@@ -169,11 +169,11 @@ export abstract class ExampleServiceInvocationHandler {
 /**
  * Client API builder
  */
-export class ComponentAClientBuilder extends BaseClientApiBuilder<ComponentAClient> {
+export class ComponentAClientBuilder implements ClientApiBuilder<ComponentAClient, ComponentAClientBuilder> {
 
-    public constructor() {
-        super(new ContainerAwareClientAPIBuilder().withApplicationId('com.db.plexus.interop.dsl.gen.test.components.ComponentA'));
-    }
+    protected genericBuilder: GenericClientApiBuilder =
+        new ContainerAwareClientAPIBuilder()
+            .withApplicationId('com.db.plexus.interop.dsl.gen.test.components.ComponentA');
 
     private noLaunchExampleServiceHandler: NoLaunchExampleServiceInvocationHandler;
 
@@ -186,6 +186,31 @@ export class ComponentAClientBuilder extends BaseClientApiBuilder<ComponentAClie
 
     public withExampleServiceInvocationsHandler(invocationsHandler: ExampleServiceInvocationHandler): ComponentAClientBuilder {
         this.exampleServiceHandler = invocationsHandler;
+        return this;
+    }
+
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): ComponentAClientBuilder {
+        this.genericBuilder.withClientApiDecorator(clientApiDecorator);
+        return this;
+    }
+
+    public withClientExtension(extension: (builder: ClientApiBuilder<ComponentAClient, ComponentAClientBuilder>) => void): ComponentAClientBuilder {
+        extension(this);
+        return this;
+    }
+
+    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): ComponentAClientBuilder {
+        this.genericBuilder.withTransportConnectionProvider(provider);
+        return this;
+    }
+
+    public withAppInstanceId(appInstanceId: UniqueId): ComponentAClientBuilder {
+        this.genericBuilder.withAppInstanceId(appInstanceId);
+        return this;
+    }
+
+    public withAppId(appId: string): ComponentAClientBuilder {
+        this.genericBuilder.withApplicationId(appId);
         return this;
     }
 

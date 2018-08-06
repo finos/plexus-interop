@@ -46,6 +46,8 @@ const initialState: StudioState = {
     connectedApp: undefined,
     consumedMethod: undefined,
     providedMethod: undefined,
+    appsFilter: undefined,
+    serviceFilter: undefined,
     apps: [],
     services: {
         interopRegistryService: undefined,
@@ -90,7 +92,7 @@ export function reducer(
             return {
                 ...initialState,
                 // keep entered/discovered connection details
-                connectionDetails: {  
+                connectionDetails: {
                     ...state.connectionDetails,
                     connected: false
                 }
@@ -136,6 +138,16 @@ export function reducer(
             return {
                 ...state,
                 consumedMethod: getPayload<ConsumedMethodState>(action)
+            };
+        case AppActions.APPS_FILTER_UPDATED:
+            return {
+                ...state,
+                appsFilter: getPayload<string>(action)
+            };
+        case AppActions.SERVICE_FILTER_UPDATED:
+            return {
+                ...state,
+                serviceFilter: getPayload<string>(action)
             };
         default:
             return state;

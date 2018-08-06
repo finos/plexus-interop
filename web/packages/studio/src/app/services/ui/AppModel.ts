@@ -34,6 +34,8 @@ export interface StudioState {
     connectedApp: Application;
     consumedMethod: ConsumedMethodState,
     providedMethod: ProvidedMethodState,
+    appsFilter?: string,
+    serviceFilter?: string, 
     apps: Application[],
     services: ServicesSnapshot
 }
