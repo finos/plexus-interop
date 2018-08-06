@@ -1,7 +1,7 @@
 :imagesdir: ./images
 ifdef::env-github,env-browser[:outFileSuffix: .adoc]
 
-In this section we'll describe available tools which simplify development and testing process.
+This section describes available tools which simplify development and testing process.
 
 ==== Plexus Command Line Interface (CLI)
 
