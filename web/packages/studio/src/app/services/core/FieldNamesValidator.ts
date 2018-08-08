@@ -17,7 +17,7 @@
 import { InteropRegistry, Message } from '@plexus-interop/broker';
 import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 
-import { Set } from 'typescript-collections';
+import { default as Set } from 'typescript-collections/dist/lib/Set';
 
 export class FieldNamesValidator {
 

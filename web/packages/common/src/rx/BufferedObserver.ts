@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { Observer } from './Observer';
-import { Queue } from 'typescript-collections';
+import { default as Queue } from 'typescript-collections/dist/lib/Queue';
 import { Logger, LoggerFactory } from '../logger';
 import { LimitedBufferQueue } from '../util/collections/LimitedBufferQueue';
 

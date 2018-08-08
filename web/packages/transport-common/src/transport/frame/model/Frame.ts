@@ -30,7 +30,7 @@ export abstract class Frame {
     }
 
     public getInternalHeader(): plexus.interop.transport.protocol.Header {
-        return plexus.interop.transport.protocol.Header.create(this._header);
+        return new plexus.interop.transport.protocol.Header(this._header);
     }
 
     public abstract get body(): ArrayBuffer;
