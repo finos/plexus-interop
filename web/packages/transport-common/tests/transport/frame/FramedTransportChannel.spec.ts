@@ -25,7 +25,7 @@ import { TestBufferedInMemoryFramedTransport } from '../TestBufferedInMemoryFram
 import { Frame } from '../../../src/transport/frame/model/Frame';
 import { AnonymousSubscription } from 'rxjs/Subscription';
 import { DelegateChannelObserver } from '../../../src/common/DelegateChannelObserver';
-import { Queue } from 'typescript-collections';
+import { default as Queue } from 'typescript-collections/dist/lib/Queue';
 
 describe('FramedTransportChannel', () => {
 

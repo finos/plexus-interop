@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Queue } from 'typescript-collections';
+import { default as Queue } from 'typescript-collections/dist/lib/Queue';
 import { LimitedBufferQueue, Arrays, Logger, LoggerFactory } from '@plexus-interop/common';
 
 let globalObj: any = typeof window !== 'undefined' ? window : global;
