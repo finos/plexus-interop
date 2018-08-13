@@ -16,6 +16,8 @@
  */
 ﻿namespace Plexus.Interop.Protocol.Discovery
 {
+    using System.Collections.Generic;
+
     public interface IDiscoveredMethod : IProtocolMessage
     {
         IProvidedMethodReference ProvidedMethod { get; }
@@ -27,5 +29,7 @@
         string OutputMessageId { get; }
 
         MethodType MethodType { get; }
+
+        IReadOnlyCollection<IOption> Options { get; }
     }
 }

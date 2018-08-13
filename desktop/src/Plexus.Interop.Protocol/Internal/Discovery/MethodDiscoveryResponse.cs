@@ -41,22 +41,5 @@
         {
             return $"{nameof(Methods)}: {Methods.FormatEnumerableObjects()}";
         }
-
-        private bool Equals(MethodDiscoveryResponse other)
-        {
-            return Equals(Methods, other.Methods);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj is MethodDiscoveryResponse && Equals((MethodDiscoveryResponse) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return (Methods != null ? Methods.GetHashCode() : 0);
-        }
     }
 }

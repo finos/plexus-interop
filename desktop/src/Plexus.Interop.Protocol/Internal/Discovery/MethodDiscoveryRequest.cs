@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol.Internal.Discovery
+namespace Plexus.Interop.Protocol.Internal.Discovery
 {
     using Plexus.Interop.Protocol.Discovery;
     using Plexus.Pools;
@@ -26,10 +26,14 @@
             InputMessageId = default;
             OutputMessageId = default;
             DiscoveryMode = default;
+            if (ConsumedMethod.HasValue)
+            {
+                ConsumedMethod.GetValueOrDefault()?.Dispose();
+            }
             ConsumedMethod = default;
         }
 
-        public T Handle<T, TArgs>(ClientToBrokerRequestHandler<T, TArgs> handler, TArgs args = default(TArgs))
+        public T Handle<T, TArgs>(ClientToBrokerRequestHandler<T, TArgs> handler, TArgs args = default)
         {
             return handler.Handle(this, args);
         }
@@ -45,30 +49,6 @@
         public override string ToString()
         {
             return $"{nameof(InputMessageId)}: {InputMessageId}, {nameof(OutputMessageId)}: {OutputMessageId}, {nameof(ConsumedMethod)}: {{{ConsumedMethod}}}, {nameof(DiscoveryMode)}: {DiscoveryMode}";
-        }
-
-        private bool Equals(MethodDiscoveryRequest other)
-        {
-            return InputMessageId.Equals(other.InputMessageId) && OutputMessageId.Equals(other.OutputMessageId) && ConsumedMethod.Equals(other.ConsumedMethod) && DiscoveryMode == other.DiscoveryMode;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj is MethodDiscoveryRequest && Equals((MethodDiscoveryRequest) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = InputMessageId.GetHashCode();
-                hashCode = (hashCode * 397) ^ OutputMessageId.GetHashCode();
-                hashCode = (hashCode * 397) ^ ConsumedMethod.GetHashCode();
-                hashCode = (hashCode * 397) ^ (int) DiscoveryMode;
-                return hashCode;
-            }
         }
     }
 }

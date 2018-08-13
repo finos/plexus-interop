@@ -14,10 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol.Internal.Discovery
+namespace Plexus.Interop.Protocol.Internal.Discovery
 {
     using Plexus.Interop.Protocol.Discovery;
     using Plexus.Pools;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     internal sealed class DiscoveredMethod : PooledObject<DiscoveredMethod>, IDiscoveredMethod
     {
@@ -29,6 +32,14 @@
             InputMessageId = default;
             OutputMessageId = default;
             MethodType = default;
+            if (Options != null)
+            {
+                foreach (var option in Options)
+                {
+                    option.Dispose();
+                }
+            }
+            Options = default;
         }
 
         public IProvidedMethodReference ProvidedMethod { get; set; }
@@ -41,34 +52,11 @@
 
         public MethodType MethodType { get; set; }
 
+        public IReadOnlyCollection<IOption> Options { get; set; }
+
         public override string ToString()
         {
-            return $"{nameof(ProvidedMethod)}: {{{ProvidedMethod}}}, {nameof(MethodTitle)}: {MethodTitle}, {nameof(InputMessageId)}: {InputMessageId}, {nameof(OutputMessageId)}: {OutputMessageId}, {nameof(MethodType)}: {MethodType}";
-        }
-
-        private bool Equals(DiscoveredMethod other)
-        {
-            return Equals(ProvidedMethod, other.ProvidedMethod) && MethodTitle.Equals(other.MethodTitle) && string.Equals(InputMessageId, other.InputMessageId) && string.Equals(OutputMessageId, other.OutputMessageId) && MethodType == other.MethodType;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj is DiscoveredMethod && Equals((DiscoveredMethod) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (ProvidedMethod != null ? ProvidedMethod.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ MethodTitle.GetHashCode();
-                hashCode = (hashCode * 397) ^ (InputMessageId != null ? InputMessageId.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (OutputMessageId != null ? OutputMessageId.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (int) MethodType;
-                return hashCode;
-            }
+            return $"{nameof(ProvidedMethod)}: {{{ProvidedMethod}}}, {nameof(MethodTitle)}: {MethodTitle}, {nameof(InputMessageId)}: {InputMessageId}, {nameof(OutputMessageId)}: {OutputMessageId}, {nameof(MethodType)}: {MethodType}, {nameof(Options)}: {Options.FormatEnumerableObjects()}";
         }
     }
 }

@@ -41,25 +41,5 @@
         {
             return $"{nameof(ConsumedService)}: {{{ConsumedService}}}, {nameof(DiscoveryMode)}: {DiscoveryMode}";
         }
-
-        private bool Equals(ServiceDiscoveryRequest other)
-        {
-            return ConsumedService.Equals(other.ConsumedService) && DiscoveryMode == other.DiscoveryMode;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj is ServiceDiscoveryRequest && Equals((ServiceDiscoveryRequest) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (ConsumedService.GetHashCode() * 397) ^ (int) DiscoveryMode;
-            }
-        }
     }
 }
