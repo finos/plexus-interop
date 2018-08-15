@@ -27,6 +27,7 @@
             OutputMessageId = string.Empty;
             MethodTitle = string.Empty;
             MethodType = default;
+            Options.Clear();
         }
     }
 }

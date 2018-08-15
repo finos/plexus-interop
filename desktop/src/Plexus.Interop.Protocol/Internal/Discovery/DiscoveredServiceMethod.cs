@@ -16,6 +16,7 @@
  */
 ﻿namespace Plexus.Interop.Protocol.Internal.Discovery
 {
+    using System.Collections.Generic;
     using Plexus.Interop.Protocol.Discovery;
     using Plexus.Pools;
 
@@ -31,9 +32,11 @@
 
         public MethodType MethodType { get; set; }
 
+        public IReadOnlyCollection<IOption> Options { get; set; }
+
         public override string ToString()
         {
-            return $"{nameof(MethodId)}: {MethodId}, {nameof(MethodTitle)}: {MethodTitle}, {nameof(InputMessageId)}: {InputMessageId}, {nameof(OutputMessageId)}: {OutputMessageId}, {nameof(MethodType)}: {MethodType}";
+            return $"{nameof(MethodId)}: {MethodId}, {nameof(MethodTitle)}: {MethodTitle}, {nameof(InputMessageId)}: {InputMessageId}, {nameof(OutputMessageId)}: {OutputMessageId}, {nameof(MethodType)}: {MethodType}, {nameof(Options)}: {Options.FormatEnumerableObjects()}";
         }
 
         protected override void Cleanup()
@@ -43,6 +46,7 @@
             InputMessageId = default;
             OutputMessageId = default;
             MethodType = default;
+            Options = null;
         }
     }
 }

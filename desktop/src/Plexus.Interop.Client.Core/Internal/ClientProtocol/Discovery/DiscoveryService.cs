@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Internal.ClientProtocol.Discovery
+namespace Plexus.Interop.Internal.ClientProtocol.Discovery
 {
     using Plexus.Channels;
     using Plexus.Interop.Protocol;
@@ -132,7 +132,8 @@
                 method.MethodTitle,
                 method.InputMessageId,
                 method.OutputMessageId,
-                Convert(method.MethodType));
+                Convert(method.MethodType),
+                method.Options.Select(x => new Option(x.Id, x.Value)).ToList());
         }
 
         private ProvidedServiceReference Convert(IProvidedServiceReference providedService)
@@ -172,7 +173,8 @@
                 method.MethodTitle,
                 method.InputMessageId,
                 method.OutputMessageId,
-                Convert(method.MethodType));
+                Convert(method.MethodType),
+                method.Options.Select(x => new Option(x.Id, x.Value)).ToList());
         }
 
         private static MethodType Convert(Protocol.Discovery.MethodType methodType)

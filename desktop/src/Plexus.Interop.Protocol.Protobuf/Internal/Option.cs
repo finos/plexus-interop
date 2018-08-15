@@ -6,8 +6,8 @@
     {
         protected override void Cleanup()
         {
-            Id = default;
-            Value = default;
+            Id = string.Empty;
+            Value = string.Empty;
         }
     }
 }

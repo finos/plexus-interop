@@ -15,30 +15,39 @@
 // limitations under the License.
 //
 
-syntax = "proto3";
+syntax = "proto2";
 
 package interop;
 
 message ApplicationOptions {
-	string title = 1;
-	ApplicationLaunchOnCallMode launch_on_call = 2;
+	optional string title = 1;
+	optional ApplicationLaunchOnCallMode launch_on_call = 2;
+
+	extensions 1000 to max;
 }
 
 message ProvidedServiceOptions {
-	string title = 1;
-	ApplicationLaunchOnCallMode launch_on_call = 2;
+	optional string title = 1;
+	optional ApplicationLaunchOnCallMode launch_on_call = 2;
+
+	extensions 1000 to max;
 }
 
 message ConsumedServiceOptions {
+	extensions 1000 to max;
 }
 
 message ProvidedMethodOptions {
-	string title = 1;
-	ApplicationLaunchOnCallMode launch_on_call = 2;
-	uint32 timeout_ms = 3;
+	optional string title = 1;
+	optional ApplicationLaunchOnCallMode launch_on_call = 2;
+	optional uint32 timeout_ms = 3;
+
+	extensions 1000 to max;
 }
 
 message ConsumedMethodOptions {
+
+	extensions 1000 to max;
 }
 
 enum ApplicationLaunchOnCallMode {

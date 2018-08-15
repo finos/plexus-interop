@@ -15,33 +15,14 @@
 // limitations under the License.
 //
 
-syntax = "proto3";
+syntax = "proto2";
 
 package plexus.interop.testing;
 
-service EchoService {
-	rpc Unary (EchoRequest) returns (EchoRequest);
-	rpc ServerStreaming (EchoRequest) returns (stream EchoRequest);
-	rpc ClientStreaming (stream EchoRequest) returns (EchoRequest);
-	rpc DuplexStreaming (stream EchoRequest) returns (stream EchoRequest);
-}
+import "interop/descriptor.proto";
+import "plexus/interop/testing/echo_service.proto";
 
-message EchoRequest {
-	string string_field = 1;
-	int64 int64_field = 2;
-	uint32 uint32_field = 3;
-	repeated double repeated_double_field = 4;
-	SubEnum enum_field = 5;
-	SubMessage sub_message_field = 6;
-	repeated SubMessage repeated_sub_message_field = 7;
-
-	message SubMessage {
-		bytes bytes_field = 1;
-		string string_field = 2;
-	}
-
-	enum SubEnum {
-		VALUE_ONE = 0;
-		VALUE_TWO = 1;
-	}
+extend .interop.ProvidedMethodOptions {
+	optional string string_option = 1500;
+	optional EchoRequest.SubEnum enum_option = 1501;
 }

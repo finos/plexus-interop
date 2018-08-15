@@ -30,8 +30,8 @@ import org.eclipse.xtext.resource.XtextResourceSet
 
 import static extension com.db.plexus.interop.dsl.gen.GenUtils.*
 import com.google.inject.Injector
-import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils
-import com.db.plexus.interop.dsl.InteropLangUtils
+import com.db.plexus.interop.dsl.protobuf.Proto
+import com.db.plexus.interop.dsl.protobuf.ProtoSyntax
 
 class CsharpGenTask extends BaseGenTask {
 
@@ -63,9 +63,8 @@ class CsharpGenTask extends BaseGenTask {
 			val isBuiltIn = resource.URI.segmentCount > 2 
 				&& resource.URI.segment(resource.URI.segmentCount - 3).equals("google") 
 				&& resource.URI.segment(resource.URI.segmentCount - 2).equals("protobuf")
-			if (!resource.URI.toString.endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH) 
-				&& !resource.URI.toString.endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH)
-				&& !isBuiltIn)
+			val isProto2 = resource.URI.lastSegment.endsWith(".proto") && resource.contents.filter(typeof(Proto)).findFirst[x | true].syntax == ProtoSyntax.PROTO2
+			if (!isBuiltIn && !isProto2)
 			{
 				var newUri = resource.URI.resolve(workingDirUri)
 				var path = newUri.toFileString
