@@ -28,6 +28,11 @@
             MethodType = default;
             ProvidedMethod?.Dispose();
             ProvidedMethod = default;
+            foreach (var option in Options)
+            {
+                option.Dispose();
+            }
+            Options.Clear();
         }
     }
 }

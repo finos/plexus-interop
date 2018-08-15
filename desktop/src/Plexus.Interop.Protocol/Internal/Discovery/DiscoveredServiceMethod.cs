@@ -14,14 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol.Internal.Discovery
+namespace Plexus.Interop.Protocol.Internal.Discovery
 {
-    using System.Collections.Generic;
     using Plexus.Interop.Protocol.Discovery;
     using Plexus.Pools;
+    using System.Collections.Generic;
 
     internal sealed class DiscoveredServiceMethod : PooledObject<DiscoveredServiceMethod>, IDiscoveredServiceMethod
     {
+        protected override void Cleanup()
+        {
+            MethodId = default;
+            MethodTitle = default;
+            InputMessageId = default;
+            OutputMessageId = default;
+            MethodType = default;
+            foreach (var option in Options)
+            {
+                option.Dispose();
+            }
+            Options = ArrayConstants<IOption>.Empty;
+        }
+
         public string MethodId { get; set; }
 
         public Maybe<string> MethodTitle { get; set; }
@@ -32,21 +46,11 @@
 
         public MethodType MethodType { get; set; }
 
-        public IReadOnlyCollection<IOption> Options { get; set; }
+        public IReadOnlyCollection<IOption> Options { get; set; } = ArrayConstants<IOption>.Empty;
 
         public override string ToString()
         {
             return $"{nameof(MethodId)}: {MethodId}, {nameof(MethodTitle)}: {MethodTitle}, {nameof(InputMessageId)}: {InputMessageId}, {nameof(OutputMessageId)}: {OutputMessageId}, {nameof(MethodType)}: {MethodType}, {nameof(Options)}: {Options.FormatEnumerableObjects()}";
-        }
-
-        protected override void Cleanup()
-        {
-            MethodId = default;
-            MethodTitle = default;
-            InputMessageId = default;
-            OutputMessageId = default;
-            MethodType = default;
-            Options = null;
-        }
+        }        
     }
 }

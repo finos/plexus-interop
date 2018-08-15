@@ -458,6 +458,10 @@ namespace Plexus.Interop
                 discoveryResult.InputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
                 discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
                 discoveryResult.Type.ShouldBe(MethodType.Unary);
+                foreach (var option in discoveryResult.Options)
+                {
+                    WriteLog($"{option.Id}: {option.Value}");
+                }
                 discoveryResult.Options.Count.ShouldBe(3);                
                 discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
                 discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));

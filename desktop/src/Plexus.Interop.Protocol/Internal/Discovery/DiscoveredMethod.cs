@@ -18,9 +18,7 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
 {
     using Plexus.Interop.Protocol.Discovery;
     using Plexus.Pools;
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     internal sealed class DiscoveredMethod : PooledObject<DiscoveredMethod>, IDiscoveredMethod
     {
@@ -32,14 +30,11 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
             InputMessageId = default;
             OutputMessageId = default;
             MethodType = default;
-            if (Options != null)
+            foreach (var option in Options)
             {
-                foreach (var option in Options)
-                {
-                    option.Dispose();
-                }
+                option.Dispose();
             }
-            Options = default;
+            Options = ArrayConstants<IOption>.Empty;
         }
 
         public IProvidedMethodReference ProvidedMethod { get; set; }
@@ -52,7 +47,7 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
 
         public MethodType MethodType { get; set; }
 
-        public IReadOnlyCollection<IOption> Options { get; set; }
+        public IReadOnlyCollection<IOption> Options { get; set; } = ArrayConstants<IOption>.Empty;
 
         public override string ToString()
         {

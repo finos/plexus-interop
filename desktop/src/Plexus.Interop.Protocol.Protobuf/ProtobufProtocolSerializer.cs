@@ -510,7 +510,7 @@ namespace Plexus.Interop.Protocol.Protobuf
 
         private IOption ConvertFromProtoStrict(Option proto)
         {
-            return _messageFactory.CreateOption(proto.Id, proto.Value);
+            return _messageFactory.CreateOption(proto.Id.ConvertFromProtoStrict(), proto.Value);
         }
 
         private IDiscoveredServiceMethod ConvertFromProtoStrict(DiscoveredServiceMethod proto)
