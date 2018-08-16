@@ -1,3 +1,5 @@
+This section presents the most interesting scenario of invocation, which includes app launch:
+
 [plantuml]
 ....
 @startuml
@@ -26,8 +28,6 @@ ProviderApplication --> InteropBroker: response
 InteropBroker --> ConsumerComponent: response
 @enduml
 ....
-
-Here is the most interesting scenario, which includes app launch:
 
 * When Desktop Plexus is started it creates transport endpoints and start listen for incoming connections.
 * Plexus Interop launches app A and provides it with the configuration on how to connect to transport servers.

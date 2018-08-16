@@ -1,81 +1,69 @@
 = Plexus Interop
 :toc2:
-:toclevels: 4
+:toclevels: 2
 
 [[getting-started]]
-== Getting Started
+== Concepts
 
 === Overview
+include::concepts-overview.adoc[]
 
-include::getting-started-overview.adoc[]
+=== Components
+include::concepts-components.adoc[]
 
 === Features
-
 include::getting-started-features.adoc[]
+
+=== Definitions
+include::concepts-definitions.adoc[]
+
+== Getting Started
 
 === Repository structure
 
-include::getting-started-components.adoc[]
+include::getting-started-repository-structure.adoc[]
 
 [[how-to-build]]
 === How to build
-
 include::getting-started-how-to-build.adoc[]
 
 [[sample-apps]]
 === Sample apps
-
 include::getting-started-how-to-run-samples.adoc[]
+
+=== Tutorial
+include::guides-quick-start.adoc[]
 
 [[guides]]
 == Guides
 
-=== Quick starts
-
-include::guides-quick-start.adoc[]
-
-=== Concepts
-
-include::guides-interop-concepts.adoc[]
-
 === Tools
-
 include::guides-tools.adoc[]
 
 === Invocation workflow
-
 [[guides-interop-invocation-workflow]]
 include::guides-interop-invocation-workflow.adoc[]
 
 === Plexus Interop integration workflow
-
 include::guides-interop-integration-workflow.adoc[]
 
 [[guides-how-to-write-custom-app-launcher]]
 === How to write custom App Launcher
-
 include::guides-how-to-write-custom-app-launcher.adoc[]
 
 [[guides-system-requirements]]
 === System requirements
-
 include::guides-system-requirements.adoc[]
 
 [[reference]]
 == Reference
-
-=== Components Overview
-
-include::spec-plexus-interop-components.adoc[]
-
-=== Concepts and Definitions
-
-include::spec-plexus-interop-concepts.adoc[]
 
 === App Registry
 include::spec-app-registry.adoc[]
 
 [[reference-metadata-definition-language]]
 === Interop Registry
-
 include::spec-interop-registry.adoc[]
+
+=== TypeScript Client API
+include::spec-typescript-client-api.adoc[]
