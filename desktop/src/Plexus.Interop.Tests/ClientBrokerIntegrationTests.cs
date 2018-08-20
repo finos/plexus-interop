@@ -678,27 +678,11 @@ namespace Plexus.Interop
 
             RunWith10SecTimeout(async () =>
             {
-                var echoServerFactory = new TestClientFactory(
-                    (broker, id) =>
-                    {
-                        var optionsBuilder = new ClientOptionsBuilder()
-                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
-                            .WithDefaultConfiguration()
-                            .WithProvidedService(
-                                EchoService.Id,
-                                x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync))
-                            .WithApplicationId(EchoServerClient.Id);
-
-                        return ClientFactory.Instance.Create(optionsBuilder.Build());
-                    });
-                var appLauncher = RegisterDisposable(
-                    new TestAppLauncher(
-                        _testBrokerFixture.SharedInstance,
-                        new Dictionary<string, TestClientFactory> { { EchoServerClient.Id, echoServerFactory } }
-                    )
-                );
-                await appLauncher.StartAsync();
                 var server = ConnectEchoServer();
+                ConnectEchoServer(
+                    b => b.WithProvidedService(
+                        EchoService.Id,
+                        x => x.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)));
                 var request = CreateTestRequest();
                 var response = await server.CallInvoker.Call(EchoUnaryMethod, request);
                 response.ShouldBe(request);

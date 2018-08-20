@@ -23,7 +23,6 @@ namespace Plexus.Interop.Broker.Internal
     using Plexus.Interop.Protocol.Invocation;
     using Plexus.Interop.Transport;
     using System;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -211,7 +210,7 @@ namespace Plexus.Interop.Broker.Internal
                 if (candidate == null)
                 {
                     candidate = singleInstanceMethods.FirstOrDefault();
-                    resolveMode = ResolveMode.SingleLaunchingInstance;
+                    resolveMode = ResolveMode.SingleInstance;
                 }
                 if (candidate == null)
                 {
