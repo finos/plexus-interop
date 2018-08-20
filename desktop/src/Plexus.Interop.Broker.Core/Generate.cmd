@@ -1,1 +1,1 @@
-java -jar ..\..\..\bin\win-x86\sdk\plexusgen.jar --baseDir=..\..\..\dsl\interop-lang\src\main\resources --type=json_meta --out=Internal
+plexus gen-json-meta -b ..\..\..\dsl\interop-lang\src\main\resources -o Internal -v
