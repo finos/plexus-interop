@@ -14,11 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SimpleUnaryInvocationHandler } from '../unary/SimpleUnaryInvocationHandler';
-import { BaseInvocationHandler } from './BaseInvocationHandler';
+import { StreamingInvocationClient } from './StreamingInvocationClient';
+import { MethodInvocationContext, ServiceInfo } from '@plexus-interop/client-api';
+import { InvocationObserver } from '../../../../';
 
-export interface GenericUnaryInvocationHandler extends BaseInvocationHandler {
+export interface BidiStreamingInvocationHandler<Req, Res> {
 
-    handler: SimpleUnaryInvocationHandler<ArrayBuffer, ArrayBuffer>;
+    serviceInfo: ServiceInfo;
+
+    methodId: string;
+
+    handle(invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<Res>): InvocationObserver<Req>;
 
 }

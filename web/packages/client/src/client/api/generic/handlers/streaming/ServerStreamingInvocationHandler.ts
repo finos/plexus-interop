@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BaseInvocationHandler } from './BaseInvocationHandler';
-import { ServerStreamingInvocationHandler } from '../streaming/ServerStreamingInvocationHandler';
+import { StreamingInvocationClient } from './StreamingInvocationClient';
+import { MethodInvocationContext, ServiceInfo } from '@plexus-interop/client-api';
 
-export interface GenericServerStreamingInvocationHandler extends BaseInvocationHandler {
+export interface ServerStreamingInvocationHandler<Req, Res> {
 
-    handler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>;
+    serviceInfo: ServiceInfo;
+    
+    methodId: string;
+
+    handle(invocationContext: MethodInvocationContext, requestPayload: Req, invocationHostClient: StreamingInvocationClient<Res>): void;
 
 }

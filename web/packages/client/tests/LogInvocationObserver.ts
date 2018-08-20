@@ -19,24 +19,28 @@ import { UniqueId } from '@plexus-interop/transport-common';
 
 export class LogInvocationObserver<T> implements Observer<T> {
 
-    constructor(private _next?: (data: T) => void, private id: UniqueId = UniqueId.generateNew()) {}
+    constructor(private _next?: (data: T) => void, private id: UniqueId = UniqueId.generateNew()) { }
 
     public streamCompleted(): void {
+        // tslint:disable-next-line:no-console
         console.log('Stream completed');
     }
 
     public complete(): void {
+        // tslint:disable-next-line:no-console
         console.log(`${this.id.toString()} - Complete`);
     }
 
     public next(data: T): void {
-        console.log(`${this.id.toString()} - Next`, data);        
+        // tslint:disable-next-line:no-console
+        console.log(`${this.id.toString()} - Next`, data);
         if (this._next) {
             this._next(data);
         }
     }
 
-    public error(error: any) {
+    public error(error: any): void {
+        // tslint:disable-next-line:no-console
         console.log(`${this.id.toString()} - Error`);
     }
 

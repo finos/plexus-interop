@@ -40,7 +40,7 @@ export class CrossDomainEventBus implements EventBus {
     private readonly log: Logger = LoggerFactory.getLogger('CrossDomainEventBus');
 
     private readonly singleOperationTimeOut: number = Defaults.OPERATION_TIMEOUT;
-    private readonly pingTimeout: number = 1000;
+    private readonly pingTimeoutInMillis: number = 1000;
 
     private readonly emitters: Map<string, Observer<any>> = new Map<string, Observer<any>>();
     private readonly observables: Map<string, Observable<any>> = new Map<string, Observable<any>>();
@@ -62,7 +62,7 @@ export class CrossDomainEventBus implements EventBus {
         this.stateMaschine.throwIfNot(State.CREATED);
         this.createHostMessagesSubscription();
         this.log.info('Host iFrame created, sending ping messages');        
-        return this.chainRetries(20, () => this.sendPingToHost(this.pingTimeout))
+        return this.chainRetries(20, () => this.sendPingToHost(this.pingTimeoutInMillis))
             .then(() => this);
     }
 
@@ -160,12 +160,12 @@ export class CrossDomainEventBus implements EventBus {
             const message = this.hostMessage({}, MessageType.Ping, ResponseType.Single);
             this.sendAndSubscribe(message, {
                 next: m => {
-                    this.log.info('Success Ping response received');
+                    this.log.info('Success ping response received');
                     this.stateMaschine.go(State.CONNECTED);
                     resolve();
                 },
                 error: e => {
-                    this.log.warn('Failed to receive Ping response', e);
+                    this.log.warn('Failed to receive ping response', e);
                     reject(e);
                 }
             }, timeout);

@@ -98,8 +98,8 @@ namespace Plexus.Interop.Testing.Generated {
       appId_ = other.appId_;
       launchParamsJson_ = other.launchParamsJson_;
       launchMode_ = other.launchMode_;
-      SuggestedAppInstanceId = other.suggestedAppInstanceId_ != null ? other.SuggestedAppInstanceId.Clone() : null;
-      Referrer = other.referrer_ != null ? other.Referrer.Clone() : null;
+      suggestedAppInstanceId_ = other.suggestedAppInstanceId_ != null ? other.suggestedAppInstanceId_.Clone() : null;
+      referrer_ = other.referrer_ != null ? other.referrer_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -349,8 +349,8 @@ namespace Plexus.Interop.Testing.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public AppLaunchReferrer(AppLaunchReferrer other) : this() {
       appId_ = other.appId_;
-      AppInstanceId = other.appInstanceId_ != null ? other.AppInstanceId.Clone() : null;
-      ConnectionId = other.connectionId_ != null ? other.ConnectionId.Clone() : null;
+      appInstanceId_ = other.appInstanceId_ != null ? other.appInstanceId_.Clone() : null;
+      connectionId_ = other.connectionId_ != null ? other.connectionId_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -545,7 +545,7 @@ namespace Plexus.Interop.Testing.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public AppLaunchResponse(AppLaunchResponse other) : this() {
-      AppInstanceId = other.appInstanceId_ != null ? other.AppInstanceId.Clone() : null;
+      appInstanceId_ = other.appInstanceId_ != null ? other.appInstanceId_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 

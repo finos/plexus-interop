@@ -24,6 +24,9 @@ import { Component, OnInit } from '@angular/core';
 import * as fromRoot from '../services/ui/RootReducers';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { FormControl } from '@angular/forms';
+import 'rxjs/add/operator/debounceTime';
+import { containsFilter } from '../services/ui/filters';
 
 interface AppUiInfo extends Application {
   label: string;
@@ -39,6 +42,10 @@ export class AppListComponent implements OnInit, OnDestroy {
 
   apps: Observable<AppUiInfo[]>;
 
+  searchFilterValue: Observable<string>;
+
+  searchFilterControl: FormControl = new FormControl("");
+
   private logger = LoggerFactory.getLogger(AppListComponent.name);
 
   constructor(
@@ -49,8 +56,11 @@ export class AppListComponent implements OnInit, OnDestroy {
     private subsctiptionsRegistry: SubscriptionsRegistry) { }
 
   ngOnInit() {
+    this.searchFilterValue = this.store
+      .select(state => state.plexus.appsFilter || '');
     this.apps = this.store
-      .select(state => state.plexus.apps)
+      .select(state => this.applyFilter(state.plexus.apps, state.plexus.appsFilter))
+      .map(this.sortApps.bind(this))
       .map(this.sortApps.bind(this))
       .map(this.toAppInfos.bind(this));
     this.subsctiptionsRegistry.add(
@@ -67,12 +77,22 @@ export class AppListComponent implements OnInit, OnDestroy {
             }
           }
         }));
+    this.subsctiptionsRegistry.add(this.searchFilterControl
+      .valueChanges
+      .debounceTime(150)
+      .subscribe(newFilter => {
+        this.store.dispatch({ type: AppActions.APPS_FILTER_UPDATED, payload: newFilter });
+      }));
   }
 
   sortApps(apps: Application[]): Application[] {
     return apps.sort((a, b) => {
       return a.id.localeCompare(b.id);
     });
+  }
+
+  applyFilter(apps: Application[], filter?: string): Application[] {
+    return apps.filter(a => containsFilter(a.id, filter));
   }
 
   toAppInfo(app: Application): AppUiInfo {

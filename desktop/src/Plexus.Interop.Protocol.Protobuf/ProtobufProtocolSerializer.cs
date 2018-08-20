@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol.Protobuf
+namespace Plexus.Interop.Protocol.Protobuf
 {
     using Plexus.Interop.Protobuf;
     using Plexus.Interop.Protocol.Connect;
     using Plexus.Interop.Protocol.Discovery;
     using Plexus.Interop.Protocol.Invocation;
+    using Plexus.Interop.Protocol.Protobuf.Internal;
     using Plexus.Pools;
     using System;
     using System.Linq;
-    using Plexus.Interop.Protocol.Protobuf.Internal;
-    using DiscoveryMode = Discovery.DiscoveryMode;
     using DiscoveryMethodType = Plexus.Interop.Protocol.Discovery.MethodType;
+    using DiscoveryMode = Discovery.DiscoveryMode;
     using MethodType = Plexus.Interop.Protocol.Protobuf.Internal.MethodType;
 
     internal sealed class ProtobufProtocolSerializer : IProtocolSerializer
@@ -360,6 +360,15 @@
             proto.OutputMessageId = method.OutputMessageId.ConvertToProtoStrict();
             proto.MethodTitle = method.MethodTitle.ConvertToProto();
             proto.ProvidedMethod = ConvertToProtoStrict(method.ProvidedMethod);
+            proto.Options.AddRange(method.Options.Select(ConvertToProto));
+            return proto;
+        }
+
+        private static Option ConvertToProto(IOption option)
+        {
+            var proto = Option.Rent();
+            proto.Id = option.Id;
+            proto.Value = option.Value;
             return proto;
         }
 
@@ -495,7 +504,13 @@
                 proto.MethodTitle.ConvertFromProto(),
                 proto.InputMessageId.ConvertFromProtoStrict(),
                 proto.OutputMessageId.ConvertFromProtoStrict(),
-                ConvertFromProto(proto.MethodType));
+                ConvertFromProto(proto.MethodType),
+                proto.Options.Select(ConvertFromProtoStrict).ToList());
+        }
+
+        private IOption ConvertFromProtoStrict(Option proto)
+        {
+            return _messageFactory.CreateOption(proto.Id.ConvertFromProtoStrict(), proto.Value);
         }
 
         private IDiscoveredServiceMethod ConvertFromProtoStrict(DiscoveredServiceMethod proto)

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus
+namespace Plexus
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -23,12 +23,12 @@
     {
         public static string FormatEnumerableObjects<T>(this IEnumerable<T> enumerable)
         {
-            return $"[{string.Join(", ", enumerable.Select(FormatObject))}]";
+            return enumerable == null ? string.Empty : $"[{string.Join(", ", enumerable.Select(FormatObject))}]";
         }
 
         public static string FormatEnumerable<T>(this IEnumerable<T> enumerable)
         {
-            return $"[{string.Join(", ", enumerable)}]";
+            return enumerable == null ? string.Empty : $"[{string.Join(", ", enumerable)}]";
         }
 
         public static string FormatObject<T>(this T obj)

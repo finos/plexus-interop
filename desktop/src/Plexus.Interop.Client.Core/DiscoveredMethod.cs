@@ -14,17 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
+    using System.Collections.Generic;
+
     public class DiscoveredMethod : IMethod
     {
         internal DiscoveredMethod(
             ProvidedMethodReference providedMethod,
             Maybe<string> title,
-            string inputMessageId, 
+            string inputMessageId,
             string outputMessageId,
-            MethodType type) 
-            : this(providedMethod, title, inputMessageId, outputMessageId, type, new MethodCallDescriptor(providedMethod))
+            MethodType type,
+            IReadOnlyCollection<Option> options)
+            : this(
+                providedMethod,
+                title,
+                inputMessageId,
+                outputMessageId,
+                type,
+                new MethodCallDescriptor(providedMethod),
+                options)
         {
         }
 
@@ -34,7 +44,8 @@
             string inputMessageId,
             string outputMessageId,
             MethodType type,
-            MethodCallDescriptor callDescriptor)
+            MethodCallDescriptor callDescriptor,
+            IReadOnlyCollection<Option> options)
         {
             ProvidedMethod = providedMethod;
             Title = title;
@@ -42,6 +53,7 @@
             OutputMessageId = outputMessageId;
             Type = type;
             CallDescriptor = callDescriptor;
+            Options = options;
         }
 
         internal DiscoveredMethod(DiscoveredMethod method) : this(
@@ -50,7 +62,8 @@
             method.InputMessageId, 
             method.OutputMessageId,             
             method.Type,
-            method.CallDescriptor)
+            method.CallDescriptor,
+            method.Options)
         {
         }
 
@@ -66,9 +79,11 @@
 
         public MethodCallDescriptor CallDescriptor { get; }
 
+        public IReadOnlyCollection<Option> Options { get; }
+
         public override string ToString()
         {
-            return $"Type: {GetType().FormatName()}, {nameof(ProvidedMethod)}: {{{ProvidedMethod}}}, {nameof(Title)}: {Title}, {nameof(InputMessageId)}: {InputMessageId}, {nameof(OutputMessageId)}: {OutputMessageId}";
+            return $"Type: {GetType().FormatName()}, {nameof(ProvidedMethod)}: {{{ProvidedMethod}}}, {nameof(Title)}: {Title}, {nameof(InputMessageId)}: {InputMessageId}, {nameof(OutputMessageId)}: {OutputMessageId}, {nameof(Options)}: {Options.FormatEnumerableObjects()}";
         }
     }
 
@@ -79,13 +94,15 @@
             Maybe<string> title,
             string inputMessageId,
             string outputMessageId,
-            MethodType type)
+            MethodType type,
+            IReadOnlyCollection<Option> options)
             : base(
                 providedMethod,
                 title,
                 inputMessageId,
                 outputMessageId,
-                type)
+                type,
+                options)
         {
             ProviderConnectionId = providedMethod.ProvidedService.ConnectionId.Value;
         }
@@ -95,7 +112,8 @@
             method.Title,
             method.InputMessageId,
             method.OutputMessageId,
-            method.Type)
+            method.Type,
+            method.Options)
         {
         }
 

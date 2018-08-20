@@ -1,10 +1,10 @@
-import { MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from "@plexus-interop/client";
-import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from "@plexus-interop/client";
-import { TransportConnection, UniqueId } from "@plexus-interop/transport-common";
-import { Arrays, Observer } from "@plexus-interop/common";
-import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from "@plexus-interop/client";
+import { InternalGenericClientApi, ClientApiBuilder, MethodInvocationContext, Completion, ClientConnectRequest, StreamingInvocationClient, GenericClientApi, InvocationRequestInfo, InvocationClient, GenericRequest, GenericClientApiBase } from '@plexus-interop/client';
+import { ProvidedMethodReference, ServiceDiscoveryRequest, ServiceDiscoveryResponse, MethodDiscoveryRequest, MethodDiscoveryResponse, GenericClientApiBuilder, ValueHandler } from '@plexus-interop/client';
+import { TransportConnection, UniqueId } from '@plexus-interop/transport-common';
+import { Arrays, Observer } from '@plexus-interop/common';
+import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from '@plexus-interop/client';
 
-import * as plexus from "./plexus-messages";
+import * as plexus from './plexus-messages';
 
 /**
  *  Proxy interface of GreetingService service, to be consumed by Client API
@@ -29,94 +29,57 @@ export class GreetingServiceProxyImpl implements GreetingServiceProxy {
     constructor(private readonly genericClient: GenericClientApi) { }
 
     public unary(request: plexus.interop.samples.IGreetingRequest): Promise<plexus.interop.samples.IGreetingResponse> {
-        const requestToBinaryConverter = (from: plexus.interop.samples.IGreetingRequest) => Arrays.toArrayBuffer(plexus.interop.samples.GreetingRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.interop.samples.GreetingResponse.decode(new Uint8Array(from));
-            return plexus.interop.samples.GreetingResponse.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "Unary",
-            serviceId: "interop.samples.GreetingService"
+            methodId: 'Unary',
+            serviceId: 'interop.samples.GreetingService'
         };
         return new Promise((resolve, reject) => {
-            this.genericClient.sendRawUnaryRequest(invocationInfo, requestToBinaryConverter(request), {
-                value: (responsePayload: ArrayBuffer) => {
-                    resolve(responseFromBinaryConverter(responsePayload));
-                },
-                error: (e) => {
-                    reject(e);
-                }
-            });
+            this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                value: responsePayload => resolve(responsePayload),
+                error: e => reject(e)
+            }, plexus.interop.samples.GreetingRequest, plexus.interop.samples.GreetingResponse);
         });
     }
     
     public serverStreaming(request: plexus.interop.samples.IGreetingRequest, responseObserver: InvocationObserver<plexus.interop.samples.IGreetingResponse>): Promise<InvocationClient> {
-        const requestToBinaryConverter = (from: plexus.interop.samples.IGreetingRequest) => Arrays.toArrayBuffer(plexus.interop.samples.GreetingRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.interop.samples.GreetingResponse.decode(new Uint8Array(from));
-            return plexus.interop.samples.GreetingResponse.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "ServerStreaming",
-            serviceId: "interop.samples.GreetingService"
+            methodId: 'ServerStreaming',
+            serviceId: 'interop.samples.GreetingService'
         };
-        return this.genericClient.sendRawServerStreamingRequest(
+        return this.genericClient.sendServerStreamingRequest(
             invocationInfo,
-            requestToBinaryConverter(request),
-            new InvocationObserverConverter<plexus.interop.samples.IGreetingResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter));
+            request,
+            responseObserver,
+            plexus.interop.samples.GreetingRequest, plexus.interop.samples.GreetingResponse
+        );
     }
     
     public clientStreaming(responseObserver: InvocationObserver<plexus.interop.samples.IGreetingResponse>): Promise<StreamingInvocationClient<plexus.interop.samples.IGreetingRequest>> {
-        const requestToBinaryConverter = (from: plexus.interop.samples.IGreetingRequest) => Arrays.toArrayBuffer(plexus.interop.samples.GreetingRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.interop.samples.GreetingResponse.decode(new Uint8Array(from));
-            return plexus.interop.samples.GreetingResponse.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "ClientStreaming",
-            serviceId: "interop.samples.GreetingService"
+            methodId: 'ClientStreaming',
+            serviceId: 'interop.samples.GreetingService'
         };
-        return this.genericClient.sendRawBidirectionalStreamingRequest(
+        return this.genericClient.sendBidirectionalStreamingRequest(
             invocationInfo,
-            new InvocationObserverConverter<plexus.interop.samples.IGreetingResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-            .then(baseClient =>  {
-                return {
-                    next: (request: plexus.interop.samples.IGreetingRequest) => baseClient.next(requestToBinaryConverter(request)),
-                    error: baseClient.error.bind(baseClient),
-                    complete: baseClient.complete.bind(baseClient),
-                    cancel: baseClient.cancel.bind(baseClient)
-                };
-            });
+            responseObserver,
+            plexus.interop.samples.GreetingRequest, plexus.interop.samples.GreetingResponse);
     }
     
     public duplexStreaming(responseObserver: InvocationObserver<plexus.interop.samples.IGreetingResponse>): Promise<StreamingInvocationClient<plexus.interop.samples.IGreetingRequest>> {
-        const requestToBinaryConverter = (from: plexus.interop.samples.IGreetingRequest) => Arrays.toArrayBuffer(plexus.interop.samples.GreetingRequest.encode(from).finish());
-        const responseFromBinaryConverter = (from: ArrayBuffer) => {
-            const decoded = plexus.interop.samples.GreetingResponse.decode(new Uint8Array(from));
-            return plexus.interop.samples.GreetingResponse.toObject(decoded);
-        };
         const invocationInfo: InvocationRequestInfo = {
-            methodId: "DuplexStreaming",
-            serviceId: "interop.samples.GreetingService"
+            methodId: 'DuplexStreaming',
+            serviceId: 'interop.samples.GreetingService'
         };
-        return this.genericClient.sendRawBidirectionalStreamingRequest(
+        return this.genericClient.sendBidirectionalStreamingRequest(
             invocationInfo,
-            new InvocationObserverConverter<plexus.interop.samples.IGreetingResponse, ArrayBuffer>(responseObserver, responseFromBinaryConverter))
-            .then(baseClient =>  {
-                return {
-                    next: (request: plexus.interop.samples.IGreetingRequest) => baseClient.next(requestToBinaryConverter(request)),
-                    error: baseClient.error.bind(baseClient),
-                    complete: baseClient.complete.bind(baseClient),
-                    cancel: baseClient.cancel.bind(baseClient)
-                };
-            });
+            responseObserver,
+            plexus.interop.samples.GreetingRequest, plexus.interop.samples.GreetingResponse);
     }
 
 }
 
 /**
  * Main client API
- *
  */
 export interface GreetingClientClient extends GenericClientApi  {
 
@@ -126,7 +89,6 @@ export interface GreetingClientClient extends GenericClientApi  {
 
 /**
  * Client's API internal implementation
- *
  */
 class GreetingClientClientImpl extends GenericClientApiBase implements GreetingClientClient {
 
@@ -144,45 +106,44 @@ class GreetingClientClientImpl extends GenericClientApiBase implements GreetingC
 }
 
 
-
 /**
  * Client API builder
- *
  */
-export class GreetingClientClientBuilder {
+export class GreetingClientClientBuilder implements ClientApiBuilder<GreetingClientClient, GreetingClientClientBuilder> {
 
-    private clientDetails: ClientConnectRequest = {
-        applicationId: "interop.samples.GreetingClient"
-    };
-
-    private transportConnectionProvider: () => Promise<TransportConnection>;
+    protected genericBuilder: GenericClientApiBuilder =
+        new ContainerAwareClientAPIBuilder()
+            .withApplicationId('interop.samples.GreetingClient');
 
 
-    public withClientDetails(clientId: ClientConnectRequest): GreetingClientClientBuilder {
-        this.clientDetails = clientId;
+
+    public withClientApiDecorator(clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi>): GreetingClientClientBuilder {
+        this.genericBuilder.withClientApiDecorator(clientApiDecorator);
+        return this;
+    }
+
+    public withClientExtension(extension: (builder: ClientApiBuilder<GreetingClientClient, GreetingClientClientBuilder>) => void): GreetingClientClientBuilder {
+        extension(this);
+        return this;
+    }
+
+    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): GreetingClientClientBuilder {
+        this.genericBuilder.withTransportConnectionProvider(provider);
         return this;
     }
 
     public withAppInstanceId(appInstanceId: UniqueId): GreetingClientClientBuilder {
-        this.clientDetails.applicationInstanceId = appInstanceId;
+        this.genericBuilder.withAppInstanceId(appInstanceId);
         return this;
     }
 
     public withAppId(appId: string): GreetingClientClientBuilder {
-        this.clientDetails.applicationId = appId;
-        return this;
-    }
-
-
-    public withTransportConnectionProvider(provider: () => Promise<TransportConnection>): GreetingClientClientBuilder {
-        this.transportConnectionProvider = provider;
+        this.genericBuilder.withApplicationId(appId);
         return this;
     }
 
     public connect(): Promise<GreetingClientClient> {
-        return new ContainerAwareClientAPIBuilder()
-            .withTransportConnectionProvider(this.transportConnectionProvider)
-            .withClientDetails(this.clientDetails)
+        return this.genericBuilder
             .connect()
             .then(genericClient => new GreetingClientClientImpl(
                 genericClient,

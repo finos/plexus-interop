@@ -19,7 +19,7 @@ import { InteropClient } from './InteropClient';
 import { Injectable } from '@angular/core';
 import { TransportConnectionProvider } from '../transport/TransportConnectionProvider';
 import { InteropRegistryService, ProvidedMethod, ProvidedService } from '@plexus-interop/broker';
-import { GenericClientApiBuilder, MethodType, GenericUnaryInvocationHandler, StreamingInvocationClient, GenericServerStreamingInvocationHandler, GenericBidiStreamingInvocationHandler, InvocationObserver } from '@plexus-interop/client';
+import { GenericClientApiBuilder, MethodType, UnaryInvocationHandler, StreamingInvocationClient, ServerStreamingInvocationHandler, BidiStreamingInvocationHandler, InvocationObserver } from '@plexus-interop/client';
 import { UniqueId, ClientError } from '@plexus-interop/protocol';
 import { flatMap, Logger, LoggerFactory, Observer } from '@plexus-interop/common';
 import { GenericClientWrapper, methodHash } from './GenericClientWrapper';
@@ -67,14 +67,14 @@ export class InteropClientFactory {
                 const responseMarshaller = marshallerFactory.getMarshaller(pm.method.responseMessage.id);
                 switch (pm.method.type) {
                     case MethodType.Unary:
-                        genericClientBuilder.withUnaryInvocationHandler(this.createUnaryHandler(pm, requestMarshaller, responseMarshaller, unaryHandlers));
+                        genericClientBuilder.withUnaryHandler(this.createUnaryHandler(pm, requestMarshaller, responseMarshaller, unaryHandlers));
                         break;
                     case MethodType.ServerStreaming:
-                        genericClientBuilder.withServerStreamingInvocationHandler(this.createServerStreamingHandler(pm, requestMarshaller, responseMarshaller, serverStreamingHandlers));
+                        genericClientBuilder.withServerStreamingHandler(this.createServerStreamingHandler(pm, requestMarshaller, responseMarshaller, serverStreamingHandlers));
                         break;
                     case MethodType.DuplexStreaming:
                     case MethodType.ClientStreaming:
-                        genericClientBuilder.withBidiStreamingInvocationHandler(this.createBidiStreamingHandlers(pm, requestMarshaller, responseMarshaller, bidiStreamingHandlers));
+                        genericClientBuilder.withBidiStreamingHandler(this.createBidiStreamingHandlers(pm, requestMarshaller, responseMarshaller, bidiStreamingHandlers));
                         break;
                 }
             });
@@ -83,7 +83,14 @@ export class InteropClientFactory {
 
         this.log.info(`Connected as ${appId}`);
 
-        const clientWrapper = new GenericClientWrapper(appId, client, interopRegistryService, marshallerFactory, unaryHandlers, serverStreamingHandlers, bidiStreamingHandlers, new DefaultMessageGenerator(interopRegistryService));
+        const clientWrapper = new GenericClientWrapper(
+            appId, 
+            client, 
+            interopRegistryService, 
+            marshallerFactory, unaryHandlers, 
+            serverStreamingHandlers, 
+            bidiStreamingHandlers, new DefaultMessageGenerator(interopRegistryService));
+        
         clientWrapper.resetInvocationHandlers();
 
         return clientWrapper;
@@ -98,21 +105,19 @@ export class InteropClientFactory {
     }
 
     private createUnaryHandler(pm: ProvidedMethod, requestMarshaller: Marshaller<any, ArrayBuffer>,
-        responseMarshaller: Marshaller<any, ArrayBuffer>, handlers: Map<string, UnaryStringHandler>): GenericUnaryInvocationHandler {
+        responseMarshaller: Marshaller<any, ArrayBuffer>, handlers: Map<string, UnaryStringHandler>): UnaryInvocationHandler<ArrayBuffer, ArrayBuffer> {
         const fullName = this.fullName(pm);
         return {
             serviceInfo: {
                 serviceId: pm.providedService.service.id,
                 serviceAlias: pm.providedService.alias
             },
-            handler: {
-                methodId: pm.method.name,
-                handle: async (invocationContext, request) => {
-                    const requestObj = requestMarshaller.decode(request);
-                    const stringHandler = handlers.get(fullName);
-                    const stringResponse = await stringHandler(JSON.stringify(requestObj));
-                    return responseMarshaller.encode(JSON.parse(stringResponse));
-                }
+            methodId: pm.method.name,
+            handle: async (invocationContext, request) => {
+                const requestObj = requestMarshaller.decode(request);
+                const stringHandler = handlers.get(fullName);
+                const stringResponse = await stringHandler(JSON.stringify(requestObj));
+                return responseMarshaller.encode(JSON.parse(stringResponse));
             }
         }
     }
@@ -121,51 +126,46 @@ export class InteropClientFactory {
         pm: ProvidedMethod,
         requestMarshaller: Marshaller<any, ArrayBuffer>,
         responseMarshaller: Marshaller<any, ArrayBuffer>,
-        handlers: Map<string, BidiStreamingStringHandler>): GenericBidiStreamingInvocationHandler {
+        handlers: Map<string, BidiStreamingStringHandler>): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
         const fullName = this.fullName(pm);
         return {
             serviceInfo: {
                 serviceId: pm.providedService.service.id,
                 serviceAlias: pm.providedService.alias
             },
-            handler: {
-                methodId: pm.method.name,
-                handle: (context, hostClient) => {
-                    const stringHandler = handlers.get(fullName);
-                    const stringRequestObserver: InvocationObserver<string> = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
-                    let received;
-                    return {
-                        next: (v: ArrayBuffer) => {
-                            stringRequestObserver.next(JSON.stringify(requestMarshaller.decode(v)));
-                        },
-                        error: e => stringRequestObserver.error(e),
-                        complete: () => stringRequestObserver.complete(),
-                        streamCompleted: () => stringRequestObserver.streamCompleted()
-                    };
-                }
+            methodId: pm.method.name,
+            handle: (context, hostClient) => {
+                const stringHandler = handlers.get(fullName);
+                const stringRequestObserver: InvocationObserver<string> = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
+                let received;
+                return {
+                    next: (v: ArrayBuffer) => {
+                        stringRequestObserver.next(JSON.stringify(requestMarshaller.decode(v)));
+                    },
+                    error: e => stringRequestObserver.error(e),
+                    complete: () => stringRequestObserver.complete(),
+                    streamCompleted: () => stringRequestObserver.streamCompleted()
+                };
             }
         }
-
     }
 
     private createServerStreamingHandler(
         pm: ProvidedMethod,
         requestMarshaller: Marshaller<any, ArrayBuffer>,
         responseMarshaller: Marshaller<any, ArrayBuffer>,
-        handlers: Map<string, ServerStreamingStringHandler>): GenericServerStreamingInvocationHandler {
+        handlers: Map<string, ServerStreamingStringHandler>): ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
         const fullName = this.fullName(pm);
         return {
             serviceInfo: {
                 serviceId: pm.providedService.service.id,
                 serviceAlias: pm.providedService.alias
             },
-            handler: {
-                methodId: pm.method.name,
-                handle: async (context, request, hostClient) => {
-                    const requestObj = requestMarshaller.decode(request);
-                    const stringHandler = handlers.get(fullName);
-                    const stringResponse = await stringHandler(JSON.stringify(requestObj), wrapGenericHostClient(hostClient, responseMarshaller));
-                }
+            methodId: pm.method.name,
+            handle: async (context, request, hostClient) => {
+                const requestObj = requestMarshaller.decode(request);
+                const stringHandler = handlers.get(fullName);
+                const stringResponse = await stringHandler(JSON.stringify(requestObj), wrapGenericHostClient(hostClient, responseMarshaller));
             }
         }
     }

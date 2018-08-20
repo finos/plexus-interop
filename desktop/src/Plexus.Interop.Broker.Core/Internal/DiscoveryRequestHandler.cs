@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Broker.Internal
+namespace Plexus.Interop.Broker.Internal
 {
     using Plexus.Channels;
+    using Plexus.Interop.Apps;
     using Plexus.Interop.Metamodel;
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Protocol.Discovery;
@@ -25,7 +26,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Plexus.Interop.Apps;
     using MethodType = Plexus.Interop.Protocol.Discovery.MethodType;
 
     internal sealed class DiscoveryRequestHandler : IDiscoveryRequestHandler
@@ -194,7 +194,9 @@
                 pm.Title,
                 pm.Method.InputMessage.Id,
                 pm.Method.OutputMessage.Id,
-                Convert(pm.Method.Type));
+                Convert(pm.Method.Type),
+                pm.Options.Select(x => _protocol.MessageFactory.CreateOption(x.Id, x.Value)).ToList()
+            );
         }
 
         private static MethodType Convert(Metamodel.MethodType methodType)

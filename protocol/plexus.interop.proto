@@ -224,6 +224,8 @@ message DiscoveredServiceMethod {
 	string output_message_id = 4;
 
 	MethodType method_type = 5;
+
+	repeated Option options = 6;
 }
 
 // client -> broker
@@ -255,4 +257,13 @@ message DiscoveredMethod {
 	string output_message_id = 4;
 
 	MethodType method_type = 5;
+
+	repeated Option options = 6;
+}
+
+message Option {
+
+	string id = 1;
+
+	string value = 2;
 }

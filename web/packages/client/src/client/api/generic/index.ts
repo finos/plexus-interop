@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './GenericClientApiBuilder';
+export * from './ClientApiBuilder';
 export * from './GenericClientApi';
 export * from './GenericClientApiImpl';
 export * from './GenericClientApiBase';
 export * from './GenericInvocationsHost';
-export * from './GenericUnaryInvocationHandler';
-export * from './GenericServerStreamingInvocationHandler';
-export * from './GenericBidiStreamingInvocationHandler';
 export * from './GenericClientApiBuilder';
+export * from './handlers';
+export * from './internal';

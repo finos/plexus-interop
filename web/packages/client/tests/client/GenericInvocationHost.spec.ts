@@ -18,11 +18,6 @@ import { AcceptedInvocation } from '../../src/client/generic/AcceptedInvocation'
 import { Invocation } from '../../src/client/generic/Invocation';
 import { createInvocationInfo } from './client-mocks';
 import { GenericInvocationsHost } from '../../src/client/api/generic/GenericInvocationsHost';
-import { StreamingInvocationClient } from '../../src/client/api/streaming/StreamingInvocationClient';
-import { UnaryHandlerConverter } from '../../src/client/api/unary/UnaryHandlerConverter';
-import { ServerStreamingInvocationHandler } from '../../src/client/api/streaming/ServerStreamingInvocationHandler';
-import { ServerStreamingConverter } from '../../src/client/api/streaming/ServerStreamingHandlerConveter';
-import { ServiceInfo } from '@plexus-interop/client-api';
 import { when, mock, instance, anything, verify } from 'ts-mockito';
 import { GenericClientImpl } from '../../src/client/generic/GenericClientImpl';
 import { Observer } from '@plexus-interop/common';
@@ -30,8 +25,12 @@ import { clientProtocol as plexus, SuccessCompletion } from '@plexus-interop/pro
 import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
 import { ChannelObserver } from '@plexus-interop/transport-common';
 import { MethodInvocationContext } from '@plexus-interop/client-api';
-import { LogInvocationObserver } from '../LogInvocationObserver';
-import { InvocationObserver } from '../../src/client';
+import { InvocationObserver, UnaryHandlerConverter } from '../../src/client';
+import { ServerStreamingInvocationHandler } from '../../src/client/api/generic/handlers/streaming/ServerStreamingInvocationHandler';
+import { ServerStreamingConverter } from '../../src/client/api/generic/handlers/streaming/converters';
+import { StreamingInvocationClient } from '../../src/client/api/generic/handlers/streaming/StreamingInvocationClient';
+import { InvocationHandlersRegistry } from '../../src/client/api/generic/handlers/InvocationHandlersRegistry';
+import { ProtoMarshallerProvider } from '../../src/client';
 
 declare var process: any;
 
@@ -41,55 +40,6 @@ process.on('unhandledRejection', (reason: any, p: any) => {
 });
 
 describe('GenericInvocationHost', () => {
-
-    it('It registers handlers of all types', () => {
-
-        const serviceInfo: ServiceInfo = {
-            serviceId: 'sid'
-        };
-
-        const genericInvocationsHost = new GenericInvocationsHost(
-            'appId',
-            instance(mock(GenericClientImpl)),
-            // bidi streaming
-            [
-                {
-                    serviceInfo,
-                    handler: {
-                        methodId: '1',
-                        handle: (context: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
-                            return new LogInvocationObserver<ArrayBuffer>();
-                        }
-                    }
-                }
-            ],
-            // unary
-            [
-                {
-                    serviceInfo,
-                    handler: {
-                        methodId: '2',
-                        handle: (context: MethodInvocationContext, req: ArrayBuffer) => {
-                            return Promise.resolve<ArrayBuffer>(new Uint8Array([]).buffer);
-                        }
-                    }
-                }
-            ],
-            // server streaming
-            [
-                {
-                    serviceInfo,
-                    handler: {
-                        methodId: '3',
-                        handle: (context: MethodInvocationContext, requestPayload: ArrayBuffer, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
-                        }
-                    }
-                }
-            ]
-        );
-        expect(genericInvocationsHost.handlersRegistry.size).toBe(3);
-
-    });
 
     it('Can handle invocoming invocation and send response back', async (done) => {
 
@@ -168,7 +118,7 @@ describe('GenericInvocationHost', () => {
         const responsePayload = new Uint8Array([1, 2, 3]).buffer;
 
         const streamingHandler: ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> = {
-            methodId: '',
+            ...baseHandler(),
             handle: (context: MethodInvocationContext, receivedRequest: ArrayBuffer, invocationHostClient: StreamingInvocationClient<ArrayBuffer>) => {
                 expect(receivedRequest).toBe(requestPayload);
                 invocationHostClient.next(responsePayload);
@@ -201,7 +151,7 @@ function setupSimpleHostedInvocation(
     postHandler?: (invocation: Invocation) => void): void {
 
     const streamingHandler = new UnaryHandlerConverter().convert({
-        methodId: '',
+        ...baseHandler(),
         handle: hostedAction
     });
 
@@ -261,18 +211,26 @@ function setupHostedInvocation(
         return Promise.resolve();
     });
     const mockGenericClientInstance = instance(mockGenericClient);
-    const invocationHost = new GenericInvocationsHost(invocationInfo.applicationId as string, mockGenericClientInstance, [
-        {
-            serviceInfo: {
-                serviceId: invocationInfo.serviceId as string,
-                serviceAlias: invocationInfo.serviceAlias
-            },
-            handler: {
-                methodId: invocationInfo.methodId as string,
-                handle: hostedAction
-            }
-        }
-    ]);
+    const registry = new InvocationHandlersRegistry(new ProtoMarshallerProvider());
+    registry.registerBidiStreamingGenericHandler({
+        ...baseHandler(),
+        handle: hostedAction
+    });
+
+    const invocationHost = new GenericInvocationsHost(mockGenericClientInstance, registry);
 
     invocationHost.start();
+}
+
+// tslint:disable-next-line:typedef
+function baseHandler() {
+    const invocationInfo = createInvocationInfo();
+    return {
+        serviceInfo: {
+            serviceId: invocationInfo.serviceId as string,
+            serviceAlias: invocationInfo.serviceAlias
+        },
+        methodId: invocationInfo.methodId as string,
+        handle: () => { }
+    };
 }

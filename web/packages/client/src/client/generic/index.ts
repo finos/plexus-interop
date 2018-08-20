@@ -21,5 +21,6 @@ export { InvocationMetaInfo as InvocationMetaInfo } from '@plexus-interop/protoc
 export * from './GenericClientFactory';
 export * from './GenericClient';
 export * from './InvocationObserver';
+export * from './BaseInvocation';
 export * from './InvocationChannelObserver';
 export * from './InvocationObserverConverter';

@@ -38,6 +38,10 @@ include::guides-quick-start.adoc[]
 
 include::guides-interop-concepts.adoc[]
 
+=== Tools
+
+include::guides-tools.adoc[]
+
 === Invocation workflow
 
 [[guides-interop-invocation-workflow]]

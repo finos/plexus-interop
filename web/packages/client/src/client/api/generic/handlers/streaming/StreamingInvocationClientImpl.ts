@@ -16,8 +16,8 @@
  */
 import { StreamingInvocationClient } from './StreamingInvocationClient';
 import { ClientError, SuccessCompletion, ClientProtocolHelper } from '@plexus-interop/protocol';
-import { Invocation } from '../../generic/Invocation';
-import { BaseInvocationClientImpl } from '../BaseInvocationClientImpl';
+import { Invocation } from '../../../../generic/Invocation';
+import { BaseInvocationClientImpl } from '../../../BaseInvocationClientImpl';
 import { Logger } from '@plexus-interop/common';
 
 export class StreamingInvocationClientImpl extends BaseInvocationClientImpl implements StreamingInvocationClient<ArrayBuffer> {

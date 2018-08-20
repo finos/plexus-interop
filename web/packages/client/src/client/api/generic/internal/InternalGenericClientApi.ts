@@ -14,11 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BidiStreamingInvocationHandler } from '../streaming/BidiStreamingInvocationHandler';
-import { BaseInvocationHandler } from './BaseInvocationHandler';
+import { InternalActionInvoker } from './InternalActionInvoker';
+import { GenericClientApi } from '..';
+import { MarshallerProvider } from '../../io/MarshallerProvider';
 
-export interface GenericBidiStreamingInvocationHandler extends BaseInvocationHandler {
+/**
+ * Extends public client with additioanal features
+ */
+export interface InternalGenericClientApi extends InternalActionInvoker, GenericClientApi {
 
-    handler: BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>;
-
+    getMarshallerProvider(): MarshallerProvider;
 }

@@ -16,7 +16,7 @@
  */
 import { ServiceDiscoveryRequest } from '@plexus-interop/client-api';
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
-import { StreamingInvocationClient } from './../streaming/StreamingInvocationClient';
+import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocationClient';
 import { InvocationClient } from './../InvocationClient';
 import { ValueHandler } from './../ValueHandler';
 import { InvocationRequestInfo } from '@plexus-interop/protocol';
@@ -26,6 +26,17 @@ import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
 import { GenericRequest } from '@plexus-interop/client-api';
 import { UniqueId } from '@plexus-interop/transport-common';
 import { InvocationObserver } from '../../generic';
+
+export enum Feature {
+    SEND_UNARY = 'SEND_UNARY',
+    SEND_RAW_UNARY = 'SEND_RAW_UNARY',
+    SEND_BIDI_STREAM = 'SEND_BIDI_STREAM',
+    SEND_RAW_BIDI_STREAM = 'SEND_RAW_BIDI_STREAM',
+    SEND_SERVER_STREAM = 'SEND_SERVER_STREAM',
+    SEND_RAW_SERVER_STREAM = 'SEND_RAW_SERVER_STREAM',
+    DISCOVER_SERVICE = 'DISCOVER_SERVICE',
+    DISCOVER_METHOD = 'DISCOVER_METHOD'
+}
 
 export interface GenericClientApi {
 
@@ -51,5 +62,7 @@ export interface GenericClientApi {
     discoverMethod(discoveryRequest: MethodDiscoveryRequest): Promise<MethodDiscoveryResponse>;
 
     disconnect(completion?: Completion): Promise<void>;
+
+    supported(apiFeature: Feature): boolean;
 
 }

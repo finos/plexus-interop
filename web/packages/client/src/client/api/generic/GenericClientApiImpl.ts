@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericClientApi } from './GenericClientApi';
+import { Feature } from './GenericClientApi';
 import { GenericClient } from '../../../client/generic/GenericClient';
-import { ServiceDiscoveryRequest } from '@plexus-interop/client-api';
+import { ServiceDiscoveryRequest, MethodInvocationContext } from '@plexus-interop/client-api';
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
 import { ClientDtoUtils } from './../../ClientDtoUtils';
-import { StreamingInvocationClient } from './../streaming/StreamingInvocationClient';
-import { StreamingInvocationClientImpl } from './../streaming/StreamingInvocationClientImpl';
+import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocationClient';
+import { StreamingInvocationClientImpl } from './handlers/streaming/StreamingInvocationClientImpl';
 import { InvocationClient } from './../InvocationClient';
 import { ValueHandler } from './../ValueHandler';
 import { ClientError } from '@plexus-interop/protocol';
@@ -29,7 +29,7 @@ import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
 import { MarshallerProvider } from '../io/MarshallerProvider';
 import { Completion } from '@plexus-interop/client-api';
 import { UniqueId } from '@plexus-interop/transport-common';
-import { ProvidedMethodReference } from '@plexus-interop/client-api';
+import { ProvidedMethodReference, ActionReference } from '@plexus-interop/client-api';
 import { Invocation } from '../../generic/Invocation';
 import { MethodDiscoveryRequest } from '@plexus-interop/client-api';
 import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
@@ -37,17 +37,30 @@ import { GenericRequest } from '@plexus-interop/client-api';
 import { InvocationObserver } from '../../generic';
 import { DelegateInvocationObserver } from '../../api/DelegateInvocationObserver';
 import { LoggingInvocationObserver } from '../LoggingInvocationObserver';
+import { InternalGenericClientApi } from './internal/InternalGenericClientApi';
+import { InvocationExecutor } from './InvocationExecutor';
+import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
 
-export class GenericClientApiImpl implements GenericClientApi {
+export class GenericClientApiImpl implements InternalGenericClientApi {
 
     private readonly log: Logger = LoggerFactory.getLogger('GenericClientApi');
 
     constructor(
-        private readonly genericClient: GenericClient,
-        private readonly marshallerProvider: MarshallerProvider) { }
+        protected readonly genericClient: GenericClient,
+        protected readonly marshallerProvider: MarshallerProvider,
+        protected readonly handlersRegistry: InvocationHandlersRegistry
+    ) { }
+
+    public supported(feature: Feature): boolean {
+        return true;
+    }
 
     public getConnectionId(): UniqueId {
         return this.genericClient.getConnectionId();
+    }
+
+    public getMarshallerProvider(): MarshallerProvider {
+        return this.marshallerProvider;
     }
 
     public discoverService(discoveryRequest: ServiceDiscoveryRequest): Promise<ServiceDiscoveryResponse> {
@@ -169,6 +182,14 @@ export class GenericClientApiImpl implements GenericClientApi {
 
     public disconnect(completion?: Completion): Promise<void> {
         return this.genericClient.disconnect(completion);
+    }
+
+    public invokeUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayload: any): Promise<any> {
+        return new InvocationExecutor(this.handlersRegistry).invokeUnaryHandler(invocationContext, actionReference, requestPayload);
+    }
+
+    public invokeRawUnaryHandler(invocationContext: MethodInvocationContext, actionReference: ActionReference, requestPayloadBuffer: ArrayBuffer): Promise<ArrayBuffer> {
+        return new InvocationExecutor(this.handlersRegistry).invokeRawUnaryHandler(invocationContext, actionReference, requestPayloadBuffer);
     }
 
     private isDiscovered(request: InvocationRequestInfo | ProvidedMethodReference): request is ProvidedMethodReference {

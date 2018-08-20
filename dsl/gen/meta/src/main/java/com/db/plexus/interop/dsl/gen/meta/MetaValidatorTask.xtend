@@ -30,10 +30,10 @@ class MetaValidatorTask extends BaseGenTask {
         val issues = validator.getValidationIssues(rs)
         if(!issues.empty) {
             val issuesString = issuesToString(issues.sortWith(issuesComparator));
-            if(config.isVerbose() || config.getOutFile() == null) {
+            if(config.isVerbose() || config.getOutFile() === null) {
                 println(issuesString)
             }
-            if(config.outFile != null) {
+            if(config.outFile !== null) {
                 FileUtils.writeStringToFile(new File(config.outFile), issuesString)
             }
             if(hasErrors(issues)) {

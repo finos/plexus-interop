@@ -31,7 +31,7 @@ export class ConnectionOpenFrame extends ServiceFrame<plexus.interop.transport.p
     }
 
     public getInternalHeader(): plexus.interop.transport.protocol.Header {
-        return plexus.interop.transport.protocol.Header.create({
+        return new plexus.interop.transport.protocol.Header({
             open: this.getHeaderData()
         });
     }

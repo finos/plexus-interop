@@ -50,7 +50,7 @@ class NoFieldsChangedRule implements UpdateRule {
         if (!first.number.equals(second.number)) {
             return false
         }
-        val labelsEqual = (first.label == null && second.label == null)
+        val labelsEqual = (first.label === null && second.label === null)
             || (first.label.equals(second.label));
         if (!labelsEqual) {
             return false
@@ -62,8 +62,7 @@ class NoFieldsChangedRule implements UpdateRule {
         }
         switch (firstType) {
             PrimitiveFieldType: return firstType.value.equals((secondType as PrimitiveFieldType).value),
-            ComplexFieldType: return complexTypesEqual(firstType, secondType as ComplexFieldType),
-            default: return firstType.equals(secondType)
+            ComplexFieldType: return complexTypesEqual(firstType, secondType as ComplexFieldType)
         }
     }
 
