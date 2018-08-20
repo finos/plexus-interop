@@ -16,6 +16,8 @@
  */
 ﻿namespace Plexus.Interop.Metamodel
 {
+    using System.Collections.Generic;
+
     public sealed class ProvidedMethod : IProvidedMethod
     {
         public Maybe<string> Title { get; set; }
@@ -27,5 +29,7 @@
         public Maybe<LaunchMode> LaunchMode { get; set; }
 
         public int TimeoutMs { get; set; } = 0;
+
+        public IReadOnlyCollection<IOption> Options { get; set; }
     }
 }

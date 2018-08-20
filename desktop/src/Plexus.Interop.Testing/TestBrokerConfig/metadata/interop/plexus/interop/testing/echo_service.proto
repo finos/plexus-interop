@@ -41,7 +41,7 @@ message EchoRequest {
 	}
 
 	enum SubEnum {
-		value_one = 0;
-		value_two = 1;
+		VALUE_ONE = 0;
+		VALUE_TWO = 1;
 	}
 }

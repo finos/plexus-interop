@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol
+namespace Plexus.Interop.Protocol
 {
     using Plexus.Interop.Protocol.Connect;
     using Plexus.Interop.Protocol.Discovery;
@@ -100,7 +100,7 @@
         public IServiceDiscoveryResponse CreateServiceDiscoveryResponse(IReadOnlyCollection<IDiscoveredService> services)
         {
             var obj = ServiceDiscoveryResponse.Rent();
-            obj.Services = new DiscoveredServiceCollection(services);
+            obj.Services = services;
             return obj;
         }
 
@@ -153,7 +153,8 @@
             Maybe<string> methodTitle, 
             string inputMessageId, 
             string outputMessageId,
-            MethodType methodType)
+            MethodType methodType,
+            IReadOnlyCollection<IOption> options)
         {
             var obj = DiscoveredMethod.Rent();
             obj.ProvidedMethod = providedMethod;
@@ -161,6 +162,7 @@
             obj.InputMessageId = inputMessageId;
             obj.OutputMessageId = outputMessageId;
             obj.MethodType = methodType;
+            obj.Options = options;
             return obj;
         }
 
@@ -168,6 +170,14 @@
         {
             var obj = MethodDiscoveryResponse.Rent();
             obj.Methods = methods;
+            return obj;
+        }
+
+        public IOption CreateOption(string id, string value)
+        {
+            var obj = Option.Rent();
+            obj.Id = id;
+            obj.Value = value;
             return obj;
         }
 

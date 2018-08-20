@@ -202,7 +202,8 @@
 	        "AppLaunchMode": {
 	          "values": {
 	            "SINGLE_INSTANCE": 0,
-	            "MULTI_INSTANCE": 1
+	            "MULTI_INSTANCE": 1,
+	            "SINGLE_LAUNCHING_INSTANCE": 2
 	          }
 	        },
 	        "AppConnectionDescriptor": {

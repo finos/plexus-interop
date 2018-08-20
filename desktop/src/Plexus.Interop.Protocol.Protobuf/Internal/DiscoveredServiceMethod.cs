@@ -27,6 +27,11 @@
             OutputMessageId = string.Empty;
             MethodTitle = string.Empty;
             MethodType = default;
+            foreach (var option in Options)
+            {
+                option.Dispose();
+            }
+            Options.Clear();
         }
     }
 }

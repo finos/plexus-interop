@@ -41,9 +41,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Ch1pbnRlcm9wL2FwcF9sYXVuY2hfbW9kZS5wcm90bxIHaW50ZXJvcBoVaW50",
-            "ZXJvcC9vcHRpb25zLnByb3RvKjgKDUFwcExhdW5jaE1vZGUSEwoPU0lOR0xF",
-            "X0lOU1RBTkNFEAASEgoOTVVMVElfSU5TVEFOQ0UQAUIpqgImUGxleHVzLklu",
-            "dGVyb3AuQXBwcy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3RvMw=="));
+            "ZXJvcC9vcHRpb25zLnByb3RvKlcKDUFwcExhdW5jaE1vZGUSEwoPU0lOR0xF",
+            "X0lOU1RBTkNFEAASEgoOTVVMVElfSU5TVEFOQ0UQARIdChlTSU5HTEVfTEFV",
+            "TkNISU5HX0lOU1RBTkNFEAJCKaoCJlBsZXh1cy5JbnRlcm9wLkFwcHMuSW50",
+            "ZXJuYWwuR2VuZXJhdGVkYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchMode), }, null));
@@ -55,6 +56,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
   internal enum AppLaunchMode {
     [pbr::OriginalName("SINGLE_INSTANCE")] SingleInstance = 0,
     [pbr::OriginalName("MULTI_INSTANCE")] MultiInstance = 1,
+    [pbr::OriginalName("SINGLE_LAUNCHING_INSTANCE")] SingleLaunchingInstance = 2,
   }
 
   #endregion

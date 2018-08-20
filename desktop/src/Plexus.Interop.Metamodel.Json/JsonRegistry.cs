@@ -136,7 +136,8 @@ namespace Plexus.Interop.Metamodel.Json
                         x.Options.GetValue("interop.ProvidedMethodOptions.launch_on_call").GetValueOrDefault()),
                     TimeoutMs = int.TryParse(
                         x.Options.GetValue("interop.ProvidedMethodOptions.timeout_ms").GetValueOrDefault(), 
-                        out var result) ? result : 0
+                        out var result) ? result : 0,
+                    Options = x.Options.Select(o => new Option { Id = o.Id, Value = o.Value }).ToList()
                 })
                 .ToDictionary(x => x.Method.Name, x => x);
             return ps;

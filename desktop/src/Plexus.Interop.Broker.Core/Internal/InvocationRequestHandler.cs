@@ -23,6 +23,7 @@ namespace Plexus.Interop.Broker.Internal
     using Plexus.Interop.Protocol.Invocation;
     using Plexus.Interop.Transport;
     using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -165,10 +166,6 @@ namespace Plexus.Interop.Broker.Internal
                 }
 
                 var resolveMode = ConvertToResolveMode(launchMode);
-                if (resolveMode == ResolveMode.SingleInstance)
-                {
-                    resolveMode = ResolveMode.SingleLaunchingInstance;
-                }
 
                 resolveTask = _appLifecycleManager.ResolveConnectionAsync(appId, resolveMode, source.Info);
             }
@@ -199,6 +196,7 @@ namespace Plexus.Interop.Broker.Internal
                 Log.Debug("Resolved target connection for call {{{0}}} from {{{1}}} to online connection: {{{2}}}", method, source, connection);
                 return connection;
             }
+
             lock (_resolveConnectionSync)
             {
                 Log.Debug("Resolving target connection for call {{{0}}} from {{{1}}} to offline connection", method, source);

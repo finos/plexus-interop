@@ -51,29 +51,5 @@
         {
             return $"{nameof(ConsumedService)}: {{{ConsumedService}}}, {nameof(ProvidedService)}: {{{ProvidedService}}}, {nameof(ServiceTitle)}: {ServiceTitle}, {nameof(Methods)}: {Methods.FormatEnumerableObjects()}";
         }
-
-        private bool Equals(DiscoveredService other)
-        {
-            return Equals(ConsumedService, other.ConsumedService) && Equals(ProvidedService, other.ProvidedService) && ServiceTitle.Equals(other.ServiceTitle) && Equals(Methods, other.Methods);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj is DiscoveredService && Equals((DiscoveredService) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (ConsumedService != null ? ConsumedService.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (ProvidedService != null ? ProvidedService.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ ServiceTitle.GetHashCode();
-                hashCode = (hashCode * 397) ^ (Methods != null ? Methods.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
     }
 }

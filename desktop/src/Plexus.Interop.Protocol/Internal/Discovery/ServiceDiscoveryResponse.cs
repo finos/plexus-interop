@@ -26,23 +26,19 @@
 
         protected override void Cleanup()
         {
+            if (Services != null)
+            {
+                foreach (var service in Services)
+                {
+                    service.Dispose();
+                }
+            }
             Services = default;
         }
 
         public override string ToString()
         {
-            return $"Type: {typeof(ServiceDiscoveryResponse).Name}, {nameof(Services)}: {Services}";
+            return $"Type: {typeof(ServiceDiscoveryResponse).Name}, {nameof(Services)}: {Services.FormatEnumerableObjects()}";
         }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ServiceDiscoveryResponse response &&
-                   EqualityComparer<IReadOnlyCollection<IDiscoveredService>>.Default.Equals(Services, response.Services);
-        }
-
-        public override int GetHashCode()
-        {
-            return -1198123260 + EqualityComparer<IReadOnlyCollection<IDiscoveredService>>.Default.GetHashCode(Services);
-        }        
     }
 }

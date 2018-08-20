@@ -26,7 +26,7 @@
     {
         private readonly ILogger _log;
         private readonly TransportChannelSendProcessor _sendProcessor;
-        private readonly IChannel<TransportMessageFrame> _receiveBuffer = new BufferedChannel<TransportMessageFrame>(3, TimeoutConstants.Timeout10Sec);
+        private readonly IChannel<TransportMessageFrame> _receiveBuffer = new BufferedChannel<TransportMessageFrame>(3);
         private readonly TransportChannelHeaderHandler<Task, ChannelMessage> _incomingMessageHandler;        
 
         public TransportChannel(

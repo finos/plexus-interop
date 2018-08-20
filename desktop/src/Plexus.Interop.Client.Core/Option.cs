@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,25 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Protocol.Protobuf.Internal
+﻿namespace Plexus.Interop
 {
-    using Plexus.Pools;
-
-    internal partial class DiscoveredMethod : PooledObject<DiscoveredMethod>
+    public sealed class Option
     {
-        protected override void Cleanup()
+        internal Option(string id, string value)
         {
-            InputMessageId = string.Empty;
-            OutputMessageId = string.Empty;
-            MethodTitle = string.Empty;
-            MethodType = default;
-            ProvidedMethod?.Dispose();
-            ProvidedMethod = default;
-            foreach (var option in Options)
-            {
-                option.Dispose();
-            }
-            Options.Clear();
+            Id = id;
+            Value = value;
+        }
+
+        public string Id { get; }
+
+        public string Value { get; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Id)}: {Id}, {nameof(Value)}: {Value}";
         }
     }
 }

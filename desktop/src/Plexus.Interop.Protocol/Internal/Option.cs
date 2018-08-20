@@ -14,32 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol.Internal.Discovery
+﻿namespace Plexus.Interop.Protocol.Internal
 {
-    using Plexus.Interop.Protocol.Discovery;
     using Plexus.Pools;
 
-    internal sealed class ServiceDiscoveryRequest : PooledObject<ServiceDiscoveryRequest>, IServiceDiscoveryRequest
+    internal sealed class Option : PooledObject<Option>, IOption
     {
-        public Maybe<IConsumedServiceReference> ConsumedService { get; set; }
+        public string Id { get; set; }
 
-        public DiscoveryMode DiscoveryMode { get; set; }
-
-        public T Handle<T, TArgs>(ClientToBrokerRequestHandler<T, TArgs> handler, TArgs args = default)
-        {
-            return handler.Handle(this, args);
-        }
+        public string Value { get; set; }
 
         protected override void Cleanup()
         {
-            ConsumedService.GetValueOrDefault()?.Dispose();
-            ConsumedService = default;
-            DiscoveryMode = default;
+            Id = default;
+            Value = default;
         }
 
         public override string ToString()
         {
-            return $"{nameof(ConsumedService)}: {{{ConsumedService}}}, {nameof(DiscoveryMode)}: {DiscoveryMode}";
+            return $"{nameof(Id)}: {Id}, {nameof(Value)}: {Value}";
         }
     }
 }

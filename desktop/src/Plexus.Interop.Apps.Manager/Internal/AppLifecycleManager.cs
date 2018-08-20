@@ -16,6 +16,7 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
+    using Google.Protobuf.WellKnownTypes;
     using Newtonsoft.Json;
     using Plexus.Channels;
     using Plexus.Interop.Transport;
@@ -25,7 +26,6 @@ namespace Plexus.Interop.Apps.Internal
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using Google.Protobuf.WellKnownTypes;
 
     internal sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager, Generated.AppLifecycleManagerClient.IAppLifecycleServiceImpl
     {        
@@ -40,9 +40,6 @@ namespace Plexus.Interop.Apps.Internal
 
         private readonly Dictionary<(UniqueId AppInstanceId, string AppId), Promise<IAppConnection>> _appInstanceConnectionsInProgress
             = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
-
-        private readonly Dictionary<string, List<Task<IAppConnection>>> _appConnectionsInProgress
-            = new Dictionary<string, List<Task<IAppConnection>>>();
 
         private readonly HashSet<IWritableChannel<Generated.AppLifecycleEvent>> _appLifecycleEventSubscribers =
             new HashSet<IWritableChannel<Generated.AppLifecycleEvent>>();
@@ -188,35 +185,27 @@ namespace Plexus.Interop.Apps.Internal
         {
             Log.Debug("Resolving connection for app {0} with mode {1} by request from {{{2}}}", appId, mode, referrerConnectionInfo);
             Task<IAppConnection> connectionTask;
-            UniqueId suggestedInstanceId = default;
+            UniqueId suggestedInstanceId;
             lock (_connections)
             {
-                if (mode == ResolveMode.SingleInstance)
+                if (mode == ResolveMode.SingleInstance &&
+                    _appConnections.TryGetValue(appId, out var appConnectionList) &&
+                    appConnectionList.Any())
                 {
-                    if (_appConnections.TryGetValue(appId, out var appConnectionList) && appConnectionList.Any())
-                    {
-                        var connection = appConnectionList.First();
-                        Log.Debug("Resolved connection for app {0} with mode {1} to online instance {{{2}}}", appId, mode, connection);
-                        return new ResolvedConnection(connection, false);
-                    }
-                } 
+                    var connection = appConnectionList.First();
+                    Log.Debug("Resolved connection for app {0} with mode {1} to online instance {{{2}}}",
+                        appId, mode, connection);
+                    return new ResolvedConnection(connection, false);
+                }
 
-                if (mode != ResolveMode.MultiInstance 
-                    && _appConnectionsInProgress.TryGetValue(appId, out var appConnectionTaskList) 
-                    && appConnectionTaskList.Any())
-                {
-                    Log.Debug("Resolving connection for app {0} with mode {1} to launching instance", appId, mode);
-                    connectionTask = appConnectionTaskList.First();
-                }
-                else
-                {
-                    suggestedInstanceId = UniqueId.Generate();
-                    Log.Debug("Resolving connection for app {0} with mode {1} to new instance with suggested id {2}", appId, mode, suggestedInstanceId);
-                    connectionTask = LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo);
-                }
+                suggestedInstanceId = UniqueId.Generate();
+                Log.Debug("Resolving connection for app {0} with mode {1} to new instance with suggested id {2}",
+                    appId, mode, suggestedInstanceId);
+                connectionTask = LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo);
             }
             var resolvedConnection = await connectionTask.ConfigureAwait(false);
-            Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}} by request from {{{3}}}", appId, mode, resolvedConnection, referrerConnectionInfo);
+            Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}} by request from {{{3}}}", 
+                appId, mode, resolvedConnection, referrerConnectionInfo);
             return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Id);
         }
         
@@ -331,16 +320,6 @@ namespace Plexus.Interop.Apps.Internal
             var deferredConnectionKey = (suggestedAppInstanceId, appId);
             try
             {
-                lock (_connections)
-                {
-                    if (!_appConnectionsInProgress.TryGetValue(appId, out var appConnectionTaskList))
-                    {
-                        appConnectionTaskList = new List<Task<IAppConnection>>();
-                        _appConnectionsInProgress[appId] = appConnectionTaskList;
-                    }
-                    appConnectionTaskList.Add(connectionPromise.Task);
-                }
-
                 appInstanceId = await LaunchAsync(appId, appInstanceId, resolveMode, referrerConnectionInfo).ConfigureAwait(false);
 
                 deferredConnectionKey = (appInstanceId, appId);
@@ -366,14 +345,6 @@ namespace Plexus.Interop.Apps.Internal
                 lock (_connections)
                 {
                     _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
-                    if (_appConnectionsInProgress.TryGetValue(appId, out var appConnectionTaskList))
-                    {
-                        appConnectionTaskList.Remove(connectionPromise.Task);
-                        if (!appConnectionTaskList.Any())
-                        {
-                            _appConnectionsInProgress.Remove(appId);
-                        }
-                    }
                 }
             }
         }
@@ -433,6 +404,8 @@ namespace Plexus.Interop.Apps.Internal
             {
                 case Generated.AppLaunchMode.SingleInstance:
                     return ResolveMode.SingleInstance;
+                case Generated.AppLaunchMode.SingleLaunchingInstance:
+                    return ResolveMode.SingleLaunchingInstance;
                 case Generated.AppLaunchMode.MultiInstance:
                     return ResolveMode.MultiInstance;
                 default:
@@ -447,7 +420,7 @@ namespace Plexus.Interop.Apps.Internal
                 case ResolveMode.SingleInstance:
                     return Generated.AppLaunchMode.SingleInstance;
                 case ResolveMode.SingleLaunchingInstance:
-                    return Generated.AppLaunchMode.MultiInstance;
+                    return Generated.AppLaunchMode.SingleLaunchingInstance;
                 case ResolveMode.MultiInstance:
                     return Generated.AppLaunchMode.MultiInstance;
                 default:
