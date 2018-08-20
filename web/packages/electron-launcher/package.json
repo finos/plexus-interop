@@ -42,7 +42,7 @@
     "electron": "1.8.4",
     "electron-log": "^2.2.9",
     "electron-packager": "9.1.0",
-    "jest": "23.1.0",
+    "jest": "23.5.0",
     "renamer": "^0.6.1",
     "trash": "^4.1.0",
     "trash-cli": "^1.4.0",
