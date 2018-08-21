@@ -1,8 +1,13 @@
 :imagesdir: ./images
 
-Plexus Interop consist of the following main components:
+Plexus Interop consist of the following main API layers:
 
 image::desktop-interop-layers.png[]
+
+All Applications are connected to central Broker.  To participate in interop each Application need to define itself in
+Interop Registry and auto-generate its specific client API using code-generation tool. Broker loads Interop Registry on
+startup and re-loads when it is changed in runtime to discover available actions, validate and route calls
+between Applications.
 
 ==== Broker
 
@@ -38,7 +43,3 @@ can support one or more Interop and Transport protocols and Client can choose wh
 ==== Interop DSL
 Interop DSL is a language for defining contracts between Applications, and associated tooling for parsing, validating and
 code-generating of application-specific client APIs from these definitions.
-
-To participate in interop each Application need to define itself in Interop Registry and auto-generate its specific
-client API using code-generation tool. Broker loads Interop Registry on startup and re-loads when it is changed in
-runtime to discover available actions, validate and route calls between Applications.

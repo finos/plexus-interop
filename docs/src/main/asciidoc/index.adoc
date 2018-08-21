@@ -12,7 +12,7 @@ include::concepts-overview.adoc[]
 include::concepts-components.adoc[]
 
 === Features
-include::getting-started-features.adoc[]
+include::concepts-features.adoc[]
 
 === Definitions
 include::concepts-definitions.adoc[]
