@@ -349,6 +349,7 @@ namespace Plexus.Interop.Protocol.Protobuf
             proto.OutputMessageId = method.OutputMessageId.ConvertToProtoStrict();
             proto.MethodId = method.MethodId.ConvertToProtoStrict();
             proto.MethodTitle = method.MethodTitle.ConvertToProto();
+            proto.Options.AddRange(method.Options.Select(ConvertToProto));
             return proto;
         }
 
@@ -520,7 +521,8 @@ namespace Plexus.Interop.Protocol.Protobuf
                 proto.MethodTitle.ConvertFromProto(),
                 proto.InputMessageId.ConvertFromProtoStrict(),
                 proto.OutputMessageId.ConvertFromProtoStrict(),
-                ConvertFromProto(proto.MethodType));
+                ConvertFromProto(proto.MethodType),
+                proto.Options.Select(ConvertFromProtoStrict).ToList());
         }
 
         private DiscoveryMethodType ConvertFromProto(MethodType proto)

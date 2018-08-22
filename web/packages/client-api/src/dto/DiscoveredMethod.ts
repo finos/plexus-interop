@@ -16,6 +16,7 @@
  */
 import { ProvidedMethodReference } from './ProvidedMethodReference';
 import { MethodType } from './MethodType';
+import { Option } from './Option';
 
 export interface DiscoveredMethod {
 
@@ -28,5 +29,7 @@ export interface DiscoveredMethod {
     outputMessageId?: string;
 
     methodType?: MethodType;
+
+    options?: Option[];
     
 }

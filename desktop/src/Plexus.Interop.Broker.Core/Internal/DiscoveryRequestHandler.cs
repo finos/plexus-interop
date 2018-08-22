@@ -85,6 +85,7 @@ namespace Plexus.Interop.Broker.Internal
                             new Maybe<UniqueId>(x.ConnectionId)),
                         x => x.Match.Provided);
             }
+
             var discoveredServices =
                 from s in groupedMethods
                 let consumedService = s.Key.ConsumedService
@@ -96,17 +97,19 @@ namespace Plexus.Interop.Broker.Internal
                         consumedService.Alias),
                     _protocol.MessageFactory.CreateProvidedServiceReference(
                         providedService.Service.Id,
-                        providedService.Alias, 
-                        providedService.Application.Id, 
+                        providedService.Alias,
+                        providedService.Application.Id,
                         connectionId),
                     s.Key.ProvidedService.Title,
                     s.Select(m =>
-                        _protocol.MessageFactory.CreateDiscoveredServiceMethod(
-                            m.Method.Name,
-                            m.Title,
-                            m.Method.InputMessage.Id,
-                            m.Method.OutputMessage.Id,
-                            Convert(m.Method.Type))).ToList());
+                            _protocol.MessageFactory.CreateDiscoveredServiceMethod(
+                                m.Method.Name,
+                                m.Title,
+                                m.Method.InputMessage.Id,
+                                m.Method.OutputMessage.Id,
+                                Convert(m.Method.Type),
+                                m.Options.Select(o => _protocol.MessageFactory.CreateOption(o.Id, o.Value)).ToList()))
+                        .ToList());
             using (var response = _protocol.MessageFactory.CreateServiceDiscoveryResponse(discoveredServices.ToList()))
             {
                 Log.Info("Completed service discovery request {{{0}}} from {{{1}}}: {2}", request, sourceConnection, response);

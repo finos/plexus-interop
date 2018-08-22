@@ -458,10 +458,6 @@ namespace Plexus.Interop
                 discoveryResult.InputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
                 discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
                 discoveryResult.Type.ShouldBe(MethodType.Unary);
-                foreach (var option in discoveryResult.Options)
-                {
-                    WriteLog($"{option.Id}: {option.Value}");
-                }
                 discoveryResult.Options.Count.ShouldBe(3);                
                 discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
                 discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
@@ -513,6 +509,13 @@ namespace Plexus.Interop
                     serverStreamingMethod.ShouldNotBeNull();
                     serverStreamingMethod.Title.ShouldBe("Sample Duplex Streaming Method");
                     serverStreamingMethod.ProvidedMethod.ProvidedService.ConnectionId.HasValue.ShouldBeFalse();
+                    serverStreamingMethod.Options.Count.ShouldBe(1);
+                    var unaryMethod =
+                        discoveryResult.Methods.FirstOrDefault(x => string.Equals(x.ProvidedMethod.Name, "Unary"));
+                    unaryMethod.ShouldNotBeNull();
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
                 }
             });
         }
@@ -541,6 +544,10 @@ namespace Plexus.Interop
                     discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
                     discoveryResult.Type.ShouldBe(MethodType.Unary);
                     discoveryResult.ProviderConnectionId.ShouldBeOneOf(server1.ConnectionId, server2.ConnectionId);
+                    discoveryResult.Options.Count.ShouldBe(3);                
+                    discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
+                    discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
+                    discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
                 }
             });
         }
@@ -569,6 +576,12 @@ namespace Plexus.Interop
                     serverStreamingMethod.ProviderConnectionId.ShouldBeOneOf(server1.ConnectionId,
                         server2.ConnectionId);
                     serverStreamingMethod.Title.ShouldBe("Sample Server Streaming Method");
+                    var unaryMethod =
+                        discoveryResult.Methods.FirstOrDefault(x => string.Equals(x.ProvidedMethod.Name, "Unary"));
+                    unaryMethod.ShouldNotBeNull();
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
                 }
             });
         }

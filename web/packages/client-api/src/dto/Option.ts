@@ -14,25 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MethodType } from './MethodType';
-import { Option } from './Option';
-
-export interface DiscoveredServiceMethod {
-    /** DiscoveredServiceMethod methodId */
-    methodId?: string;
-
-    /** DiscoveredServiceMethod methodTitle */
-    methodTitle?: string;
-
-    /** DiscoveredServiceMethod inputMessageId */
-    inputMessageId?: string;
-
-    /** DiscoveredServiceMethod outputMessageId */
-    outputMessageId?: string;
-
-    /** DiscoveredServiceMethod methodType */
-    methodType?: MethodType;
-
-    /** DiscoveredServiceMethod options */
-    options?: Option[];
+export interface Option {
+    id: string;
+    value: string;
 }

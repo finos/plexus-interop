@@ -123,7 +123,8 @@ namespace Plexus.Interop.Protocol
             Maybe<string> methodTitle, 
             string inputMessageId, 
             string outputMessageId,
-            MethodType methodType)
+            MethodType methodType,
+            IReadOnlyCollection<IOption> options)
         {
             var obj = DiscoveredServiceMethod.Rent();
             obj.MethodId = methodId;
@@ -131,6 +132,7 @@ namespace Plexus.Interop.Protocol
             obj.InputMessageId = inputMessageId;
             obj.OutputMessageId = outputMessageId;
             obj.MethodType = methodType;
+            obj.Options = options;
             return obj;
         }
 
