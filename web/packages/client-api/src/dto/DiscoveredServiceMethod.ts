@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import { MethodType } from './MethodType';
+import { Option } from './Option';
 
 export interface DiscoveredServiceMethod {
     /** DiscoveredServiceMethod methodId */
@@ -31,4 +32,7 @@ export interface DiscoveredServiceMethod {
 
     /** DiscoveredServiceMethod methodType */
     methodType?: MethodType;
+
+    /** DiscoveredServiceMethod options */
+    options?: Option[];
 }

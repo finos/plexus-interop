@@ -19,6 +19,8 @@ import { ClientsSetup } from '../common/ClientsSetup';
 import { TransportsSetup } from '../common/TransportsSetup';
 import { readWsUrl } from '../common/utils';
 import { ClientConnectivityTests } from '../echo/ClientConnectivityTests';
+import { EchoClientClientBuilder } from '../../src/echo/client/EchoClientGeneratedClient';
+import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
 
 describe('Web Socket Client connectivity', () => {
 
@@ -44,6 +46,17 @@ describe('Web Socket Client connectivity', () => {
                 client.disconnect().then(() => {
                     done();
                 });
+            });
+    });
+
+    it('Failed to connect if Web Socket server is not available', done => {
+        new EchoClientClientBuilder()
+            .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket('ws://127.0.0.1:11111')).connect())
+            .connect()
+            .catch(e => {
+                // tslint:disable-next-line:no-console
+                console.log('Connection error', e);
+                done();
             });
     });
 

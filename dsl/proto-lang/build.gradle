@@ -23,8 +23,8 @@ dependencies {
     mwe2 "org.eclipse.xtext:xtext-antlr-generator:[2.1.1, 3)"
 
 	// added for Xcore support
-	mwe2 'org.eclipse.emf:org.eclipse.emf.ecore.xcore:+'
-	mwe2 'org.eclipse.emf:org.eclipse.emf.codegen.ecore.xtext:+'
+	mwe2 'org.eclipse.emf:org.eclipse.emf.ecore.xcore:1.3.1'
+	mwe2 'org.eclipse.emf:org.eclipse.emf.codegen.ecore.xtext:1.2.0'
 }
 
 task generateXtextLanguage(type: JavaExec) {

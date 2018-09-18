@@ -35,7 +35,8 @@ namespace Plexus.Interop.Protocol.Discovery
             Maybe<string> methodTitle, 
             string inputMessageId, 
             string outputMessageId,
-            MethodType methodType);
+            MethodType methodType,
+            IReadOnlyCollection<IOption> options);
 
         IMethodDiscoveryRequest CreateMethodDiscoveryRequest(
             Maybe<string> inputMessageId,

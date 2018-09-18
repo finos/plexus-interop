@@ -18,8 +18,7 @@
 {
     public enum ResolveMode
     {
-        SingleInstance,        
-        MultiInstance,
-        SingleLaunchingInstance
+        SingleInstance,
+        MultiInstance
     }
 }

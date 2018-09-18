@@ -22,7 +22,8 @@
 
     internal sealed class ServiceDiscoveryResponse : PooledObject<ServiceDiscoveryResponse>, IServiceDiscoveryResponse
     {
-        public IReadOnlyCollection<IDiscoveredService> Services { get; set; }
+        public IReadOnlyCollection<IDiscoveredService> Services { get; set; } =
+            ArrayConstants<IDiscoveredService>.Empty;
 
         protected override void Cleanup()
         {
