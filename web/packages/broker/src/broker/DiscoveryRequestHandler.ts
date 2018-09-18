@@ -106,7 +106,8 @@ export class DiscoveryRequestHandler {
         const methodType: MethodType = pm.method.type;
         const methodTitle = pm.title;
         const inputMessageId = pm.method.requestMessage.id;
-        const outputMessageId = pm.method.responseMessage.id;
+        const outputMessageId = pm.method.responseMessage.id;        
+        const options = pm.options;
 
         const providedMethod = {
             providedService: {
@@ -115,7 +116,7 @@ export class DiscoveryRequestHandler {
                 applicationId: pm.providedService.application.id,
                 connectionId
             },
-            methodId: pm.method.name
+            methodId: pm.method.name        
         };
 
         return {
@@ -123,7 +124,8 @@ export class DiscoveryRequestHandler {
             methodTitle,
             inputMessageId,
             outputMessageId,
-            providedMethod
+            providedMethod,
+            options
         };
 
     }
