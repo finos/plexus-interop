@@ -14,13 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Method } from './Method';
-import { ProvidedService } from './ProvidedService';
-import { Option } from './Option';
-
-export interface ProvidedMethod {
-    method: Method;
-    providedService: ProvidedService;
-    title?: string;
-    options: Option[];
+export interface Option {
+    id: string;
+    value: string;
 }

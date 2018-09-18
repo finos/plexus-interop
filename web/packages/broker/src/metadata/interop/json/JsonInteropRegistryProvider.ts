@@ -175,7 +175,8 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
             return {
                 method: service.methods.get(pm.name) as Method,
                 providedService,
-                title: this.getOptionValueOrDefault(pm.options, 'interop.ProvidedMethodOptions.title', pm.name)
+                title: this.getOptionValueOrDefault(pm.options, 'interop.ProvidedMethodOptions.title', pm.name),
+                options: pm.options
             } as ProvidedMethod;
         })
             .forEach(pm => methods.set(pm.method.name, pm));
