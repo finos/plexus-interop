@@ -39,7 +39,7 @@ export class GenCSharpCommand extends BaseCommand {
         const javaExecPath = await getJavaExecPath();
         const protocExecPath = getProtocExecPath();
         const javaLibPath = getJavaGenLibPath();
-        await simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.clientGenArgs(opts), `--protoc=${protocExecPath}`], opts.verbose === 'true');
+        await simpleSpawn(javaExecPath, ['-jar', javaLibPath, ...this.clientGenArgs(opts), `--protoc=${protocExecPath}`], this.isVerbose(opts));
         
     }
 
