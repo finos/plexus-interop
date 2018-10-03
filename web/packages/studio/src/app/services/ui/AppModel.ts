@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ProvidedMethod } from '@plexus-interop/broker';
+import { ProvidedMethod } from '@plexus-interop/metadata';
 import { InteropClient } from '../core/InteropClient';
 import { TransportConnectionProvider } from '../core/TransportConnectionProvider';
-import { Application, ConsumedMethod } from '@plexus-interop/broker';
-import { InteropRegistryService } from '@plexus-interop/broker';
+import { Application, ConsumedMethod } from '@plexus-interop/metadata';
+import { InteropRegistryService } from '@plexus-interop/metadata';
 import { TransportConnection } from '@plexus-interop/transport-common';
 import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
 

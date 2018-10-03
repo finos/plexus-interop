@@ -16,7 +16,7 @@
  */
 import { GenericClientApi, StreamingInvocationClient, ValueHandler, InvocationClient, MethodDiscoveryResponse, MethodDiscoveryRequest, DiscoveredMethod, InvocationObserver } from '@plexus-interop/client';
 import { InvocationRequestInfo, Completion } from '@plexus-interop/protocol';
-import { ConsumedMethod, ProvidedMethod } from '@plexus-interop/broker';
+import { ConsumedMethod, ProvidedMethod } from '@plexus-interop/metadata';
 import { ProvidedMethodReference } from '@plexus-interop/client-api';
 import { Observer } from '@plexus-interop/common';
 import { ServerStreamingStringHandler, UnaryStringHandler, BidiStreamingStringHandler } from './StringHandlers';

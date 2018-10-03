@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Marshaller } from '@plexus-interop/broker';
+import { Marshaller } from './Marshaller';
 
 export interface ExtendedMarshaller<BaseType, EncodedType> extends Marshaller<BaseType, EncodedType> {
 

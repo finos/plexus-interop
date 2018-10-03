@@ -16,7 +16,7 @@
  */
 import { Injectable } from '@angular/core';
 import { InteropRegistryService, UrlInteropRegistryProvider, AppRegistryService, UrlAppRegistryProvider, AppRegistryProvider, InteropRegistryProvider } from
-    '@plexus-interop/broker';
+    '@plexus-interop/metadata';
 
 @Injectable()
 export class InteropServiceFactory {

@@ -18,13 +18,14 @@ import { UrlParamsProvider } from '@plexus-interop/common';
 import { InteropClient } from './InteropClient';
 import { Injectable } from '@angular/core';
 import { TransportConnectionProvider } from '../transport/TransportConnectionProvider';
-import { InteropRegistryService, ProvidedMethod, ProvidedService } from '@plexus-interop/broker';
+import { InteropRegistryService, ProvidedMethod, ProvidedService } from '@plexus-interop/metadata';
 import { GenericClientApiBuilder, MethodType, UnaryInvocationHandler, StreamingInvocationClient, ServerStreamingInvocationHandler, BidiStreamingInvocationHandler, InvocationObserver } from '@plexus-interop/client';
 import { UniqueId, ClientError } from '@plexus-interop/protocol';
 import { flatMap, Logger, LoggerFactory, Observer } from '@plexus-interop/common';
 import { GenericClientWrapper, methodHash } from './GenericClientWrapper';
-import { DynamicMarshallerFactory, Marshaller } from '@plexus-interop/broker';
+import { DynamicProtoMarshallerFactory } from '@plexus-interop/io/dist/main/src/dynamic';
 import { DefaultMessageGenerator } from './DefaultMessageGenerator';
+import { Marshaller } from '@plexus-interop/io';
 import { UnaryStringHandler, BidiStreamingStringHandler, ServerStreamingStringHandler, wrapGenericHostClient } from './StringHandlers';
 
 @Injectable()
@@ -59,7 +60,7 @@ export class InteropClientFactory {
         const serverStreamingHandlers = new Map<string, ServerStreamingStringHandler>();
         const bidiStreamingHandlers = new Map<string, BidiStreamingStringHandler>();
 
-        const marshallerFactory = new DynamicMarshallerFactory(interopRegistryService.getRegistry());
+        const marshallerFactory = new DynamicProtoMarshallerFactory(interopRegistryService.getRegistry());
 
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .forEach(pm => {

@@ -17,7 +17,7 @@
 import { SubscriptionsRegistry } from './../services/ui/SubscriptionsRegistry';
 import { OnDestroy } from '@angular/core';
 import { LoggerFactory } from '@plexus-interop/common';
-import { Application } from '@plexus-interop/broker';
+import { Application } from '@plexus-interop/metadata';
 import { Observable } from 'rxjs/Observable';
 import { AppActions } from '../services/ui/AppActions';
 import { Component, OnInit } from '@angular/core';

@@ -18,7 +18,8 @@ import { InteropClient } from './InteropClient';
 import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient, InvocationObserver, MethodType } from '@plexus-interop/client';
 import { InvocationRequestInfo, ClientError } from '@plexus-interop/protocol';
 import { MethodDiscoveryResponse, ProvidedMethodReference, DiscoveryMode } from '@plexus-interop/client-api';
-import { InteropRegistryService, DynamicMarshallerFactory, ProvidedMethod, ConsumedMethod, Marshaller, ProvidedService } from '@plexus-interop/broker';
+import { InteropRegistryService, ProvidedMethod, ConsumedMethod, ProvidedService } from '@plexus-interop/metadata';
+import { DynamicProtoMarshallerFactory } from '@plexus-interop/io/dist/main/src/dynamic';
 import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler, wrapGenericHostClient, toGenericObserver } from './StringHandlers';
 import { Observer, flatMap } from '@plexus-interop/common';
@@ -46,7 +47,7 @@ export class GenericClientWrapper implements InteropClient {
         private readonly appId: string,
         private readonly genericClient: GenericClientApi,
         private readonly interopRegistryService: InteropRegistryService,
-        private readonly encoderProvider: DynamicMarshallerFactory,
+        private readonly encoderProvider: DynamicProtoMarshallerFactory,
         private readonly unaryHandlers: Map<string, UnaryStringHandler>,
         private readonly serverStreamingHandlers: Map<string, ServerStreamingStringHandler>,
         private readonly bidiHandlers: Map<string, BidiStreamingStringHandler>,

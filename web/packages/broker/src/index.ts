@@ -17,4 +17,3 @@
 export * from './api';
 export * from './bus';
 export * from './launcher';
-export * from './io';
