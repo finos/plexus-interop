@@ -16,7 +16,7 @@
  */
 import { Observable } from 'rxjs/Observable';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
-import { UrlDataLoader } from '../../../http/UrlDataLoader';
+import { HttpDataLoader } from '@plexus-interop/remote';
 import { JsonAppRegistryProvider } from './JsonAppRegistryProvider';
 import { AppRegistryProvider } from '../AppRegistryProvider';
 import { AppRegistry } from '../model/AppRegistry';
@@ -25,7 +25,7 @@ export class UrlAppRegistryProvider implements AppRegistryProvider {
 
     private readonly log: Logger = LoggerFactory.getLogger('UrlAppRegistryProvider');
 
-    protected urlDataLoader: UrlDataLoader = new UrlDataLoader();
+    protected urlDataLoader: HttpDataLoader = new HttpDataLoader();
 
     protected started: boolean = false;    
 

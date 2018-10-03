@@ -20,9 +20,9 @@ import 'superagent';
 import * as request from 'superagent';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 
-export class UrlDataLoader {
+export class HttpDataLoader {
 
-    private readonly log: Logger = LoggerFactory.getLogger('UrlDataLoader');
+    private readonly log: Logger = LoggerFactory.getLogger('HttpDataLoader');
 
     public async fetchData(url: string): Promise<string> {
         this.log.trace(`Fetching data from [${url}]`);

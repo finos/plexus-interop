@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistry } from '../../src/metadata/interop/model/InteropRegistry';
+import { InteropRegistry } from '@plexus-interop/metadata';
 import { ExtendedMap } from '@plexus-interop/common';
-import { Application } from '../../src/metadata/interop/model/Application';
-import { Message } from '../../src/metadata/interop/model/Message';
-import { Service } from '../../src/metadata/interop/model/Service';
+import { Application } from '@plexus-interop/metadata';
+import { Message } from '@plexus-interop/metadata';
+import { Service } from '@plexus-interop/metadata';
 import { DynamicMarshallerFactory } from '../../src/io/DynamicMarshallerFactory';
 import * as fs from 'fs';
-import { JsonInteropRegistryProvider } from '../../src/metadata/interop/json/JsonInteropRegistryProvider';
+import { JsonInteropRegistryProvider } from '@plexus-interop/metadata';
 
 describe('DynamicMarshallerFactory', () => {
 
-    const metadataJson = fs.readFileSync('tests/metadata/json/test-interop.json', 'utf8');    
+    const metadataJson = fs.readFileSync('../metadata/tests/json/test-interop.json', 'utf8');    
     const registry = new JsonInteropRegistryProvider(metadataJson).getCurrent();
 
     const messages = ExtendedMap.create<string, Message>();

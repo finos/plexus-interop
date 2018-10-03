@@ -16,8 +16,8 @@
  */
 import { Observable } from 'rxjs/Observable';
 import { isString } from '@plexus-interop/common';
-import { ProvidedMethodReference } from '../metadata/interop/model/ProvidedMethodReference';
-import { ConsumedMethodReference } from '../metadata/interop/model/ConsumedMethodReference';
+import { ProvidedMethodReference } from '@plexus-interop/metadata';
+import { ConsumedMethodReference } from '@plexus-interop/metadata';
 import { ClientError } from '@plexus-interop/protocol';
 
 export class Types {

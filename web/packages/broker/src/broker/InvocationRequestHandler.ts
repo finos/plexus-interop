@@ -17,12 +17,12 @@
 import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion, Completion, UniqueId } from '@plexus-interop/protocol';
 import { ApplicationConnectionDescriptor } from '../lifecycle/ApplicationConnectionDescriptor';
 import { Observable } from 'rxjs/Observable';
-import { InteropRegistryService } from '../metadata/interop/InteropRegistryService';
+import { InteropRegistryService } from '@plexus-interop/metadata';
 import { AppLifeCycleManager } from '../lifecycle/AppLifeCycleManager';
 import { TransportChannel, Defaults } from '@plexus-interop/transport-common';
 import { LoggerFactory, Logger, BufferedObserver, Observer } from '@plexus-interop/common';
-import { ConsumedMethodReference } from '../metadata/interop/model/ConsumedMethodReference';
-import { ProvidedMethodReference } from '../metadata/interop/model/ProvidedMethodReference';
+import { ConsumedMethodReference } from '@plexus-interop/metadata';
+import { ProvidedMethodReference } from '@plexus-interop/metadata';
 import { ApplicationConnection } from '../lifecycle/ApplicationConnection';
 import { Types } from '../util/Types';
 

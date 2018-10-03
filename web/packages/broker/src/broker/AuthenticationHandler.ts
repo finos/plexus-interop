@@ -19,7 +19,7 @@ import { TransportChannel, TransportConnection, UniqueId } from '@plexus-interop
 import { ClientProtocolHelper, clientProtocol as plexus, ErrorCompletion, ClientError } from '@plexus-interop/protocol';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { ApplicationDescriptor } from '../lifecycle/ApplicationDescriptor';
-import { AppRegistryService } from '../metadata/apps/AppRegistryService';
+import { AppRegistryService } from '@plexus-interop/metadata';
 
 /**
  * Responsible for handling of first channel with Authentication Details

@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 import { AppLifeCycleManager } from '../lifecycle/AppLifeCycleManager';
-import { AppRegistryService } from '../metadata/apps/AppRegistryService';
-import { InteropRegistryService } from '../metadata/interop/InteropRegistryService';
+import { AppRegistryService } from '@plexus-interop/metadata';
+import { InteropRegistryService } from '@plexus-interop/metadata';
 import { MethodDiscoveryRequest } from '@plexus-interop/client-api';
 import { TransportChannel } from '@plexus-interop/transport-common';
 import { ApplicationConnection } from '../lifecycle/ApplicationConnection';
 import { clientProtocol, ErrorCompletion, ClientError, UniqueId, ClientProtocolHelper } from '@plexus-interop/protocol';
 import { Logger, LoggerFactory, ExtendedArray } from '@plexus-interop/common';
-import { ProvidedMethod } from '../metadata/interop/model/ProvidedMethod';
+import { ProvidedMethod } from '@plexus-interop/metadata';
 import { DiscoveredMethod, MethodType } from '@plexus-interop/client';
 
 export class DiscoveryRequestHandler {

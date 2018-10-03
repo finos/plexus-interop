@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { JsonInteropRegistryProvider } from '../../../src/metadata/interop/json/JsonInteropRegistryProvider';
-import { Message } from '../../../src/metadata/interop/model/Message';
-import { Service } from '../../../src/metadata/interop/model/Service';
-import { Method } from '../../../src/metadata/interop/model/Method';
-import { MethodType } from '../../../src/metadata/interop/model/MethodType';
-import { Application } from '../../../src/metadata/interop/model/Application';
-import { ConsumedMethod } from '../../../src/metadata/interop/model/ConsumedMethod';
-import { ProvidedMethod } from '../../../src/metadata/interop/model/ProvidedMethod';
-import { Enum } from '../../../src/metadata/interop/model/Enum';
+import { JsonInteropRegistryProvider } from '../../src/interop/json/JsonInteropRegistryProvider';
+import { Message } from '../../src/interop/model/Message';
+import { Service } from '../../src/interop/model/Service';
+import { Method } from '../../src/interop/model/Method';
+import { MethodType } from '../../src/interop/model/MethodType';
+import { Application } from '../../src/interop/model/Application';
+import { ConsumedMethod } from '../../src/interop/model/ConsumedMethod';
+import { ProvidedMethod } from '../../src/interop/model/ProvidedMethod';
+import { Enum } from '../../src/interop/model/Enum';
 import { ExtendedMap } from '@plexus-interop/common';
 
 const fs = require('fs');

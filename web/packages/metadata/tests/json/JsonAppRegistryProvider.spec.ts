@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { JsonAppRegistryProvider } from '../../../src/metadata/apps/json/JsonAppRegistryProvider';
-import { Application } from '../../../src/metadata/apps/model/Application';
+import { JsonAppRegistryProvider } from '../../src/apps/json/JsonAppRegistryProvider';
+import { Application } from '../../src/apps/model/Application';
 
 const fs = require('fs');
 

@@ -18,16 +18,16 @@ import { InteropRegistryProvider } from '../InteropRegistryProvider';
 import { Observable } from 'rxjs/Observable';
 import { InteropRegistry } from '../model/InteropRegistry';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
-import { UrlDataLoader } from '../../../http/UrlDataLoader';
+import { HttpDataLoader } from '@plexus-interop/remote';
 import { JsonInteropRegistryProvider } from './JsonInteropRegistryProvider';
-import { WebSocketDataProvider } from '../../../ws/WebSocketDataProvider';
+import { WebSocketDataProvider } from '@plexus-interop/remote';
 import 'rxjs/add/operator/throttleTime';
 
 export class UrlInteropRegistryProvider implements InteropRegistryProvider {
 
     private readonly log: Logger = LoggerFactory.getLogger('UrlInteropRegistryProvider');
 
-    private urlDataLoader: UrlDataLoader = new UrlDataLoader();
+    private urlDataLoader: HttpDataLoader = new HttpDataLoader();
 
     private webSocketDataProvider: WebSocketDataProvider = new WebSocketDataProvider();
 

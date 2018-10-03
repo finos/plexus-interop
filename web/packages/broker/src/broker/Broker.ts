@@ -20,10 +20,10 @@ import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { ClientConnectionProcessor } from './ClientConnectionProcessor';
 import { AuthenticationHandler } from './AuthenticationHandler';
 import { InvocationRequestHandler } from './InvocationRequestHandler';
-import { InteropRegistryProvider } from '../metadata/interop/InteropRegistryProvider';
-import { InteropRegistryService } from '../metadata/interop/InteropRegistryService';
+import { InteropRegistryProvider } from '@plexus-interop/metadata';
+import { InteropRegistryService } from '@plexus-interop/metadata';
 import { ClientRequestProcessor } from './ClientRequestProcessor';
-import { AppRegistryService } from '../metadata/apps/AppRegistryService';
+import { AppRegistryService } from '@plexus-interop/metadata';
 import { DiscoveryRequestHandler } from './DiscoveryRequestHandler';
 
 export class Broker {

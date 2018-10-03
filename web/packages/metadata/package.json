@@ -1,0 +1,49 @@
+{
+  "name": "@plexus-interop/metadata",
+  "types": "dist/main/src/index.d.ts",
+  "description": "Plexus Interop Metadata management",
+  "license": "Apache-2.0",
+  "version": "0.1.0",
+  "scripts": {
+    "prebuild": "yarn lint && trash dist",
+    "build": "yarn build:main",
+    "postbuild": "yarn test",
+    "build:main": "tsc -p tsconfig.json",
+    "build:watch": "tsc -w -p tsconfig.json",
+    "lint": "tslint src/**/*.ts",
+    "unit": "jest --coverage",
+    "pretest": "yarn lint",
+    "test": "yarn unit"
+  },
+  "dependencies": {
+    "@plexus-interop/common": "0.1.0",
+    "@plexus-interop/remote": "0.1.0"
+  },
+  "main": "dist/main/src/index.js",
+  "devDependencies": {
+    "@types/jest": "^18.1.1",
+    "jasmine-reporters": "^2.2.0",
+    "jest": "23.5.0",
+    "trash-cli": "^1.4.0",
+    "tslint": "5.8.0",
+    "typescript": "2.6.1",
+    "yarn": "1.4.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine.js",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".+/dist/main/tests/.+.spec.js$",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "dist/main/src/**/*.js",
+      "!dist/main/src/gen/**/*.js",
+      "!src/*.d.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.spec.ts"
+    ]
+  }
+}

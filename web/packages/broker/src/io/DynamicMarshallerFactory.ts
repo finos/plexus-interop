@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistry } from '../metadata';
+import { InteropRegistry } from '@plexus-interop/metadata';
 import { Marshaller } from './Marshaller';
 import * as protobuf from 'protobufjs/light';
 import { DynamicProtoMarshaller } from './DynamicProtoMarshaller';

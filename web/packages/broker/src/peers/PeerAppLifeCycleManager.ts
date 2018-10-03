@@ -22,7 +22,7 @@ import { ApplicationDescriptor } from '../lifecycle/ApplicationDescriptor';
 import { PeerProxyConnection } from '../peers/PeerProxyConnection';
 import { PeerConnectionsService } from './PeerConnectionsService';
 import { AppConnectionHeartBit } from './events/AppConnectionHeartBit';
-import { AppRegistryService } from '../metadata/apps/AppRegistryService';
+import { AppRegistryService } from '@plexus-interop/metadata';
 import { AppLauncherRegistry } from '../launcher/AppLauncherRegistry';
 import { CancellationToken } from '@plexus-interop/common';
 import { UniqueId } from '@plexus-interop/protocol';
