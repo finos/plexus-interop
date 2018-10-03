@@ -20,7 +20,7 @@ import { UnaryHandlerConverter, toGenericUnaryHandler } from './unary/converters
 import { LoggerFactory, Logger } from '@plexus-interop/common';
 import { UnaryInvocationHandler } from './unary/UnaryInvocationHandler';
 import { ServerStreamingConverter, toGenericStreamingHandler, toGenericBidiStreamingHandler } from './streaming/converters';
-import { MarshallerProvider } from '../../io/MarshallerProvider';
+import { BinaryMarshallerProvider } from '@plexus-interop/io';
 
 type HandlerActionRef = {
     serviceInfo: {
@@ -42,7 +42,7 @@ export class InvocationHandlersRegistry {
     // tslint:disable-next-line:typedef
     protected readonly genericHandlers = new Map<string, BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer>>();
 
-    public constructor(private readonly marshallerProvider: MarshallerProvider) { }
+    public constructor(private readonly marshallerProvider: BinaryMarshallerProvider) { }
 
     public registerServerStreamingHandler(handler: ServerStreamingInvocationHandler<any, any>, requestType: any, responseType: any): void {
         this.typeAwareHandlers.set(

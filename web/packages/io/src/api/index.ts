@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export * from './BinaryMarshaller';
+export * from './BinaryMarshallerProvider';
+export * from './ExtendedMarshaller';
 export * from './Marshaller';
-export * from './DynamicProtoMarshaller';
-export * from './DynamicMarshallerFactory';
-

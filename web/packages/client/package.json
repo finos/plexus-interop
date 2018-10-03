@@ -28,6 +28,7 @@
     "@types/long": "^3.0.31",
     "@plexus-interop/transport-common": "0.1.0",
     "@plexus-interop/client-api": "0.1.0",
+    "@plexus-interop/io": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
     "loglevel": "^1.4.1",
     "long": "^3.2.0",

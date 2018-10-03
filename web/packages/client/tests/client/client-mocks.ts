@@ -17,8 +17,7 @@
 import { InvocationMetaInfo } from '@plexus-interop/protocol';
 import { UniqueId, TransportChannel, ChannelObserver } from '@plexus-interop/transport-common';
 import { RemoteInvocationInfo } from '@plexus-interop/client-api';
-import { MarshallerProvider } from '../../src/client/api/io/MarshallerProvider';
-import { Marshaller } from '../../src/client/api/io/Marshaller';
+import { BinaryMarshallerProvider, BinaryMarshaller } from '@plexus-interop/io';
 import { Observer } from '@plexus-interop/common';
 import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
 import { clientProtocol as plexus, SuccessCompletion } from '@plexus-interop/protocol';
@@ -43,7 +42,7 @@ export function createRemoteInvocationInfo(): RemoteInvocationInfo {
     };
 }
 
-export class MockMarshaller implements Marshaller {
+export class MockMarshaller implements BinaryMarshaller {
 
     public encode(messageObj: any): Uint8Array {
         return new Uint8Array([]);
@@ -54,9 +53,9 @@ export class MockMarshaller implements Marshaller {
     }
 }
 
-export class MockMarshallerProvider implements MarshallerProvider {
+export class MockMarshallerProvider implements BinaryMarshallerProvider {
 
-    public getMarshaller(type: any): Marshaller {
+    public getMarshaller(type: any): BinaryMarshaller {
         return new MockMarshaller();
     }
 

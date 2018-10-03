@@ -14,12 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MarshallerProvider } from './MarshallerProvider';
-import { Marshaller } from './Marshaller';
+import { BinaryMarshallerProvider } from '../api/BinaryMarshallerProvider';
+import { BinaryMarshaller } from '../api/BinaryMarshaller';
 
-export class ProtoMarshallerProvider extends MarshallerProvider {
+/**
+ * Provides Marshaller based on generated Protobuf message types
+ */
+export class ProtoMarshallerProvider implements BinaryMarshallerProvider {
 
-    public getMarshaller(messageObj: any): Marshaller {
+    public getMarshaller(messageObj: any): BinaryMarshaller {
         if (!messageObj) {
             throw new Error('Proto message definition is not provided');
         } else if (!messageObj.encode || !messageObj.decode) {

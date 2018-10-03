@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './generic';
-export * from '@plexus-interop/client-api';
-export * from './InvocationClient';
-export * from './ValueHandler';
-export * from '@plexus-interop/io';
-export * from './DelegateInvocationObserver';
-export * from './container';
+import { Marshaller } from '@plexus-interop/broker';
+
+export interface ExtendedMarshaller<BaseType, EncodedType> extends Marshaller<BaseType, EncodedType> {
+
+    validate(messageObj: BaseType): void;
+
+}

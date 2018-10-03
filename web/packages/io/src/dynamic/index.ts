@@ -14,12 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Marshaller<BaseType, EncodedType> {
-    
-    encode(messageObj: BaseType): EncodedType;
-    
-    decode(messagePayload: EncodedType): BaseType;
-
-    validate(messageObj: BaseType): void;
-
-}
+export * from './DynamicProtoMarshaller';
+export * from './DynamicProtoMarshallerFactory';

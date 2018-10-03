@@ -1,0 +1,42 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "outDir": "dist/main",
+        "rootDir": ".",
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "declaration": true,
+        "importHelpers": true,
+        "inlineSourceMap": true,
+        "listFiles": false,
+        "traceResolution": false,
+        "strictNullChecks": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "pretty": true,
+        "removeComments": false,
+        "lib": [
+            "es6", "dom"
+        ],
+        "types": [
+            "node",
+            "jest",
+            "long",
+            "jstorage"
+        ],
+        "baseUrl": "."
+    },
+    "include": [
+        "src/**/*.ts",
+        "tests/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules/**"
+    ],
+    "compileOnSave": false
+}

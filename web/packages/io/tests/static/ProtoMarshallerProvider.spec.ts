@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ProtoMarshallerProvider } from '../../src/client/api/io/ProtoMarshallerProvider';
+import { ProtoMarshallerProvider } from '../../src/static/ProtoMarshallerProvider';
 import { clientProtocol as plexus } from '@plexus-interop/protocol';
 
 describe('Proto Marshaller Provider', () => {
@@ -22,7 +22,7 @@ describe('Proto Marshaller Provider', () => {
     it('Provides Marshaller by Message Type', () => {
 
         const sut = new ProtoMarshallerProvider();
-        
+
         const marshaller = sut.getMarshaller(plexus.interop.protocol.ConnectRequest);
 
         expect(marshaller).toBeDefined();

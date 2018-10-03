@@ -15,15 +15,18 @@
  * limitations under the License.
  */
 import { InteropRegistry } from '@plexus-interop/metadata';
-import { Marshaller } from './Marshaller';
+import { ExtendedMarshaller } from '../api/ExtendedMarshaller';
 import * as protobuf from 'protobufjs/light';
 import { DynamicProtoMarshaller } from './DynamicProtoMarshaller';
 import { Root } from 'protobufjs/light';
 
-export class DynamicMarshallerFactory {
+/**
+ * Dynamic Marshaller, based on Interop Metadata Registry
+ */
+export class DynamicProtoMarshallerFactory {
 
     // tslint:disable-next-line:typedef
-    private readonly cache = new Map<string, Marshaller<any, ArrayBuffer>>();
+    private readonly cache = new Map<string, ExtendedMarshaller<any, ArrayBuffer>>();
 
     private readonly protobufRoot: Root;
 
@@ -31,16 +34,16 @@ export class DynamicMarshallerFactory {
         this.protobufRoot = protobuf.Root.fromJSON(registry.rawMessages);
     }
 
-    public getMarshaller(messageId: string): Marshaller<any, ArrayBuffer> {
+    public getMarshaller(messageId: string): ExtendedMarshaller<any, ArrayBuffer> {
         if (this.cache.has(messageId)) {
-            return this.cache.get(messageId) as Marshaller<any, ArrayBuffer>;
+            return this.cache.get(messageId) as ExtendedMarshaller<any, ArrayBuffer>;
         }
         const marshaller = this.createDynamicMarshaller(this.registry, messageId);
         this.cache.set(messageId, marshaller);
         return marshaller;
     }
 
-    private createDynamicMarshaller(registry: InteropRegistry, messageId: string): Marshaller<any, ArrayBuffer> {
+    private createDynamicMarshaller(registry: InteropRegistry, messageId: string): ExtendedMarshaller<any, ArrayBuffer> {
         const message = registry.messages.get(messageId);
         if (!message) {
             throw new Error(`${messageId} not found in Registry`);

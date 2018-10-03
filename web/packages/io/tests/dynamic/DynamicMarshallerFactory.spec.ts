@@ -19,7 +19,7 @@ import { ExtendedMap } from '@plexus-interop/common';
 import { Application } from '@plexus-interop/metadata';
 import { Message } from '@plexus-interop/metadata';
 import { Service } from '@plexus-interop/metadata';
-import { DynamicMarshallerFactory } from '../../src/io/DynamicMarshallerFactory';
+import { DynamicProtoMarshallerFactory } from '../../src/dynamic/DynamicProtoMarshallerFactory';
 import * as fs from 'fs';
 import { JsonInteropRegistryProvider } from '@plexus-interop/metadata';
 
@@ -51,7 +51,7 @@ describe('DynamicMarshallerFactory', () => {
         enumField: 10
     };    
 
-    const sut = new DynamicMarshallerFactory(registry);
+    const sut = new DynamicProtoMarshallerFactory(registry);
 
     it('Creates Marshaller for existing Message', () => {
         const marshaller = sut.getMarshaller(messageId);

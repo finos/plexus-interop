@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MarshallerProvider } from '../../..';
+import { BinaryMarshallerProvider } from '@plexus-interop/io';
 import { Arrays } from '@plexus-interop/common';
 import { UnaryInvocationHandler } from './UnaryInvocationHandler';
 import { BidiStreamingInvocationHandler } from '../streaming/BidiStreamingInvocationHandler';
@@ -28,7 +28,7 @@ export function toGenericUnaryHandler(
     handler: UnaryInvocationHandler<any, any>,
     requestType: any,
     responseType: any,
-    marshallerProvider: MarshallerProvider): UnaryInvocationHandler<ArrayBuffer, ArrayBuffer> {
+    marshallerProvider: BinaryMarshallerProvider): UnaryInvocationHandler<ArrayBuffer, ArrayBuffer> {
 
     const requestMarshaller = marshallerProvider.getMarshaller(requestType);
     const responseMarshaller = marshallerProvider.getMarshaller(responseType);

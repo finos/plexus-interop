@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Marshaller } from './Marshaller';
 import * as protobuf from 'protobufjs/light';
 import { Arrays } from '@plexus-interop/common';
+import { ExtendedMarshaller } from '../api/ExtendedMarshaller';
 
-export class DynamicProtoMarshaller implements Marshaller<any, ArrayBuffer> {
+export class DynamicProtoMarshaller implements ExtendedMarshaller<any, ArrayBuffer> {
 
     public constructor(private readonly protoType: protobuf.Type) { }
 

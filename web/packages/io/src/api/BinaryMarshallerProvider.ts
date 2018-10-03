@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export abstract class Marshaller {
+import { BinaryMarshaller } from './BinaryMarshaller';
 
-    public abstract encode(messageObj: any): Uint8Array;
+export abstract class BinaryMarshallerProvider {
+
+    public abstract getMarshaller(messageType: any): BinaryMarshaller;
     
-    public abstract decode(messagePayload: Uint8Array): any;
-
 }

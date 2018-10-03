@@ -30,7 +30,7 @@ import { ServerStreamingInvocationHandler } from '../../src/client/api/generic/h
 import { ServerStreamingConverter } from '../../src/client/api/generic/handlers/streaming/converters';
 import { StreamingInvocationClient } from '../../src/client/api/generic/handlers/streaming/StreamingInvocationClient';
 import { InvocationHandlersRegistry } from '../../src/client/api/generic/handlers/InvocationHandlersRegistry';
-import { ProtoMarshallerProvider } from '../../src/client';
+import { ProtoMarshallerProvider } from '@plexus-interop/io/dist/main/src/static';
 
 declare var process: any;
 
