@@ -17,7 +17,8 @@
 
 import { DefaultConnectionDetailsService } from '@plexus-interop/client';
 import { readWsUrl } from '../common/utils';
-import { WebSocketDataProvider, UrlInteropRegistryProvider } from '@plexus-interop/broker';
+import { UrlInteropRegistryProvider } from '@plexus-interop/metadata';
+import { WebSocketDataProvider } from '@plexus-interop/remote';
 import { expect } from 'chai';
 
 const wsUrl = readWsUrl();
