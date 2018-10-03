@@ -21,7 +21,7 @@ const fs = require('fs');
 
 describe('JsonAppRegistryProvider', () => {
 
-    const appsJson: string = fs.readFileSync('tests/metadata/json/test-apps.json', 'utf8');    
+    const appsJson: string = fs.readFileSync('tests/json/test-apps.json', 'utf8');    
 
     it('Can parse App Registry JSON', () => {
 

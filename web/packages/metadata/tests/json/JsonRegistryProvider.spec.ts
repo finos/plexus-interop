@@ -29,7 +29,7 @@ const fs = require('fs');
 
 describe('JsonRegistryProvider', () => {
 
-    const metadataJson = fs.readFileSync('tests/metadata/json/test-interop.json', 'utf8');
+    const metadataJson = fs.readFileSync('tests/json/test-interop.json', 'utf8');
 
     it('Can parse metadata JSON', () => {
 
