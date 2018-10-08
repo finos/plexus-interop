@@ -31,13 +31,13 @@ describe('Client: Web Socket Send Plain JS Object', () => {
     const transportsSetup = new TransportsSetup();
 
     const wsUrl = readWsUrl();    
+    const metadataWsUrl = `${wsUrl}/metadata/interop`;
     const connectionProvider = transportsSetup.createWebSocketTransportProvider(wsUrl);
     const testUtils = new BaseEchoTest();
 
     it('Sends invocation request and receives response', async () => {
         const echoRequest = clientsSetup.createRequestDto();
-
-        const interopProvider = new UrlInteropRegistryProvider(wsUrl);
+        const interopProvider = new UrlInteropRegistryProvider(metadataWsUrl);
         await interopProvider.start();
         const marshallerProvider = new DynamicBinaryMarshallerProvider(interopProvider.getCurrent());
 
@@ -52,7 +52,7 @@ describe('Client: Web Socket Send Plain JS Object', () => {
             });
             clientsSetup.createGenericClientAndStaticServer(marshallerProvider, connectionProvider, handler)
                 .then(clients => {
-                    const genericClient = clients[0];
+                    const [genericClient, genericServer] = clients;
                     const invocationInfo: InvocationRequestInfo = {
                         methodId: 'Unary',
                         serviceId: 'plexus.interop.testing.EchoService'
@@ -61,14 +61,14 @@ describe('Client: Web Socket Send Plain JS Object', () => {
                         value: echoResponse => {
                             testUtils.assertEqual(echoRequest, echoResponse);
                             genericClient.disconnect()
-                                .then(() => clients[1].disconnect())
+                                .then(() => genericServer.disconnect())
                                 .then(() => resolve());
                         },
                         error: e => reject(e)
                     }, 'plexus.interop.testing.EchoRequest', 'plexus.interop.testing.EchoRequest');
                 })
                 .catch(error => reject(error));
-        });
+        });      
     });
 
 });
