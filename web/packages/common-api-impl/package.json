@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@plexus-interop/common": "0.1.0",
+    "@plexus-interop/metadata": "0.1.0",
+    "@plexus-interop/client": "0.1.0",
     "rxjs": "^5.4.2",
     "tslib": "^1.7.1"
   },
