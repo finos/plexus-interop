@@ -14,12 +14,7 @@
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
     "pretest": "yarn lint",
-    "test": "yarn unit",    
-    "postunpublish": "echo 'Unpublished'",
-    "prerepublish": "echo 'Republishing started...'",
-    "unpublish": "npm unpublish @plexus-interop/broker@0.1.2",
-    "republish": "npm run unpublish && npm publish",
-    "postrepublish": "echo 'Package republished successfully!'"
+    "test": "yarn unit"
   },
   "dependencies": {
     "@plexus-interop/client": "0.1.0",
@@ -29,7 +24,6 @@
     "protobufjs": "6.8.0",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.4.2",
-    "superagent": "3.8.2",
     "tslib": "^1.7.1"
   },
   "main": "dist/main/src/index.js",

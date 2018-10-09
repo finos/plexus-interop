@@ -21,7 +21,6 @@ import java.io.IOException
 import com.google.inject.Inject
 import com.db.plexus.interop.dsl.gen.util.FileUtils
 import java.io.File
-import java.util.ArrayList
 import java.util.Arrays
 import com.db.plexus.interop.dsl.gen.BaseGenTask
 import org.eclipse.xtext.resource.XtextResourceSet
@@ -37,13 +36,15 @@ class MetaJsonGenTask extends BaseGenTask {
         val protoFilePaths = getProtoFilePaths(resources, config)
         var messagesJson = "[]";
         if(!protoFilePaths.isEmpty() && config.getProtocPath() !== null) {
-            val pbJsArgs = new ArrayList(Arrays.asList(config.getProtocPath()));
+            val pbJsArgs = newArrayList(config.getProtocPath());
             pbJsArgs.addAll(this.protoArgs())
             pbJsArgs.addAll(protoFilePaths);
-            this.logger.info(String.format("Running compiler with args [%s]", String.join(" ", pbJsArgs)));
+            this.logger.info(String.format("Running ProtoJS compiler with args [%s]", String.join(" ", pbJsArgs)));
             val result = execSync(pbJsArgs);
             if(result.code !=  0) {
-                this.logger.warning("Compiler has returned non-zero result code " + result.code);
+                this.logger.severe("ProtoJS compiler has returned non-zero result code: " + result.code);
+                this.logger.severe("ProtoJS compiler output:" + result.stdout);
+                System.exit(1);
             } else {
                 messagesJson = result.stdout;
             }

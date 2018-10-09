@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { BaseJavaGenCommand } from './BaseJavaGenCommand';
-import { baseDir, out, verbose } from './DefaultOptions';
+import { baseDir, out, verbose, excludePattern } from './DefaultOptions';
 import { Option } from './Option';
 import { getPbJsExecPath } from '../common/protoJs';
 
@@ -29,6 +29,6 @@ export class GenJsonCommand extends BaseJavaGenCommand {
 
     public name = () => 'gen-json-meta';
 
-    public options: () => Option[] = () => [baseDir(), out(), verbose()];
+    public options: () => Option[] = () => [baseDir(), out(), verbose(), excludePattern()];
 
 }

@@ -1019,7 +1019,13 @@
 	              "type": "ApplicationLaunchOnCallMode",
 	              "id": 2
 	            }
-	          }
+	          },
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
 	        },
 	        "ProvidedServiceOptions": {
 	          "fields": {
@@ -1031,10 +1037,22 @@
 	              "type": "ApplicationLaunchOnCallMode",
 	              "id": 2
 	            }
-	          }
+	          },
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
 	        },
 	        "ConsumedServiceOptions": {
-	          "fields": {}
+	          "fields": {},
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
 	        },
 	        "ProvidedMethodOptions": {
 	          "fields": {
@@ -1050,10 +1068,22 @@
 	              "type": "uint32",
 	              "id": 3
 	            }
-	          }
+	          },
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
 	        },
 	        "ConsumedMethodOptions": {
-	          "fields": {}
+	          "fields": {},
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
 	        },
 	        "ApplicationLaunchOnCallMode": {
 	          "options": {

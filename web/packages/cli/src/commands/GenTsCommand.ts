@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { baseDir, out, plexusEntryPoint, namespace, verbose } from './DefaultOptions';
+import { baseDir, out, plexusEntryPoint, namespace, verbose, excludePattern } from './DefaultOptions';
 import { Option } from './Option';
 import { getJavaExecPath, getJavaGenLibPath } from '../common/java';
 import { BaseCommand } from './BaseCommand';
@@ -37,7 +37,7 @@ export class GenTsCommand extends BaseCommand {
 
     public generalDescription = () => 'generate Typescript client and messages definitions for specified entry point';
 
-    public options: () => Option[] = () => [baseDir(), out(), plexusEntryPoint(), namespace(), verbose()];
+    public options: () => Option[] = () => [baseDir(), out(), plexusEntryPoint(), namespace(), verbose(), excludePattern()];
 
     public async action(opts: any): Promise<void> {
         
@@ -49,11 +49,12 @@ export class GenTsCommand extends BaseCommand {
             ...opts,
             out: protoFilesDir
         });
-
+        const excludePatternString: string = opts.excludePattern;
         this.log('Generating proto messages JS definitions');
         const jsFilePath =  path.join(opts.out, 'plexus-messages.js');
         const protoFiles = (await listFiles(protoFilesDir, this.protoRegexp))
-            .filter(f => !this.isProtoDescriptorPath(f));
+            .filter(f => !this.isProtoDescriptorPath(f))
+            .filter(f => !excludePatternString || excludePatternString.length === 0 || !new RegExp(excludePatternString).test(f));
         await genJsStaticModule(jsFilePath, protoFiles, opts.namespace);
 
         this.log('Deleting proto definitions');
