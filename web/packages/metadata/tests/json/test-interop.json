@@ -1178,6 +1178,12 @@
 	"applications": [
 		{
 			"id": "plexus.interop.testing.EchoClient",
+			"options": [
+				{
+					"id": "interop.alias",
+					"value": "echo-client"
+				}
+			],
 			"consumes": [
 				{
 					"service": "plexus.interop.testing.EchoService",

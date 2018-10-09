@@ -39,6 +39,7 @@ import { ApplicationDto } from './ApplicationDto';
 import { OptionDto } from './OptionDto';
 import { MessagesNamespace, isMessage, isEnum } from './MessagesNamespace';
 import { Enum } from '../model/Enum';
+import { Option } from '../model/Option';
 
 export class JsonInteropRegistryProvider implements InteropRegistryProvider {
 
@@ -124,7 +125,8 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         const application: Application = {
             id: appDto.id,
             providedServices,
-            consumedServices
+            consumedServices,
+            options: []
         };
         appDto.consumes = appDto.consumes || [];
         appDto.consumes.forEach(consumedDto => {
@@ -135,6 +137,11 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         appDto.provides.forEach(providedDto => {
             providedServices.push(this.convertProvidedService(providedDto, application, services.get(providedDto.service) as Service));
         });
+        if (appDto.options) {
+            application.options = appDto.options.map(optDto => {
+                return { id: optDto.id, value: optDto.value };
+            });
+        }
         return application;
     }
 

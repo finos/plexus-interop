@@ -16,6 +16,7 @@
  */
 import { ProvidedServiceDto } from './ProvidedServiceDto';
 import { ConsumedServiceDto } from './ConsumedServiceDto';
+import { OptionDto } from './OptionDto';
 
 export interface ApplicationDto {
     
@@ -24,5 +25,7 @@ export interface ApplicationDto {
     provides: ProvidedServiceDto[];
     
     consumes: ConsumedServiceDto[];
+
+    options: OptionDto[];    
 
 }

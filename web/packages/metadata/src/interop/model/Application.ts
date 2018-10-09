@@ -16,6 +16,7 @@
  */
 import { ConsumedService } from './ConsumedService';
 import { ProvidedService } from './ProvidedService';
+import { Option } from './Option';
 
 export interface Application {
 
@@ -24,5 +25,7 @@ export interface Application {
     consumedServices: ConsumedService[];
 
     providedServices: ProvidedService[];
+
+    options: Option[];    
 
 }

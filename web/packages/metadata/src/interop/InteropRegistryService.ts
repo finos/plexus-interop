@@ -26,6 +26,7 @@ import { InteropRegistry } from './model/InteropRegistry';
 import { ConsumedServiceReference } from './model/ConsumedServiceReference';
 import { ProvidedService } from './model/ProvidedService';
 import { Method } from './model/Method';
+import { Option } from './model/Option';
 
 export class InteropRegistryService {
 
@@ -42,10 +43,12 @@ export class InteropRegistryService {
         });
     }
 
-    public getApplication(appId: string): Application {
-        const result = this.registry.applications.valuesArray().find(app => app.id === appId);
+    public getApplication(idOrAlias: string): Application {
+        const aliasOptionPredicate = (option: Option) => option.id.endsWith('alias') && idOrAlias === option.value;
+        const appFinder = (app: Application) => app.id === idOrAlias || (!!app.options && !!app.options.find(aliasOptionPredicate)); 
+        const result = this.registry.applications.valuesArray().find(appFinder);
         if (!result) {
-            throw new Error(`${appId} app not found`);
+            throw new Error(`${idOrAlias} app not found`);
         }
         return result;
     }
