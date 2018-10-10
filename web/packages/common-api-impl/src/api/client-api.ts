@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
+// tslint:disable
 /**
  * Used to instantiate an InteropPeer.
  * An application will typically create one InteropPlatform instance per Platform (e.g. 'Glue42', 'Plexus Interop', etc.) that it wishes
@@ -28,7 +28,7 @@
  *        It is expected that as implementations are created for the API, a consensus will emerge about how to handle this and the spec
  *        might update.
  */
-interface InteropPlatform {
+export interface InteropPlatform {
     type: string;                       // Specifies the platform type (e.g. 'Glue42', 'Plexus Interop', etc.).
     version: string;                    // The version of the platform.
 
@@ -61,7 +61,7 @@ interface InteropPlatform {
     ): Promise<InteropPeer>;
 }
 
-enum InteropFeature {
+export enum InteropFeature {
     InvokeMethod = "InvokeMethod",
     SubscribeStream = "SubscribeStream",
     RegisterMethod = "RegisterMethod",
@@ -76,7 +76,7 @@ enum InteropFeature {
     ListenStreamRegistered = "ListenStreamRegistered"
 }
 
-interface InteropPeer extends InteropClient, InteropServer, InteropPeerDescriptor {
+export interface InteropPeer extends InteropClient, InteropServer, InteropPeerDescriptor {
 
     connectionStatus: ConnectionStatus; // Shows the current connection status of the peer.
 
@@ -119,7 +119,7 @@ interface InteropPeer extends InteropClient, InteropServer, InteropPeerDescripto
 |                                             |
 +---------------------------------------------+
  */
-enum ConnectionStatus {
+export enum ConnectionStatus {
     Connecting = "Connecting",          /* A connection request has been started via a call to connect() but the connection has not
                                            yet been completed. */
     Connected = "Connected",            // Connected to the Platform. All data should be up to date.
@@ -131,7 +131,7 @@ enum ConnectionStatus {
 /**
  * A container for the 'Client' functionality.
  */
-interface InteropClient {
+export interface InteropClient {
     /**
      * @param  {string                 |       Method}      method  The name of the method or the method instance to be invoked.
      * @param  {any}                                        args    An object containing the arguments to be used for the invocation.
@@ -208,7 +208,7 @@ interface InteropClient {
 /**
  * Invocation result object returned after a successful method invocation.
  */
-interface InvokeResult {
+export interface InvokeResult {
     method: Method;                     // Identifies the method that was executed as well as the peer that registered/executed it.
     arguments?: any;                    // An object containing the arguments used for the invocation.  
     result?: any;                       // Result of the method invocation.
@@ -217,7 +217,7 @@ interface InvokeResult {
 /**
  * An InteropClient's stream subscription.
  */
-interface StreamSubscription extends Subscription {
+export interface StreamSubscription extends Subscription {
     arguments?: object;                 // An object containing the arguments used for the subscription.
     stream: Stream;                     // Reference to the stream that the subscription is to.
 }
@@ -225,7 +225,7 @@ interface StreamSubscription extends Subscription {
 /**
  * A container for the 'Server' functionality.
  */
-interface InteropServer {
+export interface InteropServer {
     /**
      * @param  {MethodImplementation} methodImplementation Method implementation, specifying the method's name, properties and invocation
      *                                                     handler.
@@ -252,7 +252,7 @@ interface InteropServer {
 /**
  * @type Specifies an unsubscribe function used to unsubscribe event listeners.
  */
-interface Subscription {
+export interface Subscription {
     /**
     * @return {Promise<void>} Promise that resolves when the subscription successfully closed.
     */
@@ -262,7 +262,7 @@ interface Subscription {
 /**
  * Reference to a connected instance of a peer or launchable application.
  */
-interface InteropPeerDescriptor {
+export interface InteropPeerDescriptor {
     isConnected: boolean;        // Shows the current connection status of the peer.
     applicationName: string;     // The name of the application.
     id: string;                  /* Platform specific id.
@@ -285,7 +285,7 @@ interface InteropPeerDescriptor {
 /**
  * Describes the attributes of a method.
  */
-interface MethodDefinition {
+export interface MethodDefinition {
     name: string;                       // The name of the method.
     acceptType?: string,                // Optional property specifying the accepted object type ID for e.g. FINOS FDC3 Context, FINOS FInancial object and/or OpenFIGI.
     returnType?: string,                // Optional property specifying the returned object type ID for e.g. FINOS FDC3 Context, FINOS FInancial object and/or OpenFIGI.
@@ -311,11 +311,11 @@ interface MethodDefinition {
 /**
  * A reference to a method available to be invoked, i.e. it is being offered by a server.
  */
-interface Method extends MethodDefinition {
+export interface Method extends MethodDefinition {
     peer: InteropPeerDescriptor;                       // Identifies the peer that registered the method.
 }
 
-interface RegisteredMethod extends Method {
+export interface RegisteredMethod extends Method {
     unregister: () => Promise<void>;
 }
 
@@ -323,7 +323,7 @@ type StreamDefinition = MethodDefinition;
 type Stream = Method;
 type RegisteredStream = RegisteredMethod;
 
-interface MethodHandler {
+export interface MethodHandler {
     /**
      * @param  {any}              args                  An object containing the arguments used for the invocation.
      * @param  {InteropPeerDescriptor} caller          A reference to the peer that invoked the method.
@@ -336,10 +336,10 @@ interface MethodHandler {
 /**
  * Defines a method including the handler that is being registered.
  */
-interface MethodImplementation extends MethodDefinition, MethodHandler {
+export interface MethodImplementation extends MethodDefinition, MethodHandler {
 }
 
-interface StreamHandler {
+export interface StreamHandler {
 
     /**
      * @param  {StreamObserver} observer               Observer object subscribing to the stream.
@@ -354,18 +354,18 @@ interface StreamHandler {
 /**
  * Defines a stream including the handler that is being registered.
  */
-interface StreamImplementation extends StreamDefinition, StreamHandler {
+export interface StreamImplementation extends StreamDefinition, StreamHandler {
 }
 
 /**
  * Defines observer of a stream.
  * 
- * Client (stream consumer) provides implementation of this interface to listen the called stream.
+ * Client (stream consumer) provides implementation of this export interface to listen the called stream.
  * 
- * Server (stream producer) receives an object implementing this interface and calls its methods 
+ * Server (stream producer) receives an object implementing this export interface and calls its methods 
  * to push new items or to complete the stream.
  */
-interface StreamObserver {
+export interface StreamObserver {
 
     /** 
      * On client side this method is called for each new received item.
@@ -416,11 +416,11 @@ interface StreamObserver {
 
 /**
  * Typically an application that implements an Intent does it by publishing an Interop method to implement the Intent.
- * This interface provides a way that Method publishers can record the Intent capabilities of each method.
+ * This export interface provides a way that Method publishers can record the Intent capabilities of each method.
  * This is in addition to the Intent publishing capability allowed in application definitions such as the
  * FINOS FDC3 Application definition.
  */
-interface MethodIntent {
+export interface MethodIntent {
     name: string;                       // Required. The name of the Intent.
     contexts?: string;                  /* Optional 'context' which define when this method is able to implement the Intent.
                                          This should be thought of as 'restrictions' on the scope of a method.
