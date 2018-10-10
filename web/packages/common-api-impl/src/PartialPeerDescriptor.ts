@@ -33,6 +33,6 @@ export class PartialPeerDescriptor implements InteropPeerDescriptor {
     
     public onApiMetadataChanged(callback: (metadata: string) => void): void {
         // TODO
-        throw new Error('ethod not implemented.');
+        throw new Error('Method not implemented.');
     }
 }

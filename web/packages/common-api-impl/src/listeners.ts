@@ -19,7 +19,7 @@ import { LoggerFactory, Logger } from '@plexus-interop/common';
 
 const logger: Logger = LoggerFactory.getLogger('PeerListener');
 
-class GenericListenerHolder<T> {
+export class GenericListenerHolder<T> {
     
     private listeners: Array<(update: T) => void> = [];
     

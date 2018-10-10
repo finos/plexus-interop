@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 import { InteropPeer, ConnectionStatus, Subscription, Method, InvokeResult, StreamObserver, StreamSubscription, InteropPeerDescriptor, MethodImplementation, RegisteredMethod, StreamImplementation } from './api/client-api';
-import { GenericClientApi, DiscoveryMode, GenericRequest } from '@plexus-interop/client';
+import { GenericClientApi } from '@plexus-interop/client';
 import { ConnectionStatusListeners } from './listeners';
-import { InteropRegistryService, InteropRegistry, ProvidedMethod, Application } from '@plexus-interop/metadata';
-import { isMethod } from './types';
-import { getProvidedMethodByAlias, toConsumedMethodRef } from './metadata';
-import { UniqueId } from '@plexus-interop/protocol';
+import { InteropRegistryService, Application } from '@plexus-interop/metadata';
 import { InvokeHandler } from './actions/InvokeHandler';
 import { SubscribeHandler } from './actions/SubscribeHandler';
+import { DiscoverMethodsHandler } from './actions/DiscoverMethodsHandler';
 
 export class PlexusInteropPeer implements InteropPeer {
 
@@ -62,21 +60,14 @@ export class PlexusInteropPeer implements InteropPeer {
         return new SubscribeHandler(this.registryService, this.genericClientApi, this.plexusAppMetadata).handle(stream, observer, args);
     }
 
-    public discoverPeers(): Promise<InteropPeerDescriptor[]> {
-        throw new Error('Method not implemented.');
-    }
-
     public discoverMethods(): Promise<Method[]> {
-        throw new Error('Method not implemented.');
+        return new DiscoverMethodsHandler(this.genericClientApi).discoverMethods();
     }
 
     public discoverStreams(): Promise<Method[]> {
         throw new Error('Method not implemented.');
     }
 
-    public onPeerDisconnected(callback: (peer: InteropPeerDescriptor) => void): Subscription {
-        throw new Error('Method not implemented.');
-    }
 
     // TODO: Not Implemented =>
 
@@ -121,6 +112,14 @@ export class PlexusInteropPeer implements InteropPeer {
     }
 
     public onDisconnected(callback: (error?: Error) => void): Subscription {
+        throw new Error('Method not implemented.');
+    }
+
+    public discoverPeers(): Promise<InteropPeerDescriptor[]> {
+        throw new Error('Method not implemented.');
+    }
+
+    public onPeerDisconnected(callback: (peer: InteropPeerDescriptor) => void): Subscription {
         throw new Error('Method not implemented.');
     }
 

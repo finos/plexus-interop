@@ -19,7 +19,8 @@ import { Method } from '../api';
 import { GenericRequest } from '@plexus-interop/client-api';
 import { getProvidedMethodByAlias, toConsumedMethodRef } from '../metadata';
 import { Application, InteropRegistryService } from '@plexus-interop/metadata';
-import { GenericClientApi, DiscoveryMode, UniqueId } from '@plexus-interop/client';
+import { GenericClientApi, DiscoveryMode, UniqueId, ProvidedMethodReference } from '@plexus-interop/client';
+import { clientProtocol as plexus } from '@plexus-interop/protocol';
 
 export class DiscoverMethodHandler {
 
@@ -33,8 +34,6 @@ export class DiscoverMethodHandler {
 
         const methodAlias: string = isMethod(method) ? method.name : method;
         const providedMethod = getProvidedMethodByAlias(methodAlias, this.app, this.registryService);
-        const requestType = providedMethod.method.requestMessage.id;
-        const responseType = providedMethod.method.responseMessage.id;
 
         let requestInfo: GenericRequest;
 
@@ -46,13 +45,17 @@ export class DiscoverMethodHandler {
             const providerAppRef = this.registryService.getApplication(method.peer.applicationName);
             const methods = !!discovered.methods
                 ? discovered.methods.filter(m => {
-                    const id = m.providedMethod.providedService.applicationId;
-                    const connectionId = m.providedMethod.providedService.connectionId;
-                    return id === providerAppRef.id
-                        && UniqueId.fromProperties(connectionId).toString() === method.peer.id;
+                    if (m.providedMethod && m.providedMethod.providedService) {
+                        const id = m.providedMethod.providedService.applicationId;
+                        const connectionId = m.providedMethod.providedService.connectionId;
+                        return id === providerAppRef.id
+                            && UniqueId.fromProperties(connectionId as plexus.IUniqueId).toString() === method.peer.id;
+                    } else {
+                        return false;
+                    }
                 }) : [];
             if (methods.length > 0) {
-                requestInfo = methods[0].providedMethod;
+                requestInfo = methods[0].providedMethod as ProvidedMethodReference;
             } else {
                 throw new Error(`Handler [${method.peer.id}] for action [${methodAlias}] is not found`);
             }

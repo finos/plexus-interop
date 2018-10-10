@@ -279,7 +279,7 @@ export interface InteropPeerDescriptor {
     /**
      * Notifies when application changed the published API metadata.
      */
-    onApiMetadataChanged(callback: (metadata: string) => void);
+    onApiMetadataChanged(callback: (metadata: string) => void): void;
 }
 
 /**
@@ -319,9 +319,9 @@ export interface RegisteredMethod extends Method {
     unregister: () => Promise<void>;
 }
 
-type StreamDefinition = MethodDefinition;
-type Stream = Method;
-type RegisteredStream = RegisteredMethod;
+export type StreamDefinition = MethodDefinition;
+export type Stream = Method;
+export type RegisteredStream = RegisteredMethod;
 
 export interface MethodHandler {
     /**

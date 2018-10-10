@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 import { InteropRegistryService, Application } from '@plexus-interop/metadata';
-import { GenericClientApi, UniqueId } from '@plexus-interop/client';
-import { Method, InvokeResult, StreamObserver, StreamSubscription } from '../api/client-api';
+import { GenericClientApi } from '@plexus-interop/client';
+import { Method, StreamObserver, StreamSubscription } from '../api/client-api';
 import { isMethod } from '../types';
-import { getProvidedMethodByAlias, toConsumedMethodRef, toMethodDefinition } from '../metadata';
-import { GenericRequest, DiscoveryMode } from '@plexus-interop/client-api';
+import { getProvidedMethodByAlias, toMethodDefinition } from '../metadata';
+import { GenericRequest } from '@plexus-interop/client-api';
 import { DiscoverMethodHandler } from './DiscoverMethodHandler';
 
 export class SubscribeHandler {

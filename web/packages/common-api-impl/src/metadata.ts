@@ -17,14 +17,17 @@
 import { Application, InteropRegistryService, ProvidedMethod, ConsumedMethodReference } from '@plexus-interop/metadata';
 import { Method } from './api/client-api';
 import { PartialPeerDescriptor } from './PartialPeerDescriptor';
+import { Option } from '@plexus-interop/metadata';
+
+const isAliasOption = (o: Option) => o.id.endsWith('alias');
 
 export function getProvidedMethodByAlias(alias: string, consumerApp: Application, registryService: InteropRegistryService): ProvidedMethod {
     const methods = registryService.getMatchingProvidedMethodsForApp(consumerApp);
-    const pm = methods.find(pm => !!pm.options && !!pm.options.find(o => o.id.endsWith('alias') && o.value === alias));
+    const pm = methods.find(pm => !!pm.options && !!pm.options.find(o => isAliasOption(o) && o.value === alias));
     if (!pm) {
         throw new Error(`Provided Method not found for ${alias}`);
     }
-    return methods.find(pm => !!pm.options && !!pm.options.find(o => o.id.endsWith('alias') && o.value === alias));
+    return pm;
 }
 
 export function toConsumedMethodRef(providedMethod: ProvidedMethod): ConsumedMethodReference {
@@ -40,6 +43,19 @@ export function toConsumedMethodRef(providedMethod: ProvidedMethod): ConsumedMet
 export function toMethodDefinition(providedMethod: ProvidedMethod): Method {
     return {
         name: providedMethod.method.name,
-        peer: new PartialPeerDescriptor(providedMethod.providedService.application.id, null, false)
+        peer: new PartialPeerDescriptor(
+            providedMethod.providedService.application.id, 
+            providedMethod.providedService.application.id, 
+            false)
     };
+}
+
+export function getAlias(options?: Option[]): string | undefined {
+    if (!!options) {
+        const option = options.find(isAliasOption);
+        if (option) {
+            return option.value;
+        }
+    }
+    return undefined;
 }
