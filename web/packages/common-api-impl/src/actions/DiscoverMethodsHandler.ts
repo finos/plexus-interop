@@ -17,7 +17,7 @@
 import { ProvidedMethodReference } from '@plexus-interop/metadata';
 import { GenericClientApi } from '@plexus-interop/client';
 import { Method } from '../api';
-import { DiscoveryMode, ProvidedServiceReference } from '@plexus-interop/client-api';
+import { DiscoveryMode, ProvidedServiceReference, DiscoveredMethod, MethodType } from '@plexus-interop/client-api';
 import { getAlias } from '../metadata';
 import { PartialPeerDescriptor } from '../PartialPeerDescriptor';
 
@@ -27,23 +27,27 @@ export class DiscoverMethodsHandler {
         private readonly genericClienApi: GenericClientApi
     ) { }
 
-    public async discoverMethods(): Promise<Method[]> {
+    public async discoverMethods(type?: MethodType): Promise<Method[]> {
         const provided = await this.genericClienApi.discoverMethod({
             discoveryMode: DiscoveryMode.Online
         });
         const methods = provided.methods || [];
-        return methods.map(pm => {
-            const providedMethod = pm.providedMethod as ProvidedMethodReference;
-            const providedService = providedMethod.providedService as ProvidedServiceReference;
-            return {
-                name: getAlias(pm.options) || providedMethod.methodId as string,
-                acceptType: pm.inputMessageId,
-                returnType: pm.outputMessageId,
-                peer: new PartialPeerDescriptor(
-                    providedService.applicationId as string,
-                    providedService.applicationId as string,
-                    true)
-            };
-        });
+        return methods
+            .filter(m => !type || type === m.methodType)
+            .map(this.plexusMethodToCommon);
+    }
+
+    private plexusMethodToCommon(pm: DiscoveredMethod): Method {
+        const providedMethod = pm.providedMethod as ProvidedMethodReference;
+        const providedService = providedMethod.providedService as ProvidedServiceReference;
+        return {
+            name: getAlias(pm.options) || providedMethod.methodId as string,
+            acceptType: pm.inputMessageId,
+            returnType: pm.outputMessageId,
+            peer: new PartialPeerDescriptor(
+                providedService.applicationId as string,
+                providedService.applicationId as string,
+                true)
+        };
     }
 }

@@ -31,40 +31,31 @@ export class DiscoverMethodHandler {
     ) { }
 
     public async findRequestInfo(method: string | Method): Promise<GenericRequest> {
-
         const methodAlias: string = isMethod(method) ? method.name : method;
         const providedMethod = getProvidedMethodByAlias(methodAlias, this.app, this.registryService);
-
         let requestInfo: GenericRequest;
-
+        const discovered = await this.genericClienApi.discoverMethod({
+            consumedMethod: toConsumedMethodRef(providedMethod),
+            discoveryMode: DiscoveryMode.Online
+        });
+        let methods = discovered.methods || [];
         if (isMethod(method)) {
-            const discovered = await this.genericClienApi.discoverMethod({
-                consumedMethod: toConsumedMethodRef(providedMethod),
-                discoveryMode: DiscoveryMode.Online
-            });
             const providerAppRef = this.registryService.getApplication(method.peer.applicationName);
-            const methods = !!discovered.methods
-                ? discovered.methods.filter(m => {
-                    if (m.providedMethod && m.providedMethod.providedService) {
-                        const id = m.providedMethod.providedService.applicationId;
-                        const connectionId = m.providedMethod.providedService.connectionId;
-                        return id === providerAppRef.id
-                            && UniqueId.fromProperties(connectionId as plexus.IUniqueId).toString() === method.peer.id;
-                    } else {
-                        return false;
-                    }
-                }) : [];
-            if (methods.length > 0) {
-                requestInfo = methods[0].providedMethod as ProvidedMethodReference;
-            } else {
-                throw new Error(`Handler [${method.peer.id}] for action [${methodAlias}] is not found`);
-            }
+            methods = methods.filter(m => {
+                if (m.providedMethod && m.providedMethod.providedService) {
+                    const id = m.providedMethod.providedService.applicationId;
+                    const connectionId = m.providedMethod.providedService.connectionId;
+                    const connectionIdString = UniqueId.fromProperties(connectionId as plexus.IUniqueId).toString();
+                    return id === providerAppRef.id && connectionIdString === method.peer.id;
+                } else {
+                    return false;
+                }
+            });
+        }
+        if (methods.length > 0) {
+            requestInfo = methods[0].providedMethod as ProvidedMethodReference;
         } else {
-            // find provided method ref and execute as consumed method
-            requestInfo = {
-                serviceId: providedMethod.providedService.service.id,
-                methodId: providedMethod.method.name
-            };
+            throw new Error(`Handler for action [${methodAlias}] is not found`);
         }
         return requestInfo;
     }

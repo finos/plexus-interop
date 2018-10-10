@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { InteropPeer, ConnectionStatus, Subscription, Method, InvokeResult, StreamObserver, StreamSubscription, InteropPeerDescriptor, MethodImplementation, RegisteredMethod, StreamImplementation } from './api/client-api';
-import { GenericClientApi } from '@plexus-interop/client';
+import { GenericClientApi, MethodType } from '@plexus-interop/client';
 import { ConnectionStatusListeners } from './listeners';
 import { InteropRegistryService, Application } from '@plexus-interop/metadata';
 import { InvokeHandler } from './actions/InvokeHandler';
@@ -61,13 +61,12 @@ export class PlexusInteropPeer implements InteropPeer {
     }
 
     public discoverMethods(): Promise<Method[]> {
-        return new DiscoverMethodsHandler(this.genericClientApi).discoverMethods();
+        return new DiscoverMethodsHandler(this.genericClientApi).discoverMethods(MethodType.Unary);
     }
 
     public discoverStreams(): Promise<Method[]> {
-        throw new Error('Method not implemented.');
+        return new DiscoverMethodsHandler(this.genericClientApi).discoverMethods(MethodType.ServerStreaming);       
     }
-
 
     // TODO: Not Implemented =>
 
