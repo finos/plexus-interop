@@ -21,7 +21,8 @@ import { InteropRegistryService, InteropRegistry, ProvidedMethod, Application } 
 import { isMethod } from './types';
 import { getProvidedMethodByAlias, toConsumedMethodRef } from './metadata';
 import { UniqueId } from '@plexus-interop/protocol';
-import { InvokeAction } from './actions/InvokeAction';
+import { InvokeHandler } from './actions/InvokeHandler';
+import { SubscribeHandler } from './actions/SubscribeHandler';
 
 export class PlexusInteropPeer implements InteropPeer {
 
@@ -49,15 +50,16 @@ export class PlexusInteropPeer implements InteropPeer {
     }
 
     public async disconnect(): Promise<void> {
-        return this.genericClientApi.disconnect();
+        await this.genericClientApi.disconnect();
+        this.statusChangedListeners.notifyListeners(ConnectionStatus.Disconnected);
     }
 
     public invoke(method: string | Method, args?: any): Promise<InvokeResult> {
-       return new InvokeAction(this.registryService, this.genericClientApi, this.plexusAppMetadata).handle(method, args);
+        return new InvokeHandler(this.registryService, this.genericClientApi, this.plexusAppMetadata).handle(method, args);
     }
 
     public subscribe(stream: string | Method, observer: StreamObserver, args?: any): Promise<StreamSubscription> {
-        throw new Error('Method not implemented.');
+        return new SubscribeHandler(this.registryService, this.genericClientApi, this.plexusAppMetadata).handle(stream, observer, args);
     }
 
     public discoverPeers(): Promise<InteropPeerDescriptor[]> {
@@ -71,7 +73,7 @@ export class PlexusInteropPeer implements InteropPeer {
     public discoverStreams(): Promise<Method[]> {
         throw new Error('Method not implemented.');
     }
-    
+
     public onPeerDisconnected(callback: (peer: InteropPeerDescriptor) => void): Subscription {
         throw new Error('Method not implemented.');
     }

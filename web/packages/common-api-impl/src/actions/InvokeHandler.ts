@@ -20,8 +20,9 @@ import { Method, InvokeResult } from '../api/client-api';
 import { isMethod } from '../types';
 import { getProvidedMethodByAlias, toConsumedMethodRef } from '../metadata';
 import { GenericRequest, DiscoveryMode } from '@plexus-interop/client-api';
+import { DiscoverMethodHandler } from './DiscoverMethodHandler';
 
-export class InvokeAction {
+export class InvokeHandler {
 
     public constructor(
         private readonly registryService: InteropRegistryService,
@@ -36,33 +37,10 @@ export class InvokeAction {
         const requestType = providedMethod.method.requestMessage.id;
         const responseType = providedMethod.method.responseMessage.id;
 
-        let requestInfo: GenericRequest;
-
-        if (isMethod(method)) {
-            const discovered = await this.genericClienApi.discoverMethod({
-                consumedMethod: toConsumedMethodRef(providedMethod),
-                discoveryMode: DiscoveryMode.Online
-            });
-            const providerAppRef = this.registryService.getApplication(method.peer.applicationName);
-            const methods = !!discovered.methods 
-                ? discovered.methods.filter(m => {
-                    const id = m.providedMethod.providedService.applicationId;
-                    const connectionId = m.providedMethod.providedService.connectionId;
-                    return id === providerAppRef.id 
-                        && UniqueId.fromProperties(connectionId).toString() === method.peer.id;
-                }) : [];
-            if (methods.length > 0) {
-                requestInfo = methods[0].providedMethod;
-            } else {
-                throw new Error(`Handler [${method.peer.id}] for action [${methodAlias}] is not found`);
-            }
-        } else {
-            // find provided method ref and execute as consumed method
-            requestInfo = {
-                serviceId: providedMethod.providedService.service.id,
-                methodId: providedMethod.method.name
-            };
-        }
+        let requestInfo: GenericRequest = 
+            await new DiscoverMethodHandler(this.registryService, this.genericClienApi, this.app)
+                .findRequestInfo(method);
+                
         return new Promise<InvokeResult>((resolve, reject) => {
             this.genericClienApi.sendUnaryRequest(requestInfo, args, {
                 value: v => resolve(v),

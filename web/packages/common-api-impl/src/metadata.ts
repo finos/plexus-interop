@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 import { Application, InteropRegistryService, ProvidedMethod, ConsumedMethodReference } from '@plexus-interop/metadata';
+import { Method } from './api/client-api';
+import { PartialPeerDescriptor } from './PartialPeerDescriptor';
 
 export function getProvidedMethodByAlias(alias: string, consumerApp: Application, registryService: InteropRegistryService): ProvidedMethod {
     const methods = registryService.getMatchingProvidedMethodsForApp(consumerApp);
@@ -32,5 +34,12 @@ export function toConsumedMethodRef(providedMethod: ProvidedMethod): ConsumedMet
             serviceAlias: providedMethod.providedService.service.serviceAlias
         },
         methodId: providedMethod.method.name
+    };
+}
+
+export function toMethodDefinition(providedMethod: ProvidedMethod): Method {
+    return {
+        name: providedMethod.method.name,
+        peer: new PartialPeerDescriptor(providedMethod.providedService.application.id, null, false)
     };
 }
