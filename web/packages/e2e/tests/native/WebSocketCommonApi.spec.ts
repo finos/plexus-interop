@@ -14,16 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ClientsSetup } from '../common/ClientsSetup';
-import { TransportsSetup } from '../common/TransportsSetup';
 import { readWsUrl } from '../common/utils';
-import { PointToPointInvocationTests } from '../echo/PointToPointInvocationTests';
-import { UnaryServiceHandler } from '../echo/UnaryServiceHandler';
-import { MethodInvocationContext } from '@plexus-interop/client-api';
-import { InvocationRequestInfo } from '@plexus-interop/client';
-import { BaseEchoTest } from '../echo/BaseEchoTest';
-import { UrlInteropRegistryProvider } from '@plexus-interop/metadata';
-import { DynamicBinaryMarshallerProvider } from '@plexus-interop/io/dist/main/src/dynamic';
 import { InteropPlatformFactory } from '@plexus-interop/common-api-impl';
 import { expect } from 'chai';
 
