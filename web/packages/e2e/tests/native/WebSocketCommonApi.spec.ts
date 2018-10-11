@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { readWsUrl } from '../common/utils';
-import { InteropPlatformFactory } from '@plexus-interop/common-api-impl';
+import { InteropPlatformFactory, InteropPlatform } from '@plexus-interop/common-api-impl';
 import { expect } from 'chai';
 
 // tslint:disable:no-unused-expression
@@ -30,6 +30,15 @@ describe('Client: Common API Implementation', () => {
         const platform = await factory.createPlatform({ webSocketUrl });    
         expect(platform).to.not.be.undefined;
               
+    });
+
+    it('Connects to Broker', async () => {
+        
+        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });    
+        const client = await platform.connect('echo-client');
+        expect(client).to.not.be.undefined;
+        await client.disconnect();   
+         
     });
 
 });
