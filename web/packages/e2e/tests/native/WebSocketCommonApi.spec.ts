@@ -19,6 +19,7 @@ import { InteropPlatformFactory, InteropPlatform, MethodImplementation, InteropP
 import { expect } from 'chai';
 import { BaseEchoTest } from '../echo/BaseEchoTest';
 import { ClientsSetup } from '../common/ClientsSetup';
+import * as plexus from '../../src/echo/gen/plexus-messages';
 
 // tslint:disable:no-unused-expression
 describe('Client: Common API Implementation', () => {
@@ -62,10 +63,10 @@ describe('Client: Common API Implementation', () => {
         const server = await platform.connect('echo-server', undefined, [method]);
         const request = clientsSetup.createRequestDto();
         const response = await client.invoke('unary-method', request);
-        
+        debugger;
         expect(invoked).to.be.true;        
         expect(response).to.not.be.undefined;
-        testUtils.assertEqual(request, response);
+        testUtils.assertEqual(request, response.result as plexus.plexus.interop.testing.IEchoRequest);
         expect(client).to.not.be.undefined;
         expect(server).to.not.be.undefined;
 

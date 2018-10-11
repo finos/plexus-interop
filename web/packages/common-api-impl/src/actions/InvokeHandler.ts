@@ -18,9 +18,10 @@ import { InteropRegistryService, Application } from '@plexus-interop/metadata';
 import { GenericClientApi } from '@plexus-interop/client';
 import { Method, InvokeResult } from '../api/client-api';
 import { isMethod } from '../types';
-import { getProvidedMethodByAlias } from '../metadata';
+import { getProvidedMethodByAlias, getAppAliasById } from '../metadata';
 import { GenericRequest } from '@plexus-interop/client-api';
 import { DiscoverMethodHandler } from './DiscoverMethodHandler';
+import { PartialPeerDescriptor } from '../PartialPeerDescriptor';
 
 export class InvokeHandler {
 
@@ -37,13 +38,24 @@ export class InvokeHandler {
         const requestType = providedMethod.method.requestMessage.id;
         const responseType = providedMethod.method.responseMessage.id;
 
-        const requestInfo: GenericRequest = 
+        const requestInfo: GenericRequest =
             await new DiscoverMethodHandler(this.registryService, this.genericClienApi, this.app)
                 .findRequestInfo(method);
-                
+
+        const providerId = providedMethod.providedService.application.id;
+        
         return new Promise<InvokeResult>((resolve, reject) => {
             this.genericClienApi.sendUnaryRequest(requestInfo, args, {
-                value: v => resolve(v),
+                value: v => resolve({
+                    result: v,
+                    arguments: args,
+                    method: {
+                        name: methodAlias,
+                        peer: new PartialPeerDescriptor(
+                            getAppAliasById(providerId, this.registryService) || providerId,
+                            providerId)
+                    }
+                }),
                 error: e => reject(e)
             }, requestType, responseType);
         });
