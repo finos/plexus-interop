@@ -19,11 +19,9 @@ import { InteropFeature, MethodImplementation, StreamImplementation, InteropPeer
 import { InteropRegistryService } from '@plexus-interop/metadata';
 import { BinaryMarshallerProvider } from '@plexus-interop/io';
 import { TransportConnection } from '@plexus-interop/transport-common';
-import { GenericClientApiBuilder, MethodInvocationContext, StreamingInvocationClient } from '@plexus-interop/client';
+import { GenericClientApiBuilder } from '@plexus-interop/client';
 import { PlexusInteropPeer } from './PlexusInteropPeer';
-import { getProvidedMethodByAlias, getAppAliasById } from './metadata';
-import { PartialPeerDescriptor } from './PartialPeerDescriptor';
-import { ClientError } from '@plexus-interop/protocol';
+import { registerMethod, registerStream } from './registration';
 
 export class PlexusInteropPlatform implements InteropPlatform {
 
@@ -63,54 +61,4 @@ export class PlexusInteropPlatform implements InteropPlatform {
         return new PlexusInteropPeer(genericClient, this.registryService, hostAppMetadata);
     }
 
-}
-
-function registerMethod(commonApiMethod: MethodImplementation, clientBuilder: GenericClientApiBuilder, registryService: InteropRegistryService): void {
-    const providedMethod = getProvidedMethodByAlias(commonApiMethod.name, registryService);
-    const requestType = providedMethod.method.requestMessage.id;
-    const responseType = providedMethod.method.responseMessage.id;
-    clientBuilder.withTypeAwareUnaryHandler({
-        serviceInfo: {
-            serviceId: providedMethod.providedService.service.id,
-            serviceAlias: providedMethod.providedService.alias
-        },
-        methodId: providedMethod.method.name,
-        handle: async (invocationContext: MethodInvocationContext, request: any): Promise<any> => {
-            const appId = invocationContext.consumerApplicationId;
-            const response = await commonApiMethod.onInvoke(request, new PartialPeerDescriptor(
-                getAppAliasById(appId, registryService) || appId,
-                appId
-            ));
-            return response;
-        }
-    }, requestType, responseType);
-}
-
-function registerStream(commonApiStream: StreamImplementation, clientBuilder: GenericClientApiBuilder, registryService: InteropRegistryService): void {
-    const providedMethod = getProvidedMethodByAlias(commonApiStream.name, registryService);
-    const requestType = providedMethod.method.requestMessage.id;
-    const responseType = providedMethod.method.responseMessage.id;
-    clientBuilder.withTypeAwareServerStreamingHandler({
-        serviceInfo: {
-            serviceId: providedMethod.providedService.service.id,
-            serviceAlias: providedMethod.providedService.alias
-        },
-        methodId: providedMethod.method.name,
-        handle: (invocationContext: MethodInvocationContext, request: any, invocationHostClient: StreamingInvocationClient<any>): void => {
-            const appId = invocationContext.consumerApplicationId;
-            const consumerPeer = new PartialPeerDescriptor(
-                getAppAliasById(appId, registryService) || appId,
-                appId
-            );
-            commonApiStream.onSubscriptionRequested({
-                next: async v => invocationHostClient.next(v),
-                error: async e => invocationHostClient.error(new ClientError(e.message, e.stack)),
-                completed: async () => invocationHostClient.complete()
-            }, consumerPeer, request)
-                .then(subscription => {
-                    invocationContext.cancellationToken.onCancel(() => subscription.unsubscribe());
-                })
-                .catch(e => invocationHostClient.error(new ClientError(e.message, e.stack)));
-        }
-    }, requestType, responseType);
 }

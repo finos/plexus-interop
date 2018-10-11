@@ -15,7 +15,24 @@
  * limitations under the License.
  */
 import { InteropPlatform } from '.';
+import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
+import { UrlInteropRegistryProvider, InteropRegistryService } from '@plexus-interop/metadata';
+import { DynamicBinaryMarshallerProvider } from '@plexus-interop/io/dist/main/src/dynamic';
+import { PlexusInteropPlatform } from '../PlexusInteropPlatform';
 
-export async function platformFactory(): Promise<InteropPlatform> {
-    throw new Error('Not implemented');
+export interface InteropPlatformConfig {
+    webSocketUrl: string;
+}
+
+export class InteropPlatformFactory {
+
+    public async createPlatform(config: InteropPlatformConfig): Promise<InteropPlatform> {
+        const metadataWsUrl = `${config.webSocketUrl}/metadata/interop`;
+        const connectionProvider = async () => new WebSocketConnectionFactory(new WebSocket(config.webSocketUrl)).connect();
+        const interopProvider = new UrlInteropRegistryProvider(metadataWsUrl);
+        await interopProvider.start();
+        const marshallerProvider = new DynamicBinaryMarshallerProvider(interopProvider.getCurrent());
+        return new PlexusInteropPlatform(new InteropRegistryService(interopProvider), marshallerProvider, connectionProvider);
+    }
+
 }
