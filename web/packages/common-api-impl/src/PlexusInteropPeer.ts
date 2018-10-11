@@ -25,7 +25,6 @@ import { DiscoverMethodsHandler } from './actions/DiscoverMethodsHandler';
 export class PlexusInteropPeer implements InteropPeer {
 
     private statusChangedListeners: ConnectionStatusListeners = new ConnectionStatusListeners();
-    private plexusAppMetadata: Application;
 
     public connectionStatus: ConnectionStatus;
     public isConnected: boolean;
@@ -35,12 +34,10 @@ export class PlexusInteropPeer implements InteropPeer {
     public constructor(
         private readonly genericClientApi: GenericClientApi,
         private readonly registryService: InteropRegistryService,
-        applicatioName: string
+        private readonly plexusAppMetadata: Application
     ) {
         this.id = this.genericClientApi.getConnectionId().toString();
         this.isConnected = true;
-        this.applicationName = applicatioName;
-        this.plexusAppMetadata = this.registryService.getApplication(this.applicationName);
     }
 
     public onConnectionStatusChanged(callback: (status: ConnectionStatus) => void): Subscription {
@@ -61,11 +58,13 @@ export class PlexusInteropPeer implements InteropPeer {
     }
 
     public discoverMethods(): Promise<Method[]> {
-        return new DiscoverMethodsHandler(this.genericClientApi).discoverMethods(MethodType.Unary);
+        return new DiscoverMethodsHandler(this.genericClientApi, this.registryService)
+            .discoverMethods(MethodType.Unary);
     }
 
     public discoverStreams(): Promise<Method[]> {
-        return new DiscoverMethodsHandler(this.genericClientApi).discoverMethods(MethodType.ServerStreaming);       
+        return new DiscoverMethodsHandler(this.genericClientApi, this.registryService)
+            .discoverMethods(MethodType.ServerStreaming);
     }
 
     // TODO: Not Implemented =>

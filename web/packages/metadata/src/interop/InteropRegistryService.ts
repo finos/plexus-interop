@@ -127,6 +127,15 @@ export class InteropRegistryService {
         return this.getMatchingProvidedMethodsForApp(consumedMethod.consumedService.application)
             .filter(providedMethod => this.equals(consumedMethod.method, providedMethod.method));
     }
+
+    public getProvidedMethods(): ProvidedMethod[] {
+        const allProvidedServices: ProvidedService[] = flatMap<Application, ProvidedService>(
+            app => app.providedServices, 
+            this.registry.applications.valuesArray());
+        return flatMap<ProvidedService, ProvidedMethod>(
+            service => service.methods.valuesArray(), 
+            allProvidedServices);
+    }
     
     private updateRegistry(registry: InteropRegistry): void {
         this.log.debug('Registry updated');

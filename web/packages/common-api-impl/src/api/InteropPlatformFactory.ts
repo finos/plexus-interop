@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 import { InteropPlatform } from '.';
-import { PlexusInteropPlatform } from '../PlexusInteropPlatform';
 
 export async function platformFactory(): Promise<InteropPlatform> {
-    return Promise.resolve(new PlexusInteropPlatform());
+    throw new Error('Not implemented');
 }

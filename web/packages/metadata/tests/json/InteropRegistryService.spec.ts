@@ -35,4 +35,8 @@ describe('InteropRegistryService', () => {
         expect(byId).toBe(byAlias);
     });
 
+    it('Returns all provided methods', () => {
+        expect(registryService.getProvidedMethods().length).toBe(5);
+    });
+
 });

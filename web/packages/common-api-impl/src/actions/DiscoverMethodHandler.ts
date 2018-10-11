@@ -32,7 +32,7 @@ export class DiscoverMethodHandler {
 
     public async findRequestInfo(method: string | Method): Promise<GenericRequest> {
         const methodAlias: string = isMethod(method) ? method.name : method;
-        const providedMethod = getProvidedMethodByAlias(methodAlias, this.app, this.registryService);
+        const providedMethod = getProvidedMethodByAlias(methodAlias, this.registryService, this.app);
         let requestInfo: GenericRequest;
         const discovered = await this.genericClienApi.discoverMethod({
             consumedMethod: toConsumedMethodRef(providedMethod),

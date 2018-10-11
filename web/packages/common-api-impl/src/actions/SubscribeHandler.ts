@@ -33,7 +33,7 @@ export class SubscribeHandler {
     public async handle(method: string | Method, observer: StreamObserver, args?: any): Promise<StreamSubscription> {
 
         const methodAlias: string = isMethod(method) ? method.name : method;
-        const providedMethod = getProvidedMethodByAlias(methodAlias, this.app, this.registryService);
+        const providedMethod = getProvidedMethodByAlias(methodAlias, this.registryService, this.app);
         const requestType = providedMethod.method.requestMessage.id;
         const responseType = providedMethod.method.responseMessage.id;
 

@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ProvidedMethodReference } from '@plexus-interop/metadata';
+import { ProvidedMethodReference, InteropRegistryService } from '@plexus-interop/metadata';
 import { GenericClientApi } from '@plexus-interop/client';
 import { Method } from '../api';
 import { DiscoveryMode, ProvidedServiceReference, DiscoveredMethod, MethodType } from '@plexus-interop/client-api';
-import { getAlias } from '../metadata';
+import { getAlias, getAppAliasById } from '../metadata';
 import { PartialPeerDescriptor } from '../PartialPeerDescriptor';
 
 export class DiscoverMethodsHandler {
 
     public constructor(
-        private readonly genericClienApi: GenericClientApi
+        private readonly genericClienApi: GenericClientApi,
+        private readonly registryService: InteropRegistryService
     ) { }
 
     public async discoverMethods(type?: MethodType): Promise<Method[]> {
@@ -40,14 +41,14 @@ export class DiscoverMethodsHandler {
     private plexusMethodToCommon(pm: DiscoveredMethod): Method {
         const providedMethod = pm.providedMethod as ProvidedMethodReference;
         const providedService = providedMethod.providedService as ProvidedServiceReference;
+        const appId = providedService.applicationId as string;
         return {
             name: getAlias(pm.options) || providedMethod.methodId as string,
             acceptType: pm.inputMessageId,
             returnType: pm.outputMessageId,
             peer: new PartialPeerDescriptor(
-                providedService.applicationId as string,
-                providedService.applicationId as string,
-                true)
+                getAppAliasById(appId, this.registryService) || appId,
+                appId)
         };
     }
 }

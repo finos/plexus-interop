@@ -6,8 +6,8 @@ Partial implementation for [Common Interop API](https://github.com/finos-plexus/
 
 Plexus Interop based on Metadata, so each application interracting via Common API should still be defined in metatada. 
 
-* All Methods/Streams/Messages must be defined as regular Plexus Messages and Services
-* Method/Stream names, used from client code, should refer to aliases of provided actions. E.g. method, used like below:
+- All Methods/Streams/Messages must be defined as regular Plexus Messages and Services
+- Method/Stream names, used from client code, should refer to aliases of provided actions. E.g. method, used like below:
 
 ```javascript
 peer.invoke('close-market-order', { orderId });
@@ -20,7 +20,7 @@ application ProviderApplication {
     }
 }
 ```
-* All apps should be also marked with aliases in metadata to be discovered by Common API, e.g.:
+- All apps should be also marked with aliases in metadata to be discovered by Common API, e.g.:
 application connecting to Plexus using
 ```javascript
 const peer = await window.platform.connect('web-trader-client');
@@ -32,9 +32,9 @@ application WebTraderClient {
 }
 ```
 
-## Implemented methods
+## Implemented features
 
-API is implemented partially, here is the list of supported features:
+API is implemented partially, all other methods raise ```Method not implemented``` error. Available features can be checked via feature flags API. Here is the list of supported functionality:
 
   - InvokeMethod
 
