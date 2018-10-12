@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 import { readWsUrl } from '../common/utils';
-import { InteropPlatformFactory, InteropPlatform, MethodImplementation, InteropPeerDescriptor } from '@plexus-interop/common-api-impl';
+import { InteropPlatformFactory, MethodImplementation, InteropPeerDescriptor, Stream, StreamImplementation, StreamObserver, InteropPlatform } from '@plexus-interop/common-api-impl';
 import { expect } from 'chai';
 import { BaseEchoTest } from '../echo/BaseEchoTest';
 import { ClientsSetup } from '../common/ClientsSetup';
 import * as plexus from '../../src/echo/gen/plexus-messages';
+import { AsyncHelper } from '@plexus-interop/common';
 
 // tslint:disable:no-unused-expression
 describe('Client: Common API Implementation', () => {
@@ -47,6 +48,46 @@ describe('Client: Common API Implementation', () => {
 
     });
 
+    it('Subscribes to stream and receives data from provider', async () => {
+        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
+        const stream: StreamImplementation = {
+            name: 'server-stream',
+            onSubscriptionRequested: async (streamObserver: StreamObserver, caller: InteropPeerDescriptor, args?: any) => {
+                streamObserver.next(args);
+                streamObserver.next(args);
+                streamObserver.next(args);
+                streamObserver.completed();
+                return {
+                    unsubscribe: async () => {}
+                };
+            }
+        };
+
+        const client = await platform.connect('echo-client');
+        const server = await platform.connect('echo-server', undefined, [], [stream]);
+        const request = clientsSetup.createRequestDto();
+        const received: any[] = [];
+        
+        let completed = false;
+        await client.subscribe('server-stream', {
+            next: async v => { received.push(v); },
+            error: async e => {},
+            completed: async () => {
+                completed = true;
+            }
+        }, request);
+
+        await AsyncHelper.waitFor(() => completed, undefined, 50, 2000);
+        expect(received.length).to.be.eq(3);
+        
+        for (let response of received) {
+            testUtils.assertEqual(request, response as plexus.plexus.interop.testing.IEchoRequest);
+        }
+        
+        await client.disconnect();
+        await server.disconnect();
+    });
+
     it('Discovers methods', async () => {
 
         const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
@@ -57,7 +98,7 @@ describe('Client: Common API Implementation', () => {
         };
         const server = await platform.connect('echo-server', undefined, [method]);
         const methods = await client.discoverMethods();
-        
+
         await client.disconnect();
         await server.disconnect();
         
@@ -81,7 +122,7 @@ describe('Client: Common API Implementation', () => {
         const server = await platform.connect('echo-server', undefined, [method]);
         const request = clientsSetup.createRequestDto();
         const response = await client.invoke('unary-method', request);
-        debugger;
+
         expect(invoked).to.be.true;        
         expect(response).to.not.be.undefined;
         testUtils.assertEqual(request, response.result as plexus.plexus.interop.testing.IEchoRequest);
