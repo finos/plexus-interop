@@ -10,7 +10,7 @@
     "postbuild": "yarn test",
     "build:main": "tsc -p tsconfig.json",
     "build:bundle": "yarn create-bundle",
-    "create-bundle": "browserify dist/main/src/api/InteropPlatformFactory.js -s PlexusPlatformFactory -o dist/main/src/platform-factory.bundle.js",
+    "create-bundle": "browserify dist/main/src/api/InteropPlatformFactory.js -x websocket -s PlexusPlatformFactory -o dist/main/src/platform-factory.bundle.js",
     "build:watch": "tsc -w -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",

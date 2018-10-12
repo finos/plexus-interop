@@ -31,6 +31,11 @@ export class SubscribeHandler {
     ) { }
 
     public async handle(method: string | Method, observer: StreamObserver, args?: any): Promise<StreamSubscription> {
+        
+        const asyncNop = async () => {};
+        observer.next = observer.next || asyncNop;
+        observer.error = observer.error || asyncNop;
+        observer.completed = observer.completed || asyncNop;
 
         const methodAlias: string = isMethod(method) ? method.name : method;
         const providedMethod = getProvidedMethodByAlias(methodAlias, this.registryService, this.app);
