@@ -88,6 +88,30 @@ describe('Client: Common API Implementation', () => {
         await server.disconnect();
     });
 
+    it('Discovers streams', async () => {
+
+        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
+        const stream: StreamImplementation = {
+            name: 'server-stream',
+            onSubscriptionRequested: async (streamObserver: StreamObserver, caller: InteropPeerDescriptor, args?: any) => {
+                streamObserver.completed();
+                return {
+                    unsubscribe: async () => {}
+                };
+            }
+        };
+
+        const client = await platform.connect('echo-client');
+        const server = await platform.connect('echo-server', undefined, [], [stream]);
+        const streams = await client.discoverStreams();
+
+        await client.disconnect();
+        await server.disconnect();
+        
+        expect(streams.length).to.be.greaterThan(0);
+
+    });
+
     it('Discovers methods', async () => {
 
         const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
@@ -105,6 +129,7 @@ describe('Client: Common API Implementation', () => {
         expect(methods.length).to.be.greaterThan(0);
 
     });
+
 
     it('Sends request and receives response', async () => {
 
