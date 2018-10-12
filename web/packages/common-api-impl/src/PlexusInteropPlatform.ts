@@ -58,7 +58,15 @@ export class PlexusInteropPlatform implements InteropPlatform {
         streams = streams || [];
         streams.forEach(stream => registerStream(stream, clientBuilder, this.registryService));
         const genericClient = await clientBuilder.connect();
-        return new PlexusInteropPeer(genericClient, this.registryService, hostAppMetadata);
+        const peer = new PlexusInteropPeer(genericClient, this.registryService, hostAppMetadata);
+        peer.disconnect = peer.disconnect.bind(peer);
+        peer.invoke = peer.invoke.bind(peer);
+        peer.subscribe = peer.subscribe.bind(peer);
+        peer.onConnectionStatusChanged = peer.onConnectionStatusChanged.bind(peer);
+        peer.discoverMethods = peer.discoverMethods.bind(peer);
+        peer.discoverStreams = peer.discoverStreams.bind(peer);
+        peer.disconnect = peer.disconnect.bind(peer);
+        return peer;
     }
 
 }
