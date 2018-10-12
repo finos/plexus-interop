@@ -47,6 +47,24 @@ describe('Client: Common API Implementation', () => {
 
     });
 
+    it('Discovers methods', async () => {
+
+        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
+        const client = await platform.connect('echo-client');
+        const method: MethodImplementation = {
+            name: 'unary-method',
+            onInvoke: async (args: any, caller: InteropPeerDescriptor) => args
+        };
+        const server = await platform.connect('echo-server', undefined, [method]);
+        const methods = await client.discoverMethods();
+        
+        await client.disconnect();
+        await server.disconnect();
+        
+        expect(methods.length).to.be.greaterThan(0);
+
+    });
+
     it('Sends request and receives response', async () => {
 
         const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });

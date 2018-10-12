@@ -35,7 +35,7 @@ export class DiscoverMethodsHandler {
         const methods = provided.methods || [];
         return methods
             .filter(m => !type || type === m.methodType)
-            .map(this.plexusMethodToCommon);
+            .map(m => this.plexusMethodToCommon(m));
     }
 
     private plexusMethodToCommon(pm: DiscoveredMethod): Method {
