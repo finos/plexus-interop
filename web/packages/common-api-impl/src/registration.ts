@@ -33,10 +33,10 @@ export function registerMethod(commonApiMethod: MethodImplementation, clientBuil
         methodId: providedMethod.method.name,
         handle: async (invocationContext: MethodInvocationContext, request: any): Promise<any> => {
             const appId = invocationContext.consumerApplicationId;
-            const response = await commonApiMethod.onInvoke(request, new PartialPeerDescriptor(
+            const response = await (commonApiMethod.onInvoke(request, new PartialPeerDescriptor(
                 getAppAliasById(appId, registryService) || appId,
                 appId
-            ));
+            )) /* Return empty result if no response received */ || Promise.resolve({}));
             return response;
         }
     }, requestType, responseType);
@@ -58,15 +58,17 @@ export function registerStream(commonApiStream: StreamImplementation, clientBuil
                 getAppAliasById(appId, registryService) || appId,
                 appId
             );
-            commonApiStream.onSubscriptionRequested({
+            const subscriptionPromise = commonApiStream.onSubscriptionRequested({
                 next: async v => invocationHostClient.next(v),
                 error: async e => invocationHostClient.error(new ClientError(e.message, e.stack)),
                 completed: async () => invocationHostClient.complete()
-            }, consumerPeer, request)
-                .then(subscription => {
+            }, consumerPeer, request);
+            if (subscriptionPromise) {
+                subscriptionPromise.then(subscription => {
                     invocationContext.cancellationToken.onCancel(() => subscription.unsubscribe());
                 })
-                .catch(e => invocationHostClient.error(new ClientError(e.message, e.stack)));
+                    .catch(e => invocationHostClient.error(new ClientError(e.message, e.stack)));
+            }
         }
     }, requestType, responseType);
 }

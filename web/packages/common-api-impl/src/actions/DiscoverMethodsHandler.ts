@@ -20,6 +20,8 @@ import { Method } from '../api';
 import { DiscoveryMode, ProvidedServiceReference, DiscoveredMethod, MethodType } from '@plexus-interop/client-api';
 import { getAlias, getAppAliasById } from '../metadata';
 import { PartialPeerDescriptor } from '../PartialPeerDescriptor';
+import { clientProtocol as plexus } from '@plexus-interop/protocol';
+import { UniqueId } from '@plexus-interop/protocol';
 
 export class DiscoverMethodsHandler {
 
@@ -42,13 +44,14 @@ export class DiscoverMethodsHandler {
         const providedMethod = pm.providedMethod as ProvidedMethodReference;
         const providedService = providedMethod.providedService as ProvidedServiceReference;
         const appId = providedService.applicationId as string;
+        const connectionId = UniqueId.fromProperties(providedService.connectionId as plexus.IUniqueId).toString();
         return {
             name: getAlias(pm.options) || providedMethod.methodId as string,
             acceptType: pm.inputMessageId,
             returnType: pm.outputMessageId,
             peer: new PartialPeerDescriptor(
                 getAppAliasById(appId, this.registryService) || appId,
-                appId)
+                connectionId)
         };
     }
 }
