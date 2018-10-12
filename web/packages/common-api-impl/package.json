@@ -6,9 +6,11 @@
   "version": "0.1.0",
   "scripts": {
     "prebuild": "yarn lint && trash dist",
-    "build": "yarn build:main",
+    "build": "yarn build:main && yarn build:bundle",
     "postbuild": "yarn test",
     "build:main": "tsc -p tsconfig.json",
+    "build:bundle": "yarn create-bundle",
+    "create-bundle": "browserify dist/main/src/api/InteropPlatformFactory.js -s PlexusPlatformFactory -o dist/main/src/platform-factory.bundle.js",
     "build:watch": "tsc -w -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
     "unit": "jest --coverage",
@@ -31,6 +33,7 @@
     "trash-cli": "^1.4.0",
     "tslint": "5.8.0",
     "typescript": "2.6.1",
+    "browserify": "^14.4.0",
     "yarn": "1.4.0"
   },
   "jest": {
