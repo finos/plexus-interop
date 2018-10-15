@@ -19,8 +19,6 @@ import { webSocket } from 'rxjs/observable/dom/webSocket';
 import { WebSocketSubjectConfig } from 'rxjs/observable/dom/WebSocketSubject';
 import { webSocketCtor } from '@plexus-interop/common/dist/main/src/ws/detect';
 
-const wsCtor = webSocketCtor();
-
 export class WebSocketDataProvider {
 
     public getData(url: string): Observable<string> {
@@ -46,6 +44,7 @@ export class WebSocketDataProvider {
     }
 
     private config(url: string): WebSocketSubjectConfig {
+        const wsCtor = webSocketCtor();        
         return {
             url,
             WebSocketCtor: wsCtor,
