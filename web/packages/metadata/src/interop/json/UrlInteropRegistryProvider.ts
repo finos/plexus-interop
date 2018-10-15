@@ -28,16 +28,15 @@ export class UrlInteropRegistryProvider implements InteropRegistryProvider {
     private readonly log: Logger = LoggerFactory.getLogger('UrlInteropRegistryProvider');
 
     private urlDataLoader: HttpDataLoader = new HttpDataLoader();
-
-    private webSocketDataProvider: WebSocketDataProvider = new WebSocketDataProvider();
-
+    
     private jsonInteropRegistryProvider: JsonInteropRegistryProvider;
 
     private started: boolean = false;
 
     public constructor(
         private readonly url: string,
-        private readonly interval: number = -1) { }
+        private readonly interval: number = -1,
+        private webSocketDataProvider: WebSocketDataProvider = new WebSocketDataProvider()) { }
 
     public getRegistry(): Observable<InteropRegistry> {
         return this.started ? this.jsonInteropRegistryProvider.getRegistry() : Observable.throw(new Error('Not started'));

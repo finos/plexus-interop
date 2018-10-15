@@ -15,6 +15,17 @@
  * limitations under the License.
  */
 export function webSocketCtor(): any {
+    const _window: any = window;
+    if (_window && _window.WebSocket) {
+        return _window.WebSocket;
+    }
+    const _global: any = global;
+    if (_global && _global.WebSocket) {
+        return _global.WebSocket;
+    }
     const isNode = typeof global !== 'undefined' && ({}).toString.call(global) === '[object global]';
-    return isNode ? require('websocket').w3cwebsocket : WebSocket;
+    if (isNode) {
+        return require('websocket').w3cwebsocket;
+    }
+    throw new Error('WebSocket API is not found');
 }
