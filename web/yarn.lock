@@ -3765,6 +3765,14 @@ electron@1.8.4:
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
+electron@1.8.6:
+  version "1.8.6"
+  resolved "https://registry.npmjs.org/electron/-/electron-1.8.6.tgz?dl=https://registry.yarnpkg.com/electron/-/electron-1.8.6.tgz#6d45e377b321a35b78a794b64e40b2cf8face6ae"
+  dependencies:
+    "@types/node" "^8.0.24"
+    electron-download "^3.0.1"
+    extract-zip "^1.0.3"
+
 elliptic@^6.0.0:
   version "6.4.0"
   resolved "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz#cac9af8762c85836187003c8dfe193e5e2eae5df"
