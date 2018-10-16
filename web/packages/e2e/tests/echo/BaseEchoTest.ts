@@ -16,13 +16,15 @@
  */
 import * as plexus from '../../src/echo/gen/plexus-messages';
 import { expect } from 'chai';
-import { MarshallerProvider, ProtoMarshallerProvider, MethodInvocationContext } from '@plexus-interop/client';
+import { MethodInvocationContext } from '@plexus-interop/client';
+import { BinaryMarshallerProvider } from '@plexus-interop/io';
+import { ProtoMarshallerProvider } from '@plexus-interop/io/dist/main/src/static';
 import { Arrays, LoggerFactory, LogLevel, AsyncHelper } from '@plexus-interop/common';
 import { ClientsSetup } from '../common/ClientsSetup';
 
 export class BaseEchoTest {
 
-    protected marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider();
+    protected marshallerProvider: BinaryMarshallerProvider = new ProtoMarshallerProvider();
 
     public assertEqual(first: plexus.plexus.interop.testing.IEchoRequest, second: plexus.plexus.interop.testing.IEchoRequest): void {
         let firstInt64;

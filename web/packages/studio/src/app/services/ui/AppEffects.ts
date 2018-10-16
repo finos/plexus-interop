@@ -17,7 +17,7 @@
 import { LoggerFactory } from '@plexus-interop/common';
 import { logger, State } from './RootReducers';
 import { TransportConnectionFactory } from '../core/TransportConnectionFactory';
-import { Application, ConsumedMethod } from '@plexus-interop/broker';
+import { Application, ConsumedMethod } from '@plexus-interop/metadata';
 import {
     Alert,
     AppConnectedActionParams,
@@ -28,7 +28,7 @@ import {
 } from './AppModel';
 import { TypedAction } from '../reducers/TypedAction';
 import { InteropClientFactory } from '../core/InteropClientFactory';
-import { AppRegistryService } from '@plexus-interop/broker';
+import { AppRegistryService } from '@plexus-interop/metadata';
 import { InteropServiceFactory } from '../core/InteropServiceFactory';
 import { AppActions } from './AppActions';
 import 'rxjs/add/operator/map';

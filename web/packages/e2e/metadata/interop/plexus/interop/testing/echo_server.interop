@@ -16,15 +16,18 @@
 //
 
 import "plexus/interop/testing/echo_service.proto";
+import "plexus/interop/testing/custom_options.proto";
 
 package plexus.interop.testing;
 
 application EchoServer {
 
+	option (app_alias) = "echo-server";
+
 	provides plexus.interop.testing.EchoService to plexus.interop.testing.* {
 		option title = "Sample Echo Service";
-		Unary [title = "Sample Unary Method"]; 
-		ServerStreaming [title = "Sample Server Streaming Method"]; 
+		Unary [title = "Sample Unary Method", (provided_method_alias) = "unary-method"]; 
+		ServerStreaming [title = "Sample Server Streaming Method", (provided_method_alias) = "server-stream"]; 
 		ClientStreaming [title = "Sample Client Streaming Method"]; 
 		DuplexStreaming [title = "Sample Duplex Streaming Method"]; 
 	}

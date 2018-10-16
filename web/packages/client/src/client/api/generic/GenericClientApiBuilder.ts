@@ -20,14 +20,14 @@ import { GenericClientFactory } from '../../generic/GenericClientFactory';
 import { ClientConnectRequest } from '@plexus-interop/client-api';
 import { GenericClientApiImpl } from './GenericClientApiImpl';
 import { GenericInvocationsHost } from './GenericInvocationsHost';
-import { MarshallerProvider } from '../io/MarshallerProvider';
-import { ProtoMarshallerProvider } from '../io/ProtoMarshallerProvider';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
 import { BidiStreamingInvocationHandler } from './handlers/streaming/BidiStreamingInvocationHandler';
 import { ServerStreamingInvocationHandler } from './handlers/streaming/ServerStreamingInvocationHandler';
 import { UnaryInvocationHandler } from './handlers/unary/UnaryInvocationHandler';
 import { InternalGenericClientApi } from './internal/InternalGenericClientApi';
+import { BinaryMarshallerProvider } from '@plexus-interop/io';
+import { ProtoMarshallerProvider } from '@plexus-interop/io/dist/main/src/static';
 
 
 // tslint:disable:member-ordering
@@ -41,7 +41,7 @@ export class GenericClientApiBuilder {
     protected transportConnectionProvider: () => Promise<TransportConnection>;
     protected clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi> = async client => client;
 
-    constructor(protected marshallerProvider: MarshallerProvider = new ProtoMarshallerProvider()) {
+    constructor(protected marshallerProvider: BinaryMarshallerProvider = new ProtoMarshallerProvider()) {
         this.handlersRegistry = new InvocationHandlersRegistry(this.marshallerProvider);
     }
 

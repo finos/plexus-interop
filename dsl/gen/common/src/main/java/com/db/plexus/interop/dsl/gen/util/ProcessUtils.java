@@ -23,7 +23,9 @@ import java.io.InputStreamReader;
 public class ProcessUtils {
 
     public static ProcessResult execSync(final String[] args) throws IOException, InterruptedException {
-        final Process process = new ProcessBuilder(args).start();
+        final Process process = new ProcessBuilder(args)
+                .redirectErrorStream(true)
+                .start();
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(process.getInputStream()));
         StringBuilder builder = new StringBuilder();

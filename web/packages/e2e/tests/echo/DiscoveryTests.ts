@@ -313,7 +313,7 @@ export class DiscoveryTests extends BaseEchoTest {
         expect(discoveredMethod.outputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
         expect(discoveredMethod.options).to.not.be.undefined;
         let options = discoveredMethod.options || [];
-        expect(options.length).to.be.eq(1);
+        expect(options.length).to.be.greaterThan(0);
         expect(options[0].id).to.be.eq('interop.ProvidedMethodOptions.title');
         expect(options[0].value).to.be.eq(discoveredMethod.methodTitle);
     }
@@ -324,7 +324,7 @@ export class DiscoveryTests extends BaseEchoTest {
         expect(discoveredMethod.inputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
         expect(discoveredMethod.outputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
         let options = discoveredMethod.options || [];
-        expect(options.length).to.be.eq(1);
+        expect(options.length).to.be.greaterThan(0);
         expect(options[0].id).to.be.eq('interop.ProvidedMethodOptions.title');
         expect(options[0].value).to.be.eq(discoveredMethod.methodTitle);
     }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService, Enum, Message, InteropRegistry, Field } from '@plexus-interop/broker';
+import { InteropRegistryService, Enum, Message, InteropRegistry, Field } from '@plexus-interop/metadata';
 
 export class DefaultMessageGenerator {
 

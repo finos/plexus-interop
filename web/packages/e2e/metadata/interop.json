@@ -865,6 +865,191 @@
 	        }
 	      }
 	    },
+	    "interop": {
+	      "options": {
+	        "csharp_namespace": "plexus"
+	      },
+	      "nested": {
+	        "ApplicationOptions": {
+	          "fields": {
+	            "title": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "launchOnCall": {
+	              "type": "ApplicationLaunchOnCallMode",
+	              "id": 2
+	            }
+	          },
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
+	        },
+	        "ProvidedServiceOptions": {
+	          "fields": {
+	            "title": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "launchOnCall": {
+	              "type": "ApplicationLaunchOnCallMode",
+	              "id": 2
+	            }
+	          },
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
+	        },
+	        "ConsumedServiceOptions": {
+	          "fields": {},
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
+	        },
+	        "ProvidedMethodOptions": {
+	          "fields": {
+	            "title": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "launchOnCall": {
+	              "type": "ApplicationLaunchOnCallMode",
+	              "id": 2
+	            },
+	            "timeoutMs": {
+	              "type": "uint32",
+	              "id": 3
+	            }
+	          },
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
+	        },
+	        "ConsumedMethodOptions": {
+	          "fields": {},
+	          "extensions": [
+	            [
+	              1000,
+	              536870911
+	            ]
+	          ]
+	        },
+	        "ApplicationLaunchOnCallMode": {
+	          "options": {
+	            "allow_alias": true
+	          },
+	          "values": {
+	            "IF_NOT_LAUNCHED": 0,
+	            "DEFAULT": 0,
+	            "ALWAYS": 1,
+	            "ENABLED": 1,
+	            "NEVER": 2,
+	            "DISABLED": 2
+	          }
+	        },
+	        "AppLauncherService": {
+	          "options": {
+	            "(.interop.service_id)": "interop.AppLauncherService"
+	          },
+	          "methods": {
+	            "Launch": {
+	              "requestType": "AppLaunchRequest",
+	              "responseType": "AppLaunchResponse"
+	            }
+	          }
+	        },
+	        "AppLaunchRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchRequest"
+	          },
+	          "fields": {
+	            "appId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "launchParamsJson": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "launchMode": {
+	              "type": "AppLaunchMode",
+	              "id": 3
+	            },
+	            "suggestedAppInstanceId": {
+	              "type": "UniqueId",
+	              "id": 4
+	            },
+	            "referrer": {
+	              "type": "AppLaunchReferrer",
+	              "id": 5
+	            }
+	          }
+	        },
+	        "AppLaunchReferrer": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchReferrer"
+	          },
+	          "fields": {
+	            "appId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 2
+	            },
+	            "connectionId": {
+	              "type": "UniqueId",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "AppLaunchResponse": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchResponse"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "UniqueId": {
+	          "options": {
+	            "(.interop.message_id)": "interop.UniqueId"
+	          },
+	          "fields": {
+	            "lo": {
+	              "type": "fixed64",
+	              "id": 1
+	            },
+	            "hi": {
+	              "type": "fixed64",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "AppLaunchMode": {
+	          "values": {
+	            "SINGLE_INSTANCE": 0,
+	            "MULTI_INSTANCE": 1
+	          }
+	        }
+	      }
+	    },
 	    "plexus": {
 	      "nested": {
 	        "interop": {
@@ -955,161 +1140,14 @@
 	                    },
 	                    "SubEnum": {
 	                      "values": {
-	                        "value_one": 0,
-	                        "value_two": 1
+	                        "VALUE_ONE": 0,
+	                        "VALUE_TWO": 1
 	                      }
 	                    }
 	                  }
 	                }
 	              }
 	            }
-	          }
-	        }
-	      }
-	    },
-	    "interop": {
-	      "options": {
-	        "csharp_namespace": "plexus"
-	      },
-	      "nested": {
-	        "messageId": {
-	          "type": "string",
-	          "id": 9650,
-	          "extend": "google.protobuf.MessageOptions"
-	        },
-	        "serviceId": {
-	          "type": "string",
-	          "id": 9650,
-	          "extend": "google.protobuf.ServiceOptions"
-	        },
-	        "methodId": {
-	          "type": "string",
-	          "id": 9650,
-	          "extend": "google.protobuf.MethodOptions"
-	        },
-	        "ApplicationOptions": {
-	          "fields": {
-	            "title": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "launchOnCall": {
-	              "type": "ApplicationLaunchOnCallMode",
-	              "id": 2
-	            }
-	          }
-	        },
-	        "ProvidedServiceOptions": {
-	          "fields": {
-	            "title": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "launchOnCall": {
-	              "type": "ApplicationLaunchOnCallMode",
-	              "id": 2
-	            }
-	          }
-	        },
-	        "ConsumedServiceOptions": {
-	          "fields": {}
-	        },
-	        "ProvidedMethodOptions": {
-	          "fields": {
-	            "title": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "launchOnCall": {
-	              "type": "ApplicationLaunchOnCallMode",
-	              "id": 2
-	            },
-	            "timeoutMs": {
-	              "type": "uint32",
-	              "id": 3
-	            }
-	          }
-	        },
-	        "ConsumedMethodOptions": {
-	          "fields": {}
-	        },
-	        "ApplicationLaunchOnCallMode": {
-	          "options": {
-	            "allow_alias": true
-	          },
-	          "values": {
-	            "IF_NOT_LAUNCHED": 0,
-	            "DEFAULT": 0,
-	            "ALWAYS": 1,
-	            "ENABLED": 1,
-	            "NEVER": 2,
-	            "DISABLED": 2
-	          }
-	        },
-	        "AppLauncherService": {
-	          "options": {
-	            "(.interop.service_id)": "interop.AppLauncherService"
-	          },
-	          "methods": {
-	            "Launch": {
-	              "requestType": "AppLaunchRequest",
-	              "responseType": "AppLaunchResponse"
-	            }
-	          }
-	        },
-	        "AppLaunchRequest": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLaunchRequest"
-	          },
-	          "fields": {
-	            "appId": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "launchParamsJson": {
-	              "type": "string",
-	              "id": 2
-	            },
-	            "launchMode": {
-	              "type": "AppLaunchMode",
-	              "id": 3
-	            },
-	            "suggestedAppInstanceId": {
-	              "type": "UniqueId",
-	              "id": 4
-	            }
-	          }
-	        },
-	        "AppLaunchResponse": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLaunchResponse"
-	          },
-	          "fields": {
-	            "appInstanceId": {
-	              "type": "UniqueId",
-	              "id": 1
-	            }
-	          }
-	        },
-	        "UniqueId": {
-	          "options": {
-	            "(.interop.message_id)": "interop.UniqueId"
-	          },
-	          "fields": {
-	            "lo": {
-	              "type": "fixed64",
-	              "id": 1
-	            },
-	            "hi": {
-	              "type": "fixed64",
-	              "id": 2
-	            }
-	          }
-	        },
-	        "AppLaunchMode": {
-	          "values": {
-	            "SINGLE_INSTANCE": 0,
-	            "MULTI_INSTANCE": 1
 	          }
 	        }
 	      }
@@ -1174,6 +1212,13 @@
 	"applications": [
 		{
 			"id": "plexus.interop.testing.EchoClient",
+			"options": [
+				{
+					"id": "plexus.interop.testing.app_alias",
+					"value": "echo-client"
+				}
+			]
+			,
 			"consumes": [
 				{
 					"service": "plexus.interop.testing.EchoService",
@@ -1211,6 +1256,13 @@
 		},
 		{
 			"id": "plexus.interop.testing.EchoServer",
+			"options": [
+				{
+					"id": "plexus.interop.testing.app_alias",
+					"value": "echo-server"
+				}
+			]
+			,
 			"provides": [
 				{
 					"service": "plexus.interop.testing.EchoService",
@@ -1221,6 +1273,10 @@
 								{
 									"id": "interop.ProvidedMethodOptions.title",
 									"value": "Sample Unary Method"
+								},
+								{
+									"id": "plexus.interop.testing.provided_method_alias",
+									"value": "unary-method"
 								}
 							]
 						},
@@ -1230,6 +1286,10 @@
 								{
 									"id": "interop.ProvidedMethodOptions.title",
 									"value": "Sample Server Streaming Method"
+								},
+								{
+									"id": "plexus.interop.testing.provided_method_alias",
+									"value": "server-stream"
 								}
 							]
 						},

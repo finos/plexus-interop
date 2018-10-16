@@ -18,6 +18,6 @@ export * from './generic';
 export * from '@plexus-interop/client-api';
 export * from './InvocationClient';
 export * from './ValueHandler';
-export * from './io';
+export * from '@plexus-interop/io';
 export * from './DelegateInvocationObserver';
 export * from './container';

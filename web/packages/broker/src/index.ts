@@ -16,8 +16,4 @@
  */
 export * from './api';
 export * from './bus';
-export * from './metadata';
-export * from './http';
 export * from './launcher';
-export * from './io';
-export * from './ws/WebSocketDataProvider';

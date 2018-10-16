@@ -23,7 +23,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
-import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/broker';
+import { App, ConsumedService, ProvidedService, ConsumedMethod, InteropRegistryService } from '@plexus-interop/metadata';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/observable/of';
 import { FormControl } from '@angular/forms';

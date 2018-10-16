@@ -22,6 +22,8 @@ import { TimeUtils } from '@plexus-interop/common';
 import * as Long from 'long';
 import { ConnectionSetup } from './ConnectionSetup';
 import { NopServiceAliasHandler } from '../echo/NopServiceAliasHandler';
+import { GenericClientApi, ContainerAwareClientAPIBuilder, GenericClientApiBuilder } from '@plexus-interop/client';
+import { BinaryMarshallerProvider } from '@plexus-interop/io';
 
 export class ClientsSetup {
 
@@ -42,6 +44,27 @@ export class ClientsSetup {
 
     public createEchoClient(transportConnectionProvider: ConnectionProvider): Promise<EchoClientClient> {
         return new EchoClientClientBuilder()
+            .withTransportConnectionProvider(async () => {
+                this.clientConnectionSetup = await transportConnectionProvider();
+                return this.clientConnectionSetup.getConnection();
+            })
+            .connect();
+    }
+
+    public async createGenericClientAndStaticServer(
+        clientMarshaller: BinaryMarshallerProvider,
+        transportConnectionProvider: ConnectionProvider,
+        serviceHandler: EchoServiceInvocationHandler,
+        aliasServiceHandler: ServiceAliasInvocationHandler = new NopServiceAliasHandler()): Promise<[GenericClientApi, EchoServerClient]> {
+        const server = await this.createEchoServer(transportConnectionProvider, serviceHandler, aliasServiceHandler);
+        const client = await this.createGenericEchoClient(transportConnectionProvider, clientMarshaller);
+        await TimeUtils.timeout(this.clientConnectionDelay);
+        return [client, server];
+    }
+
+    public createGenericEchoClient(transportConnectionProvider: ConnectionProvider, marhallerProvider: BinaryMarshallerProvider): Promise<GenericClientApi> {
+        return new GenericClientApiBuilder(marhallerProvider)
+            .withApplicationId('plexus.interop.testing.EchoClient')
             .withTransportConnectionProvider(async () => {
                 this.clientConnectionSetup = await transportConnectionProvider();
                 return this.clientConnectionSetup.getConnection();

@@ -18,7 +18,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppActions } from '../services/ui/AppActions';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
-import { ProvidedMethod, ProvidedService } from '@plexus-interop/broker';
+import { ProvidedMethod, ProvidedService } from '@plexus-interop/metadata';
 import { InteropClient } from '../services/core/InteropClient';
 import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
 import { Logger, LoggerFactory } from '@plexus-interop/common';

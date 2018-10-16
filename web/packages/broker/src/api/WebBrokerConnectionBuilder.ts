@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 import { TransportConnection, InMemoryConnectionFactory } from '@plexus-interop/transport-common';
-import { AppRegistryProvider } from '../metadata/apps/AppRegistryProvider';
-import { InteropRegistryProvider } from '../metadata/interop/InteropRegistryProvider';
+import { AppRegistryProvider } from '@plexus-interop/metadata';
+import { InteropRegistryProvider } from '@plexus-interop/metadata';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
-import { AppRegistryService } from '../metadata/apps/AppRegistryService';
+import { AppRegistryService } from '@plexus-interop/metadata';
 import { EventBus } from '../bus/EventBus';
 import { RemoteBrokerService } from '../peers/remote/RemoteBrokerService';
 import { EventBusRemoteBrokerService } from '../peers/remote/EventBusRemoteBrokerService';

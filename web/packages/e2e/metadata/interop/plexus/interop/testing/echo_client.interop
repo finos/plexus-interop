@@ -16,11 +16,12 @@
 //
 
 import "plexus/interop/testing/echo_service.proto";
+import "plexus/interop/testing/custom_options.proto";
 
 package plexus.interop.testing;
 
 application EchoClient {
-	
+	option (app_alias) = "echo-client";
 	consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
 	consumes plexus.interop.testing.EchoService as ServiceAlias from plexus.interop.testing.* { Unary; }
 }

@@ -22,7 +22,7 @@ import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
 import { Router } from '@angular/router';
 import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
-import { InteropRegistryService, ConsumedMethod } from '@plexus-interop/broker';
+import { InteropRegistryService, ConsumedMethod } from '@plexus-interop/metadata';
 import { DiscoveredMethod, InvocationRequestInfo, MethodType, StreamingInvocationClient, ConsumedService } from '@plexus-interop/client';
 import { UniqueId } from '@plexus-interop/protocol';
 import { Logger, LoggerFactory } from '@plexus-interop/common';

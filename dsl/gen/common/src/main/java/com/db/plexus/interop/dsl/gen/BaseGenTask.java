@@ -102,9 +102,12 @@ public abstract class BaseGenTask implements GenTask {
     }
 
     protected List<String> getProtoFilePaths(EList<Resource> resources, PlexusGenConfig config) {
+        final String excludePattern = config.getExcludePattern();
+        final boolean excludePatternIsEmpty = excludePattern == null || excludePattern.trim().isEmpty();
         return resources.stream()
                 .filter(x -> x.getURI().lastSegment().endsWith(".proto"))
                 .filter(x -> config.isIncludeProtoDescriptors() || !x.getURI().toString().endsWith(ProtoLangUtils.DESCRIPTOR_RESOURCE_PATH))
+                .filter(x -> excludePatternIsEmpty || !x.getURI().toString().matches(excludePattern))
                 .filter(x -> config.isIncludeProtoDescriptors() || !x.getURI().toString().endsWith(InteropLangUtils.DESCRIPTOR_RESOURCE_PATH))
                 .filter(x -> x.getURI().toFileString() != null)
                 .map(resource -> new File(resource.getURI().resolve(workingDirUri).toFileString()).getAbsolutePath())

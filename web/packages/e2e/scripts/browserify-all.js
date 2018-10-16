@@ -35,8 +35,9 @@ console.log('Processing files: ' + JSON.stringify(testFiles));
 
 let browserifyBundle = browserify({ 
     entries: testFiles, 
-    standalone: argv.standalone 
-});
+    standalone: argv.standalone
+})
+.external('websocket');
 
 const coverageIgnorePatterns =  [
     // skip all node modules, except our

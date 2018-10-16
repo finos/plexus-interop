@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { InteropClient } from '../core/InteropClient';
-import { ConsumedMethod, ProvidedMethod } from '@plexus-interop/broker';
+import { ConsumedMethod, ProvidedMethod } from '@plexus-interop/metadata';
 import { DiscoveredMethod } from '@plexus-interop/client';
 import { ValidatorFn, AbstractControl } from '@angular/forms';
 

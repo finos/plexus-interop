@@ -26,8 +26,8 @@ import { ValueHandler } from './../ValueHandler';
 import { ClientError } from '@plexus-interop/protocol';
 import { InvocationRequestInfo } from '@plexus-interop/protocol';
 import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
-import { MarshallerProvider } from '../io/MarshallerProvider';
 import { Completion } from '@plexus-interop/client-api';
+import { BinaryMarshallerProvider } from '@plexus-interop/io';
 import { UniqueId } from '@plexus-interop/transport-common';
 import { ProvidedMethodReference, ActionReference } from '@plexus-interop/client-api';
 import { Invocation } from '../../generic/Invocation';
@@ -47,7 +47,7 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
 
     constructor(
         protected readonly genericClient: GenericClient,
-        protected readonly marshallerProvider: MarshallerProvider,
+        protected readonly marshallerProvider: BinaryMarshallerProvider,
         protected readonly handlersRegistry: InvocationHandlersRegistry
     ) { }
 
@@ -59,7 +59,7 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         return this.genericClient.getConnectionId();
     }
 
-    public getMarshallerProvider(): MarshallerProvider {
+    public getMarshallerProvider(): BinaryMarshallerProvider {
         return this.marshallerProvider;
     }
 

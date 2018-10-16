@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistry, Message } from '@plexus-interop/broker';
+import { InteropRegistry, Message } from '@plexus-interop/metadata';
 import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 
 import { default as Set } from 'typescript-collections/dist/lib/Set';

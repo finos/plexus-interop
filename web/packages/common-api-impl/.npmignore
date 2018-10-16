@@ -1,0 +1,5 @@
+.gradle
+.vscode
+node_modules
+target
+coverage

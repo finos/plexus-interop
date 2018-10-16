@@ -21,7 +21,7 @@ import { StreamingInvocationClient } from './StreamingInvocationClient';
 import { ClientDtoUtils } from '../../../../ClientDtoUtils';
 import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
 import { MethodInvocationContext } from '@plexus-interop/client-api';
-import { MarshallerProvider } from '../../../io/MarshallerProvider';
+import { BinaryMarshallerProvider } from '@plexus-interop/io';
 
 export class ServerStreamingConverter<Req, Res> implements InvocationHandlerConverter<ServerStreamingInvocationHandler<Req, Res>, Req, Res> {
 
@@ -54,7 +54,7 @@ export function toGenericStreamingHandler(
     typedHandler: ServerStreamingInvocationHandler<any, any>,
     requestType: any,
     responseType: any,
-    marshallerProvider: MarshallerProvider): ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
+    marshallerProvider: BinaryMarshallerProvider): ServerStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
 
     const requestMarshaller = marshallerProvider.getMarshaller(requestType);
     const responseMarshaller = marshallerProvider.getMarshaller(responseType);
@@ -78,7 +78,7 @@ export function toGenericBidiStreamingHandler(
     typedHandler: BidiStreamingInvocationHandler<any, any>,
     requestType: any,
     responseType: any,
-    marshallerProvider: MarshallerProvider): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
+    marshallerProvider: BinaryMarshallerProvider): BidiStreamingInvocationHandler<ArrayBuffer, ArrayBuffer> {
     const requestMarshaller = marshallerProvider.getMarshaller(requestType);
     const responseMarshaller = marshallerProvider.getMarshaller(responseType);
     return {

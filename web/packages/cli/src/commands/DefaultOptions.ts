@@ -39,6 +39,17 @@ export function baseDir(): Option {
     };
 }
 
+export function excludePattern(): Option {
+    return {
+        shortName: 'e',
+        longName: 'exclude',
+        exampleValue: '.*options.*',
+        description: 'exclude pattern (regexp) to filter *.proto files',
+        isRequired: false,        
+        defaultValue: ''
+    };
+}
+
 export function plexusEntryPoint(): Option {
     return {
         shortName: 'i',

@@ -22,7 +22,20 @@ describe('BaseCommand', () => {
 
     it('Generates example from defined options', () => {
         const command: BaseCommand = new GenJsonCommand();
-        expect(command.usageExamples()).toBe(' $ plexus gen-json-meta -b metadata -o src/gen -v');
+        expect(command.usageExamples()).toBe(' $ plexus gen-json-meta -b metadata -o src/gen -v -e .*options.*');
+    });
+
+    it('Parses verbose flag correctly', () => {
+
+        const command: BaseCommand = new GenJsonCommand();
+
+        expect(command.isVerbose({})).toBe(false);
+        expect(command.isVerbose(null)).toBe(false);
+        expect(command.isVerbose({ verbose: 'false' })).toBe(false);
+
+        expect(command.isVerbose({ verbose: true })).toBe(true);
+        expect(command.isVerbose({ verbose: 'true' })).toBe(true);
+
     });
 
     it('Generates option args', () => {
@@ -30,20 +43,20 @@ describe('BaseCommand', () => {
         const args = command.optionArgs({
             baseDir: 'baseDir',
             out: 'out'
-        }, '=');        
+        }, '=');
         expect(args.join(' ')).toBe('--baseDir=baseDir --out=out');
     });
 
     it('Fails validation if required option not provided', () => {
         const command: BaseCommand = new GenJsonCommand();
-        expect(command.validateRequiredOpts([baseDir()], {}).length).toBe(1);        
+        expect(command.validateRequiredOpts([baseDir()], {}).length).toBe(1);
     });
 
     it('Passes validation if required option provided', () => {
         const command: BaseCommand = new GenJsonCommand();
         expect(command.validateRequiredOpts([baseDir()], {
             baseDir: 'value'
-        }).length).toBe(0);        
+        }).length).toBe(0);
     });
 
 });

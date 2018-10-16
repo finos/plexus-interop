@@ -17,7 +17,8 @@
 import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
 import { ConnectionProvider } from './ConnectionProvider';
 import { WebBrokerConnectionBuilder, EventBus } from '@plexus-interop/broker';
-import { CrossDomainEventBusProvider, CrossDomainEventBus, JsonAppRegistryProvider, JsonInteropRegistryProvider } from '@plexus-interop/broker';
+import { CrossDomainEventBusProvider, CrossDomainEventBus } from '@plexus-interop/broker';
+import { JsonAppRegistryProvider, JsonInteropRegistryProvider } from '@plexus-interop/metadata';
 import { TransportConnection } from '@plexus-interop/transport-common';
 import { RawMetadata } from './RawMetadata';
 

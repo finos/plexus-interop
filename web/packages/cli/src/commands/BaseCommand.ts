@@ -61,6 +61,10 @@ export abstract class BaseCommand implements Command {
             }, []);
     }
 
+    public isVerbose(opts: any): boolean {
+        return !!opts && !!opts.verbose && opts.verbose !== 'false';
+    }
+
     public log(msg: string, ...args: any[]): void {
         console.log(`[${this.name()}] ${msg}`, args);
     }

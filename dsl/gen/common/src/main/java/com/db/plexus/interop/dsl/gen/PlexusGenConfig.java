@@ -55,6 +55,17 @@ public class PlexusGenConfig {
     @Parameter(names = {"-tb", "--targetBaseDir"})
     private String targetBaseDir;
 
+    @Parameter(names = {"-e", "--exclude"})
+    private String excludePattern;
+
+    public String getExcludePattern() {
+        return excludePattern;
+    }
+
+    public void setExcludePattern(String excludePattern) {
+        this.excludePattern = excludePattern;
+    }
+
     private List<String> externalDependencies = new ArrayList<>();
 
     private String messagesMetadata;
