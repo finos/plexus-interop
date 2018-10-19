@@ -41,14 +41,6 @@ namespace Plexus.Interop.Transport.Internal
             header.Handle(_handler, Nothing.Instance);
         }
 
-        public void OnCompleted()
-        {
-            if (_state != State.Disconnected)
-            {
-                throw new ProtocolException($"Completed unexpectedly in state {_state}");
-            }
-        }
-
         private Nothing Handle(ITransportChannelHeader header, Nothing _)
         {
             switch (_state)

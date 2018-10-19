@@ -53,7 +53,10 @@ namespace Plexus.Interop.Transport.Internal
         private async Task ProcessAsync()
         {
             await _receiveProcessor.In.ConsumeAsync(HandleReceivedAsync).ConfigureAwait(false);
-            _stateValidator.OnCompleted();
+            if (_stateValidator.IsDisconnected)
+            {
+                _log.Warn("Connection completed unexpectedly without close handshake");
+            }
         }
 
         private async Task HandleReceivedAsync(TransportMessage message)
