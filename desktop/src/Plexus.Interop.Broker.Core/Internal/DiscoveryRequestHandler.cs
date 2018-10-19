@@ -137,7 +137,6 @@ namespace Plexus.Interop.Broker.Internal
             IAppConnection sourceConnection,
             ITransportChannel sourceChannel)
         {
-            Debugger.Launch();
             Log.Info("Handling method discovery request {{{0}}} from {{{1}}}", request, sourceConnection);
             var appId = sourceConnection.Info.ApplicationId;
             IEnumerable<IProvidedMethod> matchingProvidedMethods =
