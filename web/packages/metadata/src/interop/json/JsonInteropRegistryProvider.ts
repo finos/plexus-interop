@@ -182,7 +182,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
             return {
                 method: service.methods.get(pm.name) as Method,
                 providedService,
-                title: this.getOptionValueOrDefault(pm.options, 'interop.ProvidedMethodOptions.title', pm.name),
+                title: this.getOptionValueOrDefault(pm.options, 'interop.ProvidedMethodOptions.title', null),
                 options: pm.options
             } as ProvidedMethod;
         })
@@ -191,7 +191,7 @@ export class JsonInteropRegistryProvider implements InteropRegistryProvider {
         return providedService;
     }
 
-    private getOptionValueOrDefault(options: OptionDto[], id: string, defaultValue: string): string {
+    private getOptionValueOrDefault(options: OptionDto[], id: string, defaultValue: string | null): string | null {
         if (options) {
             for (let o of options) {
                 if (o.id === id) {

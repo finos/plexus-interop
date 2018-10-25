@@ -87,7 +87,13 @@ describe('JsonRegistryProvider', () => {
         expect(providedService.to.isMatch('plexus.interop.testing.EchoClient2')).toBeTruthy();
         expect(providedService.to.isMatch('plexus.interop.do.not.exist.Client')).toBeFalsy();
         expect(providedService.to.isMatch('plexus.interop.do.not.exist.Client')).toBeFalsy();
-        expect((providedService.methods.get('Unary') as ProvidedMethod).method).toBe(unaryMethod);
+        
+        const unaryProvidedMethod = providedService.methods.get('Unary') as ProvidedMethod;
+        expect(unaryProvidedMethod.method).toBe(unaryMethod);
+        expect(unaryProvidedMethod.title).toBeTruthy();
+
+        const duplexStreamingProvidedMethod = providedService.methods.get('DuplexStreaming') as ProvidedMethod;
+        expect(duplexStreamingProvidedMethod.title).toBe(null);
 
     });
 
