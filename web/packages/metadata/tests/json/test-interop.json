@@ -1241,13 +1241,7 @@
 							]
 						},
 						{
-							"name": "DuplexStreaming",
-							"options": [
-								{
-									"id": "interop.ProvidedMethodOptions.title",
-									"value": "Sample Duplex Streaming Method"
-								}
-							]
+							"name": "DuplexStreaming"
 						}
 					],
 					"to": [

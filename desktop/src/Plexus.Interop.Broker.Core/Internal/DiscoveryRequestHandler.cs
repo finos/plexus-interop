@@ -24,6 +24,7 @@ namespace Plexus.Interop.Broker.Internal
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
     using MethodType = Plexus.Interop.Protocol.Discovery.MethodType;
@@ -34,14 +35,14 @@ namespace Plexus.Interop.Broker.Internal
 
         private readonly IProtocolImplementation _protocol;
         private readonly IRegistryService _registryService;
-        private readonly IAppLifecycleManager _connectionTracker;
+        private readonly IAppLifecycleManager _appLifecycleManager;
 
         public DiscoveryRequestHandler(
-            IAppLifecycleManager connectionTracker,
+            IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
             IRegistryService registryService)
         {
-            _connectionTracker = connectionTracker;
+            _appLifecycleManager = appLifecycleManager;
             _protocol = protocol;
             _registryService = registryService;
         }
@@ -50,7 +51,7 @@ namespace Plexus.Interop.Broker.Internal
             IServiceDiscoveryRequest request, 
             IAppConnection sourceConnection, 
             ITransportChannel sourceChannel)
-        {
+        {            
             IReadOnlyCollection<(IConsumedMethod Consumed, IProvidedMethod Provided)> methodMatches;
             if (request.ConsumedService.HasValue)
             {
@@ -65,7 +66,10 @@ namespace Plexus.Interop.Broker.Internal
             IEnumerable<IGrouping<(IConsumedService ConsumedService, IProvidedService ProvidedService, Maybe<UniqueId> ConnectionId), IProvidedMethod>> groupedMethods;
             if (request.DiscoveryMode == DiscoveryMode.Offline)
             {
+                var providerApps = methodMatches.Select(x => x.Provided.ProvidedService.Application.Id).Distinct().ToArray();
+                var availableProviderApps = FilterAvailableApps(providerApps);
                 groupedMethods = methodMatches
+                    .Join(availableProviderApps, x=>x.Provided.ProvidedService.Application.Id, y=>y, (x, y) => x)
                     .GroupBy(
                         x => (
                             x.Consumed.ConsumedService,
@@ -75,7 +79,7 @@ namespace Plexus.Interop.Broker.Internal
             }
             else
             {
-                var onlineConnections = _connectionTracker.GetOnlineConnections();
+                var onlineConnections = _appLifecycleManager.GetOnlineConnections();
                 groupedMethods = methodMatches
                     .Join(onlineConnections, x=> x.Provided.ProvidedService.Application.Id, y=>y.Info.ApplicationId, (x, y) => (Match: x, ConnectionId: y.Id))
                     .GroupBy(
@@ -152,7 +156,7 @@ namespace Plexus.Interop.Broker.Internal
             IEnumerable<IDiscoveredMethod> discoveredMethods;
             if (request.DiscoveryMode == DiscoveryMode.Online)
             {
-                var onlineConnections = _connectionTracker.GetOnlineConnections();
+                var onlineConnections = _appLifecycleManager.GetOnlineConnections();
                 discoveredMethods = matchingProvidedMethods
                     .Join(
                         onlineConnections,
@@ -163,7 +167,11 @@ namespace Plexus.Interop.Broker.Internal
             }
             else
             {
-                discoveredMethods = matchingProvidedMethods
+                var providedMethods = matchingProvidedMethods.ToArray();
+                var providerApps = providedMethods.Select(x => x.ProvidedService.Application.Id).Distinct().ToArray();
+                var availableProviderApps = FilterAvailableApps(providerApps);
+                discoveredMethods = providedMethods
+                    .Join(availableProviderApps, x => x.ProvidedService.Application.Id, y => y, (x, y) => x)
                     .Select(pm => Convert(pm, Maybe<UniqueId>.Nothing));
             }
             using (var response = _protocol.MessageFactory.CreateMethodDiscoveryResponse(discoveredMethods.ToList()))
@@ -217,6 +225,15 @@ namespace Plexus.Interop.Broker.Internal
                 default:
                     throw new ArgumentOutOfRangeException(nameof(methodType), methodType, null);
             }
+        }
+
+        private IEnumerable<string> FilterAvailableApps(string[] providerApps)
+        {
+            var launchableProviderApps = _appLifecycleManager.FilterCanBeLaunched(providerApps);
+            var onlineApps = _appLifecycleManager.GetOnlineConnections().Select(x => x.Info.ApplicationId).Distinct();
+            var onlineProviderApps = providerApps.Intersect(onlineApps);
+            var availableProviderApps = launchableProviderApps.Union(onlineProviderApps);
+            return availableProviderApps;
         }
     }
 }

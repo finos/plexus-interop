@@ -166,7 +166,7 @@ export class ElectronAppLauncher {
             this.log.debug(`${this.brokerDirEnvProperty} env property is empty, resolving to default ${this.defaultBrokerWorkingDir}`);
             brokerDir = path.resolve(this.defaultBrokerWorkingDir);
         }
-        return brokerDir;
+        return brokerDir as string;
     }
 
     private getAppInstanceId(): UniqueId {
