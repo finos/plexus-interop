@@ -18,6 +18,7 @@ namespace Plexus.Interop.Apps.Internal
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Threading;
 
     internal sealed class JsonFileAppRegistryProvider : IAppRegistryProvider, IDisposable
@@ -26,9 +27,10 @@ namespace Plexus.Interop.Apps.Internal
 
         private readonly string _jsonFileName;
         private readonly FileSystemWatcher _watcher;
-        public AppsDto Current { get; private set; }
+        
+        public AppRegistry Current { get; private set; }
 
-        public event Action<AppsDto> Updated = registry => { };
+        public event Action<AppRegistry> Updated = registry => { };
 
         private readonly object _timerLock = new object();
         private volatile Timer _reloadTimer;
@@ -40,7 +42,7 @@ namespace Plexus.Interop.Apps.Internal
             return new JsonFileAppRegistryProvider(registry, jsonFileName);
         }
 
-        private JsonFileAppRegistryProvider(AppsDto registry, string jsonFileName)
+        private JsonFileAppRegistryProvider(AppRegistry registry, string jsonFileName)
         {
             _jsonFileName = Path.GetFullPath(jsonFileName);            
             var jsonFileDirectory = Path.GetDirectoryName(_jsonFileName) ?? throw new InvalidOperationException();
@@ -100,9 +102,11 @@ namespace Plexus.Interop.Apps.Internal
             }
         }
 
-        private static AppsDto LoadRegistry(string jsonFileName)
+        private static AppRegistry LoadRegistry(string jsonFileName)
         {
-            return AppsDto.Load(jsonFileName);
+            var dto = AppsDto.Load(jsonFileName);
+            var registry = new AppRegistry(dto.Apps.Select(x => new AppInfo(x.Id, x.DisplayName, x.LauncherId, x.LauncherParams)));
+            return registry;
         }
     }
 }

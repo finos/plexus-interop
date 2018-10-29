@@ -16,12 +16,24 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
-    using System;
+    using Newtonsoft.Json.Linq;
 
-    internal interface IAppRegistryProvider
+    internal class AppInfo
     {
-        AppRegistry Current { get; }
+        public AppInfo(string id, string displayName, string launcherId, JObject launcherParams)
+        {
+            Id = id;
+            DisplayName = displayName;
+            LauncherId = launcherId;
+            LauncherParams = launcherParams;
+        }
 
-        event Action<AppRegistry> Updated;
+        public string Id { get; set; }
+
+        public string DisplayName { get; set; }
+
+        public string LauncherId { get; set; }
+
+        public JObject LauncherParams { get; set; }
     }
 }

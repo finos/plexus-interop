@@ -173,7 +173,6 @@ namespace Plexus.Interop.Apps.Internal
 
         public IEnumerable<string> FilterCanBeLaunched(IEnumerable<string> appIds)
         {
-            // .Where(x => !string.IsNullOrEmpty(x.LauncherId))
             return appIds.Join(_appRegistryProvider.Current.Apps, x => x, y => y.Id, (x, y) => x).Distinct();
         }
 

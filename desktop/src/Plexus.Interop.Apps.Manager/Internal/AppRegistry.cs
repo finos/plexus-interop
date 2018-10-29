@@ -16,12 +16,15 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
-    using System;
+    using System.Collections.Generic;
 
-    internal interface IAppRegistryProvider
+    internal class AppRegistry
     {
-        AppRegistry Current { get; }
+        public AppRegistry(IEnumerable<AppInfo> apps)
+        {
+            Apps = new List<AppInfo>(apps);
+        }
 
-        event Action<AppRegistry> Updated;
+        public IReadOnlyCollection<AppInfo> Apps { get; }
     }
 }
