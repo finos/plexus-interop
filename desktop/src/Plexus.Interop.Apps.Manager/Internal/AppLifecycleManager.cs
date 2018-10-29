@@ -44,15 +44,16 @@ namespace Plexus.Interop.Apps.Internal
         private readonly HashSet<IWritableChannel<Generated.AppLifecycleEvent>> _appLifecycleEventSubscribers =
             new HashSet<IWritableChannel<Generated.AppLifecycleEvent>>();
 
+        private readonly IAppRegistryProvider _appRegistryProvider;
+
         private readonly Generated.IAppLifecycleManagerClient _client;
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.CreateDefault();
         private readonly NativeAppLauncherClient _nativeAppLauncherClient;
-        private readonly AppsDto _appsDto;
 
         public AppLifecycleManager(string metadataDir)
         {
             _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir, _jsonSerializer);
-            _appsDto = AppsDto.Load(Path.Combine(metadataDir, "apps.json"));
+            _appRegistryProvider = JsonFileAppRegistryProvider.Initialize(Path.Combine(metadataDir, "apps.json"));
             _client = new Generated.AppLifecycleManagerClient(
                 this, 
                 s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
@@ -173,7 +174,7 @@ namespace Plexus.Interop.Apps.Internal
         public IEnumerable<string> FilterCanBeLaunched(IEnumerable<string> appIds)
         {
             // .Where(x => !string.IsNullOrEmpty(x.LauncherId))
-            return appIds.Join(_appsDto.Apps, x => x, y => y.Id, (x, y) => x).Distinct();
+            return appIds.Join(_appRegistryProvider.Current.Apps, x => x, y => y.Id, (x, y) => x).Distinct();
         }
 
         public bool CanBeLaunched(string appId)
@@ -355,7 +356,7 @@ namespace Plexus.Interop.Apps.Internal
             ResolveMode resolveMode,
             AppConnectionDescriptor referrerConnectionInfo)
         {            
-            var appDto = _appsDto.Apps.FirstOrDefault(x => string.Equals(x.Id, appId));
+            var appDto = _appRegistryProvider.Current.Apps.FirstOrDefault(x => string.Equals(x.Id, appId));
             if (appDto == null)
             {
                 throw new InvalidOperationException($"The requested application {appId} is not defined in application registry");
