@@ -1,0 +1,45 @@
+:imagesdir: ./images
+
+Plexus Interop consist of the following main API layers:
+
+image::desktop-interop-layers.png[]
+
+All Applications are connected to central Broker.  To participate in interop each Application need to define itself in
+Interop Registry and auto-generate its specific client API using code-generation tool. Broker loads Interop Registry on
+startup and re-loads when it is changed in runtime to discover available actions, validate and route calls
+between Applications.
+
+==== Broker
+
+Broker is a process running on user desktop which handles application connections, routes calls between them and able
+to launch new applications instances on demand.
+
+[plantuml]
+....
+@startuml
+skinparam monochrome true
+[Interop Broker] -up-> [App A Instance 1] : send/receive\nmessages
+[Interop Broker] -right-> [App A Instance 2] : send/receive\nmessages
+[Interop Broker] -down-> [App C Instance 1] : send/receive\nmessages
+[Interop Broker] -left-> [App D Instance 1] : send/receive\nmessages
+@enduml
+....
+
+Interop Broker has several responsibilities:
+
+* It reads full information about all interoperability APIs from Interop Registry
+* It routes interop API calls and replies between app instances
+* It tracks which application instances are alive. If some app calls a service which is not online yet then Broker launches service provider app via App Lifecycle Manager.
+
+==== Clients
+
+Clients are technology-specific libraries used by Applications to communicate with Broker. Currently
+Plexus Interop has 2 types of clients: for .NET and for TypeScript/JavaScript.
+
+Clients communicate with Broker using Interop Protocol. Protocol messages are sent via Transport Protocol. Broker
+can support one or more Interop and Transport protocols and Client can choose which of them to use.
+
+
+==== Interop DSL
+Interop DSL is a language for defining contracts between Applications, and associated tooling for parsing, validating and
+code-generating of application-specific client APIs from these definitions.
