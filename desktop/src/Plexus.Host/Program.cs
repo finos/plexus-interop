@@ -141,8 +141,7 @@ namespace Plexus.Host
             var uriBuilder = new UriBuilder(wsUri)
             {
                 Scheme = "http",
-                Path = "studio/index.html",               
-                Query = $"transport=native-ws&wsUrl={wsUri}"
+                Path = "studio/index.html"
             };
             var uri = uriBuilder.Uri;
             Console.WriteLine("Starting " + uri);
