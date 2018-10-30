@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,12 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Host.Internal
+namespace Plexus.Interop
 {
-    using CommandLine;
-
-    [Verb("stop", HelpText = "Stop interop broker.")]
-    internal sealed class StopOptions
+    public sealed class BrokerOptions
     {
+        public BrokerOptions(string metadataDir, uint port)
+        {
+            MetadataDir = metadataDir;
+            Port = port;
+        }
+
+        public string MetadataDir { get; }
+
+        public uint Port { get; }
+
+        public override string ToString()
+        {
+            return $"{nameof(MetadataDir)}: {MetadataDir}, {nameof(Port)}: {Port}";
+        }
     }
 }

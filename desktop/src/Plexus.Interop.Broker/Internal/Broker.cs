@@ -50,23 +50,30 @@ namespace Plexus.Interop.Internal
 
         protected override ILogger Log { get; } = LogManager.GetLogger<Broker>();
 
-        public Broker(string metadataDir = null, IRegistryProvider registryProvider = null)
+        public Broker(BrokerOptions options, IRegistryProvider registryProvider = null)
         {
             _workingDir = Directory.GetCurrentDirectory();
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var studioDir = Path.Combine(binDir, "studio");
             Log.Info("Studio dir: {0}", studioDir);
-            metadataDir = Path.GetFullPath(metadataDir ?? Path.Combine(_workingDir, "metadata"));            
+            var metadataDir = Path.GetFullPath(options.MetadataDir ?? Path.Combine(_workingDir, "metadata"));
             Log.Info("Metadata dir: {0}", metadataDir);
             var metadataFile = Path.Combine(metadataDir, "interop.json");
+            var webSocketTransmissionServerOptions = new WebSocketTransmissionServerOptions(
+                _workingDir,
+                options.Port,
+                new Dictionary<string, string>
+                {
+                    {"/metadata/interop", metadataFile},
+                    {"/studio", studioDir}
+                });
             _transportServers = new[]
             {
                 TransportServerFactory.Instance.Create(
-                    PipeTransmissionServerFactory.Instance.Create(_workingDir), DefaultTransportSerializationProvider),
+                    PipeTransmissionServerFactory.Instance.Create(_workingDir), 
+                    DefaultTransportSerializationProvider),
                 TransportServerFactory.Instance.Create(
-                    WebSocketTransmissionServerFactory.Instance.Create(
-                        _workingDir,
-                        new Dictionary<string, string>{ {"/metadata/interop", metadataFile }, {"/studio", studioDir }}),
+                    WebSocketTransmissionServerFactory.Instance.Create(webSocketTransmissionServerOptions),
                     DefaultTransportSerializationProvider)
             };
             _connectionListener = new ServerConnectionListener(_transportServers);

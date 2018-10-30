@@ -18,8 +18,8 @@
 {
     using CommandLine;
 
-    [Verb("studio", HelpText = "Start Plexus Studio.")]
-    internal sealed class StudioOptions
+    [Verb("stop", HelpText = "Stop interop broker.")]
+    internal sealed class StopCliOptions
     {
     }
 }
