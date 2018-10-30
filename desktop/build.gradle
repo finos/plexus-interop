@@ -149,4 +149,4 @@ task clean {
     delete fileTree(dir: 'src').include("**/bin/*").include("**/obj/*")
 }
 
-task build (dependsOn: [compile, test, push]) {}
+task build (dependsOn: [compile, test, push, ':dsl:interop-lang-vscode:build']) {}
