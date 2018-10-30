@@ -26,7 +26,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using Plexus.Pools;
     using Plexus.Processes;
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -45,12 +44,12 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private IWebHost _host;
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
         private readonly IServerStateWriter _stateWriter;
-        private readonly IReadOnlyDictionary<string, string> _staticFileMappings;
+        private readonly WebSocketTransmissionServerOptions _options;
 
-        public WebSocketTransmissionServer(string workingDir, IReadOnlyDictionary<string, string> staticFileMappings = null)
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options)
         {
-            _staticFileMappings = staticFileMappings ?? new Dictionary<string, string>();
-            _stateWriter = new ServerStateWriter(ServerName, workingDir);
+            _options = options;
+            _stateWriter = new ServerStateWriter(ServerName, _options.WorkingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
@@ -96,7 +95,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             Log.Trace("Resolving localhost url");
             var hostEntry = Dns.GetHostEntryAsync("localhost").GetResult();
             var localhostIp = hostEntry.AddressList.First(addr => addr.AddressFamily == AddressFamily.InterNetwork);
-            var url = $"http://{localhostIp}:0";
+            var url = $"http://{localhostIp}:{_options.Port}";
             _host = new WebHostBuilder()
                 .UseKestrel()
                 .SuppressStatusMessages(true)
@@ -126,7 +125,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 ReceiveBufferSize = PooledBuffer.MaxSize
             });
 
-            foreach (var pair in _staticFileMappings)
+            foreach (var pair in _options.StaticFileMappings)
             {
                 if (!Directory.Exists(pair.Value))
                 {
@@ -145,7 +144,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 if (context.WebSockets.IsWebSocketRequest)
                 {
                     var urlPath = context.Request.Path.ToString().TrimEnd('/');
-                    if (_staticFileMappings.TryGetValue(urlPath, out var physicalPath))
+                    if (_options.StaticFileMappings.TryGetValue(urlPath, out var physicalPath))
                     {
                         if (File.Exists(physicalPath))
                         {

@@ -16,13 +16,20 @@
  */
 ﻿namespace Plexus.Host.Internal
 {
-    using System.Collections.Generic;
     using CommandLine;
 
-    [Verb("launch", HelpText = "Launch interop application.")]
-    internal sealed class LaunchOptions
+    [Verb("start", HelpText = "Start interop broker.")]
+    internal class StartCliOptions
     {
-        [Option('a', "application", Required = true, HelpText = "Identifier of application.", Separator = ',')]
-        public IEnumerable<string> ApplicationIds { get; set; }
+        [Option('m', "metadata", Required = false, HelpText = "Directory to seek for metadata files: apps.json and interop.json.")]
+        public string Metadata { get; set; }
+
+        [Option('p', "port", Required = false, HelpText = "Port number to listen. If omitted, free port is selected automatically.")]
+        public uint Port { get; set; }
+    }
+
+    [Verb("broker", HelpText = "Start interop broker.")]
+    internal class BrokerCliOptions : StartCliOptions
+    {
     }
 }

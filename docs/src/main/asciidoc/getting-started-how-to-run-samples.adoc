@@ -1,8 +1,8 @@
-==== .NET/web interoperability sample
-
 :imagesdir: ./images
 
-This sample demonstrates interoperability calls between .NET Core console apps and web app running in Electron. As an example let us test how request-response and discovery work:
+Repository contains a sample demonstrating how Plexus Interop can be used to build interoperability between apps on desktop.
+
+The sample consist of .NET Core console app and web app running in Electron. As an example let us test how request-response call and discovery work:
 
 . Build samples - see <<how-to-build, How to build>> for details
 
@@ -32,8 +32,6 @@ image::sample-3.png[Sample-3]
 image::sample-4.png[Sample-4]
 
 You may check other call types by choosing other options in the "Greeting Client" app.
-
-==== How to find sample code
 
 Source code for sample flow is here:
 

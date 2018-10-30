@@ -25,11 +25,11 @@ namespace Plexus.Host.Internal
         private int _stopped;
         private IBroker _broker;
 
-        private readonly string _metadataDir;
+        private readonly BrokerOptions _options;
 
-        public BrokerProgram(string metadataDir)
+        public BrokerProgram(BrokerOptions options)
         {
-            _metadataDir = metadataDir;
+            _options = options;
         }
 
         public string Name { get; } = "Interop Broker";
@@ -40,7 +40,7 @@ namespace Plexus.Host.Internal
 
         public async Task<Task> StartAsync()
         {
-            _broker = BrokerFactory.Instance.Create(_metadataDir);
+            _broker = BrokerFactory.Instance.Create(_options);
             if (_stopped == 1)
             {
                 return Task.FromResult(0);

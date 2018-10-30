@@ -14,17 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+﻿namespace Plexus.Host.Internal
 {
-    using Plexus.Interop.Metamodel;
+    using CommandLine;
 
-    public sealed class BrokerFactory
+    [Verb("studio", HelpText = "Start Plexus Studio.")]
+    internal sealed class StudioCliOptions
     {
-        public static BrokerFactory Instance = new BrokerFactory();
-
-        public IBroker Create(BrokerOptions options, IRegistryProvider registryProvider = null)
-        {
-            return new Internal.Broker(options, registryProvider);
-        }
     }
 }

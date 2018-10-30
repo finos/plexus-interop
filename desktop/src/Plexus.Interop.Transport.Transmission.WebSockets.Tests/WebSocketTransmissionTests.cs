@@ -28,7 +28,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
 
         protected override ITransmissionServer CreateServer()
         {
-            return WebSocketTransmissionServerFactory.Instance.Create(BrokerWorkingDir);
+            return WebSocketTransmissionServerFactory.Instance.Create(new WebSocketTransmissionServerOptions(BrokerWorkingDir));
         }
 
         protected override ITransmissionClient CreateClient()

@@ -25,6 +25,7 @@ namespace Plexus.Host
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Plexus.Interop;
 
     public sealed class Program
     {
@@ -39,13 +40,13 @@ namespace Plexus.Host
         public async Task<int> RunAsync(string[] args)
         {
             return await Parser.Default
-                .ParseArguments<BrokerOptions, StartOptions, LaunchOptions, StopOptions, StudioOptions>(args)
+                .ParseArguments<BrokerCliOptions, StartCliOptions, LaunchCliOptions, StopCliOptions, StudioCliOptions>(args)
                 .MapResult(
-                    (BrokerOptions opts) => StartBrokerAsync(opts),
-                    (StartOptions opts) => StartBrokerAsync(opts),
-                    (LaunchOptions opts) => LaunchAppAsync(opts),
-                    (StopOptions opts) => StopBrokerAsync(),
-                    (StudioOptions opts) => StartStudioAsync(),
+                    (BrokerCliOptions opts) => StartBrokerAsync(opts),
+                    (StartCliOptions opts) => StartBrokerAsync(opts),
+                    (LaunchCliOptions opts) => LaunchAppAsync(opts),
+                    (StopCliOptions opts) => StopBrokerAsync(),
+                    (StudioCliOptions opts) => StartStudioAsync(),
                     errs => Task.FromResult(1));
         }        
 
@@ -57,15 +58,16 @@ namespace Plexus.Host
             }
         }
 
-        private static async Task<int> LaunchAppAsync(LaunchOptions opts)
+        private static async Task<int> LaunchAppAsync(LaunchCliOptions opts)
         {
             var program = new InteropCliProgram(opts.ApplicationIds);
             return await LoadAndRunProgramAsync(program).ConfigureAwait(false);
         }
 
-        private static async Task<int> StartBrokerAsync(StartOptions opts)
+        private static async Task<int> StartBrokerAsync(StartCliOptions opts)
         {
-            var program = new BrokerProgram(opts.Metadata);
+            var brokerOptions = new BrokerOptions(opts.Metadata, opts.Port);
+            var program = new BrokerProgram(brokerOptions);
             return await LoadAndRunProgramAsync(program).ConfigureAwait(false);
         }
 
