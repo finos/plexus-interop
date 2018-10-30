@@ -95,8 +95,10 @@ task prepareDotnet {
 }
 
 task compile(type:Exec) {
-    dependsOn 'license'
+    dependsOn 'license' 
     dependsOn prepareDotnet
+    dependsOn ':dsl:interop-lang-vscode:build'
+    
     workingDir projectDir
     environment "PLEXUS_BUILD_DOTNET_PARAMS", dotnetParams
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -149,4 +151,4 @@ task clean {
     delete fileTree(dir: 'src').include("**/bin/*").include("**/obj/*")
 }
 
-task build (dependsOn: [compile, test, push, ':dsl:interop-lang-vscode:build']) {}
+task build (dependsOn: [compile, test, push]) {}
