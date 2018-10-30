@@ -523,123 +523,36 @@ table.CodeRay td.code>pre{padding:0}
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#getting-started">Getting Started</a>
+<li><a href="#getting-started">Concepts</a>
 <ul class="sectlevel2">
 <li><a href="#overview">Overview</a></li>
+<li><a href="#components">Components</a></li>
 <li><a href="#features">Features</a></li>
-<li><a href="#repository-structure">Repository structure</a></li>
-<li><a href="#how-to-build">How to build</a></li>
-<li><a href="#sample-apps">Sample apps</a>
-<ul class="sectlevel3">
-<li><a href="#net-web-interoperability-sample">.NET/web interoperability sample</a></li>
-<li><a href="#how-to-find-sample-code">How to find sample code</a></li>
+<li><a href="#definitions">Definitions</a></li>
 </ul>
 </li>
+<li><a href="#getting-started-2">Getting Started</a>
+<ul class="sectlevel2">
+<li><a href="#repository-structure">Repository structure</a></li>
+<li><a href="#how-to-build">How to build</a></li>
+<li><a href="#sample-apps">Sample apps</a></li>
+<li><a href="#tutorial">Tutorial</a></li>
 </ul>
 </li>
 <li><a href="#guides">Guides</a>
 <ul class="sectlevel2">
-<li><a href="#quick-starts">Quick starts</a>
-<ul class="sectlevel3">
-<li><a href="#prerequisites">Prerequisites</a></li>
-<li><a href="#quick-start-web">Quick Start - Web</a>
-<ul class="sectlevel4">
-<li><a href="#run-example">Run example</a></li>
-<li><a href="#modify-example">Modify example</a></li>
-</ul>
-</li>
-<li><a href="#quick-start-dotnet">Quick Start - .NET</a>
-<ul class="sectlevel4">
-<li><a href="#run-example-2">Run example</a></li>
-<li><a href="#modify-example-2">Modify example</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#concepts">Concepts</a>
-<ul class="sectlevel3">
-<li><a href="#discovery-flow">Discovery flow</a></li>
-<li><a href="#high-level-architecture">High-level architecture</a></li>
-<li><a href="#key-elements">Key elements</a></li>
-<li><a href="#interop-broker">Interop Broker</a></li>
-</ul>
-</li>
-<li><a href="#tools">Tools</a>
-<ul class="sectlevel3">
-<li><a href="#plexus-command-line-interface-cli">Plexus Command Line Interface (CLI)</a>
-<ul class="sectlevel4">
-<li><a href="#installation">Installation</a></li>
-<li><a href="#usage">Usage</a></li>
-</ul>
-</li>
-<li><a href="#plexus-studio">Plexus Studio</a>
-<ul class="sectlevel4">
-<li><a href="#invoke-action-workflow">Invoke action workflow</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a href="#tools">Tools</a></li>
 <li><a href="#invocation-workflow">Invocation workflow</a></li>
 <li><a href="#plexus-interop-integration-workflow">Plexus Interop integration workflow</a></li>
-<li><a href="#guides-how-to-write-custom-app-launcher">How to write custom App Launcher</a>
-<ul class="sectlevel3">
-<li><a href="#example-definition-of-electronapplauncher">Example definition of ElectronAppLauncher</a></li>
-</ul>
-</li>
-<li><a href="#guides-system-requirements">System requirements</a>
-<ul class="sectlevel3">
-<li><a href="#supported-windows-versions">Supported Windows versions</a></li>
-<li><a href="#supported-mac-os-x-versions">Supported Mac OS X versions</a></li>
-</ul>
-</li>
+<li><a href="#guides-how-to-write-custom-app-launcher">How to write custom App Launcher</a></li>
+<li><a href="#guides-system-requirements">System requirements</a></li>
 </ul>
 </li>
 <li><a href="#reference">Reference</a>
 <ul class="sectlevel2">
-<li><a href="#components-overview">Components Overview</a></li>
-<li><a href="#concepts-and-definitions">Concepts and Definitions</a>
-<ul class="sectlevel3">
-<li><a href="#application">Application</a></li>
-<li><a href="#application-instance">Application Instance</a></li>
-<li><a href="#interop-registry">Interop Registry</a></li>
-<li><a href="#broker">Broker</a></li>
-<li><a href="#application-lifecycle-manager">Application Lifecycle Manager</a></li>
-<li><a href="#application-launcher">Application Launcher</a></li>
-<li><a href="#client">Client</a></li>
-<li><a href="#client-message-marshaller">Client Message Marshaller</a></li>
-<li><a href="#generated-client-api">Generated Client API</a></li>
-<li><a href="#generic-client-api">Generic Client API</a>
-<ul class="sectlevel4">
-<li><a href="#send-unary-request">Send Unary Request</a></li>
-<li><a href="#register-unary-handler">Register Unary Handler</a></li>
-<li><a href="#discover-methods">Discover Methods</a></li>
-<li><a href="#discover-services">Discover Services</a></li>
-<li><a href="#send-server-streaming-request">Send Server Streaming Request</a></li>
-<li><a href="#register-server-streaming-handler">Register Server Streaming Handler</a></li>
-<li><a href="#send-bidirectional-streaming-request">Send Bidirectional Streaming Request</a></li>
-<li><a href="#register-bidirectional-streaming-handler">Register Bidirectional Streaming Handler</a></li>
-</ul>
-</li>
-<li><a href="#interop-protocol">Interop Protocol</a></li>
-<li><a href="#transport-protocol">Transport Protocol</a></li>
-<li><a href="#transport-connection">Transport Connection</a></li>
-<li><a href="#transport-channel">Transport Channel</a></li>
-<li><a href="#wire-protocol">Wire Protocol</a></li>
-<li><a href="#wire-connection">Wire Connection</a></li>
-</ul>
-</li>
 <li><a href="#app-registry">App Registry</a></li>
-<li><a href="#reference-metadata-definition-language">Interop Registry</a>
-<ul class="sectlevel3">
-<li><a href="#messages-and-services">Messages and Services</a></li>
-<li><a href="#application-interop-manifests">Application Interop Manifests</a>
-<ul class="sectlevel4">
-<li><a href="#consumes">Consumes</a></li>
-<li><a href="#provides">Provides</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a href="#reference-metadata-definition-language">Interop Registry</a></li>
+<li><a href="#typescript-client-api">TypeScript Client API</a></li>
 </ul>
 </li>
 </ul>
@@ -647,7 +560,7 @@ table.CodeRay td.code>pre{padding:0}
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="getting-started">Getting Started</h2>
+<h2 id="getting-started">Concepts</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="overview">Overview</h3>
@@ -678,6 +591,69 @@ based on the their runtime-metadata (e.g. container type, launch command, comman
 <div class="imageblock">
 <div class="content">
 <img src="images/architecture.png" alt="Key components and high level architecture">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="components">Components</h3>
+<div class="paragraph">
+<p>Plexus Interop consist of the following main API layers:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/desktop-interop-layers.png" alt="desktop interop layers">
+</div>
+</div>
+<div class="paragraph">
+<p>All Applications are connected to central Broker.  To participate in interop each Application need to define itself in
+Interop Registry and auto-generate its specific client API using code-generation tool. Broker loads Interop Registry on
+startup and re-loads when it is changed in runtime to discover available actions, validate and route calls
+between Applications.</p>
+</div>
+<div class="sect3">
+<h4 id="broker">Broker</h4>
+<div class="paragraph">
+<p>Broker is a process running on user desktop which handles application connections, routes calls between them and able
+to launch new applications instances on demand.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/diag-d48af40d9d064a753bde0a694854746c.png" alt="diag d48af40d9d064a753bde0a694854746c" width="599" height="320">
+</div>
+</div>
+<div class="paragraph">
+<p>Interop Broker has several responsibilities:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It reads full information about all interoperability APIs from Interop Registry</p>
+</li>
+<li>
+<p>It routes interop API calls and replies between app instances</p>
+</li>
+<li>
+<p>It tracks which application instances are alive. If some app calls a service which is not online yet then Broker launches service provider app via App Lifecycle Manager.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="clients">Clients</h4>
+<div class="paragraph">
+<p>Clients are technology-specific libraries used by Applications to communicate with Broker. Currently
+Plexus Interop has 2 types of clients: for .NET and for TypeScript/JavaScript.</p>
+</div>
+<div class="paragraph">
+<p>Clients communicate with Broker using Interop Protocol. Protocol messages are sent via Transport Protocol. Broker
+can support one or more Interop and Transport protocols and Client can choose which of them to use.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="interop-dsl">Interop DSL</h4>
+<div class="paragraph">
+<p>Interop DSL is a language for defining contracts between Applications, and associated tooling for parsing, validating and
+code-generating of application-specific client APIs from these definitions.</p>
 </div>
 </div>
 </div>
@@ -718,6 +694,367 @@ based on the their runtime-metadata (e.g. container type, launch command, comman
 <p>See <a href="#guides">Guides</a> section for the more detailed description of what is Plexus Interop and how it works.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="definitions">Definitions</h3>
+<div class="paragraph">
+<p>This section contains overview diagram which shows Plexus Interop layers on example of 2 applications interoperating
+through broker. Below this diagram you can find brief descriptions for each of the presented concepts.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/desktop-interop-concepts.png" alt="desktop interop concepts">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/diag-e24370232956d904dd9be81530041a27.png" alt="diag e24370232956d904dd9be81530041a27" width="979" height="691">
+</div>
+</div>
+<div class="sect3">
+<h4 id="application">Application</h4>
+<div class="paragraph">
+<p>Application is a program on client desktop which can be started and stopped. Each application can provide (i.e. implement)
+services and/or consume (i.e. call) services provided by other applications.</p>
+</div>
+<div class="paragraph">
+<p>Application is not necessary correspond to OS process. It can be a part of process, or consist of many processes.</p>
+</div>
+<div class="paragraph">
+<p>Examples of applications:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A program with GUI</p>
+</li>
+<li>
+<p>A program without GUI, e.g. Windows Service</p>
+</li>
+<li>
+<p>A part of process, e.g. a plugin running in a big container application consisting of many isolated plugins</p>
+</li>
+<li>
+<p>A web window or worker running in Electron.js or other web container</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="application-instance">Application Instance</h4>
+<div class="paragraph">
+<p>Application instance is a running (started) application. There can be many instances of the same application running
+simultaneously on client desktop.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="interop-registry">Interop Registry</h4>
+<div class="paragraph">
+<p>Interop registry defines strong-typed contracts between applications on client desktop using a special human-readable
+interface definition language.</p>
+</div>
+<div class="paragraph">
+<p>It consist of definitions of the following types:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Message definitions</strong> represent types of data which can be sent between applications.</p>
+</li>
+<li>
+<p><strong>Service definitions</strong> represent named sets of related methods which can be implemented by applications. Service can
+contain one or many methods and each method is defined by its name, type, and types of request and response.</p>
+</li>
+<li>
+<p><strong>Application definitions</strong> declare which service implementations are provided and which consumed
+by each application participating in desktop interop.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Broker loads Interop Registry from server on launch and re-loads it on changes. This allows adding new services to
+user desktops in runtime.</p>
+</div>
+<div class="paragraph">
+<p>Interop Registry enables dynamic service discovery. Applications are only connected to broker and call services rather
+than other applications. This concept is similar to dynamic injection containers available in almost any language and
+framework, but here it is used on a higher level. Broker dynamically searches for a suitable service implementation
+across all the applications in Interop Registry. Because of this applications are always de-coupled from each other,
+they don&#8217;t need to know about counter-parties implementation details and they can release separately.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="broker-2">Broker</h4>
+<div class="paragraph">
+<p>Broker is the central part of desktop interop. Broker accepts, authenticates and tracks application (client) connections,
+validates and routes calls between them, and optionally can trigger launch of application on demand through
+App Lifecycle Manager.</p>
+</div>
+<div class="paragraph">
+<p>Broker listens to one or many wire protocol servers to accept client connections. Applications can use any of the
+listened wire protocol implementations to establish connection with broker.</p>
+</div>
+<div class="paragraph">
+<p>Application instance is considered "online" while it has at least one established connection with broker. Broker
+uniquely identifies each connection and tracks it, so it always knows which apps are online in any given time.</p>
+</div>
+<div class="paragraph">
+<p>Online applications instances can send protocol requests to broker to discover or call service implementations provided
+by other applications. Broker validates and routes such calls to target applications according to interop registry.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="application-lifecycle-manager">Application Lifecycle Manager</h4>
+<div class="paragraph">
+<p>Component inside Broker which tracks active connections and can trigger launch of an application on demand by sending a
+request to the appropriate Application Launcher.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="application-launcher">Application Launcher</h4>
+<div class="paragraph">
+<p>Application launchers are applications which can launch other applications. This concept was introduced to allow easy
+implementation of custom launch workflows which can be very different. E.g. web application is loaded in a browser window,
+native application started as a new OS process and plugin is loaded by its container application. In addition each vendor
+usually has custom launch steps like auto-updating or accepting terms &amp; conditions. Such steps can also be implemented
+in a vendor-specific app launcher.</p>
+</div>
+<div class="paragraph">
+<p>On method call broker can either route the call to an online application instance or trigger launch of a new
+instance. There are several strategies of routing launch requests from Broker to App Launcher, called <em>Launch Behaviors</em>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Default</strong> - Pass invocation to already running provider instance or launch new one if no online providers found.</p>
+</li>
+<li>
+<p><strong>Always</strong> - Create new app instance on each invocation.</p>
+</li>
+<li>
+<p><strong>Never</strong> - Pass invocation to already running instance, return error if no online providers found.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Launch Behaviors can be specified per action in Interop Registry, please see example below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">application RateProviderApp {
+    provides CcyPairBroadcastService {
+        option launch_on_call = ALWAYS;
+        GetRate;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each application can specify its Launcher in Interop Registry and broker will delegate launch to
+the specified Launcher.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="client">Client</h4>
+<div class="paragraph">
+<p>Client is a library used by application to communicate with interop broker. Client can be implemented in any language,
+it communicates with broker using interop protocol, transport protocol and wire protocol.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="method">Method</h4>
+<div class="paragraph">
+<p>Like many other Remote Procedure Call (RPC) systems, Plexus Interop is based around the idea of defining a service by
+specifying the methods that can be called remotely with their parameters and return types.</p>
+</div>
+<div class="paragraph">
+<p>There are 4 possible types of RPC methods in Plexus Interop mirroring types supported by
+<a href="http://www.grpc.io/docs/guides/concepts.html#rpc-life-cycle">gRPC</a>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Unary - consumer send a request, provider receives it, handles, and sends response back to the consumer.</p>
+</li>
+<li>
+<p>Consumer streaming - consumer sends one or many requests, provider sends only one response back.</p>
+</li>
+<li>
+<p>Provider streaming - consumer sends one request, provider sends many responses back.</p>
+</li>
+<li>
+<p>Bidirectional streaming - consumer sends many requests, provider sends many responses.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="discovery">Discovery</h4>
+<div class="paragraph">
+<p>Ability to dynamically discover service implementations. It allows using services in a decoupled way when consumer might
+not even know where the called service is implemented.</p>
+</div>
+<div class="paragraph">
+<p>Step one: find API implementations:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/diag-c1232bd1e1db9ff2851b63035ddd135d.png" alt="diag c1232bd1e1db9ff2851b63035ddd135d" width="476" height="155">
+</div>
+</div>
+<div class="paragraph">
+<p>Step two: select between API implementations</p>
+</div>
+<div class="paragraph">
+<p>Step three: call specific API implementer:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/diag-52f1bb1b83534f00e415763f59166d7b.png" alt="diag 52f1bb1b83534f00e415763f59166d7b" width="499" height="172">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="client-message-marshaller">Client Message Marshaller</h4>
+<div class="paragraph">
+<p>Pluggable component used by client library to serialize and deserialize request/response messages.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="generic-client-api">Generic Client API</h4>
+<div class="paragraph">
+<p>Technology-specific API implementation which provides core functionality of interop client. It converts method calls to interop protocol messages and vice versa according to specification and uses pluggable transport implementation to send/receive messages to/from broker.</p>
+</div>
+<div class="paragraph">
+<p>Currently .NET and TypeScript/JavaScript libraries are provided.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="generated-client-api">Generated Client API</h4>
+<div class="paragraph">
+<p>Application-specific wrapper on top of Generic Client API which is auto-generated based on Interop Registry by code-generation tool.</p>
+</div>
+<div class="paragraph">
+<p>For each consumed service a proxy class is generated which allows invocation of service methods.</p>
+</div>
+<div class="listingblock">
+<div class="title">Executing action using generated  proxy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">const rate: ICcyPairRate = client.getCcyRateService().getRate({ <span class="key">ccyPairName</span>: <span class="string"><span class="delimiter">'</span><span class="content">EURUSD</span><span class="delimiter">'</span></span> });</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For each provided service an interface is generated which should be implemented to provide implementations for service
+methods.</p>
+</div>
+<div class="listingblock">
+<div class="title">Registering handler for provided service</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="javascript">clientBuilder.withCcyRateServiceProvider({
+    <span class="key">onGetRate</span>: (invocattionContext: InvocationContext, <span class="key">pair</span>: ICcyPair) =&gt; {
+        <span class="keyword">return</span> internalService.getRate(pair);
+    }
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="interop-protocol">Interop Protocol</h4>
+<div class="paragraph">
+<p>Interop Protocol is a language for conversations between client and broker through transport channels.</p>
+</div>
+<div class="paragraph">
+<p>Each interop protocol conversation is performed within a separate transport channel.</p>
+</div>
+<div class="paragraph">
+<p>Protocol describes 4 main types of conversations:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect handshake - the first conversation performed after new transport connection is established</p>
+</li>
+<li>
+<p>Disconnect handshake - the last conversation performed before transport connection is closed</p>
+</li>
+<li>
+<p>Discovery - request from application to broker to get the available services filtered by specific parameters</p>
+</li>
+<li>
+<p>Method call - request from an application to call a method implemented in another application</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="transport-protocol">Transport Protocol</h4>
+<div class="paragraph">
+<p>Transport protocol is used to send binary messages between client and broker and is responsible for multiplexing and
+de-multiplexing many channels through a single connection.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="transport-connection">Transport Connection</h4>
+<div class="paragraph">
+<p>Transport connection is an abstraction of established connectivity between client and broker.</p>
+</div>
+<div class="paragraph">
+<p>Connection is initiated by client and accepted by broker.</p>
+</div>
+<div class="paragraph">
+<p>Transport implementation must detect if the connection is still alive, e.g. by sending heartbeats or using lower-level
+wire protocol capabilities for this, and raise "disconnected" event on both sides when connectivity is lost.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="transport-channel">Transport Channel</h4>
+<div class="paragraph">
+<p>Transport channel is a logical unit of data exchange through connection. It consist of request and response
+byte streams on both sides of connection.</p>
+</div>
+<div class="paragraph">
+<p>Channel opening can be initiated by both client and broker. It&#8217;s only possible to write and read bytes to/from
+an opened channel. Many channels can be simultaneously opened in the context of the same connection.</p>
+</div>
+<div class="paragraph">
+<p>For example, for each call from one application to another, 2 transport channels are opened. First is opened by source
+application to broker. Second is opened by broker to target application. All the data sent in context of the call
+is transferred through these 2 channels.</p>
+</div>
+<div class="paragraph">
+<p>Bytes written to request stream on one side of channel can be read in exactly the same order from response stream
+on another side. As soon as one of the sides sent all the data it closes request stream. This triggers
+response stream completion event on another side as soon as all the sent bytes consumed.</p>
+</div>
+<div class="paragraph">
+<p>Channel considered "Completed" when both sides completed request stream and consumed all the bytes from response stream.
+Additionally it can be terminated by either client or broker with either "Failed" or "Canceled" status in case of
+exception.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="wire-protocol">Wire Protocol</h4>
+<div class="paragraph">
+<p>Wire protocol is an abstraction for sending bytes through cross-process boundaries. Any existing stream-based network
+protocol such as named pipes or websockets can be used as a wire protocol for Plexus Interop.</p>
+</div>
+<div class="paragraph">
+<p>Broker listens to many wire protocols simultaneously on different addresses, so each client can choose which one to use.
+Usually for native apps it&#8217;s more convenient to use named pipes, but for web apps it&#8217;s more convenient to use websockets,
+because most of browsers has built-in websockets support.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="wire-connection">Wire Connection</h4>
+<div class="paragraph">
+<p>Wire connection is an abstraction of established cross-process connection.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started-2">Getting Started</h2>
+<div class="sectionbody">
 <div class="sect2">
 <h3 id="repository-structure">Repository structure</h3>
 <div class="paragraph">
@@ -783,10 +1120,11 @@ gradlew build --console plain --no-daemon</code></pre>
 </div>
 <div class="sect2">
 <h3 id="sample-apps">Sample apps</h3>
-<div class="sect3">
-<h4 id="net-web-interoperability-sample">.NET/web interoperability sample</h4>
 <div class="paragraph">
-<p>This sample demonstrates interoperability calls between .NET Core console apps and web app running in Electron. As an example let us test how request-response and discovery work:</p>
+<p>Repository contains a sample demonstrating how Plexus Interop can be used to build interoperability between apps on desktop.</p>
+</div>
+<div class="paragraph">
+<p>The sample consist of .NET Core console app and web app running in Electron. As an example let us test how request-response call and discovery work:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -843,9 +1181,6 @@ Once launched the app will show the information about connection and incoming re
 <div class="paragraph">
 <p>You may check other call types by choosing other options in the "Greeting Client" app.</p>
 </div>
-</div>
-<div class="sect3">
-<h4 id="how-to-find-sample-code">How to find sample code</h4>
 <div class="paragraph">
 <p>Source code for sample flow is here:</p>
 </div>
@@ -869,14 +1204,8 @@ Once launched the app will show the information about connection and incoming re
 </ul>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="guides">Guides</h2>
-<div class="sectionbody">
 <div class="sect2">
-<h3 id="quick-starts">Quick starts</h3>
+<h3 id="tutorial">Tutorial</h3>
 <div class="paragraph">
 <p>In this section we will be going through the case of two simple business apps communicating with each other via Plexus Interop:</p>
 </div>
@@ -1891,159 +2220,11 @@ Internally it uses <a href="https://github.com/google/protobuf/releases/latest">
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="concepts">Concepts</h3>
-<div class="paragraph">
-<p>Like many other Remote Procedure Call (RPC) systems, Plexus Interop is based around the idea of defining a service by
-specifying the methods that can be called remotely with their parameters and return types.</p>
-</div>
-<div class="paragraph">
-<p>There are 4 possible types of RPC methods in Plexus Interop mirroring types supported by
-<a href="http://www.grpc.io/docs/guides/concepts.html#rpc-life-cycle">gRPC</a>:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Unary call - consumer send a request, provider receives it, handles, and sends response back to the consumer.</p>
-</li>
-<li>
-<p>Consumer streaming call - consumer sends one or many requests, provider sends only one response back.</p>
-</li>
-<li>
-<p>Provider streaming call - consumer sends one request, provider sends many responses back.</p>
-</li>
-<li>
-<p>Bidirectional streaming call - consumer sends many requests, provider sends many responses.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>However Plexus Interop goes beyond what most RPC frameworks do:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Plexus tracks the lifecycle of desktop apps, i.e. it knows if app is running or not and can launch app on demand.</p>
-</li>
-<li>
-<p>Plexus allows to define custom App Launchers, which allow fully custom installation, startup and shutdown flows.</p>
-</li>
-<li>
-<p>Each app specified which interop services it provides and consumes. This way it is easy to track API usage and evolve APIs.</p>
-</li>
-<li>
-<p>Central Broker decouples apps from each other and allows dynamic discovery of service providers.</p>
-</li>
-</ul>
-</div>
-<div class="sect3">
-<h4 id="discovery-flow">Discovery flow</h4>
-<div class="paragraph">
-<p>Step one: find API implementations:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/diag-c1232bd1e1db9ff2851b63035ddd135d.png" alt="diag c1232bd1e1db9ff2851b63035ddd135d" width="476" height="155">
 </div>
 </div>
-<div class="paragraph">
-<p>Step two: select between API implementations</p>
-</div>
-<div class="paragraph">
-<p>Step three: call specific API implementer:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/diag-52f1bb1b83534f00e415763f59166d7b.png" alt="diag 52f1bb1b83534f00e415763f59166d7b" width="499" height="172">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="high-level-architecture">High-level architecture</h4>
-<div class="imageblock">
-<div class="content">
-<img src="images/diag-e24370232956d904dd9be81530041a27.png" alt="diag e24370232956d904dd9be81530041a27" width="979" height="691">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="key-elements">Key elements</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>App Registry</strong> - catalogue of apps, interop components within apps and <em>app launchers</em></p>
-</li>
-<li>
-<p><strong>App Launcher</strong> - component responsible for starting new app instances and tracking their lifecycle. Different app launchers should be used for different app technologies (e.g. .NET Launcher, Java Launcher, Python Launcher) or custom startup flows (e.g. launcher that knows how to download app from a special binary storage within organization).</p>
-</li>
-<li>
-<p><strong>App Lifecycle Manager</strong> - central component that tracks all live app instances. All apps are started via App Lifecycle Managers, which selects an appropriate App Launcher and uses this Launcher to create a new instance of the app.</p>
-</li>
-<li>
-<p><strong>Interop API Definitions</strong> - text files with formal definitions of interop APIs between apps, which define <em>messages</em>, <em>services</em> and <em>applications</em>:</p>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Message</strong> - logical record of information, containing a series of name-value pairs (fields). Plexus uses Protobuf v3 protocol for defining and serializing messages.</p>
-</li>
-<li>
-<p><strong>Service</strong> - set of related methods that can be provided by one or many applications. Plexus uses Protobuf v3 definition language syntax for defining services.</p>
-</li>
-<li>
-<p><strong>Application</strong> - corresponds to a desktop application. Each application can provide services to other applications and consume services provided by other applications.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><strong>Interop Broker</strong> - responsible for managing interop sessions, routing messages between apps and discovery mechanisms. If message was sent to component that is not running yet then Broker asks App Launcher to start the app using mapping between components and apps.</p>
-</li>
-<li>
-<p><strong>Interop Registry</strong> - provides Interop Broker with all information about services, messages and connections between apps in run-time. Interop Registry is populated from <strong>approved</strong> Interop API Definitions.</p>
-</li>
-<li>
-<p><strong>App Registry</strong> - provides App Lifecycle Manager with all information about how to launch apps: app launcher and launcher-specific parameters.</p>
-</li>
-<li>
-<p><strong>Interop Transport</strong> - responsible for delivering serialized messages between Interop Broker and client interop APIs</p>
-</li>
-<li>
-<p><strong>Client Service API</strong> - client library that app uses to provide some interop service or to consume interop service provided by another app. Service API is generated from interop API definitions. Depending on app technology API can be generated either in run-time (e.g. JavaScript) or in compile time (e.g. DLLs for .NET). Compile-time generation uses Plexus SDK tools.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="interop-broker">Interop Broker</h4>
-<div class="paragraph">
-<p>Interop broker is the central component working as a hub for all interop communications:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/diag-287668115a1ab17e8f15e719c561a1d0.png" alt="diag 287668115a1ab17e8f15e719c561a1d0" width="461" height="320">
-</div>
-</div>
-<div class="paragraph">
-<p>Interop Broker has several responsibilities:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>It reads full information about all interoperability APIs from Interop Registry</p>
-</li>
-<li>
-<p>It routes interop API calls and replies between app instances</p>
-</li>
-<li>
-<p>It tracks which interop API implementations are alive. If some app calls a service which is not online yet then Broker launches service provider app via App Lifecycle Manager.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Note that Interop Broker is not talking with apps directly - it relies on Interop Transport, which can deliver serialized messages across app boundaries.</p>
-</div>
-</div>
-</div>
+<div class="sect1">
+<h2 id="guides">Guides</h2>
+<div class="sectionbody">
 <div class="sect2">
 <h3 id="tools">Tools</h3>
 <div class="paragraph">
@@ -2201,13 +2382,13 @@ specifying the methods that can be called remotely with their parameters and ret
 </div>
 <div class="sect2">
 <h3 id="invocation-workflow">Invocation workflow</h3>
-<div id="guides-interop-invocation-workflow" class="imageblock">
+<div id="guides-interop-invocation-workflow" class="paragraph">
+<p>This section presents the most interesting scenario of invocation, which includes app launch:</p>
+</div>
+<div class="imageblock">
 <div class="content">
-<img src="images/diag-358efcd3faf7abf2e00ef1083673940d.png" alt="diag 358efcd3faf7abf2e00ef1083673940d" width="1874" height="552">
+<img src="images/diag-94484b5c9cb52f30160f27f639a75cb6.png" alt="diag 94484b5c9cb52f30160f27f639a75cb6" width="1874" height="552">
 </div>
-</div>
-<div class="paragraph">
-<p>Here is the most interesting scenario, which includes app launch:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -2498,247 +2679,205 @@ application <span class="constant">ElectronAppLauncher</span> {
 <h2 id="reference">Reference</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="components-overview">Components Overview</h3>
-<div class="imageblock">
-<div class="content">
-<img src="images/desktop-interop-layers.png" alt="desktop interop layers">
-</div>
-</div>
+<h3 id="app-registry">App Registry</h3>
 <div class="paragraph">
-<p>Plexus Interop consist of the following main components:</p>
+<p>Application registry is a JSON array where each item has following properties:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>Broker - a process running on user desktop which handles application connections and routes calls between them</p>
-</li>
-<li>
-<p>Client - technology-specific library used by applications to communicate with broker</p>
-</li>
-<li>
-<p>Interop DSL - language to define connections between applications and associated tooling for parsing, validation and
-code-generation of application-specific client APIs from these definitions</p>
-</li>
-</ul>
-</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 1. Application properties</caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><strong>Name</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Type</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Description</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Example</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>id</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unique key representing the application</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>"interop.samples.GreetingServer"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>displayName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Human readable display name of the application</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>"App which provides greetings to other apps"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>launcherId</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A reference to another application in the registry which starts this app</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>"interop.NativeAppLauncher"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>launcherParams</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Application launcher specific object which contains data required by launcher to launch the specific application</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{
+              "cmd": "../apps/GreetingServer/GreetingServer.exe",
+              "args": "" }</code></p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
-<p>To participate in interop each application need to define itself in Interop Registry and auto-generate its specific
-client API using code-generation tool. Broker also uses Interop Registry to validate and route calls.</p>
-</div>
-<div class="paragraph">
-<p>Both client and broker use transport protocol and interop protocol to communicate with each other. Broker can support
-one or more interop and transport protocols. Currently it supports version 1 of interop protocol and 2 versions of
-transport protocols: named-pipe-based and websocket-based.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="concepts-and-definitions">Concepts and Definitions</h3>
-<div class="paragraph">
-<p>This section contains overview diagram which shows Plexus Interop layers on example of 2 applications interoperating
-through broker. Below this diagram you can find brief descriptions for each of the presented concepts.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/desktop-interop-concepts.png" alt="desktop interop concepts">
-</div>
-</div>
-<div class="sect3">
-<h4 id="application">Application</h4>
-<div class="paragraph">
-<p>Application is a program on client desktop which can be started and stopped. Each application can provide (i.e. implement)
-services and/or consume (i.e. call) services provided by other applications.</p>
-</div>
-<div class="paragraph">
-<p>Application is not necessary correspond to OS process. It can be a part of process, or consist of many processes.</p>
-</div>
-<div class="paragraph">
-<p>Examples of applications:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>A program with GUI</p>
-</li>
-<li>
-<p>A program without GUI, e.g. Windows Service</p>
-</li>
-<li>
-<p>A part of process, e.g. a plugin running in a big container application consisting of many isolated plugins</p>
-</li>
-<li>
-<p>A web window or worker running in Electron.js or other web container</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="application-instance">Application Instance</h4>
-<div class="paragraph">
-<p>Application instance is a running (started) application. There can be many instances of the same application running
-simultaneously on client desktop.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="interop-registry">Interop Registry</h4>
-<div class="paragraph">
-<p>Interop registry defines strong-typed contracts between applications on client desktop using a special human-readable
-interface definition language.</p>
-</div>
-<div class="paragraph">
-<p>It consist of definitions of the following types:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Message definitions</strong> represent types of data which can be sent between applications.</p>
-</li>
-<li>
-<p><strong>Service definitions</strong> represent named sets of related methods which can be implemented by applications. Service can
-contain one or many methods and each method is defined by its name, type, and types of request and response.</p>
-</li>
-<li>
-<p><strong>Application definitions</strong> declare which service implementations are provided and which consumed
-by each application participating in desktop interop.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Broker loads Interop Registry from server on launch and re-loads it on changes. This allows adding new services to
-user desktops in runtime.</p>
-</div>
-<div class="paragraph">
-<p>Interop Registry enables dynamic service discovery. Applications are only connected to broker and call services rather
-than other applications. This concept is similar to dynamic injection containers available in almost any language and
-framework, but here it is used on a higher level. Broker dynamically searches for a suitable service implementation
-across all the applications in Interop Registry. Because of this applications are always de-coupled from each other,
-they don&#8217;t need to know about counter-parties implementation details and they can release separately.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="broker">Broker</h4>
-<div class="paragraph">
-<p>Broker is the central part of desktop interop. Broker accepts, authenticates and tracks application (client) connections,
-validates and routes calls between them, and optionally can trigger launch of application on demand through
-App Lifecycle Manager.</p>
-</div>
-<div class="paragraph">
-<p>Broker listens to one or many wire protocol servers to accept client connections. Applications can use any of the
-listened wire protocol implementations to establish connection with broker.</p>
-</div>
-<div class="paragraph">
-<p>Application instance is considered "online" while it has at least one established connection with broker. Broker
-uniquely identifies each connection and tracks it, so it always knows which apps are online in any given time.</p>
-</div>
-<div class="paragraph">
-<p>Online applications instances can send protocol requests to broker to discover or call service implementations provided
-by other applications. Broker validates and routes such calls to target applications according to interop registry.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="application-lifecycle-manager">Application Lifecycle Manager</h4>
-<div class="paragraph">
-<p>Component inside Broker which tracks active connections and can trigger launch of an application on demand by sending a
-request to the appropriate Application Launcher.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="application-launcher">Application Launcher</h4>
-<div class="paragraph">
-<p>Application launchers are applications which can launch other applications. This concept was introduced to allow easy
-implementation of custom launch workflows which can be very different. E.g. web application is loaded in a browser window,
-native application started as a new OS process and plugin is loaded by its container application. In addition each vendor
-usually has custom launch steps like auto-updating or accepting terms &amp; conditions. Such steps can also be implemented
-in a vendor-specific app launcher.</p>
-</div>
-<div class="paragraph">
-<p>On method call broker can either route the call to an online application instance or trigger launch of a new
-instance. There are several strategies of routing launch requests from Broker to App Launcher, called <em>Launch Behaviors</em>:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Default</strong> - Pass invocation to already running provider instance or launch new one if no online providers found.</p>
-</li>
-<li>
-<p><strong>Always</strong> - Create new app instance on each invocation.</p>
-</li>
-<li>
-<p><strong>Never</strong> - Pass invocation to already running instance, return error if no online providers found.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Launch Behaviors can be specified per action in Interop Registry, please see example below:</p>
+<p>Find below a JSON schema for the application registry</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="javascript">application RateProviderApp {
-    provides CcyPairBroadcastService {
-        option launch_on_call = ALWAYS;
-        GetRate;
+<pre class="CodeRay highlight"><code data-lang="json">{
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">array</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">items</span><span class="delimiter">&quot;</span></span>: {
+        <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">object</span><span class="delimiter">&quot;</span></span>,
+        <span class="key"><span class="delimiter">&quot;</span><span class="content">properties</span><span class="delimiter">&quot;</span></span>: {
+            <span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: {
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">string</span><span class="delimiter">&quot;</span></span>,
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">required</span><span class="delimiter">&quot;</span></span>: <span class="value">true</span>
+            },
+            <span class="key"><span class="delimiter">&quot;</span><span class="content">displayName</span><span class="delimiter">&quot;</span></span>: {
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">string</span><span class="delimiter">&quot;</span></span>,
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">required</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>
+            },
+            <span class="key"><span class="delimiter">&quot;</span><span class="content">launcherId</span><span class="delimiter">&quot;</span></span>: {
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">string</span><span class="delimiter">&quot;</span></span>,
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">required</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>
+            },
+            <span class="key"><span class="delimiter">&quot;</span><span class="content">launcherParams</span><span class="delimiter">&quot;</span></span>: {
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">object</span><span class="delimiter">&quot;</span></span>,
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">required</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+                <span class="key"><span class="delimiter">&quot;</span><span class="content">additionalProperties</span><span class="delimiter">&quot;</span></span>: <span class="value">true</span>
+            }
+        }
     }
 }</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="reference-metadata-definition-language">Interop Registry</h3>
+<div class="sect3">
+<h4 id="messages-and-services">Messages and Services</h4>
 <div class="paragraph">
-<p>Each application can specify its Launcher in Interop Registry and broker will delegate launch to
-the specified Launcher.</p>
+<p>For messages and services definition Plexus uses Google Protobuf v3 format. For example:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>package fx;
+
+message CcyPair {
+  string ccyPairName = 1;
+}
+
+message CcyPairRate {
+  string ccyPairName = 1;
+  double rate = 2;
+}
+
+service CcyPairRateService {
+  rpc GetRate (CcyPair) returns (CcyPairRate);
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can find Protobuf specification here - <a href="https://developers.google.com/protocol-buffers/docs/proto3" class="bare">https://developers.google.com/protocol-buffers/docs/proto3</a></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="client">Client</h4>
+<h4 id="application-interop-manifests">Application Interop Manifests</h4>
 <div class="paragraph">
-<p>Client is a library used by application to communicate with interop broker. Client can be implemented in any language,
-it communicates with broker using interop protocol, transport protocol and wire protocol.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="client-message-marshaller">Client Message Marshaller</h4>
-<div class="paragraph">
-<p>Pluggable component used by client library to serialize and deserialize request/response messages.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="generated-client-api">Generated Client API</h4>
-<div class="paragraph">
-<p>Application-specific and language-specific API which is auto-generated by code-generation tool based on Interop Registry.</p>
-</div>
-<div class="paragraph">
-<p>For each consumed service a proxy class is generated which allows invocation of service methods.</p>
+<p>Application interop manifests are defined using special <code>.interop</code> format. Here is an example:</p>
 </div>
 <div class="listingblock">
-<div class="title">Executing action using generated  proxy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="javascript">const rate: ICcyPairRate = client.getCcyRateService().getRate({ <span class="key">ccyPairName</span>: <span class="string"><span class="delimiter">'</span><span class="content">EURUSD</span><span class="delimiter">'</span></span> });</code></pre>
+<pre class="CodeRay highlight"><code data-lang="php">package vendorA.fx; <i class="conum" data-value="1"></i><b>(1)</b>
+
+import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/CcyPairRateService.proto</span><span class="delimiter">&quot;</span></span>; <i class="conum" data-value="2"></i><b>(2)</b>
+
+application <span class="constant">CcyPairRateProvider</span> { <i class="conum" data-value="3"></i><b>(3)</b>
+    provides fx.<span class="constant">CcyPairRateService</span> to vendorA.* { <span class="constant">GetRate</span>; } <i class="conum" data-value="4"></i><b>(4)</b>
+    consumes interop.samples.<span class="constant">GreetingService</span> from interop.samples.<span class="constant">GreetingServer</span> { <span class="constant">ShowGreeting</span>; } <i class="conum" data-value="5"></i><b>(5)</b>
+    consumes interop.samples.<span class="constant">EchoService</span> from interop.* { <span class="predefined">Echo</span>; } <i class="conum" data-value="6"></i><b>(6)</b>
+}</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>For each provided service an interface is generated which should be implemented to provide implementations for service
-methods.</p>
-</div>
-<div class="listingblock">
-<div class="title">Registering handler for provided service</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="javascript">clientBuilder.withCcyRateServiceProvider({
-    <span class="key">onGetRate</span>: (invocattionContext: InvocationContext, <span class="key">pair</span>: ICcyPair) =&gt; {
-        <span class="keyword">return</span> internalService.getRate(pair);
-    }
-});</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="generic-client-api">Generic Client API</h4>
-<div class="paragraph">
-<p>Technology-specific API implementation which provides core functionality of interop client. It converts method calls to interop
-protocol messages and vice versa according to specification and uses pluggable transport implementation to
-send/receive messages to/from broker.</p>
-</div>
-<div class="paragraph">
-<p>Currently .NET and TypeScript/JavaScript libraries are provided as a part of this repository. Please see Web API definition with examples below.</p>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Define namespace for application</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Import services definition that application provides or consumes</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Application name</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Provided service definition. In this case app only allows using this implementation for other apps in package "vendorA".</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Consumed service definition</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>One more consumed service definition.</td>
+</tr>
+</table>
 </div>
 <div class="sect4">
-<h5 id="send-unary-request">Send Unary Request</h5>
+<h5 id="consumes">Consumes</h5>
+<div class="paragraph">
+<p>Consumes notation defines to which Service methods this component can execute. This Methods can be provided by several components
+ and they will be accessible by discovery for component client code. We explicitly ask to specify exact methods
+to support schema evolution and corner cases where one component produce not the full set of service methods</p>
+</div>
+<div class="paragraph">
+<p>Imagine the following scenario:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>There is "ServiceA" fully implemented and produced by two components "ComponentA" and "ComponentB"</p>
+</li>
+<li>
+<p>We add new additional method to "ServiceA"</p>
+</li>
+<li>
+<p>"ComponentA" implements this method, where "ComponentB" is still in progress</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Thus exact method import will allow plexus to check if some methods used anywhere, it will allow to check if method is produced by
+both components and give error if not.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="provides">Provides</h5>
+<div class="paragraph">
+<p>We ask to provide explicit list of methods for consume and provide notations to support service evolutions and changes.
+Plexus will be able to check if what set of methods of specific Service implemented in concrete Component and validate if
+all mapping are correct and consistent.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="typescript-client-api">TypeScript Client API</h3>
+<div class="sect3">
+<h4 id="send-unary-request">Send Unary Request</h4>
 <div class="paragraph">
 <p>Executes Point-to-Point invocation, client receives response from server.</p>
 </div>
@@ -2840,8 +2979,8 @@ client.sendUnaryRequest&lt;ICcyPair, ICcyPairRate&gt;(invocationInfo, requestMes
 </div>
 </div>
 </div>
-<div class="sect4">
-<h5 id="register-unary-handler">Register Unary Handler</h5>
+<div class="sect3">
+<h4 id="register-unary-handler">Register Unary Handler</h4>
 <div class="paragraph">
 <p>Registers handler for provided unary method.</p>
 </div>
@@ -2898,8 +3037,8 @@ clientBuilder.onUnary&lt;ICcyPair, ICcyPairRate&gt;(serviceInfo, {
 </ul>
 </div>
 </div>
-<div class="sect4">
-<h5 id="discover-methods">Discover Methods</h5>
+<div class="sect3">
+<h4 id="discover-methods">Discover Methods</h4>
 <div class="paragraph">
 <p>Discovers available method invocation handlers.</p>
 </div>
@@ -3098,8 +3237,8 @@ client.sendUnaryRequest&lt;ICcyPair, ICcyPairRate&gt;(
 </ol>
 </div>
 </div>
-<div class="sect4">
-<h5 id="discover-services">Discover Services</h5>
+<div class="sect3">
+<h4 id="discover-services">Discover Services</h4>
 <div class="paragraph">
 <p>Discovers available service implementations. Provides ability to use few methods from particular provider together.</p>
 </div>
@@ -3178,8 +3317,8 @@ const getRateStreamMethod = service.methods.find(m =&gt; m.methodId === <span cl
 </ul>
 </div>
 </div>
-<div class="sect4">
-<h5 id="send-server-streaming-request">Send Server Streaming Request</h5>
+<div class="sect3">
+<h4 id="send-server-streaming-request">Send Server Streaming Request</h4>
 <div class="paragraph">
 <p>Executes Server Streaming invocation, client receives stream of messages from server.</p>
 </div>
@@ -3262,8 +3401,8 @@ client.sendServerStreamingRequest&lt;ICcyPair, ICcyPairRate&gt;(invocationInfo, 
 </ul>
 </div>
 </div>
-<div class="sect4">
-<h5 id="register-server-streaming-handler">Register Server Streaming Handler</h5>
+<div class="sect3">
+<h4 id="register-server-streaming-handler">Register Server Streaming Handler</h4>
 <div class="paragraph">
 <p>Registers handler for provided server streaming method.</p>
 </div>
@@ -3327,8 +3466,8 @@ clientBuilder.onServerStreaming&lt;ICcyPair, ICcyPairRate&gt;(serviceInfo, {
 </ul>
 </div>
 </div>
-<div class="sect4">
-<h5 id="send-bidirectional-streaming-request">Send Bidirectional Streaming Request</h5>
+<div class="sect3">
+<h4 id="send-bidirectional-streaming-request">Send Bidirectional Streaming Request</h4>
 <div class="paragraph">
 <p>Executes Bidirectional Streaming invocation. Client and Server communicates using streams of messages.</p>
 </div>
@@ -3409,8 +3548,8 @@ invocation.complete();</code></pre>
 </ul>
 </div>
 </div>
-<div class="sect4">
-<h5 id="register-bidirectional-streaming-handler">Register Bidirectional Streaming Handler</h5>
+<div class="sect3">
+<h4 id="register-bidirectional-streaming-handler">Register Bidirectional Streaming Handler</h4>
 <div class="paragraph">
 <p>Registers handler for provided bidirectional streaming method.</p>
 </div>
@@ -3478,301 +3617,12 @@ clientBuilder.onBidiStreaming&lt;ICcyPair, ICcyPairRate&gt;(serviceInfo, {
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="interop-protocol">Interop Protocol</h4>
-<div class="paragraph">
-<p>Interop Protocol is a language for conversations between client and broker through transport channels.</p>
-</div>
-<div class="paragraph">
-<p>Each interop protocol conversation is performed within a separate transport channel.</p>
-</div>
-<div class="paragraph">
-<p>Protocol describes 4 main types of conversations:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Connect handshake - the first conversation performed after new transport connection is established</p>
-</li>
-<li>
-<p>Disconnect handshake - the last conversation performed before transport connection is closed</p>
-</li>
-<li>
-<p>Discovery - request from application to broker to get the available services filtered by specific parameters</p>
-</li>
-<li>
-<p>Method call - request from an application to call a method implemented in another application</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="transport-protocol">Transport Protocol</h4>
-<div class="paragraph">
-<p>Transport protocol is used to send binary messages between client and broker and is responsible for multiplexing and
-de-multiplexing many channels through a single connection.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="transport-connection">Transport Connection</h4>
-<div class="paragraph">
-<p>Transport connection is an abstraction of established connectivity between client and broker.</p>
-</div>
-<div class="paragraph">
-<p>Connection is initiated by client and accepted by broker.</p>
-</div>
-<div class="paragraph">
-<p>Transport implementation must detect if the connection is still alive, e.g. by sending heartbeats or using lower-level
-wire protocol capabilities for this, and raise "disconnected" event on both sides when connectivity is lost.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="transport-channel">Transport Channel</h4>
-<div class="paragraph">
-<p>Transport channel is a logical unit of data exchange through connection. It consist of request and response
-byte streams on both sides of connection.</p>
-</div>
-<div class="paragraph">
-<p>Channel opening can be initiated by both client and broker. It&#8217;s only possible to write and read bytes to/from
-an opened channel. Many channels can be simultaneously opened in the context of the same connection.</p>
-</div>
-<div class="paragraph">
-<p>For example, for each call from one application to another, 2 transport channels are opened. First is opened by source
-application to broker. Second is opened by broker to target application. All the data sent in context of the call
-is transferred through these 2 channels.</p>
-</div>
-<div class="paragraph">
-<p>Bytes written to request stream on one side of channel can be read in exactly the same order from response stream
-on another side. As soon as one of the sides sent all the data it closes request stream. This triggers
-response stream completion event on another side as soon as all the sent bytes consumed.</p>
-</div>
-<div class="paragraph">
-<p>Channel considered "Completed" when both sides completed request stream and consumed all the bytes from response stream.
-Additionally it can be terminated by either client or broker with either "Failed" or "Canceled" status in case of
-exception.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="wire-protocol">Wire Protocol</h4>
-<div class="paragraph">
-<p>Wire protocol is an abstraction for sending bytes through cross-process boundaries. Any existing stream-based network
-protocol such as named pipes or websockets can be used as a wire protocol for Plexus Interop.</p>
-</div>
-<div class="paragraph">
-<p>Broker listens to many wire protocols simultaneously on different addresses, so each client can choose which one to use.
-Usually for native apps it&#8217;s more convenient to use named pipes, but for web apps it&#8217;s more convenient to use websockets,
-because most of browsers has built-in websockets support.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="wire-connection">Wire Connection</h4>
-<div class="paragraph">
-<p>Wire connection is an abstraction of established cross-process connection.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="app-registry">App Registry</h3>
-<div class="paragraph">
-<p>Application registry is a JSON array where each item has following properties:</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Table 1. Application properties</caption>
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top"><strong>Name</strong></th>
-<th class="tableblock halign-left valign-top"><strong>Type</strong></th>
-<th class="tableblock halign-left valign-top"><strong>Description</strong></th>
-<th class="tableblock halign-left valign-top"><strong>Example</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>id</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unique key representing the application</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>"interop.samples.GreetingServer"</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>displayName</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Human readable display name of the application</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>"App which provides greetings to other apps"</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>launcherId</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A reference to another application in the registry which starts this app</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>"interop.NativeAppLauncher"</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>launcherParams</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Application launcher specific object which contains data required by launcher to launch the specific application</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{
-              "cmd": "../apps/GreetingServer/GreetingServer.exe",
-              "args": "" }</code></p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>Find below a JSON schema for the application registry</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{
-    <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">array</span><span class="delimiter">&quot;</span></span>,
-    <span class="key"><span class="delimiter">&quot;</span><span class="content">items</span><span class="delimiter">&quot;</span></span>: {
-        <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">object</span><span class="delimiter">&quot;</span></span>,
-        <span class="key"><span class="delimiter">&quot;</span><span class="content">properties</span><span class="delimiter">&quot;</span></span>: {
-            <span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: {
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">string</span><span class="delimiter">&quot;</span></span>,
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">required</span><span class="delimiter">&quot;</span></span>: <span class="value">true</span>
-            },
-            <span class="key"><span class="delimiter">&quot;</span><span class="content">displayName</span><span class="delimiter">&quot;</span></span>: {
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">string</span><span class="delimiter">&quot;</span></span>,
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">required</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>
-            },
-            <span class="key"><span class="delimiter">&quot;</span><span class="content">launcherId</span><span class="delimiter">&quot;</span></span>: {
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">string</span><span class="delimiter">&quot;</span></span>,
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">required</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>
-            },
-            <span class="key"><span class="delimiter">&quot;</span><span class="content">launcherParams</span><span class="delimiter">&quot;</span></span>: {
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">object</span><span class="delimiter">&quot;</span></span>,
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">required</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
-                <span class="key"><span class="delimiter">&quot;</span><span class="content">additionalProperties</span><span class="delimiter">&quot;</span></span>: <span class="value">true</span>
-            }
-        }
-    }
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="reference-metadata-definition-language">Interop Registry</h3>
-<div class="sect3">
-<h4 id="messages-and-services">Messages and Services</h4>
-<div class="paragraph">
-<p>For messages and services definition Plexus uses Google Protobuf v3 format. For example:</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>package fx;
-
-message CcyPair {
-  string ccyPairName = 1;
-}
-
-message CcyPairRate {
-  string ccyPairName = 1;
-  double rate = 2;
-}
-
-service CcyPairRateService {
-  rpc GetRate (CcyPair) returns (CcyPairRate);
-}</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You can find Protobuf specification here - <a href="https://developers.google.com/protocol-buffers/docs/proto3" class="bare">https://developers.google.com/protocol-buffers/docs/proto3</a></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="application-interop-manifests">Application Interop Manifests</h4>
-<div class="paragraph">
-<p>Application interop manifests are defined using special <code>.interop</code> format. Here is an example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="php">package vendorA.fx; <i class="conum" data-value="1"></i><b>(1)</b>
-
-import <span class="string"><span class="delimiter">&quot;</span><span class="content">fx/CcyPairRateService.proto</span><span class="delimiter">&quot;</span></span>; <i class="conum" data-value="2"></i><b>(2)</b>
-
-application <span class="constant">CcyPairRateProvider</span> { <i class="conum" data-value="3"></i><b>(3)</b>
-    provides fx.<span class="constant">CcyPairRateService</span> to vendorA.* { <span class="constant">GetRate</span>; } <i class="conum" data-value="4"></i><b>(4)</b>
-    consumes interop.samples.<span class="constant">GreetingService</span> from interop.samples.<span class="constant">GreetingServer</span> { <span class="constant">ShowGreeting</span>; } <i class="conum" data-value="5"></i><b>(5)</b>
-    consumes interop.samples.<span class="constant">EchoService</span> from interop.* { <span class="predefined">Echo</span>; } <i class="conum" data-value="6"></i><b>(6)</b>
-}</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Define namespace for application</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Import services definition that application provides or consumes</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Application name</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Provided service definition. In this case app only allows using this implementation for other apps in package "vendorA".</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Consumed service definition</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>One more consumed service definition.</td>
-</tr>
-</table>
-</div>
-<div class="sect4">
-<h5 id="consumes">Consumes</h5>
-<div class="paragraph">
-<p>Consumes notation defines to which Service methods this component can execute. This Methods can be provided by several components
- and they will be accessible by discovery for component client code. We explicitly ask to specify exact methods
-to support schema evolution and corner cases where one component produce not the full set of service methods</p>
-</div>
-<div class="paragraph">
-<p>Imagine the following scenario:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>There is "ServiceA" fully implemented and produced by two components "ComponentA" and "ComponentB"</p>
-</li>
-<li>
-<p>We add new additional method to "ServiceA"</p>
-</li>
-<li>
-<p>"ComponentA" implements this method, where "ComponentB" is still in progress</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Thus exact method import will allow plexus to check if some methods used anywhere, it will allow to check if method is produced by
-both components and give error if not.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="provides">Provides</h5>
-<div class="paragraph">
-<p>We ask to provide explicit list of methods for consume and provide notations to support service evolutions and changes.
-Plexus will be able to check if what set of methods of specific Service implemented in concrete Component and validate if
-all mapping are correct and consistent.</p>
-</div>
-</div>
-</div>
-</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-07-31 20:36:20 MSK
+Last updated 2018-10-30 18:28:23 MSK
 </div>
 </div>
 </body>
