@@ -97,7 +97,7 @@ task prepareDotnet {
 task compile(type:Exec) {
     dependsOn 'license' 
     dependsOn prepareDotnet
-    dependsOn ':dsl:interop-lang-vscode:build'
+    dependsOn ':web:buildStudio'
     
     workingDir projectDir
     environment "PLEXUS_BUILD_DOTNET_PARAMS", dotnetParams
