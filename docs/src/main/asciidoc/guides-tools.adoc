@@ -84,11 +84,11 @@ Let's take a look at simple workflow of simulating action invocation. It provide
 
 . Find required application in the list and click it to connect on behalf of this Application:
 +
-image::guide-studio-apps.png[Plexus Studio Apps]
+image::guide-studio-apps-list.png[Plexus Studio Apps]
 
 . Choose required Action from *Consumed Services* section
 +
-image::guide-studio-app-consumer.png[Plexus Studio Consumer]
+image::guide-studio-consumer.png[Plexus Studio Consumer]
 
 . On *Consumed Action* screen you can:
 
@@ -98,7 +98,7 @@ image::guide-studio-app-consumer.png[Plexus Studio Consumer]
 - Send request and get response details
 
 +
-image::guide-studio-app-consumed.png[Plexus Studio Consumed action]
+image::guide-studio-consumed.png[Plexus Studio Consumed action]
 
 
 
