@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, Channel, Defaults } from '@plexus-interop/transport-common';
+import { UniqueId, Channel } from '@plexus-interop/transport-common';
 import { clientProtocol as plexus, SuccessCompletion, ErrorCompletion, ClientError, ClientProtocolUtils, InvocationMetaInfo } from '@plexus-interop/protocol';
 import { ClientProtocolHelper as modelHelper, ClientProtocolHelper } from '@plexus-interop/protocol';
 import { InvocationState } from './InvocationState';
 import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
-import { StateMaschine, CancellationToken, Logger, LoggerFactory, StateMaschineBase, AsyncHelper } from '@plexus-interop/common';
+import { StateMaschine, CancellationToken, Logger, LoggerFactory, StateMaschineBase } from '@plexus-interop/common';
 import { ProvidedMethodReference } from '@plexus-interop/client-api';
 import { ClientDtoUtils } from '../ClientDtoUtils';
 import { InvocationChannelObserver } from './InvocationChannelObserver';
@@ -34,7 +34,7 @@ export class GenericInvocation {
 
     private sentMessagesCounter: number = 0;
 
-    private sendCompletionReceived: boolean = false;
+    private sendCompletionReceivedCallback: (() => void) | null = null;
 
     private metaInfo: InvocationMetaInfo;
 
@@ -117,20 +117,21 @@ export class GenericInvocation {
         this.stateMachine.go(InvocationState.COMPLETED);
         this.log.trace('Sending completion message');
         this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
-        if (ClientProtocolHelper.isSuccessCompletion(completion)) {
-            // wait for remote side for success case only
-            try {
-                this.log.trace('Waiting for send completion from remote');
-                await this.waitForIt(() => this.sendCompletionReceived);
-            } catch (error) {
-                const errorText = 'Unable to wait for send completion, trying to terminate';
-                this.log.error(errorText, error);
-                this.terminate(errorText);
-                return Promise.reject(error);
+        return new Promise((resolveCloseAction, rejectCloseAction) => {
+            const remoteStreamCompletedHandler = () => {
+                this.log.trace('Sending channel close message');
+                this.closeChannel(completion)
+                    .then(result => resolveCloseAction(result))
+                    .catch(e => rejectCloseAction(e));
+            };
+            if (ClientProtocolHelper.isSuccessCompletion(completion)) {
+                // wait for remote side for success case only
+                this.log.trace('Waiting for remote completion');
+                this.sendCompletionReceivedCallback = remoteStreamCompletedHandler;
+            } else {
+                remoteStreamCompletedHandler();
             }
-        }
-        this.log.trace('Sending channel close message');
-        return this.closeChannel(completion);
+        });
     }
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
@@ -179,14 +180,6 @@ export class GenericInvocation {
         this.closeChannel(new ErrorCompletion(new ClientError(message)));
     }
 
-    private async waitForIt(check: () => boolean): Promise<void> {
-        await AsyncHelper.waitFor(
-            check,
-            this.readCancellationToken,
-            Defaults.STATUS_CHECK_INTERVAL,
-            this.invocationTimeout);
-    }
-
     private closeChannel(completion: plexus.ICompletion): Promise<plexus.ICompletion> {
         return this.sourceChannel.close(completion).then((channelCompletion) => {
             this.log.debug('Channel closed');
@@ -208,8 +201,11 @@ export class GenericInvocation {
 
     private handleRemoteSentCompleted(invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug('Source channel subscription completed');
-        invocationObserver.streamCompleted();                
-        this.sendCompletionReceived = true;
+        invocationObserver.streamCompleted();
+        if (this.sendCompletionReceivedCallback) {
+            this.sendCompletionReceivedCallback();
+            this.sendCompletionReceivedCallback = null;
+        }
         switch (this.stateMachine.getCurrent()) {
             case InvocationState.OPEN:
                 this.log.debug('Open state, switching to COMPLETION_RECEIVED');
