@@ -44,8 +44,7 @@ export class GenericInvocation {
 
     public constructor(
         private readonly sourceChannel: Channel,
-        baseReadToken: CancellationToken = new CancellationToken(),
-        private readonly invocationTimeout: number = -1) {
+        baseReadToken: CancellationToken = new CancellationToken()) {
         this.readCancellationToken = new CancellationToken(baseReadToken);
         this.log = LoggerFactory.getLogger('Invocation');
         this.stateMachine = new StateMaschineBase<InvocationState>(InvocationState.CREATED, [
