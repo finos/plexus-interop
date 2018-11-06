@@ -116,14 +116,14 @@ function lookupWsUrl(): Promise<string> {
             const details = await discoveryService.getConnectionDetails();
             return `ws://127.0.0.1:${details.ws.port}`;
         })
-        .catch(() => null);
+        .catch(() => `ws://${window.location.host}`);
 }
 
 function lookupMetadataUrl(): Promise<string> {
     return nullable(requestParams.getMetadataUrl())
         .catch(() => discoveryService.getMetadataUrl())
-        .catch(e => StudioExtensions.getMetadataUrl())
-        .catch(() => null);
+        .catch(() => StudioExtensions.getMetadataUrl())
+        .catch(() => `ws://${window.location.host}/metadata/interop`);
 }
 
 function lookupAppsUrl(): Promise<string> {

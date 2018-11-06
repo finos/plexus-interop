@@ -93,6 +93,10 @@ task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild', ':dsl:g
             e2eTestsEnabled ? ['run', 'build-e2e'] : ['run', 'build']
 }
 
+task npmBuildOnly(type: NpmTask, dependsOn: ['npmRunInstall', 'preNpmBuild']) {
+    args =  ['run', 'build']
+}
+
 task buildTransport(dependsOn: npmBuild) {
     outputs.dir('.')
 }
