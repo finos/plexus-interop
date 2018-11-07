@@ -34,6 +34,8 @@ export class GenericInvocation {
 
     private sentMessagesCounter: number = 0;
 
+    private sendCompletionReceived: boolean = false;
+    
     private sendCompletionReceivedCallback: (() => void) | null = null;
 
     private metaInfo: InvocationMetaInfo;
@@ -123,7 +125,7 @@ export class GenericInvocation {
                     .then(result => resolveCloseAction(result))
                     .catch(e => rejectCloseAction(e));
             };
-            if (ClientProtocolHelper.isSuccessCompletion(completion)) {
+            if (ClientProtocolHelper.isSuccessCompletion(completion) && !this.sendCompletionReceived) {
                 // wait for remote side for success case only
                 this.log.trace('Waiting for remote completion');
                 this.sendCompletionReceivedCallback = remoteStreamCompletedHandler;
@@ -201,6 +203,7 @@ export class GenericInvocation {
     private handleRemoteSentCompleted(invocationObserver: InvocationChannelObserver<AnonymousSubscription, ArrayBuffer>): void {
         this.log.debug('Source channel subscription completed');
         invocationObserver.streamCompleted();
+        this.sendCompletionReceived = true;
         if (this.sendCompletionReceivedCallback) {
             this.sendCompletionReceivedCallback();
             this.sendCompletionReceivedCallback = null;
