@@ -27,7 +27,6 @@ import { WebSocketDataProvider } from '@plexus-interop/remote';
 import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
 import { UrlInteropRegistryProvider, InteropRegistryService, Application, Option } from '@plexus-interop/metadata';
 import { DynamicBinaryMarshallerProvider } from '@plexus-interop/io/dist/main/src/dynamic';
-import { bindFunctionsToOwner } from './binder';
 
 export class PlexusInteropPlatform implements InteropPlatform {
 
@@ -74,7 +73,13 @@ export class PlexusInteropPlatform implements InteropPlatform {
         streams.forEach(stream => registerStream(stream, clientBuilder, this.registryService));
         const genericClient = await clientBuilder.connect();
         const peer = new PlexusInteropPeer(genericClient, this.registryService, hostAppMetadata);
-        bindFunctionsToOwner(peer);
+        peer.disconnect = peer.disconnect.bind(peer);
+        peer.invoke = peer.invoke.bind(peer);
+        peer.subscribe = peer.subscribe.bind(peer);
+        peer.onConnectionStatusChanged = peer.onConnectionStatusChanged.bind(peer);
+        peer.discoverMethods = peer.discoverMethods.bind(peer);
+        peer.discoverStreams = peer.discoverStreams.bind(peer);
+        peer.disconnect = peer.disconnect.bind(peer);
         return peer;
     }
 
