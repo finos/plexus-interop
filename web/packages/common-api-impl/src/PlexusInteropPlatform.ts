@@ -16,23 +16,37 @@
  */
 import { InteropPlatform } from './api';
 import { InteropFeature, MethodImplementation, StreamImplementation, InteropPeer } from './api/client-api';
-import { InteropRegistryService } from '@plexus-interop/metadata';
 import { BinaryMarshallerProvider } from '@plexus-interop/io';
 import { TransportConnection } from '@plexus-interop/transport-common';
 import { GenericClientApiBuilder } from '@plexus-interop/client';
 import { PlexusInteropPeer } from './PlexusInteropPeer';
 import { registerMethod, registerStream } from './registration';
+import { InteropPlatformConfig } from './api/InteropPlatformFactory';
+import { webSocketCtor } from '@plexus-interop/common/dist/main/src/ws/detect';
+import { WebSocketDataProvider } from '@plexus-interop/remote';
+import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
+import { UrlInteropRegistryProvider, InteropRegistryService } from '@plexus-interop/metadata';
+import { DynamicBinaryMarshallerProvider } from '@plexus-interop/io/dist/main/src/dynamic';
+import { bindFunctionsToOwner } from './binder';
 
 export class PlexusInteropPlatform implements InteropPlatform {
+
+    private registryService: InteropRegistryService;
+    private connectionProvider: () => Promise<TransportConnection>;
+    private marshallerProvider: BinaryMarshallerProvider;
+    private interopRegistryProvider: UrlInteropRegistryProvider;
 
     public readonly type: string = 'Plexus Interop';
     public readonly version: string = '0.0.1';
 
     public constructor(
-        private readonly registryService: InteropRegistryService,
-        private readonly marshallerProvider: BinaryMarshallerProvider,
-        private readonly connectionProvider: () => Promise<TransportConnection>
-    ) { }
+        platformConfig: InteropPlatformConfig
+    ) {
+        const wsCtor = webSocketCtor();
+        const metadataWsUrl = `${platformConfig.webSocketUrl}/metadata/interop`;
+        this.connectionProvider = async () => new WebSocketConnectionFactory(new wsCtor(platformConfig.webSocketUrl)).connect();
+        this.interopRegistryProvider = new UrlInteropRegistryProvider(metadataWsUrl, -1, new WebSocketDataProvider(webSocketCtor()));
+    }
 
     public isFeatureSupported(feature: InteropFeature): boolean {
         switch (feature) {
@@ -49,6 +63,7 @@ export class PlexusInteropPlatform implements InteropPlatform {
     }
 
     public async connect(applicationName: string, apiMetadata?: string, methods?: MethodImplementation[], streams?: StreamImplementation[]): Promise<InteropPeer> {
+        await this.finishInitialization();
         const hostAppMetadata = this.registryService.getApplication(applicationName);
         const clientBuilder = new GenericClientApiBuilder(this.marshallerProvider)
             .withApplicationId(hostAppMetadata.id)
@@ -59,14 +74,16 @@ export class PlexusInteropPlatform implements InteropPlatform {
         streams.forEach(stream => registerStream(stream, clientBuilder, this.registryService));
         const genericClient = await clientBuilder.connect();
         const peer = new PlexusInteropPeer(genericClient, this.registryService, hostAppMetadata);
-        peer.disconnect = peer.disconnect.bind(peer);
-        peer.invoke = peer.invoke.bind(peer);
-        peer.subscribe = peer.subscribe.bind(peer);
-        peer.onConnectionStatusChanged = peer.onConnectionStatusChanged.bind(peer);
-        peer.discoverMethods = peer.discoverMethods.bind(peer);
-        peer.discoverStreams = peer.discoverStreams.bind(peer);
-        peer.disconnect = peer.disconnect.bind(peer);
+        bindFunctionsToOwner(peer);
         return peer;
+    }
+
+    private async finishInitialization(): Promise<void> {
+        if (!this.marshallerProvider || !this.registryService) {
+            await this.interopRegistryProvider.start();
+            this.marshallerProvider = new DynamicBinaryMarshallerProvider(this.interopRegistryProvider.getCurrent());
+            this.registryService = new InteropRegistryService(this.interopRegistryProvider);
+        }
     }
 
 }

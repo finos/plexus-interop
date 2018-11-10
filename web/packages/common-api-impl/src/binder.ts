@@ -14,17 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropPlatform } from '.';
-import { PlexusInteropPlatform } from '../PlexusInteropPlatform';
-
-export interface InteropPlatformConfig {
-    webSocketUrl: string;
+export function bindFunctionsToOwner(object: any): void {
+    Object.keys(object)
+        .filter(key => isFunction(object[key]))
+        .forEach(key => {
+            object[key] = object[key].bind(object);
+        });
 }
 
-export class InteropPlatformFactory {
-
-    public createPlatform(config: InteropPlatformConfig): InteropPlatform {
-        return new PlexusInteropPlatform(config);
-    }
-
+function isFunction(functionToCheck: any): boolean {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
