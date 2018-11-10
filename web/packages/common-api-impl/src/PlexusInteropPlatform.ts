@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { InteropPlatform } from './api';
-import { InteropFeature, MethodImplementation, StreamImplementation, InteropPeer } from './api/client-api';
+import { InteropFeature, MethodImplementation, StreamImplementation, InteropPeer, InteropPeerDefinition } from './api/client-api';
 import { BinaryMarshallerProvider } from '@plexus-interop/io';
 import { TransportConnection } from '@plexus-interop/transport-common';
 import { GenericClientApiBuilder } from '@plexus-interop/client';
@@ -25,7 +25,7 @@ import { InteropPlatformConfig } from './api/InteropPlatformFactory';
 import { webSocketCtor } from '@plexus-interop/common/dist/main/src/ws/detect';
 import { WebSocketDataProvider } from '@plexus-interop/remote';
 import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
-import { UrlInteropRegistryProvider, InteropRegistryService } from '@plexus-interop/metadata';
+import { UrlInteropRegistryProvider, InteropRegistryService, Application, Option } from '@plexus-interop/metadata';
 import { DynamicBinaryMarshallerProvider } from '@plexus-interop/io/dist/main/src/dynamic';
 import { bindFunctionsToOwner } from './binder';
 
@@ -76,6 +76,21 @@ export class PlexusInteropPlatform implements InteropPlatform {
         const peer = new PlexusInteropPeer(genericClient, this.registryService, hostAppMetadata);
         bindFunctionsToOwner(peer);
         return peer;
+    }
+
+    public async getPeerDefinitions(): Promise<InteropPeerDefinition[]> {
+        await this.finishInitialization();
+        const aliasFinder = (app: Application) => app.options.find(o => o.id.endsWith('alias'));
+        return this.interopRegistryProvider
+            .getCurrent()
+            .applications.valuesArray()
+            .map(aliasFinder)
+            .filter(alias => !!alias)
+            .map(alias => {
+                return {
+                    applicationName: (alias as Option).value
+                };
+            });
     }
 
     private async finishInitialization(): Promise<void> {

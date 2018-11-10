@@ -34,14 +34,14 @@ describe('Client: Common API Implementation', () => {
 
     it('Creates Interop Platform Factory', async () => {
 
-        const platform = await factory.createPlatform({ webSocketUrl });
+        const platform = factory.createPlatform({ webSocketUrl });
         expect(platform).to.not.be.undefined;
 
     });
 
     it('Connects to Broker', async () => {
 
-        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
+        const platform: InteropPlatform = factory.createPlatform({ webSocketUrl });
         const client = await platform.connect('echo-client');
         expect(client).to.not.be.undefined;
         await client.disconnect();
@@ -49,7 +49,7 @@ describe('Client: Common API Implementation', () => {
     });
 
     it('Subscribes to stream and receives data from provider', async () => {
-        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
+        const platform: InteropPlatform = factory.createPlatform({ webSocketUrl });
         const stream: StreamImplementation = {
             name: 'server-stream',
             onSubscriptionRequested: async (streamObserver: StreamObserver, caller: InteropPeerDescriptor, args?: any) => {
@@ -58,7 +58,7 @@ describe('Client: Common API Implementation', () => {
                 streamObserver.next(args);
                 streamObserver.completed();
                 return {
-                    unsubscribe: async () => {}
+                    unsubscribe: async () => { }
                 };
             }
         };
@@ -67,11 +67,11 @@ describe('Client: Common API Implementation', () => {
         const server = await platform.connect('echo-server', undefined, [], [stream]);
         const request = clientsSetup.createRequestDto();
         const received: any[] = [];
-        
+
         let completed = false;
         await client.subscribe('server-stream', {
             next: async v => { received.push(v); },
-            error: async e => {},
+            error: async e => { },
             completed: async () => {
                 completed = true;
             }
@@ -79,24 +79,32 @@ describe('Client: Common API Implementation', () => {
 
         await AsyncHelper.waitFor(() => completed, undefined, 50, 2000);
         expect(received.length).to.be.eq(3);
-        
+
         for (let response of received) {
             testUtils.assertEqual(request, response as plexus.plexus.interop.testing.IEchoRequest);
         }
-        
+
         await client.disconnect();
         await server.disconnect();
     });
 
+    it('Returns all peer descriptors', async () => {
+        const platform: InteropPlatform = factory.createPlatform({ webSocketUrl });
+        const definitions = await platform.getPeerDefinitions();
+        // tslint:disable-next-line:no-console
+        const names = definitions.map(d => d.applicationName);
+        expect(names).to.have.members(['echo-server', 'echo-client']);
+    });
+
     it('Discovers streams', async () => {
 
-        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
+        const platform: InteropPlatform = factory.createPlatform({ webSocketUrl });
         const stream: StreamImplementation = {
             name: 'server-stream',
             onSubscriptionRequested: async (streamObserver: StreamObserver, caller: InteropPeerDescriptor, args?: any) => {
                 streamObserver.completed();
                 return {
-                    unsubscribe: async () => {}
+                    unsubscribe: async () => { }
                 };
             }
         };
@@ -107,14 +115,14 @@ describe('Client: Common API Implementation', () => {
 
         await client.disconnect();
         await server.disconnect();
-        
+
         expect(streams.length).to.be.greaterThan(0);
 
     });
 
     it('Discovers methods', async () => {
 
-        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
+        const platform: InteropPlatform = factory.createPlatform({ webSocketUrl });
         const client = await platform.connect('echo-client');
         const method: MethodImplementation = {
             name: 'unary-method',
@@ -125,7 +133,7 @@ describe('Client: Common API Implementation', () => {
 
         await client.disconnect();
         await server.disconnect();
-        
+
         expect(methods.length).to.be.greaterThan(0);
 
     });
@@ -133,7 +141,7 @@ describe('Client: Common API Implementation', () => {
 
     it('Sends request and receives response', async () => {
 
-        const platform: InteropPlatform = await factory.createPlatform({ webSocketUrl });
+        const platform: InteropPlatform = factory.createPlatform({ webSocketUrl });
         let invoked = false;
         const method: MethodImplementation = {
             name: 'unary-method',
@@ -148,7 +156,7 @@ describe('Client: Common API Implementation', () => {
         const request = clientsSetup.createRequestDto();
         const response = await client.invoke('unary-method', request);
 
-        expect(invoked).to.be.true;        
+        expect(invoked).to.be.true;
         expect(response).to.not.be.undefined;
         testUtils.assertEqual(request, response.result as plexus.plexus.interop.testing.IEchoRequest);
         expect(client).to.not.be.undefined;
