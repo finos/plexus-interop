@@ -59,6 +59,9 @@ export interface InteropPlatform {
         methods?: MethodImplementation[],
         streams?: StreamImplementation[]
     ): Promise<InteropPeer>;
+
+    getPeerDefinitions(): Promise<InteropPeerDefinition[]>;
+
 }
 
 export enum InteropFeature {
@@ -259,12 +262,15 @@ export interface Subscription {
     unsubscribe(): Promise<void>;
 }
 
+export interface InteropPeerDefinition {
+    applicationName: string;     // The name of the application.
+}
+
 /**
  * Reference to a connected instance of a peer or launchable application.
  */
-export interface InteropPeerDescriptor {
+export interface InteropPeerDescriptor extends InteropPeerDefinition {
     isConnected: boolean;        // Shows the current connection status of the peer.
-    applicationName: string;     // The name of the application.
     id: string;                  /* Platform specific id.
                                     Unique for an InteropPeerInstance connected to the platform. Null for launchable app.
                                     Some platforms may change the id following a disconnect/reconnect. */

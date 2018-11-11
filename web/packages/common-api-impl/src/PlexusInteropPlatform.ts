@@ -15,24 +15,37 @@
  * limitations under the License.
  */
 import { InteropPlatform } from './api';
-import { InteropFeature, MethodImplementation, StreamImplementation, InteropPeer } from './api/client-api';
-import { InteropRegistryService } from '@plexus-interop/metadata';
+import { InteropFeature, MethodImplementation, StreamImplementation, InteropPeer, InteropPeerDefinition } from './api/client-api';
 import { BinaryMarshallerProvider } from '@plexus-interop/io';
 import { TransportConnection } from '@plexus-interop/transport-common';
 import { GenericClientApiBuilder } from '@plexus-interop/client';
 import { PlexusInteropPeer } from './PlexusInteropPeer';
 import { registerMethod, registerStream } from './registration';
+import { InteropPlatformConfig } from './api/InteropPlatformFactory';
+import { webSocketCtor } from '@plexus-interop/common/dist/main/src/ws/detect';
+import { WebSocketDataProvider } from '@plexus-interop/remote';
+import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
+import { UrlInteropRegistryProvider, InteropRegistryService, Application, Option } from '@plexus-interop/metadata';
+import { DynamicBinaryMarshallerProvider } from '@plexus-interop/io/dist/main/src/dynamic';
 
 export class PlexusInteropPlatform implements InteropPlatform {
+
+    private registryService: InteropRegistryService;
+    private connectionProvider: () => Promise<TransportConnection>;
+    private marshallerProvider: BinaryMarshallerProvider;
+    private interopRegistryProvider: UrlInteropRegistryProvider;
 
     public readonly type: string = 'Plexus Interop';
     public readonly version: string = '0.0.1';
 
     public constructor(
-        private readonly registryService: InteropRegistryService,
-        private readonly marshallerProvider: BinaryMarshallerProvider,
-        private readonly connectionProvider: () => Promise<TransportConnection>
-    ) { }
+        platformConfig: InteropPlatformConfig
+    ) {
+        const wsCtor = webSocketCtor();
+        const metadataWsUrl = `${platformConfig.webSocketUrl}/metadata/interop`;
+        this.connectionProvider = async () => new WebSocketConnectionFactory(new wsCtor(platformConfig.webSocketUrl)).connect();
+        this.interopRegistryProvider = new UrlInteropRegistryProvider(metadataWsUrl, -1, new WebSocketDataProvider(webSocketCtor()));
+    }
 
     public isFeatureSupported(feature: InteropFeature): boolean {
         switch (feature) {
@@ -49,6 +62,7 @@ export class PlexusInteropPlatform implements InteropPlatform {
     }
 
     public async connect(applicationName: string, apiMetadata?: string, methods?: MethodImplementation[], streams?: StreamImplementation[]): Promise<InteropPeer> {
+        await this.finishInitialization();
         const hostAppMetadata = this.registryService.getApplication(applicationName);
         const clientBuilder = new GenericClientApiBuilder(this.marshallerProvider)
             .withApplicationId(hostAppMetadata.id)
@@ -67,6 +81,29 @@ export class PlexusInteropPlatform implements InteropPlatform {
         peer.discoverStreams = peer.discoverStreams.bind(peer);
         peer.disconnect = peer.disconnect.bind(peer);
         return peer;
+    }
+
+    public async getPeerDefinitions(): Promise<InteropPeerDefinition[]> {
+        await this.finishInitialization();
+        const aliasFinder = (app: Application) => app.options.find(o => o.id.endsWith('alias'));
+        return this.interopRegistryProvider
+            .getCurrent()
+            .applications.valuesArray()
+            .map(aliasFinder)
+            .filter(alias => !!alias)
+            .map(alias => {
+                return {
+                    applicationName: (alias as Option).value
+                };
+            });
+    }
+
+    private async finishInitialization(): Promise<void> {
+        if (!this.marshallerProvider || !this.registryService) {
+            await this.interopRegistryProvider.start();
+            this.marshallerProvider = new DynamicBinaryMarshallerProvider(this.interopRegistryProvider.getCurrent());
+            this.registryService = new InteropRegistryService(this.interopRegistryProvider);
+        }
     }
 
 }
