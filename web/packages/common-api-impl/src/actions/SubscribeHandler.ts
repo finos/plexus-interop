@@ -44,7 +44,7 @@ export class SubscribeHandler {
 
         const requestInfo: GenericRequest =
             await new DiscoverMethodHandler(this.registryService, this.genericClienApi, this.app)
-                .findRequestInfo(method);
+                .findOnlineRequestInfo(method);
 
         const invocation = await this.genericClienApi.sendServerStreamingRequest(requestInfo, args, {
             next: v => observer.next(v),
