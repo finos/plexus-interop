@@ -30,13 +30,21 @@ export class DiscoverMethodHandler {
         private readonly app: Application
     ) { }
 
-    public async findRequestInfo(method: string | Method): Promise<GenericRequest> {
+    public async findOnlineRequestInfo(method: string | Method): Promise<GenericRequest> {
+        return this.findRequestInfo(method, DiscoveryMode.Online);
+    }
+
+    public async findOfflineRequestInfo(method: string | Method): Promise<GenericRequest> {
+        return this.findRequestInfo(method, DiscoveryMode.Offline);
+    }
+
+    public async findRequestInfo(method: string | Method, mode: DiscoveryMode): Promise<GenericRequest> {
         const methodAlias: string = isMethod(method) ? method.name : method;
         const providedMethod = getProvidedMethodByAlias(methodAlias, this.registryService, this.app);
         let requestInfo: GenericRequest;
         const discovered = await this.genericClienApi.discoverMethod({
             consumedMethod: toConsumedMethodRef(providedMethod),
-            discoveryMode: DiscoveryMode.Online
+            discoveryMode: mode
         });
         let methods = discovered.methods || [];
         if (isMethod(method)) {

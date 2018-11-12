@@ -37,11 +37,20 @@ export class InvokeHandler {
         const providedMethod = getProvidedMethodByAlias(methodAlias, this.registryService, this.app);
         const requestType = providedMethod.method.requestMessage.id;
         const responseType = providedMethod.method.responseMessage.id;
-
-        const requestInfo: GenericRequest =
-            await new DiscoverMethodHandler(this.registryService, this.genericClienApi, this.app)
-                .findRequestInfo(method);
-
+        let requestInfo: GenericRequest;
+        try {
+            requestInfo = await new DiscoverMethodHandler(this.registryService, this.genericClienApi, this.app)
+                .findOnlineRequestInfo(method);    
+        } catch (error) {
+            if (methodAlias.startsWith('open-')) {
+                // try offline discovery for 'open' invocations
+                requestInfo = await new DiscoverMethodHandler(this.registryService, this.genericClienApi, this.app)
+                    .findOfflineRequestInfo(method);
+            } else {
+                throw error;
+            }
+        }
+        
         const providerId = providedMethod.providedService.application.id;
         
         return new Promise<InvokeResult>((resolve, reject) => {
