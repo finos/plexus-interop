@@ -3759,9 +3759,9 @@ electron-window@^0.8.0:
   dependencies:
     is-electron-renderer "^2.0.0"
 
-electron@1.8.6:
-  version "1.8.6"
-  resolved "https://registry.npmjs.org/electron/-/electron-1.8.6.tgz?dl=https://registry.yarnpkg.com/electron/-/electron-1.8.6.tgz#6d45e377b321a35b78a794b64e40b2cf8face6ae"
+electron@1.8.8:
+  version "1.8.8"
+  resolved "https://registry.npmjs.org/electron/-/electron-1.8.8.tgz#a90cddb075291f49576993e6f5c8bb4439301cae"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
