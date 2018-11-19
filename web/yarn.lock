@@ -320,7 +320,7 @@
   version "1.5.3"
   resolved "https://registry.npmjs.org/@types/loglevel/-/loglevel-1.5.3.tgz?dl=https://registry.yarnpkg.com/@types/loglevel/-/loglevel-1.5.3.tgz#adfce55383edc5998a2170ad581b3e23d6adb5b8"
 
-"@types/long@^3.0.31":
+"@types/long@^3.0.31", "@types/long@^3.0.32":
   version "3.0.32"
   resolved "https://registry.npmjs.org/@types/long/-/long-3.0.32.tgz?dl=https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
@@ -336,13 +336,17 @@
   version "6.14.0"
   resolved "https://registry.npmjs.org/@types/node/-/node-6.14.0.tgz?dl=https://registry.yarnpkg.com/@types/node/-/node-6.14.0.tgz#85c6998293fc6f2945915419296c7fbb63384f66"
 
-"@types/node@^7.0.29", "@types/node@^7.0.5":
+"@types/node@^7.0.5":
   version "7.10.0"
   resolved "https://registry.npmjs.org/@types/node/-/node-7.10.0.tgz?dl=https://registry.yarnpkg.com/@types/node/-/node-7.10.0.tgz#9a42f16e2b264cb63903989c5d1d0a7c5eb901c2"
 
 "@types/node@^8.0.24":
   version "8.10.36"
   resolved "https://registry.npmjs.org/@types/node/-/node-8.10.36.tgz?dl=https://registry.yarnpkg.com/@types/node/-/node-8.10.36.tgz#eac05d576fbcd0b4ea3c912dc58c20475c08d9e4"
+
+"@types/node@^8.9.4":
+  version "8.10.38"
+  resolved "https://registry.npmjs.org/@types/node/-/node-8.10.38.tgz?dl=https://registry.yarnpkg.com/@types/node/-/node-8.10.38.tgz#e05c201a668492e534b48102aca0294898f449f6"
 
 "@types/node@~6.0.60":
   version "6.0.118"
@@ -3755,9 +3759,9 @@ electron-window@^0.8.0:
   dependencies:
     is-electron-renderer "^2.0.0"
 
-electron@1.8.6:
-  version "1.8.6"
-  resolved "https://registry.npmjs.org/electron/-/electron-1.8.6.tgz?dl=https://registry.yarnpkg.com/electron/-/electron-1.8.6.tgz#6d45e377b321a35b78a794b64e40b2cf8face6ae"
+electron@1.8.8:
+  version "1.8.8"
+  resolved "https://registry.npmjs.org/electron/-/electron-1.8.8.tgz#a90cddb075291f49576993e6f5c8bb4439301cae"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -7194,6 +7198,10 @@ long@^3.2.0:
   version "3.2.0"
   resolved "https://registry.npmjs.org/long/-/long-3.2.0.tgz?dl=https://registry.yarnpkg.com/long/-/long-3.2.0.tgz#d821b7138ca1cb581c172990ef14db200b5c474b"
 
+long@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/long/-/long-4.0.0.tgz?dl=https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
+
 longest@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/longest/-/longest-1.0.1.tgz?dl=https://registry.yarnpkg.com/longest/-/longest-1.0.1.tgz#30a0b2da38f73770e8294a0d22e6625ed77d0097"
@@ -8889,9 +8897,9 @@ prompts@^0.1.9:
     kleur "^2.0.1"
     sisteransi "^0.1.1"
 
-protobufjs@6.8.0:
-  version "6.8.0"
-  resolved "https://registry.npmjs.org/protobufjs/-/protobufjs-6.8.0.tgz?dl=https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.0.tgz#04e85493c4e1653878ec283f18bc78b1e7c5d5a2"
+protobufjs@6.8.6:
+  version "6.8.6"
+  resolved "https://registry.npmjs.org/protobufjs/-/protobufjs-6.8.6.tgz?dl=https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.6.tgz#ce3cf4fff9625b62966c455fc4c15e4331a11ca2"
   dependencies:
     "@protobufjs/aspromise" "^1.1.2"
     "@protobufjs/base64" "^1.1.2"
@@ -8903,9 +8911,9 @@ protobufjs@6.8.0:
     "@protobufjs/path" "^1.1.2"
     "@protobufjs/pool" "^1.1.0"
     "@protobufjs/utf8" "^1.1.0"
-    "@types/long" "^3.0.31"
-    "@types/node" "^7.0.29"
-    long "^3.2.0"
+    "@types/long" "^3.0.32"
+    "@types/node" "^8.9.4"
+    long "^4.0.0"
 
 protractor@~5.1.2:
   version "5.1.2"

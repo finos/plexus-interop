@@ -52,7 +52,7 @@
     "chokidar": "^1.7.0",
     "copyfiles": "^1.2.0",
     "core-js": "^2.5.3",
-    "electron": "1.8.6",
+    "electron": "1.8.8",
     "electron-mocha": "^4.0.2",
     "glob": "^7.1.2",
     "http-server": "^0.11.1",

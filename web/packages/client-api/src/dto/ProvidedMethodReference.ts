@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus } from '@plexus-interop/protocol';
+import { ProvidedServiceReference } from '.';
 
-export interface ProvidedMethodReference extends plexus.interop.protocol.IProvidedMethodReference {}
+export interface ProvidedMethodReference {
+    providedService?: ProvidedServiceReference;
+    methodId?: string;
+}

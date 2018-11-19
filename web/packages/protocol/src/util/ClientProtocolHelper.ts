@@ -172,10 +172,10 @@ export class ClientProtocolHelper {
 
     public static toInvocationInfo(header: plexus.interop.protocol.IInvocationStartRequested): InvocationMetaInfo {
         return {
-            methodId: header.methodId,
-            serviceId: header.serviceId,
-            serviceAlias: header.serviceAlias,
-            consumerApplicationId: header.consumerApplicationId,
+            methodId: header.methodId || undefined,
+            serviceId: header.serviceId || undefined,
+            serviceAlias: header.serviceAlias || undefined,
+            consumerApplicationId: header.consumerApplicationId || undefined,
             consumerConnectionId: UniqueId.fromProperties(header.consumerConnectionId as plexus.IUniqueId)
         };
     }

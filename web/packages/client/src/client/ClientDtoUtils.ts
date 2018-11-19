@@ -29,15 +29,15 @@ export class ClientDtoUtils {
     public static providedMethodToInvocationInfo(providedMethod: ProvidedMethodReference): InvocationMetaInfo {
         if (providedMethod.providedService) {
             return {
-                serviceId: providedMethod.providedService.serviceId,
-                serviceAlias: providedMethod.providedService.serviceAlias,
-                methodId: providedMethod.methodId,
-                applicationId: providedMethod.providedService.applicationId,
+                serviceId: providedMethod.providedService.serviceId || undefined,
+                serviceAlias: providedMethod.providedService.serviceAlias || undefined,
+                methodId: providedMethod.methodId || undefined,
+                applicationId: providedMethod.providedService.applicationId || undefined,
                 connectionId: providedMethod.providedService.connectionId as UniqueId
             };
         } else {
             return {
-                methodId: providedMethod.methodId
+                methodId: providedMethod.methodId || undefined
             };
         }
     }
