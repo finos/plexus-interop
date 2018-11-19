@@ -21,10 +21,10 @@
   "dependencies": {
     "@types/long": "^3.0.31",
     "long": "^3.2.0",
-    "protobufjs": "6.8.0"
+    "protobufjs": "6.8.6"
   },
   "peerDependencies": {
-    "protobufjs": "6.8.0"
+    "protobufjs": "6.8.6"
   },
   "devDependencies": {
     "@types/jest": "^22.0.0",

@@ -25,6 +25,7 @@ import { UnaryServiceHandler } from './UnaryServiceHandler';
 import { ServerStreamingHandler } from './ServerStreamingHandler';
 import { ClientStreamingHandler } from './ClientStreamingHandler';
 
+// tslint:disable:no-unused-expression
 export class DiscoveryTests extends BaseEchoTest {
 
     public constructor(
@@ -137,7 +138,7 @@ export class DiscoveryTests extends BaseEchoTest {
             let receivedResponse: plexus.plexus.interop.testing.IEchoRequest | null = null;
             return new Promise<void>((resolve, reject) => {
                 client.sendRawServerStreamingRequest(method.providedMethod as ProvidedMethodReference, this.encodeRequestDto(echoRequest), {
-                    next: (response) => {
+                    next: response => {
                         receivedResponse = this.decodeRequestDto(response);
                     },
                     complete: async () => {
@@ -145,9 +146,7 @@ export class DiscoveryTests extends BaseEchoTest {
                         await this.clientsSetup.disconnect(client, server);
                         resolve();
                     },
-                    error: (e) => {
-                        reject(e);
-                    },
+                    error: e => reject(e),
                     streamCompleted: () => {}
                 });
             });
@@ -307,7 +306,7 @@ export class DiscoveryTests extends BaseEchoTest {
         await this.clientsSetup.disconnect(client, server);
     }
     
-    private assertDiscoveredMethodValid(discoveredMethod: DiscoveredMethod) {
+    private assertDiscoveredMethodValid(discoveredMethod: DiscoveredMethod): void {
         expect(discoveredMethod.providedMethod).to.not.be.undefined;
         expect(discoveredMethod.inputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
         expect(discoveredMethod.outputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
@@ -318,7 +317,7 @@ export class DiscoveryTests extends BaseEchoTest {
         expect(options[0].value).to.be.eq(discoveredMethod.methodTitle);
     }
 
-    private assertDiscoveredServiceMethodValid(discoveredMethod: DiscoveredServiceMethod) {
+    private assertDiscoveredServiceMethodValid(discoveredMethod: DiscoveredServiceMethod): void {
         expect(discoveredMethod.methodId).to.not.be.undefined;
         expect(discoveredMethod.methodTitle).to.not.be.undefined;
         expect(discoveredMethod.inputMessageId).to.be.eq('plexus.interop.testing.EchoRequest');
