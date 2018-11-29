@@ -59,6 +59,11 @@ public class ProtoGenTask extends BaseGenTask {
 	
 	protected val customOptions = new LinkedList<Option>
 
+	override public validateResources(PlexusGenConfig config, XtextResourceSet resourceSet) {
+		super.validateResources(config, resourceSet);
+		this.validateInteropResourceLoaded(config, resourceSet);
+	}
+
 	public def getCustomOptions() {
 		customOptions
 	}	

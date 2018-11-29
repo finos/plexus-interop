@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.db.plexus.interop.dsl.InteropLangUtils;
+import com.db.plexus.interop.dsl.gen.errors.CodeGenerationException;
 import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -59,7 +60,7 @@ public abstract class BaseGenTask implements GenTask {
         if (config.isVerbose()) {
             printResources(resourceSet);
         }
-        validateResources(resourceSet);
+        validateResources(config, resourceSet);
         doGenWithResources(config, resourceSet);
     }
 
@@ -75,8 +76,17 @@ public abstract class BaseGenTask implements GenTask {
         resourceSet.getResources().forEach(r ->  this.logger.info("Loaded resource: " + r.getURI()));
     }
 
-    public void validateResources(XtextResourceSet resourceSet) {
+    public void validateResources(PlexusGenConfig config, XtextResourceSet resourceSet) {
         this.validator.validateResources(resourceSet);
+    }
+
+    public void validateInteropResourceLoaded(PlexusGenConfig config, XtextResourceSet resourceSet) {
+        boolean containsInterop = resourceSet.getResources().stream().anyMatch(r -> r.getURI().toString().endsWith(".interop"));
+        if (!containsInterop) {
+            String errorMessage = String.format("No *.interop files match provided [%s] criteria, please check your input arguments.", config.getInput());
+            this.logger.severe(errorMessage);
+            throw new CodeGenerationException(errorMessage);
+        }
     }
 
     protected void doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException {}

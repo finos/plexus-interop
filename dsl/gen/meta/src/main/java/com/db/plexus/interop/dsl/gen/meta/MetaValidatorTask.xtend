@@ -42,7 +42,7 @@ class MetaValidatorTask extends BaseGenTask {
         }
     }
 
-    override validateResources(XtextResourceSet resourceSet) {
+    override validateResources(PlexusGenConfig config, XtextResourceSet resourceSet) {
         // skip default validation
     }
 

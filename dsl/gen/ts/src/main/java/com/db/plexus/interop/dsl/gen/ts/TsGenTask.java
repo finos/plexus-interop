@@ -48,6 +48,12 @@ public class TsGenTask extends BaseGenTask {
     private TypescriptApplicationApiGenerator codeOutputGenerator;
 
     @Override
+    public void validateResources(PlexusGenConfig config, XtextResourceSet resourceSet) {
+        super.validateResources(config, resourceSet);
+        this.validateInteropResourceLoaded(config, resourceSet);
+    }
+
+    @Override
     protected void doGenWithResources(PlexusGenConfig config, XtextResourceSet resourceSet) throws IOException {
     	
     	EList<Resource> resources = resourceSet.getResources();
