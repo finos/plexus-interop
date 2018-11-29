@@ -18,6 +18,7 @@ import { spawn } from 'child_process';
 
 export function simpleSpawn(execPath: string, args: string[] = [], printOutput: boolean = false): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+        const errorsBuffer: string[] = [];
         const child = spawn(execPath, args, {
             detached: true
         });
@@ -26,13 +27,18 @@ export function simpleSpawn(execPath: string, args: string[] = [], printOutput: 
                 console.log(`${data}`);
             }
         });
-        child.stderr.on('data', (data) => {
+        child.stderr.on('data', data => {
             if (printOutput) {
                 console.error(`${data}`);
+            } else {
+                errorsBuffer.push(`${data}`);
             }
         });
         child.on('exit', (code, signal) => {
             if (code !== 0) {
+                if (errorsBuffer.length > 0) {
+                    console.error(errorsBuffer.join('\n'));
+                }
                 reject(new Error(`Child process completed with error code: ${code}, please use --verbose flag to see whole output`));
             } else {
                 resolve();
