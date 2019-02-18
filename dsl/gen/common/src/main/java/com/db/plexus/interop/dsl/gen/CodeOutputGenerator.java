@@ -36,6 +36,8 @@ public abstract class CodeOutputGenerator {
     public static final String PROTO_CSHARP = "proto_csharp";
     
     public static final String CSHARP = "csharp";
+
+    public static final String LIST_METADATA = "list-meta";
     
     public final String generate(PlexusGenConfig genConfig, ResourceSet resourceSet) {    	
     	return generate(
