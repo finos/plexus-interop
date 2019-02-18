@@ -30,12 +30,14 @@ class ListMetadataFilesTask extends BaseGenTask {
 
         val loadedResourcesString = rs.resources
             .map[resource | resource.getURI.toFileString]
+            .filterNull
             .sort
             .join(System.lineSeparator)
 
         if (config.outFile != null && !config.outFile.isEmpty()) {
-            println("Saving metadata files list to: " + config.outFile)
-            FileUtils.writeStringToFile(new File(config.outFile), loadedResourcesString)
+            val file = new File(config.outFile)
+            println("Saving metadata files list to: " + file.absolutePath)
+            FileUtils.writeStringToFile(file, loadedResourcesString)
         } else {
             println(loadedResourcesString)
         }

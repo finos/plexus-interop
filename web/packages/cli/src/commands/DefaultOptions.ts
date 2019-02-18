@@ -50,6 +50,16 @@ export function excludePattern(): Option {
     };
 }
 
+export function generalEntryPoint(): Option {
+    return {
+        shortName: 'i',
+        longName: 'input',
+        exampleValue: 'plexus_application.interop',
+        isRequired: true,        
+        description: 'entry point file'
+    };
+}
+
 export function plexusEntryPoint(): Option {
     return {
         shortName: 'i',
