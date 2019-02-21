@@ -21,6 +21,7 @@ import { GenProtoCommand } from './GenProtoCommand';
 import { GenCSharpCommand } from './GenCSharpCommand';
 import { ValidateMetadataCommand } from './ValidateMetadataCommand';
 import { ValidateMetadataPatchCommand } from './ValidateMetadataPatchCommand';
+import { ListMetaFilesCommand } from './ListMetaFilesCommand';
 
 export function commands(): Command[] {
     return [
@@ -29,7 +30,8 @@ export function commands(): Command[] {
         new GenProtoCommand(), 
         new GenCSharpCommand(), 
         new ValidateMetadataCommand(),
-        new ValidateMetadataPatchCommand()
+        new ValidateMetadataPatchCommand(),
+        new ListMetaFilesCommand()
     ];
 }
 
