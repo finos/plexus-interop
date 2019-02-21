@@ -37,6 +37,8 @@ export interface InteropClient {
 
     createDefaultPayload(messageId: string): string;
 
+    createPayloadPreview(messageId: string, jsonPayload: string): string;
+
     validateRequest(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod, payload: string): void;
 
     resetInvocationHandlers(): void;

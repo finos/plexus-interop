@@ -140,11 +140,23 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
     this.store.dispatch({ type: AppActions.DISCOVER_METHODS_SUCCESS, payload: discovered });
   }
 
+  payloadPreview() {
+    if ((!this.selectedDiscoveredMethod && !this.consumedMethod) || !this.interopClient) {
+      return "";
+    }
+    const messageId = this.selectedDiscoveredMethod ? this.selectedDiscoveredMethod.inputMessageId : this.consumedMethod.method.requestMessage.id;
+    return this.interopClient.createPayloadPreview(messageId, this.messageContent);
+  }
+
   async sendRequest() {
 
     const method = this.selectedDiscoveredMethod || this.consumedMethod;
     const invocationLogger = createInvocationLogger(this.consumedMethod.method.type, ++this.requestId, this.log, this.selectedDiscoveredMethod);
 
+
+    invocationLogger.info(`Request JSON payload: ${this.messageContent}`);
+    invocationLogger.info(`Request binary payload: ${this.payloadPreview()}`);
+    
     const handler = {
       value: v => this.handleResponse(v, invocationLogger),
       error: e => this.handleError(e, invocationLogger)
@@ -159,20 +171,19 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
 
     this.resetInvocationInfo();
 
+    invocationLogger.info('Starting invocation');
+    
     switch (this.consumedMethod.method.type) {
       case MethodType.Unary:
-        invocationLogger.info(`Sending:\n${this.messageContent}`);
         this.interopClient.sendUnaryRequest(method, this.messageContent, handler)
           .catch(e => this.handleError(e, invocationLogger));
         break;
       case MethodType.ServerStreaming:
-        invocationLogger.info(`Sending:\n${this.messageContent}`);
         this.interopClient.sendServerStreamingRequest(method, this.messageContent, responseObserver);
         break;
       case MethodType.ClientStreaming:
       case MethodType.DuplexStreaming:
         try {
-          invocationLogger.info('Starting invocation');
           const client = await this.interopClient.sendBidiStreamingRequest(method, responseObserver);
           this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, client, invocationLogger);
         } catch (error) {
