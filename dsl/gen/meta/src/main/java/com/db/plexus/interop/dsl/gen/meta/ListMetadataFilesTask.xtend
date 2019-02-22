@@ -15,38 +15,33 @@
  * limitations under the License.
  */
 package com.db.plexus.interop.dsl.gen.meta
-
+import com.db.plexus.interop.dsl.gen.BaseGenTask
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig
+import org.eclipse.xtext.resource.XtextResourceSet
 import java.io.IOException
 import com.db.plexus.interop.dsl.gen.util.FileUtils
 import java.io.File
-import com.db.plexus.interop.dsl.gen.BaseGenTask
-import org.eclipse.xtext.resource.XtextResourceSet
-import static com.db.plexus.interop.dsl.validation.Issues.*;
+import javax.inject.Named
 
-class MetaValidatorTask extends BaseGenTask {
+@Named
+class ListMetadataFilesTask extends BaseGenTask {
 
     override doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
-        val issues = validator.getValidationIssues(rs)
-        if(!issues.empty) {
-            val issuesString = issuesToString(issues.sortWith(issuesComparator));
-            if(config.isVerbose() || config.getOutFile() === null) {
-                println(issuesString)
-            }
-            if(config.outFile !== null) {
-                FileUtils.writeStringToFile(new File(config.outFile), issuesString)
-            }
-            if(hasErrors(issues)) {
-                System.exit(1);
-            }
+
+        val loadedResourcesString = rs.resources
+            .map[resource | resource.getURI.toFileString]
+            .filterNull
+            .sort
+            .join(System.lineSeparator)
+
+        if (config.outFile != null && !config.outFile.isEmpty()) {
+            val file = new File(config.outFile)
+            println("Saving metadata files list to: " + file.absolutePath)
+            FileUtils.writeStringToFile(file, loadedResourcesString)
+        } else {
+            println(loadedResourcesString)
         }
+
     }
 
-    override validateResources(PlexusGenConfig config, XtextResourceSet resourceSet) {
-        // skip default validation
-    }
-
-    override inputFilesGlob(PlexusGenConfig config) {
-        "*.interop"
-    }
 }

@@ -24,6 +24,7 @@ import com.db.plexus.interop.dsl.gen.PlexusGenConfig;
 import com.db.plexus.interop.dsl.gen.js.JsGenTask;
 import com.db.plexus.interop.dsl.gen.csharp.CsharpGenTask;
 import com.db.plexus.interop.dsl.gen.csharp.CsharpProtoGenTask;
+import com.db.plexus.interop.dsl.gen.meta.ListMetadataFilesTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaValidatorTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaPatchValidatorTask;
@@ -89,6 +90,10 @@ public class Main {
             case CodeOutputGenerator.VALIDATE:
                 GenTask validatorTask = injector.getInstance(MetaValidatorTask.class);
                 validatorTask.doGen(genConfig);
+                break;
+            case CodeOutputGenerator.LIST_METADATA:
+                GenTask listFiles = injector.getInstance(ListMetadataFilesTask.class);
+                listFiles.doGen(genConfig);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type " + type);

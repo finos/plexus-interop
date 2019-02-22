@@ -64,6 +64,17 @@ export class GenericClientWrapper implements InteropClient {
         this.validateRequestByMessageId(this.isProvided(method) ? outputMessageId : inputMessageId, payload);
     }
 
+    public createPayloadPreview(messageId: string, jsonPayload: string): string {
+        try {
+            const requestData = JSON.parse(jsonPayload);
+            const requestEncoder = this.encoderProvider.getMarshaller(messageId);
+            const encodedRequest: ArrayBuffer = requestEncoder.encode(requestData);
+            return `[${new Uint8Array(encodedRequest).toString()}]`;
+        } catch (error) {
+            return "Unable to generate payload";
+        }
+    }
+
     public disconnect(): Promise<void> {
         return this.genericClient.disconnect();
     }

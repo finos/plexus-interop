@@ -43,9 +43,6 @@ export function prepareOutDir(testName: string): string {
 export async function filesEqual(first: string, second: string): Promise<boolean> {
     const firstContent = await readTextFile(first);
     const secondContent = await readTextFile(second);
-    console.log(first);
-    console.log(second);
-    console.log('Length ', firstContent.length, secondContent.length);
     return unifyWhiteSpaces(firstContent) === unifyWhiteSpaces(secondContent);
 }
 
