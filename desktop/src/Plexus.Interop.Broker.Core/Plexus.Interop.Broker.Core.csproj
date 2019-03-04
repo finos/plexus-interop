@@ -3,8 +3,8 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net45</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
 
     <RootNamespace>Plexus.Interop.Broker</RootNamespace>
     <IsPackable>false</IsPackable>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 
   <ItemGroup>

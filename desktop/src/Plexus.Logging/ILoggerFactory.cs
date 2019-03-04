@@ -20,7 +20,7 @@
     {
         ILogger Create(string name);
 
-#if NETSTANDARD1_6      
+#if NETSTANDARD2_0
         void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory);
 #endif
     }

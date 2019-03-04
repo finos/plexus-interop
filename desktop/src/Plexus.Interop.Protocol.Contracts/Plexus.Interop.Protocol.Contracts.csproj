@@ -3,8 +3,8 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net45</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
     <RootNamespace>Plexus.Interop.Protocol</RootNamespace>
   </PropertyGroup>
 

@@ -3,13 +3,13 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net45</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NLog" Version="4.5.6" />
-    <PackageReference Condition="'$(TargetFramework)' == 'netstandard1.6'" Include="NLog.Extensions.Logging" Version="1.1.0" />
+    <PackageReference Include="NLog" Version="4.5.11" />
+    <PackageReference Condition="'$(TargetFramework)' == 'netstandard2.0'" Include="NLog.Extensions.Logging" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

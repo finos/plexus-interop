@@ -3,17 +3,17 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net45;net46</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard2.0;net45;net46</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
     <AssemblyName>Plexus.Utils</AssemblyName>
     <PackageId>Plexus.Utils</PackageId>
     <RootNamespace>Plexus</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2018.3.0" PrivateAssets="All" />
     <PackageReference Include="System.Buffers" Version="4.5.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
   </ItemGroup>
 
   <ItemGroup>

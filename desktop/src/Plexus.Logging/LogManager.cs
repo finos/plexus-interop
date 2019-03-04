@@ -21,7 +21,7 @@ namespace Plexus
 
     public static class LogManager
     {
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
         public static void ConfigureLogging(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
             LogConfig.LoggerFactory.Configure(loggerFactory);

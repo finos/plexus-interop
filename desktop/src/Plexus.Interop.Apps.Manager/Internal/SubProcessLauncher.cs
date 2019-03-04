@@ -47,7 +47,7 @@
 
             var appInstanceId = UniqueId.Generate();
 
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
             process.StartInfo.Environment[EnvironmentHelper.ParentProcessIdVarName] = _curPid;
             process.StartInfo.Environment[EnvironmentHelper.BrokerWorkingDirVarName] = Directory.GetCurrentDirectory();
             process.StartInfo.Environment[EnvironmentHelper.AppInstanceIdVarName] = appInstanceId.ToString();

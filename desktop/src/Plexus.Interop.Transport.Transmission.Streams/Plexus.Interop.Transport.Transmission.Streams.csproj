@@ -3,13 +3,13 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net45</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Buffers" Version="4.5.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,12 +17,6 @@
     <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Contracts\Plexus.Interop.Transport.Transmission.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Logging\Plexus.Logging.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
-    <PackageReference Include="System.Threading.Thread">
-      <Version>4.3.0</Version>
-    </PackageReference>
   </ItemGroup>
 
 </Project>

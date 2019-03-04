@@ -22,7 +22,7 @@ namespace Plexus.Logging.NLog
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using NLogManager = global::NLog.LogManager;
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
     using global::NLog.Extensions.Logging;
 #endif
 
@@ -54,7 +54,7 @@ namespace Plexus.Logging.NLog
             return new Logger(NLogManager.GetLogger(name));
         }
 
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
         public void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
             loggerFactory.AddNLog();

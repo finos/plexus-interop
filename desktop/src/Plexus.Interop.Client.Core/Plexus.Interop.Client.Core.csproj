@@ -3,8 +3,8 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard1.6;net45</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard1.6</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
     <RootNamespace>Plexus.Interop</RootNamespace>
     <AssemblyName>Plexus.Interop.Client.Core</AssemblyName>
   </PropertyGroup>
@@ -12,7 +12,7 @@
     <None Include="Internal\Client.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2018.3.0" PrivateAssets="All" />
     <ProjectReference Include="..\Plexus.Common.Contracts\Plexus.Common.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Client.Marshalling.Contracts\Plexus.Interop.Client.Marshalling.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Protocol.Contracts\Plexus.Interop.Protocol.Contracts.csproj" />
