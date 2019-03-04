@@ -5,7 +5,7 @@ plugins {
     id "de.undercouch.download" version "3.2.0"
 }
 
-def dotnetSdkVersion = "2.1.300"
+def dotnetSdkVersion = "2.2"
 def buildCache = System.getenv("PLEXUS_BUILD_CACHE_DIR") ?: new File("${rootDir}/build").absolutePath
 def fullDotNetBuild = System.env['PLEXUS_BUILD_FULL_DOTNET'] == 'true' && Os.isFamily(Os.FAMILY_WINDOWS)
 def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] != 'true'
@@ -52,7 +52,7 @@ task prepareDotnet {
         }
         dotnetVersion = "$dotnetVersion".trim()
 
-        if (dotnetVersion == dotnetSdkVersion) {
+        if (dotnetVersion.startsWith(dotnetSdkVersion)) {
             println "Dotnet SDK $dotnetSdkVersion is already installed, skipping downloading"
         } else {
             println "Dotnet SDK $dotnetSdkVersion is not installed on the current machine. Downloading it to $buildCache."
@@ -60,13 +60,13 @@ task prepareDotnet {
             download {
                 onlyIfNewer true
                 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    src 'https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-2.1.300-win-x86.zip'
+                    src 'https://download.visualstudio.microsoft.com/download/pr/59e18010-8e57-4073-add2-d2b5cfbc5e58/8fa6831c7be0800889324640e29476f4/dotnet-sdk-2.2.104-win-x86.zip'
                     dest "$buildCache/win32/sdk/dotnet.zip"
                 } else if (Os.isFamily(Os.FAMILY_MAC)){
-                    src 'https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-2.1.300-osx-x64.tar.gz'
+                    src 'https://download.visualstudio.microsoft.com/download/pr/7b61ec42-34d4-443a-9472-10db3b600b00/331956fdc0884ec01aaa5aa44360fce2/dotnet-sdk-2.2.104-osx-x64.tar.gz'
                     dest "$buildCache/unix/sdk/dotnet.tar.gz"
                 } else {
-                    src 'https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-2.1.300-linux-x64.tar.gz'
+                    src 'https://download.visualstudio.microsoft.com/download/pr/69937b49-a877-4ced-81e6-286620b390ab/8ab938cf6f5e83b2221630354160ef21/dotnet-sdk-2.2.104-linux-x64.tar.gz'
                     dest "$buildCache/unix/sdk/dotnet.tar.gz"
                 }
             }
