@@ -55,7 +55,7 @@ task prepareDotnet {
         if (dotnetVersion.startsWith(dotnetSdkVersion)) {
             println "Dotnet SDK $dotnetSdkVersion is already installed, skipping downloading"
         } else {
-            println "Dotnet SDK $dotnetSdkVersion is not installed on the current machine. Downloading it to $buildCache."
+            println "Dotnet SDK $dotnetSdkVersion is not installed on the current machine. 'dotnet --version' command output: '$dotnetVersion'. Downloading Dotnet SDK $dotnetSdkVersion to $buildCache."
 
             download {
                 onlyIfNewer true
