@@ -6,7 +6,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>plexus</AssemblyName>
 
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>

@@ -3,7 +3,7 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     
     <IsPackable>false</IsPackable>
 

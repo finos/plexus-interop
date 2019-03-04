@@ -3,8 +3,8 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.1;net45;net46</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.2;net45;net46</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.2</TargetFrameworks>
 
     <RootNamespace>Plexus.Interop.Broker.Core</RootNamespace>
     <IsPackable>false</IsPackable>
