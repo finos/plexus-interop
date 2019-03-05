@@ -16,21 +16,22 @@
  */
 ﻿namespace Plexus.Interop.Apps.Internal
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
+    using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class AppDto
     {
-        [JsonProperty("id", Required = Required.Always)]
+        [DataMember(Name = "id", IsRequired = true)]
         public string Id { get; set; }
 
-        [JsonProperty("displayName")]
+        [DataMember(Name = "displayName")]
         public string DisplayName { get; set; }
 
-        [JsonProperty("launcherId")]
+        [DataMember(Name = "launcherId")]
         public string LauncherId { get; set; }
 
-        [JsonProperty("launcherParams")]
-        public JObject LauncherParams { get; set; }
+        [DataMember(Name = "launcherParams")]
+        public Dictionary<string, object> LauncherParams { get; set; } = new Dictionary<string, object>();
     }
 }

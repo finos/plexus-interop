@@ -16,27 +16,41 @@
  */
 namespace Plexus.Interop.Metamodel.Json.Internal
 {
+    using System;
     using System.Collections.Generic;
-    using Newtonsoft.Json;
+    using System.Runtime.Serialization;    
 
+    [DataContract]
     internal sealed class MethodDto
     {
-        [JsonProperty("name")]
+        private List<OptionDto> _options = new List<OptionDto>();
+
+        [DataMember(Name = "name")]
         public string Name { get; set; }
 
-        [JsonProperty("title")]
+        [DataMember(Name = "title")]
         public string Title { get; set; }
 
-        [JsonProperty("request")]
+        [DataMember(Name = "request")]
         public string RequestMessageId { get; set; }
 
-        [JsonProperty("response")]
+        [DataMember(Name = "response")]
         public string ResponseMessageId { get; set; }
 
-        [JsonProperty("type")]
         public MethodTypeDto Type { get; set; }
 
-        [JsonProperty("options")]
-        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
+        [DataMember(Name = "type")]
+        internal string TypeInternal
+        {
+            get => Enum.GetName(typeof(MethodTypeDto), Type);
+            set => Type = (MethodTypeDto)Enum.Parse(typeof(MethodTypeDto), value);
+        }
+
+        [DataMember(Name = "options")]
+        public List<OptionDto> Options
+        {
+            get => _options = _options ?? new List<OptionDto>();
+            set => _options = value ?? new List<OptionDto>();
+        }
     }
 }

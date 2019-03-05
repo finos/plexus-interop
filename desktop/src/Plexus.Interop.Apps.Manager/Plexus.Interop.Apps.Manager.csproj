@@ -10,10 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Plexus.Common.Contracts\Plexus.Common.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Apps.Manager.Contracts\Plexus.Interop.Apps.Manager.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Client\Plexus.Interop.Client.csproj" />

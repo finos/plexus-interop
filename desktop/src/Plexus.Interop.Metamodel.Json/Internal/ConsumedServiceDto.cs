@@ -16,24 +16,41 @@
  */
 namespace Plexus.Interop.Metamodel.Json.Internal
 {
-    using Newtonsoft.Json;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class ConsumedServiceDto
     {
-        [JsonProperty("service")]
+        private List<OptionDto> _options = new List<OptionDto>();
+        private List<ConsumedMethodDto> _methods = new List<ConsumedMethodDto>();
+        private List<string> _from = new List<string>();
+
+        [DataMember(Name = "service")]
         public string ServiceId{ get; set; }
 
-        [JsonProperty("methods")]
-        public List<ConsumedMethodDto> Methods { get; set; } = new List<ConsumedMethodDto>();
+        [DataMember(Name = "methods")]
+        public List<ConsumedMethodDto> Methods
+        {
+            get => _methods = _methods ?? new List<ConsumedMethodDto>();
+            set => _methods = value ?? new List<ConsumedMethodDto>();
+        }
 
-        [JsonProperty("alias")]
+        [DataMember(Name = "alias")]
         public string Alias { get; set; }
 
-        [JsonProperty("from")]
-        public List<string> From { get; set; } = new List<string>();
+        [DataMember(Name = "from")]
+        public List<string> From
+        {
+            get => _from = _from ?? new List<string>();
+            set => _from = value ?? new List<string>();
+        }
 
-        [JsonProperty("options")]
-        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
+        [DataMember(Name = "options")]
+        public List<OptionDto> Options
+        {
+            get => _options = _options ?? new List<OptionDto>();
+            set => _options = value ?? new List<OptionDto>();
+        }
     }
 }

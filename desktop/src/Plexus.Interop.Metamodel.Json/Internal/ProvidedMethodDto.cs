@@ -17,14 +17,21 @@
 ﻿namespace Plexus.Interop.Metamodel.Json.Internal
 {
     using System.Collections.Generic;
-    using Newtonsoft.Json;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class ProvidedMethodDto
     {
-        [JsonProperty("name")]
+        private List<OptionDto> _options = new List<OptionDto>();
+
+        [DataMember(Name = "name")]
         public string Name { get; set; }
 
-        [JsonProperty("options")]
-        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
+        [DataMember(Name = "options")]
+        public List<OptionDto> Options
+        {
+            get => _options = _options ?? new List<OptionDto>();
+            set => _options = value ?? new List<OptionDto>();
+        }
     }
 }
