@@ -18,6 +18,7 @@
 {
     using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class NativeAppLauncherParamsDto
     {
         [DataMember(Name = "cmd")]
