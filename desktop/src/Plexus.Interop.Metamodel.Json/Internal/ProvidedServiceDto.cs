@@ -14,26 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Metamodel.Json.Internal
+namespace Plexus.Interop.Metamodel.Json.Internal
 {
-    using Newtonsoft.Json;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class ProvidedServiceDto
     {
-        [JsonProperty("service")]
+        private List<ProvidedMethodDto> _methods = new List<ProvidedMethodDto>();
+        private List<OptionDto> _options = new List<OptionDto>();
+        private List<string> _to = new List<string>();
+
+        [DataMember(Name = "service")]
         public string ServiceId { get; set; }
 
-        [JsonProperty("methods")]
-        public List<ProvidedMethodDto> Methods { get; set; } = new List<ProvidedMethodDto>();
+        [DataMember(Name = "methods")]
+        public List<ProvidedMethodDto> Methods
+        {
+            get => _methods = _methods ?? new List<ProvidedMethodDto>();
+            set => _methods = value ?? new List<ProvidedMethodDto>();
+        }
 
-        [JsonProperty("to")]
-        public List<string> To { get; set; } = new List<string>();
+        [DataMember(Name = "to")]
+        public List<string> To
+        {
+            get => _to = _to ?? new List<string>();
+            set => _to = value ?? new List<string>();
+        }
 
-        [JsonProperty("alias")]
+        [DataMember(Name = "alias")]
         public string Alias { get; set; }
 
-        [JsonProperty("options")]
-        public List<OptionDto> Options { get; set; } = new List<OptionDto>();
+        [DataMember(Name = "options")]
+        public List<OptionDto> Options
+        {
+            get => _options = _options ?? new List<OptionDto>();
+            set => _options = value ?? new List<OptionDto>();
+        }
     }
 }

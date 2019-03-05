@@ -17,7 +17,6 @@
 namespace Plexus.Interop.Apps.Internal
 {
     using Google.Protobuf.WellKnownTypes;
-    using Newtonsoft.Json;
     using Plexus.Channels;
     using Plexus.Interop.Transport;
     using Plexus.Processes;
@@ -47,12 +46,11 @@ namespace Plexus.Interop.Apps.Internal
         private readonly IAppRegistryProvider _appRegistryProvider;
 
         private readonly Generated.IAppLifecycleManagerClient _client;
-        private readonly JsonSerializer _jsonSerializer = JsonSerializer.CreateDefault();
         private readonly NativeAppLauncherClient _nativeAppLauncherClient;
 
         public AppLifecycleManager(string metadataDir)
         {
-            _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir, _jsonSerializer);
+            _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir);
             _appRegistryProvider = JsonFileAppRegistryProvider.Initialize(Path.Combine(metadataDir, "apps.json"));
             _client = new Generated.AppLifecycleManagerClient(
                 this, 
@@ -381,7 +379,7 @@ namespace Plexus.Interop.Apps.Internal
             var request = new Generated.AppLaunchRequest
             {
                 AppId = appId,
-                LaunchParamsJson = appDto.LauncherParams.ToString(),
+                LaunchParamsJson = JsonConvert.Serialize(appDto.LauncherParams),
                 SuggestedAppInstanceId = suggestedAppInstanceId.ToProto(),
                 LaunchMode = Convert(resolveMode),
                 Referrer = referrer

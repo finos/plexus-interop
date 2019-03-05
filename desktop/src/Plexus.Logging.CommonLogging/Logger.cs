@@ -16,7 +16,7 @@
  */
 namespace Plexus.Logging.CommonLogging
 {
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
     using Microsoft.Extensions.Logging;
 #endif
     using System;
@@ -26,7 +26,7 @@ namespace Plexus.Logging.CommonLogging
     using LogLevel = LogLevel;
 
     internal sealed class Logger : ILogger
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
         , Microsoft.Extensions.Logging.ILogger
 #endif
     {
@@ -172,7 +172,7 @@ namespace Plexus.Logging.CommonLogging
                 }
             }
         }
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)

@@ -16,25 +16,15 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
-    using Newtonsoft.Json;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class AppsDto
     {
-        [JsonProperty("apps")]
+        [DataMember(Name = "apps")]
         public List<AppDto> Apps { get; set; } = new List<AppDto>();
 
-        public static AppsDto Load(string filePath)
-        {
-            using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
-            using (var jsonReader = new JsonTextReader(streamReader))
-            {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<AppsDto>(jsonReader);
-            }
-        }
+        public static AppsDto Load(string filePath) => JsonConvert.DeserializeFromFile<AppsDto>(filePath);
     }
 }

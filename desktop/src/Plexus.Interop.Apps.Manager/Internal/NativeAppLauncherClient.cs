@@ -16,8 +16,6 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
     using Plexus.Interop.Apps.Internal.Generated;
     using Plexus.Processes;
     using System.IO;
@@ -27,19 +25,15 @@ namespace Plexus.Interop.Apps.Internal
     {
         private readonly SubProcessLauncher _subProcessLauncher;
         private readonly string _cmdBasePath;
-        private readonly JsonSerializer _jsonSerializer;
         private INativeAppLauncherClient _client;
 
         public Plexus.UniqueId Id { get; }
 
-        public NativeAppLauncherClient(
-            string cmdBasePath, 
-            JsonSerializer jsonSerializer)
+        public NativeAppLauncherClient(string cmdBasePath)
         {
             Id = Plexus.UniqueId.Generate();
             _cmdBasePath = cmdBasePath;
             _subProcessLauncher = new SubProcessLauncher();
-            _jsonSerializer = jsonSerializer;
         }
 
         protected override ILogger Log { get; } = LogManager.GetLogger<NativeAppLauncherClient>();
@@ -57,8 +51,7 @@ namespace Plexus.Interop.Apps.Internal
         Task<AppLaunchResponse> AppLauncherService.ILaunchImpl.Launch(AppLaunchRequest request, MethodCallContext context)
         {
             Log.Debug("Launch request received: {0}", request);
-            var paramsDto = _jsonSerializer.Deserialize<NativeAppLauncherParamsDto>(
-                new JTokenReader(JToken.Parse(request.LaunchParamsJson)));
+            var paramsDto = JsonConvert.Deserialize<NativeAppLauncherParamsDto>(request.LaunchParamsJson);
             var cmd = Path.Combine(_cmdBasePath, paramsDto.Cmd);
             var id = _subProcessLauncher.Launch(cmd, paramsDto.Args);
             Log.Trace("Launched app instance {0} by request: {1}", id, request);

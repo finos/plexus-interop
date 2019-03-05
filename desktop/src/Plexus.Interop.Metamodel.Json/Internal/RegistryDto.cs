@@ -16,43 +16,35 @@
  */
 namespace Plexus.Interop.Metamodel.Json.Internal
 {
-    using Newtonsoft.Json;
     using System.Collections.Generic;
     using System.IO;
-    using System.Text;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class RegistryDto
     {
-        [JsonProperty("services")]
-        public List<ServiceDto> Services { get; set; } = new List<ServiceDto>();
+        private List<ServiceDto> _services = new List<ServiceDto>();
+        private List<ApplicationDto> _applications = new List<ApplicationDto>();
 
-        [JsonProperty("applications")]
-        public List<ApplicationDto> Applications { get; set; } = new List<ApplicationDto>();
-
-        public static RegistryDto LoadFromFile(string filePath)
+        [DataMember(Name = "services")]
+        public List<ServiceDto> Services
         {
-            using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
-            using (var reader = new JsonTextReader(streamReader))
-            {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<RegistryDto>(reader);
-            }
+            get => _services = _services ?? new List<ServiceDto>();
+            set => _services = value ?? new List<ServiceDto>();
         }
 
-        public static RegistryDto LoadFromStream(Stream stream)
+        [DataMember(Name = "applications")]
+        public List<ApplicationDto> Applications
         {
-            using (var file = new StreamReader(stream))
-            using (JsonReader reader = new JsonTextReader(file))
-            {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<RegistryDto>(reader);
-            }
+            get => _applications = _applications ?? new List<ApplicationDto>();
+            set => _applications = value ?? new List<ApplicationDto>();
         }
 
-        public static RegistryDto Parse(string content)
-        {
-            return JsonConvert.DeserializeObject<RegistryDto>(content);
-        }
+        public static RegistryDto LoadFromFile(string filePath) =>
+            JsonConvert.DeserializeFromFile<RegistryDto>(filePath);
+
+        public static RegistryDto LoadFromStream(Stream stream) => JsonConvert.Deserialize<RegistryDto>(stream);
+
+        public static RegistryDto Parse(string content) => JsonConvert.Deserialize<RegistryDto>(content);
     }
 }

@@ -6,7 +6,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>plexus</AssemblyName>
 
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>
@@ -41,11 +41,11 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.2.1" />
+    <PackageReference Include="CommandLineParser" Version="2.4.3" />
     <PackageReference Include="System.Console" Version="4.3.1" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
     <PackageReference Include="System.IO.Pipes" Version="4.3.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
   </ItemGroup>
   
   <ItemGroup>

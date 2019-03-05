@@ -16,11 +16,17 @@
  */
 ﻿namespace Plexus.Interop.Metamodel.Json.Internal
 {
+    using System.Runtime.Serialization;
+
     internal enum MethodTypeDto
     {
+        [EnumMember(Value = "Unary")]
         Unary,
+        [EnumMember(Value = "ServerStreaming")]
         ServerStreaming,
+        [EnumMember(Value = "ClientStreaming")]
         ClientStreaming,
+        [EnumMember(Value = "DuplexStreaming")]
         DuplexStreaming
     }
 }

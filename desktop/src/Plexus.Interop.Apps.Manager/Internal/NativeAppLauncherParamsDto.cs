@@ -16,14 +16,15 @@
  */
 ﻿namespace Plexus.Interop.Apps.Internal
 {
-    using Newtonsoft.Json;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class NativeAppLauncherParamsDto
     {
-        [JsonProperty("cmd")]
+        [DataMember(Name = "cmd")]
         public string Cmd { get; set; }
 
-        [JsonProperty("args")]
+        [DataMember(Name = "args")]
         public string Args { get; set; }
     }
 }

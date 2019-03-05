@@ -16,16 +16,18 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
-    using Newtonsoft.Json.Linq;
+    using System.Collections.Generic;
 
     internal class AppInfo
     {
-        public AppInfo(string id, string displayName, string launcherId, JObject launcherParams)
+        public AppInfo(string id, string displayName, string launcherId, IDictionary<string, object> launcherParams)
         {
             Id = id;
             DisplayName = displayName;
             LauncherId = launcherId;
-            LauncherParams = launcherParams;
+            LauncherParams = launcherParams == null
+                ? new Dictionary<string, object>()
+                : new Dictionary<string, object>(launcherParams);
         }
 
         public string Id { get; set; }
@@ -34,6 +36,6 @@ namespace Plexus.Interop.Apps.Internal
 
         public string LauncherId { get; set; }
 
-        public JObject LauncherParams { get; set; }
+        public IDictionary<string, object> LauncherParams { get; set; }
     }
 }

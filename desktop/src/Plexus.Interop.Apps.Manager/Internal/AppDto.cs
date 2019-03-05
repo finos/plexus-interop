@@ -14,23 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps.Internal
+namespace Plexus.Interop.Apps.Internal
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
+    using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class AppDto
     {
-        [JsonProperty("id", Required = Required.Always)]
+        private Dictionary<string, object> _launcherParams = new Dictionary<string, object>();
+
+        [DataMember(Name = "id", IsRequired = true)]
         public string Id { get; set; }
 
-        [JsonProperty("displayName")]
+        [DataMember(Name = "displayName")]
         public string DisplayName { get; set; }
 
-        [JsonProperty("launcherId")]
+        [DataMember(Name = "launcherId")]
         public string LauncherId { get; set; }
 
-        [JsonProperty("launcherParams")]
-        public JObject LauncherParams { get; set; }
+        [DataMember(Name = "launcherParams")]
+        public Dictionary<string, object> LauncherParams
+        {
+            get => _launcherParams = _launcherParams ?? new Dictionary<string, object>();
+            set => _launcherParams = value ?? new Dictionary<string, object>();
+        }
     }
 }

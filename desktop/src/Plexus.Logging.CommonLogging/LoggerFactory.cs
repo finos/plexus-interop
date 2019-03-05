@@ -16,7 +16,7 @@
  */
 namespace Plexus.Logging.CommonLogging
 {
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
     using Microsoft.Extensions.Logging;
 #endif
     using Common.Logging;    
@@ -24,7 +24,7 @@ namespace Plexus.Logging.CommonLogging
     using ILoggerFactory = Plexus.ILoggerFactory;
 
     internal sealed class LoggerFactory : ILoggerFactory
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
         ,ILoggerProvider
 #endif
     {
@@ -33,7 +33,7 @@ namespace Plexus.Logging.CommonLogging
             return new Logger(LogManager.GetLogger(name), name);
         }
 
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
         public void Configure(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
             loggerFactory.AddProvider(this);

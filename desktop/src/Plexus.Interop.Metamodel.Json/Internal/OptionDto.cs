@@ -16,14 +16,15 @@
  */
 ﻿namespace Plexus.Interop.Metamodel.Json.Internal
 {
-    using Newtonsoft.Json;
+    using System.Runtime.Serialization;
 
+    [DataContract]
     internal sealed class OptionDto
     {
-        [JsonProperty("id")]
+        [DataMember(Name = "id")]
         public string Id { get; set; }
 
-        [JsonProperty("value")]
+        [DataMember(Name = "value")]
         public string Value { get; set; }
     }
 }
