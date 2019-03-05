@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps.Internal
+namespace Plexus.Interop.Apps.Internal
 {
     using System.Collections.Generic;
     using System.Runtime.Serialization;
@@ -22,6 +22,8 @@
     [DataContract]
     internal sealed class AppDto
     {
+        private Dictionary<string, object> _launcherParams = new Dictionary<string, object>();
+
         [DataMember(Name = "id", IsRequired = true)]
         public string Id { get; set; }
 
@@ -32,6 +34,10 @@
         public string LauncherId { get; set; }
 
         [DataMember(Name = "launcherParams")]
-        public Dictionary<string, object> LauncherParams { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> LauncherParams
+        {
+            get => _launcherParams = _launcherParams ?? new Dictionary<string, object>();
+            set => _launcherParams = value ?? new Dictionary<string, object>();
+        }
     }
 }
