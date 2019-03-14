@@ -7,6 +7,8 @@
     "start": "ng serve",
     "prebuild": "npm run test",
     "build": "ng build && npm run copy-to-bin",
+    "build:verbose": "tsc -p src/tsconfig.app.json --extendedDiagnostics",
+    "build:version": "tsc --version",
     "test": "jest",
     "lint": "echo 'Not implemented'",
     "copy-to-bin": "copyfiles dist/* ../../../bin/win-x86/broker/studio -u 1",
@@ -69,7 +71,7 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "5.8.0",
-    "typescript": "2.6.1"
+    "typescript": "3.3.3"
   },
   "jest": {
     "preset": "jest-preset-angular",
