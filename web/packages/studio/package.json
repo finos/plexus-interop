@@ -7,8 +7,6 @@
     "start": "ng serve",
     "prebuild": "npm run test",
     "build": "ng build && npm run copy-to-bin",
-    "build:verbose": "tsc -p src/tsconfig.app.json --extendedDiagnostics",
-    "build:version": "tsc --version",
     "test": "jest",
     "lint": "echo 'Not implemented'",
     "copy-to-bin": "copyfiles dist/* ../../../bin/win-x86/broker/studio -u 1",
