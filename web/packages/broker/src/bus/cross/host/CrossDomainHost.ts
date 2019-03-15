@@ -80,7 +80,10 @@ export class CrossDomainHost {
                 && parsed.message.requestPayload !== undefined
                 && !parsed.message.responsePayload)
             .subscribe({
-                next: msg => this.handleParentMessage(msg),
+                next: msg => this.handleParentMessage({
+                    ...msg,
+                    sourceWindow: msg.sourceWindow as Window
+                }),
                 error: e => this.log.error('Error from parent messages subscription', e)
             });
     }
