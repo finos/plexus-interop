@@ -28,7 +28,7 @@ namespace Plexus
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SuppressUnobservedExceptions(this Task task)
         {
-            task.ContinueWithInBackground(t => t.Exception?.Handle(x => true));
+            task.ContinueWithSynchronously(t => t.Exception?.Handle(x => true));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
