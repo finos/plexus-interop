@@ -12,7 +12,7 @@ node {
 }
 
 def ciBuild = System.env['BuildRunner'] != null
-def ciPublishBuild = ciBuild && !packageVersion.contains("-") && (System.env['APPVEYOR_REPO_TAG'] == "true" || System.env['PLEXUS_BUILD_VSCODE_PUBLISH'] == "true")
+def ciPublishBuild = ciBuild && (System.env['APPVEYOR_REPO_TAG'] == "true" || System.env['PLEXUS_BUILD_VSCODE_PUBLISH'] == "true")
 def packageVersion = System.env["PLEXUS_BUILD_VSCODE_PACKAGE_VERSION"] ?: (System.env["APPVEYOR_REPO_TAG_NAME"] ?: System.env["PackageVersion"])
 // NPM config settings
 def npmRegistry = System.env['NPM_REGISTRY']
@@ -71,7 +71,7 @@ task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'installProtoServer', 
     environment = [
         'PLEXUS_BUILD_VSCODE_PACKAGE_VERSION': packageVersion
     ]
-    args = ciPublishBuild ? ['run', 'ci-publish'] : ['run', 'build']
+    args = ciPublishBuild && !packageVersion.contains("-") ? ['run', 'ci-publish'] : ['run', 'build']
 }
 
 build.dependsOn npmBuild
