@@ -47,16 +47,51 @@ namespace Plexus.Interop
 
         private readonly TestBrokerFixture _testBrokerFixture;
 
+        private readonly List<Exception> _unobservedExceptions = new List<Exception>();
+
         public ClientBrokerIntegrationTests(ITestOutputHelper output, TestBrokerFixture testBrokerFixture) : base(output)
         {
             _testBrokerFixture = testBrokerFixture;
             _testBrokerFixture.OnBeforeTest();
+            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+        }
+
+        private void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            lock (_unobservedExceptions)
+            {
+                _unobservedExceptions.AddRange(e.Exception.InnerExceptions);
+            }
         }
 
         public override void Dispose()
         {
-            base.Dispose();
-            _testBrokerFixture.OnAfterTest();
+            try
+            {
+                base.Dispose();
+                _testBrokerFixture.OnAfterTest();
+                VerifyNoUnobservedTaskExceptions();
+            }
+            finally
+            {
+                TaskScheduler.UnobservedTaskException -= OnUnobservedTaskException;
+            }
+        }
+
+        private void VerifyNoUnobservedTaskExceptions()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            lock (_unobservedExceptions)
+            {
+                if (_unobservedExceptions.Count > 0)
+                {
+                    throw new AggregateException(
+                        "Unhandled task exceptions after test run",
+                        _unobservedExceptions);
+                }
+            }
         }
 
         [Fact]

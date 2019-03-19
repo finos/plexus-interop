@@ -26,6 +26,12 @@ namespace Plexus
         private static readonly ILogger Log = LogManager.GetLogger(typeof(TaskExtensions));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SuppressUnobservedExceptions(this Task task)
+        {
+            task.ContinueWithSynchronously(t => t.Exception?.Handle(x => true));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task ContinueWithInBackground(this Task task, Action<Task> func,
             CancellationToken cancellationToken = new CancellationToken())
         {
