@@ -206,7 +206,31 @@ namespace Plexus.Interop.Apps.Internal
                 appId, mode, resolvedConnection, referrerConnectionInfo);
             return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Id);
         }
-        
+
+        public void OnInvocationStarted(MethodCallStartedEventDescriptor eventData)
+        {
+            BroadcastEvent(new Generated.AppLifecycleEvent
+            {
+                MethodCallStarted = new Generated.MethodCallStartedEvent
+                {
+                    CallDescriptor = eventData.MethodCallDescriptor.ToProto()
+                }
+            });
+        }
+
+        public void OnInvocationFinished(MethodCallFinishedEventDescriptor eventData)
+        {
+            BroadcastEvent(new Generated.AppLifecycleEvent
+            {
+                MethodCallFinished = new Generated.MethodCallFinishedEvent
+                {
+                    CallDescriptor = eventData.MethodCallDescriptor.ToProto(),
+                    Result = eventData.Result.ToProto(),
+                    DurationMs = eventData.DurationMs
+                }
+            });
+        }
+
         public IReadOnlyCollection<IAppConnection> GetOnlineConnections()
         {
             lock (_connections)

@@ -132,7 +132,9 @@
 	            "event": {
 	              "oneof": [
 	                "connected",
-	                "disconnected"
+	                "disconnected",
+	                "methodCallStarted",
+	                "methodCallFinished"
 	              ]
 	            }
 	          },
@@ -144,6 +146,14 @@
 	            "disconnected": {
 	              "type": "AppDisconnectedEvent",
 	              "id": 2
+	            },
+	            "methodCallStarted": {
+	              "type": "MethodCallStartedEvent",
+	              "id": 3
+	            },
+	            "methodCallFinished": {
+	              "type": "MethodCallFinishedEvent",
+	              "id": 4
 	            }
 	          }
 	        },
@@ -167,6 +177,43 @@
 	              "type": "AppConnectionDescriptor",
 	              "id": 1
 	            }
+	          }
+	        },
+	        "MethodCallStartedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.MethodCallStartedEvent"
+	          },
+	          "fields": {
+	            "callDescriptor": {
+	              "type": "MethodCallDescriptor",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "MethodCallFinishedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.MethodCallFinishedEvent"
+	          },
+	          "fields": {
+	            "callDescriptor": {
+	              "type": "MethodCallDescriptor",
+	              "id": 1
+	            },
+	            "result": {
+	              "type": "MethodCallResult",
+	              "id": 2
+	            },
+	            "durationMs": {
+	              "type": "int64",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "MethodCallResult": {
+	          "values": {
+	            "Succeeded": 0,
+	            "Canceled": 1,
+	            "Failed": 2
 	          }
 	        },
 	        "messageId": {
@@ -221,6 +268,33 @@
 	            "appInstanceId": {
 	              "type": "UniqueId",
 	              "id": 3
+	            }
+	          }
+	        },
+	        "MethodCallDescriptor": {
+	          "options": {
+	            "(.interop.message_id)": "interop.MethodCallDescriptor"
+	          },
+	          "fields": {
+	            "serviceId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "serviceAliasId": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "methodId": {
+	              "type": "string",
+	              "id": 3
+	            },
+	            "source": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 4
+	            },
+	            "target": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 5
 	            }
 	          }
 	        }

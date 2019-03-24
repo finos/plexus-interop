@@ -23,6 +23,8 @@ namespace Plexus.Channels
     {
         public static void PropagateTerminationFrom<T>(this ITerminatableWritableChannel<T> channel, Task completion)
         {
+            completion.SuppressUnobservedExceptions();
+
             void OnCompleted(Task task, object state)
             {
                 var c = (ITerminatableWritableChannel<T>)state;
@@ -41,6 +43,8 @@ namespace Plexus.Channels
 
         public static void PropagateCompletionFrom<T>(this ITerminatableWritableChannel<T> channel, Task completion)
         {
+            completion.SuppressUnobservedExceptions();
+
             void OnCompleted(Task task, object state)
             {
                 var c = (ITerminatableWritableChannel<T>)state;
@@ -63,6 +67,8 @@ namespace Plexus.Channels
 
         public static void PropagateExceptionFrom<T>(this ITerminatableWritableChannel<T> channel, Task completion)
         {
+            completion.SuppressUnobservedExceptions();
+
             void OnCompleted(Task task, object state)
             {
                 var c = (ITerminatableWritableChannel<T>)state;

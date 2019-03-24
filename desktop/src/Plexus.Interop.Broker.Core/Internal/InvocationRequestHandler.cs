@@ -23,13 +23,15 @@ namespace Plexus.Interop.Broker.Internal
     using Plexus.Interop.Protocol.Invocation;
     using Plexus.Interop.Transport;
     using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
 
     internal sealed class InvocationRequestHandler : IInvocationRequestHandler
     {
         private static readonly ILogger Log = LogManager.GetLogger<InvocationRequestHandler>();
-
+        
+        private readonly Stopwatch _stopwatch = new Stopwatch();
         private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly IRegistryService _registryService;
         private readonly IProtocolMessageFactory _protocolMessageFactory;
@@ -50,12 +52,15 @@ namespace Plexus.Interop.Broker.Internal
             _registryService = registryService;
             _createRequestHandler = new InvocationTargetHandler<IInvocationStartRequested, IAppConnection>(CreateInvocationTarget, CreateInvocationTarget);
             _resolveTargetConnectionHandler = new InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection>(ResolveTargetConnectionAsync, ResolveTargetConnectionAsync);
+            _stopwatch.Start();
         }
         
         public async Task HandleAsync(IInvocationStart request, IAppConnection sourceConnection, ITransportChannel sourceChannel)
         {
             IAppConnection targetConnection = null;
-            ITransportChannel targetChannel = null;            
+            ITransportChannel targetChannel = null;
+            MethodCallDescriptor callDescriptor = null;
+            var startMs = _stopwatch.ElapsedMilliseconds;
             try
             {
                 Log.Info("Handling invocation {0} from {{{1}}}: {{{2}}}", sourceChannel.Id, sourceConnection, request);
@@ -75,9 +80,17 @@ namespace Plexus.Interop.Broker.Internal
                         serialized.Dispose();
                         throw;
                     }
-                }
+                }                
                 using (var invocationRequested = request.Target.Handle(_createRequestHandler, sourceConnection))
                 {
+                    startMs = _stopwatch.ElapsedMilliseconds;
+                    callDescriptor = new MethodCallDescriptor(
+                        sourceConnection.Info, 
+                        targetConnection.Info, 
+                        invocationRequested.ServiceId, 
+                        invocationRequested.ServiceAlias.GetValueOrDefault(), 
+                        invocationRequested.MethodId);
+                    _appLifecycleManager.OnInvocationStarted(new MethodCallStartedEventDescriptor(callDescriptor));
                     var serialized = _protocolSerializer.Serialize(invocationRequested);
                     try
                     {
@@ -112,18 +125,34 @@ namespace Plexus.Interop.Broker.Internal
                             sourceChannel.Completion)
                         .ConfigureAwait(false);
                     Log.Info("Completed invocation {0} from {{{1}}} to {{{2}}}: {{{3}}}", sourceChannel.Id, sourceConnection, targetConnection, request);
+                    OnActionFinished(callDescriptor, MethodCallResult.Succeeded, startMs);
                 }
                 catch (OperationCanceledException)
                 {
                     Log.Info("Canceled invocation {0} from {{{1}}} to {{{2}}}: {{{3}}}", sourceChannel.Id, sourceConnection, targetConnection, request);
+                    OnActionFinished(callDescriptor, MethodCallResult.Canceled, startMs);
                     throw;
                 }
                 catch (Exception ex)
                 {
                     Log.Warn("Failed invocation {0} from {{{1}}} to {{{2}}}: {{{3}}}. Error: {4}", sourceChannel.Id, sourceConnection, targetConnection, request, ex.FormatTypeAndMessage());
+                    OnActionFinished(callDescriptor, MethodCallResult.Failed, startMs);
                     throw;
                 }
             }
+        }
+
+        private void OnActionFinished(MethodCallDescriptor callDescriptor, MethodCallResult callResult, long startMs)
+        {
+            if (callDescriptor == null)
+            {
+                return;
+            }
+            _appLifecycleManager.OnInvocationFinished(
+                new MethodCallFinishedEventDescriptor(
+                    callDescriptor,
+                    callResult,
+                    _stopwatch.ElapsedMilliseconds - startMs));
         }
 
         private async ValueTask<IAppConnection> ResolveTargetConnectionAsync(
