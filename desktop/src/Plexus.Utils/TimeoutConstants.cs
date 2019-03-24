@@ -25,6 +25,7 @@ namespace Plexus
         public static readonly TimeSpan Timeout10Ms = TimeSpan.FromMilliseconds(10 * TimeoutMultiplier);
         public static readonly TimeSpan Timeout50Ms = TimeSpan.FromMilliseconds(50 * TimeoutMultiplier);
         public static readonly TimeSpan Timeout100Ms = TimeSpan.FromMilliseconds(100 * TimeoutMultiplier);
+        public static readonly TimeSpan Timeout500Ms = TimeSpan.FromMilliseconds(500 * TimeoutMultiplier);
         public static readonly TimeSpan Timeout1Sec = TimeSpan.FromSeconds(1 * TimeoutMultiplier);
         public static readonly TimeSpan Timeout3Sec = TimeSpan.FromSeconds(3 * TimeoutMultiplier);
         public static readonly TimeSpan Timeout5Sec = TimeSpan.FromSeconds(5 * TimeoutMultiplier);

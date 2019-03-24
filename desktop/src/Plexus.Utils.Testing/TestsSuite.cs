@@ -38,6 +38,7 @@ namespace Plexus
         protected static readonly TimeSpan Timeout10Ms = TimeoutConstants.Timeout10Ms;
         protected static readonly TimeSpan Timeout50Ms = TimeoutConstants.Timeout50Ms;
         protected static readonly TimeSpan Timeout100Ms = TimeoutConstants.Timeout100Ms;
+        protected static readonly TimeSpan Timeout500Ms = TimeoutConstants.Timeout500Ms;
         protected static readonly TimeSpan Timeout1Sec = TimeoutConstants.Timeout1Sec;
         protected static readonly TimeSpan Timeout5Sec = TimeoutConstants.Timeout5Sec;
         protected static readonly TimeSpan Timeout10Sec = TimeoutConstants.Timeout10Sec;

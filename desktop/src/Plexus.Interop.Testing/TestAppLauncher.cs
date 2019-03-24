@@ -22,6 +22,7 @@ namespace Plexus.Interop.Testing
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Google.Protobuf.WellKnownTypes;
     using UniqueId = Plexus.UniqueId;
 
     internal sealed class TestAppLauncher : ProcessBase, TestAppLauncherClient.IAppLauncherServiceImpl
@@ -140,6 +141,11 @@ namespace Plexus.Interop.Testing
             }
 
             return client;
+        }
+
+        public IServerStreamingMethodCall<AppLifecycleEvent> GetLifecycleEventStream()
+        {
+            return _client.AppLifecycleService.GetLifecycleEventStream(new Empty());
         }
     }
 }

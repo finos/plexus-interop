@@ -16,10 +16,13 @@
 //
 
 import "interop/app_launcher_service.proto";
+import "interop/app_lifecycle_service.proto";
 
 package plexus.interop.testing;
 
 application TestAppLauncher {
 
 	provides .interop.AppLauncherService to interop.AppLifecycleManager { Launch; }
+
+	consumes .interop.AppLifecycleService from interop.AppLifecycleManager { GetLifecycleEventStream; }
 }
