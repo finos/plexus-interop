@@ -173,7 +173,12 @@ export class CrossDomainEventBus implements EventBus {
     }
 
     private postToIFrame(message: any): void {
-        this.hostIFrame.contentWindow.postMessage(message, this.hostOrigin);
+        const contentWindow = this.hostIFrame.contentWindow;
+        if (contentWindow) {
+            contentWindow.postMessage(message, this.hostOrigin);
+        } else {
+            this.log.warn('Content window is empty');
+        }
     }
 
     private clearRejectTimeout(key: string): void {

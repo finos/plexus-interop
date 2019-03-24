@@ -33,6 +33,6 @@
     "electron": "1.8.8",
     "http-server": "^0.10.0",
     "trash-cli": "^1.4.0",
-    "typescript": "2.6.1"
+    "typescript": "3.3.3"
   }
 }

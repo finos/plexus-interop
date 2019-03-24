@@ -71,7 +71,7 @@ task npmBuild(type: NpmTask, dependsOn: ['npmRunInstall', 'installProtoServer', 
     environment = [
         'PLEXUS_BUILD_VSCODE_PACKAGE_VERSION': packageVersion
     ]
-    args = ciPublishBuild ? ['run', 'ci-publish'] : ['run', 'build']
+    args = ciPublishBuild && !packageVersion.contains("-") ? ['run', 'ci-publish'] : ['run', 'build']
 }
 
 build.dependsOn npmBuild

@@ -26,6 +26,11 @@ namespace Plexus
 #if NET45
         private readonly TaskCompletionSource<T> _completion = new TaskCompletionSource<T>(TaskCreationOptions.None);
 
+        public Promise()
+        {
+            _completion.Task.SuppressUnobservedExceptions();
+        }
+
         private int _isCompleted;
 
         public Task<T> Task => _completion.Task;
@@ -125,6 +130,7 @@ namespace Plexus
         public Promise()
         {
             Task = _completion.Task;
+            Task.SuppressUnobservedExceptions();
         }
 
         public Task<T> Task { get; }

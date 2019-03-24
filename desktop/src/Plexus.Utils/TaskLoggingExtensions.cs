@@ -19,6 +19,7 @@ namespace Plexus
 {
     using System;
     using System.Runtime.CompilerServices;
+    using System.Threading;
     using System.Threading.Tasks;
 
     internal static class TaskLoggingExtensions
@@ -197,14 +198,17 @@ namespace Plexus
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task LogCompletion(this Task task, ILogger log)
         {
+            task.SuppressUnobservedExceptions();
             if (task.IsCompleted)
             {
                 LogCompletionInternal(task, log);
             }
-            return task.ContinueWithSynchronously(LogCompletionInternal, log);
+            task.ContinueWithSynchronously(
+                (Action<Task, object>) LogCompletionInternal, log);
+            return task;
         }
 
-        private static Task LogCompletionInternal(Task task, object state)
+        private static void LogCompletionInternal(Task task, object state)
         {
             var log = (ILogger)state;
             if (task.IsCanceled)
@@ -219,7 +223,6 @@ namespace Plexus
             {
                 log.Trace("Completed");
             }
-            return task;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
