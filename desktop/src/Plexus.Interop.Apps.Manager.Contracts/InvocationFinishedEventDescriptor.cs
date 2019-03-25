@@ -16,18 +16,25 @@
  */
 ﻿namespace Plexus.Interop.Apps
 {
-    public sealed class MethodCallStartedEventDescriptor
+    public sealed class InvocationFinishedEventDescriptor
     {
-        public MethodCallStartedEventDescriptor(MethodCallDescriptor methodCallDescriptor)
+        public InvocationFinishedEventDescriptor(
+            InvocationDescriptor methodCallDescriptor, 
+            InvocationResult result, 
+            long durationMs)
         {
             MethodCallDescriptor = methodCallDescriptor;
+            Result = result;
+            DurationMs = durationMs;
         }
 
-        public MethodCallDescriptor MethodCallDescriptor { get; }
+        public InvocationDescriptor MethodCallDescriptor { get; }
+        public InvocationResult Result { get; }
+        public long DurationMs { get; }
 
         public override string ToString()
         {
-            return $"{nameof(MethodCallDescriptor)}: {{{MethodCallDescriptor}}}";
+            return $"{nameof(MethodCallDescriptor)}: {MethodCallDescriptor}, {nameof(Result)}: {Result}, {nameof(DurationMs)}: {DurationMs}";
         }
     }
 }

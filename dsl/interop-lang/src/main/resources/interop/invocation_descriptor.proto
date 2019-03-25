@@ -21,7 +21,7 @@ import "interop/app_connection_descriptor.proto";
 
 package interop;
 
-message MethodCallDescriptor {
+message InvocationDescriptor {
 	string service_id = 1;
 	string service_alias_id = 2;
     string method_id = 3;

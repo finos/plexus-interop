@@ -16,9 +16,9 @@
  */
 ﻿namespace Plexus.Interop.Apps
 {
-    public sealed class MethodCallDescriptor
+    public sealed class InvocationDescriptor
     {
-        public MethodCallDescriptor(
+        public InvocationDescriptor(
             AppConnectionDescriptor sourceConnection, 
             AppConnectionDescriptor targetConnection, 
             string serviceId, 

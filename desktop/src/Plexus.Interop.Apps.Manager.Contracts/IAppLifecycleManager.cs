@@ -40,8 +40,8 @@
 
         Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
 
-        void OnInvocationStarted(MethodCallStartedEventDescriptor eventData);
+        void OnInvocationStarted(InvocationStartedEventDescriptor eventData);
 
-        void OnInvocationFinished(MethodCallFinishedEventDescriptor eventData);
+        void OnInvocationFinished(InvocationFinishedEventDescriptor eventData);
     }
 }

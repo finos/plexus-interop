@@ -59,7 +59,7 @@ namespace Plexus.Interop.Broker.Internal
         {
             IAppConnection targetConnection = null;
             ITransportChannel targetChannel = null;
-            MethodCallDescriptor callDescriptor = null;
+            InvocationDescriptor callDescriptor = null;
             var startMs = _stopwatch.ElapsedMilliseconds;
             try
             {
@@ -84,13 +84,13 @@ namespace Plexus.Interop.Broker.Internal
                 using (var invocationRequested = request.Target.Handle(_createRequestHandler, sourceConnection))
                 {
                     startMs = _stopwatch.ElapsedMilliseconds;
-                    callDescriptor = new MethodCallDescriptor(
+                    callDescriptor = new InvocationDescriptor(
                         sourceConnection.Info, 
                         targetConnection.Info, 
                         invocationRequested.ServiceId, 
                         invocationRequested.ServiceAlias.GetValueOrDefault(), 
                         invocationRequested.MethodId);
-                    _appLifecycleManager.OnInvocationStarted(new MethodCallStartedEventDescriptor(callDescriptor));
+                    _appLifecycleManager.OnInvocationStarted(new InvocationStartedEventDescriptor(callDescriptor));
                     var serialized = _protocolSerializer.Serialize(invocationRequested);
                     try
                     {
@@ -125,31 +125,31 @@ namespace Plexus.Interop.Broker.Internal
                             sourceChannel.Completion)
                         .ConfigureAwait(false);
                     Log.Info("Completed invocation {0} from {{{1}}} to {{{2}}}: {{{3}}}", sourceChannel.Id, sourceConnection, targetConnection, request);
-                    OnActionFinished(callDescriptor, MethodCallResult.Succeeded, startMs);
+                    OnActionFinished(callDescriptor, InvocationResult.Succeeded, startMs);
                 }
                 catch (OperationCanceledException)
                 {
                     Log.Info("Canceled invocation {0} from {{{1}}} to {{{2}}}: {{{3}}}", sourceChannel.Id, sourceConnection, targetConnection, request);
-                    OnActionFinished(callDescriptor, MethodCallResult.Canceled, startMs);
+                    OnActionFinished(callDescriptor, InvocationResult.Canceled, startMs);
                     throw;
                 }
                 catch (Exception ex)
                 {
                     Log.Warn("Failed invocation {0} from {{{1}}} to {{{2}}}: {{{3}}}. Error: {4}", sourceChannel.Id, sourceConnection, targetConnection, request, ex.FormatTypeAndMessage());
-                    OnActionFinished(callDescriptor, MethodCallResult.Failed, startMs);
+                    OnActionFinished(callDescriptor, InvocationResult.Failed, startMs);
                     throw;
                 }
             }
         }
 
-        private void OnActionFinished(MethodCallDescriptor callDescriptor, MethodCallResult callResult, long startMs)
+        private void OnActionFinished(InvocationDescriptor callDescriptor, InvocationResult callResult, long startMs)
         {
             if (callDescriptor == null)
             {
                 return;
             }
             _appLifecycleManager.OnInvocationFinished(
-                new MethodCallFinishedEventDescriptor(
+                new InvocationFinishedEventDescriptor(
                     callDescriptor,
                     callResult,
                     _stopwatch.ElapsedMilliseconds - startMs));

@@ -45,9 +45,9 @@
             };
         }
 
-        public static Generated.MethodCallDescriptor ToProto(this MethodCallDescriptor info)
+        public static Generated.InvocationDescriptor ToProto(this InvocationDescriptor info)
         {
-            return new Generated.MethodCallDescriptor
+            return new Generated.InvocationDescriptor
             {
                 Source = info.SourceConnection.ToProto(),
                 Target = info.TargetConnection.ToProto(),
@@ -57,16 +57,16 @@
             };
         }
 
-        public static Generated.MethodCallResult ToProto(this MethodCallResult info)
+        public static Generated.InvocationResult ToProto(this InvocationResult info)
         {
             switch (info)
             {
-                case MethodCallResult.Succeeded:
-                    return Generated.MethodCallResult.Succeeded;
-                case MethodCallResult.Canceled:
-                    return Generated.MethodCallResult.Canceled;
-                case MethodCallResult.Failed:
-                    return Generated.MethodCallResult.Failed;
+                case InvocationResult.Succeeded:
+                    return Generated.InvocationResult.Succeeded;
+                case InvocationResult.Canceled:
+                    return Generated.InvocationResult.Canceled;
+                case InvocationResult.Failed:
+                    return Generated.InvocationResult.Failed;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(info), info, null);
             }

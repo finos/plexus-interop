@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,27 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps
+namespace Plexus.Interop.Apps
 {
-    public sealed class MethodCallFinishedEventDescriptor
+    public sealed class InvocationStartedEventDescriptor
     {
-        public MethodCallFinishedEventDescriptor(
-            MethodCallDescriptor methodCallDescriptor, 
-            MethodCallResult result, 
-            long durationMs)
+        public InvocationStartedEventDescriptor(InvocationDescriptor invocationDescriptor)
         {
-            MethodCallDescriptor = methodCallDescriptor;
-            Result = result;
-            DurationMs = durationMs;
+            InvocationDescriptor = invocationDescriptor;
         }
 
-        public MethodCallDescriptor MethodCallDescriptor { get; }
-        public MethodCallResult Result { get; }
-        public long DurationMs { get; }
+        public InvocationDescriptor InvocationDescriptor { get; }
 
         public override string ToString()
         {
-            return $"{nameof(MethodCallDescriptor)}: {MethodCallDescriptor}, {nameof(Result)}: {Result}, {nameof(DurationMs)}: {DurationMs}";
+            return $"{nameof(InvocationDescriptor)}: {{{InvocationDescriptor}}}";
         }
     }
 }

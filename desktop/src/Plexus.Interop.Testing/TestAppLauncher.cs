@@ -147,5 +147,10 @@ namespace Plexus.Interop.Testing
         {
             return _client.AppLifecycleService.GetLifecycleEventStream(new Empty());
         }
+
+        public IServerStreamingMethodCall<InvocationEvent> GetInvocationEventStream()
+        {
+            return _client.AppLifecycleService.GetInvocationEventStream(new Empty());
+        }
     }
 }

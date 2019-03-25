@@ -87,6 +87,11 @@
 	              "requestType": "google.protobuf.Empty",
 	              "responseType": "AppLifecycleEvent",
 	              "responseStream": true
+	            },
+	            "GetInvocationEventStream": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "InvocationEvent",
+	              "responseStream": true
 	            }
 	          }
 	        },
@@ -132,9 +137,7 @@
 	            "event": {
 	              "oneof": [
 	                "connected",
-	                "disconnected",
-	                "methodCallStarted",
-	                "methodCallFinished"
+	                "disconnected"
 	              ]
 	            }
 	          },
@@ -146,14 +149,29 @@
 	            "disconnected": {
 	              "type": "AppDisconnectedEvent",
 	              "id": 2
+	            }
+	          }
+	        },
+	        "InvocationEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationEvent"
+	          },
+	          "oneofs": {
+	            "event": {
+	              "oneof": [
+	                "invocationStarted",
+	                "invocationFinished"
+	              ]
+	            }
+	          },
+	          "fields": {
+	            "invocationStarted": {
+	              "type": "InvocationStartedEvent",
+	              "id": 1
 	            },
-	            "methodCallStarted": {
-	              "type": "MethodCallStartedEvent",
-	              "id": 3
-	            },
-	            "methodCallFinished": {
-	              "type": "MethodCallFinishedEvent",
-	              "id": 4
+	            "invocationFinished": {
+	              "type": "InvocationFinishedEvent",
+	              "id": 2
 	            }
 	          }
 	        },
@@ -179,28 +197,28 @@
 	            }
 	          }
 	        },
-	        "MethodCallStartedEvent": {
+	        "InvocationStartedEvent": {
 	          "options": {
-	            "(.interop.message_id)": "interop.MethodCallStartedEvent"
+	            "(.interop.message_id)": "interop.InvocationStartedEvent"
 	          },
 	          "fields": {
-	            "callDescriptor": {
-	              "type": "MethodCallDescriptor",
+	            "invocationDescriptor": {
+	              "type": "InvocationDescriptor",
 	              "id": 1
 	            }
 	          }
 	        },
-	        "MethodCallFinishedEvent": {
+	        "InvocationFinishedEvent": {
 	          "options": {
-	            "(.interop.message_id)": "interop.MethodCallFinishedEvent"
+	            "(.interop.message_id)": "interop.InvocationFinishedEvent"
 	          },
 	          "fields": {
-	            "callDescriptor": {
-	              "type": "MethodCallDescriptor",
+	            "invocationDescriptor": {
+	              "type": "InvocationDescriptor",
 	              "id": 1
 	            },
 	            "result": {
-	              "type": "MethodCallResult",
+	              "type": "InvocationResult",
 	              "id": 2
 	            },
 	            "durationMs": {
@@ -209,7 +227,7 @@
 	            }
 	          }
 	        },
-	        "MethodCallResult": {
+	        "InvocationResult": {
 	          "values": {
 	            "Succeeded": 0,
 	            "Canceled": 1,
@@ -360,9 +378,9 @@
 	            }
 	          }
 	        },
-	        "MethodCallDescriptor": {
+	        "InvocationDescriptor": {
 	          "options": {
-	            "(.interop.message_id)": "interop.MethodCallDescriptor"
+	            "(.interop.message_id)": "interop.InvocationDescriptor"
 	          },
 	          "fields": {
 	            "serviceId": {
@@ -1436,6 +1454,12 @@
 					"request": "google.protobuf.Empty",
 					"response": "interop.AppLifecycleEvent",
 					"type": "ServerStreaming"
+				},
+				{
+					"name": "GetInvocationEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.InvocationEvent",
+					"type": "ServerStreaming"
 				}
 			],
 			"options": [
@@ -1520,6 +1544,9 @@
 						},
 						{
 							"name": "GetLifecycleEventStream"
+						},
+						{
+							"name": "GetInvocationEventStream"
 						}
 					]
 				}
@@ -1744,6 +1771,9 @@
 					"methods": [
 						{
 							"name": "GetLifecycleEventStream"
+						},
+						{
+							"name": "GetInvocationEventStream"
 						}
 					],
 					"from": [

@@ -204,10 +204,10 @@ namespace Plexus.Interop
         }
 
         [Theory]
-        [InlineData(MethodCallResult.Succeeded)]
-        [InlineData(MethodCallResult.Canceled)]
-        [InlineData(MethodCallResult.Failed)]
-        public void InvocationLifecycleEvents(MethodCallResult result)
+        [InlineData(InvocationResult.Succeeded)]
+        [InlineData(InvocationResult.Canceled)]
+        [InlineData(InvocationResult.Failed)]
+        public void InvocationLifecycleEvents(InvocationResult result)
         {
             RunWith10SecTimeout(async () =>
             {
@@ -223,9 +223,9 @@ namespace Plexus.Interop
                 {
                     switch (result)
                     {
-                        case MethodCallResult.Failed:
+                        case InvocationResult.Failed:
                             throw new ApplicationException("Boom");
-                        case MethodCallResult.Canceled:
+                        case InvocationResult.Canceled:
                             throw new OperationCanceledException();
                         default:
                             return Task.FromResult(request);
@@ -241,7 +241,7 @@ namespace Plexus.Interop
                 );
                 var sentRequest = CreateTestRequest();
 
-                var stream = appLauncher.GetLifecycleEventStream().ResponseStream;
+                var stream = appLauncher.GetInvocationEventStream().ResponseStream;
                 await Task.Delay(Timeout500Ms);
                 await client.CallInvoker
                     .Call(EchoUnaryMethod, sentRequest)
@@ -250,14 +250,14 @@ namespace Plexus.Interop
 
                 var evt1 = await stream.ReadAsync();
                 var evt2 = await stream.ReadAsync();
-                evt1.EventCase.ShouldBe(AppLifecycleEvent.EventOneofCase.MethodCallStarted);
-                evt1.MethodCallStarted.CallDescriptor.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
-                evt1.MethodCallStarted.CallDescriptor.MethodId.ShouldBe("Unary");
-                evt2.EventCase.ShouldBe(AppLifecycleEvent.EventOneofCase.MethodCallFinished);
-                evt2.MethodCallFinished.CallDescriptor.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
-                evt2.MethodCallFinished.CallDescriptor.MethodId.ShouldBe("Unary");
-                evt2.MethodCallFinished.Result.ShouldBe(result);
-                evt2.MethodCallFinished.DurationMs.ShouldBeGreaterThan(0);
+                evt1.EventCase.ShouldBe(InvocationEvent.EventOneofCase.InvocationStarted);
+                evt1.InvocationStarted.InvocationDescriptor.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                evt1.InvocationStarted.InvocationDescriptor.MethodId.ShouldBe("Unary");
+                evt2.EventCase.ShouldBe(InvocationEvent.EventOneofCase.InvocationFinished);
+                evt2.InvocationFinished.InvocationDescriptor.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                evt2.InvocationFinished.InvocationDescriptor.MethodId.ShouldBe("Unary");
+                evt2.InvocationFinished.Result.ShouldBe(result);
+                evt2.InvocationFinished.DurationMs.ShouldBeGreaterThan(0);
             });
         }
 

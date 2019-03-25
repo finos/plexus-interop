@@ -16,7 +16,7 @@
  */
 ﻿namespace Plexus.Interop.Apps
 {
-    public enum MethodCallResult
+    public enum InvocationResult
     {
         Succeeded,
         Canceled,
