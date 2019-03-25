@@ -87,6 +87,11 @@
 	              "requestType": "google.protobuf.Empty",
 	              "responseType": "AppLifecycleEvent",
 	              "responseStream": true
+	            },
+	            "GetInvocationEventStream": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "InvocationEvent",
+	              "responseStream": true
 	            }
 	          }
 	        },
@@ -147,6 +152,29 @@
 	            }
 	          }
 	        },
+	        "InvocationEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationEvent"
+	          },
+	          "oneofs": {
+	            "event": {
+	              "oneof": [
+	                "invocationStarted",
+	                "invocationFinished"
+	              ]
+	            }
+	          },
+	          "fields": {
+	            "invocationStarted": {
+	              "type": "InvocationStartedEvent",
+	              "id": 1
+	            },
+	            "invocationFinished": {
+	              "type": "InvocationFinishedEvent",
+	              "id": 2
+	            }
+	          }
+	        },
 	        "AppConnectedEvent": {
 	          "options": {
 	            "(.interop.message_id)": "interop.AppConnectedEvent"
@@ -167,6 +195,43 @@
 	              "type": "AppConnectionDescriptor",
 	              "id": 1
 	            }
+	          }
+	        },
+	        "InvocationStartedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationStartedEvent"
+	          },
+	          "fields": {
+	            "invocationDescriptor": {
+	              "type": "InvocationDescriptor",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "InvocationFinishedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationFinishedEvent"
+	          },
+	          "fields": {
+	            "invocationDescriptor": {
+	              "type": "InvocationDescriptor",
+	              "id": 1
+	            },
+	            "result": {
+	              "type": "InvocationResult",
+	              "id": 2
+	            },
+	            "durationMs": {
+	              "type": "int64",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "InvocationResult": {
+	          "values": {
+	            "Succeeded": 0,
+	            "Canceled": 1,
+	            "Failed": 2
 	          }
 	        },
 	        "messageId": {
@@ -221,6 +286,33 @@
 	            "appInstanceId": {
 	              "type": "UniqueId",
 	              "id": 3
+	            }
+	          }
+	        },
+	        "InvocationDescriptor": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationDescriptor"
+	          },
+	          "fields": {
+	            "serviceId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "serviceAliasId": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "methodId": {
+	              "type": "string",
+	              "id": 3
+	            },
+	            "source": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 4
+	            },
+	            "target": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 5
 	            }
 	          }
 	        }
@@ -1128,6 +1220,12 @@
 					"request": "google.protobuf.Empty",
 					"response": "interop.AppLifecycleEvent",
 					"type": "ServerStreaming"
+				},
+				{
+					"name": "GetInvocationEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.InvocationEvent",
+					"type": "ServerStreaming"
 				}
 			],
 			"options": [
@@ -1160,6 +1258,9 @@
 						},
 						{
 							"name": "GetLifecycleEventStream"
+						},
+						{
+							"name": "GetInvocationEventStream"
 						}
 					]
 				}

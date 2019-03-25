@@ -16,6 +16,7 @@
  */
 ﻿namespace Plexus.Interop.Apps.Internal
 {
+    using System;
     using UniqueId = Plexus.UniqueId;
 
     internal static class ProtobufHelper
@@ -42,6 +43,33 @@
                 AppInstanceId = info.ApplicationInstanceId.ToProto(),
                 ConnectionId = info.ConnectionId.ToProto()
             };
+        }
+
+        public static Generated.InvocationDescriptor ToProto(this InvocationDescriptor info)
+        {
+            return new Generated.InvocationDescriptor
+            {
+                Source = info.SourceConnection.ToProto(),
+                Target = info.TargetConnection.ToProto(),
+                MethodId = info.MethodId,
+                ServiceId = info.ServiceId,
+                ServiceAliasId = info.ServiceAlias ?? string.Empty
+            };
+        }
+
+        public static Generated.InvocationResult ToProto(this InvocationResult info)
+        {
+            switch (info)
+            {
+                case InvocationResult.Succeeded:
+                    return Generated.InvocationResult.Succeeded;
+                case InvocationResult.Canceled:
+                    return Generated.InvocationResult.Canceled;
+                case InvocationResult.Failed:
+                    return Generated.InvocationResult.Failed;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(info), info, null);
+            }
         }
     }
 }

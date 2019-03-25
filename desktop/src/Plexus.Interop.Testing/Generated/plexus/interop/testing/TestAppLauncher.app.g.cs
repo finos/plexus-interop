@@ -30,6 +30,7 @@ namespace Plexus.Interop.Testing.Generated {
 					
 					
 	public partial interface ITestAppLauncherClient: IClient {
+		TestAppLauncherClient.IAppLifecycleServiceProxy AppLifecycleService { get; }
 	}
 	
 	public sealed partial class TestAppLauncherClient: ClientBase, ITestAppLauncherClient {
@@ -55,6 +56,7 @@ namespace Plexus.Interop.Testing.Generated {
 		
 		public TestAppLauncherClient(TestAppLauncherClient.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
 		{
+			AppLifecycleService = new TestAppLauncherClient.AppLifecycleServiceProxy(this.CallInvoker);
 		}
 	
 		public sealed partial class ServiceBinder {
@@ -126,6 +128,31 @@ namespace Plexus.Interop.Testing.Generated {
 			}
 		}
 		
+		public partial interface IAppLifecycleServiceProxy:
+			global::Plexus.Interop.Testing.Generated.AppLifecycleService.IGetLifecycleEventStreamProxy,
+			global::Plexus.Interop.Testing.Generated.AppLifecycleService.IGetInvocationEventStreamProxy
+		{ }
+		
+		public sealed partial class AppLifecycleServiceProxy: IAppLifecycleServiceProxy {
+			
+			public static global::Plexus.Interop.Testing.Generated.AppLifecycleService.Descriptor Descriptor = global::Plexus.Interop.Testing.Generated.AppLifecycleService.DefaultDescriptor;
+			
+			private readonly IClientCallInvoker _callInvoker;
+									
+			public AppLifecycleServiceProxy(IClientCallInvoker callInvoker) {
+				_callInvoker = callInvoker;
+			}						
+			
+			public IServerStreamingMethodCall<global::Plexus.Interop.Testing.Generated.AppLifecycleEvent> GetLifecycleEventStream(global::Google.Protobuf.WellKnownTypes.Empty request) {
+				return _callInvoker.Call(Descriptor.GetLifecycleEventStreamMethod, request);
+			}
+			
+			public IServerStreamingMethodCall<global::Plexus.Interop.Testing.Generated.InvocationEvent> GetInvocationEventStream(global::Google.Protobuf.WellKnownTypes.Empty request) {
+				return _callInvoker.Call(Descriptor.GetInvocationEventStreamMethod, request);
+			}
+		}
+		
+		public IAppLifecycleServiceProxy AppLifecycleService { get; private set; }
 	}
 }
 #endregion Designer generated code

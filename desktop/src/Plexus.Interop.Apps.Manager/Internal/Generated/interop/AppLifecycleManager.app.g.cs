@@ -77,7 +77,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 	
 		public partial interface IAppLifecycleServiceImpl:
 			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IResolveAppImpl,
-			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IGetLifecycleEventStreamImpl
+			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IGetLifecycleEventStreamImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IGetInvocationEventStreamImpl
 		{ }
 		
 		private sealed partial class AppLifecycleServiceBinder {
@@ -96,6 +97,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
 				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse>(global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.ResolveAppMethodId, _impl.ResolveApp);
 				builder = builder.WithServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent>(global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.GetLifecycleEventStreamMethodId, _impl.GetLifecycleEventStream);
+				builder = builder.WithServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent>(global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.GetInvocationEventStreamMethodId, _impl.GetInvocationEventStream);
 				return builder; 							
 			}
 		}
@@ -104,13 +106,16 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		{
 			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> _resolveAppHandler;
 			private readonly ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> _getLifecycleEventStreamHandler;
+			private readonly ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent> _getInvocationEventStreamHandler;
 			
 			public AppLifecycleServiceImpl(
 				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest, global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> resolveAppHandler,
-				ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> getLifecycleEventStreamHandler
+				ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> getLifecycleEventStreamHandler,
+				ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent> getInvocationEventStreamHandler
 			) {
 				_resolveAppHandler = resolveAppHandler;
 				_getLifecycleEventStreamHandler = getLifecycleEventStreamHandler;
+				_getInvocationEventStreamHandler = getInvocationEventStreamHandler;
 			}
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse> ResolveApp(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest request, MethodCallContext context) {
@@ -120,12 +125,17 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			public Task GetLifecycleEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> responseStream, MethodCallContext context) {
 				return _getLifecycleEventStreamHandler(request, responseStream, context);
 			}
+			
+			public Task GetInvocationEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent> responseStream, MethodCallContext context) {
+				return _getInvocationEventStreamHandler(request, responseStream, context);
+			}
 		}					
 		
 		public sealed partial class AppLifecycleServiceImpl<T>: IAppLifecycleServiceImpl
 			where T:
 			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IResolveAppImpl,
-			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IGetLifecycleEventStreamImpl
+			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IGetLifecycleEventStreamImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleService.IGetInvocationEventStreamImpl
 		{
 			private readonly T _impl;
 			
@@ -139,6 +149,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			public Task GetLifecycleEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent> responseStream, MethodCallContext context) {
 				return _impl.GetLifecycleEventStream(request, responseStream, context);
+			}
+			
+			public Task GetInvocationEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent> responseStream, MethodCallContext context) {
+				return _impl.GetInvocationEventStream(request, responseStream, context);
 			}
 		}
 		

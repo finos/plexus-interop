@@ -41,10 +41,9 @@ namespace Plexus.Interop.Testing.Generated {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Ch1pbnRlcm9wL2FwcF9sYXVuY2hfbW9kZS5wcm90bxIHaW50ZXJvcBoVaW50",
-            "ZXJvcC9vcHRpb25zLnByb3RvKlcKDUFwcExhdW5jaE1vZGUSEwoPU0lOR0xF",
-            "X0lOU1RBTkNFEAASEgoOTVVMVElfSU5TVEFOQ0UQARIdChlTSU5HTEVfTEFV",
-            "TkNISU5HX0lOU1RBTkNFEAJCI6oCIFBsZXh1cy5JbnRlcm9wLlRlc3Rpbmcu",
-            "R2VuZXJhdGVkYgZwcm90bzM="));
+            "ZXJvcC9vcHRpb25zLnByb3RvKjgKDUFwcExhdW5jaE1vZGUSEwoPU0lOR0xF",
+            "X0lOU1RBTkNFEAASEgoOTVVMVElfSU5TVEFOQ0UQAUIjqgIgUGxleHVzLklu",
+            "dGVyb3AuVGVzdGluZy5HZW5lcmF0ZWRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Testing.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Testing.Generated.AppLaunchMode), }, null));
@@ -56,7 +55,6 @@ namespace Plexus.Interop.Testing.Generated {
   public enum AppLaunchMode {
     [pbr::OriginalName("SINGLE_INSTANCE")] SingleInstance = 0,
     [pbr::OriginalName("MULTI_INSTANCE")] MultiInstance = 1,
-    [pbr::OriginalName("SINGLE_LAUNCHING_INSTANCE")] SingleLaunchingInstance = 2,
   }
 
   #endregion

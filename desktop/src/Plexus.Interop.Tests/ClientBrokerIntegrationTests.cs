@@ -105,6 +105,32 @@ namespace Plexus.Interop
         }
 
         [Fact]
+        public void ConnectionLifecycleEvents()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                var appLauncher = RegisterDisposable(
+                    new TestAppLauncher(
+                        _testBrokerFixture.SharedInstance,
+                        new Dictionary<string, TestClientFactory>()
+                    )
+                );
+                await appLauncher.StartAsync();
+                var stream = appLauncher.GetLifecycleEventStream().ResponseStream;
+                await Task.Delay(Timeout500Ms);
+                var client = ConnectEchoClient();                
+                await client.DisconnectAsync();  
+                var evt1 = await stream.ReadAsync();
+                var evt2 = await stream.ReadAsync();
+
+                evt1.EventCase.ShouldBe(AppLifecycleEvent.EventOneofCase.Connected);
+                evt1.Connected.ConnectionDescriptor.AppId.ShouldBe("plexus.interop.testing.EchoClient");
+                evt2.EventCase.ShouldBe(AppLifecycleEvent.EventOneofCase.Disconnected);
+                evt2.Disconnected.ConnectionDescriptor.AppId.ShouldBe("plexus.interop.testing.EchoClient");
+            });
+        }
+
+        [Fact]
         public void ConcurrentClientConnectDisconnect()
         {
             RunWith30SecTimeout(() =>
@@ -174,6 +200,64 @@ namespace Plexus.Interop
                 receivedCallContext.ShouldNotBeNull();
                 receivedCallContext.ConsumerApplicationId.ShouldBe("plexus.interop.testing.EchoClient");
                 receivedCallContext.ConsumerConnectionId.ShouldBe(client.ConnectionId);
+            });
+        }
+
+        [Theory]
+        [InlineData(InvocationResult.Succeeded)]
+        [InlineData(InvocationResult.Canceled)]
+        [InlineData(InvocationResult.Failed)]
+        public void InvocationLifecycleEvents(InvocationResult result)
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                var appLauncher = RegisterDisposable(
+                    new TestAppLauncher(
+                        _testBrokerFixture.SharedInstance,
+                        new Dictionary<string, TestClientFactory>()
+                    )
+                );
+                await appLauncher.StartAsync();                
+
+                Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
+                {
+                    switch (result)
+                    {
+                        case InvocationResult.Failed:
+                            throw new ApplicationException("Boom");
+                        case InvocationResult.Canceled:
+                            throw new OperationCanceledException();
+                        default:
+                            return Task.FromResult(request);
+                    }
+                }
+
+                var client = ConnectEchoClient();
+                ConnectEchoServer(x => x
+                    .WithProvidedService(
+                        "plexus.interop.testing.EchoService",
+                        s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
+                    )
+                );
+                var sentRequest = CreateTestRequest();
+
+                var stream = appLauncher.GetInvocationEventStream().ResponseStream;
+                await Task.Delay(Timeout500Ms);
+                await client.CallInvoker
+                    .Call(EchoUnaryMethod, sentRequest)
+                    .AsTask()
+                    .IgnoreExceptions();
+
+                var evt1 = await stream.ReadAsync();
+                var evt2 = await stream.ReadAsync();
+                evt1.EventCase.ShouldBe(InvocationEvent.EventOneofCase.InvocationStarted);
+                evt1.InvocationStarted.InvocationDescriptor.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                evt1.InvocationStarted.InvocationDescriptor.MethodId.ShouldBe("Unary");
+                evt2.EventCase.ShouldBe(InvocationEvent.EventOneofCase.InvocationFinished);
+                evt2.InvocationFinished.InvocationDescriptor.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                evt2.InvocationFinished.InvocationDescriptor.MethodId.ShouldBe("Unary");
+                evt2.InvocationFinished.Result.ShouldBe(result);
+                evt2.InvocationFinished.DurationMs.ShouldBeGreaterThan(0);
             });
         }
 

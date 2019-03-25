@@ -22,11 +22,13 @@ package interop;
 import "interop/unique_id.proto";
 import "interop/app_launch_mode.proto";
 import "interop/app_connection_descriptor.proto";
+import "interop/invocation_descriptor.proto";
 import "google/protobuf/empty.proto";
 
 service AppLifecycleService {
 	rpc ResolveApp (ResolveAppRequest) returns (ResolveAppResponse);
 	rpc GetLifecycleEventStream (google.protobuf.Empty) returns (stream AppLifecycleEvent);
+	rpc GetInvocationEventStream (google.protobuf.Empty) returns (stream InvocationEvent);
 }
 
 message ResolveAppRequest {
@@ -47,10 +49,33 @@ message AppLifecycleEvent {
 	}
 }
 
+message InvocationEvent {
+	oneof event {
+		InvocationStartedEvent invocation_started = 1;
+		InvocationFinishedEvent invocation_finished = 2;
+	}
+}
+
 message AppConnectedEvent {
 	AppConnectionDescriptor connection_descriptor = 1;
 }
 
 message AppDisconnectedEvent {
 	AppConnectionDescriptor connection_descriptor = 1;	
+}
+
+message InvocationStartedEvent {	
+	InvocationDescriptor invocation_descriptor = 1;
+}
+
+message InvocationFinishedEvent {
+	InvocationDescriptor invocation_descriptor = 1;
+	InvocationResult result = 2;
+	int64 duration_ms = 3;
+}
+
+enum InvocationResult {
+	Succeeded = 0;
+	Canceled = 1;
+	Failed = 2;
 }

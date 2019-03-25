@@ -15,14 +15,16 @@
 // limitations under the License.
 //
 
+syntax="proto3";
+
+import "interop/app_connection_descriptor.proto";
+
 package interop;
 
-import "interop/app_launcher_service.proto";
-import "interop/app_lifecycle_service.proto";
-
-application AppLifecycleManager {
-
-	consumes AppLauncherService { Launch; }
-
-	provides AppLifecycleService { ResolveApp; GetLifecycleEventStream; GetInvocationEventStream; }
+message InvocationDescriptor {
+	string service_id = 1;
+	string service_alias_id = 2;
+    string method_id = 3;
+	AppConnectionDescriptor source = 4;
+	AppConnectionDescriptor target = 5;
 }

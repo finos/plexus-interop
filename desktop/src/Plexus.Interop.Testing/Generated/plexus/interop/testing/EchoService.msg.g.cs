@@ -105,7 +105,7 @@ namespace Plexus.Interop.Testing.Generated {
       uint32Field_ = other.uint32Field_;
       repeatedDoubleField_ = other.repeatedDoubleField_.Clone();
       enumField_ = other.enumField_;
-      subMessageField_ = other.subMessageField_ != null ? other.subMessageField_.Clone() : null;
+      SubMessageField = other.subMessageField_ != null ? other.SubMessageField.Clone() : null;
       repeatedSubMessageField_ = other.repeatedSubMessageField_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }

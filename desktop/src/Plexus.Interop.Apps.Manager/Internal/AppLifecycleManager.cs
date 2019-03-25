@@ -25,6 +25,9 @@ namespace Plexus.Interop.Apps.Internal
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using Plexus.Interop.Apps.Internal.Generated;
+    using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
+    using UniqueId = Plexus.UniqueId;
 
     internal sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager, Generated.AppLifecycleManagerClient.IAppLifecycleServiceImpl
     {        
@@ -40,8 +43,11 @@ namespace Plexus.Interop.Apps.Internal
         private readonly Dictionary<(UniqueId AppInstanceId, string AppId), Promise<IAppConnection>> _appInstanceConnectionsInProgress
             = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
 
-        private readonly HashSet<IWritableChannel<Generated.AppLifecycleEvent>> _appLifecycleEventSubscribers =
-            new HashSet<IWritableChannel<Generated.AppLifecycleEvent>>();
+        private readonly AppLifecycleManagerEventBroadcaster<Generated.AppLifecycleEvent> _appLifecycleEventBroadcaster
+            = new AppLifecycleManagerEventBroadcaster<Generated.AppLifecycleEvent>();
+
+        private readonly AppLifecycleManagerEventBroadcaster<Generated.InvocationEvent> _invocationEventBroadcaster
+            = new AppLifecycleManagerEventBroadcaster<Generated.InvocationEvent>();
 
         private readonly IAppRegistryProvider _appRegistryProvider;
 
@@ -206,7 +212,31 @@ namespace Plexus.Interop.Apps.Internal
                 appId, mode, resolvedConnection, referrerConnectionInfo);
             return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Id);
         }
-        
+
+        public void OnInvocationStarted(InvocationStartedEventDescriptor eventData)
+        {
+            BroadcastEvent(new Generated.InvocationEvent
+            {
+                InvocationStarted = new Generated.InvocationStartedEvent
+                {
+                    InvocationDescriptor = eventData.InvocationDescriptor.ToProto()
+                }
+            });
+        }
+
+        public void OnInvocationFinished(InvocationFinishedEventDescriptor eventData)
+        {
+            BroadcastEvent(new Generated.InvocationEvent
+            {
+                InvocationFinished = new Generated.InvocationFinishedEvent
+                {
+                    InvocationDescriptor = eventData.MethodCallDescriptor.ToProto(),
+                    Result = eventData.Result.ToProto(),
+                    DurationMs = eventData.DurationMs
+                }
+            });
+        }
+
         public IReadOnlyCollection<IAppConnection> GetOnlineConnections()
         {
             lock (_connections)
@@ -246,64 +276,25 @@ namespace Plexus.Interop.Apps.Internal
         
         Task Generated.AppLifecycleService.IGetLifecycleEventStreamImpl.GetLifecycleEventStream(
             Empty request, IWritableChannel<Generated.AppLifecycleEvent> responseStream, MethodCallContext context)
-        {            
-            lock (_appLifecycleEventSubscribers)
-            {
-                _appLifecycleEventSubscribers.Add(responseStream);
-            }
-            Log.Info("Lifecycle events subscriber added: {{{0}}}", context);
-            using (context.CancellationToken.Register(() =>
-            {
-                lock (_appLifecycleEventSubscribers)
-                {
-                    _appLifecycleEventSubscribers.Remove(responseStream);
-                }
-                Log.Info("Lifecycle events subscriber removed: {{{0}}}", context);
-            }))
-            {
-            }
-            return TaskConstants.Infinite;
+        {
+            return _appLifecycleEventBroadcaster.Subscribe(responseStream, context);
         }
+
+        Task Generated.AppLifecycleService.IGetInvocationEventStreamImpl.GetInvocationEventStream(
+            Empty request, IWritableChannel<InvocationEvent> responseStream, MethodCallContext context)
+        {
+            return _invocationEventBroadcaster.Subscribe(responseStream, context);
+        }
+
 
         private void BroadcastEvent(Generated.AppLifecycleEvent evt)
         {
-            IWritableChannel<Generated.AppLifecycleEvent>[] subscribers;
-            lock (_appLifecycleEventSubscribers)
-            {
-                subscribers = _appLifecycleEventSubscribers.ToArray();
-            }
-            if (subscribers.Length > 0)
-            {
-                TaskRunner.RunInBackground(
-                    () => BroadcastEventAsync(evt, subscribers),
-                    CancellationToken);
-            }
-            try
-            {
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Exception while broadcasting lifecycle event");
-            }
+            _appLifecycleEventBroadcaster.BroadcastEvent(evt);
         }
 
-        private async Task BroadcastEventAsync(
-            Generated.AppLifecycleEvent evt,
-            IReadOnlyCollection<IWritableChannel<Generated.AppLifecycleEvent>> subscribers)
-        {            
-            try
-            {
-                Log.Info("Broadcasting event to {0} subscribers: {1}", subscribers.Count, evt);
-                await Task
-                    .WhenAll(subscribers.Select(x =>
-                        x.TryWriteAsync(evt, CancellationToken).IgnoreCancellation(CancellationToken)))
-                    .ConfigureAwait(false);
-                Log.Info("Event broadcasted to {0} subscribers: {1}", subscribers.Count, evt);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Exception while broadcasting lifecycle event");
-            }
+        private void BroadcastEvent(Generated.InvocationEvent evt)
+        {
+            _invocationEventBroadcaster.BroadcastEvent(evt);
         }
 
         private async Task<IAppConnection> LaunchAndWaitConnectionAsync(

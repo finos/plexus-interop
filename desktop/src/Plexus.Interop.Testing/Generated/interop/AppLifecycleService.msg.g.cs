@@ -25,10 +25,10 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Plexus.Interop.Apps.Internal.Generated {
+namespace Plexus.Interop.Testing.Generated {
 
   /// <summary>Holder for reflection information generated from interop/app_lifecycle_service.proto</summary>
-  internal static partial class AppLifecycleServiceReflection {
+  public static partial class AppLifecycleServiceReflection {
 
     #region Descriptor
     /// <summary>File descriptor for interop/app_lifecycle_service.proto</summary>
@@ -79,26 +79,26 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "Fi5nb29nbGUucHJvdG9idWYuRW1wdHkaGi5pbnRlcm9wLkFwcExpZmVjeWNs",
             "ZUV2ZW50MAESTgoYR2V0SW52b2NhdGlvbkV2ZW50U3RyZWFtEhYuZ29vZ2xl",
             "LnByb3RvYnVmLkVtcHR5GhguaW50ZXJvcC5JbnZvY2F0aW9uRXZlbnQwARof",
-            "ktsEG2ludGVyb3AuQXBwTGlmZWN5Y2xlU2VydmljZUIpqgImUGxleHVzLklu",
-            "dGVyb3AuQXBwcy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3RvMw=="));
+            "ktsEG2ludGVyb3AuQXBwTGlmZWN5Y2xlU2VydmljZUIjqgIgUGxleHVzLklu",
+            "dGVyb3AuVGVzdGluZy5HZW5lcmF0ZWRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchModeReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptorReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationResult), }, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest), global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest.Parser, new[]{ "AppId", "AppResolveMode" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse), global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse.Parser, new[]{ "AppInstanceId", "AppConnectionId", "IsNewInstanceLaunched" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent), global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent.Parser, new[]{ "Connected", "Disconnected" }, new[]{ "Event" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent), global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent.Parser, new[]{ "InvocationStarted", "InvocationFinished" }, new[]{ "Event" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent), global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent.Parser, new[]{ "ConnectionDescriptor" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent), global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent.Parser, new[]{ "ConnectionDescriptor" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent), global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent.Parser, new[]{ "InvocationDescriptor" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent), global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent.Parser, new[]{ "InvocationDescriptor", "Result", "DurationMs" }, null, null, null)
+          new pbr::FileDescriptor[] { global::Plexus.Interop.Testing.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Testing.Generated.AppLaunchModeReflection.Descriptor, global::Plexus.Interop.Testing.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Testing.Generated.InvocationDescriptorReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Testing.Generated.OptionsReflection.Descriptor, },
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Testing.Generated.InvocationResult), }, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Testing.Generated.ResolveAppRequest), global::Plexus.Interop.Testing.Generated.ResolveAppRequest.Parser, new[]{ "AppId", "AppResolveMode" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Testing.Generated.ResolveAppResponse), global::Plexus.Interop.Testing.Generated.ResolveAppResponse.Parser, new[]{ "AppInstanceId", "AppConnectionId", "IsNewInstanceLaunched" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Testing.Generated.AppLifecycleEvent), global::Plexus.Interop.Testing.Generated.AppLifecycleEvent.Parser, new[]{ "Connected", "Disconnected" }, new[]{ "Event" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Testing.Generated.InvocationEvent), global::Plexus.Interop.Testing.Generated.InvocationEvent.Parser, new[]{ "InvocationStarted", "InvocationFinished" }, new[]{ "Event" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Testing.Generated.AppConnectedEvent), global::Plexus.Interop.Testing.Generated.AppConnectedEvent.Parser, new[]{ "ConnectionDescriptor" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Testing.Generated.AppDisconnectedEvent), global::Plexus.Interop.Testing.Generated.AppDisconnectedEvent.Parser, new[]{ "ConnectionDescriptor" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Testing.Generated.InvocationStartedEvent), global::Plexus.Interop.Testing.Generated.InvocationStartedEvent.Parser, new[]{ "InvocationDescriptor" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Testing.Generated.InvocationFinishedEvent), global::Plexus.Interop.Testing.Generated.InvocationFinishedEvent.Parser, new[]{ "InvocationDescriptor", "Result", "DurationMs" }, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Enums
-  internal enum InvocationResult {
+  public enum InvocationResult {
     [pbr::OriginalName("Succeeded")] Succeeded = 0,
     [pbr::OriginalName("Canceled")] Canceled = 1,
     [pbr::OriginalName("Failed")] Failed = 2,
@@ -107,7 +107,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
   #endregion
 
   #region Messages
-  internal sealed partial class ResolveAppRequest : pb::IMessage<ResolveAppRequest> {
+  public sealed partial class ResolveAppRequest : pb::IMessage<ResolveAppRequest> {
     private static readonly pb::MessageParser<ResolveAppRequest> _parser = new pb::MessageParser<ResolveAppRequest>(() => new ResolveAppRequest());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -115,7 +115,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Plexus.Interop.Testing.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -155,9 +155,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "app_resolve_mode" field.</summary>
     public const int AppResolveModeFieldNumber = 2;
-    private global::Plexus.Interop.Apps.Internal.Generated.AppLaunchMode appResolveMode_ = 0;
+    private global::Plexus.Interop.Testing.Generated.AppLaunchMode appResolveMode_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.AppLaunchMode AppResolveMode {
+    public global::Plexus.Interop.Testing.Generated.AppLaunchMode AppResolveMode {
       get { return appResolveMode_; }
       set {
         appResolveMode_ = value;
@@ -255,7 +255,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 16: {
-            appResolveMode_ = (global::Plexus.Interop.Apps.Internal.Generated.AppLaunchMode) input.ReadEnum();
+            appResolveMode_ = (global::Plexus.Interop.Testing.Generated.AppLaunchMode) input.ReadEnum();
             break;
           }
         }
@@ -264,7 +264,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class ResolveAppResponse : pb::IMessage<ResolveAppResponse> {
+  public sealed partial class ResolveAppResponse : pb::IMessage<ResolveAppResponse> {
     private static readonly pb::MessageParser<ResolveAppResponse> _parser = new pb::MessageParser<ResolveAppResponse>(() => new ResolveAppResponse());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -272,7 +272,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Plexus.Interop.Testing.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -302,9 +302,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "app_instance_id" field.</summary>
     public const int AppInstanceIdFieldNumber = 1;
-    private global::Plexus.Interop.Apps.Internal.Generated.UniqueId appInstanceId_;
+    private global::Plexus.Interop.Testing.Generated.UniqueId appInstanceId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.UniqueId AppInstanceId {
+    public global::Plexus.Interop.Testing.Generated.UniqueId AppInstanceId {
       get { return appInstanceId_; }
       set {
         appInstanceId_ = value;
@@ -313,9 +313,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "app_connection_id" field.</summary>
     public const int AppConnectionIdFieldNumber = 2;
-    private global::Plexus.Interop.Apps.Internal.Generated.UniqueId appConnectionId_;
+    private global::Plexus.Interop.Testing.Generated.UniqueId appConnectionId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.UniqueId AppConnectionId {
+    public global::Plexus.Interop.Testing.Generated.UniqueId AppConnectionId {
       get { return appConnectionId_; }
       set {
         appConnectionId_ = value;
@@ -413,13 +413,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.appInstanceId_ != null) {
         if (appInstanceId_ == null) {
-          appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+          appInstanceId_ = new global::Plexus.Interop.Testing.Generated.UniqueId();
         }
         AppInstanceId.MergeFrom(other.AppInstanceId);
       }
       if (other.appConnectionId_ != null) {
         if (appConnectionId_ == null) {
-          appConnectionId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+          appConnectionId_ = new global::Plexus.Interop.Testing.Generated.UniqueId();
         }
         AppConnectionId.MergeFrom(other.AppConnectionId);
       }
@@ -439,14 +439,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           case 10: {
             if (appInstanceId_ == null) {
-              appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+              appInstanceId_ = new global::Plexus.Interop.Testing.Generated.UniqueId();
             }
             input.ReadMessage(appInstanceId_);
             break;
           }
           case 18: {
             if (appConnectionId_ == null) {
-              appConnectionId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+              appConnectionId_ = new global::Plexus.Interop.Testing.Generated.UniqueId();
             }
             input.ReadMessage(appConnectionId_);
             break;
@@ -461,7 +461,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class AppLifecycleEvent : pb::IMessage<AppLifecycleEvent> {
+  public sealed partial class AppLifecycleEvent : pb::IMessage<AppLifecycleEvent> {
     private static readonly pb::MessageParser<AppLifecycleEvent> _parser = new pb::MessageParser<AppLifecycleEvent>(() => new AppLifecycleEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -469,7 +469,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Plexus.Interop.Testing.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -506,8 +506,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     /// <summary>Field number for the "connected" field.</summary>
     public const int ConnectedFieldNumber = 1;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent Connected {
-      get { return eventCase_ == EventOneofCase.Connected ? (global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent) event_ : null; }
+    public global::Plexus.Interop.Testing.Generated.AppConnectedEvent Connected {
+      get { return eventCase_ == EventOneofCase.Connected ? (global::Plexus.Interop.Testing.Generated.AppConnectedEvent) event_ : null; }
       set {
         event_ = value;
         eventCase_ = value == null ? EventOneofCase.None : EventOneofCase.Connected;
@@ -517,8 +517,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     /// <summary>Field number for the "disconnected" field.</summary>
     public const int DisconnectedFieldNumber = 2;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent Disconnected {
-      get { return eventCase_ == EventOneofCase.Disconnected ? (global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent) event_ : null; }
+    public global::Plexus.Interop.Testing.Generated.AppDisconnectedEvent Disconnected {
+      get { return eventCase_ == EventOneofCase.Disconnected ? (global::Plexus.Interop.Testing.Generated.AppDisconnectedEvent) event_ : null; }
       set {
         event_ = value;
         eventCase_ = value == null ? EventOneofCase.None : EventOneofCase.Disconnected;
@@ -618,13 +618,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       switch (other.EventCase) {
         case EventOneofCase.Connected:
           if (Connected == null) {
-            Connected = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent();
+            Connected = new global::Plexus.Interop.Testing.Generated.AppConnectedEvent();
           }
           Connected.MergeFrom(other.Connected);
           break;
         case EventOneofCase.Disconnected:
           if (Disconnected == null) {
-            Disconnected = new global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent();
+            Disconnected = new global::Plexus.Interop.Testing.Generated.AppDisconnectedEvent();
           }
           Disconnected.MergeFrom(other.Disconnected);
           break;
@@ -642,7 +642,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent subBuilder = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent();
+            global::Plexus.Interop.Testing.Generated.AppConnectedEvent subBuilder = new global::Plexus.Interop.Testing.Generated.AppConnectedEvent();
             if (eventCase_ == EventOneofCase.Connected) {
               subBuilder.MergeFrom(Connected);
             }
@@ -651,7 +651,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 18: {
-            global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent subBuilder = new global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent();
+            global::Plexus.Interop.Testing.Generated.AppDisconnectedEvent subBuilder = new global::Plexus.Interop.Testing.Generated.AppDisconnectedEvent();
             if (eventCase_ == EventOneofCase.Disconnected) {
               subBuilder.MergeFrom(Disconnected);
             }
@@ -665,7 +665,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class InvocationEvent : pb::IMessage<InvocationEvent> {
+  public sealed partial class InvocationEvent : pb::IMessage<InvocationEvent> {
     private static readonly pb::MessageParser<InvocationEvent> _parser = new pb::MessageParser<InvocationEvent>(() => new InvocationEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -673,7 +673,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Plexus.Interop.Testing.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -710,8 +710,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     /// <summary>Field number for the "invocation_started" field.</summary>
     public const int InvocationStartedFieldNumber = 1;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent InvocationStarted {
-      get { return eventCase_ == EventOneofCase.InvocationStarted ? (global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent) event_ : null; }
+    public global::Plexus.Interop.Testing.Generated.InvocationStartedEvent InvocationStarted {
+      get { return eventCase_ == EventOneofCase.InvocationStarted ? (global::Plexus.Interop.Testing.Generated.InvocationStartedEvent) event_ : null; }
       set {
         event_ = value;
         eventCase_ = value == null ? EventOneofCase.None : EventOneofCase.InvocationStarted;
@@ -721,8 +721,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     /// <summary>Field number for the "invocation_finished" field.</summary>
     public const int InvocationFinishedFieldNumber = 2;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent InvocationFinished {
-      get { return eventCase_ == EventOneofCase.InvocationFinished ? (global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent) event_ : null; }
+    public global::Plexus.Interop.Testing.Generated.InvocationFinishedEvent InvocationFinished {
+      get { return eventCase_ == EventOneofCase.InvocationFinished ? (global::Plexus.Interop.Testing.Generated.InvocationFinishedEvent) event_ : null; }
       set {
         event_ = value;
         eventCase_ = value == null ? EventOneofCase.None : EventOneofCase.InvocationFinished;
@@ -822,13 +822,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       switch (other.EventCase) {
         case EventOneofCase.InvocationStarted:
           if (InvocationStarted == null) {
-            InvocationStarted = new global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent();
+            InvocationStarted = new global::Plexus.Interop.Testing.Generated.InvocationStartedEvent();
           }
           InvocationStarted.MergeFrom(other.InvocationStarted);
           break;
         case EventOneofCase.InvocationFinished:
           if (InvocationFinished == null) {
-            InvocationFinished = new global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent();
+            InvocationFinished = new global::Plexus.Interop.Testing.Generated.InvocationFinishedEvent();
           }
           InvocationFinished.MergeFrom(other.InvocationFinished);
           break;
@@ -846,7 +846,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent subBuilder = new global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent();
+            global::Plexus.Interop.Testing.Generated.InvocationStartedEvent subBuilder = new global::Plexus.Interop.Testing.Generated.InvocationStartedEvent();
             if (eventCase_ == EventOneofCase.InvocationStarted) {
               subBuilder.MergeFrom(InvocationStarted);
             }
@@ -855,7 +855,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 18: {
-            global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent subBuilder = new global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent();
+            global::Plexus.Interop.Testing.Generated.InvocationFinishedEvent subBuilder = new global::Plexus.Interop.Testing.Generated.InvocationFinishedEvent();
             if (eventCase_ == EventOneofCase.InvocationFinished) {
               subBuilder.MergeFrom(InvocationFinished);
             }
@@ -869,7 +869,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class AppConnectedEvent : pb::IMessage<AppConnectedEvent> {
+  public sealed partial class AppConnectedEvent : pb::IMessage<AppConnectedEvent> {
     private static readonly pb::MessageParser<AppConnectedEvent> _parser = new pb::MessageParser<AppConnectedEvent>(() => new AppConnectedEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -877,7 +877,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Plexus.Interop.Testing.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -905,9 +905,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "connection_descriptor" field.</summary>
     public const int ConnectionDescriptorFieldNumber = 1;
-    private global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor connectionDescriptor_;
+    private global::Plexus.Interop.Testing.Generated.AppConnectionDescriptor connectionDescriptor_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor ConnectionDescriptor {
+    public global::Plexus.Interop.Testing.Generated.AppConnectionDescriptor ConnectionDescriptor {
       get { return connectionDescriptor_; }
       set {
         connectionDescriptor_ = value;
@@ -976,7 +976,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.connectionDescriptor_ != null) {
         if (connectionDescriptor_ == null) {
-          connectionDescriptor_ = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor();
+          connectionDescriptor_ = new global::Plexus.Interop.Testing.Generated.AppConnectionDescriptor();
         }
         ConnectionDescriptor.MergeFrom(other.ConnectionDescriptor);
       }
@@ -993,7 +993,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           case 10: {
             if (connectionDescriptor_ == null) {
-              connectionDescriptor_ = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor();
+              connectionDescriptor_ = new global::Plexus.Interop.Testing.Generated.AppConnectionDescriptor();
             }
             input.ReadMessage(connectionDescriptor_);
             break;
@@ -1004,7 +1004,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class AppDisconnectedEvent : pb::IMessage<AppDisconnectedEvent> {
+  public sealed partial class AppDisconnectedEvent : pb::IMessage<AppDisconnectedEvent> {
     private static readonly pb::MessageParser<AppDisconnectedEvent> _parser = new pb::MessageParser<AppDisconnectedEvent>(() => new AppDisconnectedEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1012,7 +1012,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Plexus.Interop.Testing.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1040,9 +1040,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "connection_descriptor" field.</summary>
     public const int ConnectionDescriptorFieldNumber = 1;
-    private global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor connectionDescriptor_;
+    private global::Plexus.Interop.Testing.Generated.AppConnectionDescriptor connectionDescriptor_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor ConnectionDescriptor {
+    public global::Plexus.Interop.Testing.Generated.AppConnectionDescriptor ConnectionDescriptor {
       get { return connectionDescriptor_; }
       set {
         connectionDescriptor_ = value;
@@ -1111,7 +1111,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.connectionDescriptor_ != null) {
         if (connectionDescriptor_ == null) {
-          connectionDescriptor_ = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor();
+          connectionDescriptor_ = new global::Plexus.Interop.Testing.Generated.AppConnectionDescriptor();
         }
         ConnectionDescriptor.MergeFrom(other.ConnectionDescriptor);
       }
@@ -1128,7 +1128,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           case 10: {
             if (connectionDescriptor_ == null) {
-              connectionDescriptor_ = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor();
+              connectionDescriptor_ = new global::Plexus.Interop.Testing.Generated.AppConnectionDescriptor();
             }
             input.ReadMessage(connectionDescriptor_);
             break;
@@ -1139,7 +1139,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class InvocationStartedEvent : pb::IMessage<InvocationStartedEvent> {
+  public sealed partial class InvocationStartedEvent : pb::IMessage<InvocationStartedEvent> {
     private static readonly pb::MessageParser<InvocationStartedEvent> _parser = new pb::MessageParser<InvocationStartedEvent>(() => new InvocationStartedEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1147,7 +1147,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Plexus.Interop.Testing.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1175,9 +1175,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "invocation_descriptor" field.</summary>
     public const int InvocationDescriptorFieldNumber = 1;
-    private global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptor invocationDescriptor_;
+    private global::Plexus.Interop.Testing.Generated.InvocationDescriptor invocationDescriptor_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptor InvocationDescriptor {
+    public global::Plexus.Interop.Testing.Generated.InvocationDescriptor InvocationDescriptor {
       get { return invocationDescriptor_; }
       set {
         invocationDescriptor_ = value;
@@ -1246,7 +1246,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.invocationDescriptor_ != null) {
         if (invocationDescriptor_ == null) {
-          invocationDescriptor_ = new global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptor();
+          invocationDescriptor_ = new global::Plexus.Interop.Testing.Generated.InvocationDescriptor();
         }
         InvocationDescriptor.MergeFrom(other.InvocationDescriptor);
       }
@@ -1263,7 +1263,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           case 10: {
             if (invocationDescriptor_ == null) {
-              invocationDescriptor_ = new global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptor();
+              invocationDescriptor_ = new global::Plexus.Interop.Testing.Generated.InvocationDescriptor();
             }
             input.ReadMessage(invocationDescriptor_);
             break;
@@ -1274,7 +1274,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class InvocationFinishedEvent : pb::IMessage<InvocationFinishedEvent> {
+  public sealed partial class InvocationFinishedEvent : pb::IMessage<InvocationFinishedEvent> {
     private static readonly pb::MessageParser<InvocationFinishedEvent> _parser = new pb::MessageParser<InvocationFinishedEvent>(() => new InvocationFinishedEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1282,7 +1282,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Plexus.Interop.Testing.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1312,9 +1312,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "invocation_descriptor" field.</summary>
     public const int InvocationDescriptorFieldNumber = 1;
-    private global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptor invocationDescriptor_;
+    private global::Plexus.Interop.Testing.Generated.InvocationDescriptor invocationDescriptor_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptor InvocationDescriptor {
+    public global::Plexus.Interop.Testing.Generated.InvocationDescriptor InvocationDescriptor {
       get { return invocationDescriptor_; }
       set {
         invocationDescriptor_ = value;
@@ -1323,9 +1323,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "result" field.</summary>
     public const int ResultFieldNumber = 2;
-    private global::Plexus.Interop.Apps.Internal.Generated.InvocationResult result_ = 0;
+    private global::Plexus.Interop.Testing.Generated.InvocationResult result_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.InvocationResult Result {
+    public global::Plexus.Interop.Testing.Generated.InvocationResult Result {
       get { return result_; }
       set {
         result_ = value;
@@ -1423,7 +1423,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.invocationDescriptor_ != null) {
         if (invocationDescriptor_ == null) {
-          invocationDescriptor_ = new global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptor();
+          invocationDescriptor_ = new global::Plexus.Interop.Testing.Generated.InvocationDescriptor();
         }
         InvocationDescriptor.MergeFrom(other.InvocationDescriptor);
       }
@@ -1446,13 +1446,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           case 10: {
             if (invocationDescriptor_ == null) {
-              invocationDescriptor_ = new global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptor();
+              invocationDescriptor_ = new global::Plexus.Interop.Testing.Generated.InvocationDescriptor();
             }
             input.ReadMessage(invocationDescriptor_);
             break;
           }
           case 16: {
-            result_ = (global::Plexus.Interop.Apps.Internal.Generated.InvocationResult) input.ReadEnum();
+            result_ = (global::Plexus.Interop.Testing.Generated.InvocationResult) input.ReadEnum();
             break;
           }
           case 24: {
