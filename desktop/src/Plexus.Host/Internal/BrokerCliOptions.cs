@@ -17,6 +17,7 @@
 ﻿namespace Plexus.Host.Internal
 {
     using CommandLine;
+    using CommandLine.Text;
 
 #if NETCOREAPP2_2
     [Verb("start", HelpText = "Start interop broker.")]

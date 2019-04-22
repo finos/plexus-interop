@@ -1,10 +1,19 @@
 ﻿namespace Plexus.Host.Internal
 {
     using CommandLine;
+    using CommandLine.Text;
 
 #if NET45
     internal sealed class VerbOptions
     {
+        [HelpVerbOption]
+        public string DoHelpForVerb(string verbName)
+        {
+            return HelpText.AutoBuild(this,
+                current => HelpText.DefaultParsingErrorsHandler(this, current),
+                true);
+        }
+
         [VerbOption("start", HelpText = "Start interop broker.")]
         public StartCliOptions StartVerb { get; set; }
 
