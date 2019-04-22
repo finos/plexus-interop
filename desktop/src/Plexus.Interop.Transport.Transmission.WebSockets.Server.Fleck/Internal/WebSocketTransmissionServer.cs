@@ -16,11 +16,12 @@
  */
 namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
-    using System;
-    using System.Threading.Tasks;
     using global::Fleck;
     using Plexus.Channels;
     using Plexus.Processes;
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
 
     internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer
     {
@@ -65,9 +66,36 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private void OnSocketConnection(IWebSocketConnection websocket)
         {
             Log.Trace("Handling websocket connection {0}: path={1}", websocket.ConnectionInfo.Id, websocket.ConnectionInfo.Path);
-            if (string.IsNullOrEmpty(websocket.ConnectionInfo.Path) || websocket.ConnectionInfo.Path.Equals("/"))
+            var urlPath = websocket.ConnectionInfo.Path.TrimEnd('/');
+            if (string.IsNullOrEmpty(urlPath))
             {
                 TaskRunner.RunInBackground(AcceptWebSocketConnectionAsync, websocket).IgnoreAwait();
+            }
+            else
+            {
+                TaskRunner.RunInBackground(() => ReadFileAsync(websocket, urlPath)).IgnoreAwait();
+            }
+        }
+
+        private async Task ReadFileAsync(IWebSocketConnection webSocket, string urlPath)
+        {
+            try
+            {
+                if (_options.StaticFileMappings.TryGetValue(urlPath, out var physicalPath))
+                {
+                    if (File.Exists(physicalPath))
+                    {
+                        using (var stream = File.Open(physicalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        using (var streamReader = new StreamReader(stream))
+                        {
+                            await webSocket.Send(await streamReader.ReadToEndAsync()).ConfigureAwait(false);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                webSocket.Close();
             }
         }
 
