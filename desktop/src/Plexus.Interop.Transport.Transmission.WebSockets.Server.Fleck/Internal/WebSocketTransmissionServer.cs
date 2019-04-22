@@ -50,7 +50,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 Log.Trace(exc, msg);
             };
             using (_stateWriter)
-            using (_server = new WebSocketServer($"ws://127.0.0.1:{_options.Port}"))            
+            using (_server = CreateWebSocketServerWithRetry(_options.Port))
             {
                 _server.RestartAfterListenError = true;
                 _server.ListenerSocket.NoDelay = true;
@@ -61,6 +61,45 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 await CancellationToken.ToAwaitable().AsTask().IgnoreAnyCancellation().ConfigureAwait(false);
             }
             return TaskConstants.Completed;
+        }
+
+        private WebSocketServer CreateWebSocketServerWithRetry(uint port)
+        {
+            var server = StartWebSocketServer($"ws://127.0.0.1:{port}", true);
+            server = server ?? StartWebSocketServer($"ws://127.0.0.1:{port}", false);
+            server = server ?? StartWebSocketServer($"ws://localhost:{port}", true);
+            server = server ?? StartWebSocketServer($"ws://localhost:{port}", false);
+            server = server ?? StartWebSocketServer($"ws://[::1]:{port}", false);
+            if (server == null)
+            {
+                throw new InvalidOperationException("Failed to start websocket server");
+            }
+            return server;
+        }
+
+        private WebSocketServer StartWebSocketServer(string url, bool supportDualStack)
+        {
+            var server = new WebSocketServer(url, supportDualStack);
+            try
+            {
+                server.RestartAfterListenError = true;
+                server.ListenerSocket.NoDelay = true;
+                server.Start(OnSocketConnection);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception while starting websocket server with url={0} and supportDualStack={1}", url, supportDualStack);
+                try
+                {
+                    server.Dispose();
+                }
+                catch
+                {
+                    // skip
+                }
+                return null;
+            }
+            return server;
         }
 
         private void OnSocketConnection(IWebSocketConnection websocket)
