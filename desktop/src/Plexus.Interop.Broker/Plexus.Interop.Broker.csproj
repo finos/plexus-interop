@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
+
     <RootNamespace>Plexus.Interop</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -15,7 +17,8 @@
     <ProjectReference Include="..\Plexus.Interop.Protocol.Protobuf\Plexus.Interop.Protocol.Protobuf.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Protocol.Protobuf\Plexus.Interop.Transport.Protocol.Protobuf.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Pipes\Plexus.Interop.Transport.Transmission.Pipes.csproj" />
-    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server\Plexus.Interop.Transport.Transmission.WebSockets.Server.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck\Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.csproj" Condition="'$(TargetFramework)' == 'net45'" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server\Plexus.Interop.Transport.Transmission.WebSockets.Server.csproj" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <ProjectReference Include="..\Plexus.Interop.Transport\Plexus.Interop.Transport.csproj" />
   </ItemGroup>
 
