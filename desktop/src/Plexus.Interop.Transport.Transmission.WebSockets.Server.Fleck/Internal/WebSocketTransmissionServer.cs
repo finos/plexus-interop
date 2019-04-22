@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.Internal
+namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
     using System;
     using System.Threading.Tasks;
@@ -73,20 +73,22 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.Internal
         private async Task AcceptWebSocketConnectionAsync(object arg)
         {
             var websocket = (IWebSocketConnection) arg;
+            var connection = new WebSocketServerTransmissionConnection(websocket);
             try
-            {
-                var connection = new WebSocketTransmissionConnection(websocket);
+            {                
                 connection.Start();
                 using (CancellationToken.Register(() => connection.Stop()))
                 {
                     await _buffer.Out.WriteAsync(connection, CancellationToken).ConfigureAwait(false);
                     Log.Trace("Websocket connection {0} accepted", websocket.ConnectionInfo.Id);
                     await connection.Completion.ConfigureAwait(false);
+                    Log.Trace("Websocket connection {0} completed", websocket.ConnectionInfo.Id);
                 }
             }
             catch (Exception ex)
-            {
-                Log.Error(ex, "Connection {0} completed with exception", websocket.ConnectionInfo.Id);
+            {                
+                Log.Error(ex, "Websocket connection {0} completed with exception", websocket.ConnectionInfo.Id);
+                connection.Stop();
             }
         }        
     }

@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck
+﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 {
-    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.Internal;
+    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
 
     public sealed class WebSocketTransmissionServerFactory
     {

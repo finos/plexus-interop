@@ -14,28 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.Internal
+namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
-    using global::Fleck;
-    using Plexus.Channels;
-    using Plexus.Pools;
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using global::Fleck;
+    using Plexus.Channels;
+    using Plexus.Pools;
 
-    internal sealed class WebSocketTransmissionReader
+    internal sealed class WebSocketServerTransmissionReader
     {
         private readonly ILogger _log;
         private readonly BufferedChannel<IPooledBuffer> _buffer = new BufferedChannel<IPooledBuffer>(3);
         private readonly CancellationToken _cancellationToken;
         private readonly IWebSocketConnection _webSocket;
 
-        public WebSocketTransmissionReader(
+        public WebSocketServerTransmissionReader(
             UniqueId id,
             IWebSocketConnection webSocket, 
             CancellationToken cancellationToken)
         {
-            _log = LogManager.GetLogger<WebSocketTransmissionReader>(id.ToString());
+            _log = LogManager.GetLogger<WebSocketServerTransmissionReader>(id.ToString());
             _cancellationToken = cancellationToken;
             _webSocket = webSocket;
             _webSocket.OnBinary += OnDataReceived;

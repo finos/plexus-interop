@@ -4,6 +4,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <AssemblyName>Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck</AssemblyName>
+    <RootNamespace>Plexus.Interop.Transport.Transmission.WebSockets.Server</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

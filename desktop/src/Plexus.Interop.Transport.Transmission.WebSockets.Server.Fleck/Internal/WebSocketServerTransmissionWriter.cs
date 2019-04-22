@@ -14,29 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.Internal
+ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using global::Fleck;
+    using Fleck;
     using Plexus.Channels;
     using Plexus.Pools;
     using Plexus.Processes;
 
-    internal sealed class WebSocketTransmissionWriter : ProcessBase
+    internal sealed class WebSocketServerTransmissionWriter : ProcessBase
     {
         private readonly ILogger _log;
         private readonly BufferedChannel<IPooledBuffer> _buffer = new BufferedChannel<IPooledBuffer>(3);
         private readonly CancellationToken _cancellationToken;
         private readonly IWebSocketConnection _webSocket;
 
-        public WebSocketTransmissionWriter(
+        public WebSocketServerTransmissionWriter(
             UniqueId id,
             IWebSocketConnection webSocket,
             CancellationToken cancellationToken)
         {
-            _log = LogManager.GetLogger<WebSocketTransmissionReader>(id.ToString());
+            _log = LogManager.GetLogger<WebSocketServerTransmissionReader>(id.ToString());
             _cancellationToken = cancellationToken;
             _webSocket = webSocket;
         }
@@ -54,7 +54,7 @@
             {
                 await _buffer.In.ConsumeAsync(SendAsync, _cancellationToken).ConfigureAwait(false);
                 _log.Trace("Sending <END> message");
-                await _webSocket.Send("<END>");
+                await _webSocket.Send("<END>").ConfigureAwait(false);
             }
             catch (Exception ex)
             {

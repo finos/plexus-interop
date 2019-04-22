@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.Internal
+namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
     using System;
     using System.Threading;
@@ -24,28 +24,28 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.Internal
     using Plexus.Pools;
     using Plexus.Processes;
 
-    internal sealed class WebSocketTransmissionConnection : ProcessBase, ITransmissionConnection
+    internal sealed class WebSocketServerTransmissionConnection : ProcessBase, ITransmissionConnection
     {
         private static readonly TimeSpan ConnectionTimeout = TimeoutConstants.Timeout5Sec;
 
         private readonly ILogger _log;
         private readonly IWebSocketConnection _webSocket;
-        private readonly WebSocketTransmissionReader _reader;
-        private readonly WebSocketTransmissionWriter _writer;
+        private readonly WebSocketServerTransmissionReader _reader;
+        private readonly WebSocketServerTransmissionWriter _writer;
         private readonly Promise _connectCompletion = new Promise();
         private readonly Promise _disconnectCompletion = new Promise();
 
-        public WebSocketTransmissionConnection(IWebSocketConnection websocket)
+        public WebSocketServerTransmissionConnection(IWebSocketConnection websocket)
         {            
-            _log = LogManager.GetLogger<WebSocketTransmissionConnection>(Id.ToString());
+            _log = LogManager.GetLogger<WebSocketServerTransmissionConnection>(Id.ToString());
             _webSocket = websocket;
             _disconnectCompletion.Task.PropagateCompletionToPromise(_connectCompletion);
             _webSocket.OnOpen += OnOpened;
             _webSocket.OnClose += OnClosed;
             _webSocket.OnError += OnError;
 
-            _reader = new WebSocketTransmissionReader(Id, _webSocket, CancellationToken);
-            _writer = new WebSocketTransmissionWriter(Id, _webSocket, CancellationToken);
+            _reader = new WebSocketServerTransmissionReader(Id, _webSocket, CancellationToken);
+            _writer = new WebSocketServerTransmissionWriter(Id, _webSocket, CancellationToken);
 
             Completion.LogCompletion(_log);
 
@@ -123,17 +123,17 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.Internal
         {
             try
             {
-                using (CancellationToken.Register(_webSocket.Close))
-                {
-                    await Task.WhenAny(_writer.Completion, _reader.Completion).Unwrap().ConfigureAwait(false);
-                }
+                await Task.WhenAny(_writer.Completion, _reader.Completion).Unwrap().ConfigureAwait(false);
             }
             catch
             {
-                Stop();
+                _webSocket.Close();
+                throw;
             }
-            await Task.WhenAll(_writer.Completion, _reader.Completion).ConfigureAwait(false);
-            _webSocket.Close();
+            finally
+            {
+                await Task.WhenAll(_writer.Completion, _reader.Completion).ConfigureAwait(false);
+            }
             await _disconnectCompletion.Task.ConfigureAwait(false);
         }
     }

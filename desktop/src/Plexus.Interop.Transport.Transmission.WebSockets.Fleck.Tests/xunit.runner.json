@@ -1,7 +1,0 @@
-﻿{
-  "longRunningTestSeconds": 10,
-  "parallelizeAssembly": false,
-  "parallelizeTestCollections": false,
-  "preEnumerateTheories": true,
-  "diagnosticMessages": true
-}
