@@ -69,7 +69,7 @@
             using (msg)
             {
                 _log.Trace("Sending message of length {0}", msg.Count);
-                await _webSocket.Send(msg.ToArray()).ConfigureAwait(false);
+                await _webSocket.Send(msg.ToArray()).WithCancellation(_cancellationToken).ConfigureAwait(false);
             }
         }
     }

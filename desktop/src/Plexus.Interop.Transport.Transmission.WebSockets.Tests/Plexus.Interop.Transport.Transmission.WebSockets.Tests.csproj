@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.2;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.2</TargetFrameworks>
     
     <IsPackable>false</IsPackable>
 

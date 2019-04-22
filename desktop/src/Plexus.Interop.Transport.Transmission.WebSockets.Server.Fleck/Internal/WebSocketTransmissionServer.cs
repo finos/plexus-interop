@@ -36,6 +36,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         {
             _options = options;
             _stateWriter = new ServerStateWriter(ServerName, _options.WorkingDir);
+            _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
         public IReadableChannel<ITransmissionConnection> In => _buffer.In;
@@ -56,7 +57,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 _stateWriter.Write("address", "ws://" + _server.ListenerSocket.LocalEndPoint);
                 _stateWriter.SignalInitialized();
                 SetStartCompleted();
-                await CancellationToken.ToAwaitable().ConfigureAwait(false);
+                await CancellationToken.ToAwaitable().AsTask().IgnoreAnyCancellation().ConfigureAwait(false);
             }
             return TaskConstants.Completed;
         }
@@ -77,7 +78,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             try
             {                
                 connection.Start();
-                using (CancellationToken.Register(() => connection.Stop()))
+                using (CancellationToken.Register(connection.Stop))
                 {
                     await _buffer.Out.WriteAsync(connection, CancellationToken).ConfigureAwait(false);
                     Log.Trace("Websocket connection {0} accepted", websocket.ConnectionInfo.Id);

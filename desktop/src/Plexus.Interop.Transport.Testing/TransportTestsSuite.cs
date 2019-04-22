@@ -274,7 +274,7 @@ namespace Plexus.Interop.Transport
 
             async Task HandleChannelAsync(ITransportChannel c, int[] send, List<byte[]> received, List<byte[]> sent)
             {
-                Log.Info("Handling channel {0}", c.Id);
+                WriteLog($"Handling channel {c.Id}");
                 var receiveTask = TaskRunner.RunInBackground(
                         async () =>
                         {
@@ -302,7 +302,7 @@ namespace Plexus.Interop.Transport
                 }
                 c.Out.TryComplete();
                 await receiveTask.ConfigureAwait(false);
-                Log.Info("Channel handling completed {0}. Received {1} messages.", c.Id, received.Count);
+                WriteLog($"Channel handling completed {c.Id}. Received {received.Count} messages.");
             }
 
             ITransportConnection clientConnection = null;
@@ -312,12 +312,12 @@ namespace Plexus.Interop.Transport
                 {
                     await Server.StartAsync().ConfigureAwait(false);
                     serverConnection = await Server.In.ReadAsync().ConfigureAwait(false);
-                    Log.Info("Server connection created");
+                    WriteLog("Server connection created");
                     var channelTasks = new List<Task>();
                     foreach (var channelExchange in cases)
                     {
                         var channel = await serverConnection.CreateChannelAsync().ConfigureAwait(false);
-                        Log.Info("Server channel created");
+                        WriteLog("Server channel created");
                         var rec = new List<byte[]>();
                         var sent = new List<byte[]>();
                         clientReceivedMessageHashes.Add(rec);
@@ -332,12 +332,12 @@ namespace Plexus.Interop.Transport
                 async () =>
                 {
                     clientConnection = await Client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false);
-                    Log.Info("Client connection created");
+                    WriteLog("Client connection created");
                     var channelTasks = new List<Task>();
                     foreach (var channelExchange in cases)
                     {
                         var channel = await clientConnection.IncomingChannels.ReadAsync().ConfigureAwait(false);
-                        Log.Info("Client channel received");
+                        WriteLog("Client channel received");
                         var rec = new List<byte[]>();
                         var sent = new List<byte[]>();
                         serverReceivedMessageHashes.Add(rec);
@@ -351,7 +351,7 @@ namespace Plexus.Interop.Transport
             Should.CompleteIn(clientConnection.CompleteAsync(), Timeout1Sec);
             Should.CompleteIn(serverConnection.CompleteAsync(), Timeout1Sec);
 
-            Log.Debug("Tasks completed");
+            WriteLog("Tasks completed");
             serverReceivedMessageHashes.Count.ShouldBe(cases.Length);
             serverSentMessageHashes.Count.ShouldBe(cases.Length);
             clientReceivedMessageHashes.Count.ShouldBe(cases.Length);
