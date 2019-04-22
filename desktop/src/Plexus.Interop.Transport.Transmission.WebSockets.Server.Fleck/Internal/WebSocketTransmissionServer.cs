@@ -49,8 +49,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             {
                 Log.Trace(exc, msg);
             };
-            using (_server = new WebSocketServer($"ws://127.0.0.1:{_options.Port}"))
             using (_stateWriter)
+            using (_server = new WebSocketServer($"ws://127.0.0.1:{_options.Port}"))            
             {
                 _server.RestartAfterListenError = true;
                 _server.ListenerSocket.NoDelay = true;
