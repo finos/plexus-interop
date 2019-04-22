@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
 
     <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>
@@ -40,7 +41,7 @@
     <QuickStartRegistry Include="$(RepoRootDir)samples/quick-start/registry/**/*.*" />
   </ItemGroup>
   
-  <Target Name="PublishOnBuild" DependsOnTargets="CoreCompile" BeforeTargets="Build">
+  <Target Name="PublishOnBuild" DependsOnTargets="CoreBuild" BeforeTargets="AfterBuild">
     <Copy SourceFiles="@(SamplesMetadata)" DestinationFolder="$(ArtifactsSamplesDir)metadata/%(RecursiveDir)" />
     <Copy SourceFiles="@(SamplesRegistry)" DestinationFolder="$(ArtifactsSamplesDir)registry/%(RecursiveDir)" />
 

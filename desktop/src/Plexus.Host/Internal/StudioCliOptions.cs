@@ -18,7 +18,9 @@
 {
     using CommandLine;
 
+#if NETCOREAPP2_2
     [Verb("studio", HelpText = "Start Plexus Studio.")]
+#endif
     internal sealed class StudioCliOptions
     {
     }

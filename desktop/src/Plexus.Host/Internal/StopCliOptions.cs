@@ -18,7 +18,9 @@
 {
     using CommandLine;
 
+#if NETCOREAPP2_2
     [Verb("stop", HelpText = "Stop interop broker.")]
+#endif
     internal sealed class StopCliOptions
     {
     }

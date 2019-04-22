@@ -6,7 +6,8 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>plexus</AssemblyName>
 
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.2</TargetFrameworks>
 
     <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>
@@ -16,7 +17,8 @@
 
     <RepoRootDir>../../../</RepoRootDir>
     <ArtifactsDir>$(RepoRootDir)bin/$(RuntimeIdentifier)/</ArtifactsDir>
-    <PublishDir>$(ArtifactsDir)broker/</PublishDir>
+    <PublishDir Condition="'$(TargetFramework)' == 'net45'">$(ArtifactsDir)broker-net45/</PublishDir>
+    <PublishDir Condition="'$(TargetFramework)' == 'netcoreapp2.2'">$(ArtifactsDir)broker/</PublishDir>
     <ArtifactsSamplesDir>$(ArtifactsDir)samples/greeting/</ArtifactsSamplesDir>
     <QuickStartSamplesDir>$(ArtifactsDir)samples/quick-start/</QuickStartSamplesDir>
 
@@ -40,12 +42,16 @@
     <Content Include="plexus.cmd" />
   </ItemGroup>
   
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
     <PackageReference Include="CommandLineParser" Version="2.4.3" />
     <PackageReference Include="System.Console" Version="4.3.1" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
     <PackageReference Include="System.IO.Pipes" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <PackageReference Include="CommandLineParser" Version="1.9.71" />
   </ItemGroup>
   
   <ItemGroup>
@@ -64,7 +70,7 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish">
+  <Target Name="PublishOnBuild" DependsOnTargets="CoreBuild" BeforeTargets="AfterBuild">
     <Copy SourceFiles="plexus.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
     <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
     <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
@@ -76,9 +82,22 @@
     <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
   </Target>
 
+  <!--<Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish">
+    <Copy SourceFiles="plexus.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
+
+    <Copy SourceFiles="plexus.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
+    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
+  </Target>-->
+
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);id=Plexus.Interop.Broker.Redist-$(RuntimeIdentifier)</NuspecProperties>
+      <NuspecProperties Condition="'$(TargetFramework)' == 'net45'">$(NuspecProperties);id=Plexus.Interop.Broker.Redist-net45</NuspecProperties>
+      <NuspecProperties Condition="'$(TargetFramework)' == 'netcoreapp2.2'">$(NuspecProperties);id=Plexus.Interop.Broker.Redist-$(RuntimeIdentifier)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
     </PropertyGroup>
     <Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />

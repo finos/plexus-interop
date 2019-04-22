@@ -18,7 +18,9 @@
 {
     using CommandLine;
 
+#if NETCOREAPP2_2
     [Verb("start", HelpText = "Start interop broker.")]
+#endif
     internal class StartCliOptions
     {
         [Option('m', "metadata", Required = false, HelpText = "Directory to seek for metadata files: apps.json and interop.json.")]
@@ -28,7 +30,9 @@
         public uint Port { get; set; }
     }
 
+#if NETCOREAPP2_2
     [Verb("broker", HelpText = "Start interop broker.")]
+#endif
     internal class BrokerCliOptions : StartCliOptions
     {
     }
