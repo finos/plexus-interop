@@ -155,10 +155,14 @@ namespace Plexus.Interop.Transport.Transmission
                         WriteLog("Client connected");                        
                         using (var serverConection = await serverConnectionTask)
                         {
+                            WriteLog("Server connected");
                             await serverConection.Out.WriteAsync(PooledBuffer.Get(testMsg));
+                            WriteLog("Message written on server side");
                             receivedMsg = await clientConnection.In.ReadAsync();
-                            WriteLog("Disposing connections");
+                            WriteLog("Message received on client side");
+                            WriteLog("Disposing server connection");
                         }
+                        WriteLog("Disposing client connection");
                     }
                     WriteLog("Disposing server");
                 }
@@ -219,8 +223,10 @@ namespace Plexus.Interop.Transport.Transmission
 
             var serverTask = TaskRunner.RunInBackground(async () =>
             {
+                WriteLog($"Starting server");
                 var server = RegisterDisposable(CreateServer());
                 await server.StartAsync().ConfigureAwaitWithTimeout(Timeout5Sec);
+                WriteLog($"Server started");
                 using (var serverConnection = RegisterDisposable(await server.In.ReadAsync().ConfigureAwait(false)))
                 {
                     var receiveTask = TaskRunner.RunInBackground(async () =>
@@ -261,9 +267,10 @@ namespace Plexus.Interop.Transport.Transmission
             var clientTask = TaskRunner.RunInBackground(async () =>
             {
                 var clientFactory = CreateClient();
-                Log.Trace("Connecting client");
+                WriteLog("Connecting client");
                 using (var connection = RegisterDisposable(await clientFactory.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false)))
                 {
+                    WriteLog($"Client connected");
                     var receiveTask = TaskRunner.RunInBackground(async () =>
                     {
                         while (true)

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Common.csproj" />
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fleck" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Contracts\Plexus.Interop.Transport.Transmission.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Utils\Plexus.Interop.Transport.Utils.csproj" />
+    <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
+  </ItemGroup>
+
+</Project>
