@@ -69,6 +69,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             server = server ?? StartWebSocketServer($"ws://127.0.0.1:{port}", false);
             server = server ?? StartWebSocketServer($"ws://localhost:{port}", true);
             server = server ?? StartWebSocketServer($"ws://localhost:{port}", false);
+            server = server ?? StartWebSocketServer($"ws://[::1]:{port}", true);
             server = server ?? StartWebSocketServer($"ws://[::1]:{port}", false);
             if (server == null)
             {
