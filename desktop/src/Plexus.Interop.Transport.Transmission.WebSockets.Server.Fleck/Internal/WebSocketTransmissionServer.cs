@@ -52,10 +52,9 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             using (_stateWriter)
             using (_server = CreateWebSocketServerWithRetry(_options.Port))
             {
-                _server.RestartAfterListenError = true;
-                _server.ListenerSocket.NoDelay = true;
-                _server.Start(OnSocketConnection);
-                _stateWriter.Write("address", "ws://" + _server.ListenerSocket.LocalEndPoint);
+                var address = "ws://" + _server.ListenerSocket.LocalEndPoint;
+                Log.Trace("WebSocket server started on {0}", address);
+                _stateWriter.Write("address", address);
                 _stateWriter.SignalInitialized();
                 SetStartCompleted();
                 await CancellationToken.ToAwaitable().AsTask().IgnoreAnyCancellation().ConfigureAwait(false);

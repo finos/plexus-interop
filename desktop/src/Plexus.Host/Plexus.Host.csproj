@@ -2,7 +2,7 @@
 
   <Import Project="../Common.csproj" />
 
-  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' Or '$(CORE_ONLY)' == ''">
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' And '$(CORE_ONLY)' == ''">
     <TargetFramework>net45</TargetFramework>    
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
