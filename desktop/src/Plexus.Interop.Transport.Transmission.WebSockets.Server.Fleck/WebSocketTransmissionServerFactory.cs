@@ -14,14 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Host.Internal
+﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 {
-    using CommandLine;
+    using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
 
-#if NETCOREAPP2_2
-    [Verb("stop", HelpText = "Stop interop broker.")]
-#endif
-    internal sealed class StopCliOptions
+    public sealed class WebSocketTransmissionServerFactory
     {
+        public static WebSocketTransmissionServerFactory Instance = new WebSocketTransmissionServerFactory();
+
+        public ITransmissionServer Create(WebSocketTransmissionServerOptions options)
+        {
+            return new WebSocketTransmissionServer(options);
+        }
     }
 }

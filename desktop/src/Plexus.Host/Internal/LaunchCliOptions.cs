@@ -19,10 +19,16 @@
     using System.Collections.Generic;
     using CommandLine;
 
+#if NETCOREAPP2_2
     [Verb("launch", HelpText = "Launch interop application.")]
+#endif
     internal sealed class LaunchCliOptions
     {
+#if NETCOREAPP2_2
         [Option('a', "application", Required = true, HelpText = "Identifier of application.", Separator = ',')]
+#else
+        [OptionList('a', "application", Required = true, HelpText = "Identifier of application.", Separator = ',')]
+#endif
         public IEnumerable<string> ApplicationIds { get; set; }
     }
 }

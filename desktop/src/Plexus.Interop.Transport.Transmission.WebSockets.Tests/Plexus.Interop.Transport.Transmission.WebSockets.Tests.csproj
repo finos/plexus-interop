@@ -3,7 +3,8 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.2</TargetFrameworks>
     
     <IsPackable>false</IsPackable>
 
@@ -11,7 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
@@ -27,7 +27,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Testing\Plexus.Interop.Transport.Transmission.Testing.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Client\Plexus.Interop.Transport.Transmission.WebSockets.Client.csproj" />
-    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server\Plexus.Interop.Transport.Transmission.WebSockets.Server.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck\Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.csproj" Condition="'$(TargetFramework)' == 'net45'" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server\Plexus.Interop.Transport.Transmission.WebSockets.Server.csproj" Condition="'$(TargetFramework)' == 'netcoreapp2.2'" />
     <ProjectReference Include="..\Plexus.Utils.Testing\Plexus.Utils.Testing.csproj" />
   </ItemGroup>
 
@@ -50,3 +51,4 @@
   <Import Project="..\Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems" Label="Shared" />
 
 </Project>
+

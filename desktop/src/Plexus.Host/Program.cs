@@ -18,6 +18,7 @@ namespace Plexus.Host
 {
     using CommandLine;
     using Plexus.Host.Internal;
+    using Plexus.Interop;
     using System;
     using System.Diagnostics;
     using System.IO;
@@ -25,7 +26,6 @@ namespace Plexus.Host
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Interop;
 
     public sealed class Program
     {
@@ -39,6 +39,37 @@ namespace Plexus.Host
 
         public async Task<int> RunAsync(string[] args)
         {
+#if NET45
+            var invokedVerb = string.Empty;
+            object invokedVerbInstance = null;
+
+            var options = new VerbOptions();
+            if (!Parser.Default.ParseArguments(args, options,
+                (verb, subOptions) =>
+                {
+                    invokedVerb = verb;
+                    invokedVerbInstance = subOptions;
+                }))
+            {
+                return Parser.DefaultExitCodeFail;
+            }
+
+            switch (invokedVerb)
+            {
+                case "start":
+                    return await StartBrokerAsync((StartCliOptions)invokedVerbInstance).ConfigureAwait(false);
+                case "broker":
+                    return await StartBrokerAsync((BrokerCliOptions)invokedVerbInstance).ConfigureAwait(false);
+                case "launch":
+                    return await LaunchAppAsync((LaunchCliOptions)invokedVerbInstance).ConfigureAwait(false);
+                case "stop":
+                    return await StopBrokerAsync().ConfigureAwait(false);
+                case "studio":
+                    return await StartStudioAsync().ConfigureAwait(false);
+                default:
+                    return Parser.DefaultExitCodeFail;
+            }
+#else
             return await Parser.Default
                 .ParseArguments<BrokerCliOptions, StartCliOptions, LaunchCliOptions, StopCliOptions, StudioCliOptions>(args)
                 .MapResult(
@@ -48,6 +79,7 @@ namespace Plexus.Host
                     (StopCliOptions opts) => StopBrokerAsync(),
                     (StudioCliOptions opts) => StartStudioAsync(),
                     errs => Task.FromResult(1));
+#endif
         }        
 
         private static async Task<int> LoadAndRunProgramAsync(IProgram program)
@@ -151,9 +183,11 @@ namespace Plexus.Host
 
         private static void InitializeProcess()
         {
+#if NETCOREAPP2_2
             // by default, .NET Core doesn't have all code pages needed for Console apps.
             // see the .NET Core Notes in https://msdn.microsoft.com/en-us/library/system.diagnostics.process(v=vs.110).aspx
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
         }
     }
 }

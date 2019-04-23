@@ -2,11 +2,19 @@
 
   <Import Project="../Common.csproj" />
 
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' And '$(CORE_ONLY)' == ''">
+    <TargetFramework>net45</TargetFramework>    
+    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">
+    <TargetFramework>netcore2.2</TargetFramework>    
+  </PropertyGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>plexus</AssemblyName>
-
-    <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>
@@ -24,8 +32,6 @@
     <NuspecFile>$(MSBuildThisFileDirectory)Plexus.Interop.Broker.Redist.nuspec</NuspecFile>    
   </PropertyGroup>
   
-  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish" />
-  
   <ItemGroup>
     <None Remove="GenBrokerMetadata.cmd" />
     <None Remove="LaunchBroker.cmd" />
@@ -40,12 +46,16 @@
     <Content Include="plexus.cmd" />
   </ItemGroup>
   
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
     <PackageReference Include="CommandLineParser" Version="2.4.3" />
     <PackageReference Include="System.Console" Version="4.3.1" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
     <PackageReference Include="System.IO.Pipes" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <PackageReference Include="CommandLineParser" Version="1.9.71" />
   </ItemGroup>
   
   <ItemGroup>

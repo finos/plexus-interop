@@ -97,7 +97,6 @@ task prepareDotnet {
 task compile(type:Exec) {
     dependsOn 'license' 
     dependsOn prepareDotnet
-    dependsOn ':web:npmBuildOnly'
     
     workingDir projectDir
     environment "PLEXUS_BUILD_DOTNET_PARAMS", dotnetParams

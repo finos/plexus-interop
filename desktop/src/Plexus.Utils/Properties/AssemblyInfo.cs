@@ -29,6 +29,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.Testing")]
 [assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.WebSockets.Client")]
 [assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.WebSockets.Server")]
+[assembly: InternalsVisibleTo("Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck")]
 [assembly: InternalsVisibleTo("Plexus.Interop.Transport.Utils")]
 [assembly: InternalsVisibleTo("Plexus.Interop.Protobuf")]
 [assembly: InternalsVisibleTo("Plexus.Interop.Protocol")]

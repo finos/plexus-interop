@@ -16,6 +16,7 @@
  */
 namespace Plexus.Interop.Transport.Transmission
 {
+    using System;
     using Plexus.Channels;
     using Plexus.Pools;
     using Shouldly;
@@ -155,10 +156,14 @@ namespace Plexus.Interop.Transport.Transmission
                         WriteLog("Client connected");                        
                         using (var serverConection = await serverConnectionTask)
                         {
+                            WriteLog("Server connected");
                             await serverConection.Out.WriteAsync(PooledBuffer.Get(testMsg));
+                            WriteLog("Message written on server side");
                             receivedMsg = await clientConnection.In.ReadAsync();
-                            WriteLog("Disposing connections");
+                            WriteLog("Message received on client side");
+                            WriteLog("Disposing server connection");
                         }
+                        WriteLog("Disposing client connection");
                     }
                     WriteLog("Disposing server");
                 }
@@ -219,8 +224,10 @@ namespace Plexus.Interop.Transport.Transmission
 
             var serverTask = TaskRunner.RunInBackground(async () =>
             {
+                WriteLog($"Starting server");
                 var server = RegisterDisposable(CreateServer());
                 await server.StartAsync().ConfigureAwaitWithTimeout(Timeout5Sec);
+                WriteLog($"Server started");
                 using (var serverConnection = RegisterDisposable(await server.In.ReadAsync().ConfigureAwait(false)))
                 {
                     var receiveTask = TaskRunner.RunInBackground(async () =>
@@ -261,9 +268,10 @@ namespace Plexus.Interop.Transport.Transmission
             var clientTask = TaskRunner.RunInBackground(async () =>
             {
                 var clientFactory = CreateClient();
-                Log.Trace("Connecting client");
+                WriteLog("Connecting client");
                 using (var connection = RegisterDisposable(await clientFactory.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false)))
                 {
+                    WriteLog($"Client connected");
                     var receiveTask = TaskRunner.RunInBackground(async () =>
                     {
                         while (true)
@@ -271,12 +279,12 @@ namespace Plexus.Interop.Transport.Transmission
                             var msg = await connection.In.TryReadAsync().ConfigureAwait(false);
                             if (msg.HasValue)
                             {
-                                Log.Trace("Client received message of length {0}", msg.Value.Count);
+                                WriteLog($"Client received message of length {msg.Value.Count}");
                                 clientReceived.Add(msg.Value.ToArray());
                             }
                             else
                             {
-                                Log.Trace("Client receive completed");
+                                WriteLog("Client receive completed");
                                 break;
                             }
                         }
@@ -286,20 +294,22 @@ namespace Plexus.Interop.Transport.Transmission
                     {
                         foreach (var msg in clientMessages)
                         {
-                            Log.Trace("Client sending message of length {0}", msg.Length);
+                            WriteLog($"Client sending message of length {msg.Length}");
                             await connection.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
                         }
                         connection.Out.TryComplete();
-                        Log.Trace("Client send completed");
+                        WriteLog("Client send completed");
                     });
 
                     await Task.WhenAll(sendTask, receiveTask, connection.Completion).ConfigureAwait(false);
-                    Log.Trace("Client completed");
+
+                    WriteLog("Client completed");
                 }
             });
 
-            Should.CompleteIn(Task.WhenAny(serverTask, clientTask).Unwrap(), TimeoutConstants.Timeout10Sec);
+            Should.CompleteIn(Task.WhenAny(serverTask, clientTask).Unwrap(), TimeoutConstants.Timeout10Sec);            
             Should.CompleteIn(Task.WhenAll(serverTask, clientTask), TimeoutConstants.Timeout10Sec);
+            WriteLog("All completed");
 
             serverRecevied.Count.ShouldBe(clientMessages.Length);
             clientReceived.Count.ShouldBe(serverMessages.Length);

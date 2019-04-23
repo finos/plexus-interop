@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Common.csproj" />
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
+    <AssemblyName>Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck</AssemblyName>
+    <RootNamespace>Plexus.Interop.Transport.Transmission.WebSockets.Server</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fleck" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Contracts\Plexus.Interop.Transport.Transmission.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Utils\Plexus.Interop.Transport.Utils.csproj" />
+    <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
+  </ItemGroup>
+
+</Project>
