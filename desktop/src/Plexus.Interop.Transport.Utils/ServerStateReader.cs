@@ -46,12 +46,15 @@ namespace Plexus.Interop.Transport
         {
             Log.Debug("Waiting initialization {0}", _eventName);
             using (var waitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, _eventName))
+            using (var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
-                var waitHandleTimeout = WaitHandleTimeout(waitHandle, timeout, cancellationToken);
-                var pollFileTimeout = PollFileTimeout(timeout, cancellationToken);
+                var waitHandleTimeout = WaitHandleTimeout(waitHandle, timeout, cancellation.Token);
+                var pollFileTimeout = PollFileTimeout(timeout, cancellation.Token);
                 var firstCompleted = await Task.WhenAny(waitHandleTimeout, pollFileTimeout).ConfigureAwait(false);
                 if (firstCompleted.GetResult())
                 {
+                    cancellation.Cancel();
+                    await Task.WhenAll(waitHandleTimeout.IgnoreExceptions(), pollFileTimeout.IgnoreExceptions());
                     return true;
                 }
                 var allCompleted = await Task.WhenAll(waitHandleTimeout, pollFileTimeout).ConfigureAwait(false);
