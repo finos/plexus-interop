@@ -96,8 +96,9 @@ namespace Plexus.Interop.Transport.Transmission
                 var timeoutMs = 40 * i;
                 WriteLog($"Testing cancel after {timeoutMs}ms");
                 var client = CreateClient();
-                using (var cancellation = new CancellationTokenSource(timeoutMs))
+                using (var cancellation = new CancellationTokenSource())
                 {
+                    cancellation.CancelAfter(timeoutMs);
                     client.ConnectAsync(BrokerWorkingDir, cancellation.Token)
                         .AsTask()
                         .IgnoreCancellation(cancellation.Token)
