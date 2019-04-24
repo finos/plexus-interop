@@ -17,23 +17,29 @@
 namespace Plexus.Interop.Transport
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
     public sealed class ServerStateReader : IServerStateReader
     {
+        private const string ReadyMarker = "ready";
+        private static readonly TimeSpan PollPeriod = TimeoutConstants.Timeout250Ms;        
         private static readonly ILogger Log = LogManager.GetLogger<ServerStateReader>();
 
         private readonly string _eventName;
         private readonly string _settingsDir;
+        private readonly string _lockFilePath;
 
         public ServerStateReader(string serverName, string brokerWorkingDir)
         {
             brokerWorkingDir = Path.GetFullPath(brokerWorkingDir ?? Directory.GetCurrentDirectory());
             _eventName = ServerStateUtils.GetServerIntiializationEventName(serverName, brokerWorkingDir);
             _settingsDir = ServerStateUtils.GetServerSettingsDirectory(serverName, brokerWorkingDir);
+            _lockFilePath = Path.Combine(_settingsDir, "lock");
         }
 
         public async Task<bool> WaitInitializationAsync(TimeSpan timeout, CancellationToken cancellationToken)
@@ -41,7 +47,16 @@ namespace Plexus.Interop.Transport
             Log.Debug("Waiting initialization {0}", _eventName);
             using (var waitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, _eventName))
             {
-                return await FromWaitHandle(waitHandle, timeout, cancellationToken).ConfigureAwait(false);
+                var waitHandleTimeout = WaitHandleTimeout(waitHandle, timeout, cancellationToken);
+                var pollFileTimeout = PollFileTimeout(timeout, cancellationToken);
+                var firstCompleted = await Task.WhenAny(waitHandleTimeout, pollFileTimeout).ConfigureAwait(false);
+                if (firstCompleted.GetResult())
+                {
+                    return true;
+                }
+                var allCompleted = await Task.WhenAll(waitHandleTimeout, pollFileTimeout).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
+                return allCompleted.Any(x => x);
             }
         }
 
@@ -56,7 +71,58 @@ namespace Plexus.Interop.Transport
             return File.Exists(file) ? File.ReadAllText(file, Encoding.UTF8) : null;
         }
 
-        private static async Task<bool> FromWaitHandle(WaitHandle handle, TimeSpan timeout, CancellationToken cancellationToken)
+        private async Task<bool> PollFileTimeout(TimeSpan timeout, CancellationToken cancellationToken)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            while (!IsFileLocked(_lockFilePath) && stopwatch.Elapsed <= timeout)
+            {
+                await Task.Delay(PollPeriod, cancellationToken);
+            }
+            while (!string.Equals(ReadyMarker, TryReadFromFile(_lockFilePath), StringComparison.InvariantCultureIgnoreCase) && stopwatch.Elapsed <= timeout)
+            {
+                await Task.Delay(PollPeriod, cancellationToken);
+            }
+            return stopwatch.Elapsed <= timeout;
+        }
+
+        private static string TryReadFromFile(string path)
+        {
+            try
+            {
+                using (var reader =
+                    new StreamReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+                        Encoding.UTF8))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static bool IsFileLocked(string path)
+        {
+            try
+            {
+                using (File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                {
+                }
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+            catch
+            {
+                // file does not exist yet or cannot be open by some other reason
+            }
+            return false;
+        }
+
+        private static async Task<bool> WaitHandleTimeout(WaitHandle handle, TimeSpan timeout, CancellationToken cancellationToken)
         {
             var alreadySignaled = handle.WaitOne(0);
             if (alreadySignaled)

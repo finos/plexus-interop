@@ -22,18 +22,26 @@
 
     public sealed class ServerStateWriter : IServerStateWriter
     {
+        private static readonly byte[] ReadyBytes = Encoding.UTF8.GetBytes("ready");
+
         private static readonly ILogger Log = LogManager.GetLogger<ServerStateWriter>();
 
         private int _disposed;
         private readonly DirectoryInfo _settingsDir;
         private readonly EventWaitHandle _waitHandle;
         private readonly string _eventName;
+        private readonly FileStream _lockFileStream;
 
         public ServerStateWriter(string serverName, string workingDir = null)
         {
             workingDir = Path.GetFullPath(workingDir ?? Directory.GetCurrentDirectory());
             _eventName = ServerStateUtils.GetServerIntiializationEventName(serverName, workingDir);
             _settingsDir = new DirectoryInfo(ServerStateUtils.GetServerSettingsDirectory(serverName, workingDir));
+            var lockFilePath = Path.Combine(_settingsDir.FullName, "lock");
+            _settingsDir.Create();
+            _lockFileStream = File.Open(lockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+            _lockFileStream.SetLength(0);            
+            _lockFileStream.Flush(true);
             _waitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, _eventName);
             _waitHandle.Reset();
             Cleanup();
@@ -43,13 +51,23 @@
         {
             Log.Debug("Signalling initialization {0}", _eventName);
             _waitHandle.Set();
+            _lockFileStream.Write(ReadyBytes, 0, ReadyBytes.Length);
+            _lockFileStream.Flush(true);
         }
 
         public void Write(string key, string value)
         {
             _settingsDir.Create();
             var filePath = Path.Combine(_settingsDir.FullName, key);
-            File.WriteAllText(filePath, value, Encoding.UTF8);
+            using (var fileStream =
+                new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+            {
+                var bytes = Encoding.UTF8.GetBytes(value);
+                fileStream.SetLength(0);
+                fileStream.Write(bytes, 0, bytes.Length);
+                fileStream.Flush();
+                fileStream.Close();
+            }
         }
 
         public void Dispose()
@@ -60,6 +78,7 @@
             }
             _waitHandle.Reset();
             _waitHandle.Dispose();
+            _lockFileStream.Dispose();
             Cleanup();
         }
 
