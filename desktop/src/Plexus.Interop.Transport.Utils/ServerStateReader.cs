@@ -79,11 +79,16 @@ namespace Plexus.Interop.Transport
             {
                 await Task.Delay(PollPeriod, cancellationToken);
             }
-            while (IsFileLocked(_lockFilePath) && stopwatch.Elapsed <= timeout && !string.Equals(ReadyMarker, TryReadFromFile(_lockFilePath), StringComparison.InvariantCultureIgnoreCase))
+            while (IsFileLocked(_lockFilePath) && stopwatch.Elapsed <= timeout && !IsReadyMarkerSet(_lockFilePath))
             {
                 await Task.Delay(PollPeriod, cancellationToken);
             }
-            return stopwatch.Elapsed <= timeout;
+            return IsReadyMarkerSet(_lockFilePath) && stopwatch.Elapsed <= timeout;
+        }
+
+        private static bool IsReadyMarkerSet(string path)
+        {
+            return string.Equals(ReadyMarker, TryReadFromFile(path), StringComparison.InvariantCultureIgnoreCase);
         }
 
         private static string TryReadFromFile(string path)
