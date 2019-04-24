@@ -79,7 +79,7 @@ namespace Plexus.Interop.Transport
             {
                 await Task.Delay(PollPeriod, cancellationToken);
             }
-            while (!string.Equals(ReadyMarker, TryReadFromFile(_lockFilePath), StringComparison.InvariantCultureIgnoreCase) && stopwatch.Elapsed <= timeout)
+            while (IsFileLocked(_lockFilePath) && stopwatch.Elapsed <= timeout && !string.Equals(ReadyMarker, TryReadFromFile(_lockFilePath), StringComparison.InvariantCultureIgnoreCase))
             {
                 await Task.Delay(PollPeriod, cancellationToken);
             }
@@ -133,6 +133,8 @@ namespace Plexus.Interop.Transport
             {
                 return false;
             }
+
+            var result = false;
             var tcs = new TaskCompletionSource<bool>();
             using (cancellationToken.Register(() => tcs.TrySetCanceled(), false))
             {
@@ -144,13 +146,14 @@ namespace Plexus.Interop.Transport
                     true);
                 try
                 {
-                    return await tcs.Task.ConfigureAwait(false);
+                    result = await tcs.Task.ConfigureAwait(false);
                 }
                 finally
                 {
                     threadPoolRegistration.Unregister(handle);
                 }
             }
+            return result;
         }
     }
 }
