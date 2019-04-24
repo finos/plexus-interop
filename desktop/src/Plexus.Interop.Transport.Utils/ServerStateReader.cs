@@ -127,38 +127,25 @@ namespace Plexus.Interop.Transport
             return false;
         }
 
-        private static async Task<bool> WaitHandleTimeout(WaitHandle handle, TimeSpan timeout, CancellationToken cancellationToken)
+        private static Task<bool> WaitHandleTimeout(WaitHandle handle, TimeSpan timeout, CancellationToken cancellationToken)
         {
-            var alreadySignaled = handle.WaitOne(0);
-            if (alreadySignaled)
+            return TaskRunner.RunInBackground(() =>
             {
-                return true;
-            }
-            if (timeout == TimeSpan.Zero)
-            {
-                return false;
-            }
+                var alreadySignaled = handle.WaitOne(0);
+                if (alreadySignaled)
+                {
+                    return true;
+                }
 
-            var result = false;
-            var tcs = new TaskCompletionSource<bool>();
-            using (cancellationToken.Register(() => tcs.TrySetCanceled(), false))
-            {
-                var threadPoolRegistration = ThreadPool.RegisterWaitForSingleObject(
-                    handle,
-                    (state, timedOut) => ((TaskCompletionSource<bool>) state).TrySetResult(!timedOut),
-                    tcs,
-                    timeout,
-                    true);
-                try
+                if (timeout == TimeSpan.Zero)
                 {
-                    result = await tcs.Task.ConfigureAwait(false);
+                    return false;
                 }
-                finally
-                {
-                    threadPoolRegistration.Unregister(handle);
-                }
-            }
-            return result;
+
+                var completedIndex = WaitHandle.WaitAny(new[] {handle, cancellationToken.WaitHandle}, timeout);
+                cancellationToken.ThrowIfCancellationRequested();
+                return completedIndex == 0;
+            }, cancellationToken);
         }
     }
 }
