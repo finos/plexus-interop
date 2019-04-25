@@ -7,7 +7,7 @@ plugins {
 
 def dotnetSdkVersion = "2.2"
 def buildCache = System.getenv("PLEXUS_BUILD_CACHE_DIR") ?: new File("${rootDir}/build").absolutePath
-def fullDotNetBuild = System.env['PLEXUS_BUILD_FULL_DOTNET'] == 'true' && Os.isFamily(Os.FAMILY_WINDOWS)
+def fullDotNetBuild = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['PLEXUS_BUILD_FULL_DOTNET'] != 'false'
 def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] != 'true'
 def nugetVersion = System.getenv("PLEXUS_BUILD_NUGET_VERSION") ?: System.getenv("APPVEYOR_REPO_TAG_NAME")
 def dotnetParams = nugetVersion == null ? " " : "/p:Version=$nugetVersion"

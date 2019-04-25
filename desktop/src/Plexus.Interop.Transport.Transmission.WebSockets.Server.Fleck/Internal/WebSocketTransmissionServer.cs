@@ -47,16 +47,16 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             FleckLog.Level = LogLevel.Debug;
             FleckLog.LogAction = (lvl, msg, exc) =>
             {
-                Log.Trace(exc, msg);
+                Log.Debug(exc, msg);
             };
             using (_stateWriter)
             using (_server = CreateWebSocketServerWithRetry(_options.Port))
             {
-                var address = "ws://" + _server.ListenerSocket.LocalEndPoint;
-                Log.Trace("WebSocket server started on {0}", address);
+                var address = "ws://" + _server.ListenerSocket.LocalEndPoint;                
                 _stateWriter.Write("address", address);
                 _stateWriter.SignalInitialized();
                 SetStartCompleted();
+                Log.Info("WebSocket server started on {0}", address);
                 await CancellationToken.ToAwaitable().AsTask().IgnoreAnyCancellation().ConfigureAwait(false);
             }
             return TaskConstants.Completed;
@@ -104,15 +104,16 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         private void OnSocketConnection(IWebSocketConnection websocket)
         {
-            Log.Trace("Handling websocket connection {0}: path={1}", websocket.ConnectionInfo.Id, websocket.ConnectionInfo.Path);
+            Log.Debug("Handling websocket connection {0}: path={1}", websocket.ConnectionInfo.Id, websocket.ConnectionInfo.Path);
             var urlPath = websocket.ConnectionInfo.Path.TrimEnd('/');
             if (string.IsNullOrEmpty(urlPath))
             {
-                TaskRunner.RunInBackground(AcceptWebSocketConnectionAsync, websocket).IgnoreAwait();
+                var connection = new WebSocketServerTransmissionConnection(websocket);
+                TaskRunner.RunInBackground(AcceptWebSocketConnectionAsync, connection).IgnoreAwait(Log);
             }
             else
             {
-                TaskRunner.RunInBackground(() => ReadFileAsync(websocket, urlPath)).IgnoreAwait();
+                TaskRunner.RunInBackground(() => ReadFileAsync(websocket, urlPath)).IgnoreAwait(Log);
             }
         }
 
@@ -120,42 +121,43 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         {
             try
             {
-                if (_options.StaticFileMappings.TryGetValue(urlPath, out var physicalPath))
+                if (_options.StaticFileMappings.TryGetValue(urlPath, out var physicalPath) && File.Exists(physicalPath))
                 {
-                    if (File.Exists(physicalPath))
+                    using (var stream = File.Open(physicalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (var streamReader = new StreamReader(stream))
                     {
-                        using (var stream = File.Open(physicalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                        using (var streamReader = new StreamReader(stream))
-                        {
-                            await webSocket.Send(await streamReader.ReadToEndAsync()).ConfigureAwait(false);
-                        }
+                        await webSocket.Send(await streamReader.ReadToEndAsync()).ConfigureAwait(false);
                     }
                 }
+                else
+                {
+                    webSocket.Close();
+                }
             }
-            finally
+            catch (Exception ex)
             {
+                Log.Warn(ex, "Exception while serving static file via websocket");
                 webSocket.Close();
             }
         }
 
         private async Task AcceptWebSocketConnectionAsync(object arg)
         {
-            var websocket = (IWebSocketConnection) arg;
-            var connection = new WebSocketServerTransmissionConnection(websocket);
+            var connection = (WebSocketServerTransmissionConnection) arg;
             try
             {                
                 connection.Start();
                 using (CancellationToken.Register(connection.Stop))
                 {
                     await _buffer.Out.WriteAsync(connection, CancellationToken).ConfigureAwait(false);
-                    Log.Trace("Websocket connection {0} accepted", websocket.ConnectionInfo.Id);
+                    Log.Debug("Websocket connection {0} accepted", connection.Id);
                     await connection.Completion.ConfigureAwait(false);
-                    Log.Trace("Websocket connection {0} completed", websocket.ConnectionInfo.Id);
+                    Log.Debug("Websocket connection {0} completed", connection.Id);
                 }
             }
             catch (Exception ex)
             {                
-                Log.Error(ex, "Websocket connection {0} completed with exception", websocket.ConnectionInfo.Id);
+                Log.Warn(ex, "Websocket connection {0} completed with exception", connection.Id);
                 connection.Stop();
             }
         }        
