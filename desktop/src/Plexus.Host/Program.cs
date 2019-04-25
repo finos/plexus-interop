@@ -187,6 +187,10 @@ namespace Plexus.Host
             // by default, .NET Core doesn't have all code pages needed for Console apps.
             // see the .NET Core Notes in https://msdn.microsoft.com/en-us/library/system.diagnostics.process(v=vs.110).aspx
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#else
+            // For .NET 4.5 increasing min threads count
+            ThreadPool.GetMaxThreads(out var minWorkerThreads, out var minCompletionPortThreads);
+            ThreadPool.SetMinThreads(minWorkerThreads, minCompletionPortThreads);
 #endif
         }
     }

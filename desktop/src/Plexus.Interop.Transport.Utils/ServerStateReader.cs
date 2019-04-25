@@ -46,12 +46,15 @@ namespace Plexus.Interop.Transport
         {
             Log.Debug("Waiting initialization {0}", _eventName);
             using (var waitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, _eventName))
+            using (var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
-                var waitHandleTimeout = WaitHandleTimeout(waitHandle, timeout, cancellationToken);
-                var pollFileTimeout = PollFileTimeout(timeout, cancellationToken);
+                var waitHandleTimeout = WaitHandleTimeout(waitHandle, timeout, cancellation.Token);
+                var pollFileTimeout = PollFileTimeout(timeout, cancellation.Token);
                 var firstCompleted = await Task.WhenAny(waitHandleTimeout, pollFileTimeout).ConfigureAwait(false);
                 if (firstCompleted.GetResult())
                 {
+                    cancellation.Cancel();
+                    await Task.WhenAll(waitHandleTimeout.IgnoreExceptions(), pollFileTimeout.IgnoreExceptions());
                     return true;
                 }
                 var allCompleted = await Task.WhenAll(waitHandleTimeout, pollFileTimeout).ConfigureAwait(false);
@@ -127,38 +130,25 @@ namespace Plexus.Interop.Transport
             return false;
         }
 
-        private static async Task<bool> WaitHandleTimeout(WaitHandle handle, TimeSpan timeout, CancellationToken cancellationToken)
+        private static Task<bool> WaitHandleTimeout(WaitHandle handle, TimeSpan timeout, CancellationToken cancellationToken)
         {
-            var alreadySignaled = handle.WaitOne(0);
-            if (alreadySignaled)
+            return TaskRunner.RunInBackground(() =>
             {
-                return true;
-            }
-            if (timeout == TimeSpan.Zero)
-            {
-                return false;
-            }
+                var alreadySignaled = handle.WaitOne(0);
+                if (alreadySignaled)
+                {
+                    return true;
+                }
 
-            var result = false;
-            var tcs = new TaskCompletionSource<bool>();
-            using (cancellationToken.Register(() => tcs.TrySetCanceled(), false))
-            {
-                var threadPoolRegistration = ThreadPool.RegisterWaitForSingleObject(
-                    handle,
-                    (state, timedOut) => ((TaskCompletionSource<bool>) state).TrySetResult(!timedOut),
-                    tcs,
-                    timeout,
-                    true);
-                try
+                if (timeout == TimeSpan.Zero)
                 {
-                    result = await tcs.Task.ConfigureAwait(false);
+                    return false;
                 }
-                finally
-                {
-                    threadPoolRegistration.Unregister(handle);
-                }
-            }
-            return result;
+
+                var completedIndex = WaitHandle.WaitAny(new[] {handle, cancellationToken.WaitHandle}, timeout);
+                cancellationToken.ThrowIfCancellationRequested();
+                return completedIndex == 0;
+            }, cancellationToken);
         }
     }
 }

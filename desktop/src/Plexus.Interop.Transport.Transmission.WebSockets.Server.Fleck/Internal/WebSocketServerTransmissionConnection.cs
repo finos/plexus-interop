@@ -16,13 +16,13 @@
  */
 namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
     using global::Fleck;
     using Plexus.Channels;
     using Plexus.Pools;
     using Plexus.Processes;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     internal sealed class WebSocketServerTransmissionConnection : ProcessBase, ITransmissionConnection
     {
@@ -40,12 +40,13 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             _log = LogManager.GetLogger<WebSocketServerTransmissionConnection>(Id.ToString());
             _webSocket = websocket;
             _disconnectCompletion.Task.PropagateCompletionToPromise(_connectCompletion);
-            _webSocket.OnOpen += OnOpened;
-            _webSocket.OnClose += OnClosed;
-            _webSocket.OnError += OnError;
 
             _reader = new WebSocketServerTransmissionReader(Id, _webSocket, CancellationToken);
             _writer = new WebSocketServerTransmissionWriter(Id, _webSocket, CancellationToken);
+
+            _webSocket.OnOpen += OnOpened;
+            _webSocket.OnClose += OnClosed;
+            _webSocket.OnError += OnError;
 
             Completion.LogCompletion(_log);
 
@@ -54,7 +55,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         private void OnError(Exception e)
         {
-            _log.Trace("OnError: {0}", e.FormatTypeAndMessage());
+            _log.Warn("OnError: {0}", e.FormatTypeAndMessage());
             _reader.OnError(e);
             Stop();
             _disconnectCompletion.TryFail(e);
@@ -62,7 +63,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         private void OnClosed()
         {
-            _log.Trace("OnClosed");
+            _log.Debug("OnClosed");
             _reader.OnClose();
             Stop();
             _disconnectCompletion.TryComplete();
@@ -70,7 +71,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         private void OnOpened()
         {
-            _log.Trace("OnOpened");
+            _log.Debug("OnOpened");
             _connectCompletion.TryComplete();
         }
 
@@ -99,18 +100,18 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         public Task DisconnectAsync() => StopAsync();
 
-        protected override async Task<Task> StartCoreAsync()
+        protected override Task<Task> StartCoreAsync()
         {
             try
             {
                 if (CancellationToken.IsCancellationRequested)
                 {
                     _webSocket.Close();
-                    return TaskConstants.Completed;
+                    return Task.FromResult(TaskConstants.Completed);
                 }                
                 _writer.Start();
                 _log.Trace("Connected");
-                return ProcessAsync();
+                return Task.FromResult(ProcessAsync());
             }
             catch
             {
