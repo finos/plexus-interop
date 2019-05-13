@@ -27,8 +27,8 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
     {        
         private const string ServerName = "np-v1";
 
-        private static readonly TimeSpan ConnectTimeoutMs = TimeoutConstants.Timeout10Sec;
-        private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout30Sec;
+        private static readonly TimeSpan ConnectTimeoutMs = TimeoutConstants.Timeout20Sec;
+        private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout1Min;
         private static readonly ILogger Log = LogManager.GetLogger<PipeTransmissionClient>();
 
         public async ValueTask<ITransmissionConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken)
@@ -40,21 +40,28 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
             return connection;
         }
 
-        private async ValueTask<Stream> ConnectStreamAsync(string brokerWorkingDir, CancellationToken cancellationToken)
+        private static async ValueTask<Stream> ConnectStreamAsync(string brokerWorkingDir, CancellationToken cancellationToken)
         {
-            var serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
-            if (!await serverStateReader
-                .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
-                .ConfigureAwait(false))
+            var pipeName = EnvironmentHelper.GetPipeAddress();
+            if (string.IsNullOrEmpty(pipeName))
             {
-                throw new TimeoutException(
-                    $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+                var serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
+                if (!await serverStateReader
+                    .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
+                    .ConfigureAwait(false))
+                {
+                    throw new TimeoutException(
+                        $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+                }
+
+                pipeName = serverStateReader.ReadSetting("address");
             }
-            var pipeName = serverStateReader.ReadSetting("address");
+
             if (string.IsNullOrEmpty(pipeName))
             {
                 throw new InvalidOperationException("Cannot find pipe name to connect");
             }
+
             Log.Trace("Connecting to pipe");
             var pipeClientStream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
             try

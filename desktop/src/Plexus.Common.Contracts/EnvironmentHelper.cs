@@ -24,6 +24,8 @@
         public const string AppInstanceIdVarName = "PLEXUS_APP_INSTANCE_ID";
         public const string ParentProcessIdVarName = "PLEXUS_PARENT_PROCESS_ID";
         public const string PlexusTimeoutMultiplier = "PLEXUS_TIMEOUT_MULTIPLIER";
+        public const string PlexusBrokerWebSocketAddress = "PLEXUS_BROKER_WEBSOCKET_ADDRESS";
+        public const string PlexusBrokerPipeAddress = "PLEXUS_BROKER_PIPE_ADDRESS";
 
         public static string GetBrokerWorkingDir()
         {
@@ -51,6 +53,16 @@
             return double.TryParse(Environment.GetEnvironmentVariable(PlexusTimeoutMultiplier), out var multiplier)
                 ? multiplier
                 : 1;
+        }
+
+        public static string GetWebSocketAddress()
+        {
+            return Environment.GetEnvironmentVariable(PlexusBrokerWebSocketAddress);
+        }
+
+        public static string GetPipeAddress()
+        {
+            return Environment.GetEnvironmentVariable(PlexusBrokerPipeAddress);
         }
     }
 }

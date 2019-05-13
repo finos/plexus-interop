@@ -25,29 +25,37 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
     {
         private const string ServerName = "ws-v1";
 
-        private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout30Sec;
+        private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout1Min;
 
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
 
         public async ValueTask<ITransmissionConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken = default)
         {
-            var serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
-            if (!await serverStateReader
-                .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
-                .ConfigureAwait(false))
+            var webSocketAddress = EnvironmentHelper.GetWebSocketAddress();
+            if (string.IsNullOrEmpty(webSocketAddress))
             {
-                throw new TimeoutException(
-                    $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+                Log.Trace("Waiting initialization of server {0}", ServerName);
+                var serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
+                if (!await serverStateReader
+                    .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
+                    .ConfigureAwait(false))
+                {
+                    throw new TimeoutException(
+                        $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+                }
+
+                webSocketAddress = serverStateReader.ReadSetting("address");
             }
-            var url = serverStateReader.ReadSetting("address");
-            if (string.IsNullOrEmpty(url))
+
+            if (string.IsNullOrEmpty(webSocketAddress))
             {
                 throw new InvalidOperationException("Cannot find url to connect");
             }
-            Log.Trace("Creating new connection to url {0}", url);
-            var connection = new WebSocketClientTransmissionConnection(url);
+
+            Log.Trace("Creating new connection to url {0}", webSocketAddress);
+            var connection = new WebSocketClientTransmissionConnection(webSocketAddress);
             await connection.ConnectAsync(cancellationToken).ConfigureAwait(false);
-            Log.Trace("Created new connection {0} to url {1}", connection.Id, url);
+            Log.Trace("Created new connection {0} to url {1}", connection.Id, webSocketAddress);
             return connection;
         }
     }
