@@ -138,7 +138,12 @@ After successful build documentation is available via:
 
 ## Contributing
 
-Please refer to [Contribution guidelines for this project](CONTRIBUTING.md).
+1. Fork it (<https://github.com/finos-plexus/plexus-interop/fork>)
+2. Create your feature branch (`git checkout -b feature/fooBar`)
+3. Read our [contribution guidelines](.github/CONTRIBUTING.md) and [Community Code of Conduct](https://www.finos.org/code-of-conduct)
+4. Commit your changes (`git commit -am 'Add some fooBar'`)
+5. Push to the branch (`git push origin feature/fooBar`)
+6. Create a new Pull Request
 
 ## Troubleshooting
 
@@ -157,3 +162,8 @@ As described above, public documentation is served using [GitHub Pages](https://
 * Copy documentation sources - `plexus-interop/docs` to `plexus-interop-docs/docs`
 * Copy generated documentation - `plexus-interop/bin/html5` to `plexus-interop-docs` (project root)
 * Go to `plexus-interop-docs`, push the changes and raise PR against `gh-pages` branch
+
+## License
+The code in this repository is distributed under the Apache License, Version 2.0.
+
+Copyright 2017-2019 Plexus Interop Deutsche Bank AG
