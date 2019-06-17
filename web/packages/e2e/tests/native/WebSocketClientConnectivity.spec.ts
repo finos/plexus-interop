@@ -74,7 +74,7 @@ describe('Web Socket Client connectivity', () => {
     });
 
     it('Failed to connect if Web Socket server is not available', function (done) {
-        this.timeout(3000);        
+        this.timeout(10000);    
         new EchoClientClientBuilder()
             .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket('ws://127.0.0.1:11111')).connect())
             .connect()
