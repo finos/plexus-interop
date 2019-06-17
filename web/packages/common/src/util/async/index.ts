@@ -19,3 +19,4 @@ export * from './ReadOnlyCancellationToken';
 export * from './ReadWriteCancellationToken';
 export * from './AsyncHelper';
 export * from './SequencedExecutor';
+export * from './promises';

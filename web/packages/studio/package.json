@@ -10,6 +10,7 @@
     "test": "jest",
     "lint": "echo 'Not implemented'",
     "copy-to-bin": "copyfiles dist/* ../../../bin/win-x86/broker/studio -u 1",
+    "clear-jest": "jest --clearCache",
     "e2e": "ng e2e",
     "republish": "echo 'Not implemented'"
   },
@@ -59,7 +60,7 @@
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",
     "jest": "23.5.0",
-    "jest-preset-angular": "^5.2.3",
+    "jest-preset-angular": "^6.0.0",
     "karma": "~1.7.0",
     "karma-chrome-launcher": "~2.1.1",
     "karma-cli": "~1.0.1",

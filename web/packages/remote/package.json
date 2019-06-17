@@ -23,7 +23,7 @@
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {
-    "@types/jest": "^18.1.1",
+    "@types/jest": "^23.0.0",
     "@types/jstorage": "^0.3.30",
     "@types/superagent": "^3.5.6",
     "jasmine-reporters": "^2.2.0",
