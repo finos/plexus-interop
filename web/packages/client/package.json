@@ -12,16 +12,10 @@
     "build:main": "tsc -p tsconfig.json",
     "watch": "tsc -w",
     "lint": "tslint src/**/*.ts",
-    "unit": "jest --coverage --forceExit",
-    "test": "yarn unit",
+    "test": "jest --coverage --detectOpenHandles",
     "gen-client-js": "pbjs --force-long -t static-module -r client -w commonjs -o src/gen/internal-client-protocol.js ../../../protocol/Plexus.Interop.proto",
     "gen-client-ts": "pbts --force-long -o src/gen/internal-client-protocol.d.ts src/gen/internal-client-protocol.js",
-    "gen-client-protocol": "npm run gen-client-js && npm run gen-client-ts",
-    "unpublish": "npm unpublish @plexus-interop/client@0.1.2",
-    "postunpublish": "echo 'Unpublished'",
-    "prerepublish": "echo 'Republishing started...'",
-    "republish": "npm run unpublish && npm publish",
-    "postrepublish": "echo 'Package republished successfully!'"
+    "gen-client-protocol": "npm run gen-client-js && npm run gen-client-ts"
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",

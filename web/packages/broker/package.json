@@ -7,14 +7,12 @@
   "scripts": {
     "prebuild": "yarn lint && trash dist",
     "build": "yarn build:main && yarn build:host",
-    "postbuild": "yarn test",
     "build:main": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json",
     "build:host": "browserify dist/main/src/api/CrossDomainHostEntryPoint.js -s proxyHost -o dist/main/src/CrossDomainHostBuilder.bundle.js",
     "lint": "tslint src/**/*.ts",
-    "unit": "jest --coverage",
     "pretest": "yarn lint",
-    "test": "yarn unit"
+    "test": "jest --coverage"
   },
   "dependencies": {
     "@plexus-interop/client": "0.1.0",
