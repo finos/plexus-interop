@@ -11,8 +11,7 @@
     "lint": "echo 'Not implemented'",
     "copy-to-bin": "copyfiles dist/* ../../../bin/win-x86/broker/studio -u 1",
     "clear-jest": "jest --clearCache",
-    "e2e": "ng e2e",
-    "republish": "echo 'Not implemented'"
+    "e2e": "ng e2e"
   },
   "dependencies": {
     "@angular/animations": "^5.0.0",
@@ -70,7 +69,8 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "5.8.0",
-    "typescript": "3.3.3"
+    "typescript": "3.3.3",
+    "prr": "1.0.1"
   },
   "jest": {
     "preset": "jest-preset-angular",

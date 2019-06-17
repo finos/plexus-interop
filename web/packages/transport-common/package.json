@@ -12,13 +12,7 @@
     "build:watch": "tsc -w",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
-    "unit": "jest --coverage --runInBand",
-    "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/transport-common@0.1.2",
-    "postunpublish": "echo 'Unpublished'",
-    "prerepublish": "echo 'Republishing started...'",
-    "republish": "npm run unpublish && npm publish",
-    "postrepublish": "echo 'Package republished successfully!'"
+    "test": "jest --coverage --runInBand --detectOpenHandles"
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",
