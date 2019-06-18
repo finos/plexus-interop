@@ -12,7 +12,7 @@
     "build:watch": "tsc -w",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
-    "test": "jest --coverage --runInBand --detectOpenHandles"
+    "test": "jest --coverage --runInBand"
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",
