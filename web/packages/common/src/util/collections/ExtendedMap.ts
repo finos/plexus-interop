@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import 'core-js/es6/map';
 import { ObjectUtils } from '../js/ObjectUtils';
 
 export class ExtendedMap<K, V> extends Map<K, V> {

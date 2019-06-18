@@ -27,7 +27,7 @@
     "protobufjs": "6.8.6"
   },
   "devDependencies": {
-    "@types/jest": "^22.0.0",
+    "@types/jest": "^23.0.0",
     "@types/long": "^3.0.31",
     "@types/node": "^7.0.5",
     "trash-cli": "^1.4.0",

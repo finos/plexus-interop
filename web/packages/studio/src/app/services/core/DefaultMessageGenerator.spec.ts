@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService, Message, InteropRegistry, Service, Application, Enum } from '@plexus-interop/metadata';
+import { Message, InteropRegistry, Service, Application, Enum } from '@plexus-interop/metadata';
 import { ExtendedMap } from '@plexus-interop/common';
 import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 

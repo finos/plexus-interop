@@ -29,9 +29,9 @@ describe('Web Socket Client connectivity', () => {
     const wsUrl = readWsUrl();
 
     const connectivityTests = new ClientConnectivityTests(
-        transportsSetup.createWebSocketTransportProvider(wsUrl), 
+        transportsSetup.createWebSocketTransportProvider(wsUrl),
         clientsSetup);
-    
+
     it('Can receive WS URL from Broker', () => {
         expect(wsUrl).is.not.empty;
     });
@@ -49,7 +49,32 @@ describe('Web Socket Client connectivity', () => {
             });
     });
 
-    it('Failed to connect if Web Socket server is not available', done => {
+    it('Connects when second connect is successfull', done => {
+        const wsUrl = readWsUrl();
+        const provider = transportsSetup.createWebSocketTransportProvider(wsUrl);
+        let count = 0;
+        const failAndSuccessProvider = () => {
+            if (count === 0) {
+                count++;
+                return Promise.reject('Failed');
+            } else {
+                return provider().then(setup => setup.getConnection());
+            }
+        }
+        new EchoClientClientBuilder()
+            .withTransportConnectionProvider(failAndSuccessProvider)
+            .connect()
+            .then(client => {
+                // tslint:disable-next-line: no-unused-expression
+                expect(client).to.not.be.undefined;
+                client.disconnect().then(() => {
+                    done();
+                });
+            });
+    });
+
+    it('Failed to connect if Web Socket server is not available', function (done) {
+        this.timeout(10000);    
         new EchoClientClientBuilder()
             .withTransportConnectionProvider(() => new WebSocketConnectionFactory(new WebSocket('ws://127.0.0.1:11111')).connect())
             .connect()
@@ -60,19 +85,19 @@ describe('Web Socket Client connectivity', () => {
             });
     });
 
-    it('Received error for open invocation on disconnect', function() {
+    it('Received error for open invocation on disconnect', function () {
         return connectivityTests.testInvocationClientReceiveErrorOnClientDisconnect();
     });
 
-    it('Receives error if provide wrong client id to Broker', function() {
+    it('Receives error if provide wrong client id to Broker', function () {
         return connectivityTests.testClientReceiveErrorIfProvideWrongId();
     });
 
-    it('Server receives error if client dropped connection', function() {
+    it('Server receives error if client dropped connection', function () {
         return connectivityTests.testServerReceivesErrorIfClientDroppedConnection();
     });
 
-    it('Client receives error if server dropped connection', function() {
+    it('Client receives error if server dropped connection', function () {
         return connectivityTests.testClientReceivesErrorIfServerDroppedConnection();
     });
 

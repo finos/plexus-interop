@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './util';
-export * from './logger';
-export * from './rx';
-export * from './cache';
-export * from './RetryConfig';
+export interface RetryConfig {
+    retriesNum: number;
+    retryTimeoutInMillis: number;
+    errorHandler?: (e: any) => void;
+}

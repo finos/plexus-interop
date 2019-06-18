@@ -235,7 +235,7 @@ import { TransportConnection, UniqueId } from '@plexus-interop/transport-common'
 import { Arrays, Observer } from '@plexus-interop/common';
 import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from '@plexus-interop/client';
 
-import * as plexus from '«genConfig.getExternalDependencies().get(0)»';
+import * as «genConfig.namespace» from '«genConfig.getExternalDependencies().get(0)»';
     '''
 
     def clientMethodSignature(ConsumedMethod methodLink, PlexusGenConfig genConfig) {

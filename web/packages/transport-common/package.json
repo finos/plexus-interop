@@ -12,13 +12,7 @@
     "build:watch": "tsc -w",
     "build:main": "tsc -p tsconfig.json",
     "lint": "tslint src/**/*.ts",
-    "unit": "jest --coverage --runInBand",
-    "test": "yarn unit",
-    "unpublish": "npm unpublish @plexus-interop/transport-common@0.1.2",
-    "postunpublish": "echo 'Unpublished'",
-    "prerepublish": "echo 'Republishing started...'",
-    "republish": "npm run unpublish && npm publish",
-    "postrepublish": "echo 'Package republished successfully!'"
+    "test": "jest --coverage --runInBand"
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",
@@ -49,7 +43,7 @@
     "glob": "^7.1.2",
     "jasmine-reporters": "^2.2.0",
     "jest": "23.5.0",
-    "jest-cli": "^21.1.0",
+    "jest-cli": "^23.0.0",
     "minimist": "^1.2.0",
     "mocha": "^3.5.0",
     "path": "^0.12.7",

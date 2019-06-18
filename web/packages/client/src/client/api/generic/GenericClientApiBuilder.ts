@@ -20,7 +20,7 @@ import { GenericClientFactory } from '../../generic/GenericClientFactory';
 import { ClientConnectRequest } from '@plexus-interop/client-api';
 import { GenericClientApiImpl } from './GenericClientApiImpl';
 import { GenericInvocationsHost } from './GenericInvocationsHost';
-import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { Logger, LoggerFactory, retriable, defaultPromiseRetryConfig } from '@plexus-interop/common';
 import { InvocationHandlersRegistry } from './handlers/InvocationHandlersRegistry';
 import { BidiStreamingInvocationHandler } from './handlers/streaming/BidiStreamingInvocationHandler';
 import { ServerStreamingInvocationHandler } from './handlers/streaming/ServerStreamingInvocationHandler';
@@ -109,8 +109,15 @@ export class GenericClientApiBuilder {
             applicationId: this.applicationId,
             applicationInstanceId: this.applicationInstanceId
         };
+        const connectionRetryConfig = {
+            ...defaultPromiseRetryConfig,
+            errorHandler: (connectError: any) => {
+                this.log.warn(`Failed to get connection, will retry in ${defaultPromiseRetryConfig.retryTimeoutInMillis}ms`, connectError);
+            }
+        };
+        const connectionProviderWithRetries = retriable(() => this.transportConnectionProvider(), connectionRetryConfig);
         return this.validateState()
-            .then(() => this.transportConnectionProvider())
+            .then(connectionProviderWithRetries)
             .then(connection => {
                 this.log.info('Connection established');
                 return new GenericClientFactory(connection).createClient(appInfo);
