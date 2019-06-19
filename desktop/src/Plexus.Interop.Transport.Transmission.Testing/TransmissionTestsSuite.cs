@@ -50,14 +50,16 @@ namespace Plexus.Interop.Transport.Transmission
                     var serverConnectionTask = server.In.ReadAsync();
                     WriteLog("Connecting client");
                     var client = CreateClient();
-                    using (await client.ConnectAsync(BrokerWorkingDir))
+                    using (var clientConnection = await client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false))
                     {
                         WriteLog("Client connected");
-                        using (await serverConnectionTask)
-                        {
+                        using (var serverConnection = await serverConnectionTask.ConfigureAwait(false))
+                        {                            
+                            await serverConnection.DisconnectAsync().ConfigureAwait(false);
                             WriteLog("Disposing server connection");
                         }
                         WriteLog("Disposing client connection");
+                        await clientConnection.DisconnectAsync().ConfigureAwait(false);
                     }
                     WriteLog("Disposing server");
                 }
@@ -268,43 +270,53 @@ namespace Plexus.Interop.Transport.Transmission
 
             var clientTask = TaskRunner.RunInBackground(async () =>
             {
-                var clientFactory = CreateClient();
-                WriteLog("Connecting client");
-                using (var connection = RegisterDisposable(await clientFactory.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false)))
+                try
                 {
-                    WriteLog($"Client connected");
-                    var receiveTask = TaskRunner.RunInBackground(async () =>
+                    var clientFactory = CreateClient();
+                    WriteLog("Connecting client");
+                    using (var connection =
+                        RegisterDisposable(await clientFactory.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false)))
                     {
-                        while (true)
+                        WriteLog($"Client connected");
+                        var receiveTask = TaskRunner.RunInBackground(async () =>
                         {
-                            var msg = await connection.In.TryReadAsync().ConfigureAwait(false);
-                            if (msg.HasValue)
+                            while (true)
                             {
-                                WriteLog($"Client received message of length {msg.Value.Count}");
-                                clientReceived.Add(msg.Value.ToArray());
+                                var msg = await connection.In.TryReadAsync().ConfigureAwait(false);
+                                if (msg.HasValue)
+                                {
+                                    WriteLog($"Client received message of length {msg.Value.Count}");
+                                    clientReceived.Add(msg.Value.ToArray());
+                                }
+                                else
+                                {
+                                    WriteLog("Client receive completed");
+                                    break;
+                                }
                             }
-                            else
-                            {
-                                WriteLog("Client receive completed");
-                                break;
-                            }
-                        }
-                    });
+                        });
 
-                    var sendTask = TaskRunner.RunInBackground(async () =>
-                    {
-                        foreach (var msg in clientMessages)
+                        var sendTask = TaskRunner.RunInBackground(async () =>
                         {
-                            WriteLog($"Client sending message of length {msg.Length}");
-                            await connection.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
-                        }
-                        connection.Out.TryComplete();
-                        WriteLog("Client send completed");
-                    });
+                            foreach (var msg in clientMessages)
+                            {
+                                WriteLog($"Client sending message of length {msg.Length}");
+                                await connection.Out.WriteAsync(PooledBuffer.Get(msg)).ConfigureAwait(false);
+                            }
 
-                    await Task.WhenAll(sendTask, receiveTask, connection.Completion).ConfigureAwait(false);
+                            connection.Out.TryComplete();
+                            WriteLog("Client send completed");
+                        });
 
-                    WriteLog("Client completed");
+                        await Task.WhenAll(sendTask, receiveTask, connection.Completion).ConfigureAwait(false);
+
+                        WriteLog("Client completed");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    WriteLog("Client exception: " + ex);
+                    throw;
                 }
             });
 

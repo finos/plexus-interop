@@ -19,6 +19,7 @@ namespace Plexus
     using System;
     using System.Collections.Concurrent;
     using System.Diagnostics;
+    using System.IO;
     using System.Security.Cryptography;
     using System.Threading;
     using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace Plexus
         }
 
         protected TestsSuite(ITestOutputHelper output)
-        {
+        {            
             Console = output;
             Log = LogManager.GetLogger(GetType());
         }

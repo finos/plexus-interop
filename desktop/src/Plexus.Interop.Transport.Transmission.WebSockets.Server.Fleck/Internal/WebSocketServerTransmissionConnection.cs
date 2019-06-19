@@ -128,9 +128,12 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 {
                     await Task.WhenAny(_writer.Completion, _reader.Completion).Unwrap().ConfigureAwait(false);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _writer.Out.TryTerminate(ex);
+                    _reader.OnError(ex);
                     Stop();
+                    _webSocket.Close();
                     throw;
                 }
                 finally
@@ -139,8 +142,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 }
             }
             finally
-            {
-                _webSocket.Close();
+            {                
                 await _disconnectCompletion.Task.ConfigureAwait(false);
             }
         }

@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using Plexus.Logging.NLog;
 using Xunit;
 
 // ReSharper disable once CheckNamespace
 namespace Plexus
 {
     [CollectionDefinition("Default")]
-    public class DefaultTestCollection : ICollectionFixture<LoggingInitializer>
+    public class DefaultTestCollection : ICollectionFixture<TestingInitializer>
     {
         // This class has no code, and is never created. Its purpose is simply
         // to be the place to apply [CollectionDefinition] and all the
