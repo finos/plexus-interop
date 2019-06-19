@@ -16,11 +16,11 @@
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",
-    "@types/long": "^3.0.31",
+    "@types/long": "^4.0.0",
     "@plexus-interop/common": "0.1.0",
     "@plexus-interop/protocol": "0.1.0",
     "loglevel": "^1.4.1",
-    "long": "^3.2.0",
+    "long": "^4.0.0",
     "protobufjs": "6.8.6",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.4.2",
