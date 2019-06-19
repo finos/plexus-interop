@@ -16,10 +16,10 @@
  */
 namespace Plexus.Interop.Transport.Transmission
 {
-    using System;
     using Plexus.Channels;
     using Plexus.Pools;
     using Shouldly;
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -46,21 +46,30 @@ namespace Plexus.Interop.Transport.Transmission
                 WriteLog("Starting server");
                 using (var server = CreateServer())
                 {
-                    await server.StartAsync();
-                    var serverConnectionTask = server.In.ReadAsync();
-                    WriteLog("Connecting client");
-                    var client = CreateClient();
-                    using (var clientConnection = await client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false))
+                    await server.StartAsync();                    
+                    for (var i=0; i<100; i++)
                     {
-                        WriteLog("Client connected");
-                        using (var serverConnection = await serverConnectionTask.ConfigureAwait(false))
-                        {                            
-                            await serverConnection.DisconnectAsync().ConfigureAwait(false);
-                            WriteLog("Disposing server connection");
+                        WriteLog($"Connecting client {i}");
+                        var serverConnectionTask = server.In.ReadAsync();
+                        var client = CreateClient();
+                        using (var clientConnection = await client.ConnectAsync(BrokerWorkingDir).ConfigureAwait(false))
+                        {
+                            WriteLog($"Client {i} connected");
+                            using (var serverConnection = await serverConnectionTask.ConfigureAwait(false))
+                            {
+                                WriteLog($"Server connection {i} established");
+
+                                WriteLog($"Disconnecting client {i}");
+                                await clientConnection.DisconnectAsync().ConfigureAwait(false);
+                                WriteLog($"Client {i} disconnected");
+
+                                WriteLog($"Disconnecting server {i}");
+                                await serverConnection.DisconnectAsync().ConfigureAwait(false);                                
+                                WriteLog($"Server {i} disconnected");
+                            }
                         }
-                        WriteLog("Disposing client connection");
-                        await clientConnection.DisconnectAsync().ConfigureAwait(false);
                     }
+
                     WriteLog("Disposing server");
                 }
             });
