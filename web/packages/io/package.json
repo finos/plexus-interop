@@ -24,7 +24,7 @@
   "devDependencies": {
     "@types/jest": "^23.0.0",
     "jasmine-reporters": "^2.2.0",
-    "@types/long": "^3.0.31",
+    "@types/long": "^4.0.0",
     "jest": "23.5.0",
     "trash-cli": "^1.4.0",
     "tslint": "5.8.0",

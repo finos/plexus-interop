@@ -39,7 +39,7 @@
     "@plexus-interop/client": "0.1.0",
     "@plexus-interop/common-api-impl": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
-    "@types/long": "^3.0.31"
+    "@types/long": "^4.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.0.2",

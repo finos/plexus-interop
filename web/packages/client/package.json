@@ -19,13 +19,13 @@
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",
-    "@types/long": "^3.0.31",
+    "@types/long": "^4.0.0",
     "@plexus-interop/transport-common": "0.1.0",
     "@plexus-interop/client-api": "0.1.0",
     "@plexus-interop/io": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
     "loglevel": "^1.4.1",
-    "long": "^3.2.0",
+    "long": "^4.0.0",
     "reflect-metadata": "^0.1.10",
     "tslib": "^1.6.0",
     "typescript-collections": "1.2.3"

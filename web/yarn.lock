@@ -316,9 +316,13 @@
   version "1.5.4"
   resolved "https://registry.npmjs.org/@types/loglevel/-/loglevel-1.5.4.tgz#6e296bf20d9f6b0a3274cfb01a918f1d634e4c32"
 
-"@types/long@^3.0.31", "@types/long@^3.0.32":
+"@types/long@^3.0.32":
   version "3.0.32"
   resolved "https://registry.npmjs.org/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
+
+"@types/long@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/@types/long/-/long-4.0.0.tgz#719551d2352d301ac8b81db732acb6bdc28dbdef"
 
 "@types/mocha@^2.2.41", "@types/mocha@^2.2.43":
   version "2.2.48"
@@ -6727,10 +6731,6 @@ loglevel@^1.4.1:
 lolex@^1.6.0:
   version "1.6.0"
   resolved "https://registry.npmjs.org/lolex/-/lolex-1.6.0.tgz#3a9a0283452a47d7439e72731b9e07d7386e49f6"
-
-long@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.npmjs.org/long/-/long-3.2.0.tgz#d821b7138ca1cb581c172990ef14db200b5c474b"
 
 long@^4.0.0:
   version "4.0.0"
