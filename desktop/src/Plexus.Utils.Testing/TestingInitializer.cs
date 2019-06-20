@@ -30,7 +30,6 @@ namespace Plexus
         {
             var location = Path.GetDirectoryName(Assembly.GetAssembly(typeof(LoggingInitializer)).Location);
             Environment.SetEnvironmentVariable("PLEXUS_LOG_DIR", $"{location}/logs");
-            Directory.SetCurrentDirectory(location);
         }
 
         public TestingInitializer()

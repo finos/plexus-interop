@@ -81,7 +81,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 try
                 {
                     await _webSocket
-                        .CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None)
+                        .CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None)
                         .ConfigureAwait(false);
                 }
                 catch (Exception ex)
