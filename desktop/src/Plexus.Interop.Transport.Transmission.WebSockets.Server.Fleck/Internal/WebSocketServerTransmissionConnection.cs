@@ -100,7 +100,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         public Task DisconnectAsync() => StopAsync();
 
-        protected override Task<Task> StartCoreAsync()
+        protected override async Task<Task> StartCoreAsync()
         {
             try
             {
@@ -108,10 +108,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 {
                     _webSocket.Close();
                     return Task.FromResult(TaskConstants.Completed);
-                }                
+                }        
+                await _connectCompletion.Task.WithCancellation(CancellationToken).ConfigureAwait(false);
                 _writer.Start();
                 _log.Trace("Connected");
-                return Task.FromResult(ProcessAsync());
+                return ProcessAsync();
             }
             catch
             {
@@ -128,9 +129,10 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 {
                     await Task.WhenAny(_writer.Completion, _reader.Completion).Unwrap().ConfigureAwait(false);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Stop();
+                    _writer.Out.TryTerminate(ex);
+                    _webSocket.Close();
                     throw;
                 }
                 finally
@@ -139,8 +141,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 }
             }
             finally
-            {
-                _webSocket.Close();
+            {                
                 await _disconnectCompletion.Task.ConfigureAwait(false);
             }
         }
