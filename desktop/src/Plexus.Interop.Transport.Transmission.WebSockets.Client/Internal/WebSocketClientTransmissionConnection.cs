@@ -131,15 +131,26 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
             {
                 try
                 {
-                    await Task.WhenAny(_writer.Completion, _reader.Completion).Unwrap().ConfigureAwait(false);
+                    try
+                    {
+                        await Task.WhenAny(_writer.Completion, _reader.Completion).Unwrap().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _writer.Out.TryTerminate(ex);
+                        _webSocket.Close();
+                        throw;
+                    }
+                    finally
+                    {
+                        await Task.WhenAll(_writer.Completion, _reader.Completion).ConfigureAwait(false);
+                    }
                 }
-                catch
+                finally
                 {
-                    Stop();
+                    _webSocket.Close();
+                    await _disconnectCompletion.Task.ConfigureAwait(false);
                 }
-                await Task.WhenAll(_writer.Completion, _reader.Completion).ConfigureAwait(false);
-                _webSocket.Close();
-                await _disconnectCompletion.Task.ConfigureAwait(false);
             }
         }        
     }

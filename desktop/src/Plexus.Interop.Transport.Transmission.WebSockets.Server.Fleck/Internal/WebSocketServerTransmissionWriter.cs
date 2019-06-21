@@ -36,7 +36,7 @@
             IWebSocketConnection webSocket,
             CancellationToken cancellationToken)
         {
-            _log = LogManager.GetLogger<WebSocketServerTransmissionReader>(id.ToString());
+            _log = LogManager.GetLogger<WebSocketServerTransmissionWriter>(id.ToString());
             _cancellationToken = cancellationToken;
             _webSocket = webSocket;
         }

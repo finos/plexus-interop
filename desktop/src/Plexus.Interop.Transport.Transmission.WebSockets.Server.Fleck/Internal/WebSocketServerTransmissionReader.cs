@@ -50,11 +50,13 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         public void OnClose()
         {
+            _log.Debug("OnClose");
             _buffer.Out.TryComplete();
         }
 
         public void OnError(Exception ex)
         {
+            _log.Debug("OnError " + ex.GetType() + ": " + ex.Message);
             _buffer.Out.TryTerminate(ex);
         }
 
@@ -67,6 +69,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             catch (Exception ex)
             {
                 _buffer.Out.TryTerminate(ex);
+                _buffer.DisposeBufferedItems();
                 throw;
             }
             finally

@@ -67,19 +67,16 @@
                             .WithCancellation(_cancellationToken)
                             .ConfigureAwait(false);
                         _log.Trace("Received websocket message: {0}", result.MessageType);
-                        if (result.MessageType == WebSocketMessageType.Close)
-                        {
-                            _log.Trace("Received close message. Current state: {0}", _webSocket.State);
-                            break;
-                        }
                         curMessageLength += result.Count;
                         if (!result.EndOfMessage)
                         {
                             continue;
                         }
+
                         await HandleReceiveMessageAsync(result, curMessageLength).ConfigureAwait(false);
                         curMessageLength = 0;
                     }
+
                     _buffer.Out.TryComplete();
                 }
             }
@@ -88,6 +85,10 @@
                 _log.Trace("Reading terminated: {0}", ex.FormatTypeAndMessage());
                 _buffer.Out.TryTerminate(ex);
                 throw;
+            }
+            finally
+            {
+                await _buffer.Out.Completion.ConfigureAwait(false);
             }
             _log.Trace("Reading completed");
         }
@@ -124,7 +125,7 @@
                     }
                     break;
                 case WebSocketMessageType.Close:
-                    _buffer.Out.TryComplete();
+                    _buffer.Out.TryTerminate();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

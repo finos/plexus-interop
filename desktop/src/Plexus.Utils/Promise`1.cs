@@ -47,7 +47,14 @@ namespace Plexus
             {
                 completed = false;
             }
-            Task.Wait();
+            try
+            {
+                Task.Wait();
+            }
+            catch
+            {
+                // ignored
+            }
             return completed;
         }
 
