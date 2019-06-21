@@ -39,9 +39,9 @@ namespace Plexus.Interop.Transport.Transmission
         }
 
         [Fact]
-        public void ConnectDisconnect()
+        public void SequentialConnect()
         {
-            RunWith5SecTimeout(async () =>
+            RunWith30SecTimeout(async () =>
             {
                 WriteLog("Starting server");
                 using (var server = CreateServer())
