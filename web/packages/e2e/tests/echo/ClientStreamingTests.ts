@@ -20,7 +20,6 @@ import { BaseEchoTest } from './BaseEchoTest';
 import * as plexus from '../../src/echo/gen/plexus-messages';
 import { ClientStreamingHandler } from './ClientStreamingHandler';
 import { StreamingInvocationClient, MethodInvocationContext } from '@plexus-interop/client';
-import { expect } from 'chai';
 
 export class ClientStreamingTests extends BaseEchoTest {
 
@@ -48,8 +47,9 @@ export class ClientStreamingTests extends BaseEchoTest {
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, serverHandler);
             let remoteCompleted = false;
             const streamingClient = await client.getEchoServiceProxy().clientStreaming({
-                next: (serverResponse) => { },
+                next: () => { },
                 error: (e) => {
+                    // tslint:disable-next-line: no-console
                     console.error('Error received by client', e);
                     reject(e);
                 },
@@ -86,7 +86,7 @@ export class ClientStreamingTests extends BaseEchoTest {
             let serverCompleted = false;
             let serverStreamCompleted = false;
             const streamingClient = await client.getEchoServiceProxy().clientStreaming({
-                next: serverResponse => { },
+                next: () => { },
                 error: e => reject(e),
                 complete: async () => serverCompleted = true,
                 streamCompleted: () => serverStreamCompleted = true
