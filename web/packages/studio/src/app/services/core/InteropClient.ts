@@ -16,6 +16,7 @@
  */
 import { StreamingInvocationClient, ValueHandler, InvocationClient, MethodDiscoveryResponse, MethodDiscoveryRequest, DiscoveredMethod, InvocationObserver } from '@plexus-interop/client';
 import { ConsumedMethod, ProvidedMethod } from '@plexus-interop/metadata';
+import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler } from './StringHandlers';
 
 export interface InteropClient {
 
