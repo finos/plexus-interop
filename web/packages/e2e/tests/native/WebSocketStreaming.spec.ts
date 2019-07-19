@@ -76,4 +76,8 @@ describe('Client: Web Socket Streaming invocation', () => {
         return serverStreamingTests.testServerExceptionReceivedByClient();
     });
 
+    // it('Client can cancel server streaming invocation', function() {
+    //     return serverStreamingTests.testClientCanCloseServerStreamingRequest();
+    // });
+
 });

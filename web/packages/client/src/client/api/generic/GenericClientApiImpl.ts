@@ -165,9 +165,21 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         requestInvocation: () => Promise<Invocation>,
         request: ArrayBuffer,
         responseObserver: InvocationObserver<ArrayBuffer>): Promise<InvocationClient> {
-        const streamingClient = await this.sendBidirectionalStreamingRequestInternal(strInfo, requestInvocation, responseObserver);
+        let streamingClient: StreamingInvocationClient<ArrayBuffer> | undefined;
+        const completeHandler = () => {
+            if (streamingClient) {
+                streamingClient
+                    .complete()
+                    .catch(e => responseObserver.error(e));
+            }
+        };
+        const baseCompleteHandler = responseObserver.complete;
+        responseObserver.complete = () => {
+            baseCompleteHandler();
+            completeHandler();
+        };
+        streamingClient = await this.sendBidirectionalStreamingRequestInternal(strInfo, requestInvocation, responseObserver);
         await streamingClient.next(request);
-        streamingClient.complete().catch(e => responseObserver.error(e));
         return streamingClient;
     }
 

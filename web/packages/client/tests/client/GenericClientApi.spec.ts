@@ -20,7 +20,7 @@ import { GenericClientImpl } from '../../src/client/generic/GenericClientImpl';
 import { RequestedInvocation } from '../../src/client/generic/RequestedInvocation';
 import { Observer } from '@plexus-interop/common';
 import { createRemoteInvocationInfo, MockMarshallerProvider } from './client-mocks';
-import { clientProtocol as plexus, Completion, ErrorCompletion, SuccessCompletion } from '@plexus-interop/protocol';
+import { clientProtocol as plexus, Completion, SuccessCompletion } from '@plexus-interop/protocol';
 import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
 import { ChannelObserver } from '@plexus-interop/transport-common';
 import { InvocationHandlersRegistry} from '../../src';
@@ -57,37 +57,6 @@ describe('GenericClientApi', () => {
                 done();
             },
             error: () => { }
-        });
-
-    });
-
-    it('Fails Point to Point invocation if invalid completion received', (done) => {
-
-        const mockInvocation = mock(RequestedInvocation);
-
-        const responsePayload = new Uint8Array([3, 2, 1]).buffer;
-        const requestPayload = new Uint8Array([1, 2, 3]).buffer;
-
-        when(mockInvocation.open(anything())).thenCall((observer: ChannelObserver<AnonymousSubscription, ArrayBuffer>) => {
-            observer.started(new Subscription());
-            observer.next(responsePayload);
-            observer.complete();
-        });
-
-        when(mockInvocation.sendMessage(anything())).thenReturn(Promise.resolve());
-        when(mockInvocation.close(anything())).thenReturn(Promise.resolve(new ErrorCompletion()));
-
-        const mockGenericClient = mock(GenericClientImpl);
-        when(mockGenericClient.requestInvocation(anything()))
-            .thenReturn(Promise.resolve(instance(mockInvocation)));
-
-        const mockMarshaller = new MockMarshallerProvider();
-        const registry = new InvocationHandlersRegistry(mockMarshaller);
-        const clientApi = new GenericClientApiImpl(instance(mockGenericClient), mockMarshaller, registry);
-
-        clientApi.sendRawUnaryRequest(createRemoteInvocationInfo(), requestPayload, {
-            value: () => { },
-            error: () => done()
         });
 
     });
@@ -193,7 +162,7 @@ describe('GenericClientApi', () => {
         });
 
         await invocationClient.cancel();
-        verify(mockInvocation.close(anything())).twice();
+        verify(mockInvocation.close(anything())).once();
         const [completion] = capture(mockInvocation.close).last();
         expect((completion as Completion).status).toBe(plexus.Completion.Status.Canceled);
 

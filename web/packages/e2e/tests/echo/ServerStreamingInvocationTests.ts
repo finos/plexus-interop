@@ -94,6 +94,29 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
         });
     }
 
+    public async testClientCanCloseServerStreamingRequest(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();        
+        const handler = new ServerStreamingHandler((context, request, hostClient) => {
+            hostClient.next(echoRequest);
+        });
+        const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
+        debugger;
+        const invocationClient = await client.getEchoServiceProxy().serverStreaming(this.clientsSetup.createRequestDto(), {
+            next: response => {
+                console.log('Next');
+            },
+            complete: async () => {
+                console.log('Completed');
+            },
+            error: async e => {
+                console.log('Error');
+            },
+            streamCompleted: () => { }
+        });
+        await invocationClient.cancel();
+        await this.clientsSetup.disconnect(client, server);
+    }
+
     public testServerExceptionReceivedByClient(): Promise<void> {
         const errorText = 'Host error';
         return new Promise<void>(async (resolve, reject) => {
