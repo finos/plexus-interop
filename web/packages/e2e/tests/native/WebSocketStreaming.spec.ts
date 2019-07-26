@@ -39,45 +39,46 @@ describe('Client: Web Socket Streaming invocation', () => {
     const clientStreamingTests = new ClientStreamingTests(transportsSetup.createWebSocketTransportProvider(wsUrl),
         clientsSetup);
 
-    it('Sends streaming response from server using serverStreaming invocation', function () {
-        return serverStreamingTests.testServerSendsStreamToClient();
-    });
-
-    it('Sends few streams in parrallel to client using serverStreaming invocation', function () {
-        return serverStreamingTests.testServerSendsFewStreamsInParrallelToClient();
-    });
-
-    it('Sends stream of messages and error to client', function () {
-        return serverStreamingTests.testServerSendsStreamWithErrorToClient();
-    });
-
-    it('Sends stream of messages and cancel operation to client', function () {
-        return serverStreamingTests.testServerSendsStreamWithCancelToClient();
-    });
-
-    it('Sends streaming messages in two directions', function () {
-        this.timeout(5000);
-        return bidiStreamingTests.testClientAndServerCanSendMessages();
-    });
-
-    it('Sends client stream messages to server', function () {
-        return clientStreamingTests.testClientCanSendStreamToServer();
-    });
-
-    it('Server receives client\'s completion before response for Client Streaming', function () {
-        return clientStreamingTests.testServerReceivesClientCompletionBeforeResponse();
-    });
-
-    it('Client can cancel invocation', function() {
-        return bidiStreamingTests.testClientCanCancelInvocation();
-    });
-
-    it('Client receives exception from server', function() {
-        return serverStreamingTests.testServerExceptionReceivedByClient();
-    });
-
-    // it('Client can cancel server streaming invocation', function() {
-    //     return serverStreamingTests.testClientCanCloseServerStreamingRequest();
+    // it('Sends streaming response from server using serverStreaming invocation', function () {
+    //     return serverStreamingTests.testServerSendsStreamToClient();
     // });
+
+    // it('Sends few streams in parrallel to client using serverStreaming invocation', function () {
+    //     return serverStreamingTests.testServerSendsFewStreamsInParrallelToClient();
+    // });
+
+    // it('Sends stream of messages and error to client', function () {
+    //     return serverStreamingTests.testServerSendsStreamWithErrorToClient();
+    // });
+
+    // it('Sends stream of messages and cancel operation to client', function () {
+    //     return serverStreamingTests.testServerSendsStreamWithCancelToClient();
+    // });
+
+    // it('Sends streaming messages in two directions', function () {
+    //     this.timeout(5000);
+    //     return bidiStreamingTests.testClientAndServerCanSendMessages();
+    // });
+
+    // it('Sends client stream messages to server', function () {
+    //     return clientStreamingTests.testClientCanSendStreamToServer();
+    // });
+
+    // it('Server receives client\'s completion before response for Client Streaming', function () {
+    //     return clientStreamingTests.testServerReceivesClientCompletionBeforeResponse();
+    // });
+
+    // it('Client can cancel invocation', function() {
+    //     return bidiStreamingTests.testClientCanCancelInvocation();
+    // });
+
+    // it('Client receives exception from server', function() {
+    //     return serverStreamingTests.testServerExceptionReceivedByClient();
+    // });
+
+    it('Client can cancel server streaming invocation', function() {
+        this.timeout(1000000);
+        return serverStreamingTests.testClientCanCloseServerStreamingRequest();
+    });
 
 });

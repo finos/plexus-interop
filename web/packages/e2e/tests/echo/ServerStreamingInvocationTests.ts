@@ -21,6 +21,7 @@ import { BaseEchoTest } from './BaseEchoTest';
 import * as plexus from '../../src/echo/gen/plexus-messages';
 import { ClientError } from '@plexus-interop/protocol';
 import { expect } from 'chai';
+import { delayed } from '@plexus-interop/common';
 
 export class ServerStreamingInvocationTests extends BaseEchoTest {
 
@@ -80,8 +81,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: response => {
-                },
+                next: () => {},
                 complete: async () => {
                     reject('Not expected to be completed');
                 },
@@ -98,6 +98,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
         const echoRequest = this.clientsSetup.createRequestDto();        
         const handler = new ServerStreamingHandler((context, request, hostClient) => {
             hostClient.next(echoRequest);
+            // do not send completion, so invocation stays open
         });
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         debugger;
@@ -113,7 +114,9 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             },
             streamCompleted: () => { }
         });
+        await delayed(async () => {}, 5000);
         await invocationClient.cancel();
+        await delayed(async () => {}, 10000);
         await this.clientsSetup.disconnect(client, server);
     }
 
