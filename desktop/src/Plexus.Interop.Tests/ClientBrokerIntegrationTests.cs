@@ -20,16 +20,19 @@ namespace Plexus.Interop
     using Plexus.Channels;
     using Plexus.Interop.Testing;
     using Plexus.Interop.Testing.Generated;
+    using Plexus.Interop.Transport.Protocol;
     using Shouldly;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Plexus.Interop.Transport.Protocol;
+    using WebSocket4Net;
     using Xunit;
     using Xunit.Abstractions;
+    using ErrorEventArgs = SuperSocket.ClientEngine.ErrorEventArgs;
 
     public sealed class ClientBrokerIntegrationTests : TestsSuite, IClassFixture<TestBrokerFixture>
     {
@@ -290,6 +293,80 @@ namespace Plexus.Interop
                     await broker.StopAsync().ConfigureAwait(false);
                 }
             });
+        }
+
+        [Fact]
+        public void RequestBrokerMetadataStress()
+        {
+            ConnectEchoClient();
+            var wsAddress =
+                File.ReadAllText(Path.Combine(_testBrokerFixture.SharedInstance.WorkingDir, "servers", "ws-v1",
+                    "address")) + "/metadata/interop";
+            for (var repeat = 0; repeat < 500; repeat++)
+            {
+                RunWith5SecTimeout(async () =>
+                {
+                    var tasks = new List<Task>();
+                    for (var i = 0; i < 10; i++)
+                    {
+                        tasks.Add(Task.Run(async () =>
+                        {
+                            using (var websocket = new WebSocket(wsAddress))
+                            {
+                                var openedCompletion = new TaskCompletionSource<bool>();
+                                var receivedCompletion = new TaskCompletionSource<string>();
+                                var closedCompletion = new TaskCompletionSource<bool>();
+
+                                void OnOpened(object sender, EventArgs args)
+                                {
+                                    openedCompletion.TrySetResult(true);
+                                }
+
+                                void OnError(object sender, ErrorEventArgs args)
+                                {
+                                    openedCompletion.TrySetException(args.Exception);
+                                    receivedCompletion.TrySetException(args.Exception);
+                                    closedCompletion.TrySetException(args.Exception);
+                                }
+
+                                void OnClosed(object sender, EventArgs args)
+                                {
+                                    openedCompletion.TrySetException(new Exception("Unexpectedly closed"));
+                                    receivedCompletion.TrySetException(new Exception("Unexpectedly closed"));
+                                    closedCompletion.TrySetResult(true);
+                                }
+
+                                void OnReceived(object sender, MessageReceivedEventArgs args)
+                                {
+                                    receivedCompletion.TrySetResult(args.Message);
+                                }
+
+                                websocket.Opened += OnOpened;
+                                websocket.Error += OnError;
+                                websocket.Closed += OnClosed;
+                                websocket.MessageReceived += OnReceived;
+                                try
+                                {
+                                    websocket.Open();
+                                    await openedCompletion.Task;
+                                    var metadata = await receivedCompletion.Task;
+                                    metadata.ShouldContain("plexus.interop");
+                                    websocket.Close();
+                                    await closedCompletion.Task;
+                                }
+                                finally
+                                {
+                                    websocket.Opened -= OnOpened;
+                                    websocket.Error -= OnError;
+                                    websocket.Closed -= OnClosed;
+                                    websocket.MessageReceived -= OnReceived;
+                                }
+                            }
+                        }));
+                    }
+                    await Task.WhenAll(tasks);
+                });
+            }
         }
 
         [Fact]
