@@ -21,7 +21,7 @@
     "copy-assets": "copyfiles src/echo/gen/* dist/main && copyfiles src/views/* dist/main",
     "republish": "echo 'Not implemented'",
     "build-host-proxy": "node scripts/browserify-all.js --standalone proxyHost --inputGlob dist/main/tests/common/TestCrossDomainHost.js --outputFile dist/main/tests/web/CrossDomainHost.bundle.js",
-    "prepare-native-e2e-debug-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/*SocketStreaming*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
+    "prepare-native-e2e-debug-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/*PointToPoint*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
     "e2e-web-electron": "node scripts/web-e2e-tests-launcher.js --file ./dist/main/tests/web/RendererProcess.bundle.js",
     "pree2e-web-electron": "node scripts/browserify-all.js --brokerCoverage true --inputGlob dist/main/tests/web/*spec.js --outputFile dist/main/tests/web/RendererProcess.bundle.js",
     "e2e-web-ie": "node scripts/web-e2e-tests-launcher.js --browser ie",
@@ -32,7 +32,8 @@
     "prenative-broker-benchmarks": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/benchmarks/*spec.js --outputFile dist/main/tests/native/benchmarks/RendererProcessBenchmarks.bundle.js",
     "e2e-native": "node scripts/native-e2e-tests-launcher.js --file ./dist/main/tests/native/RendererProcess.bundle.js",
     "pree2e-native": "node scripts/browserify-all.js --clientCoverage true --inputGlob dist/main/tests/native/*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
-    "e2e-native-debug": "npm run build && npm run prepare-native-e2e-debug-tests && node scripts/native-e2e-tests-launcher.js --printBrokerStdout true --debug true --file ./dist/main/tests/native/RendererProcess.bundle.js"
+    "e2e-native-debug": "npm run build && npm run prepare-native-e2e-debug-tests && npm run e2e-native-debug-run",
+    "e2e-native-debug-run": "node scripts/native-e2e-tests-launcher.js --printBrokerStdout true --debug true --file ./dist/main/tests/native/RendererProcess.bundle.js"
   },
   "dependencies": {
     "@plexus-interop/broker": "0.1.0",

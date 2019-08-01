@@ -19,36 +19,36 @@ import { plexus } from '../gen/internal-client-protocol';
 export class ClientProtocolUtils {
 
     public static createSummarizedCompletion(...completions: plexus.ICompletion[]): plexus.ICompletion {
-        const errors: plexus.IError[] = [];
-        completions = completions.filter(c => !!c);
-        completions.forEach(completion => {
-            const status: plexus.Completion.Status = completion.status as plexus.Completion.Status;
-            if (status === plexus.Completion.Status.Canceled || status === plexus.Completion.Status.Failed) {
-                errors.push(completion.error || {
-                        message: `Unknown error, completion status ${status}`
-                    });
-            }
-        });
+        const errors: string[] = completions
+            .filter(completion => !!completion && completion.status === plexus.Completion.Status.Failed)
+            .map(completion => {
+                return completion.error || {
+                    message: `Unknown error, completion status ${status}`
+                };
+            })
+            .map(error => error.message || 'Unknown error');
         if (errors.length > 0) {
-            const messages = new Array();
-            errors.forEach(error => {
-                messages.push(error.message);
-            });
             return {
                 status: plexus.Completion.Status.Failed,
                 error: {
-                    message: messages.join('\n')
+                    message: errors.join('\n')
                 }
             };
         } else {
-            return {
-                status: plexus.Completion.Status.Completed
-            };
+            return { status: plexus.Completion.Status.Completed };
         }
     }
 
     public static isSuccessCompletion(completion: plexus.ICompletion): boolean {
         return completion && (completion.status === undefined || completion.status === plexus.Completion.Status.Completed);
+    }
+
+    public static isCancelCompletion(completion: plexus.ICompletion): boolean {
+        return completion && (completion.status === plexus.Completion.Status.Canceled);
+    }
+
+    public static isErrorCompletion(completion: plexus.ICompletion): boolean {
+        return completion && (completion.status === plexus.Completion.Status.Failed);
     }
 
 }

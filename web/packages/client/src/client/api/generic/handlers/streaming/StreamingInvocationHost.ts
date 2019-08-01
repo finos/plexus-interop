@@ -83,6 +83,7 @@ export class StreamingInvocationHost {
 
             complete: () => {
                 this.logger.trace('Received remote completion');
+                cancellationToken.cancel('Invocation completed');
                 this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<any>).complete());
             },
 

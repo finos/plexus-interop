@@ -60,10 +60,10 @@ export class LoggerBase implements Logger, LoggerDelegate {
                 log.trace(actualMessage, args); 
                 break;
             case LogLevel.DEBUG: 
-                log.debug(actualMessage, args); 
+                log.warn(actualMessage, args); 
                 break;
             case LogLevel.INFO: 
-                log.info(actualMessage, args); 
+                log.warn(actualMessage, args); 
                 break;
             case LogLevel.WARN: 
                 log.warn(actualMessage, args); 

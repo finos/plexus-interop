@@ -162,7 +162,7 @@ describe('GenericClientApi', () => {
         });
 
         await invocationClient.cancel();
-        verify(mockInvocation.close(anything())).once();
+        verify(mockInvocation.close(anything())).called();
         const [completion] = capture(mockInvocation.close).last();
         expect((completion as Completion).status).toBe(plexus.Completion.Status.Canceled);
 

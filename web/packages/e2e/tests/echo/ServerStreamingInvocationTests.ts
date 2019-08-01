@@ -21,7 +21,6 @@ import { BaseEchoTest } from './BaseEchoTest';
 import * as plexus from '../../src/echo/gen/plexus-messages';
 import { ClientError } from '@plexus-interop/protocol';
 import { expect } from 'chai';
-import { delayed } from '@plexus-interop/common';
 
 export class ServerStreamingInvocationTests extends BaseEchoTest {
 
@@ -94,41 +93,36 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
         });
     }
 
-    public async testClientCanCloseServerStreamingRequest(): Promise<void> {
+    public async testClientCanCancelServerStreamingRequest(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();        
+        let cancelReceivedByServer = false;
         const handler = new ServerStreamingHandler((context, request, hostClient) => {
             hostClient.next(echoRequest);
-            // do not send completion, so invocation stays open
+            context.cancellationToken.onCancel(() => {
+                cancelReceivedByServer = true;
+            });
         });
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
-        debugger;
         const invocationClient = await client.getEchoServiceProxy().serverStreaming(this.clientsSetup.createRequestDto(), {
-            next: response => {
-                console.log('Next');
-            },
-            complete: async () => {
-                console.log('Completed');
-            },
-            error: async e => {
-                console.log('Error');
-            },
+            next: () => {},
+            complete: async () => {},
+            error: async () => {},
             streamCompleted: () => { }
         });
-        await delayed(async () => {}, 5000);
         await invocationClient.cancel();
-        await delayed(async () => {}, 10000);
+        expect(cancelReceivedByServer).to.eq(true);
         await this.clientsSetup.disconnect(client, server);
     }
 
     public testServerExceptionReceivedByClient(): Promise<void> {
         const errorText = 'Host error';
         return new Promise<void>(async (resolve, reject) => {
-            const handler = new ServerStreamingHandler((context, request, hostClient) => {
+            const handler = new ServerStreamingHandler(() => {
                 throw new Error(errorText);
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
             client.getEchoServiceProxy().serverStreaming(this.clientsSetup.createRequestDto(), {
-                next: response => {
+                next: () => {
                     reject('Not expected to receive update');
                 },
                 complete: async () => {
@@ -214,15 +208,12 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
 
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: response => {
-                },
+                next: () => {},
                 complete: async () => {
-                    reject('Not expected to be completed');
-                },
-                error: async e => {
                     await this.clientsSetup.disconnect(client, server);
                     resolve();
                 },
+                error: async () => {},
                 streamCompleted: () => { }
             });
         });
