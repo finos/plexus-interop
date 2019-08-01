@@ -60,4 +60,4 @@ export class LoggerFactory {
 
 }
 
-LoggerFactory.setLogLevel(LogLevel.DEBUG);
+LoggerFactory.setLogLevel(LogLevel.INFO);
