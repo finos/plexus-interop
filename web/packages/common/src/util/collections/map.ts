@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './BlockingQueue';
-export * from './LimitedBufferQueue';
-export * from './ExtendedMap';
-export * from './map';
+export function pop<K, V>(map: Map<K, V>): [K, V] {
+    if (!map || map.size === 0) {
+        throw new Error('Map is empty');
+    }
+    return Array.from(map)[map.size - 1];
+}

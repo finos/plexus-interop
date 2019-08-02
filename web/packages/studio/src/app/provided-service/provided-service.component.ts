@@ -21,11 +21,10 @@ import * as fromRoot from '../services/ui/RootReducers';
 import { ProvidedMethod, ProvidedService } from '@plexus-interop/metadata';
 import { InteropClient } from '../services/core/InteropClient';
 import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
-import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { Logger, LoggerFactory, uniqueId } from '@plexus-interop/common';
 import { StreamingInvocationClient, MethodType } from '@plexus-interop/client';
 import { createInvocationLogger } from '../services/core/invocation-utils';
-import { FormGroup, ValidatorFn } from '@angular/forms';
-import { AbstractControl, FormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { plexusMessageValidator } from '../services/ui/validators';
 
 @Component({
@@ -46,11 +45,9 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
-  requesId: number = 0;
   title: string = '';
 
   constructor(
-    private actions: AppActions,
     private store: Store<fromRoot.State>,
     private subscriptions: SubscriptionsRegistry) { }
 
@@ -117,7 +114,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
           methodId,
           serviceAlias,
           async requestJson => {
-            const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
+            const invocationLogger = createInvocationLogger(this.providedMethod.method.type, uniqueId(), this.log);
             this.printRequest(requestJson, invocationLogger);
             invocationLogger.info(`Sending message:\n${contentJson}`);
             return contentJson;
@@ -125,14 +122,14 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
         break;
       case MethodType.ServerStreaming:
         this.interopClient.setServerStreamingActionHandler(serviceId, methodId, serviceAlias, (request, client) => {
-          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, uniqueId(), this.log);
           this.printRequest(request, invocationLogger);
           this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
         });
         break;
       case MethodType.ClientStreaming:
         this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, serviceAlias, (client) => {
-          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, uniqueId(), this.log);
           return {
             next: request => this.printRequest(request, invocationLogger),
             error: e => this.handleError(e, invocationLogger),
@@ -146,7 +143,7 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
         break;
       case MethodType.DuplexStreaming:
         this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, serviceAlias, (client) => {
-          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, uniqueId(), this.log);
           this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
           return {
             next: request => {

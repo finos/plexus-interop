@@ -14,7 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './BlockingQueue';
-export * from './LimitedBufferQueue';
-export * from './ExtendedMap';
-export * from './map';
+const idCounters: Map<string, number> = new Map();
+
+export function uniqueId(prefix: string = ''): string {
+    const prevIdx = idCounters.get(prefix) || 0;
+    const nextIdx = prevIdx + 1;
+    idCounters.set(prefix, nextIdx);
+    return `${prefix + nextIdx}`;
+}

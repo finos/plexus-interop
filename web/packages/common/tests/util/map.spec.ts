@@ -14,7 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './BlockingQueue';
-export * from './LimitedBufferQueue';
-export * from './ExtendedMap';
-export * from './map';
+import { pop } from '../../src/util/collections/map';
+
+describe('Map Utils', () => {
+
+    it('Should pop last element from Map', () => {
+
+        const map = new Map();
+        map.set(1, 2);
+        map.set(3, 4);
+
+        const [key, value] = pop(map);
+        expect(key).toBe(3);
+        expect(value).toBe(4);
+
+    });
+
+});
