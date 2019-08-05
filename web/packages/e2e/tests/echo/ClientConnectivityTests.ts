@@ -61,7 +61,6 @@ export class ClientConnectivityTests extends BaseEchoTest {
         let client: EchoClientClient | null = null;
         let server: EchoServerClient | null = null;
         let serverInvocationContext: MethodInvocationContext | null = null;
-        debugger;
         return new Promise<void>(async (testResolve, testError) => {
 
             let handler: ServerStreamingHandler | null = null;

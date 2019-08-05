@@ -17,7 +17,6 @@
 
 
 import { StreamingInvocationClient, InvocationObserver } from '@plexus-interop/client';
-import { Observer } from '@plexus-interop/common';
 import { Marshaller } from '@plexus-interop/io';
 
 export type UnaryStringHandler = (requestJson: string) => Promise<string>;

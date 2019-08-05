@@ -138,7 +138,6 @@ export class InteropClientFactory {
             handle: (context, hostClient) => {
                 const stringHandler = handlers.get(fullName);
                 const stringRequestObserver: InvocationObserver<string> = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
-                let received;
                 return {
                     next: (v: ArrayBuffer) => {
                         stringRequestObserver.next(JSON.stringify(requestMarshaller.decode(v)));
@@ -166,7 +165,7 @@ export class InteropClientFactory {
             handle: async (context, request, hostClient) => {
                 const requestObj = requestMarshaller.decode(request);
                 const stringHandler = handlers.get(fullName);
-                const stringResponse = await stringHandler(JSON.stringify(requestObj), wrapGenericHostClient(hostClient, responseMarshaller));
+                await stringHandler(JSON.stringify(requestObj), wrapGenericHostClient(hostClient, responseMarshaller));
             }
         }
     }
