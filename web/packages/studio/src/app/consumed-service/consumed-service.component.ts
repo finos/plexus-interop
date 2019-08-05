@@ -180,13 +180,16 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
           const streamingClient = await this.interopClient.sendBidiStreamingRequest(method, responseObserver);
           invocationClient = streamingClient;
           this.sendAndSchedule(this.messageContent, this.messagesToSend, this.messagesPeriodInMillis, streamingClient, invocationLogger);
+          break;
       }
-      this.activeInvocationsMap.set(invocationId, {
-        id: invocationId,
-        client: invocationClient,
-        logger: invocationLogger,
-        started
-      });
+      if (this.consumedMethod.method.type !== MethodType.Unary) {
+        this.activeInvocationsMap.set(invocationId, {
+          id: invocationId,
+          client: invocationClient,
+          logger: invocationLogger,
+          started
+        });
+      }
     } catch (error) {
       this.handleError(error, invocationLogger, invocationId);
     }
