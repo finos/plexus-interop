@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// tslint:disable-next-line:variable-name
-export enum InvocationState {
-    CREATED = 'CREATED',
-    START_REQUESTED = 'START_REQUESTED',
-    REMOTE_STARTING = 'REMOTE_STARTING',
-    ACCEPTING_INVOCATION_INFO = 'ACCEPTING_INVOCATION_INFO',
-    OPEN = 'OPEN',
-    COMPLETION_RECEIVED = 'COMPLETION_RECEIVED',
-    SENT_COMPLETED = 'COMPLETION_SENT',
-    COMPLETION_HANDSHAKE = 'COMPLETION_HANDSHAKE',
-    COMPLETED = 'COMPLETED'
-}
+/**
+ * Call source fn only once, even if source promise is rejected
+ */
+export const once = <T>(fn: () => Promise<T>): () => Promise<T> => {
+    let promise: Promise<T> | undefined;
+    return () => {
+        if (!promise) {
+            promise = fn();
+        }
+        return promise;
+    };
+};

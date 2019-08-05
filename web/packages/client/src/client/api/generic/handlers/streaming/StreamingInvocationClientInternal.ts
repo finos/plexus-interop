@@ -14,15 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// tslint:disable-next-line:variable-name
-export enum InvocationState {
-    CREATED = 'CREATED',
-    START_REQUESTED = 'START_REQUESTED',
-    REMOTE_STARTING = 'REMOTE_STARTING',
-    ACCEPTING_INVOCATION_INFO = 'ACCEPTING_INVOCATION_INFO',
-    OPEN = 'OPEN',
-    COMPLETION_RECEIVED = 'COMPLETION_RECEIVED',
-    SENT_COMPLETED = 'COMPLETION_SENT',
-    COMPLETION_HANDSHAKE = 'COMPLETION_HANDSHAKE',
-    COMPLETED = 'COMPLETED'
+import { StreamingInvocationClient } from './StreamingInvocationClient';
+
+export interface StreamingInvocationClientInternal<T> extends StreamingInvocationClient<T> {
+
+    sendCompleted(): Promise<void>;
+
 }

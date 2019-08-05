@@ -25,3 +25,4 @@ export * from './dom/DomUtils';
 export * from './time/TimeUtils';
 export * from './url/UrlParamsProvider';
 export * from './unique';
+export * from './once';

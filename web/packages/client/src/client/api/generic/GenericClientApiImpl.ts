@@ -20,6 +20,7 @@ import { ServiceDiscoveryRequest, MethodInvocationContext } from '@plexus-intero
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
 import { ClientDtoUtils } from './../../ClientDtoUtils';
 import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocationClient';
+import { StreamingInvocationClientInternal } from './handlers/streaming/StreamingInvocationClientInternal';
 import { StreamingInvocationClientImpl } from './handlers/streaming/StreamingInvocationClientImpl';
 import { InvocationClient } from './../InvocationClient';
 import { ValueHandler } from './../ValueHandler';
@@ -145,7 +146,7 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         };
     }
 
-    public async sendBidirectionalStreamingRequestInternal(strInfo: string, requestInvocation: () => Promise<Invocation>, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
+    public async sendBidirectionalStreamingRequestInternal(strInfo: string, requestInvocation: () => Promise<Invocation>, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClientInternal<ArrayBuffer>> {
         const logger = LoggerFactory.getLogger(`Invocation Request [${strInfo}]`);
         logger.debug(`Sending request for invocation`);
         const invocation = await requestInvocation();
@@ -165,7 +166,7 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         requestInvocation: () => Promise<Invocation>,
         request: ArrayBuffer,
         responseObserver: InvocationObserver<ArrayBuffer>): Promise<InvocationClient> {
-        let streamingClient: StreamingInvocationClient<ArrayBuffer> | undefined;
+        let streamingClient: StreamingInvocationClientInternal<ArrayBuffer> | undefined;
         const completeHandler = (() => {
             let called = false;
             return () => {
@@ -193,6 +194,7 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         };
         streamingClient = await this.sendBidirectionalStreamingRequestInternal(strInfo, requestInvocation, responseObserver);
         await streamingClient.next(request);
+        streamingClient.sendCompleted();
         return streamingClient;
     }
 
