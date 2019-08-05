@@ -21,12 +21,15 @@ describe('Map Utils', () => {
     it('Should pop last element from Map', () => {
 
         const map = new Map();
+
         map.set(1, 2);
         map.set(3, 4);
 
         const [key, value] = pop(map);
+
         expect(key).toBe(3);
         expect(value).toBe(4);
+        expect(map.get(key)).toBeUndefined();
 
     });
 

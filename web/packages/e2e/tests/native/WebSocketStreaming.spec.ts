@@ -21,6 +21,9 @@ import { ServerStreamingInvocationTests } from '../echo/ServerStreamingInvocatio
 import { BidiStreamingInvocationTests } from '../echo/BidiStreamingTests';
 import { ClientStreamingTests } from '../echo/ClientStreamingTests';
 
+// tslint:disable: only-arrow-functions
+// tslint:disable: typedef
+// tslint:disable: no-invalid-this
 describe('Client: Web Socket Streaming invocation', () => {
 
     const clientsSetup = new ClientsSetup();

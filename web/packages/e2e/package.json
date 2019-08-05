@@ -21,7 +21,7 @@
     "copy-assets": "copyfiles src/echo/gen/* dist/main && copyfiles src/views/* dist/main",
     "republish": "echo 'Not implemented'",
     "build-host-proxy": "node scripts/browserify-all.js --standalone proxyHost --inputGlob dist/main/tests/common/TestCrossDomainHost.js --outputFile dist/main/tests/web/CrossDomainHost.bundle.js",
-    "prepare-native-e2e-debug-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/*PointToPoint*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
+    "prepare-native-e2e-debug-tests": "node scripts/browserify-all.js --inputGlob dist/main/tests/native/*Streaming*spec.js --outputFile dist/main/tests/native/RendererProcess.bundle.js",
     "e2e-web-electron": "node scripts/web-e2e-tests-launcher.js --file ./dist/main/tests/web/RendererProcess.bundle.js",
     "pree2e-web-electron": "node scripts/browserify-all.js --brokerCoverage true --inputGlob dist/main/tests/web/*spec.js --outputFile dist/main/tests/web/RendererProcess.bundle.js",
     "e2e-web-ie": "node scripts/web-e2e-tests-launcher.js --browser ie",

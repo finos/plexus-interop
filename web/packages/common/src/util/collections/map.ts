@@ -18,5 +18,7 @@ export function pop<K, V>(map: Map<K, V>): [K, V] {
     if (!map || map.size === 0) {
         throw new Error('Map is empty');
     }
-    return Array.from(map)[map.size - 1];
+    const entry = Array.from(map)[map.size - 1];
+    map.delete(entry[0]);
+    return entry;
 }

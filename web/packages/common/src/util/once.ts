@@ -17,11 +17,11 @@
 /**
  * Call source fn only once, even if source promise is rejected
  */
-export const once = <T>(fn: () => Promise<T>): () => Promise<T> => {
-    let promise: Promise<T> | undefined;
-    return () => {
+export const once = <Req, Res>(fn: (req?: Req) => Promise<Res>): (req?: Req) => Promise<Res> => {
+    let promise: Promise<Res> | undefined;
+    return (req?: Req) => {
         if (!promise) {
-            promise = fn();
+            promise = fn(req);
         }
         return promise;
     };

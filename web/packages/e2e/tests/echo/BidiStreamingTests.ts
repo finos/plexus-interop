@@ -37,14 +37,13 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
         let invocationCompletedReceivedByServer = false;
         let clientReceivedCompletion = false;
         let serverReceivedMessage = false;
-        let clientCompletedReceived = false;
         return new Promise<void>((resolve, reject) => {
             const serverHandler = new ClientStreamingHandler(() => {
                 return {
                     next: () => serverReceivedMessage = true,
                     complete: () => invocationCompletedReceivedByServer = true,
                     error: () => {},
-                    streamCompleted: () => clientCompletedReceived = true
+                    streamCompleted: () => {}
                 };
             });
             try {
@@ -60,7 +59,6 @@ export class BidiStreamingInvocationTests extends BaseEchoTest {
                     await AsyncHelper.waitFor(() => serverReceivedMessage === true);
                     streamingClient.cancel();
                     await AsyncHelper.waitFor(() => invocationCompletedReceivedByServer === true);
-                    await AsyncHelper.waitFor(() => clientCompletedReceived === true);
                     await AsyncHelper.waitFor(() => clientReceivedCompletion === true);
                     await this.waitForClientConnectionCleared(this.clientsSetup);
                     await this.waitForServerConnectionCleared(this.clientsSetup);

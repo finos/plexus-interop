@@ -120,7 +120,7 @@ export class GenericInvocation {
     }
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
-        this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
+        this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED, InvocationState.SENT_COMPLETED);
         this.log.trace(`Sending message of ${data.byteLength} bytes`);
         const headerPayload = modelHelper.messageHeaderPayload({
             length: data.byteLength
@@ -144,7 +144,9 @@ export class GenericInvocation {
 
         this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED, InvocationState.SENT_COMPLETED, InvocationState.COMPLETION_HANDSHAKE);
 
-        if (this.stateMachine.isOneOf(InvocationState.COMPLETION_RECEIVED, InvocationState.OPEN)) {
+        const isSuccessCompletion = ClientProtocolHelper.isSuccessCompletion(completion);
+        
+        if (isSuccessCompletion && this.stateMachine.isOneOf(InvocationState.COMPLETION_RECEIVED, InvocationState.OPEN)) {
             this.sendCompleted();
         }
 
@@ -157,7 +159,7 @@ export class GenericInvocation {
                     .then(result => resolveCloseAction(result))
                     .catch(e => rejectCloseAction(e));
             };
-            if (ClientProtocolHelper.isSuccessCompletion(completion) && !this.sendCompletionReceived) {
+            if (isSuccessCompletion && !this.sendCompletionReceived) {
                 // wait for remote side for success case only
                 this.log.debug('Waiting for remote completion');
                 this.sendCompletionReceivedCallback = closeChannel;
@@ -220,8 +222,12 @@ export class GenericInvocation {
             this.sendCompletionReceivedCallback = null;
         }
         switch (this.stateMachine.getCurrent()) {
+            case InvocationState.SENT_COMPLETED:
+                this.log.debug('SENT_COMPLETED -> COMPLETION_HANDSHAKE');
+                this.stateMachine.go(InvocationState.COMPLETION_HANDSHAKE);
+                break;
             case InvocationState.OPEN:
-                this.log.debug('Open state, switching to COMPLETION_RECEIVED');
+                this.log.debug('OPEN -> COMPLETION_RECEIVED');
                 this.stateMachine.go(InvocationState.COMPLETION_RECEIVED);
                 break;
             case InvocationState.COMPLETED:

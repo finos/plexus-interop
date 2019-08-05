@@ -40,15 +40,15 @@ export class ClientProtocolUtils {
     }
 
     public static isSuccessCompletion(completion: plexus.ICompletion): boolean {
-        return completion && (completion.status === undefined || completion.status === plexus.Completion.Status.Completed);
+        return !!completion && (completion.status === undefined || completion.status === plexus.Completion.Status.Completed);
     }
 
     public static isCancelCompletion(completion: plexus.ICompletion): boolean {
-        return completion && (completion.status === plexus.Completion.Status.Canceled);
+        return !!completion && (completion.status === plexus.Completion.Status.Canceled);
     }
 
     public static isErrorCompletion(completion: plexus.ICompletion): boolean {
-        return completion && (completion.status === plexus.Completion.Status.Failed);
+        return !!completion && (completion.status === plexus.Completion.Status.Failed);
     }
 
 }

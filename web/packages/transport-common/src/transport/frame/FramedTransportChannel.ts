@@ -203,7 +203,7 @@ export class FramedTransportChannel implements TransportChannel {
     }
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
-        this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
+        this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED, ChannelState.CLOSE_REQUESTED);
         let currentMessageIndex = ++this.messageId;
         /* istanbul ignore if */
         if (this.log.isTraceEnabled()) {
