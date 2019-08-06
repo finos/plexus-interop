@@ -16,14 +16,13 @@
  */
 import { InteropClient } from './InteropClient';
 import { GenericClientApi, ValueHandler, InvocationClient, MethodDiscoveryRequest, DiscoveredMethod, StreamingInvocationClient, InvocationObserver, MethodType } from '@plexus-interop/client';
-import { InvocationRequestInfo, ClientError } from '@plexus-interop/protocol';
-import { MethodDiscoveryResponse, ProvidedMethodReference, DiscoveryMode } from '@plexus-interop/client-api';
+import { ClientError } from '@plexus-interop/protocol';
+import { MethodDiscoveryResponse, ProvidedMethodReference, DiscoveryMode, MethodInvocationContext } from '@plexus-interop/client-api';
 import { InteropRegistryService, ProvidedMethod, ConsumedMethod, ProvidedService } from '@plexus-interop/metadata';
 import { DynamicProtoMarshallerFactory } from '@plexus-interop/io/dist/main/src/dynamic';
 import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler, wrapGenericHostClient, toGenericObserver } from './StringHandlers';
-import { Observer, flatMap } from '@plexus-interop/common';
-import { clientProtocol as plexus } from '@plexus-interop/protocol';
+import { flatMap } from '@plexus-interop/common';
 import { FieldNamesValidator } from './FieldNamesValidator';
 
 type DiscoveredMetaInfo = {
@@ -79,7 +78,11 @@ export class GenericClientWrapper implements InteropClient {
         return this.genericClient.disconnect();
     }
 
-    public setUnaryActionHandler(serviceId: string, methodId: string, serviceAlias: string, handler: (requestJson: string) => Promise<string>): void {
+    public setUnaryActionHandler(
+        serviceId: string, 
+        methodId: string, 
+        serviceAlias: string, 
+        handler: (invocationContext: MethodInvocationContext, requestJson: string) => Promise<string>): void {
         this.unaryHandlers.set(methodHash({
             serviceId,
             methodId,
@@ -97,6 +100,7 @@ export class GenericClientWrapper implements InteropClient {
     private isConsumed(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod): methodToInvoke is ConsumedMethod {
         return !!(methodToInvoke as ConsumedMethod).consumedService;
     }
+    
     private isDiscovered(methodToInvoke: DiscoveredMethod | ConsumedMethod | ProvidedMethod): methodToInvoke is DiscoveredMethod {
         return !!(methodToInvoke as DiscoveredMethod).providedMethod;
     }
@@ -231,7 +235,7 @@ export class GenericClientWrapper implements InteropClient {
     public resetInvocationHandlers(): void {
         const providedServices = this.interopRegistryService.getProvidedServices(this.appId);
         const notInterceptedMsg = 'Plexus Studio: Not intercepted';
-        const notInterceptedError: Error = new Error(notInterceptedMsg);
+        const notInterceptedError = new Error(notInterceptedMsg);
         flatMap((ps: ProvidedService) => ps.methods.valuesArray(), providedServices)
             .forEach(pm => {
                 const pmFullName = methodHash({
@@ -239,17 +243,16 @@ export class GenericClientWrapper implements InteropClient {
                     serviceAlias: pm.providedService.alias,
                     methodId: pm.method.name
                 });
-                const defaultResponse = this.defaultGenerator.generate(pm.method.responseMessage.id);
                 switch (pm.method.type) {
                     case MethodType.Unary:
-                        this.unaryHandlers.set(pmFullName, async requestJson => Promise.reject(notInterceptedError));
+                        this.unaryHandlers.set(pmFullName, async () => Promise.reject(notInterceptedError));
                         break;
                     case MethodType.ServerStreaming:
-                        this.serverStreamingHandlers.set(pmFullName, (request, hostClient) => hostClient.error(new ClientError(notInterceptedMsg)));
+                        this.serverStreamingHandlers.set(pmFullName, (context, request, hostClient) => hostClient.error(new ClientError(notInterceptedMsg)));
                         break;
                     case MethodType.DuplexStreaming:
                     case MethodType.ClientStreaming:
-                        this.bidiHandlers.set(pmFullName, hostClient => {
+                        this.bidiHandlers.set(pmFullName, (context, hostClient) => {
                             hostClient.error(new ClientError(notInterceptedMsg));
                             return {
                                 next: v => { },

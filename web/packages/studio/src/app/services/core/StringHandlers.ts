@@ -16,12 +16,12 @@
  */
 
 
-import { StreamingInvocationClient, InvocationObserver } from '@plexus-interop/client';
+import { StreamingInvocationClient, InvocationObserver, MethodInvocationContext  } from '@plexus-interop/client';
 import { Marshaller } from '@plexus-interop/io';
 
-export type UnaryStringHandler = (requestJson: string) => Promise<string>;
-export type ServerStreamingStringHandler = (request: string, invocationHostClient: StreamingInvocationClient<string>) => void;
-export type BidiStreamingStringHandler = (invocationHostClient: StreamingInvocationClient<string>) => InvocationObserver<string>;
+export type UnaryStringHandler = (invocationContext: MethodInvocationContext, requestJson: string) => Promise<string>;
+export type ServerStreamingStringHandler = (invocationContext: MethodInvocationContext, request: string, invocationHostClient: StreamingInvocationClient<string>) => void;
+export type BidiStreamingStringHandler = (invocationContext: MethodInvocationContext, invocationHostClient: StreamingInvocationClient<string>) => InvocationObserver<string>;
 
 export function wrapGenericHostClient(base: StreamingInvocationClient<ArrayBuffer>, marshaller: Marshaller<any, ArrayBuffer>): StreamingInvocationClient<string> {
     return {
