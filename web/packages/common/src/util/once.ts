@@ -26,3 +26,13 @@ export const once = <Req, Res>(fn: (req?: Req) => Promise<Res>): (req?: Req) => 
         return promise;
     };
 };
+
+export function onceVoid(fn: () => void): () => void {
+    let called = false;
+    return () => {
+        if (!called) {
+            called = true;
+            fn();
+        }
+    };
+}

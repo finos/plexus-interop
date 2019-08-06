@@ -26,7 +26,7 @@ import { InvocationClient } from './../InvocationClient';
 import { ValueHandler } from './../ValueHandler';
 import { ClientError } from '@plexus-interop/protocol';
 import { InvocationRequestInfo } from '@plexus-interop/protocol';
-import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
+import { Logger, LoggerFactory, Arrays, onceVoid } from '@plexus-interop/common';
 import { Completion } from '@plexus-interop/client-api';
 import { BinaryMarshallerProvider } from '@plexus-interop/io';
 import { UniqueId } from '@plexus-interop/transport-common';
@@ -167,19 +167,13 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         request: ArrayBuffer,
         responseObserver: InvocationObserver<ArrayBuffer>): Promise<InvocationClient> {
         let streamingClient: StreamingInvocationClientInternal<ArrayBuffer> | undefined;
-        const completeHandler = (() => {
-            let called = false;
-            return () => {
-                if (!called) {
-                    called = true;
-                    if (streamingClient) {
-                        streamingClient
-                            .complete()
-                            .catch(e => responseObserver.error(e));
-                    }
-                }
-            };
-        })();
+        const completeHandler = onceVoid(() => {
+            if (streamingClient) {
+                streamingClient
+                    .complete()
+                    .catch(e => responseObserver.error(e));
+            }
+        });
         // to react on cancel/complete invocation without stream completion
         const baseCompleteHandler = responseObserver.complete;
         responseObserver.complete = () => {
