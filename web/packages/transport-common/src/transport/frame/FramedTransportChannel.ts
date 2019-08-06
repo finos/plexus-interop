@@ -47,7 +47,7 @@ export class FramedTransportChannel implements TransportChannel {
 
     private clientCompletion: plexus.ICompletion;
     private remoteCompletion: plexus.ICompletion;
-    private channelObserver: Observer<ArrayBuffer>;
+    private channelObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>;
 
     private writeExecutor: SequencedExecutor;
     private safeMessagesBuffer: SafeMessageBuffer;
@@ -158,8 +158,7 @@ export class FramedTransportChannel implements TransportChannel {
                 Defaults.OPERATION_TIMEOUT);
         }
         if (ClientProtocolUtils.isCancelCompletion(this.remoteCompletion)) {
-            // TODO extend channel observer with cancel operation and replace channelObserver.complete with that
-            this.handleNonErrorCompletion('Channel Cancel received', new CancelledCompletion());
+            this.handleNonErrorCompletion('Channel Cancel received', this.remoteCompletion);
         } else if (ClientProtocolUtils.isErrorCompletion(this.remoteCompletion)) {
             // channel closed with error, report error and close
             const error = this.remoteCompletionToError(this.remoteCompletion);
@@ -213,7 +212,7 @@ export class FramedTransportChannel implements TransportChannel {
     }
 
     private handleNonErrorCompletion(message: string, completion?: plexus.ICompletion): void {
-        this.channelObserver.complete();
+        this.channelObserver.complete(completion);
         switch (this.stateMachine.getCurrent()) {
             case ChannelState.OPEN:
                 this.channelCancellationToken.cancelRead(message);

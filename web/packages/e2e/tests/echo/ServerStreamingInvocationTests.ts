@@ -21,6 +21,7 @@ import { BaseEchoTest } from './BaseEchoTest';
 import * as plexus from '../../src/echo/gen/plexus-messages';
 import { ClientError } from '@plexus-interop/protocol';
 import { expect } from 'chai';
+import { MethodInvocationContext } from '@plexus-interop/client-api';
 
 export class ServerStreamingInvocationTests extends BaseEchoTest {
 
@@ -32,10 +33,12 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
 
     public testServerSendsStreamToClient(): Promise<void> {
         const echoRequest = this.clientsSetup.createRequestDto();
+        let serverInvocationContext: MethodInvocationContext | null = null;
         return new Promise<void>(async (resolve, reject) => {
             const handler = new ServerStreamingHandler(async (context, request, hostClient) => {
                 try {
                     this.verifyInvocationContext(context);
+                    serverInvocationContext = context;
                     await this.assertEqual(request, echoRequest);
                     hostClient.next(echoRequest);
                     hostClient.next(echoRequest);
@@ -56,7 +59,11 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
                     expect(responses.length).is.eq(3);
                     responses.forEach(r => this.assertEqual(r, echoRequest));
                     await this.clientsSetup.disconnect(client, server);
-                    resolve();
+                    if (serverInvocationContext && serverInvocationContext.cancellationToken.isCancelled()) {
+                        reject('Server should not receive cancel for success completion');
+                    } else {
+                        resolve();
+                    }
                 },
                 error: (e) => {
                     reject(e);

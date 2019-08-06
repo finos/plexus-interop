@@ -270,9 +270,9 @@ export class GenericInvocation {
                     }
                 },
 
-                complete: () => {
+                complete: completion => {
                     this.log.debug('Remote channel closed');
-                    invocationObserver.complete();
+                    invocationObserver.complete(completion);
                 },
 
                 error: (e) => {

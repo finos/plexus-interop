@@ -23,6 +23,7 @@ import { UniqueId } from '@plexus-interop/transport-common';
 import { InvocationObserver } from '../../../../generic/InvocationObserver';
 import { InvocationHandlersRegistry } from '../InvocationHandlersRegistry';
 import { BaseInvocation } from '../../../../generic/BaseInvocation';
+import { ClientProtocolUtils } from '@plexus-interop/protocol';
 
 export class StreamingInvocationHost {
 
@@ -40,15 +41,15 @@ export class StreamingInvocationHost {
     }
 
     private execute(
-        isTypeAware: boolean, 
-        invocation: BaseInvocation<any, any>, 
+        isTypeAware: boolean,
+        invocation: BaseInvocation<any, any>,
         cancellationToken: CancellationToken = new CancellationToken()): void {
 
         this.logger.debug('Handling invocation started');
         let baseRequestObserver: null | Observer<any> = null;
         invocation.open({
 
-            started: (s) => {
+            started: () => {
                 this.logger.trace('Invocation opened');
                 const metaInfo = invocation.getMetaInfo();
                 const actionRef: ActionReference = {
@@ -61,8 +62,8 @@ export class StreamingInvocationHost {
                 const invocationHandler = isTypeAware ? this.handlersRegistry.getTypeAwareBidiStreamingHandler(actionRef) : this.handlersRegistry.getRawBidiStreamingHandler(actionRef);
                 if (invocationHandler) {
                     const invocationContext = new MethodInvocationContext(
-                        metaInfo.consumerApplicationId as string, 
-                        metaInfo.consumerConnectionId as UniqueId, 
+                        metaInfo.consumerApplicationId as string,
+                        metaInfo.consumerConnectionId as UniqueId,
                         cancellationToken);
                     baseRequestObserver = invocationHandler.handle(invocationContext, new StreamingInvocationClientImpl(invocation, this.logger));
                 } else {
@@ -70,7 +71,7 @@ export class StreamingInvocationHost {
                 }
             },
 
-            startFailed: (e) => this.logger.error('Could not open invocation', e),
+            startFailed: e => this.logger.error('Could not open invocation', e),
 
             next: (requestPayload: any) => {
                 if (!isTypeAware) {
@@ -81,9 +82,11 @@ export class StreamingInvocationHost {
                 this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<any>).next(requestPayload));
             },
 
-            complete: () => {
+            complete: completion => {
                 this.logger.trace('Received remote completion');
-                cancellationToken.cancel('Invocation completed');
+                if (completion && ClientProtocolUtils.isCancelCompletion(completion)) {
+                    cancellationToken.cancel('Invocation completed');
+                }
                 this.handleClientAction(baseRequestObserver, () => (baseRequestObserver as Observer<any>).complete());
             },
 
