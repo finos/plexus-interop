@@ -22,6 +22,7 @@ import * as plexus from '../../src/echo/gen/plexus-messages';
 import { ClientError } from '@plexus-interop/protocol';
 import { expect } from 'chai';
 import { MethodInvocationContext } from '@plexus-interop/client-api';
+import { AsyncHelper } from '@plexus-interop/common';
 
 export class ServerStreamingInvocationTests extends BaseEchoTest {
 
@@ -117,7 +118,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             streamCompleted: () => { }
         });
         await invocationClient.cancel();
-        expect(cancelReceivedByServer).to.eq(true);
+        await AsyncHelper.waitFor(() => cancelReceivedByServer === true);
         await this.clientsSetup.disconnect(client, server);
     }
 
