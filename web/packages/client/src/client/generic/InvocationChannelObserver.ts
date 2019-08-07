@@ -16,6 +16,8 @@
  */
 import { ChannelObserver } from '@plexus-interop/transport-common';
 import { InvocationObserver } from '.';
+import { transportProtocol as plexus } from '@plexus-interop/protocol';
 
 export interface InvocationChannelObserver<S, D> extends ChannelObserver<S, D>, InvocationObserver<D> {
+    complete: (completion?: plexus.ICompletion) => void;
 } 

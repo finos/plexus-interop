@@ -15,17 +15,15 @@
  * limitations under the License.
  */
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AppActions } from '../services/ui/AppActions';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '../services/ui/RootReducers';
 import { ProvidedMethod, ProvidedService } from '@plexus-interop/metadata';
 import { InteropClient } from '../services/core/InteropClient';
 import { SubscriptionsRegistry } from '../services/ui/SubscriptionsRegistry';
-import { Logger, LoggerFactory } from '@plexus-interop/common';
+import { Logger, LoggerFactory, uniqueId, ReadOnlyCancellationToken } from '@plexus-interop/common';
 import { StreamingInvocationClient, MethodType } from '@plexus-interop/client';
 import { createInvocationLogger } from '../services/core/invocation-utils';
-import { FormGroup, ValidatorFn } from '@angular/forms';
-import { AbstractControl, FormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { plexusMessageValidator } from '../services/ui/validators';
 
 @Component({
@@ -46,11 +44,9 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
 
   messagesToSend: number = 1;
   messagesPeriodInMillis: number = 200;
-  requesId: number = 0;
   title: string = '';
 
   constructor(
-    private actions: AppActions,
     private store: Store<fromRoot.State>,
     private subscriptions: SubscriptionsRegistry) { }
 
@@ -116,38 +112,41 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
           serviceId,
           methodId,
           serviceAlias,
-          async requestJson => {
-            const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
+          async (context, requestJson) => {
+            const invocationLogger = createInvocationLogger(this.providedMethod.method.type, uniqueId(), this.log);
             this.printRequest(requestJson, invocationLogger);
             invocationLogger.info(`Sending message:\n${contentJson}`);
             return contentJson;
           });
         break;
       case MethodType.ServerStreaming:
-        this.interopClient.setServerStreamingActionHandler(serviceId, methodId, serviceAlias, (request, client) => {
-          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
+        this.interopClient.setServerStreamingActionHandler(serviceId, methodId, serviceAlias, (context, request, client) => {
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, uniqueId(), this.log);
+          context.cancellationToken.onCancel(reason => invocationLogger.info(`Invocation Cancelled`, reason));
           this.printRequest(request, invocationLogger);
-          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
+          this.sendAndSchedule(context.cancellationToken, contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
         });
         break;
       case MethodType.ClientStreaming:
-        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, serviceAlias, (client) => {
-          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
+        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, serviceAlias, (context, client) => {
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, uniqueId(), this.log);
+          context.cancellationToken.onCancel(reason => invocationLogger.info(`Invocation Cancelled`, reason));
           return {
             next: request => this.printRequest(request, invocationLogger),
             error: e => this.handleError(e, invocationLogger),
             complete: () => this.handleCompleted(invocationLogger),
             streamCompleted: () => {
               this.handleStreamCompleted(invocationLogger);
-              this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
+              this.sendAndSchedule(context.cancellationToken, contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
             }
           };
         });
         break;
       case MethodType.DuplexStreaming:
-        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, serviceAlias, (client) => {
-          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, ++this.requesId, this.log);
-          this.sendAndSchedule(contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
+        this.interopClient.setBidiStreamingActionHandler(serviceId, methodId, serviceAlias, (context, client) => {
+          const invocationLogger = createInvocationLogger(this.providedMethod.method.type, uniqueId(), this.log);
+          context.cancellationToken.onCancel(reason => invocationLogger.info(`Invocation Cancelled`, reason));
+          this.sendAndSchedule(context.cancellationToken, contentJson, messagesToSend, messagesPeriodInMillis, client, invocationLogger);
           return {
             next: request => {
               this.printRequest(request, invocationLogger);
@@ -170,12 +169,21 @@ export class ProvidedServiceComponent implements OnInit, OnDestroy {
     return JSON.stringify(JSON.parse(data), null, 2);
   }
 
-  sendAndSchedule(message: string, leftToSend: number, intervalInMillis: number, client: StreamingInvocationClient<string>, logger: Logger) {
+  sendAndSchedule(
+    cancellationToken: ReadOnlyCancellationToken,
+    message: string, 
+    leftToSend: number, 
+    intervalInMillis: number, 
+    client: StreamingInvocationClient<string>, 
+    logger: Logger) {
+    if (cancellationToken.isCancelled()) {
+      return;
+    }
     if (leftToSend > 0) {
       logger.info(`Sending message:\n${message}`);
       client.next(message);
       setTimeout(() => {
-        this.sendAndSchedule(message, leftToSend - 1, intervalInMillis, client, logger);
+        this.sendAndSchedule(cancellationToken, message, leftToSend - 1, intervalInMillis, client, logger);
       }, intervalInMillis);
     } else {
       logger.info('Sending completion');

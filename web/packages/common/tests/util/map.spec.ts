@@ -14,15 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// tslint:disable-next-line:variable-name
-export enum InvocationState {
-    CREATED = 'CREATED',
-    START_REQUESTED = 'START_REQUESTED',
-    REMOTE_STARTING = 'REMOTE_STARTING',
-    ACCEPTING_INVOCATION_INFO = 'ACCEPTING_INVOCATION_INFO',
-    OPEN = 'OPEN',
-    COMPLETION_RECEIVED = 'COMPLETION_RECEIVED',
-    SENT_COMPLETED = 'COMPLETION_SENT',
-    COMPLETION_HANDSHAKE = 'COMPLETION_HANDSHAKE',
-    COMPLETED = 'COMPLETED'
-}
+import { pop } from '../../src/util/collections/map';
+
+describe('Map Utils', () => {
+
+    it('Should pop last element from Map', () => {
+
+        const map = new Map();
+
+        map.set(1, 2);
+        map.set(3, 4);
+
+        const [key, value] = pop(map);
+
+        expect(key).toBe(3);
+        expect(value).toBe(4);
+        expect(map.get(key)).toBeUndefined();
+
+    });
+
+});

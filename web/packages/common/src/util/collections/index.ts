@@ -17,3 +17,4 @@
 export * from './BlockingQueue';
 export * from './LimitedBufferQueue';
 export * from './ExtendedMap';
+export * from './map';

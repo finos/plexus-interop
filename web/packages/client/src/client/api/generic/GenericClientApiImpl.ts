@@ -20,12 +20,13 @@ import { ServiceDiscoveryRequest, MethodInvocationContext } from '@plexus-intero
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
 import { ClientDtoUtils } from './../../ClientDtoUtils';
 import { StreamingInvocationClient } from './handlers/streaming/StreamingInvocationClient';
+import { StreamingInvocationClientInternal } from './handlers/streaming/StreamingInvocationClientInternal';
 import { StreamingInvocationClientImpl } from './handlers/streaming/StreamingInvocationClientImpl';
 import { InvocationClient } from './../InvocationClient';
 import { ValueHandler } from './../ValueHandler';
 import { ClientError } from '@plexus-interop/protocol';
 import { InvocationRequestInfo } from '@plexus-interop/protocol';
-import { Logger, LoggerFactory, Arrays } from '@plexus-interop/common';
+import { Logger, LoggerFactory, Arrays, onceVoid } from '@plexus-interop/common';
 import { Completion } from '@plexus-interop/client-api';
 import { BinaryMarshallerProvider } from '@plexus-interop/io';
 import { UniqueId } from '@plexus-interop/transport-common';
@@ -145,7 +146,7 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         };
     }
 
-    public async sendBidirectionalStreamingRequestInternal(strInfo: string, requestInvocation: () => Promise<Invocation>, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>> {
+    public async sendBidirectionalStreamingRequestInternal(strInfo: string, requestInvocation: () => Promise<Invocation>, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClientInternal<ArrayBuffer>> {
         const logger = LoggerFactory.getLogger(`Invocation Request [${strInfo}]`);
         logger.debug(`Sending request for invocation`);
         const invocation = await requestInvocation();
@@ -165,9 +166,29 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         requestInvocation: () => Promise<Invocation>,
         request: ArrayBuffer,
         responseObserver: InvocationObserver<ArrayBuffer>): Promise<InvocationClient> {
-        const streamingClient = await this.sendBidirectionalStreamingRequestInternal(strInfo, requestInvocation, responseObserver);
+        let streamingClient: StreamingInvocationClientInternal<ArrayBuffer> | undefined;
+        const completeHandler = onceVoid(() => {
+            if (streamingClient) {
+                streamingClient
+                    .complete()
+                    .catch(e => responseObserver.error(e));
+            }
+        });
+        // to react on cancel/complete invocation without stream completion
+        const baseCompleteHandler = responseObserver.complete;
+        responseObserver.complete = () => {
+            baseCompleteHandler();
+            completeHandler();
+        };
+        // send client completion on stream completion also, success case
+        const streamCompleteHandler = responseObserver.streamCompleted;
+        responseObserver.streamCompleted = () => {
+            streamCompleteHandler();
+            completeHandler();
+        };
+        streamingClient = await this.sendBidirectionalStreamingRequestInternal(strInfo, requestInvocation, responseObserver);
         await streamingClient.next(request);
-        streamingClient.complete().catch(e => responseObserver.error(e));
+        streamingClient.sendCompleted();
         return streamingClient;
     }
 

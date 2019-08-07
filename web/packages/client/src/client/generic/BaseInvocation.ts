@@ -23,6 +23,7 @@ import { clientProtocol as plexus } from '@plexus-interop/protocol';
 export interface BaseInvocation<Req, Res> {
     uuid(): UniqueId;
     sendMessage(data: Req): Promise<void>;
+    sendCompleted(): Promise<void>;
     open(observer: InvocationChannelObserver<AnonymousSubscription, Res>): void;
     close(completion?: plexus.ICompletion): Promise<plexus.ICompletion>;
     getMetaInfo(): InvocationMetaInfo;

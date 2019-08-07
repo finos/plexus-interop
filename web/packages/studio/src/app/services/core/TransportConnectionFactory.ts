@@ -20,7 +20,7 @@ import { CrossDomainEventBus, WebBrokerConnectionBuilder, CrossDomainEventBusPro
 import { TransportConnection } from '@plexus-interop/transport-common';
 import { InteropServiceFactory } from './InteropServiceFactory';
 import { WebSocketConnectionFactory } from '@plexus-interop/websocket-transport';
-import { UrlParamsProvider, LoggerFactory } from '@plexus-interop/common';
+import { LoggerFactory } from '@plexus-interop/common';
 import { StudioExtensions } from '../extensions/StudioExtensions';
 import { TransportType, ConnectionDetails } from '../ui/AppModel';
 
@@ -92,7 +92,6 @@ export class TransportConnectionFactory {
 
     private createWebTransportProvider(appsUrl: string, metadataUrl: string, eventBusProvider: () => Promise<EventBus>): TransportConnectionProvider {
         return async () => {
-            let eventBus: CrossDomainEventBus;
             const connection: TransportConnection = await new WebBrokerConnectionBuilder()
                 .withAppRegistryProviderFactory(async () => this.serviceFactory.createAppRegistryProvider(appsUrl))
                 .withInteropRegistryProviderFactory(async () => this.serviceFactory.createInteropRegistryProvider(metadataUrl))

@@ -48,4 +48,8 @@ export class RequestedDiscoveredInvocation implements Invocation {
         return this.genericInvocation.getMetaInfo();
     }
 
+    public async sendCompleted(): Promise<void> {
+        return this.genericInvocation.sendCompleted();
+    }
+
 }
