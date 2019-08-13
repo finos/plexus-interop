@@ -39,7 +39,7 @@
     "trash-cli": "^1.4.0",
     "tslint": "5.8.0",
     "typescript": "3.3.3",
-    "yarn": "1.4.0"
+    "yarn": "1.17.3"
   },
   "jest": {
     "testEnvironment": "node",

@@ -32,7 +32,7 @@
     "tslint": "5.8.0",
     "typescript": "3.3.3",
     "browserify": "^14.4.0",
-    "yarn": "1.4.0"
+    "yarn": "1.17.3"
   },
   "jest": {
     "testEnvironment": "node",
