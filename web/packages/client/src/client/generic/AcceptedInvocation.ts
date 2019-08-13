@@ -41,6 +41,10 @@ export class AcceptedInvocation implements Invocation {
         return this.genericInvocation.close(completion);
     }
 
+    public async sendCompleted(): Promise<void> {
+        return this.genericInvocation.sendCompleted();
+    }
+
     public getMetaInfo(): InvocationMetaInfo {
         return this.genericInvocation.getMetaInfo();
     }

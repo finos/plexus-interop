@@ -100,22 +100,23 @@ export class HostTransportConnection implements TransportConnection {
             }).subscribe(responseObserver);
         }, this.stringUuid);
 
-        this.remoteBrokerService.host<ChannelRequest, ArrayBuffer>(RemoteActions.OPEN_CHANNEL, (request: ChannelRequest, responseObserver) => {                          
-            return new Observable(observer => {            
-                const channel = this.getManagedChannel(request.channelId);
-                this.log.trace(`Open Channel [${request.channelId}] request received`);
-                if (channel) {
-                    channel.open({
-                        started: () => { },
-                        startFailed: e => observer.error(e),
-                        next: msg => observer.next(arrayBufferToString(msg)),
-                        complete: () => observer.complete(),
-                        error: e => observer.error(Types.toClientError(e))
-                    });
-                } else {
-                    observer.error(`No channel with id [${request.channelId}]`);
-                }
-            }).subscribe(responseObserver);
+        this.remoteBrokerService.host<ChannelRequest, string>(RemoteActions.OPEN_CHANNEL, (request: ChannelRequest, responseObserver) => {
+            const channel = this.getManagedChannel(request.channelId);
+            this.log.trace(`Open Channel [${request.channelId}] request received`);
+            if (channel) {
+                channel.open({
+                    started: () => { },
+                    startFailed: e => responseObserver.error(e),
+                    next: msg => responseObserver.next(arrayBufferToString(msg)),
+                    complete: completion => responseObserver.complete(completion),
+                    error: e => responseObserver.error(Types.toClientError(e))
+                });
+            } else {
+                responseObserver.error(`No channel with id [${request.channelId}]`);
+            }
+            return {
+                unsubscribe: () => { }
+            };
         }, this.stringUuid);
 
         this.remoteBrokerService.host<SendMessageRequest, {}>(RemoteActions.SEND_MESSAGE, (request: SendMessageRequest, responseObserver) => {
@@ -135,7 +136,7 @@ export class HostTransportConnection implements TransportConnection {
         }, this.stringUuid);
 
         this.remoteBrokerService.host<CloseChannelRequest, CloseChannelResponse>(RemoteActions.CLOSE_CHANNEL, (request: CloseChannelRequest, responseObserver) => {
-            return new Observable(observer => {               
+            return new Observable(observer => {
                 this.log.trace(`Close channel [${request.channelId}] received`);
                 const channel = this.getManagedChannel(request.channelId);
                 if (channel) {

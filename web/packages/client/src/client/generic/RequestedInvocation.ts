@@ -39,6 +39,10 @@ export class RequestedInvocation implements Invocation {
         return this.genericInvocation.start(this.metaInfo, observer);
     }
 
+    public async sendCompleted(): Promise<void> {
+        return this.genericInvocation.sendCompleted();
+    }
+
     public close(completion?: plexus.ICompletion): Promise<plexus.ICompletion> {
         return this.genericInvocation.close(completion);
     }

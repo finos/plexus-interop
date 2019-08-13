@@ -20,7 +20,6 @@ import { BaseEchoTest } from './BaseEchoTest';
 import { ServerStreamingHandler } from './ServerStreamingHandler';
 import { EchoClientClient, EchoClientClientBuilder } from '../../src/echo/client/EchoClientGeneratedClient';
 import { EchoServerClient } from '../../src/echo/server/EchoServerGeneratedClient';
-import { UniqueId } from '@plexus-interop/transport-common';
 import { MethodInvocationContext } from '@plexus-interop/client';
 import { AsyncHelper } from '@plexus-interop/common';
 
@@ -68,19 +67,24 @@ export class ClientConnectivityTests extends BaseEchoTest {
             let clientInvocationErrorReceived: Promise<void> | null = null;
 
             const serverRequestReceived = new Promise(async (serverRequestResolve) => {
-                handler = new ServerStreamingHandler(async (context, request, hostClient) => {
+                handler = new ServerStreamingHandler(async context => {
                     serverInvocationContext = context;
                     serverRequestResolve();
                 });
                 [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler as ServerStreamingHandler);
-                clientInvocationErrorReceived = new Promise<void>((clientErrorResolve, clientErrorReject) => {
+                clientInvocationErrorReceived = new Promise<void>(clientComplete => {
                     (client as EchoClientClient).getEchoServiceProxy().serverStreaming(echoRequest, {
-                        next: (r) => {
-                            clientErrorReject('Not expected to receive update');
+                        next: () => {},
+                        // client receives 'cancel' completion
+                        complete: () => {
+                            if  (!isDroppedByClient) {
+                                clientComplete();
+                            }
                         },
-                        complete: () => clientErrorReject('Complete not expected'),
-                        error: (e) => {
-                            clientErrorResolve();
+                        error: () => {
+                            if  (isDroppedByClient) {
+                                clientComplete();
+                            }
                         },
                         streamCompleted: () => { }
                     });
@@ -97,11 +101,10 @@ export class ClientConnectivityTests extends BaseEchoTest {
             }
 
             // server's context must be cancelled
-            AsyncHelper.waitFor(() => (serverInvocationContext as MethodInvocationContext).cancellationToken.isCancelled());
+            await AsyncHelper.waitFor(() => (serverInvocationContext as MethodInvocationContext).cancellationToken.isCancelled());
 
             await clientInvocationErrorReceived;
 
-            // gracefully disconnect other side
             if (isDroppedByClient) {
                 await (server as EchoServerClient).disconnect();
             } else {
@@ -119,13 +122,13 @@ export class ClientConnectivityTests extends BaseEchoTest {
         let client: EchoClientClient | null = null;
         let server: EchoServerClient | null = null;
 
-        return new Promise<void>(async (testResolve, testError) => {
+        return new Promise<void>(async (testResolve) => {
 
             let handler: ServerStreamingHandler | null = null;
             let clientInvocationErrorReceived: Promise<void> | null = null;
 
             const serverRequestReceived = new Promise(async (serverRequestResolve) => {
-                handler = new ServerStreamingHandler(async (context, request, hostClient) => {
+                handler = new ServerStreamingHandler(async () => {
                     serverRequestResolve();
                 });
                 [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler as ServerStreamingHandler);

@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion, Completion, UniqueId } from '@plexus-interop/protocol';
+import { clientProtocol as plexus, SuccessCompletion, ClientProtocolHelper, ErrorCompletion, Completion, UniqueId, ClientProtocolUtils } from '@plexus-interop/protocol';
 import { ApplicationConnectionDescriptor } from '../lifecycle/ApplicationConnectionDescriptor';
-import { Observable } from 'rxjs/Observable';
 import { InteropRegistryService } from '@plexus-interop/metadata';
 import { AppLifeCycleManager } from '../lifecycle/AppLifeCycleManager';
-import { TransportChannel, Defaults } from '@plexus-interop/transport-common';
-import { LoggerFactory, Logger, BufferedObserver, Observer } from '@plexus-interop/common';
+import { TransportChannel, Defaults, BufferedObserver, PlexusObserver } from '@plexus-interop/transport-common';
+import { LoggerFactory, Logger } from '@plexus-interop/common';
 import { ConsumedMethodReference } from '@plexus-interop/metadata';
 import { ProvidedMethodReference } from '@plexus-interop/metadata';
 import { ApplicationConnection } from '../lifecycle/ApplicationConnection';
@@ -35,7 +34,7 @@ export class InvocationRequestHandler {
         private readonly appLifeCycleManager: AppLifeCycleManager) { }
 
     public async handleRequest(
-        $inMessages: Observable<ArrayBuffer>,
+        inMessagesBufferedObserver: BufferedObserver<ArrayBuffer>,
         invocationRequest: plexus.interop.protocol.IInvocationStartRequest,
         sourceChannel: TransportChannel,
         sourceConnectionDescriptor: ApplicationConnectionDescriptor): Promise<Completion> {
@@ -67,7 +66,7 @@ export class InvocationRequestHandler {
                 const targetChannelObserver = new BufferedObserver(Defaults.DEFAULT_BUFFER_SIZE, this.log);
                 await targetChannel.open({
                     next: m => targetChannelObserver.next(m),
-                    complete: () => targetChannelObserver.complete(),
+                    complete: completion => targetChannelObserver.complete(completion),
                     error: e => targetChannelObserver.error(e),
                     started: () => { },
                     startFailed: e => this.log.error('Failed to start target channel', e)
@@ -79,7 +78,7 @@ export class InvocationRequestHandler {
                 this.log.trace(`Sending InvocationRequested to [${targetChannelId}]`);
                 targetChannel.sendMessage(ClientProtocolHelper.invocationRequestedPayload(this.createInvocationStartRequested(methodReference, sourceConnectionDescriptor)));
 
-                const targetPropogationCompleted = this.propogateAll($inMessages, targetChannel, sourceChannel);
+                const targetPropogationCompleted = this.propogateAll(inMessagesBufferedObserver, targetChannel, sourceChannel);
                 const sourcePropogationCompleted = this.propogateAll(targetChannelObserver, sourceChannel, targetChannel);
 
                 await Promise.all([targetPropogationCompleted, sourcePropogationCompleted]);
@@ -116,12 +115,12 @@ export class InvocationRequestHandler {
 
     }
 
-    private async propogateAll(source: Observable<ArrayBuffer> | BufferedObserver<ArrayBuffer>, targetChannel: TransportChannel, sourceChannel: TransportChannel): Promise<void> {
+    private async propogateAll(source: BufferedObserver<ArrayBuffer>, targetChannel: TransportChannel, sourceChannel: TransportChannel): Promise<void> {
 
         const targetChannelId = targetChannel.uuid().toString();
         const sourceChannelId = sourceChannel.uuid().toString();
-        
-        const sourceObserver: (resolve: any, reject: any) => Observer<ArrayBuffer> = (resolve, reject) => {
+
+        const sourceObserver: (resolve: any, reject: any) => PlexusObserver<ArrayBuffer> = (resolve, reject) => {
             return {
                 next: async messagePayload => {
                     if (this.log.isTraceEnabled()) {
@@ -134,7 +133,11 @@ export class InvocationRequestHandler {
                         reject(e);
                     }
                 },
-                complete: () => {
+                complete: completion => {
+                    if (completion && ClientProtocolUtils.isCancelCompletion(completion)) {
+                        this.log.info(`Source channel [${sourceChannelId}] cancelled invocation, sending cancellation close to target [${targetChannelId}]`);
+                        targetChannel.close(completion);
+                    }
                     this.log.trace(`Source channel [${sourceChannelId}] completed`);
                     resolve();
                 },
@@ -144,15 +147,10 @@ export class InvocationRequestHandler {
                 }
             };
         };
-        if (Types.isObservable(source)) {
-            return new Promise<void>((resolve, reject) => {
-                source.subscribe(sourceObserver(resolve, reject));
-            });
-        } else {
-            return new Promise<void>((resolve, reject) => {
-                source.setObserver(sourceObserver(resolve, reject));
-            });
-        }
+
+        return new Promise<void>((resolve, reject) => {
+            source.setObserver(sourceObserver(resolve, reject));
+        });
     }
 
     private createInvocationStartRequested(methodReference: ConsumedMethodReference | ProvidedMethodReference, sourceConnection: ApplicationConnectionDescriptor): plexus.interop.protocol.IInvocationStartRequested {
@@ -178,7 +176,7 @@ export class InvocationRequestHandler {
                 this.log.trace(`Looking for app by connection id [${connectionId.toString()}]`);
                 appConnection = onlineApps.find(a => connectionId.equals(a.connection.uuid()));
             } else if (methodReference.providedService && methodReference.providedService.applicationId) {
-                this.log.trace(`Looking for app by app id [${methodReference.providedService.applicationId}]`);                
+                this.log.trace(`Looking for app by app id [${methodReference.providedService.applicationId}]`);
                 appConnection = this.appLifeCycleManager.getOrSpawnConnection(methodReference.providedService.applicationId, sourceConnection.instanceId);
             }
             if (!appConnection) {

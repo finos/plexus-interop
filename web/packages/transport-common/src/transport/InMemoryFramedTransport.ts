@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 import { ConnectableFramedTransport, Defaults, UniqueId, Frame } from '../.';
-import { ReadWriteCancellationToken, Observer, BufferedObserver, Logger, LoggerFactory } from '@plexus-interop/common';
+import { ReadWriteCancellationToken, Observer, Logger, LoggerFactory } from '@plexus-interop/common';
+import { BufferedObserver } from '../common';
 
 export class InMemoryFramedTransport implements ConnectableFramedTransport {
 

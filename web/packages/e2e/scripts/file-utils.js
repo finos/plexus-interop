@@ -27,17 +27,23 @@ function readline(filePath, callBack) {
     });
 };
 
-function onFileAdded(dir, callback) {
+function onFileAdded(dir, fileName, callback) {
     var wsAddressWatcher = chokidar.watch(dir, {
         ignored: /(^|[\/\\])\../,
         persistent: true
     });
     wsAddressWatcher
         .on('add', path => {
-            console.log(`File ${path} has been added`);
-            callback(path);
+            if (path.endsWith(fileName)) {
+                console.log(`File ${path} has been added`);
+                callback(path);
+            }
         })
-        .on('change', path => console.log(`File ${path} has been changed`));
+        .on('change', path => {
+            if (path.endsWith(fileName)) {
+                console.log(`File ${path} has been changed`)
+            }
+        });
 }
 
 module.exports = {

@@ -47,7 +47,7 @@ export class FramedTransportChannel implements TransportChannel {
 
     private clientCompletion: plexus.ICompletion;
     private remoteCompletion: plexus.ICompletion;
-    private channelObserver: Observer<ArrayBuffer>;
+    private channelObserver: ChannelObserver<AnonymousSubscription, ArrayBuffer>;
 
     private writeExecutor: SequencedExecutor;
     private safeMessagesBuffer: SafeMessageBuffer;
@@ -120,7 +120,7 @@ export class FramedTransportChannel implements TransportChannel {
         this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
         // wait for remote side if required and report result
         return new Promise<plexus.ICompletion>((resolve, reject) => {
-            (async () => {
+            try {
                 // handler called when remote side also sent its completion
                 this.onCloseHandler = (summarizedCompletion?: plexus.ICompletion) => {
                     resolve(summarizedCompletion);
@@ -134,11 +134,10 @@ export class FramedTransportChannel implements TransportChannel {
                     this.sendChannelClosedRequest(completion);
                     this.closeInternal('Remote completed, confirmation sent');
                 }
-            })()
-                .catch(e => {
-                    this.log.error('Error during sending close channel request', e);
-                    reject(e);
-                });
+            } catch (error) {
+                this.log.error('Error during sending close channel request', error);
+                reject(error);
+            }
         });
     }
 
@@ -153,28 +152,20 @@ export class FramedTransportChannel implements TransportChannel {
             this.log.debug(`Remote completed with ${JSON.stringify(this.remoteCompletion)}`);
         }
         if (this.safeMessagesBuffer && this.safeMessagesBuffer.hasPendingChunks()) {
-            await AsyncHelper.waitFor(() => !this.safeMessagesBuffer.hasPendingChunks(), 
-                new CancellationToken(), 
-                Defaults.STATUS_CHECK_INTERVAL, 
+            await AsyncHelper.waitFor(() => !this.safeMessagesBuffer.hasPendingChunks(),
+                new CancellationToken(),
+                Defaults.STATUS_CHECK_INTERVAL,
                 Defaults.OPERATION_TIMEOUT);
         }
-        if (!ClientProtocolUtils.isSuccessCompletion(this.remoteCompletion)) {
+        if (ClientProtocolUtils.isCancelCompletion(this.remoteCompletion)) {
+            this.handleNonErrorCompletion('Channel Cancel received', this.remoteCompletion);
+        } else if (ClientProtocolUtils.isErrorCompletion(this.remoteCompletion)) {
             // channel closed with error, report error and close
             const error = this.remoteCompletionToError(this.remoteCompletion);
-            this.closeInternal('Channel Close with error received', error);
+            this.closeInternal('Channel Close with Error received', error);
         } else {
-            this.channelObserver.complete();
-            switch (this.stateMachine.getCurrent()) {
-                case ChannelState.OPEN:
-                    this.channelCancellationToken.cancelRead('Channel close received');
-                    this.stateMachine.go(ChannelState.CLOSE_RECEIVED);
-                    break;
-                case ChannelState.CLOSE_REQUESTED:
-                    this.closeInternal('Remote channel close received');
-                    break;
-                default:
-                    throw new Error(`Can't handle close, invalid state ${this.stateMachine.getCurrent()}`);
-            }
+            // success
+            this.handleNonErrorCompletion('Channel Close received');
         }
     }
 
@@ -192,7 +183,7 @@ export class FramedTransportChannel implements TransportChannel {
             const completion = ClientProtocolUtils.createSummarizedCompletion(
                 this.clientCompletion,
                 this.remoteCompletion || new ErrorCompletion(new ClientError('Remote side not completed')));
-            if (!ClientProtocolUtils.isSuccessCompletion(completion)) {
+            if (ClientProtocolUtils.isErrorCompletion(completion)) {
                 this.channelObserver.error(error || completion.error);
             }
             this.onCloseHandler(completion);
@@ -211,13 +202,31 @@ export class FramedTransportChannel implements TransportChannel {
     }
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
-        this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED);
+        this.stateMachine.throwIfNot(ChannelState.OPEN, ChannelState.CLOSE_RECEIVED, ChannelState.CLOSE_REQUESTED);
         let currentMessageIndex = ++this.messageId;
         /* istanbul ignore if */
         if (this.log.isTraceEnabled()) {
             this.log.trace(`Scheduling sending [${currentMessageIndex}] message of ${data.byteLength} bytes`);
         }
         return this.writeExecutor.submit(() => this.sendMessageInternal(data, currentMessageIndex));
+    }
+
+    private handleNonErrorCompletion(message: string, completion?: plexus.ICompletion): void {
+        this.channelObserver.complete(completion);
+        switch (this.stateMachine.getCurrent()) {
+            case ChannelState.OPEN:
+                this.channelCancellationToken.cancelRead(message);
+                this.stateMachine.go(ChannelState.CLOSE_RECEIVED);
+                if (completion) {
+                    this.close(completion);
+                }
+                break;
+            case ChannelState.CLOSE_REQUESTED:
+                this.closeInternal(message);
+                break;
+            default:
+                throw new Error(`Can't handle close, invalid state ${this.stateMachine.getCurrent()}`);
+        }
     }
 
     private async subscribeToMessages(channelObserver: Observer<ArrayBuffer>): Promise<void> {
@@ -232,7 +241,7 @@ export class FramedTransportChannel implements TransportChannel {
             complete: () => this.log.debug('Received complete from transport'),
             error: (e: any) => this.handleConnectionError(channelObserver, e)
         })
-        .catch(connectionError => channelObserver.error(connectionError));
+            .catch(connectionError => channelObserver.error(connectionError));
     }
 
     private async sendChannelClosedRequest(completion: plexus.ICompletion = new SuccessCompletion()): Promise<void> {

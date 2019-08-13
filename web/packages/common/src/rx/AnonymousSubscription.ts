@@ -17,5 +17,5 @@
 import { Subscription } from './Subscription';
 
 export class AnonymousSubscription implements Subscription {
-    constructor (public readonly unsubscribe: () => void = () => {}) {}
+    constructor(public readonly unsubscribe: () => void = () => { }) { }
 }

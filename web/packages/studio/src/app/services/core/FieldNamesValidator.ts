@@ -19,6 +19,8 @@ import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 
 import { default as Set } from 'typescript-collections/dist/lib/Set';
 
+const maxRecursiveDepth = 3;
+
 export class FieldNamesValidator {
 
     private messageGenerator: DefaultMessageGenerator;
@@ -43,17 +45,16 @@ export class FieldNamesValidator {
         if (Array.isArray(object) || !object) {
             return result;
         }
-        Object.keys(object).forEach(key => {
-            if (object.hasOwnProperty(key)) {
-                result.add(prefix + key);
-                const value = object[key];
-                if (this.messageGenerator.isMapByName(messageId, key)) {
-                    // map field, stop
-                    return;
-                }
-                if (this.isObject(value)) {
-                    this.collectObjFieldNames(messageId, value, result, key + ".");
-                }
+        Object.getOwnPropertyNames(object).forEach(key => {
+            const fullPropertyName = prefix + key;
+            result.add(fullPropertyName);
+            const value = object[key];
+            if (this.messageGenerator.isMapByName(messageId, key)) {
+                // map field, stop
+                return;
+            }
+            if (this.isObject(value)) {
+                this.collectObjFieldNames(messageId, value, result, fullPropertyName + ".");
             }
         });
         return result;
@@ -67,24 +68,44 @@ export class FieldNamesValidator {
         if (this.messageFieldsNameCache.has(message.id)) {
             return this.messageFieldsNameCache.get(message.id);
         } else {
-            return this.collectFields(message, new Set<string>());
+            return this.collectFields(message);
         }
     }
 
-    private collectFields(message: Message, result: Set<string>, prefix: string = ""): Set<string> {
-        for (let fieldName in message.fields) {
-            result.add(prefix + fieldName);
-            const field = message.fields[fieldName];
-            const messageType = this.messageGenerator.lookupMessageByFieldType(message.id, field.type);
-            if (messageType) {
-                this.collectFields(messageType, result, fieldName + ".");
-            }
+    private collectFields(
+        message: Message,
+        collectedFields: Set<string> = new Set(),
+        visitedNestedTypes: Map<string, number> = new Map(),
+        prefix: string = ""): Set<string> {
+
+        let visitsCount = visitedNestedTypes.get(message.id) || 0;
+        if (visitsCount > maxRecursiveDepth) {
+            // already visited few times, skip nested fields 
+            return;
         }
-        return result;
+        visitedNestedTypes.set(message.id, visitsCount + 1);
+        Object.getOwnPropertyNames(message.fields)
+            .map(fieldName => {
+                const field = message.fields[fieldName];
+                const type = !!field ? this.messageGenerator.lookupMessageByFieldType(message.id, field.type) : undefined;
+                return { field, type, fieldName };
+            })
+            // fields with message type goes at the end, so we have better chances to process 
+            // simple types before got recursive call issue
+            .sort((first, second) => {
+                const firstScore = !!first.type ? 1 : 0;
+                const secondScore = !!second.type ? 1 : 0;
+                return secondScore - firstScore;
+            })
+            .forEach(field => {
+                const fullFieldName = `${prefix}${field.fieldName}`;
+                collectedFields.add(fullFieldName);
+                if (field.type) {
+                    this.collectFields(field.type, collectedFields, visitedNestedTypes, fullFieldName + ".");
+                }
+            });
+        return collectedFields;
     }
 
-    private lookupMessage(id: string): Message | null {
-        return this.registryProvider.getRegistry().messages.get(id);
-    }
 
 }

@@ -48,7 +48,7 @@ function start() {
         fs.accessSync(addressFile);
         log(`Deleting WS address file ${addressFile}`);
         fs.unlinkSync(addressFile);
-        log(`Deleted ${addressFile}`); 
+        log(`Deleted ${addressFile}`);
     } catch (error) {
         log(`${addressFile} does not exist`);
     }
@@ -63,7 +63,7 @@ function start() {
 
         let brokerProcess;
         let launched = false;
-        onFileAdded(wsAddressDir, (receivedPath) => {
+        onFileAdded(wsAddressDir, addressFile, receivedPath => {
             if (!launched) {
                 launched = true;
                 readClearedLine(receivedPath)

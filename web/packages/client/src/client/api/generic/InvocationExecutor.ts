@@ -66,6 +66,7 @@ export class InvocationExecutor {
                     };
                     return metaInfo;
                 },
+                sendCompleted: async () => { },
                 close: async completion => {
                     if (!ClientProtocolHelper.isSuccessCompletion(completion || new SuccessCompletion())) {
                         reject(completion);

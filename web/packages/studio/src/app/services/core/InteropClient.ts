@@ -14,14 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GenericClientApi, StreamingInvocationClient, ValueHandler, InvocationClient, MethodDiscoveryResponse, MethodDiscoveryRequest, DiscoveredMethod, InvocationObserver } from '@plexus-interop/client';
-import { InvocationRequestInfo, Completion } from '@plexus-interop/protocol';
+import { StreamingInvocationClient, ValueHandler, InvocationClient, MethodDiscoveryResponse, MethodDiscoveryRequest, DiscoveredMethod, InvocationObserver } from '@plexus-interop/client';
 import { ConsumedMethod, ProvidedMethod } from '@plexus-interop/metadata';
-import { ProvidedMethodReference } from '@plexus-interop/client-api';
-import { Observer } from '@plexus-interop/common';
-import { ServerStreamingStringHandler, UnaryStringHandler, BidiStreamingStringHandler } from './StringHandlers';
-import { clientProtocol as plexus } from '@plexus-interop/protocol';
-
+import { UnaryStringHandler, ServerStreamingStringHandler, BidiStreamingStringHandler } from './StringHandlers';
 
 export interface InteropClient {
 

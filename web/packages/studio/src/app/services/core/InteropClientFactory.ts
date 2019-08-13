@@ -117,7 +117,7 @@ export class InteropClientFactory {
             handle: async (invocationContext, request) => {
                 const requestObj = requestMarshaller.decode(request);
                 const stringHandler = handlers.get(fullName);
-                const stringResponse = await stringHandler(JSON.stringify(requestObj));
+                const stringResponse = await stringHandler(invocationContext, JSON.stringify(requestObj));
                 return responseMarshaller.encode(JSON.parse(stringResponse));
             }
         }
@@ -137,8 +137,7 @@ export class InteropClientFactory {
             methodId: pm.method.name,
             handle: (context, hostClient) => {
                 const stringHandler = handlers.get(fullName);
-                const stringRequestObserver: InvocationObserver<string> = stringHandler(wrapGenericHostClient(hostClient, responseMarshaller));
-                let received;
+                const stringRequestObserver: InvocationObserver<string> = stringHandler(context, wrapGenericHostClient(hostClient, responseMarshaller));
                 return {
                     next: (v: ArrayBuffer) => {
                         stringRequestObserver.next(JSON.stringify(requestMarshaller.decode(v)));
@@ -166,7 +165,7 @@ export class InteropClientFactory {
             handle: async (context, request, hostClient) => {
                 const requestObj = requestMarshaller.decode(request);
                 const stringHandler = handlers.get(fullName);
-                const stringResponse = await stringHandler(JSON.stringify(requestObj), wrapGenericHostClient(hostClient, responseMarshaller));
+                await stringHandler(context, JSON.stringify(requestObj), wrapGenericHostClient(hostClient, responseMarshaller));
             }
         }
     }

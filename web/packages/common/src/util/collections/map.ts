@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PlexusObserver } from './PlexusObserver';
-
-export interface ChannelObserver<S, D> extends PlexusObserver<D> {
-
-    started(subscription: S): void;
-
-    startFailed(error: any): void;
-
+export function pop<K, V>(map: Map<K, V>): [K, V] {
+    if (!map || map.size === 0) {
+        throw new Error('Map is empty');
+    }
+    const entry = Array.from(map)[map.size - 1];
+    map.delete(entry[0]);
+    return entry;
 }

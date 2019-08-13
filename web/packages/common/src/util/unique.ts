@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PlexusObserver } from './PlexusObserver';
+const idCounters: Map<string, number> = new Map();
 
-export interface ChannelObserver<S, D> extends PlexusObserver<D> {
-
-    started(subscription: S): void;
-
-    startFailed(error: any): void;
-
+export function uniqueId(prefix: string = ''): string {
+    const prevIdx = idCounters.get(prefix) || 0;
+    const nextIdx = prevIdx + 1;
+    idCounters.set(prefix, nextIdx);
+    return `${prefix + nextIdx}`;
 }

@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TransportChannel } from '@plexus-interop/transport-common';
+import { TransportChannel, BufferedObserver } from '@plexus-interop/transport-common';
 import { Completion, ClientProtocolHelper } from '@plexus-interop/protocol';
-import { LoggerFactory, Observer, Logger } from '@plexus-interop/common';
+import { LoggerFactory, Logger } from '@plexus-interop/common';
 import { InvocationRequestHandler } from './InvocationRequestHandler';
-import { Observable } from 'rxjs/Observable';
 import { ApplicationConnection } from '../lifecycle/ApplicationConnection';
 import { DiscoveryRequestHandler } from './DiscoveryRequestHandler';
 
@@ -27,7 +26,7 @@ export class ClientRequestProcessor {
     private readonly log: Logger = LoggerFactory.getLogger('ClientRequestProcessor');
 
     constructor(
-        private readonly invocationRequestProcessor: InvocationRequestHandler, 
+        private readonly invocationRequestProcessor: InvocationRequestHandler,
         private readonly discoveryRequestHandler: DiscoveryRequestHandler) { }
 
     public async handle(channel: TransportChannel, sourceConnection: ApplicationConnection): Promise<Completion> {
@@ -37,7 +36,7 @@ export class ClientRequestProcessor {
 
         return new Promise((resolve, reject) => {
 
-            let channelObserver: Observer<ArrayBuffer> | undefined;
+            let channelObserver: BufferedObserver<ArrayBuffer> | undefined;
 
             channel.open({
                 started: () => log.trace('Channel started'),
@@ -49,12 +48,10 @@ export class ClientRequestProcessor {
                     if (!channelObserver) {
                         const clientToBrokerRequest = ClientProtocolHelper.decodeClientToBrokerRequest(messagePayload);
                         if (clientToBrokerRequest.invocationStartRequest) {
-                            const $inMessagesObservable = new Observable<ArrayBuffer>(observer => {
-                                channelObserver = observer;
-                            });
+                            channelObserver = new BufferedObserver<ArrayBuffer>();
                             try {
                                 const result = await this.invocationRequestProcessor.handleRequest(
-                                    $inMessagesObservable,
+                                    channelObserver,
                                     clientToBrokerRequest.invocationStartRequest,
                                     channel,
                                     sourceConnection.descriptor);
@@ -84,9 +81,9 @@ export class ClientRequestProcessor {
                     }
                     reject(e);
                 },
-                complete: () => {
+                complete: completion => {
                     if (channelObserver) {
-                        channelObserver.complete();
+                        channelObserver.complete(completion);
                     }
                     log.trace('Channel completed');
                 }

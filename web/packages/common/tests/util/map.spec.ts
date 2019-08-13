@@ -14,12 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PlexusObserver } from './PlexusObserver';
+import { pop } from '../../src/util/collections/map';
 
-export interface ChannelObserver<S, D> extends PlexusObserver<D> {
+describe('Map Utils', () => {
 
-    started(subscription: S): void;
+    it('Should pop last element from Map', () => {
 
-    startFailed(error: any): void;
+        const map = new Map();
 
-}
+        map.set(1, 2);
+        map.set(3, 4);
+
+        const [key, value] = pop(map);
+
+        expect(key).toBe(3);
+        expect(value).toBe(4);
+        expect(map.get(key)).toBeUndefined();
+
+    });
+
+});

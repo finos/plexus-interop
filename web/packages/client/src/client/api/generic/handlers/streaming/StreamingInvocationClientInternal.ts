@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PlexusObserver } from './PlexusObserver';
+import { StreamingInvocationClient } from './StreamingInvocationClient';
 
-export interface ChannelObserver<S, D> extends PlexusObserver<D> {
+export interface StreamingInvocationClientInternal<T> extends StreamingInvocationClient<T> {
 
-    started(subscription: S): void;
-
-    startFailed(error: any): void;
+    sendCompleted(): Promise<void>;
 
 }

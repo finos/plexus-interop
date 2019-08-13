@@ -21,6 +21,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using Plexus.Processes;
     using System;
     using System.IO;
+    using System.Net;
     using System.Threading.Tasks;
 
     internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer
@@ -113,7 +114,29 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             }
             else
             {
-                TaskRunner.RunInBackground(() => ReadFileAsync(websocket, urlPath)).IgnoreAwait(Log);
+                var connectedCompletion = new Promise();
+                void OnOpened() => connectedCompletion.TryComplete();
+                void OnClosed() => connectedCompletion.TryFail(new Exception("Websocket unexpectedly closed"));
+                void OnError(Exception ex) => connectedCompletion.TryFail(new Exception("Websocket exception occurred", ex));
+                websocket.OnOpen = OnOpened;
+                websocket.OnClose = OnClosed;
+                websocket.OnError = OnError;
+                TaskRunner.RunInBackground(async () =>
+                {
+                    try
+                    {
+                        await connectedCompletion.Task;
+                    }
+                    finally
+                    {
+                        // ReSharper disable DelegateSubtraction
+                        websocket.OnOpen -= OnOpened;
+                        websocket.OnClose -= OnClosed;
+                        websocket.OnError -= OnError;
+                        // ReSharper restore DelegateSubtraction
+                    }
+                    await ReadFileAsync(websocket, urlPath);
+                }).IgnoreAwait(Log);
             }
         }
 

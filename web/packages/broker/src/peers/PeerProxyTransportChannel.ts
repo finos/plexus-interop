@@ -66,9 +66,9 @@ export class PeerProxyTransportChannel implements TransportChannel {
                     this.log.error('Received remote error', e);
                     observer.error(e);
                 },
-                complete: () => {
+                complete: completion => {
                     this.log.trace('Received remote completion');
-                    observer.complete();
+                    observer.complete(completion);
                 }
             });
     }

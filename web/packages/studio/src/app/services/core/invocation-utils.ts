@@ -18,7 +18,7 @@ import { MethodType, DiscoveredMethod } from '@plexus-interop/client';
 import { Logger, PrefixedLogger } from '@plexus-interop/common';
 import { UniqueId } from '@plexus-interop/protocol';
 
-export function createInvocationLogger(type: MethodType, id: number, baseLogger: Logger, target: DiscoveredMethod = null): Logger {
+export function createInvocationLogger(type: MethodType, id: string, baseLogger: Logger, target: DiscoveredMethod = null): Logger {
     const targetPostfix = target ? ` -> ${UniqueId.fromProperties(target.providedMethod.providedService.connectionId).toString()}` : '';
     switch (type) {
         case MethodType.Unary:

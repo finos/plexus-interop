@@ -19,7 +19,7 @@ import { clientProtocol as plexus, SuccessCompletion, ErrorCompletion, ClientErr
 import { ClientProtocolHelper as modelHelper, ClientProtocolHelper } from '@plexus-interop/protocol';
 import { InvocationState } from './InvocationState';
 import { Subscription, AnonymousSubscription } from 'rxjs/Subscription';
-import { StateMaschine, CancellationToken, Logger, LoggerFactory, StateMaschineBase } from '@plexus-interop/common';
+import { StateMaschine, CancellationToken, Logger, LoggerFactory, StateMaschineBase, once } from '@plexus-interop/common';
 import { ProvidedMethodReference } from '@plexus-interop/client-api';
 import { ClientDtoUtils } from '../ClientDtoUtils';
 import { InvocationChannelObserver } from './InvocationChannelObserver';
@@ -35,7 +35,7 @@ export class GenericInvocation {
     private sentMessagesCounter: number = 0;
 
     private sendCompletionReceived: boolean = false;
-    
+
     private sendCompletionReceivedCallback: (() => void) | null = null;
 
     private metaInfo: InvocationMetaInfo;
@@ -49,29 +49,25 @@ export class GenericInvocation {
         baseReadToken: CancellationToken = new CancellationToken()) {
         this.readCancellationToken = new CancellationToken(baseReadToken);
         this.log = LoggerFactory.getLogger('Invocation');
+        this.memoizedClose = once(this.memoizedClose.bind(this));
         this.stateMachine = new StateMaschineBase<InvocationState>(InvocationState.CREATED, [
-            // initialization states
-            {
-                from: InvocationState.CREATED, to: InvocationState.START_REQUESTED
-            }, {
-                from: InvocationState.START_REQUESTED, to: InvocationState.REMOTE_STARTING
-            }, {
-                from: InvocationState.REMOTE_STARTING, to: InvocationState.OPEN
-            }, {
-                from: InvocationState.CREATED, to: InvocationState.ACCEPTING_INVOCATION_INFO
-            }, {
-                from: InvocationState.ACCEPTING_INVOCATION_INFO, to: InvocationState.OPEN
-            }, {
-                from: InvocationState.START_REQUESTED, to: InvocationState.OPEN
-            },
-            // active states
-            {
-                from: InvocationState.OPEN, to: InvocationState.COMPLETION_RECEIVED
-            }, {
-                from: InvocationState.COMPLETION_RECEIVED, to: InvocationState.COMPLETED
-            }, {
-                from: InvocationState.OPEN, to: InvocationState.COMPLETED
-            }
+            // initialization
+            { from: InvocationState.CREATED, to: InvocationState.START_REQUESTED },
+            { from: InvocationState.START_REQUESTED, to: InvocationState.REMOTE_STARTING },
+            { from: InvocationState.REMOTE_STARTING, to: InvocationState.OPEN },
+            { from: InvocationState.CREATED, to: InvocationState.ACCEPTING_INVOCATION_INFO },
+            { from: InvocationState.ACCEPTING_INVOCATION_INFO, to: InvocationState.OPEN },
+            { from: InvocationState.START_REQUESTED, to: InvocationState.OPEN },
+            // active -> completion
+            { from: InvocationState.OPEN, to: InvocationState.COMPLETION_RECEIVED },
+            { from: InvocationState.OPEN, to: InvocationState.SENT_COMPLETED },
+            { from: InvocationState.COMPLETION_RECEIVED, to: InvocationState.COMPLETION_HANDSHAKE },
+            { from: InvocationState.SENT_COMPLETED, to: InvocationState.COMPLETION_HANDSHAKE },
+            // closure
+            { from: InvocationState.COMPLETION_HANDSHAKE, to: InvocationState.COMPLETED },
+            // forced closure
+            { from: InvocationState.OPEN, to: InvocationState.COMPLETED },
+            { from: InvocationState.SENT_COMPLETED, to: InvocationState.COMPLETED }
         ]);
     }
 
@@ -105,38 +101,26 @@ export class GenericInvocation {
         return this.metaInfo;
     }
 
+    public sendCompleted(): void {
+        this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
+        if (this.stateMachine.is(InvocationState.COMPLETION_RECEIVED)) {
+            this.stateMachine.go(InvocationState.COMPLETION_HANDSHAKE);
+        } else {
+            this.stateMachine.go(InvocationState.SENT_COMPLETED);
+        }
+        this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
+    }
+
     public async close(completion: plexus.ICompletion = new SuccessCompletion()): Promise<plexus.ICompletion> {
         /* istanbul ignore if */
         if (this.log.isDebugEnabled()) {
             this.log.debug('Close invocation requested', JSON.stringify(completion));
         }
-        if (this.stateMachine.is(InvocationState.COMPLETED)) {
-            this.log.warn('Already completed');
-            return Promise.resolve(completion);
-        }
-        this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
-        this.stateMachine.go(InvocationState.COMPLETED);
-        this.log.trace('Sending completion message');
-        this.sourceChannel.sendMessage(modelHelper.sendCompletionPayload({}));
-        return new Promise((resolveCloseAction, rejectCloseAction) => {
-            const remoteStreamCompletedHandler = () => {
-                this.log.trace('Sending channel close message');
-                this.closeChannel(completion)
-                    .then(result => resolveCloseAction(result))
-                    .catch(e => rejectCloseAction(e));
-            };
-            if (ClientProtocolHelper.isSuccessCompletion(completion) && !this.sendCompletionReceived) {
-                // wait for remote side for success case only
-                this.log.trace('Waiting for remote completion');
-                this.sendCompletionReceivedCallback = remoteStreamCompletedHandler;
-            } else {
-                remoteStreamCompletedHandler();
-            }
-        });
+        return this.memoizedClose(completion);
     }
 
     public async sendMessage(data: ArrayBuffer): Promise<void> {
-        this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED);
+        this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED, InvocationState.SENT_COMPLETED);
         this.log.trace(`Sending message of ${data.byteLength} bytes`);
         const headerPayload = modelHelper.messageHeaderPayload({
             length: data.byteLength
@@ -154,6 +138,35 @@ export class GenericInvocation {
 
     public getSentMessagesCounter(): number {
         return this.sentMessagesCounter;
+    }
+
+    private async memoizedClose(completion: plexus.ICompletion): Promise<plexus.ICompletion> {
+
+        this.stateMachine.throwIfNot(InvocationState.OPEN, InvocationState.COMPLETION_RECEIVED, InvocationState.SENT_COMPLETED, InvocationState.COMPLETION_HANDSHAKE);
+
+        const isSuccessCompletion = ClientProtocolHelper.isSuccessCompletion(completion);
+        
+        if (isSuccessCompletion && this.stateMachine.isOneOf(InvocationState.COMPLETION_RECEIVED, InvocationState.OPEN)) {
+            this.sendCompleted();
+        }
+
+        this.stateMachine.go(InvocationState.COMPLETED);
+
+        return new Promise((resolveCloseAction, rejectCloseAction) => {
+            const closeChannel = () => {
+                this.log.trace('Sending channel close message');
+                this.closeChannel(completion)
+                    .then(result => resolveCloseAction(result))
+                    .catch(e => rejectCloseAction(e));
+            };
+            if (isSuccessCompletion && !this.sendCompletionReceived) {
+                // wait for remote side for success case only
+                this.log.debug('Waiting for remote completion');
+                this.sendCompletionReceivedCallback = closeChannel;
+            } else {
+                closeChannel();
+            }
+        });
     }
 
     private setUuid(id: UniqueId): void {
@@ -209,8 +222,12 @@ export class GenericInvocation {
             this.sendCompletionReceivedCallback = null;
         }
         switch (this.stateMachine.getCurrent()) {
+            case InvocationState.SENT_COMPLETED:
+                this.log.debug('SENT_COMPLETED -> COMPLETION_HANDSHAKE');
+                this.stateMachine.go(InvocationState.COMPLETION_HANDSHAKE);
+                break;
             case InvocationState.OPEN:
-                this.log.debug('Open state, switching to COMPLETION_RECEIVED');
+                this.log.debug('OPEN -> COMPLETION_RECEIVED');
                 this.stateMachine.go(InvocationState.COMPLETION_RECEIVED);
                 break;
             case InvocationState.COMPLETED:
@@ -253,9 +270,9 @@ export class GenericInvocation {
                     }
                 },
 
-                complete: () => {
+                complete: completion => {
                     this.log.debug('Remote channel closed');
-                    invocationObserver.complete();
+                    invocationObserver.complete(completion);
                 },
 
                 error: (e) => {
@@ -309,7 +326,12 @@ export class GenericInvocation {
             } else {
                 this.log.warn(`Unknown message received ${JSON.stringify(envelopObject)}`);
             }
-        } else if (this.stateMachine.isOneOf(InvocationState.OPEN, InvocationState.COMPLETED, InvocationState.COMPLETION_RECEIVED)) {
+        } else if (this.stateMachine.isOneOf(
+            InvocationState.OPEN, 
+            InvocationState.SENT_COMPLETED,
+            InvocationState.COMPLETION_HANDSHAKE,
+            InvocationState.COMPLETED, 
+            InvocationState.COMPLETION_RECEIVED)) {
             const envelopObject = modelHelper.decodeInvocationEnvelop(data);
             if (envelopObject.message) {
                 this.log.trace(`Received message header`);

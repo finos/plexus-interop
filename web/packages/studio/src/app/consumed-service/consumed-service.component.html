@@ -17,25 +17,8 @@
           <button id="default-msg-btn" class="btn btn-link" type="button" (click)="createDefaultMessage()">Default</button>
         </div>
       </div>
-      <div class="col">
-        <div>
-          <label for="exampleFormControlTextarea1">Response JSON:</label>
-          <textarea readonly id="message-content-area" class="form-control" rows="8" [(ngModel)]="responseContent"></textarea>
-        </div>
-        <div class="container">
-          <div class="row" [hidden]="!isServerStreaming()">
-            <label class="col-sm-6">Messages Received</label>
-            <label class="col-sm-6">{{responseCounter}}</label>
-          </div>
-          <div class="row">
-            <label class="col-sm-6">Total Response Time (ms)</label>
-            <label class="col-sm-6">{{responseTime}}</label>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
-
 
   <div class="form-group" [hidden]="!isClientStreaming()">
     <label for="messages-count">Enter messages number:</label>
@@ -61,8 +44,10 @@
 
   <button class="btn btn-primary" [disabled]="messageContentControl && messageContentControl.invalid" id="consumedInvokeBtn"
     (click)="sendRequest()" type="button">Send</button>
-  <button class="btn btn-primary" id="consumedStartUnarSpamBtn" [disabled]="spamStarted || (messageContentControl && messageContentControl.invalid)"
-    [hidden]="!isUnary()" (click)="startUnarySpam()" type="button">Start Spam</button>
-  <button class="btn btn-primary" id="consumedStopUnarSpamBtn" [disabled]="!spamStarted" [hidden]="!isUnary()" (click)="stopUnarySpam()"
-    type="button">Stop Spam</button>
+  <button class="btn btn-primary" 
+    id="cancelBtn" 
+    [disabled]="!hasRunningInvocations()" 
+    (click)="cancelLatestInvocation()" 
+    title="Cancel Latest started invocation" 
+    type="button">Cancel</button>
   <button class="btn btn-primary" id="consumedDiscoverBtn" (click)="discoverMethods()" type="button">Discover</button>

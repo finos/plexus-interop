@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { StreamingInvocationClient } from './StreamingInvocationClient';
+import { StreamingInvocationClientInternal } from './StreamingInvocationClientInternal';
 import { ClientError, SuccessCompletion, ClientProtocolHelper } from '@plexus-interop/protocol';
 import { Invocation } from '../../../../generic/Invocation';
 import { BaseInvocationClientImpl } from '../../../BaseInvocationClientImpl';
 import { Logger } from '@plexus-interop/common';
 
-export class StreamingInvocationClientImpl extends BaseInvocationClientImpl implements StreamingInvocationClient<ArrayBuffer> {
+export class StreamingInvocationClientImpl extends BaseInvocationClientImpl implements StreamingInvocationClientInternal<ArrayBuffer> {
 
     constructor(invocation: Invocation, log: Logger) {
         super(invocation, log);
@@ -38,6 +38,11 @@ export class StreamingInvocationClientImpl extends BaseInvocationClientImpl impl
             this.log.error(`Completed with errors`, completion ? completion.error : 'Completion is empty');
             throw completion && completion.error ? completion.error : new ClientError('Completed with errors');
         }
+    }
+
+    public async sendCompleted(): Promise<void> {
+        this.log.trace(`Stream completed operation requested`);
+        return this.invocation.sendCompleted();
     }
 
 }

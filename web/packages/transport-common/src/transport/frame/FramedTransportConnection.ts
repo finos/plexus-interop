@@ -24,8 +24,9 @@ import { TransportChannel } from '../TransportChannel';
 import { UniqueId, ClientProtocolUtils, ClientError, SuccessCompletion } from '@plexus-interop/protocol';
 import { transportProtocol as plexus } from '@plexus-interop/protocol';
 import { TransportFrameHandler } from './TransportFrameHandler';
-import { StateMaschineBase, StateMaschine, LoggerFactory, Logger, ReadWriteCancellationToken, Observer, BufferedObserver, Subscription, AnonymousSubscription } from '@plexus-interop/common';
+import { StateMaschineBase, StateMaschine, LoggerFactory, Logger, ReadWriteCancellationToken, Observer, Subscription, AnonymousSubscription } from '@plexus-interop/common';
 import { TransportFrameListener } from './TransportFrameListener';
+import { BufferedObserver } from '../../common';
 
 export enum ConnectionState {
     CREATED = 'CREATED',
@@ -114,7 +115,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
     }
 
     public subscribeToChannels(channelObserver: Observer<TransportChannel>): Subscription {
-        this.log.debug('Received channels observer');        
+        this.log.debug('Received channels observer');
         this.channelObserver.setObserver(channelObserver);
         return new AnonymousSubscription();
     }
@@ -134,7 +135,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
         }
         return this.stateMachine.goAsync(ConnectionState.ACCEPT);
     }
-    
+
     public closeAndCleanUp(): void {
         if (this.stateMachine.is(ConnectionState.CLOSED)) {
             this.log.debug('Already closed');
@@ -156,7 +157,7 @@ export class FramedTransportConnection implements TransportConnection, Transport
             .catch(e => this.log.error('Failed to disconnect from source', e));
     }
 
-    
+
     public async handleConnectionCloseFrame(frame: ConnectionCloseFrame): Promise<void> {
         const completion = frame.getHeaderData().completion as plexus.ICompletion || new SuccessCompletion();
         /* istanbul ignore if */
@@ -172,11 +173,11 @@ export class FramedTransportConnection implements TransportConnection, Transport
                 case ConnectionState.OPEN:
                     this.log.debug('Close received, waiting for client to close it');
                     this.stateMachine.go(ConnectionState.CLOSE_RECEIVED);
-                    this.channelObserver.complete();                    
+                    this.channelObserver.complete();
                     break;
                 case ConnectionState.CLOSE_REQUESTED:
                     this.log.debug('Close already requested, closing connection');
-                    this.channelObserver.complete();                    
+                    this.channelObserver.complete();
                     this.closeAndCleanUp();
                     break;
                 default:

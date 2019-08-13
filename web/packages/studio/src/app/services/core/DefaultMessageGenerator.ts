@@ -14,17 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService, Enum, Message, InteropRegistry, Field } from '@plexus-interop/metadata';
+import { Enum, Message, InteropRegistry } from '@plexus-interop/metadata';
+
+// https://developers.google.com/protocol-buffers/docs/reference/proto3-spec    
+const primitiveTypes = [
+    'double', 'float', 'int32', 'int64', 'uint32',
+    'uint64', 'sint32', 'sint64', 'fixed32', 'fixed64',
+    'sfixed32', 'sfixed64', 'bool', 'string'];
+
+const bytesType = 'bytes';
 
 export class DefaultMessageGenerator {
 
     public constructor(private readonly interopRegistryProvider: { getRegistry: () => InteropRegistry }) { }
 
-    // https://developers.google.com/protocol-buffers/docs/reference/proto3-spec    
-    private readonly primitiveTypes = [
-        'double', 'float', 'int32', 'int64', 'uint32',
-        'uint64', 'sint32', 'sint64', 'fixed32', 'fixed64',
-        'sfixed32', 'sfixed64', 'bool', 'string'];
+
 
     public generate(messageId: string): string {
         return JSON.stringify(this.generateObj(messageId));
@@ -38,9 +42,13 @@ export class DefaultMessageGenerator {
         const defaultPayload: any = {};
         for (let fieldName in message.fields) {
             const field = message.fields[fieldName];
-            defaultPayload[fieldName] = this.isArray(field) ?
+            if (field.type === bytesType) {
+                defaultPayload[fieldName] = [];
+            } else {
+                defaultPayload[fieldName] = this.isArray(field) ?
                 this.generateArrayValue(messageId, field, skipMessageType)
                 : this.generateNonArrayValue(messageId, field, skipMessageType)
+            }
         }
         return defaultPayload;
     }
@@ -140,7 +148,7 @@ export class DefaultMessageGenerator {
     }
 
     public isPrimitive(type: string): boolean {
-        return this.primitiveTypes.indexOf(type) !== -1;
+        return primitiveTypes.indexOf(type) !== -1;
     }
 
     public isMap(field: any): boolean {

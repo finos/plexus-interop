@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InteropRegistryService, Message, InteropRegistry, Service, Application, Enum } from '@plexus-interop/metadata';
+import { Message, InteropRegistry, Service, Application, Enum } from '@plexus-interop/metadata';
 import { ExtendedMap } from '@plexus-interop/common';
 import { FieldNamesValidator } from './FieldNamesValidator';
 
@@ -72,6 +72,89 @@ describe('Field names validator', () => {
                 stringField: "1234"
             }
         });
+    });
+
+    it('Should pass with recursive type references', () => {
+
+        const firstMessageType = "recursiveMessageType";
+        const secondMessageType = "otherMessageType";
+
+        const firstMessageDef: Message = {
+            id: firstMessageType,
+            fields: {
+                stringField2: {
+                    type: "string",
+                    id: 1
+                },
+                otherMessageField: {
+                    type: secondMessageType,
+                    id: 2
+                }
+            }
+        };
+
+        const secondMessageDef: Message = {
+            id: secondMessageType,
+            fields: {
+                firstMessageField: {
+                    type: firstMessageType,
+                    id: 1
+                }
+            }
+        }
+
+        new FieldNamesValidator(setupRegistry([firstMessageDef, secondMessageDef])).validate(firstMessageType, {
+            stringField2: "123",
+            otherMessageField: {
+                firstMessageField: {
+                    stringField2: "321"
+                }
+            }
+        });
+        
+    });
+
+    
+    it('Should fail with recursive type references and incorrect field inside', () => {
+
+        const firstMessageType = "recursiveMessageType";
+        const secondMessageType = "otherMessageType";
+
+        const firstMessageDef: Message = {
+            id: firstMessageType,
+            fields: {
+                stringField2: {
+                    type: "string",
+                    id: 1
+                },
+                otherMessageField: {
+                    type: secondMessageType,
+                    id: 2
+                }
+            }
+        };
+
+        const secondMessageDef: Message = {
+            id: secondMessageType,
+            fields: {
+                firstMessageField: {
+                    type: firstMessageType,
+                    id: 1
+                }
+            }
+        }
+
+        const validateAction = () => new FieldNamesValidator(setupRegistry([firstMessageDef, secondMessageDef])).validate(firstMessageType, {
+            stringField2: "123",
+            otherMessageField: {
+                firstMessageField: {
+                    stringField3: "321"
+                }
+            }
+        });
+
+        expect(validateAction).toThrow();
+        
     });
 
     it('Should fail on object with incorrect field', () => {
