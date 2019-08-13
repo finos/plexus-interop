@@ -20,3 +20,5 @@ export * from './Defaults';
 export * from './ChannelObserver';
 export * from './DelegateChannelObserver';
 export * from './Defaults';
+export * from './BufferedObserver';
+export * from './PlexusObserver';

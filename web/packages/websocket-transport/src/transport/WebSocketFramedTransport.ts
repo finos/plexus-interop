@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults } from '@plexus-interop/transport-common';
-import { CancellationToken, Logger, LoggerFactory, Observer, BufferedObserver, AsyncHelper } from '@plexus-interop/common';
+import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults, BufferedObserver } from '@plexus-interop/transport-common';
+import { CancellationToken, Logger, LoggerFactory, Observer, AsyncHelper } from '@plexus-interop/common';
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
 

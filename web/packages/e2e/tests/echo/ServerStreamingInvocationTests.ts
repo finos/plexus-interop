@@ -88,7 +88,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             });
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: () => {},
+                next: () => { },
                 complete: async () => {
                     reject('Not expected to be completed');
                 },
@@ -102,7 +102,7 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
     }
 
     public async testClientCanCancelServerStreamingRequest(): Promise<void> {
-        const echoRequest = this.clientsSetup.createRequestDto();        
+        const echoRequest = this.clientsSetup.createRequestDto();
         let cancelReceivedByServer = false;
         const handler = new ServerStreamingHandler((context, request, hostClient) => {
             hostClient.next(echoRequest);
@@ -112,9 +112,9 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
         });
         const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
         const invocationClient = await client.getEchoServiceProxy().serverStreaming(this.clientsSetup.createRequestDto(), {
-            next: () => {},
-            complete: async () => {},
-            error: async () => {},
+            next: () => { },
+            complete: async () => { },
+            error: async () => { },
             streamCompleted: () => { }
         });
         await invocationClient.cancel();
@@ -216,12 +216,12 @@ export class ServerStreamingInvocationTests extends BaseEchoTest {
             const [client, server] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
 
             client.getEchoServiceProxy().serverStreaming(echoRequest, {
-                next: () => {},
+                next: () => { },
                 complete: async () => {
                     await this.clientsSetup.disconnect(client, server);
                     resolve();
                 },
-                error: async () => {},
+                error: async () => { },
                 streamCompleted: () => { }
             });
         });

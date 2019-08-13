@@ -17,12 +17,12 @@
 import { EventBus } from '../../bus/EventBus';
 import { ActionType } from '../../peers/ActionType';
 import { EventType } from '../events/EventType';
-import { PartialObserver } from 'rxjs/Observer';
 import { Subscription, Observer, Logger, LoggerFactory } from '@plexus-interop/common';
 import { RemoteBrokerService } from './RemoteBrokerService';
 import { Observable } from 'rxjs/Observable';
 import { RemoteActionResult, isFailed, isCompleted, successResult, errorResult, completedResult } from './RemoteActionResult';
 import { EventBasedRequest } from './EventBasedRequest';
+import { PlexusPartialObserver, PlexusObserver } from '@plexus-interop/transport-common';
 
 export class EventBusRemoteBrokerService implements RemoteBrokerService {
 
@@ -44,7 +44,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
                 complete: () => {
                     if (!res) {
                         this.log.trace(`[${actionType.id}] - No response, resolve with empty object`);
-                    } 
+                    }
                     resolve(res || {} as Res);
                 },
                 error: e => reject(e)
@@ -52,7 +52,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
         });
     }
 
-    public host<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req, observer: PartialObserver<Res>) => Subscription, hostId: string): void {
+    public host<Req, Res>(actionType: ActionType<Req, Res>, handler: (requestPaylaod: Req, observer: PlexusObserver<Res>) => Subscription, hostId: string): void {
 
         const requestTopic = this.requestTopic(hostId, actionType);
 
@@ -70,15 +70,15 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
                 error: e => {
                     this.eventBus.publish(responseTopic, { payload: errorResult(e) });
                 },
-                complete: () => {
-                    this.eventBus.publish(responseTopic, { payload: completedResult() });
+                complete: completion => {
+                    this.eventBus.publish(responseTopic, { payload: completedResult({ completion }) });
                 }
             });
         });
 
     }
 
-    public invoke<Req, Res>(actionType: ActionType<Req, Res>, requestPayload: Req, remoteBrokerId: string, observer: PartialObserver<Res>): Subscription {
+    public invoke<Req, Res>(actionType: ActionType<Req, Res>, requestPayload: Req, remoteBrokerId: string, observer: PlexusObserver<Res>): Subscription {
 
         this.log.trace(`Sending invocation ${actionType.id} to ${remoteBrokerId}`);
 
@@ -86,34 +86,32 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
         const requestTopic = this.requestTopic(remoteBrokerId, actionType);
         const responseTopic = this.responseHandlingTopic(remoteBrokerId, actionType, requestId);
 
-        return new Observable((invocationSubscriber: Observer<Res>) => {
+        const subscription = this.eventBus.subscribe(responseTopic, (event) => {
+            this.log.trace(`Received update for ${responseTopic}`);
+            const invocationResult = event.payload as RemoteActionResult;
+            if (isFailed(invocationResult)) {
+                subscription.unsubscribe();
+                observer.error(invocationResult.error);
+            } else if (isCompleted(invocationResult)) {
+                subscription.unsubscribe();
+                observer.complete(invocationResult.completion);
+            } else {
+                observer.next(invocationResult.payload);
+            }
+        });
 
-            const subscription = this.eventBus.subscribe(responseTopic, (event) => {
-                this.log.trace(`Received update for ${responseTopic}`);
-                const invocationResult = event.payload as RemoteActionResult;
-                if (isFailed(invocationResult)) {
-                    subscription.unsubscribe();                    
-                    invocationSubscriber.error(invocationResult.error);
-                } else if (isCompleted(invocationResult)) {
-                    subscription.unsubscribe();                                        
-                    invocationSubscriber.complete();
-                } else {
-                    invocationSubscriber.next(invocationResult.payload);
-                }
-            });
+        this.log.trace(`Sending request to ${requestTopic}`);
+        const payload: EventBasedRequest = {
+            payload: requestPayload,
+            requestId: requestId.toString(),
+            senderId: this.id
+        };
 
-            this.log.trace(`Sending request to ${requestTopic}`);
-            const payload: EventBasedRequest = {
-                payload: requestPayload,
-                requestId: requestId.toString(),
-                senderId: this.id
-            };
-            
-            this.eventBus.publish(requestTopic, {
-                payload
-            });
+        this.eventBus.publish(requestTopic, {
+            payload
+        });
 
-        }).subscribe(observer);
+        return subscription;
 
     }
 
@@ -125,7 +123,7 @@ export class EventBusRemoteBrokerService implements RemoteBrokerService {
         });
     }
 
-    public subscribe<T>(eventType: EventType<T>, observer: PartialObserver<T>, remoteBrokerId?: string): Subscription {
+    public subscribe<T>(eventType: EventType<T>, observer: PlexusPartialObserver<T>, remoteBrokerId?: string): Subscription {
         const requestTopic = this.eventTopic(eventType, remoteBrokerId);
         this.log.trace(`Subscribing to ${requestTopic}`);
         return new Observable((observer: Observer<T>) => {

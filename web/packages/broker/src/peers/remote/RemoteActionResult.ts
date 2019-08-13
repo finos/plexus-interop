@@ -16,6 +16,7 @@
  */
 import { RemoteActionStatus } from './RemoteActionStatus';
 import { ClientError } from '@plexus-interop/protocol';
+import { transportProtocol as plexus } from '@plexus-interop/protocol';
 
 export interface RemoteActionResult {
 
@@ -24,6 +25,8 @@ export interface RemoteActionResult {
     payload?: any;
 
     error?: ClientError;
+
+    completion?: plexus.ICompletion;
 
 }
 
@@ -46,10 +49,11 @@ export function successResult(payload: any): RemoteActionResult {
     };
 }
 
-export function completedResult(payload?: any): RemoteActionResult {
+export function completedResult(completed: { payload?: any, completion?: plexus.ICompletion } = {}): RemoteActionResult {
     return {
         status: RemoteActionStatus.COMPLETED,
-        payload
+        payload: completed.payload,
+        completion: completed.completion
     };
 }
 

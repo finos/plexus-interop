@@ -14,15 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { transportProtocol as plexus } from '@plexus-interop/protocol';
+import { PlexusObserver } from './PlexusObserver';
 
-export interface ChannelObserver<S, D> {
-
-    next: (value: D) => void;
-
-    error: (err: any) => void;
-
-    complete: (completion?: plexus.ICompletion) => void;
+export interface ChannelObserver<S, D> extends PlexusObserver<D> {
 
     started(subscription: S): void;
 

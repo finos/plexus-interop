@@ -111,7 +111,7 @@ export class PointToPointInvocationTests extends BaseEchoTest {
 
     }
 
-    private testMessageSentInternal(echoRequest: plexus.plexus.interop.testing.IEchoRequest): Promise<void> {     
+    private testMessageSentInternal(echoRequest: plexus.plexus.interop.testing.IEchoRequest): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const handler = new UnaryServiceHandler(async (context: MethodInvocationContext, request) => {
                 try {
