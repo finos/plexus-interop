@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 import { DuplexConnectionFactory } from './DuplexConnectionFactory';
-import { Observer, Subscription, BufferedObserver, Logger, LoggerFactory, AnonymousSubscription } from '@plexus-interop/common';
+import { Observer, Subscription, Logger, LoggerFactory, AnonymousSubscription } from '@plexus-interop/common';
 import { TransportConnection, Defaults, Frame, FramedTransportConnection } from '../.';
 import { InMemoryFramedTransport } from './InMemoryFramedTransport';
+import { BufferedObserver } from '../common';
 
 /**
  * Creates pair of coupled in memory connections for each Client's connect request
@@ -49,12 +50,12 @@ export class InMemoryConnectionFactory implements DuplexConnectionFactory {
                 Client [${clientTransportConnection.uuid().toString()}] 
                 Server [${serverTransportConnection.uuid().toString()}]`);
         }
-        
+
         await clientTransportConnection.connect();
         await serverTransportConnection.acceptingConnection();
 
         this.serverConnectionsObserver.next(serverTransportConnection);
-        
+
         return [clientTransportConnection, serverTransportConnection];
     }
 
