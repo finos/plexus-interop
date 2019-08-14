@@ -10095,11 +10095,12 @@ tapable@^0.2.7:
   version "0.2.9"
   resolved "https://registry.npmjs.org/tapable/-/tapable-0.2.9.tgz#af2d8bbc9b04f74ee17af2b4d9048f807acd18a8"
 
-tar-fs@1.13.2:
-  version "1.13.2"
-  resolved "https://registry.npmjs.org/tar-fs/-/tar-fs-1.13.2.tgz#433e879f9538d7e1e883ba914904f339c6414835"
+tar-fs@1.16.2:
+  version "1.16.2"
+  resolved "https://registry.yarnpkg.com/tar-fs/-/tar-fs-1.16.2.tgz#17e5239747e399f7e77344f5f53365f04af53577"
   dependencies:
-    mkdirp "^0.5.0"
+    chownr "^1.0.1"
+    mkdirp "^0.5.1"
     pump "^1.0.0"
     tar-stream "^1.1.2"
 
