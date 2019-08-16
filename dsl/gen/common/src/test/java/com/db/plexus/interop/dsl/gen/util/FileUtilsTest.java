@@ -16,13 +16,23 @@
  */
 package com.db.plexus.interop.dsl.gen.util;
 
-public class ProcessResult {
+import org.junit.Assert;
+import org.junit.Test;
 
-    public final int code;
-    public final String stdout;
+import java.io.File;
+import java.util.Arrays;
 
-    public ProcessResult(int code, String stdout) {
-        this.code = code;
-        this.stdout = stdout;
+public class FileUtilsTest {
+
+    @Test
+    public void testCommonPath() {
+        Assert.assertEquals("C:" + File.separator + "common" + File.separator, FileUtils.commonPath(Arrays.asList(
+                "C:" + File.separator + "common" + File.separator + "first" + File.separator + "second",
+                "C:" + File.separator + "common" + File.separator + "third" + File.separator + "second"
+                )));
+        Assert.assertEquals("C:" + File.separator, FileUtils.commonPath(Arrays.asList(
+                "C:" + File.separator + "first",
+                "C:" + File.separator + "second"
+        )));
     }
 }

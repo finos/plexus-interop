@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
@@ -50,6 +51,31 @@ public class FileUtils {
 
     public static void processFiles(String baseDir, String pattern, Consumer<Path> fileHandler) throws IOException {
         Files.walkFileTree(Paths.get(baseDir), new Finder(pattern, fileHandler));
+    }
+
+    public static String commonPath(List<String> paths) {
+        String commonPath = "";
+        String[][] folders = new String[paths.size()][];
+        for (int i = 0; i < paths.size(); i++) {
+            folders[i] = paths.get(i).split("\\" + File.separator);
+        }
+        for (int j = 0; j < folders[0].length; j++) {
+            String thisFolder = folders[0][j];
+            boolean allMatched = true;
+            for (int i = 1; i < folders.length && allMatched; i++) {
+                if (folders[i].length < j) {
+                    allMatched = false;
+                    break;
+                }
+                allMatched &= folders[i][j].equals(thisFolder);
+            }
+            if (allMatched) {
+                commonPath += thisFolder + File.separator;
+            } else {
+                break;
+            }
+        }
+        return commonPath;
     }
 
     private static class Finder extends SimpleFileVisitor<Path> {
