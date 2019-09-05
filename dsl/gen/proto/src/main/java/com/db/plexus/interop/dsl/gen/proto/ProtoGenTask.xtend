@@ -45,8 +45,17 @@ import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.validation.CheckMode
 import org.eclipse.xtext.validation.IResourceValidator
 import org.eclipse.xtext.validation.Issue
+import org.eclipse.xtext.naming.QualifiedName
+import com.db.plexus.interop.dsl.protobuf.ProtoLangUtils
 
 public class ProtoGenTask extends BaseGenTask {
+	
+	private static final QualifiedName CSHARP_NAMESPACE_OPTION_DESCRIPTOR_NAME = 
+		QualifiedName.create("", "google", "protobuf", "FileOptions", "csharp_namespace")
+		
+	@Inject
+	ProtoLangUtils utils
+	
 	
 	@Inject
 	IResourceValidator validator
@@ -56,17 +65,11 @@ public class ProtoGenTask extends BaseGenTask {
 		
 	@Inject
 	ProtoLangImportResolver importResolver 
-	
-	protected val customOptions = new LinkedList<Option>
 
 	override public validateResources(PlexusGenConfig config, XtextResourceSet resourceSet) {
 		super.validateResources(config, resourceSet);
 		this.validateInteropResourceLoaded(config, resourceSet);
 	}
-
-	public def getCustomOptions() {
-		customOptions
-	}	
 
 	override protected doGenWithResources(PlexusGenConfig config, XtextResourceSet rs) throws IOException {
 
@@ -104,7 +107,27 @@ public class ProtoGenTask extends BaseGenTask {
 			}
 			throw new IOException("Errors found in the loaded resources")
 		}
-
+		
+		var namespace = config.namespace;		
+		if (namespace === null) {
+			namespace = ""			
+		}
+		var namespaceIsPrefix = false
+		if (namespace.startsWith("internal_access:")) {
+			namespace = namespace.substring("internal_access:".length)
+		}
+		if (namespace.endsWith("*")) {
+			namespaceIsPrefix = true
+			namespace = namespace.substring(0, namespace.length-1)
+		}
+		
+		val description = utils.getDescriptorResourceDescription(rs)
+		val csharpNamespaceOptionDescriptor = description.getExportedObjects(
+			ProtobufPackage.Literals.FIELD, 
+			CSHARP_NAMESPACE_OPTION_DESCRIPTOR_NAME, 
+			false
+			).findFirst[x | true].EObjectOrProxy as Field
+				
 		val oldResources = new LinkedList<Resource>
 		oldResources.addAll(rs.resources)
 		
@@ -191,17 +214,39 @@ public class ProtoGenTask extends BaseGenTask {
 				}
 
 				if (needAddCustomOptions) {
-					for (customOption : this.customOptions) {
+					
+					if (namespaceIsPrefix || !namespace.isEmpty) {
+					
+						// Injecting C# namespace option					
+								
+						var namespaceToSet = namespace
+						if (namespaceIsPrefix) {
+							val protoNamespace = qualifiedNameProvider.getFullyQualifiedName(root).skipFirst(1).segments.map[x|x.toFirstUpper].join(".");
+							if (protoNamespace !== null && !protoNamespace.isEmpty) {
+								if (!namespace.isEmpty) {								
+									namespaceToSet = namespace + "." + protoNamespace
+								} else {
+									namespaceToSet = protoNamespace
+								}									
+							}													
+						}
+							
+						val csharpNamespaceOption = ProtobufFactory.eINSTANCE.createOption()
+						csharpNamespaceOption.isCustom = false
+						csharpNamespaceOption.descriptor = csharpNamespaceOptionDescriptor
+						val stringConstant = ProtobufFactory.eINSTANCE.createStringConstant()
+						stringConstant.value = namespaceToSet											
+						csharpNamespaceOption.value = stringConstant
 						var existingOption = root.elements
 							.filter(typeof(Option))
-							.findFirst [o | qualifiedNameProvider.getFullyQualifiedName(o.descriptor).equals(qualifiedNameProvider.getFullyQualifiedName(customOption.descriptor))]
+							.findFirst [o | qualifiedNameProvider.getFullyQualifiedName(o.descriptor).equals(qualifiedNameProvider.getFullyQualifiedName(csharpNamespaceOptionDescriptor))]
 						if (existingOption === null) {							
-							root.elements.add(addIndex, customOption)
+							root.elements.add(addIndex, csharpNamespaceOption)
 							addIndex++
 						} else {
-							existingOption.value = EcoreUtil2.cloneIfContained(customOption.value)
-						}
-					}
+							existingOption.value = EcoreUtil2.cloneIfContained(csharpNamespaceOption.value)
+						}					
+					}					
 				}
 
 				var uri = r.URI				

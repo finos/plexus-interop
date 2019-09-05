@@ -23,7 +23,6 @@ import com.db.plexus.interop.dsl.gen.GenTask;
 import com.db.plexus.interop.dsl.gen.PlexusGenConfig;
 import com.db.plexus.interop.dsl.gen.js.JsGenTask;
 import com.db.plexus.interop.dsl.gen.csharp.CsharpGenTask;
-import com.db.plexus.interop.dsl.gen.csharp.CsharpProtoGenTask;
 import com.db.plexus.interop.dsl.gen.meta.ListMetadataFilesTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaJsonGenTask;
 import com.db.plexus.interop.dsl.gen.meta.MetaValidatorTask;
@@ -84,7 +83,7 @@ public class Main {
                 cSharpGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.PROTO_CSHARP:
-                GenTask protoCSharpGenTask = injector.getInstance(CsharpProtoGenTask.class);
+                GenTask protoCSharpGenTask = injector.getInstance(ProtoGenTask.class);
                 protoCSharpGenTask.doGen(genConfig);
                 break;
             case CodeOutputGenerator.VALIDATE:
@@ -106,7 +105,7 @@ public class Main {
     }
 
     private static void enhanceMetadata(PlexusGenConfig genConfig, URI workDir, URI baseDir, InteropLangStandaloneSetup setup, Injector injector) throws IOException, URISyntaxException {
-        GenTask preProcessTask = injector.getInstance(CsharpProtoGenTask.class);
+        GenTask preProcessTask = injector.getInstance(ProtoGenTask.class);
         File temp = FileUtils.createTempDir();
         String outDir = genConfig.getOutDir();
         genConfig.setOutDir(temp.getPath());
