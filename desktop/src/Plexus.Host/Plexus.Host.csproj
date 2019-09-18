@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">
-    <TargetFramework>netcore2.2</TargetFramework>    
+    <TargetFramework>netcoreapp2.1</TargetFramework>    
   </PropertyGroup>
 
   <PropertyGroup>
