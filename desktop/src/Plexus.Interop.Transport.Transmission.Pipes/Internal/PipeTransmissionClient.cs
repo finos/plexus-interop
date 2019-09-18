@@ -63,7 +63,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
             }
 
             Log.Trace("Connecting to pipe");
-            var pipeClientStream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+            var pipeClientStream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous | PipeOptions.WriteThrough);
             try
             {
                 await ConnectAsync(pipeClientStream, cancellationToken).ConfigureAwait(false);

@@ -27,6 +27,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     internal sealed class WebSocketServerTransmissionConnection : ProcessBase, ITransmissionConnection
     {
         private static readonly TimeSpan ConnectionTimeout = TimeoutConstants.Timeout5Sec;
+        private static readonly TimeSpan PingTimeout = TimeoutConstants.Timeout5Sec;
+        private static readonly byte[] EmptyMessage = new byte[0];
 
         private readonly ILogger _log;
         private readonly IWebSocketConnection _webSocket;
@@ -110,6 +112,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                     return Task.FromResult(TaskConstants.Completed);
                 }        
                 await _connectCompletion.Task.WithCancellation(CancellationToken).ConfigureAwait(false);
+                StartPinging();
                 _writer.Start();
                 _log.Trace("Connected");
                 return ProcessAsync();
@@ -119,6 +122,30 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 _webSocket.Close();
                 throw;
             }
+        }
+
+        private void StartPinging()
+        {
+            TaskRunner.RunInBackground(async () =>
+            {
+                _log.Info("Starting ping loop");
+                try
+                {
+                    while (!CancellationToken.IsCancellationRequested)
+                    {
+                        await _webSocket.SendPing(EmptyMessage);
+                        await Task.Delay(PingTimeout, CancellationToken);
+                    }
+                }
+                catch (OperationCanceledException) when (CancellationToken.IsCancellationRequested)
+                {                    
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex, "Ping loop terminated because of the exception");
+                }
+                _log.Info("Ping loop finished");
+            });
         }
 
         private async Task ProcessAsync()

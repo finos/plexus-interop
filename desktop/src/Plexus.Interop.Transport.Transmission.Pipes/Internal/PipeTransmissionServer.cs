@@ -86,7 +86,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
                 PipeDirection.InOut,
                 -1,
                 PipeTransmissionMode.Byte,
-                PipeOptions.Asynchronous);
+                PipeOptions.Asynchronous | PipeOptions.WriteThrough);
             try
             {
                 await WaitForConnectionAsync(pipeServerStream, CancellationToken).ConfigureAwait(false);
