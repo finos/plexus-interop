@@ -474,8 +474,15 @@ namespace Plexus
         private static async Task<T> WithCancellationAsync<T>(Task<T> task, CancellationToken cancellationToken, Action<Task<T>> disposeAction = null)
         {
             var cancellationPromise = new Promise<T>();
-            using (cancellationPromise.AssignCancellationToken(cancellationToken))
+            using (cancellationToken.Register(
+                CancelPromise<T>,
+                cancellationPromise,
+                false))
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    cancellationPromise.TryCancel();
+                }
                 var completedTask = await Task.WhenAny(task, cancellationPromise.Task).ConfigureAwait(false);
                 if (completedTask != task)
                 {
@@ -490,6 +497,12 @@ namespace Plexus
                 }
                 return completedTask.GetResult();
             }
+        }
+
+        private static void CancelPromise<T>(object state)
+        {
+            var promise = (Promise<T>) state;
+            promise.TryCancel();
         }
     }
 }

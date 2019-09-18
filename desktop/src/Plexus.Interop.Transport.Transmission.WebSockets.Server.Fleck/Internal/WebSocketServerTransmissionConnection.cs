@@ -49,10 +49,23 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             _webSocket.OnOpen += OnOpened;
             _webSocket.OnClose += OnClosed;
             _webSocket.OnError += OnError;
+            _webSocket.OnPing += OnPing;
+            _webSocket.OnPong += OnPong;
 
             Completion.LogCompletion(_log);
 
             _log.Trace("Created");
+        }
+
+        private void OnPong(byte[] obj)
+        {
+            _log.Trace("Pong received");
+        }
+
+        private void OnPing(byte[] obj)
+        {
+            _log.Trace("Ping received");
+            TaskRunner.RunInBackground(() => _webSocket.SendPong(obj)).LogAndIgnoreExceptions(_log);
         }
 
         private void OnError(Exception e)
@@ -133,7 +146,9 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 {
                     while (!CancellationToken.IsCancellationRequested)
                     {
+                        _log.Trace("Sending ping");
                         await _webSocket.SendPing(EmptyMessage);
+                        _log.Trace("Ping sent");
                         await Task.Delay(PingTimeout, CancellationToken);
                     }
                 }
