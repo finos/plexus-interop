@@ -304,7 +304,7 @@ namespace Plexus.Interop
                     "address")) + "/metadata/interop";
             for (var repeat = 0; repeat < 500; repeat++)
             {
-                RunWith10SecTimeout(async () =>
+                RunWith20SecTimeout(async () =>
                 {
                     var tasks = new List<Task>();
                     for (var i = 0; i < 10; i++)

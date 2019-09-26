@@ -35,7 +35,7 @@ namespace Plexus
         private static readonly SmartThreadPool SmartThreadPool = 
             new SmartThreadPool(new STPStartInfo
             {
-                MinWorkerThreads = Environment.ProcessorCount,
+                MinWorkerThreads = 8,
                 MaxWorkerThreads = 1000,
                 ApartmentState = ApartmentState.MTA,
                 AreThreadsBackground = true,
