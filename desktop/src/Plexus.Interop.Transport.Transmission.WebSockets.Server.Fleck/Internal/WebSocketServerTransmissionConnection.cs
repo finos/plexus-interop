@@ -1,5 +1,5 @@
-﻿/**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+/**
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     internal sealed class WebSocketServerTransmissionConnection : ProcessBase, ITransmissionConnection
     {
         private static readonly TimeSpan ConnectionTimeout = TimeoutConstants.Timeout5Sec;
+        private static readonly TimeSpan PingTimeout = TimeoutConstants.Timeout5Sec;
+        private static readonly byte[] EmptyMessage = new byte[0];
 
         private readonly ILogger _log;
         private readonly IWebSocketConnection _webSocket;
@@ -47,10 +49,23 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             _webSocket.OnOpen += OnOpened;
             _webSocket.OnClose += OnClosed;
             _webSocket.OnError += OnError;
+            _webSocket.OnPing += OnPing;
+            _webSocket.OnPong += OnPong;
 
             Completion.LogCompletion(_log);
 
             _log.Trace("Created");
+        }
+
+        private void OnPong(byte[] obj)
+        {
+            _log.Trace("Pong received");
+        }
+
+        private void OnPing(byte[] obj)
+        {
+            _log.Trace("Ping received");
+            TaskRunner.RunInBackground(() => _webSocket.SendPong(obj)).LogAndIgnoreExceptions(_log);
         }
 
         private void OnError(Exception e)
@@ -110,6 +125,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                     return Task.FromResult(TaskConstants.Completed);
                 }        
                 await _connectCompletion.Task.WithCancellation(CancellationToken).ConfigureAwait(false);
+                StartPinging();
                 _writer.Start();
                 _log.Trace("Connected");
                 return ProcessAsync();
@@ -119,6 +135,32 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 _webSocket.Close();
                 throw;
             }
+        }
+
+        private void StartPinging()
+        {
+            TaskRunner.RunInBackground(async () =>
+            {
+                _log.Info("Starting ping loop");
+                try
+                {
+                    while (!CancellationToken.IsCancellationRequested)
+                    {
+                        _log.Trace("Sending ping");
+                        await _webSocket.SendPing(EmptyMessage);
+                        _log.Trace("Ping sent");
+                        await Task.Delay(PingTimeout, CancellationToken);
+                    }
+                }
+                catch (OperationCanceledException) when (CancellationToken.IsCancellationRequested)
+                {                    
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex, "Ping loop terminated because of the exception");
+                }
+                _log.Info("Ping loop finished");
+            });
         }
 
         private async Task ProcessAsync()

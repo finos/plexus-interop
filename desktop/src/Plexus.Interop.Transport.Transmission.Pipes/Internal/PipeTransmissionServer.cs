@@ -1,5 +1,5 @@
-﻿/**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+/**
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,7 +86,7 @@ namespace Plexus.Interop.Transport.Transmission.Pipes.Internal
                 PipeDirection.InOut,
                 -1,
                 PipeTransmissionMode.Byte,
-                PipeOptions.Asynchronous);
+                PipeOptions.Asynchronous | PipeOptions.WriteThrough);
             try
             {
                 await WaitForConnectionAsync(pipeServerStream, CancellationToken).ConfigureAwait(false);

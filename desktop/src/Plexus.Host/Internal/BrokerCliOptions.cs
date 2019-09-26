@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
     using CommandLine;
     using CommandLine.Text;
 
-#if NETCOREAPP2_2
+#if !NET45
     [Verb("start", HelpText = "Start interop broker.")]
 #endif
     internal class StartCliOptions
@@ -31,7 +31,7 @@
         public uint Port { get; set; }
     }
 
-#if NETCOREAPP2_2
+#if !NET45
     [Verb("broker", HelpText = "Start interop broker.")]
 #endif
     internal class BrokerCliOptions : StartCliOptions

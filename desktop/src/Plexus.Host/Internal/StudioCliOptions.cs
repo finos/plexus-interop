@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 {
     using CommandLine;
 
-#if NETCOREAPP2_2
+#if !NET45
     [Verb("studio", HelpText = "Start Plexus Studio.")]
 #endif
     internal sealed class StudioCliOptions

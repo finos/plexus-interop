@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,16 +48,6 @@ namespace Plexus
         protected static readonly TimeSpan Timeout30Sec = TimeoutConstants.Timeout30Sec;
 
         protected ITestOutputHelper Console { get; }
-
-#if NET45
-        static TestsSuite()
-        {
-            // For .NET 4.5 increasing min threads count to avoid starvation and slow running in the cases 
-            // when we're creating a lot of connections in the same process concurrently (which is not a very realistic scenario in real world case)
-            ThreadPool.GetMaxThreads(out var minWorkerThreads, out var minCompletionPortThreads);
-            ThreadPool.SetMinThreads(minWorkerThreads, minCompletionPortThreads);
-        }
-#endif
 
         protected TestsSuite() : this(null)
         {

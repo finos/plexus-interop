@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,19 +28,24 @@ namespace Plexus
 
         public Promise()
         {
-            _completion.Task.SuppressUnobservedExceptions();
+            Task = _completion.Task;
         }
 
         private int _isCompleted;
 
-        public Task<T> Task => _completion.Task;
+        public Task<T> Task { get; }
+
+        private static void ScheduleCompletionAction(Action action)
+        {
+            Promise.ScheduleCompletionAction(action);
+        }
 
         public bool TryComplete(T result)
         {
             bool completed;
             if (Interlocked.Exchange(ref _isCompleted, 1) == 0)
             {
-                TaskRunner.RunInBackground(() => _completion.SetResult(result));
+                ScheduleCompletionAction(() => _completion.SetResult(result));
                 completed = true;
             }
             else
@@ -63,7 +68,7 @@ namespace Plexus
             bool completed;
             if (Interlocked.Exchange(ref _isCompleted, 1) == 0)
             {
-                TaskRunner.RunInBackground(() => _completion.SetCanceled());
+                ScheduleCompletionAction(() => _completion.SetCanceled());
                 completed = true;
             }
             else
@@ -90,7 +95,7 @@ namespace Plexus
             bool completed;
             if (Interlocked.Exchange(ref _isCompleted, 1) == 0)
             {
-                TaskRunner.RunInBackground(() => _completion.SetException(error));
+                ScheduleCompletionAction(() => _completion.SetException(error));
                 completed = true;
             }
             else
@@ -113,7 +118,7 @@ namespace Plexus
             bool completed;
             if (Interlocked.Exchange(ref _isCompleted, 1) == 0)
             {
-                TaskRunner.RunInBackground(() => _completion.SetException(errors));
+                ScheduleCompletionAction(() => _completion.SetException(errors));
                 completed = true;
             }
             else

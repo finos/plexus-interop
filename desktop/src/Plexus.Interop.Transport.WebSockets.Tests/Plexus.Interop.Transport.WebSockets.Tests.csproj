@@ -3,8 +3,8 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2;net45</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.1</TargetFrameworks>
 
     <RootNamespace>Plexus.Interop.Transport.WebSockets</RootNamespace>
 
@@ -29,7 +29,7 @@
     <ProjectReference Include="..\Plexus.Interop.Transport.Testing\Plexus.Interop.Transport.Testing.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Client\Plexus.Interop.Transport.Transmission.WebSockets.Client.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck\Plexus.Interop.Transport.Transmission.WebSockets.Server.Fleck.csproj" Condition="'$(TargetFramework)' == 'net45'" />
-    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server\Plexus.Interop.Transport.Transmission.WebSockets.Server.csproj" Condition="'$(TargetFramework)' == 'netcoreapp2.2'" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.WebSockets.Server\Plexus.Interop.Transport.Transmission.WebSockets.Server.csproj" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
   </ItemGroup>
 
   <ItemGroup>

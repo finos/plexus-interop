@@ -1,5 +1,5 @@
-﻿/**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+/**
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -474,8 +474,15 @@ namespace Plexus
         private static async Task<T> WithCancellationAsync<T>(Task<T> task, CancellationToken cancellationToken, Action<Task<T>> disposeAction = null)
         {
             var cancellationPromise = new Promise<T>();
-            using (cancellationPromise.AssignCancellationToken(cancellationToken))
+            using (cancellationToken.Register(
+                CancelPromise<T>,
+                cancellationPromise,
+                false))
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    cancellationPromise.TryCancel();
+                }
                 var completedTask = await Task.WhenAny(task, cancellationPromise.Task).ConfigureAwait(false);
                 if (completedTask != task)
                 {
@@ -490,6 +497,12 @@ namespace Plexus
                 }
                 return completedTask.GetResult();
             }
+        }
+
+        private static void CancelPromise<T>(object state)
+        {
+            var promise = (Promise<T>) state;
+            promise.TryCancel();
         }
     }
 }

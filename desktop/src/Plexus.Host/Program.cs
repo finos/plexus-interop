@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2018 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -183,7 +183,7 @@ namespace Plexus.Host
 
         private static void InitializeProcess()
         {
-#if NETCOREAPP2_2
+#if !NET45
             // by default, .NET Core doesn't have all code pages needed for Console apps.
             // see the .NET Core Notes in https://msdn.microsoft.com/en-us/library/system.diagnostics.process(v=vs.110).aspx
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
