@@ -55,6 +55,7 @@
                 await _buffer.In.ConsumeAsync(SendAsync, _cancellationToken).ConfigureAwait(false);
                 _log.Trace("Sending <END> message");
                 await _webSocket.Send("<END>").ConfigureAwait(false);
+                _log.Trace("Sent <END> message");
             }
             catch (Exception ex)
             {
@@ -70,6 +71,7 @@
             {
                 _log.Trace("Sending message of length {0}", msg.Count);
                 await _webSocket.Send(msg.ToArray()).WithCancellation(_cancellationToken).ConfigureAwait(false);
+                _log.Trace("Sent message of length {0}", msg.Count);
             }
         }
     }
