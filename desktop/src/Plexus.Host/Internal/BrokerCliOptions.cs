@@ -19,7 +19,7 @@
     using CommandLine;
     using CommandLine.Text;
 
-#if NETCOREAPP2_2
+#if !NET45
     [Verb("start", HelpText = "Start interop broker.")]
 #endif
     internal class StartCliOptions
@@ -31,7 +31,7 @@
         public uint Port { get; set; }
     }
 
-#if NETCOREAPP2_2
+#if !NET45
     [Verb("broker", HelpText = "Start interop broker.")]
 #endif
     internal class BrokerCliOptions : StartCliOptions

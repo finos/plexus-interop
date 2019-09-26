@@ -19,12 +19,12 @@
     using System.Collections.Generic;
     using CommandLine;
 
-#if NETCOREAPP2_2
+#if !NET45
     [Verb("launch", HelpText = "Launch interop application.")]
 #endif
     internal sealed class LaunchCliOptions
     {
-#if NETCOREAPP2_2
+#if !NET45
         [Option('a', "application", Required = true, HelpText = "Identifier of application.", Separator = ',')]
 #else
         [OptionList('a', "application", Required = true, HelpText = "Identifier of application.", Separator = ',')]
