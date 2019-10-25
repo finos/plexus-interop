@@ -22,12 +22,19 @@ import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAP
 
 import * as plexus from '../gen/plexus-messages';
 
+export interface CancellableUnaryResponse<T> {
+    invocation: InvocationClient;
+    response: Promise<T>;
+}
+
 /**
  *  Proxy interface of EchoService service, to be consumed by Client API
  */
 export abstract class EchoServiceProxy {
 
     public abstract unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
+
+    public abstract unaryWithCancellation(request: plexus.plexus.interop.testing.IEchoRequest): Promise<CancellableUnaryResponse<plexus.plexus.interop.testing.IEchoRequest>>;
     
     public abstract serverStreaming(request: plexus.plexus.interop.testing.IEchoRequest, responseObserver: InvocationObserver<plexus.plexus.interop.testing.IEchoRequest>): Promise<InvocationClient>;
     
@@ -52,6 +59,23 @@ export abstract class ServiceAliasProxy {
 export class EchoServiceProxyImpl implements EchoServiceProxy {
 
     constructor(private readonly genericClient: GenericClientApi) { }
+
+    public unaryWithCancellation(request: plexus.plexus.interop.testing.IEchoRequest): Promise<CancellableUnaryResponse<plexus.plexus.interop.testing.IEchoRequest>> {
+        const invocationInfo: InvocationRequestInfo = {
+            methodId: 'Unary',
+            serviceId: 'plexus.interop.testing.EchoService'
+        };
+        return new Promise<CancellableUnaryResponse<plexus.plexus.interop.testing.IEchoRequest>>((resolveInvocation, rejectInvocation) => {
+            const responsePromise = new Promise<plexus.plexus.interop.testing.IEchoRequest>((resolveResponse, rejectResponse) => {
+                this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                    value: responsePayload => resolveResponse(responsePayload),
+                    error: e => rejectResponse(e)
+                }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
+                .then(invocationClient => resolveInvocation({ invocation: invocationClient, response: responsePromise }))
+                .catch(rejectInvocation);
+            });
+        });
+    }
 
     public unary(request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> {
         const invocationInfo: InvocationRequestInfo = {

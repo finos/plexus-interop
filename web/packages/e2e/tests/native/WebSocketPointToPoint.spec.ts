@@ -66,4 +66,12 @@ describe('Client: Web Socket Point to Point invocation', () => {
         return pointToPointTests.testHostExecutionExceptionReceived();
     });
 
+    it('Supports cancel of Unary Invocation by Generated Client', () => {
+        return pointToPointTests.testGeneratedClientCanCancelUnaryInvocation();
+    });
+
+    it('Supports receiving of result from cancellable Unary Invocation by Generated Client', () => {
+        return pointToPointTests.testGeneratedClientCanGetResponseFromCancellableUnaryInvocation();
+    });
+
 });
