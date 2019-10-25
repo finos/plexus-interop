@@ -53,16 +53,23 @@ class TypescriptApplicationApiGenerator extends ApplicationCodeGenerator {
         '''
 «imports(genConfig)»
 
+export interface CancellableUnaryResponse<T> {
+    invocation: InvocationClient;
+    response: Promise<T>;
+}
+
 «FOR consumedService : consumedServices SEPARATOR "\n"»
     /**
      *  Proxy interface of «consumedService.aliasOrName.toFirstUpper» service, to be consumed by Client API
      */
     export abstract class «consumedService.aliasOrName.toFirstUpper»Proxy {
 
-        «FOR method : consumedService.methods SEPARATOR "\n"»
-        public abstract «clientMethodSignature(method, genConfig)»;
+        «FOR consumedMethod : consumedService.methods SEPARATOR "\n"»
+        public abstract «clientMethodSignature(consumedMethod, genConfig)»;
+        «IF consumedMethod.method.isPointToPoint»
+        public abstract «cancellableUnaryMethodSignature(consumedMethod.method, genConfig)»;
+        «ENDIF»
         «ENDFOR»
-
     }
 «ENDFOR»
 
@@ -78,6 +85,11 @@ class TypescriptApplicationApiGenerator extends ApplicationCodeGenerator {
         public «clientMethodSignature(consumedMethod, genConfig)» {
             «clientMethodImpl(consumedMethod, consumedService, genConfig)»
         }
+        «IF consumedMethod.method.isPointToPoint»
+        public «cancellableUnaryMethodSignature(consumedMethod.method, genConfig)» {
+            «clientCancellablePointToPointImpl(consumedMethod, consumedService, genConfig)»
+        }
+        «ENDIF»
         «ENDFOR»
 
     }
@@ -242,6 +254,8 @@ import * as «genConfig.namespace» from '«genConfig.getExternalDependencies().
         clientMethodSignature(methodLink.method, genConfig)
     }
 
+    def cancellableUnaryMethodSignature(Method rpcMethod, PlexusGenConfig genConfig) '''«rpcMethod.name.toFirstLower»WithCancellation(request: «requestType(rpcMethod, genConfig)»): Promise<CancellableUnaryResponse<«responseType(rpcMethod, genConfig)»>>'''
+    
     def clientMethodSignature(Method rpcMethod, PlexusGenConfig genConfig) {
         switch (rpcMethod) {
             case rpcMethod.isPointToPoint: '''«rpcMethod.name.toFirstLower»(request: «requestType(rpcMethod, genConfig)»): Promise<«responseType(rpcMethod, genConfig)»>'''
@@ -282,6 +296,23 @@ import * as «genConfig.namespace» from '«genConfig.getExternalDependencies().
                     value: responsePayload => resolve(responsePayload),
                     error: e => reject(e)
                 }, «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»);
+            });
+        '''
+    }
+
+    def clientCancellablePointToPointImpl(ConsumedMethod consumed, ConsumedService consumedService, PlexusGenConfig genConfig) {
+        val rpcMethod = consumed.method
+        return '''
+            «clientInvocationInfo(consumed, consumedService, genConfig)»
+            return new Promise<CancellableUnaryResponse<«responseTypeImpl(rpcMethod, genConfig)»>>((resolveInvocation, rejectInvocation) => {
+                const responsePromise = new Promise<«responseTypeImpl(rpcMethod, genConfig)»>((resolveResponse, rejectResponse) => {
+                    this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                        value: responsePayload => resolveResponse(responsePayload),
+                        error: e => rejectResponse(e)
+                    }, «requestTypeImpl(rpcMethod, genConfig)», «responseTypeImpl(rpcMethod, genConfig)»)
+                    .then(invocationClient => resolveInvocation({ invocation: invocationClient, response: responsePromise }))
+                    .catch(rejectInvocation);
+                });
             });
         '''
     }

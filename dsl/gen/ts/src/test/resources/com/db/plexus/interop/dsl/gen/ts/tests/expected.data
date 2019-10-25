@@ -6,12 +6,19 @@ import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAP
 
 import * as plexus from './plexus-messages';
 
+export interface CancellableUnaryResponse<T> {
+    invocation: InvocationClient;
+    response: Promise<T>;
+}
+
 /**
  *  Proxy interface of ExampleService service, to be consumed by Client API
  */
 export abstract class ExampleServiceProxy {
 
     public abstract pointToPoint(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>;
+
+    public abstract pointToPointWithCancellation(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>>;
 
     public abstract serverStreaming(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest, responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<InvocationClient>;
 
@@ -47,6 +54,23 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
                 value: responsePayload => resolve(responsePayload),
                 error: e => reject(e)
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response);
+        });
+    }
+
+    public pointToPointWithCancellation(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>> {
+        const invocationInfo: InvocationRequestInfo = {
+            methodId: 'PointToPoint',
+            serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
+        };
+        return new Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>>((resolveInvocation, rejectInvocation) => {
+            const responsePromise = new Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>((resolveResponse, rejectResponse) => {
+                this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                    value: responsePayload => resolveResponse(responsePayload),
+                    error: e => rejectResponse(e)
+                }, plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest, plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse)
+                .then(invocationClient => resolveInvocation({ invocation: invocationClient, response: responsePromise }))
+                .catch(rejectInvocation);
+            });
         });
     }
 
