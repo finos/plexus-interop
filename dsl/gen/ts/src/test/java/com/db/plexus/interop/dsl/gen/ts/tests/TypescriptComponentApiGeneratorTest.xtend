@@ -59,7 +59,7 @@ class TypescriptComponentApiGeneratorTest {
 
         val generatedResult = outputGenerator.generate(plexusConfig, apps.get(0),
         resourceSet.getResources())
-        println(generatedResult)
+        
         val expectedURI = ResourceUtils.resolveStandardURI("com/db/plexus/interop/dsl/gen/ts/tests/expected.data")
         val expected = new String(Files.readAllBytes(Paths.get(expectedURI)))	
 

@@ -304,8 +304,8 @@ import * as «genConfig.namespace» from '«genConfig.getExternalDependencies().
         val rpcMethod = consumed.method
         return '''
             «clientInvocationInfo(consumed, consumedService, genConfig)»
-            return new Promise<CancellableUnaryResponse<«responseTypeImpl(rpcMethod, genConfig)»>>((resolveInvocation, rejectInvocation) => {
-                const responsePromise = new Promise<«responseTypeImpl(rpcMethod, genConfig)»>((resolveResponse, rejectResponse) => {
+            return new Promise<CancellableUnaryResponse<«responseType(rpcMethod, genConfig)»>>((resolveInvocation, rejectInvocation) => {
+                const responsePromise = new Promise<«responseType(rpcMethod, genConfig)»>((resolveResponse, rejectResponse) => {
                     this.genericClient.sendUnaryRequest(invocationInfo, request, {
                         value: responsePayload => resolveResponse(responsePayload),
                         error: e => rejectResponse(e)
