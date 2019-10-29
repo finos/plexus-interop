@@ -23,6 +23,7 @@ import { ClientError } from '@plexus-interop/protocol';
 import { expect } from 'chai';
 import { MethodInvocationContext } from '@plexus-interop/client';
 import { NopServiceHandler } from './NopServiceHandler';
+import { AsyncHelper } from '@plexus-interop/common';
 
 export class PointToPointInvocationTests extends BaseEchoTest {
 
@@ -83,6 +84,33 @@ export class PointToPointInvocationTests extends BaseEchoTest {
     public testHostsExecutionStringErrorReceived(): Promise<void> {
         const errorText = 'Host error';
         return this.testHostsExecutionErrorReceivedInternal(errorText, errorText);
+    }
+
+    public async testGeneratedClientCanCancelUnaryInvocation(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        let serverReceivedCancel = false;
+        const handler = new UnaryServiceHandler(context => {
+            return new Promise<plexus.plexus.interop.testing.IEchoRequest>(() => {
+                context.cancellationToken.onCancel(() => serverReceivedCancel = true);
+                // "long running operation" do not return any result
+            });
+        });
+        const [echoClient, echoServer] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
+        const cancellableResponse = await echoClient.getEchoServiceProxy().unaryWithCancellation(echoRequest);
+        await cancellableResponse.invocation.cancel();
+        await this.clientsSetup.disconnect(echoClient, echoServer);
+        // tslint:disable-next-line: no-unused-expression
+        await AsyncHelper.waitFor(() => serverReceivedCancel === true, undefined, 10, 500);
+    }
+
+    public async testGeneratedClientCanGetResponseFromCancellableUnaryInvocation(): Promise<void> {
+        const echoRequest = this.clientsSetup.createRequestDto();
+        const handler = new UnaryServiceHandler(async () => echoRequest);
+        const [echoClient, echoServer] = await this.clientsSetup.createEchoClients(this.connectionProvider, handler);
+        const cancellableResponse = await echoClient.getEchoServiceProxy().unaryWithCancellation(echoRequest);
+        const echoResponse = await cancellableResponse.response;
+        await this.clientsSetup.disconnect(echoClient, echoServer);
+        this.assertEqual(echoRequest, echoResponse);
     }
 
     public testFewMessagesSent(): Promise<void> {

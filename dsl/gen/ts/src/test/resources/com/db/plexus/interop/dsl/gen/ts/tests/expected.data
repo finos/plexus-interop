@@ -6,19 +6,24 @@ import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAP
 
 import * as plexus from './plexus-messages';
 
+export interface CancellableUnaryResponse<T> {
+    invocation: InvocationClient;
+    response: Promise<T>;
+}
+
 /**
  *  Proxy interface of ExampleService service, to be consumed by Client API
  */
 export abstract class ExampleServiceProxy {
 
     public abstract pointToPoint(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>;
-
+    public abstract pointToPointWithCancellation(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>>;
+    
     public abstract serverStreaming(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest, responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<InvocationClient>;
-
+    
     public abstract clientToServer(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>>;
-
+    
     public abstract bidiStreaming(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>>;
-
 }
 
 /**
@@ -27,7 +32,7 @@ export abstract class ExampleServiceProxy {
 export abstract class NoLaunchExampleServiceProxy {
 
     public abstract pointToPoint(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>;
-
+    public abstract pointToPointWithCancellation(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>>;
 }
 
 /**
@@ -49,7 +54,23 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response);
         });
     }
-
+    public pointToPointWithCancellation(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>> {
+        const invocationInfo: InvocationRequestInfo = {
+            methodId: 'PointToPoint',
+            serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'
+        };
+        return new Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>>((resolveInvocation, rejectInvocation) => {
+            const responsePromise = new Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>((resolveResponse, rejectResponse) => {
+                this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                    value: responsePayload => resolveResponse(responsePayload),
+                    error: e => rejectResponse(e)
+                }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
+                .then(invocationClient => resolveInvocation({ invocation: invocationClient, response: responsePromise }))
+                .catch(rejectInvocation);
+            });
+        });
+    }
+    
     public serverStreaming(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest, responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<InvocationClient> {
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'ServerStreaming',
@@ -62,7 +83,7 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
             plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response
         );
     }
-
+    
     public clientToServer(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>> {
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'ClientToServer',
@@ -73,7 +94,7 @@ export class ExampleServiceProxyImpl implements ExampleServiceProxy {
             responseObserver,
             plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response);
     }
-
+    
     public bidiStreaming(responseObserver: InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): Promise<StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>> {
         const invocationInfo: InvocationRequestInfo = {
             methodId: 'BidiStreaming',
@@ -107,6 +128,23 @@ export class NoLaunchExampleServiceProxyImpl implements NoLaunchExampleServicePr
             }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response);
         });
     }
+    public pointToPointWithCancellation(request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>> {
+        const invocationInfo: InvocationRequestInfo = {
+            methodId: 'PointToPoint',
+            serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService',
+            serviceAlias: 'NoLaunchExampleService'
+        };
+        return new Promise<CancellableUnaryResponse<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>>((resolveInvocation, rejectInvocation) => {
+            const responsePromise = new Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>((resolveResponse, rejectResponse) => {
+                this.genericClient.sendUnaryRequest(invocationInfo, request, {
+                    value: responsePayload => resolveResponse(responsePayload),
+                    error: e => rejectResponse(e)
+                }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
+                .then(invocationClient => resolveInvocation({ invocation: invocationClient, response: responsePromise }))
+                .catch(rejectInvocation);
+            });
+        });
+    }
 
 }
 
@@ -116,7 +154,7 @@ export class NoLaunchExampleServiceProxyImpl implements NoLaunchExampleServicePr
 export interface ComponentAClient extends GenericClientApi  {
 
     getExampleServiceProxy(): ExampleServiceProxy;
-
+    
     getNoLaunchExampleServiceProxy(): NoLaunchExampleServiceProxy;
 
 }
@@ -137,7 +175,7 @@ class ComponentAClientImpl extends GenericClientApiBase implements ComponentACli
     public getExampleServiceProxy(): ExampleServiceProxy {
         return this.exampleServiceProxy;
     }
-
+    
     public getNoLaunchExampleServiceProxy(): NoLaunchExampleServiceProxy {
         return this.noLaunchExampleServiceProxy;
     }
@@ -158,11 +196,11 @@ export abstract class NoLaunchExampleServiceInvocationHandler {
 export abstract class ExampleServiceInvocationHandler {
 
     public abstract onPointToPoint(invocationContext: MethodInvocationContext, request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>;
-
+    
     public abstract onServerStreaming(invocationContext: MethodInvocationContext, request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest, hostClient: StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): void;
-
+    
     public abstract onClientToServer(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>;
-
+    
     public abstract onBidiStreaming(invocationContext: MethodInvocationContext, hostClient: StreamingInvocationClient<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>): InvocationObserver<plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest>;
 }
 
@@ -176,14 +214,14 @@ export class ComponentAClientBuilder implements ClientApiBuilder<ComponentAClien
             .withApplicationId('com.db.plexus.interop.dsl.gen.test.components.ComponentA');
 
     private noLaunchExampleServiceHandler: NoLaunchExampleServiceInvocationHandler;
-
+    
     private exampleServiceHandler: ExampleServiceInvocationHandler;
 
     public withNoLaunchExampleServiceInvocationsHandler(invocationsHandler: NoLaunchExampleServiceInvocationHandler): ComponentAClientBuilder {
         this.noLaunchExampleServiceHandler = invocationsHandler;
         return this;
     }
-
+    
     public withExampleServiceInvocationsHandler(invocationsHandler: ExampleServiceInvocationHandler): ComponentAClientBuilder {
         this.exampleServiceHandler = invocationsHandler;
         return this;
