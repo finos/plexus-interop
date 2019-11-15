@@ -26,7 +26,7 @@ Existing [Desktop Interop Broker](./desktop/src/Plexus.Interop.Broker) is implem
 
 ![Key components and high level architecture](./docs/src/main/asciidoc/images/high-level-architecture2.png "Key components and high level architecture")
 
-Current [Broker Implementation for Stand alone Browser](./web/packages/broker/src/api/) based on same principles, therefore already defined required interfaces:
+Current [Broker Implementation for Stand alone Browser](./web/packages/broker/src/broker/Broker.ts) based on same principles, therefore already defined required interfaces:
 
 - [App Life Cycle Manager (TS)](./web/packages/broker/src/lifecycle/AppLifeCycleManager.ts)
 - [App Launcher (TS)](./web/packages/broker/src/launcher/AppLifeCycleManager.ts)
