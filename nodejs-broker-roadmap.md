@@ -4,14 +4,13 @@
 <!-- TOC -->
 - [High Level Design](#high-level-design)
 - [Road Map](#road-map)
-    - [Adoption of Existing JS Broker for Desktop](#adoption-of-existing-js-broker-for-desktop)
+    - [1. Adoption of Existing JS Broker for Desktop](#adoption-of-existing-js-broker-for-desktop)
         - [Target State](#target-state)
-        - [Detailed Progress](#detailed-progress)
-    - [Feature Parity with .Net Broker](#feature-parity-with-net-broker)
-    - [Support for JSON and ProtobufJS based Serialization for JS clients](#support-for-json-and-protobufjs-based-serialization-for-js-clients)
+    - [2. Feature Parity with .Net Broker](#feature-parity-with-net-broker)
+        - [Target State](#target-state-3)
+    - [3. Support for JSON and ProtobufJS based Serialization for JS clients](#support-for-json-and-protobufjs-based-serialization-for-js-clients)
         - [Target State](#target-state-1)
-        - [Detailed Progress](#detailed-progress-1)
-    - [Full Implementation of Common Interop API](#full-implementation-of-common-interop-api)
+    - [4. Full Implementation of Common Interop API](#full-implementation-of-common-interop-api)
         - [Target State](#target-state-2)
     <!-- /TOC -->
 
@@ -34,13 +33,13 @@ Current [Broker Implementation for Stand alone Browser](./web/packages/broker/sr
 - [Transport Connection (TS)](./packages/transport-common/src/transport/TransportConnection.ts)
 - [Interop Client (TS)](./packages/client/src/client/api/generic/GenericClientApi.ts)
 
-Also default implementation of some components, like **InteropRegistryProvider**/**Broker**/**Discovery Handler**/etc, will work fine in Node JS environment. So we can start with adopting everything we already have and implement missed Desktop implementations like native App Life Cycle Manager.
+Also default implementation of some components, like **InteropRegistryProvider**/**Broker**/**Discovery Handler**/etc, will work well in Node JS environment. So we can start with adopting everything we already have and implement missed Desktop implementations like native App Life Cycle Manager.
 
 <a id="road-map" name="road-map"></a>
 ## Road Map
 
 <a id="adoption-of-existing-js-broker-for-desktop" name="adoption-of-existing-js-broker-for-desktop"></a>
-### Adoption of Existing JS Broker for Desktop
+### 1. Adoption of Existing JS Broker for Desktop
 
 As described above - we need to adopt existing functionality of **JS Broker for Stand Alone Browser** to Desktop environment. 
 
@@ -49,20 +48,23 @@ As described above - we need to adopt existing functionality of **JS Broker for 
 
 Node JS Broker, which supports Web Sockets Transport for connectivity, basic Discovery, fully compatible with both Generic and Generated Typescript/.Net clients.
 
-<a id="detailed-progress" name="detailed-progress"></a>
-#### Detailed Progress
-
-TODO add items to list
-
 <a id="feature-parity-with-net-broker" name="feature-parity-with-net-broker"></a>
-### Feature Parity with .Net Broker
+### 2. Feature Parity with .Net Broker
 
 Implement all functionality, already available in .Net Broker implementation
 
-TODO add details
+<a id="target-state-3" name="target-state-3"></a>
+#### Target State
+
+Supports all existing functionality and Transport Implementation, including:
+
+- Different Launch Modes
+- Named Pipes Transport for .Net
+- Full Discovery Support
+- etc
 
 <a id="support-for-json-and-protobufjs-based-serialization-for-js-clients" name="support-for-json-and-protobufjs-based-serialization-for-js-clients"></a>
-### Support for JSON and ProtobufJS based Serialization for JS clients
+### 3. Support for JSON and ProtobufJS based Serialization for JS clients
 
 We still need to support ProtobufJS based transport for **.Net** <-> **JS** communication and for support of existing clients. However we would like to add JSON based serialization for JS clients to significantly decrease Generated JS bundle size and unblock usage of Generic API (no code generation).
 
@@ -71,13 +73,8 @@ We still need to support ProtobufJS based transport for **.Net** <-> **JS** comm
 
 Plexus Client can choose one of two serialization mechanisms during connection to Broker.
 
-<a id="detailed-progress-1" name="detailed-progress-1"></a>
-#### Detailed Progress
-
-TODO add items to list
-
 <a id="full-implementation-of-common-interop-api" name="full-implementation-of-common-interop-api"></a>
-### Full Implementation of Common Interop API
+### 4. Full Implementation of Common Interop API
 
 Support of all supported methods of [Common Interop API](https://github.com/finos-plexus/finos-plexus.github.io/blob/master/client-api/client-api.ts)
 
