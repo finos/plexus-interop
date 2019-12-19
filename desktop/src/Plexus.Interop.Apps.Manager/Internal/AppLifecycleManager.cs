@@ -34,8 +34,8 @@ namespace Plexus.Interop.Apps.Internal
         private readonly Dictionary<UniqueId, IAppConnection> _connections
             = new Dictionary<UniqueId, IAppConnection>();
 
-        private readonly Dictionary<(UniqueId AppInstanceId, string AppId), List<IAppConnection>> _appInstanceConnections
-            = new Dictionary<(UniqueId, string), List<IAppConnection>>();
+        private readonly Dictionary<UniqueId, Dictionary<string, IAppConnection>> _appInstanceConnections
+            = new Dictionary<UniqueId, Dictionary<string, IAppConnection>>();
 
         private readonly Dictionary<string, List<IAppConnection>> _appConnections
             = new Dictionary<string, List<IAppConnection>>();
@@ -86,13 +86,13 @@ namespace Plexus.Interop.Apps.Internal
                 }
 
                 _connections[clientConnection.Id] = clientConnection;
-                var deferredConnectionKey = (clientConnection.Info.ApplicationInstanceId, clientConnection.Info.ApplicationId);
-                if (!_appInstanceConnections.TryGetValue(deferredConnectionKey, out var connectionList))
+                var appInstanceId = clientConnection.Info.ApplicationInstanceId;
+                if (!_appInstanceConnections.TryGetValue(appInstanceId, out var appConnections))
                 {
-                    connectionList = new List<IAppConnection>();
-                    _appInstanceConnections[deferredConnectionKey] = connectionList;
+                    appConnections = new Dictionary<string, IAppConnection>();
+                    _appInstanceConnections[appInstanceId] = appConnections;
                 }
-                connectionList.Add(clientConnection);
+                appConnections[clientConnection.Info.ApplicationId] = clientConnection;
 
                 var appId = clientConnection.Info.ApplicationId;
                 if (!_appConnections.TryGetValue(appId, out var appConnectionList))
@@ -112,6 +112,7 @@ namespace Plexus.Interop.Apps.Internal
                     }
                 });
 
+                var deferredConnectionKey = (appInstanceId, appId);
                 if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
                     Log.Debug("Resolving deferred connection {{{0}}} to accepted connection {{{1}}}", deferredConnectionKey, connection);
@@ -131,17 +132,17 @@ namespace Plexus.Interop.Apps.Internal
             {                
                 _connections.Remove(connection.Id);
 
-                var deferredConnectionKey = (connection.Info.ApplicationInstanceId, connection.Info.ApplicationId);
-                if (_appInstanceConnections.TryGetValue(deferredConnectionKey, out var list))
+                var appInstanceId = connection.Info.ApplicationInstanceId;
+                var appId = connection.Info.ApplicationId;
+                if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections))
                 {
-                    list.Remove(connection);
-                    if (list.Count == 0)
+                    connections.Remove(appId);
+                    if (connections.Count == 0)
                     {
-                        _appInstanceConnections.Remove(deferredConnectionKey);
+                        _appInstanceConnections.Remove(appInstanceId);
                     }
                 }
 
-                var appId = connection.Info.ApplicationId;
                 if (_appConnections.TryGetValue(appId, out var appConnectionList))
                 {
                     appConnectionList.Remove(connection);
@@ -151,6 +152,7 @@ namespace Plexus.Interop.Apps.Internal
                     }
                 }
 
+                var deferredConnectionKey = (appInstanceId, connection.Info.ApplicationId);
                 if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
                     waiter.TryCancel();
@@ -315,9 +317,9 @@ namespace Plexus.Interop.Apps.Internal
 
                 lock (_connections)
                 {
-                    if (_appInstanceConnections.TryGetValue(deferredConnectionKey, out var connectionList) && connectionList.Any())
+                    if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.Any())
                     {
-                        var existingConnection = connectionList.First();
+                        var existingConnection = connections.First().Value;
                         Log.Debug("Resolving deferred connection {{{0}}} to existing connection {{{1}}}", deferredConnectionKey, existingConnection);
                         connectionPromise.TryComplete(existingConnection);
                     }
