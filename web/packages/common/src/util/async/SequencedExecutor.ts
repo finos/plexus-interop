@@ -15,48 +15,79 @@
  * limitations under the License.
  */
 import { Logger } from '../../logger/Logger';
-import { default as Queue } from 'typescript-collections/dist/lib/Queue';
-import { AsyncHelper } from './AsyncHelper';
 import { LoggerFactory } from '../../logger/LoggerFactory';
+import { uniqueId } from '../unique';
 
-type PendingTask = {
-    id: number,
+export interface PendingTask {
+    id: string;
     task: () => Promise<void>;
-};
+    wrapperReject: (e: any) => void;
+    wrapperResolve: () => void;
+}
 
 export class SequencedExecutor {
 
-    private outQueue: Queue<PendingTask> = new Queue<PendingTask>();
+    private readonly _queue: PendingTask[] = [];
 
-    private currentId: number = 0;
+    private _workInProgress: boolean = false;
 
     constructor(private readonly log: Logger = LoggerFactory.getLogger('SequencedExecutor')) { }
 
-    public async submit(task: () => Promise<void>): Promise<void> {
-        const id = ++this.currentId;
-        /* istanbul ignore if */
-        if (this.log.isTraceEnabled()) {
-            this.log.trace(`Scheduling [${id}] task`);
-        }
-        this.outQueue.enqueue({
-            id: this.currentId,
-            task
+    public submit(task: () => Promise<void>): Promise<void> {
+        const id = uniqueId('seq-task');
+        return new Promise((wrapperResolve, wrapperReject) => {
+            /* istanbul ignore if */
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Placing [${id}] task to queue`);
+            }
+            this._queue.push({
+                id,
+                wrapperReject,
+                wrapperResolve,
+                task
+            });
+            this._dequeue();
         });
-        if (this.outQueue.size() > 1) {
-            /* istanbul ignore if */
-            if (this.log.isTraceEnabled()) {
-                this.log.trace(`Waiting for [${id}] task to execute`);
-            }
-            await AsyncHelper.waitFor(() => this.outQueue.peek().id === id);
-        }
-        try {
-            /* istanbul ignore if */
-            if (this.log.isTraceEnabled()) {
-                this.log.trace(`Executing [${id}] task`);
-            }
-            await this.outQueue.peek().task();
-        } finally {
-            this.outQueue.dequeue();
-        }
     }
+
+    private _dequeue(): void {
+
+        if (this._workInProgress) {
+            return;
+        }
+
+        const pendingTask = this._queue.shift();
+
+        if (!pendingTask) {
+            return;
+        }
+
+        try {
+
+            this._workInProgress = true;
+
+            /* istanbul ignore if */
+            if (this.log.isTraceEnabled()) {
+                this.log.trace(`Executing [${pendingTask.id}] task`);
+            }
+
+            pendingTask.task().then(() => {
+                this._workInProgress = false;
+                pendingTask.wrapperResolve();
+                this._dequeue();
+            })
+                .catch(e => this._handleFailure(pendingTask, e));
+
+        } catch (e) {
+            this._handleFailure(pendingTask, e);
+        }
+
+    }
+
+    private _handleFailure(task: PendingTask, e: any): void {
+        this._workInProgress = false;
+        task.wrapperReject(e);
+        this._dequeue();
+    }
+
 }
