@@ -19,25 +19,22 @@ export interface ActiveTransmissionServer {
 const logger = LoggerFactory.getLogger('WebSocketsTransmissionServer');
 
 export class WebSocketsTransmissionServer implements TransmissionServer {
-    
+
     async start(
-        port: number, 
+        port: number,
         connectionsObserver: Observer<TransportConnection>): Promise<ServerStartupDescriptor> {
-        
+
+        logger.info(`Trying to start server on ${port}`);
+
         const wss = new WebSocket.Server({ port });
-        
+
         return new Promise((resolve, reject) => {
-            
+
             wss.on('listening', () => {
                 logger.info(`Started ${addressToString(wss.address())}`)
             });
-            
-            wss.on('connection', (socket: WebSocket) => {
-                logger.debug('Accepted new ws connection');
-                new WebSocketConnectionFactory(socket).connect()
-                    .then(transportConnection => connectionsObserver.next(transportConnection))
-                    .catch(e => logger.error('Error during Web Socket Transport connection initialization', e));
-            });
+
+            wss.on('connection', this._createConnectionHandler(connectionsObserver));
 
             wss.on('error', e => {
                 logger.error('Server failure', e);
@@ -45,15 +42,19 @@ export class WebSocketsTransmissionServer implements TransmissionServer {
                 reject(e);
             });
 
+            const instance = {
+                stop: this._createStopHandler(wss)
+            };
+
             const serverDescriptor: ServerStartupDescriptor = {
                 connectionsSubscription: {
                     unsubscribe: () => {
-                        logger.info('Connections subscription stopped, closing active ');
+                        logger.info('Connections subscription stopped');
+                        instance.stop()
+                            .catch(e => logger.warn('Failure on stopping the server'));
                     }
                 },
-                instance: {
-                    stop: this._stopHandler(wss)
-                }
+                instance
             };
 
             resolve(serverDescriptor);
@@ -61,7 +62,16 @@ export class WebSocketsTransmissionServer implements TransmissionServer {
         });
     }
 
-    private _stopHandler(wss: WebSocket.Server): () => Promise<void> {
+    private _createConnectionHandler(connectionsObserver: Observer<TransportConnection>) {
+        return (socket: WebSocket) => {
+            logger.debug('Accepted new ws connection');
+            new WebSocketConnectionFactory(socket).connect()
+                .then(transportConnection => connectionsObserver.next(transportConnection))
+                .catch(e => logger.error('Error during Web Socket Transport connection initialization', e));
+        }
+    }
+
+    private _createStopHandler(wss: WebSocket.Server): () => Promise<void> {
         return () => {
             return new Promise((resolve, reject) => {
                 logger.info('Stop requested');
