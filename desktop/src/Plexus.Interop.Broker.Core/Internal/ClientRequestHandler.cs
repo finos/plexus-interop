@@ -37,11 +37,12 @@
         public ClientRequestHandler(
             IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
-            IRegistryService registryService)
+            IRegistryService registryService,
+            IInvocationEventProvider invocationEventProvider)
         {
             _protocolSerializer = protocol.Serializer;
             _discoveryRequestHandler = new DiscoveryRequestHandler(appLifecycleManager, protocol, registryService);
-            _invocationRequestHandler = new InvocationRequestHandler(appLifecycleManager, protocol, registryService);
+            _invocationRequestHandler = new InvocationRequestHandler(appLifecycleManager, protocol, registryService, invocationEventProvider);
             _clientToBrokerRequestHandler =
                 new ClientToBrokerRequestHandler<Task, (IAppConnection, ITransportChannel)>(
                     HandleInvocationAsync,

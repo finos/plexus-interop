@@ -19,7 +19,6 @@
     using Plexus.Channels;
     using Plexus.Interop.Apps;
     using Plexus.Interop.Broker.Internal;
-    using Plexus.Interop.Metamodel;
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Transport;
 
@@ -29,15 +28,13 @@
 
         public IBrokerProcessor Create(
             IReadableChannel<ITransportConnection> incomingConnections, 
-            IRegistryProvider registryProvider, 
             IProtocolSerializerFactory protocolSerializerFactory,
-            IAppLifecycleManager appLifecycleManager)
+            IInteropContext interopContext)
         {
             return new BrokerProcessor(
-                incomingConnections, 
-                registryProvider, 
+                incomingConnections,
                 protocolSerializerFactory,
-                appLifecycleManager);
+                interopContext);
         }
     }
 }

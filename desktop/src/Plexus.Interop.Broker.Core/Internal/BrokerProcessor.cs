@@ -41,16 +41,14 @@ namespace Plexus.Interop.Broker.Internal
 
         public BrokerProcessor(
             IReadableChannel<ITransportConnection> incomingConnections,
-            IRegistryProvider registryProvider,
             IProtocolSerializerFactory serializerFactory,
-            IAppLifecycleManager appLifecycleManager)
+            IInteropContext interopContext)
         {
             _incomingConnections = incomingConnections;
-            _appLifecycleManager = appLifecycleManager;
-            var registryService = new RegistryService(registryProvider);
+            var registryService = new RegistryService(interopContext.RegistryProvider);
             var protocol = new ProtocolImplementation(DefaultProtocolMessageFactory, serializerFactory);
-            _authenticationHandler = new AuthenticationHandler(appLifecycleManager, protocol, registryService);
-            _clientRequestHandler = new ClientRequestHandler(appLifecycleManager, protocol, registryService);
+            _authenticationHandler = new AuthenticationHandler(interopContext.AppLifecycleManager, protocol, registryService);
+            _clientRequestHandler = new ClientRequestHandler(interopContext.AppLifecycleManager, protocol, registryService, interopContext.InvocationEventProvider);
         }
 
         protected override ILogger Log { get; } = LogManager.GetLogger<BrokerProcessor>();

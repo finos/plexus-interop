@@ -23,9 +23,9 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal sealed class AppLifecycleManagerEventBroadcaster<T> : IDisposable
+    internal sealed class EventBroadcaster<T> : IDisposable
     {
-        private static readonly ILogger Log = LogManager.GetLogger(typeof(AppLifecycleManagerEventBroadcaster<T>));
+        private static readonly ILogger Log = LogManager.GetLogger(typeof(EventBroadcaster<T>));
 
         private readonly HashSet<IWritableChannel<T>> _subscribers = new HashSet<IWritableChannel<T>>();
 
