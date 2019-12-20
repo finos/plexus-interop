@@ -16,4 +16,10 @@
     <ProjectReference Include="..\Plexus.Interop.Metamodel.Contracts\Plexus.Interop.Metamodel.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Reactive">
+      <Version>3.1.1</Version>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>

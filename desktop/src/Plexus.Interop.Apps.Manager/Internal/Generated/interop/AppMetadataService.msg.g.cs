@@ -38,70 +38,59 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "YW1vZGVsQ2hhbmdlZEV2ZW50Ei8KDGFwcGxpY2F0aW9ucxgBIAMoCzIZLmlu",
             "dGVyb3AuQXBwTWV0YW1vZGVsSW5mbxIiCghzZXJ2aWNlcxgCIAMoCzIQLmlu",
             "dGVyb3AuU2VydmljZTohktsEHWludGVyb3AuTWV0YW1vZGVsQ2hhbmdlZEV2",
-            "ZW50Is4BChBBcHBNZXRhbW9kZWxJbmZvEgoKAmlkGAEgASgJEjMKEWNvbnN1",
+            "ZW50IqYBChBBcHBNZXRhbW9kZWxJbmZvEgoKAmlkGAEgASgJEjMKEWNvbnN1",
             "bWVkX3NlcnZpY2VzGAIgAygLMhguaW50ZXJvcC5Db25zdW1lZFNlcnZpY2US",
             "MwoRcHJvdmlkZWRfc2VydmljZXMYAyADKAsyGC5pbnRlcm9wLlByb3ZpZGVk",
-            "U2VydmljZRImCgdvcHRpb25zGAQgAygLMhUuaW50ZXJvcC5LZXlWYWx1ZVBh",
-            "aXI6HJLbBBhpbnRlcm9wLkFwcE1ldGFtb2RlbEluZm8iuAEKD1Byb3ZpZGVk",
-            "U2VydmljZRISCgpzZXJ2aWNlX2lkGAEgASgJEigKB21ldGhvZHMYAiADKAsy",
-            "Fy5pbnRlcm9wLlByb3ZpZGVkTWV0aG9kEhMKC3Byb3ZpZGVkX3RvGAMgAygJ",
-            "Eg0KBWFsaWFzGAQgASgJEiYKB29wdGlvbnMYBSADKAsyFS5pbnRlcm9wLktl",
-            "eVZhbHVlUGFpcjobktsEF2ludGVyb3AuUHJvdmlkZWRTZXJ2aWNlIroBCg9D",
-            "b25zdW1lZFNlcnZpY2USEgoKc2VydmljZV9pZBgBIAEoCRIoCgdtZXRob2Rz",
-            "GAIgAygLMhcuaW50ZXJvcC5Db25zdW1lZE1ldGhvZBIVCg1jb25zdW1lZF9m",
-            "cm9tGAMgAygJEg0KBWFsaWFzGAQgASgJEiYKB29wdGlvbnMYBSADKAsyFS5p",
-            "bnRlcm9wLktleVZhbHVlUGFpcjobktsEF2ludGVyb3AuQ29uc3VtZWRTZXJ2",
-            "aWNlImIKDkNvbnN1bWVkTWV0aG9kEgwKBG5hbWUYASABKAkSJgoHb3B0aW9u",
-            "cxgCIAMoCzIVLmludGVyb3AuS2V5VmFsdWVQYWlyOhqS2wQWaW50ZXJvcC5D",
-            "b25zdW1lZE1ldGhvZCJiCg5Qcm92aWRlZE1ldGhvZBIMCgRuYW1lGAEgASgJ",
-            "EiYKB29wdGlvbnMYAiADKAsyFS5pbnRlcm9wLktleVZhbHVlUGFpcjoaktsE",
-            "FmludGVyb3AuUHJvdmlkZWRNZXRob2QieAoHU2VydmljZRIKCgJpZBgBIAEo",
-            "CRIkCgdtZXRob2RzGAIgAygLMhMuaW50ZXJvcC5NZXRob2RJbmZvEiYKB29w",
-            "dGlvbnMYAyADKAsyFS5pbnRlcm9wLktleVZhbHVlUGFpcjoTktsED2ludGVy",
-            "b3AuU2VydmljZSLFAQoKTWV0aG9kSW5mbxIMCgRuYW1lGAEgASgJEg0KBXRp",
-            "dGxlGAIgASgJEhoKEnJlcXVlc3RfbWVzc2FnZV9pZBgDIAEoCRIbChNyZXNw",
-            "b25zZV9tZXNzYWdlX2lkGAQgASgJEiEKBHR5cGUYBSABKA4yEy5pbnRlcm9w",
-            "Lk1ldGhvZFR5cGUSJgoHb3B0aW9ucxgGIAMoCzIVLmludGVyb3AuS2V5VmFs",
-            "dWVQYWlyOhaS2wQSaW50ZXJvcC5NZXRob2RJbmZvIkQKDEtleVZhbHVlUGFp",
-            "chILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6GJLbBBRpbnRlcm9wLktl",
-            "eVZhbHVlUGFpcipWCgpNZXRob2RUeXBlEgkKBVVuYXJ5EAASEwoPU2VydmVy",
-            "U3RyZWFtaW5nEAESEwoPQ2xpZW50U3RyZWFtaW5nEAISEwoPRHVwbGV4U3Ry",
-            "ZWFtaW5nEAMy7AEKEkFwcE1ldGFkYXRhU2VydmljZRJcCiBHZXRBcHBNZXRh",
-            "ZGF0YUNoYW5nZWRFdmVudFN0cmVhbRIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0",
-            "eRogLmludGVyb3AuQXBwTWV0YWRhdGFDaGFuZ2VkRXZlbnQSWAoeR2V0TWV0",
-            "YW1vZGVsQ2hhbmdlZEV2ZW50U3RyZWFtEhYuZ29vZ2xlLnByb3RvYnVmLkVt",
-            "cHR5Gh4uaW50ZXJvcC5NZXRhbW9kZWxDaGFuZ2VkRXZlbnQaHpLbBBppbnRl",
-            "cm9wLkFwcE1ldGFkYXRhU2VydmljZUIpqgImUGxleHVzLkludGVyb3AuQXBw",
-            "cy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3RvMw=="));
+            "U2VydmljZTocktsEGGludGVyb3AuQXBwTWV0YW1vZGVsSW5mbyJ7Cg9Qcm92",
+            "aWRlZFNlcnZpY2USEgoKc2VydmljZV9pZBgBIAEoCRINCgVhbGlhcxgCIAEo",
+            "CRIoCgdtZXRob2RzGAMgAygLMhcuaW50ZXJvcC5Qcm92aWRlZE1ldGhvZDob",
+            "ktsEF2ludGVyb3AuUHJvdmlkZWRTZXJ2aWNlInsKD0NvbnN1bWVkU2Vydmlj",
+            "ZRISCgpzZXJ2aWNlX2lkGAEgASgJEg0KBWFsaWFzGAIgASgJEigKB21ldGhv",
+            "ZHMYAyADKAsyFy5pbnRlcm9wLkNvbnN1bWVkTWV0aG9kOhuS2wQXaW50ZXJv",
+            "cC5Db25zdW1lZFNlcnZpY2UiOgoOQ29uc3VtZWRNZXRob2QSDAoEbmFtZRgB",
+            "IAEoCToaktsEFmludGVyb3AuQ29uc3VtZWRNZXRob2QijwIKDlByb3ZpZGVk",
+            "TWV0aG9kEgwKBG5hbWUYASABKAkSDQoFdGl0bGUYAiABKAkSQAoLbGF1bmNo",
+            "X21vZGUYAyABKA4yKy5pbnRlcm9wLlByb3ZpZGVkTWV0aG9kLk1ldGFtb2Rl",
+            "bExhdW5jaE1vZGUSEgoKdGltZW91dF9tcxgEIAEoBRImCgdvcHRpb25zGAUg",
+            "AygLMhUuaW50ZXJvcC5LZXlWYWx1ZVBhaXIiRgoTTWV0YW1vZGVsTGF1bmNo",
+            "TW9kZRIICgROb25lEAASEgoOU2luZ2xlSW5zdGFuY2UQARIRCg1NdWx0aUlu",
+            "c3RhbmNlEAI6GpLbBBZpbnRlcm9wLlByb3ZpZGVkTWV0aG9kIngKB1NlcnZp",
+            "Y2USCgoCaWQYASABKAkSJAoHbWV0aG9kcxgCIAMoCzITLmludGVyb3AuTWV0",
+            "aG9kSW5mbxImCgdvcHRpb25zGAMgAygLMhUuaW50ZXJvcC5LZXlWYWx1ZVBh",
+            "aXI6E5LbBA9pbnRlcm9wLlNlcnZpY2Ui8QEKCk1ldGhvZEluZm8SDAoEbmFt",
+            "ZRgBIAEoCRIaChJyZXF1ZXN0X21lc3NhZ2VfaWQYAyABKAkSGwoTcmVzcG9u",
+            "c2VfbWVzc2FnZV9pZBgEIAEoCRIsCgR0eXBlGAUgASgOMh4uaW50ZXJvcC5N",
+            "ZXRob2RJbmZvLk1ldGhvZFR5cGUiVgoKTWV0aG9kVHlwZRIJCgVVbmFyeRAA",
+            "EhMKD1NlcnZlclN0cmVhbWluZxABEhMKD0NsaWVudFN0cmVhbWluZxACEhMK",
+            "D0R1cGxleFN0cmVhbWluZxADOhaS2wQSaW50ZXJvcC5NZXRob2RJbmZvIkQK",
+            "DEtleVZhbHVlUGFpchILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6GJLb",
+            "BBRpbnRlcm9wLktleVZhbHVlUGFpcjLwAQoSQXBwTWV0YWRhdGFTZXJ2aWNl",
+            "El4KIEdldEFwcE1ldGFkYXRhQ2hhbmdlZEV2ZW50U3RyZWFtEhYuZ29vZ2xl",
+            "LnByb3RvYnVmLkVtcHR5GiAuaW50ZXJvcC5BcHBNZXRhZGF0YUNoYW5nZWRF",
+            "dmVudDABEloKHkdldE1ldGFtb2RlbENoYW5nZWRFdmVudFN0cmVhbRIWLmdv",
+            "b2dsZS5wcm90b2J1Zi5FbXB0eRoeLmludGVyb3AuTWV0YW1vZGVsQ2hhbmdl",
+            "ZEV2ZW50MAEaHpLbBBppbnRlcm9wLkFwcE1ldGFkYXRhU2VydmljZUIpqgIm",
+            "UGxleHVzLkludGVyb3AuQXBwcy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3Rv",
+            "Mw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchModeReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptorReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.MethodType), }, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent), global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent.Parser, new[]{ "Apps" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo), global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo.Parser, new[]{ "Id", "DisplayName", "LauncherId", "LauncherParams" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent), global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent.Parser, new[]{ "Applications", "Services" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo), global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo.Parser, new[]{ "Id", "ConsumedServices", "ProvidedServices", "Options" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedService), global::Plexus.Interop.Apps.Internal.Generated.ProvidedService.Parser, new[]{ "ServiceId", "Methods", "ProvidedTo", "Alias", "Options" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ConsumedService), global::Plexus.Interop.Apps.Internal.Generated.ConsumedService.Parser, new[]{ "ServiceId", "Methods", "ConsumedFrom", "Alias", "Options" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod), global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod.Parser, new[]{ "Name", "Options" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod), global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Parser, new[]{ "Name", "Options" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo), global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo.Parser, new[]{ "Id", "ConsumedServices", "ProvidedServices" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedService), global::Plexus.Interop.Apps.Internal.Generated.ProvidedService.Parser, new[]{ "ServiceId", "Alias", "Methods" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ConsumedService), global::Plexus.Interop.Apps.Internal.Generated.ConsumedService.Parser, new[]{ "ServiceId", "Alias", "Methods" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod), global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod.Parser, new[]{ "Name" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod), global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Parser, new[]{ "Name", "Title", "LaunchMode", "TimeoutMs", "Options" }, null, new[]{ typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode) }, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.Service), global::Plexus.Interop.Apps.Internal.Generated.Service.Parser, new[]{ "Id", "Methods", "Options" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.MethodInfo), global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Parser, new[]{ "Name", "Title", "RequestMessageId", "ResponseMessageId", "Type", "Options" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.MethodInfo), global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Parser, new[]{ "Name", "RequestMessageId", "ResponseMessageId", "Type" }, null, new[]{ typeof(global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType) }, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair), global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair.Parser, new[]{ "Key", "Value" }, null, null, null)
           }));
     }
     #endregion
 
   }
-  #region Enums
-  internal enum MethodType {
-    [pbr::OriginalName("Unary")] Unary = 0,
-    [pbr::OriginalName("ServerStreaming")] ServerStreaming = 1,
-    [pbr::OriginalName("ClientStreaming")] ClientStreaming = 2,
-    [pbr::OriginalName("DuplexStreaming")] DuplexStreaming = 3,
-  }
-
-  #endregion
-
   #region Messages
   internal sealed partial class AppMetadataChangedEvent : pb::IMessage<AppMetadataChangedEvent> {
     private static readonly pb::MessageParser<AppMetadataChangedEvent> _parser = new pb::MessageParser<AppMetadataChangedEvent>(() => new AppMetadataChangedEvent());
@@ -598,7 +587,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       id_ = other.id_;
       consumedServices_ = other.consumedServices_.Clone();
       providedServices_ = other.providedServices_.Clone();
-      options_ = other.options_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -638,16 +626,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       get { return providedServices_; }
     }
 
-    /// <summary>Field number for the "options" field.</summary>
-    public const int OptionsFieldNumber = 4;
-    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> _repeated_options_codec
-        = pb::FieldCodec.ForMessage(34, global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair.Parser);
-    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> options_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> Options {
-      get { return options_; }
-    }
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as AppMetamodelInfo);
@@ -664,7 +642,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Id != other.Id) return false;
       if(!consumedServices_.Equals(other.consumedServices_)) return false;
       if(!providedServices_.Equals(other.providedServices_)) return false;
-      if(!options_.Equals(other.options_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -674,7 +651,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Id.Length != 0) hash ^= Id.GetHashCode();
       hash ^= consumedServices_.GetHashCode();
       hash ^= providedServices_.GetHashCode();
-      hash ^= options_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -694,7 +670,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       consumedServices_.WriteTo(output, _repeated_consumedServices_codec);
       providedServices_.WriteTo(output, _repeated_providedServices_codec);
-      options_.WriteTo(output, _repeated_options_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -708,7 +683,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       size += consumedServices_.CalculateSize(_repeated_consumedServices_codec);
       size += providedServices_.CalculateSize(_repeated_providedServices_codec);
-      size += options_.CalculateSize(_repeated_options_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -725,7 +699,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       consumedServices_.Add(other.consumedServices_);
       providedServices_.Add(other.providedServices_);
-      options_.Add(other.options_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -747,10 +720,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
           case 26: {
             providedServices_.AddEntriesFrom(input, _repeated_providedServices_codec);
-            break;
-          }
-          case 34: {
-            options_.AddEntriesFrom(input, _repeated_options_codec);
             break;
           }
         }
@@ -785,10 +754,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ProvidedService(ProvidedService other) : this() {
       serviceId_ = other.serviceId_;
-      methods_ = other.methods_.Clone();
-      providedTo_ = other.providedTo_.Clone();
       alias_ = other.alias_;
-      options_ = other.options_.Clone();
+      methods_ = other.methods_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -808,28 +775,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
-    /// <summary>Field number for the "methods" field.</summary>
-    public const int MethodsFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod> _repeated_methods_codec
-        = pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Parser);
-    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod> methods_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod> Methods {
-      get { return methods_; }
-    }
-
-    /// <summary>Field number for the "provided_to" field.</summary>
-    public const int ProvidedToFieldNumber = 3;
-    private static readonly pb::FieldCodec<string> _repeated_providedTo_codec
-        = pb::FieldCodec.ForString(26);
-    private readonly pbc::RepeatedField<string> providedTo_ = new pbc::RepeatedField<string>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<string> ProvidedTo {
-      get { return providedTo_; }
-    }
-
     /// <summary>Field number for the "alias" field.</summary>
-    public const int AliasFieldNumber = 4;
+    public const int AliasFieldNumber = 2;
     private string alias_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public string Alias {
@@ -839,14 +786,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
-    /// <summary>Field number for the "options" field.</summary>
-    public const int OptionsFieldNumber = 5;
-    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> _repeated_options_codec
-        = pb::FieldCodec.ForMessage(42, global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair.Parser);
-    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> options_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair>();
+    /// <summary>Field number for the "methods" field.</summary>
+    public const int MethodsFieldNumber = 3;
+    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod> _repeated_methods_codec
+        = pb::FieldCodec.ForMessage(26, global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Parser);
+    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod> methods_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> Options {
-      get { return options_; }
+    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod> Methods {
+      get { return methods_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -863,10 +810,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         return true;
       }
       if (ServiceId != other.ServiceId) return false;
-      if(!methods_.Equals(other.methods_)) return false;
-      if(!providedTo_.Equals(other.providedTo_)) return false;
       if (Alias != other.Alias) return false;
-      if(!options_.Equals(other.options_)) return false;
+      if(!methods_.Equals(other.methods_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -874,10 +819,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public override int GetHashCode() {
       int hash = 1;
       if (ServiceId.Length != 0) hash ^= ServiceId.GetHashCode();
-      hash ^= methods_.GetHashCode();
-      hash ^= providedTo_.GetHashCode();
       if (Alias.Length != 0) hash ^= Alias.GetHashCode();
-      hash ^= options_.GetHashCode();
+      hash ^= methods_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -895,13 +838,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(10);
         output.WriteString(ServiceId);
       }
-      methods_.WriteTo(output, _repeated_methods_codec);
-      providedTo_.WriteTo(output, _repeated_providedTo_codec);
       if (Alias.Length != 0) {
-        output.WriteRawTag(34);
+        output.WriteRawTag(18);
         output.WriteString(Alias);
       }
-      options_.WriteTo(output, _repeated_options_codec);
+      methods_.WriteTo(output, _repeated_methods_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -913,12 +854,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (ServiceId.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceId);
       }
-      size += methods_.CalculateSize(_repeated_methods_codec);
-      size += providedTo_.CalculateSize(_repeated_providedTo_codec);
       if (Alias.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Alias);
       }
-      size += options_.CalculateSize(_repeated_options_codec);
+      size += methods_.CalculateSize(_repeated_methods_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -933,12 +872,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (other.ServiceId.Length != 0) {
         ServiceId = other.ServiceId;
       }
-      methods_.Add(other.methods_);
-      providedTo_.Add(other.providedTo_);
       if (other.Alias.Length != 0) {
         Alias = other.Alias;
       }
-      options_.Add(other.options_);
+      methods_.Add(other.methods_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -955,19 +892,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 18: {
-            methods_.AddEntriesFrom(input, _repeated_methods_codec);
-            break;
-          }
-          case 26: {
-            providedTo_.AddEntriesFrom(input, _repeated_providedTo_codec);
-            break;
-          }
-          case 34: {
             Alias = input.ReadString();
             break;
           }
-          case 42: {
-            options_.AddEntriesFrom(input, _repeated_options_codec);
+          case 26: {
+            methods_.AddEntriesFrom(input, _repeated_methods_codec);
             break;
           }
         }
@@ -1002,10 +931,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ConsumedService(ConsumedService other) : this() {
       serviceId_ = other.serviceId_;
-      methods_ = other.methods_.Clone();
-      consumedFrom_ = other.consumedFrom_.Clone();
       alias_ = other.alias_;
-      options_ = other.options_.Clone();
+      methods_ = other.methods_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1025,28 +952,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
-    /// <summary>Field number for the "methods" field.</summary>
-    public const int MethodsFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod> _repeated_methods_codec
-        = pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod.Parser);
-    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod> methods_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod> Methods {
-      get { return methods_; }
-    }
-
-    /// <summary>Field number for the "consumed_from" field.</summary>
-    public const int ConsumedFromFieldNumber = 3;
-    private static readonly pb::FieldCodec<string> _repeated_consumedFrom_codec
-        = pb::FieldCodec.ForString(26);
-    private readonly pbc::RepeatedField<string> consumedFrom_ = new pbc::RepeatedField<string>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<string> ConsumedFrom {
-      get { return consumedFrom_; }
-    }
-
     /// <summary>Field number for the "alias" field.</summary>
-    public const int AliasFieldNumber = 4;
+    public const int AliasFieldNumber = 2;
     private string alias_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public string Alias {
@@ -1056,14 +963,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
-    /// <summary>Field number for the "options" field.</summary>
-    public const int OptionsFieldNumber = 5;
-    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> _repeated_options_codec
-        = pb::FieldCodec.ForMessage(42, global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair.Parser);
-    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> options_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair>();
+    /// <summary>Field number for the "methods" field.</summary>
+    public const int MethodsFieldNumber = 3;
+    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod> _repeated_methods_codec
+        = pb::FieldCodec.ForMessage(26, global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod.Parser);
+    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod> methods_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> Options {
-      get { return options_; }
+    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod> Methods {
+      get { return methods_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1080,10 +987,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         return true;
       }
       if (ServiceId != other.ServiceId) return false;
-      if(!methods_.Equals(other.methods_)) return false;
-      if(!consumedFrom_.Equals(other.consumedFrom_)) return false;
       if (Alias != other.Alias) return false;
-      if(!options_.Equals(other.options_)) return false;
+      if(!methods_.Equals(other.methods_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1091,10 +996,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public override int GetHashCode() {
       int hash = 1;
       if (ServiceId.Length != 0) hash ^= ServiceId.GetHashCode();
-      hash ^= methods_.GetHashCode();
-      hash ^= consumedFrom_.GetHashCode();
       if (Alias.Length != 0) hash ^= Alias.GetHashCode();
-      hash ^= options_.GetHashCode();
+      hash ^= methods_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1112,13 +1015,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(10);
         output.WriteString(ServiceId);
       }
-      methods_.WriteTo(output, _repeated_methods_codec);
-      consumedFrom_.WriteTo(output, _repeated_consumedFrom_codec);
       if (Alias.Length != 0) {
-        output.WriteRawTag(34);
+        output.WriteRawTag(18);
         output.WriteString(Alias);
       }
-      options_.WriteTo(output, _repeated_options_codec);
+      methods_.WriteTo(output, _repeated_methods_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1130,12 +1031,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (ServiceId.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceId);
       }
-      size += methods_.CalculateSize(_repeated_methods_codec);
-      size += consumedFrom_.CalculateSize(_repeated_consumedFrom_codec);
       if (Alias.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Alias);
       }
-      size += options_.CalculateSize(_repeated_options_codec);
+      size += methods_.CalculateSize(_repeated_methods_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1150,12 +1049,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (other.ServiceId.Length != 0) {
         ServiceId = other.ServiceId;
       }
-      methods_.Add(other.methods_);
-      consumedFrom_.Add(other.consumedFrom_);
       if (other.Alias.Length != 0) {
         Alias = other.Alias;
       }
-      options_.Add(other.options_);
+      methods_.Add(other.methods_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1172,19 +1069,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 18: {
-            methods_.AddEntriesFrom(input, _repeated_methods_codec);
-            break;
-          }
-          case 26: {
-            consumedFrom_.AddEntriesFrom(input, _repeated_consumedFrom_codec);
-            break;
-          }
-          case 34: {
             Alias = input.ReadString();
             break;
           }
-          case 42: {
-            options_.AddEntriesFrom(input, _repeated_options_codec);
+          case 26: {
+            methods_.AddEntriesFrom(input, _repeated_methods_codec);
             break;
           }
         }
@@ -1219,7 +1108,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ConsumedMethod(ConsumedMethod other) : this() {
       name_ = other.name_;
-      options_ = other.options_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1239,16 +1127,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
-    /// <summary>Field number for the "options" field.</summary>
-    public const int OptionsFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> _repeated_options_codec
-        = pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair.Parser);
-    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> options_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> Options {
-      get { return options_; }
-    }
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as ConsumedMethod);
@@ -1263,7 +1141,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         return true;
       }
       if (Name != other.Name) return false;
-      if(!options_.Equals(other.options_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1271,7 +1148,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      hash ^= options_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1289,7 +1165,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(10);
         output.WriteString(Name);
       }
-      options_.WriteTo(output, _repeated_options_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1301,7 +1176,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      size += options_.CalculateSize(_repeated_options_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1316,7 +1190,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      options_.Add(other.options_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1330,10 +1203,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           case 10: {
             Name = input.ReadString();
-            break;
-          }
-          case 18: {
-            options_.AddEntriesFrom(input, _repeated_options_codec);
             break;
           }
         }
@@ -1368,6 +1237,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ProvidedMethod(ProvidedMethod other) : this() {
       name_ = other.name_;
+      title_ = other.title_;
+      launchMode_ = other.launchMode_;
+      timeoutMs_ = other.timeoutMs_;
       options_ = other.options_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -1388,10 +1260,43 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
+    /// <summary>Field number for the "title" field.</summary>
+    public const int TitleFieldNumber = 2;
+    private string title_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Title {
+      get { return title_; }
+      set {
+        title_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "launch_mode" field.</summary>
+    public const int LaunchModeFieldNumber = 3;
+    private global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode launchMode_ = 0;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode LaunchMode {
+      get { return launchMode_; }
+      set {
+        launchMode_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "timeout_ms" field.</summary>
+    public const int TimeoutMsFieldNumber = 4;
+    private int timeoutMs_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int TimeoutMs {
+      get { return timeoutMs_; }
+      set {
+        timeoutMs_ = value;
+      }
+    }
+
     /// <summary>Field number for the "options" field.</summary>
-    public const int OptionsFieldNumber = 2;
+    public const int OptionsFieldNumber = 5;
     private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> _repeated_options_codec
-        = pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair.Parser);
+        = pb::FieldCodec.ForMessage(42, global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> options_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> Options {
@@ -1412,6 +1317,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         return true;
       }
       if (Name != other.Name) return false;
+      if (Title != other.Title) return false;
+      if (LaunchMode != other.LaunchMode) return false;
+      if (TimeoutMs != other.TimeoutMs) return false;
       if(!options_.Equals(other.options_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -1420,6 +1328,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
+      if (Title.Length != 0) hash ^= Title.GetHashCode();
+      if (LaunchMode != 0) hash ^= LaunchMode.GetHashCode();
+      if (TimeoutMs != 0) hash ^= TimeoutMs.GetHashCode();
       hash ^= options_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -1438,6 +1349,18 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(10);
         output.WriteString(Name);
       }
+      if (Title.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Title);
+      }
+      if (LaunchMode != 0) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) LaunchMode);
+      }
+      if (TimeoutMs != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(TimeoutMs);
+      }
       options_.WriteTo(output, _repeated_options_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -1449,6 +1372,15 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       int size = 0;
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      if (Title.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Title);
+      }
+      if (LaunchMode != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) LaunchMode);
+      }
+      if (TimeoutMs != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(TimeoutMs);
       }
       size += options_.CalculateSize(_repeated_options_codec);
       if (_unknownFields != null) {
@@ -1464,6 +1396,15 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.Name.Length != 0) {
         Name = other.Name;
+      }
+      if (other.Title.Length != 0) {
+        Title = other.Title;
+      }
+      if (other.LaunchMode != 0) {
+        LaunchMode = other.LaunchMode;
+      }
+      if (other.TimeoutMs != 0) {
+        TimeoutMs = other.TimeoutMs;
       }
       options_.Add(other.options_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -1482,12 +1423,37 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 18: {
+            Title = input.ReadString();
+            break;
+          }
+          case 24: {
+            launchMode_ = (global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            TimeoutMs = input.ReadInt32();
+            break;
+          }
+          case 42: {
             options_.AddEntriesFrom(input, _repeated_options_codec);
             break;
           }
         }
       }
     }
+
+    #region Nested types
+    /// <summary>Container for nested types declared in the ProvidedMethod message type.</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static partial class Types {
+      internal enum MetamodelLaunchMode {
+        [pbr::OriginalName("None")] None = 0,
+        [pbr::OriginalName("SingleInstance")] SingleInstance = 1,
+        [pbr::OriginalName("MultiInstance")] MultiInstance = 2,
+      }
+
+    }
+    #endregion
 
   }
 
@@ -1686,11 +1652,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public MethodInfo(MethodInfo other) : this() {
       name_ = other.name_;
-      title_ = other.title_;
       requestMessageId_ = other.requestMessageId_;
       responseMessageId_ = other.responseMessageId_;
       type_ = other.type_;
-      options_ = other.options_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1707,17 +1671,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       get { return name_; }
       set {
         name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "title" field.</summary>
-    public const int TitleFieldNumber = 2;
-    private string title_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Title {
-      get { return title_; }
-      set {
-        title_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -1745,23 +1698,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 5;
-    private global::Plexus.Interop.Apps.Internal.Generated.MethodType type_ = 0;
+    private global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType type_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Plexus.Interop.Apps.Internal.Generated.MethodType Type {
+    public global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType Type {
       get { return type_; }
       set {
         type_ = value;
       }
-    }
-
-    /// <summary>Field number for the "options" field.</summary>
-    public const int OptionsFieldNumber = 6;
-    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> _repeated_options_codec
-        = pb::FieldCodec.ForMessage(50, global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair.Parser);
-    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> options_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.KeyValuePair> Options {
-      get { return options_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1778,11 +1721,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         return true;
       }
       if (Name != other.Name) return false;
-      if (Title != other.Title) return false;
       if (RequestMessageId != other.RequestMessageId) return false;
       if (ResponseMessageId != other.ResponseMessageId) return false;
       if (Type != other.Type) return false;
-      if(!options_.Equals(other.options_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1790,11 +1731,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (Title.Length != 0) hash ^= Title.GetHashCode();
       if (RequestMessageId.Length != 0) hash ^= RequestMessageId.GetHashCode();
       if (ResponseMessageId.Length != 0) hash ^= ResponseMessageId.GetHashCode();
       if (Type != 0) hash ^= Type.GetHashCode();
-      hash ^= options_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1812,10 +1751,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(10);
         output.WriteString(Name);
       }
-      if (Title.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Title);
-      }
       if (RequestMessageId.Length != 0) {
         output.WriteRawTag(26);
         output.WriteString(RequestMessageId);
@@ -1828,7 +1763,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(40);
         output.WriteEnum((int) Type);
       }
-      options_.WriteTo(output, _repeated_options_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1840,9 +1774,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      if (Title.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Title);
-      }
       if (RequestMessageId.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(RequestMessageId);
       }
@@ -1852,7 +1783,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Type != 0) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
       }
-      size += options_.CalculateSize(_repeated_options_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1867,9 +1797,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      if (other.Title.Length != 0) {
-        Title = other.Title;
-      }
       if (other.RequestMessageId.Length != 0) {
         RequestMessageId = other.RequestMessageId;
       }
@@ -1879,7 +1806,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (other.Type != 0) {
         Type = other.Type;
       }
-      options_.Add(other.options_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1895,10 +1821,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             Name = input.ReadString();
             break;
           }
-          case 18: {
-            Title = input.ReadString();
-            break;
-          }
           case 26: {
             RequestMessageId = input.ReadString();
             break;
@@ -1908,16 +1830,26 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 40: {
-            type_ = (global::Plexus.Interop.Apps.Internal.Generated.MethodType) input.ReadEnum();
-            break;
-          }
-          case 50: {
-            options_.AddEntriesFrom(input, _repeated_options_codec);
+            type_ = (global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType) input.ReadEnum();
             break;
           }
         }
       }
     }
+
+    #region Nested types
+    /// <summary>Container for nested types declared in the MethodInfo message type.</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static partial class Types {
+      internal enum MethodType {
+        [pbr::OriginalName("Unary")] Unary = 0,
+        [pbr::OriginalName("ServerStreaming")] ServerStreaming = 1,
+        [pbr::OriginalName("ClientStreaming")] ClientStreaming = 2,
+        [pbr::OriginalName("DuplexStreaming")] DuplexStreaming = 3,
+      }
+
+    }
+    #endregion
 
   }
 

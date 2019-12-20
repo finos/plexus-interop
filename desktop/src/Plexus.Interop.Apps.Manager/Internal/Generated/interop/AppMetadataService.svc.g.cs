@@ -29,34 +29,34 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		}				
 	
 		public partial interface IGetAppMetadataChangedEventStreamProxy {
-			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> GetAppMetadataChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
+			IServerStreamingMethodCall<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> GetAppMetadataChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
 		}
 		
 		public partial interface IGetMetamodelChangedEventStreamProxy {
-			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> GetMetamodelChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
+			IServerStreamingMethodCall<global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> GetMetamodelChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
 		}
 		
 		public partial interface IGetAppMetadataChangedEventStreamImpl {
-			Task<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> GetAppMetadataChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context);
+			Task GetAppMetadataChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> responseStream, MethodCallContext context);
 		}
 		
 		public partial interface IGetMetamodelChangedEventStreamImpl {
-			Task<global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> GetMetamodelChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context);
+			Task GetMetamodelChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> responseStream, MethodCallContext context);
 		}
 		
 		public sealed partial class Descriptor {
 		
-			public UnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> GetAppMetadataChangedEventStreamMethod {get; private set; }
-			public UnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> GetMetamodelChangedEventStreamMethod {get; private set; }
+			public ServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> GetAppMetadataChangedEventStreamMethod {get; private set; }
+			public ServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> GetMetamodelChangedEventStreamMethod {get; private set; }
 			
 			public Descriptor() {				
-				GetAppMetadataChangedEventStreamMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent>(Id, GetAppMetadataChangedEventStreamMethodId);
-				GetMetamodelChangedEventStreamMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent>(Id, GetMetamodelChangedEventStreamMethodId);
+				GetAppMetadataChangedEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent>(Id, GetAppMetadataChangedEventStreamMethodId);
+				GetMetamodelChangedEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent>(Id, GetMetamodelChangedEventStreamMethodId);
 			}
 		
 			public Descriptor(string alias) {
-				GetAppMetadataChangedEventStreamMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent>(Id, alias, GetAppMetadataChangedEventStreamMethodId);
-				GetMetamodelChangedEventStreamMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent>(Id, alias, GetMetamodelChangedEventStreamMethodId);
+				GetAppMetadataChangedEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent>(Id, alias, GetAppMetadataChangedEventStreamMethodId);
+				GetMetamodelChangedEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent>(Id, alias, GetMetamodelChangedEventStreamMethodId);
 			}
 		}
 	}

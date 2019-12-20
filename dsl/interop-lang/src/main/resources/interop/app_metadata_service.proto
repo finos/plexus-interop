@@ -26,8 +26,8 @@ import "interop/invocation_descriptor.proto";
 import "google/protobuf/empty.proto";
 
 service AppMetadataService {
-    rpc GetAppMetadataChangedEventStream (google.protobuf.Empty) returns (AppMetadataChangedEvent);
-    rpc GetMetamodelChangedEventStream (google.protobuf.Empty) returns (MetamodelChangedEvent);
+    rpc GetAppMetadataChangedEventStream (google.protobuf.Empty) returns (stream AppMetadataChangedEvent);
+    rpc GetMetamodelChangedEventStream (google.protobuf.Empty) returns (stream MetamodelChangedEvent);
 }
 
 message AppMetadataChangedEvent {
@@ -50,33 +50,35 @@ message AppMetamodelInfo {
     string id = 1;
     repeated ConsumedService consumed_services = 2;
     repeated ProvidedService provided_services = 3;
-    repeated KeyValuePair options = 4;
 }
 
 message ProvidedService {
     string service_id = 1;
-    repeated ProvidedMethod methods = 2;
-    repeated string provided_to = 3;
-    string alias = 4;
-    repeated KeyValuePair options = 5;
+    string alias = 2;
+    repeated ProvidedMethod methods =3;
 }
 
 message ConsumedService {
     string service_id = 1;
-    repeated ConsumedMethod methods = 2;
-    repeated string consumed_from = 3;
-    string alias = 4;
-    repeated KeyValuePair options = 5;
+    string alias = 2;
+    repeated ConsumedMethod methods = 3;
 }
 
 message ConsumedMethod {
     string name = 1;
-    repeated KeyValuePair options = 2;
 }
 
 message ProvidedMethod {
     string name = 1;
-    repeated KeyValuePair options = 2;
+    string title = 2;
+    enum MetamodelLaunchMode {
+        None = 0;
+        SingleInstance = 1;
+        MultiInstance = 2;
+    }
+    MetamodelLaunchMode launch_mode = 3;
+    int32 timeout_ms = 4;
+    repeated KeyValuePair options = 5;
 }
 
 message Service {
@@ -87,18 +89,15 @@ message Service {
 
 message MethodInfo {
     string name = 1;
-    string title = 2;
     string request_message_id = 3;
     string response_message_id = 4;
+    enum MethodType {
+        Unary = 0;
+        ServerStreaming = 1;
+        ClientStreaming = 2;
+        DuplexStreaming = 3;
+    }
     MethodType type = 5;
-    repeated KeyValuePair options = 6;
-}
-
-enum MethodType {
-    Unary = 0;
-    ServerStreaming = 1;
-    ClientStreaming = 2;
-    DuplexStreaming = 3;
 }
 
 message KeyValuePair {
