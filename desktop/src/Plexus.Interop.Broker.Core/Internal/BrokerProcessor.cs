@@ -22,7 +22,6 @@ namespace Plexus.Interop.Broker.Internal
     using System.Threading.Tasks;
     using Plexus.Channels;
     using Plexus.Interop.Apps;
-    using Plexus.Interop.Metamodel;
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Transport;
     using Plexus.Processes;
@@ -47,6 +46,7 @@ namespace Plexus.Interop.Broker.Internal
             _incomingConnections = incomingConnections;
             var registryService = new RegistryService(interopContext.RegistryProvider);
             var protocol = new ProtocolImplementation(DefaultProtocolMessageFactory, serializerFactory);
+            _appLifecycleManager = interopContext.AppLifecycleManager;
             _authenticationHandler = new AuthenticationHandler(interopContext.AppLifecycleManager, protocol, registryService);
             _clientRequestHandler = new ClientRequestHandler(interopContext.AppLifecycleManager, protocol, registryService, interopContext.InvocationEventProvider);
         }
