@@ -16,6 +16,7 @@
  */
 import { UniqueId, ConnectableFramedTransport, Frame, InternalMessagesConverter, Defaults, BufferedObserver } from '@plexus-interop/transport-common';
 import { CancellationToken, Logger, LoggerFactory, Observer, AsyncHelper } from '@plexus-interop/common';
+import { UnifiedWebSocket } from './UnifiedWebSocket';
 
 export class WebSocketFramedTransport implements ConnectableFramedTransport {
 
@@ -43,7 +44,7 @@ export class WebSocketFramedTransport implements ConnectableFramedTransport {
     public terminateReceived: boolean = false;
 
     constructor(
-        private readonly socket: WebSocket,
+        private readonly socket: UnifiedWebSocket,
         private readonly guid: UniqueId = UniqueId.generateNew(),
         private messagesConverter: InternalMessagesConverter = new InternalMessagesConverter()) {
         this.socket.binaryType = 'arraybuffer';
