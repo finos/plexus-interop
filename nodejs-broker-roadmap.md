@@ -29,9 +29,10 @@ Existing [Desktop Interop Broker](./desktop/src/Plexus.Interop.Broker) is implem
 Current [Broker Implementation for Stand alone Browser](./web/packages/broker/src/broker/Broker.ts) based on same principles, therefore already defined required interfaces:
 
 - [App Life Cycle Manager (TS)](./web/packages/broker/src/lifecycle/AppLifeCycleManager.ts)
-- [App Launcher (TS)](./web/packages/broker/src/launcher/AppLifeCycleManager.ts)
-- [Transport Connection (TS)](./packages/transport-common/src/transport/TransportConnection.ts)
-- [Interop Client (TS)](./packages/client/src/client/api/generic/GenericClientApi.ts)
+- [App Launcher (TS)](./web/packages/broker/src/launcher/AppLauncher.ts)
+- [Transport Connection (TS)](./web/packages/transport-common/src/transport/TransportConnection.ts)
+- [Interop Client (TS)](./web/packages/client/src/client/api/generic/GenericClientApi.ts)
+- [Transmission Server](./web/packages/transport-common/src/transport/TransmissionServer.ts)
 
 Also default implementation of some components, like **InteropRegistryProvider**/**Broker**/**Discovery Handler**/etc, will work well in Node JS environment. So we can start with adopting everything we already have and implement missed Desktop implementations like native App Life Cycle Manager.
 
