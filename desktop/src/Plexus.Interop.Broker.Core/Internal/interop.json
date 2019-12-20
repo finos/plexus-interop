@@ -1,323 +1,6 @@
 {
 	"messages": {
 	  "nested": {
-	    "interop": {
-	      "options": {
-	        "csharp_namespace": "plexus"
-	      },
-	      "nested": {
-	        "AppLauncherService": {
-	          "options": {
-	            "(.interop.service_id)": "interop.AppLauncherService"
-	          },
-	          "methods": {
-	            "Launch": {
-	              "requestType": "AppLaunchRequest",
-	              "responseType": "AppLaunchResponse"
-	            }
-	          }
-	        },
-	        "AppLaunchRequest": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLaunchRequest"
-	          },
-	          "fields": {
-	            "appId": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "launchParamsJson": {
-	              "type": "string",
-	              "id": 2
-	            },
-	            "launchMode": {
-	              "type": "AppLaunchMode",
-	              "id": 3
-	            },
-	            "suggestedAppInstanceId": {
-	              "type": "UniqueId",
-	              "id": 4
-	            },
-	            "referrer": {
-	              "type": "AppLaunchReferrer",
-	              "id": 5
-	            }
-	          }
-	        },
-	        "AppLaunchReferrer": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLaunchReferrer"
-	          },
-	          "fields": {
-	            "appId": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "appInstanceId": {
-	              "type": "UniqueId",
-	              "id": 2
-	            },
-	            "connectionId": {
-	              "type": "UniqueId",
-	              "id": 3
-	            }
-	          }
-	        },
-	        "AppLaunchResponse": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLaunchResponse"
-	          },
-	          "fields": {
-	            "appInstanceId": {
-	              "type": "UniqueId",
-	              "id": 1
-	            }
-	          }
-	        },
-	        "AppLifecycleService": {
-	          "options": {
-	            "(.interop.service_id)": "interop.AppLifecycleService"
-	          },
-	          "methods": {
-	            "ResolveApp": {
-	              "requestType": "ResolveAppRequest",
-	              "responseType": "ResolveAppResponse"
-	            },
-	            "GetLifecycleEventStream": {
-	              "requestType": "google.protobuf.Empty",
-	              "responseType": "AppLifecycleEvent",
-	              "responseStream": true
-	            },
-	            "GetInvocationEventStream": {
-	              "requestType": "google.protobuf.Empty",
-	              "responseType": "InvocationEvent",
-	              "responseStream": true
-	            }
-	          }
-	        },
-	        "ResolveAppRequest": {
-	          "options": {
-	            "(.interop.message_id)": "interop.ResolveAppRequest"
-	          },
-	          "fields": {
-	            "appId": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "appResolveMode": {
-	              "type": "AppLaunchMode",
-	              "id": 2
-	            }
-	          }
-	        },
-	        "ResolveAppResponse": {
-	          "options": {
-	            "(.interop.message_id)": "interop.ResolveAppResponse"
-	          },
-	          "fields": {
-	            "appInstanceId": {
-	              "type": "UniqueId",
-	              "id": 1
-	            },
-	            "appConnectionId": {
-	              "type": "UniqueId",
-	              "id": 2
-	            },
-	            "isNewInstanceLaunched": {
-	              "type": "bool",
-	              "id": 3
-	            }
-	          }
-	        },
-	        "AppLifecycleEvent": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLifecycleEvent"
-	          },
-	          "oneofs": {
-	            "event": {
-	              "oneof": [
-	                "connected",
-	                "disconnected"
-	              ]
-	            }
-	          },
-	          "fields": {
-	            "connected": {
-	              "type": "AppConnectedEvent",
-	              "id": 1
-	            },
-	            "disconnected": {
-	              "type": "AppDisconnectedEvent",
-	              "id": 2
-	            }
-	          }
-	        },
-	        "InvocationEvent": {
-	          "options": {
-	            "(.interop.message_id)": "interop.InvocationEvent"
-	          },
-	          "oneofs": {
-	            "event": {
-	              "oneof": [
-	                "invocationStarted",
-	                "invocationFinished"
-	              ]
-	            }
-	          },
-	          "fields": {
-	            "invocationStarted": {
-	              "type": "InvocationStartedEvent",
-	              "id": 1
-	            },
-	            "invocationFinished": {
-	              "type": "InvocationFinishedEvent",
-	              "id": 2
-	            }
-	          }
-	        },
-	        "AppConnectedEvent": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppConnectedEvent"
-	          },
-	          "fields": {
-	            "connectionDescriptor": {
-	              "type": "AppConnectionDescriptor",
-	              "id": 1
-	            }
-	          }
-	        },
-	        "AppDisconnectedEvent": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppDisconnectedEvent"
-	          },
-	          "fields": {
-	            "connectionDescriptor": {
-	              "type": "AppConnectionDescriptor",
-	              "id": 1
-	            }
-	          }
-	        },
-	        "InvocationStartedEvent": {
-	          "options": {
-	            "(.interop.message_id)": "interop.InvocationStartedEvent"
-	          },
-	          "fields": {
-	            "invocationDescriptor": {
-	              "type": "InvocationDescriptor",
-	              "id": 1
-	            }
-	          }
-	        },
-	        "InvocationFinishedEvent": {
-	          "options": {
-	            "(.interop.message_id)": "interop.InvocationFinishedEvent"
-	          },
-	          "fields": {
-	            "invocationDescriptor": {
-	              "type": "InvocationDescriptor",
-	              "id": 1
-	            },
-	            "result": {
-	              "type": "InvocationResult",
-	              "id": 2
-	            },
-	            "durationMs": {
-	              "type": "int64",
-	              "id": 3
-	            }
-	          }
-	        },
-	        "InvocationResult": {
-	          "values": {
-	            "Succeeded": 0,
-	            "Canceled": 1,
-	            "Failed": 2
-	          }
-	        },
-	        "messageId": {
-	          "type": "string",
-	          "id": 9650,
-	          "extend": "google.protobuf.MessageOptions"
-	        },
-	        "serviceId": {
-	          "type": "string",
-	          "id": 9650,
-	          "extend": "google.protobuf.ServiceOptions"
-	        },
-	        "methodId": {
-	          "type": "string",
-	          "id": 9650,
-	          "extend": "google.protobuf.MethodOptions"
-	        },
-	        "UniqueId": {
-	          "options": {
-	            "(.interop.message_id)": "interop.UniqueId"
-	          },
-	          "fields": {
-	            "lo": {
-	              "type": "fixed64",
-	              "id": 1
-	            },
-	            "hi": {
-	              "type": "fixed64",
-	              "id": 2
-	            }
-	          }
-	        },
-	        "AppLaunchMode": {
-	          "values": {
-	            "SINGLE_INSTANCE": 0,
-	            "MULTI_INSTANCE": 1
-	          }
-	        },
-	        "AppConnectionDescriptor": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppConnectionDescriptor"
-	          },
-	          "fields": {
-	            "connectionId": {
-	              "type": "UniqueId",
-	              "id": 1
-	            },
-	            "appId": {
-	              "type": "string",
-	              "id": 2
-	            },
-	            "appInstanceId": {
-	              "type": "UniqueId",
-	              "id": 3
-	            }
-	          }
-	        },
-	        "InvocationDescriptor": {
-	          "options": {
-	            "(.interop.message_id)": "interop.InvocationDescriptor"
-	          },
-	          "fields": {
-	            "serviceId": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "serviceAliasId": {
-	              "type": "string",
-	              "id": 2
-	            },
-	            "methodId": {
-	              "type": "string",
-	              "id": 3
-	            },
-	            "source": {
-	              "type": "AppConnectionDescriptor",
-	              "id": 4
-	            },
-	            "target": {
-	              "type": "AppConnectionDescriptor",
-	              "id": 5
-	            }
-	          }
-	        }
-	      }
-	    },
 	    "google": {
 	      "nested": {
 	        "protobuf": {
@@ -1184,6 +867,571 @@
 	          }
 	        }
 	      }
+	    },
+	    "interop": {
+	      "options": {
+	        "csharp_namespace": "plexus"
+	      },
+	      "nested": {
+	        "AppConnectionDescriptor": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppConnectionDescriptor"
+	          },
+	          "fields": {
+	            "connectionId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            },
+	            "appId": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "AppLaunchMode": {
+	          "values": {
+	            "SINGLE_INSTANCE": 0,
+	            "MULTI_INSTANCE": 1
+	          }
+	        },
+	        "AppLauncherService": {
+	          "options": {
+	            "(.interop.service_id)": "interop.AppLauncherService"
+	          },
+	          "methods": {
+	            "Launch": {
+	              "requestType": "AppLaunchRequest",
+	              "responseType": "AppLaunchResponse"
+	            }
+	          }
+	        },
+	        "AppLaunchRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchRequest"
+	          },
+	          "fields": {
+	            "appId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "launchParamsJson": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "launchMode": {
+	              "type": "AppLaunchMode",
+	              "id": 3
+	            },
+	            "suggestedAppInstanceId": {
+	              "type": "UniqueId",
+	              "id": 4
+	            },
+	            "referrer": {
+	              "type": "AppLaunchReferrer",
+	              "id": 5
+	            }
+	          }
+	        },
+	        "AppLaunchReferrer": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchReferrer"
+	          },
+	          "fields": {
+	            "appId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 2
+	            },
+	            "connectionId": {
+	              "type": "UniqueId",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "AppLaunchResponse": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchResponse"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "AppLifecycleService": {
+	          "options": {
+	            "(.interop.service_id)": "interop.AppLifecycleService"
+	          },
+	          "methods": {
+	            "ResolveApp": {
+	              "requestType": "ResolveAppRequest",
+	              "responseType": "ResolveAppResponse"
+	            },
+	            "GetLifecycleEventStream": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "AppLifecycleEvent",
+	              "responseStream": true
+	            },
+	            "GetInvocationEventStream": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "InvocationEvent",
+	              "responseStream": true
+	            }
+	          }
+	        },
+	        "ResolveAppRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ResolveAppRequest"
+	          },
+	          "fields": {
+	            "appId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "appResolveMode": {
+	              "type": "AppLaunchMode",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "ResolveAppResponse": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ResolveAppResponse"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            },
+	            "appConnectionId": {
+	              "type": "UniqueId",
+	              "id": 2
+	            },
+	            "isNewInstanceLaunched": {
+	              "type": "bool",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "AppLifecycleEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLifecycleEvent"
+	          },
+	          "oneofs": {
+	            "event": {
+	              "oneof": [
+	                "connected",
+	                "disconnected"
+	              ]
+	            }
+	          },
+	          "fields": {
+	            "connected": {
+	              "type": "AppConnectedEvent",
+	              "id": 1
+	            },
+	            "disconnected": {
+	              "type": "AppDisconnectedEvent",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "InvocationEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationEvent"
+	          },
+	          "oneofs": {
+	            "event": {
+	              "oneof": [
+	                "invocationStarted",
+	                "invocationFinished"
+	              ]
+	            }
+	          },
+	          "fields": {
+	            "invocationStarted": {
+	              "type": "InvocationStartedEvent",
+	              "id": 1
+	            },
+	            "invocationFinished": {
+	              "type": "InvocationFinishedEvent",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "AppConnectedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppConnectedEvent"
+	          },
+	          "fields": {
+	            "connectionDescriptor": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "AppDisconnectedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppDisconnectedEvent"
+	          },
+	          "fields": {
+	            "connectionDescriptor": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "InvocationStartedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationStartedEvent"
+	          },
+	          "fields": {
+	            "invocationDescriptor": {
+	              "type": "InvocationDescriptor",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "InvocationFinishedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationFinishedEvent"
+	          },
+	          "fields": {
+	            "invocationDescriptor": {
+	              "type": "InvocationDescriptor",
+	              "id": 1
+	            },
+	            "result": {
+	              "type": "InvocationResult",
+	              "id": 2
+	            },
+	            "durationMs": {
+	              "type": "int64",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "InvocationResult": {
+	          "values": {
+	            "Succeeded": 0,
+	            "Canceled": 1,
+	            "Failed": 2
+	          }
+	        },
+	        "AppMetadataService": {
+	          "options": {
+	            "(.interop.service_id)": "interop.AppMetadataService"
+	          },
+	          "methods": {
+	            "GetAppMetadataChangedEventStream": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "AppMetadataChangedEvent",
+	              "responseStream": true
+	            },
+	            "GetMetamodelChangedEventStream": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "MetamodelChangedEvent",
+	              "responseStream": true
+	            }
+	          }
+	        },
+	        "AppMetadataChangedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppMetadataChangedEvent"
+	          },
+	          "fields": {
+	            "apps": {
+	              "rule": "repeated",
+	              "type": "AppMetadataInfo",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "AppMetadataInfo": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppMetadataInfo"
+	          },
+	          "fields": {
+	            "id": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "displayName": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "launcherId": {
+	              "type": "string",
+	              "id": 3
+	            },
+	            "launcherParams": {
+	              "rule": "repeated",
+	              "type": "KeyValuePair",
+	              "id": 4
+	            }
+	          }
+	        },
+	        "MetamodelChangedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.MetamodelChangedEvent"
+	          },
+	          "fields": {
+	            "applications": {
+	              "rule": "repeated",
+	              "type": ".interop.AppMetamodelInfo",
+	              "id": 1
+	            },
+	            "services": {
+	              "rule": "repeated",
+	              "type": "Service",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "AppMetamodelInfo": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppMetamodelInfo"
+	          },
+	          "fields": {
+	            "id": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "consumedServices": {
+	              "rule": "repeated",
+	              "type": "ConsumedService",
+	              "id": 2
+	            },
+	            "providedServices": {
+	              "rule": "repeated",
+	              "type": "ProvidedService",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "ProvidedService": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ProvidedService"
+	          },
+	          "fields": {
+	            "serviceId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "alias": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "methods": {
+	              "rule": "repeated",
+	              "type": "ProvidedMethod",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "ConsumedService": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ConsumedService"
+	          },
+	          "fields": {
+	            "serviceId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "alias": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "methods": {
+	              "rule": "repeated",
+	              "type": "ConsumedMethod",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "ConsumedMethod": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ConsumedMethod"
+	          },
+	          "fields": {
+	            "name": {
+	              "type": "string",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "ProvidedMethod": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ProvidedMethod"
+	          },
+	          "fields": {
+	            "name": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "title": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "launchMode": {
+	              "type": "MetamodelLaunchMode",
+	              "id": 3
+	            },
+	            "timeoutMs": {
+	              "type": "int32",
+	              "id": 4
+	            },
+	            "options": {
+	              "rule": "repeated",
+	              "type": "KeyValuePair",
+	              "id": 5
+	            }
+	          },
+	          "nested": {
+	            "MetamodelLaunchMode": {
+	              "values": {
+	                "None": 0,
+	                "SingleInstance": 1,
+	                "MultiInstance": 2
+	              }
+	            }
+	          }
+	        },
+	        "Service": {
+	          "options": {
+	            "(.interop.message_id)": "interop.Service"
+	          },
+	          "fields": {
+	            "id": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "methods": {
+	              "rule": "repeated",
+	              "type": "MethodInfo",
+	              "id": 2
+	            },
+	            "options": {
+	              "rule": "repeated",
+	              "type": "KeyValuePair",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "MethodInfo": {
+	          "options": {
+	            "(.interop.message_id)": "interop.MethodInfo"
+	          },
+	          "fields": {
+	            "name": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "requestMessageId": {
+	              "type": "string",
+	              "id": 3
+	            },
+	            "responseMessageId": {
+	              "type": "string",
+	              "id": 4
+	            },
+	            "type": {
+	              "type": "MethodType",
+	              "id": 5
+	            }
+	          },
+	          "nested": {
+	            "MethodType": {
+	              "values": {
+	                "Unary": 0,
+	                "ServerStreaming": 1,
+	                "ClientStreaming": 2,
+	                "DuplexStreaming": 3
+	              }
+	            }
+	          }
+	        },
+	        "KeyValuePair": {
+	          "options": {
+	            "(.interop.message_id)": "interop.KeyValuePair"
+	          },
+	          "fields": {
+	            "key": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "value": {
+	              "type": "string",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "InvocationDescriptor": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationDescriptor"
+	          },
+	          "fields": {
+	            "serviceId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "serviceAliasId": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "methodId": {
+	              "type": "string",
+	              "id": 3
+	            },
+	            "source": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 4
+	            },
+	            "target": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 5
+	            }
+	          }
+	        },
+	        "messageId": {
+	          "type": "string",
+	          "id": 9650,
+	          "extend": "google.protobuf.MessageOptions"
+	        },
+	        "serviceId": {
+	          "type": "string",
+	          "id": 9650,
+	          "extend": "google.protobuf.ServiceOptions"
+	        },
+	        "methodId": {
+	          "type": "string",
+	          "id": 9650,
+	          "extend": "google.protobuf.MethodOptions"
+	        },
+	        "UniqueId": {
+	          "options": {
+	            "(.interop.message_id)": "interop.UniqueId"
+	          },
+	          "fields": {
+	            "lo": {
+	              "type": "fixed64",
+	              "id": 1
+	            },
+	            "hi": {
+	              "type": "fixed64",
+	              "id": 2
+	            }
+	          }
+	        }
+	      }
 	    }
 	  }
 	}
@@ -1234,6 +1482,29 @@
 					"value": "interop.AppLifecycleService"
 				}
 			]
+		},
+		{
+			"id": "interop.AppMetadataService",
+			"methods": [
+				{
+					"name": "GetAppMetadataChangedEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.AppMetadataChangedEvent",
+					"type": "ServerStreaming"
+				},
+				{
+					"name": "GetMetamodelChangedEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.MetamodelChangedEvent",
+					"type": "ServerStreaming"
+				}
+			],
+			"options": [
+				{
+					"id": "interop.service_id",
+					"value": "interop.AppMetadataService"
+				}
+			]
 		}
 	],
 	"applications": [
@@ -1261,6 +1532,17 @@
 						},
 						{
 							"name": "GetInvocationEventStream"
+						}
+					]
+				},
+				{
+					"service": "interop.AppMetadataService",
+					"methods": [
+						{
+							"name": "GetAppMetadataChangedEventStream"
+						},
+						{
+							"name": "GetMetamodelChangedEventStream"
 						}
 					]
 				}

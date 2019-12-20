@@ -31,5 +31,10 @@
         public int TimeoutMs { get; set; } = 0;
 
         public IReadOnlyCollection<IOption> Options { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Title)}: {Title}, {nameof(Method)}: {Method}, {nameof(LaunchMode)}: {LaunchMode}, {nameof(TimeoutMs)}: {TimeoutMs}";
+        }
     }
 }

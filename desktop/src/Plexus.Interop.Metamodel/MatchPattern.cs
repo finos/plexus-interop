@@ -42,5 +42,10 @@
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Type)}: {Type}, {nameof(Value)}: {Value}";
+        }
     }
 }
