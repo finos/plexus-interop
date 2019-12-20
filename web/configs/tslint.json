@@ -1,10 +1,6 @@
 {
     "rules": {
-        /*
-         * TypeScipt
-         */
         "adjacent-overload-signatures": true,
-        "member-access": true,
         "no-any": false,
         "no-inferrable-types": false,
         "no-internal-module": true,
@@ -47,9 +43,6 @@
                 "variable-declaration": "nospace"
             }
         ],
-        /*
-         * Functionality
-         */
         "ban": false,
         "curly": true,
         "forin": false,
@@ -78,9 +71,6 @@
             "allow-null-check"
         ],
         "use-isnan": true,
-        /*
-         * Maintainability
-         */
         "eofline": false,
         "indent": [
             true,
@@ -98,9 +88,6 @@
                 "singleline": "never"
             }
         ],
-        /*
-         * Style
-         */
         "align": [true, "parameters", "statements"],
         "arrow-parens": false,
         "class-name": true,

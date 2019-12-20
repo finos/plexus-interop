@@ -16,10 +16,11 @@
  */
 import { ClientConnectionFactory, TransportConnection, FramedTransportConnection, ConnectionDetails } from '@plexus-interop/transport-common';
 import { WebSocketFramedTransport } from './WebSocketFramedTransport';
+import { UnifiedWebSocket } from './UnifiedWebSocket';
 
 export class WebSocketConnectionFactory implements ClientConnectionFactory {
 
-    constructor(private readonly socket: WebSocket) { }
+    constructor(private readonly socket: UnifiedWebSocket) { }
 
     public connect(connectionDetails?: ConnectionDetails): Promise<TransportConnection> {
         return new Promise((resolve, reject) => {

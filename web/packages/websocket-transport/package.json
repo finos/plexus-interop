@@ -19,17 +19,18 @@
     "@plexus-interop/transport-common": "0.1.0",
     "protobufjs": "6.8.6",
     "reflect-metadata": "^0.1.10",
-    "rxjs": "^5.4.2",
     "tslib": "^1.7.1"
   },
   "peerDependencies": {
     "protobufjs": "6.8.6",
-    "rxjs": "^5.4.2"
+    "rxjs": "^5.4.2",
+    "ws": "^7.2.1"    
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {
     "@types/jest": "^23.0.0",
     "@types/long": "^4.0.0",
+    "@types/ws": "^6.0.4",
     "@types/node": "^7.0.5",
     "babel-register": "^6.23.0",
     "find-port": "^2.0.1",
