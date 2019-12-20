@@ -14,6 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ServerConnectionFactory, ClientConnectionFactory } from '.'; 
+import { TransmissionServer, ClientConnectionFactory } from '.'; 
 
-export interface DuplexConnectionFactory extends ServerConnectionFactory, ClientConnectionFactory {}
+export interface DuplexConnectionFactory extends TransmissionServer, ClientConnectionFactory {}

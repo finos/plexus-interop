@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 import { DuplexConnectionFactory } from './DuplexConnectionFactory';
-import { Observer, Subscription, Logger, LoggerFactory, AnonymousSubscription } from '@plexus-interop/common';
+import { Observer, Logger, LoggerFactory, AnonymousSubscription } from '@plexus-interop/common';
 import { TransportConnection, Defaults, Frame, FramedTransportConnection } from '../.';
 import { InMemoryFramedTransport } from './InMemoryFramedTransport';
 import { BufferedObserver } from '../common';
+import { ServerStartupDescriptor } from './TransmissionServer';
 
 /**
  * Creates pair of coupled in memory connections for each Client's connect request
@@ -59,10 +60,15 @@ export class InMemoryConnectionFactory implements DuplexConnectionFactory {
         return [clientTransportConnection, serverTransportConnection];
     }
 
-    public acceptConnections(connectionsObserver: Observer<TransportConnection>): Subscription {
+    public async start(connectionsObserver: Observer<TransportConnection>): Promise<ServerStartupDescriptor> {
         this.log.debug('Received accept connections request');
         this.serverConnectionsObserver.setObserver(connectionsObserver);
-        return new AnonymousSubscription();
+        return {
+            connectionsSubscription:  new AnonymousSubscription(),
+            instance: {
+                stop: async () => {}
+            }
+        };
     }
 
 }

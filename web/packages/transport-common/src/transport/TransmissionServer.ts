@@ -14,11 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { TransportConnection } from './TransportConnection';
 import { Observer, Subscription } from '@plexus-interop/common';
-import { TransportConnection } from  './TransportConnection';
 
-export interface ServerConnectionFactory {
+export interface TransmissionServer {
+    start(connectionsObserver: Observer<TransportConnection>): Promise<ServerStartupDescriptor>;
+}
 
-    acceptConnections(connectionsObserver: Observer<TransportConnection>): Subscription;
+export interface ServerStartupDescriptor {
+    connectionsSubscription: Subscription;
+    instance: ActiveTransmissionServer;
+}
 
+export interface ActiveTransmissionServer {
+    stop(): Promise<void>;
 }

@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Observer, Subscription, Logger, LoggerFactory, AnonymousSubscription } from '@plexus-interop/common';
-import { TransportConnection, UniqueId, ServerConnectionFactory, BufferedObserver } from '@plexus-interop/transport-common';
+import { Observer, Logger, LoggerFactory, AnonymousSubscription } from '@plexus-interop/common';
+import { TransportConnection, UniqueId, BufferedObserver, TransmissionServer, ServerStartupDescriptor } from '@plexus-interop/transport-common';
 import { AppConnectionHeartBit } from '../peers/events/AppConnectionHeartBit';
 import { PeerConnectionsService } from '../peers/PeerConnectionsService';
 import { ApplicationConnectionDescriptor } from '../lifecycle/ApplicationConnectionDescriptor';
 import { PeerProxyConnection } from '../peers/PeerProxyConnection';
 import { RemoteBrokerService } from './remote/RemoteBrokerService';
 
-export class PeerServerConnectionFactory implements ServerConnectionFactory {
+export class PeerTransmissionServer implements TransmissionServer {
 
     private readonly log: Logger;
 
@@ -39,9 +39,15 @@ export class PeerServerConnectionFactory implements ServerConnectionFactory {
         this.listenForPeerConnections();
     }
 
-    public acceptConnections(connectionsObserver: Observer<TransportConnection>): Subscription {
+    async start(connectionsObserver: Observer<TransportConnection>): Promise<ServerStartupDescriptor> {
         this.connectionsObserver.setObserver(connectionsObserver);
-        return new AnonymousSubscription();
+        return {
+            // TODO handle unsubscribe correctly
+            connectionsSubscription: new AnonymousSubscription(),
+            instance: {
+                stop: async () => { }
+            }
+        };
     }
 
     private listenForPeerConnections(): void {

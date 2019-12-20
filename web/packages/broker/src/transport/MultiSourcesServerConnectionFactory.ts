@@ -14,22 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ServerConnectionFactory, TransportConnection } from '@plexus-interop/transport-common';
-import { Observer, Subscription, AnonymousSubscription } from '@plexus-interop/common';
+import { TransmissionServer, TransportConnection, ServerStartupDescriptor } from '@plexus-interop/transport-common';
+import { Observer } from '@plexus-interop/common';
 
-export class MultiSourcesServerConnectionFactory implements ServerConnectionFactory {
+export class MultiSourcesTransmissionServer implements TransmissionServer {
 
-    private readonly sources: ServerConnectionFactory[];
+    private readonly sources: TransmissionServer[];
 
-    constructor(...sources: ServerConnectionFactory[]) {
+    constructor(...sources: TransmissionServer[]) {
         this.sources = sources;
     }
 
-    public acceptConnections(connectionsObserver: Observer<TransportConnection>): Subscription {
-        const subscriptions: Subscription[] = [];
-        this.sources.forEach(s => subscriptions.push(s.acceptConnections(connectionsObserver)));
-        return new AnonymousSubscription(() => {
-            subscriptions.forEach(s => s.unsubscribe());
-        });
+    async start(connectionsObserver: Observer<TransportConnection>): Promise<ServerStartupDescriptor> {
+        const sourceStartups = await Promise.all(this.sources.map(s => s.start(connectionsObserver)));
+        return {
+            connectionsSubscription: {
+                unsubscribe: () => {
+                    sourceStartups.forEach(s => s.connectionsSubscription.unsubscribe());
+                }
+            },
+            instance: {
+                stop: async () => {
+                    await Promise.all(sourceStartups.map(s => s.instance.stop()));
+                }
+            }
+        };
     }
 }

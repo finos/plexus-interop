@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { AppLifeCycleManager } from '../lifecycle/AppLifeCycleManager';
-import { ServerConnectionFactory } from '@plexus-interop/transport-common';
+import { TransmissionServer, ServerStartupDescriptor } from '@plexus-interop/transport-common';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 import { ClientConnectionProcessor } from './ClientConnectionProcessor';
 import { AuthenticationHandler } from './AuthenticationHandler';
@@ -30,38 +30,43 @@ export class Broker {
 
     private readonly log: Logger = LoggerFactory.getLogger('Broker');
 
-    private readonly connectionProcessor: ClientConnectionProcessor;
+    private readonly _connectionProcessor: ClientConnectionProcessor;
+    private _activeServer: ServerStartupDescriptor | undefined;
 
     constructor(
-        private readonly appLifeCycleManager: AppLifeCycleManager,
-        private readonly connectionFactory: ServerConnectionFactory,
-        private readonly registryProvider: InteropRegistryProvider,
-        private readonly appService: AppRegistryService
+        private readonly _appLifeCycleManager: AppLifeCycleManager,
+        private readonly _transmissionServer: TransmissionServer,
+        private readonly _registryProvider: InteropRegistryProvider,
+        private readonly _appService: AppRegistryService
     ) {
-        const authHandler = new AuthenticationHandler(this.appService);
-        const registryService = new InteropRegistryService(this.registryProvider);
-        const invocationRequestHandler = new InvocationRequestHandler(registryService, this.appLifeCycleManager);
-        const discoveryRequestHandler = new DiscoveryRequestHandler(appLifeCycleManager, appService, registryService);
+        const authHandler = new AuthenticationHandler(this._appService);
+        const registryService = new InteropRegistryService(this._registryProvider);
+        const invocationRequestHandler = new InvocationRequestHandler(registryService, this._appLifeCycleManager);
+        const discoveryRequestHandler = new DiscoveryRequestHandler(_appLifeCycleManager, _appService, registryService);
         const clientRequestProcessor = new ClientRequestProcessor(invocationRequestHandler, discoveryRequestHandler);
-        this.connectionProcessor = new ClientConnectionProcessor(authHandler, clientRequestProcessor, this.appLifeCycleManager);
+        this._connectionProcessor = new ClientConnectionProcessor(authHandler, clientRequestProcessor, this._appLifeCycleManager);
         this.log.trace('Created');
     }
 
-    public start(): void {
+    async start(): Promise<void> {
         this.log.debug('Starting to listen for incoming connections');
-        this.connectionFactory.acceptConnections({
+        this._activeServer = await this._transmissionServer.start({
             next: connection => {
                 const connectionGuid = connection.uuid().toString();
                 if (this.log.isDebugEnabled()) {
                     this.log.debug(`Accepted new connection [${connectionGuid}]`);
                 }
-                this.connectionProcessor.handle(connection)
+                this._connectionProcessor.handle(connection)
                     .then(() => this.log.info(`Finished processing of [${connectionGuid}] connection`))
                     .catch(e => this.log.error(`Error while processing of [${connectionGuid}] connection`, e));
             },
             error: e => this.log.error('Error on receiving new connection', e),
             complete: () => this.log.info('No more connections')
         });
+    }
+
+    stop(): Promise<void> {
+        return this._activeServer ? this._activeServer.instance.stop() : Promise.reject('Broker is not running');
     }
 
 }

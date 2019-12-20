@@ -23,11 +23,11 @@ import { EventBus } from '../bus/EventBus';
 import { RemoteBrokerService } from '../peers/remote/RemoteBrokerService';
 import { EventBusRemoteBrokerService } from '../peers/remote/EventBusRemoteBrokerService';
 import { PeerConnectionsService } from '../peers/PeerConnectionsService';
-import { PeerServerConnectionFactory } from '../peers/PeerServerConnectionFactory';
-import { MultiSourcesServerConnectionFactory } from '../transport/MultiSourcesServerConnectionFactory';
+import { PeerTransmissionServer } from '../peers/PeerServerConnectionFactory';
+import { MultiSourcesTransmissionServer } from '../transport/MultiSourcesServerConnectionFactory';
 import { Broker } from '../broker/Broker';
 import { PeerAppLifeCycleManager } from '../peers/PeerAppLifeCycleManager';
-import { HostConnectionFactory } from '../peers/host/HostConnectionFactory';
+import { HostTransmissionServer } from '../peers/host/HostConnectionFactory';
 import { AppLifeCycleConfig } from './AppLifeCycleConfig';
 import { AppLauncher } from '../launcher/AppLauncher';
 import { AppLauncherRegistry } from '../launcher/AppLauncherRegistry';
@@ -94,9 +94,9 @@ export class WebBrokerConnectionBuilder {
         const remoteBrokerService: RemoteBrokerService = new EventBusRemoteBrokerService(eventBus, hostServerConnectionId);
 
         const peerConnectionService: PeerConnectionsService = new PeerConnectionsService(remoteBrokerService);
-        const peerConnectionsFactory = new PeerServerConnectionFactory(hostClientConnectionId, peerConnectionService, remoteBrokerService);
-        const brokerConnectionsFactory = new MultiSourcesServerConnectionFactory(
-            new HostConnectionFactory(hostClientConnectionFactory, remoteBrokerService),
+        const peerConnectionsFactory = new PeerTransmissionServer(hostClientConnectionId, peerConnectionService, remoteBrokerService);
+        const brokerConnectionsFactory = new MultiSourcesTransmissionServer(
+            new HostTransmissionServer(hostClientConnectionFactory, remoteBrokerService),
             peerConnectionsFactory);
 
         const appLifeCycleManager = new PeerAppLifeCycleManager(
