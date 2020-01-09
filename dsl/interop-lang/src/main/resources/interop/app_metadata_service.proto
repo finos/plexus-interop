@@ -1,5 +1,5 @@
 //
-// Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+// Copyright 2017-2020 Plexus Interop Deutsche Bank AG
 // SPDX-License-Identifier: Apache-2.0
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ message AppMetadataInfo {
     string id = 1;
     string display_name = 2;
     string launcher_id = 3;
-    repeated KeyValuePair launcher_params = 4;
+    repeated OptionParameter launcher_params = 4;
 }
 
 message MetamodelChangedEvent {
@@ -78,13 +78,13 @@ message ProvidedMethod {
     }
     MetamodelLaunchMode launch_mode = 3;
     int32 timeout_ms = 4;
-    repeated KeyValuePair options = 5;
+    repeated OptionParameter options = 5;
 }
 
 message Service {
     string id = 1;
     repeated MethodInfo methods = 2;
-    repeated KeyValuePair options = 3;
+    repeated OptionParameter options = 3;
 }
 
 message MethodInfo {
@@ -100,7 +100,7 @@ message MethodInfo {
     MethodType type = 5;
 }
 
-message KeyValuePair {
+message OptionParameter {
     string key = 1;
     string value = 2;
 }
