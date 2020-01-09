@@ -10,12 +10,12 @@
     using Plexus.Interop.Apps.Internal.Generated;
     using Plexus.Interop.Metamodel;
 
-    internal class AppMetadataService : IAppMetadataService
+    internal class AppMetadataServiceImpl : IAppMetadataService
     {
         private readonly BehaviorSubject<IRegistry> _metamodelSubject;
         private readonly BehaviorSubject<AppRegistry> _appRegistrySubject;
 
-        public AppMetadataService(IAppRegistryProvider appRegistryProvider, IRegistryProvider registryProvider)
+        public AppMetadataServiceImpl(IAppRegistryProvider appRegistryProvider, IRegistryProvider registryProvider)
         {
             _appRegistrySubject = new BehaviorSubject<AppRegistry>(appRegistryProvider.Current);
             appRegistryProvider.Updated += registry => _appRegistrySubject.OnNext(registry);

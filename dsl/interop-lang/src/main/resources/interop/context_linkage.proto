@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package interop;
+
+import "google/protobuf/empty.proto";
+import "interop/unique_id.proto";
+import "interop/app_connection_descriptor.proto";
+
+message Context {
+	string id = 1;
+}
+
+message ContextsList {
+	repeated Context contexts = 1;
+}
+
+message InvocationRef {
+	string service_id = 1;
+	string service_alias = 2;
+	string method_id = 3;
+	interop.AppConnectionDescriptor target = 4;
+}
+
+message InvocationsList {
+	repeated InvocationRef invocations = 1;
+}
+
+message ContextToInvocations {
+	Context context = 1;
+	InvocationsList invocations = 2;
+}
+
+message ContextToInvocationsList {
+	repeated ContextToInvocations contexts = 1;
+}
+
+message AttachRequest {	
+    UniqueId app_instance_id = 1;
+	Context context = 2;
+}
+
+service ContextLinkageService {
+
+	/**
+	* Creates new context and associates running instance to it 
+	*/
+	rpc CreateContext(google.protobuf.Empty) returns (Context);
+
+	/**
+	* Associates running instance with provided context, useful if we want to link already running instance
+	*/
+	rpc JoinContext(Context) returns (google.protobuf.Empty);
+
+	/**
+	* Associates specified application instance with provided context
+	*/
+	rpc AttachApplicationToContext(AttachRequest) returns (google.protobuf.Empty);
+
+	/**
+	* Get list of associated contexts
+	*/
+	rpc GetContexts(google.protobuf.Empty) returns (ContextsList);
+
+	/**
+	* Discover list of linked invocations for specified context
+	*/
+	rpc GetLinkedInvocations(Context) returns (InvocationsList);
+
+	/**
+	* Get Linked Invocations for all associated contexts
+	*/
+	rpc GetAllLinkedInvocations(google.protobuf.Empty) returns (ContextToInvocationsList);
+}

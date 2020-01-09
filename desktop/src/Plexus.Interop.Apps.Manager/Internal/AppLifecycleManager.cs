@@ -54,6 +54,8 @@ namespace Plexus.Interop.Apps.Internal
 
         public event Action<AppConnectionDescriptor> AppDisconnected = delegate { };
 
+        public event Action<AppLaunchedAndConnected> AppLaunchedAndConnected = delegate { };
+
         public IAppConnection AcceptConnection(
             ITransportConnection connection,
             AppConnectionDescriptor connectionInfo)
@@ -222,7 +224,11 @@ namespace Plexus.Interop.Apps.Internal
                     }
                 }
 
-                return await connectionPromise.Task.ConfigureAwait(false);
+                var appConnection = await connectionPromise.Task.ConfigureAwait(false);
+
+                AppLaunchedAndConnected(new AppLaunchedAndConnected(appInstanceId, appId, appConnection, referrerConnectionInfo));
+
+                return appConnection;
             }
             finally
             {

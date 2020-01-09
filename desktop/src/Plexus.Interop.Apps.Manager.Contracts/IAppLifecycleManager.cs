@@ -40,5 +40,7 @@
         event Action<AppConnectionDescriptor> AppConnected;
 
         event Action<AppConnectionDescriptor> AppDisconnected;
+
+        event Action<AppLaunchedAndConnected> AppLaunchedAndConnected;
     }
 }

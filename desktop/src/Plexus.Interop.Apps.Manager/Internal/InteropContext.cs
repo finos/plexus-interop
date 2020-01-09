@@ -4,9 +4,9 @@
     using System.IO;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal.Generated;
+    using Plexus.Interop.Apps.Internal.Services;
     using Plexus.Interop.Metamodel;
     using Plexus.Processes;
-    using AppLifecycleService = Services.AppLifecycleService;
 
     internal class InteropContext : ProcessBase, IInteropContext
     {
@@ -21,7 +21,8 @@
         private readonly NativeAppLauncherClient _nativeAppLauncherClient;
         private readonly AppLifecycleManagerClient _lifecycleManagerClient;
         private readonly AppLifecycleManager _appLifecycleManager;
-        private readonly AppLifecycleService _appLifecycleService;
+
+        private readonly AppLifecycleServiceImpl _appLifecycleService;
 
         public InteropContext(string metadataDir, IRegistryProvider registryProvider)
         {
@@ -31,12 +32,14 @@
 
             _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, new Lazy<IClient>(() => LifecycleManagerClient));
 
-            var appMetadataService = new Services.AppMetadataService(appRegistryProvider, registryProvider);
-            _appLifecycleService = new AppLifecycleService(_appLifecycleManager);
+            var appMetadataService = new AppMetadataServiceImpl(appRegistryProvider, registryProvider);
+            _appLifecycleService = new AppLifecycleServiceImpl(_appLifecycleManager);
+            var contextLinkageService = new ContextLinkageServiceImpl(_appLifecycleManager);
 
             _lifecycleManagerClient = new AppLifecycleManagerClient(
                 _appLifecycleService,
                 appMetadataService,
+                contextLinkageService,
                 s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
 
             OnStop(_nativeAppLauncherClient.Stop);

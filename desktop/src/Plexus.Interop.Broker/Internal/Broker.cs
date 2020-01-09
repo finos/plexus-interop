@@ -27,12 +27,12 @@ namespace Plexus.Interop.Internal
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using Plexus.Processes;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal;
-    using Plexus.Interop.Apps.Internal.Services;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
 
@@ -54,6 +54,11 @@ namespace Plexus.Interop.Internal
 
         public Broker(BrokerOptions options, IRegistryProvider registryProvider = null)
         {
+            if (!Debugger.IsAttached)
+            {
+                Debugger.Launch();
+            }
+
             _workingDir = Directory.GetCurrentDirectory();
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var studioDir = Path.Combine(binDir, "studio");
