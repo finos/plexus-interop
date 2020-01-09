@@ -34,13 +34,7 @@ message ContextToInvocationsList {
 	repeated ContextToInvocations contexts = 1;
 }
 
-message AttachRequest {	
-    UniqueId app_instance_id = 1;
-	Context context = 2;
-}
-
 service ContextLinkageService {
-
 	/**
 	* Creates new context and associates running instance to it 
 	*/
@@ -50,11 +44,6 @@ service ContextLinkageService {
 	* Associates running instance with provided context, useful if we want to link already running instance
 	*/
 	rpc JoinContext(Context) returns (google.protobuf.Empty);
-
-	/**
-	* Associates specified application instance with provided context
-	*/
-	rpc AttachApplicationToContext(AttachRequest) returns (google.protobuf.Empty);
 
 	/**
 	* Get list of associated contexts

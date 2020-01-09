@@ -1174,7 +1174,7 @@
 	            },
 	            "launcherParams": {
 	              "rule": "repeated",
-	              "type": "KeyValuePair",
+	              "type": "OptionParameter",
 	              "id": 4
 	            }
 	          }
@@ -1291,7 +1291,7 @@
 	            },
 	            "options": {
 	              "rule": "repeated",
-	              "type": "KeyValuePair",
+	              "type": "OptionParameter",
 	              "id": 5
 	            }
 	          },
@@ -1321,7 +1321,7 @@
 	            },
 	            "options": {
 	              "rule": "repeated",
-	              "type": "KeyValuePair",
+	              "type": "OptionParameter",
 	              "id": 3
 	            }
 	          }
@@ -1359,9 +1359,9 @@
 	            }
 	          }
 	        },
-	        "KeyValuePair": {
+	        "OptionParameter": {
 	          "options": {
-	            "(.interop.message_id)": "interop.KeyValuePair"
+	            "(.interop.message_id)": "interop.OptionParameter"
 	          },
 	          "fields": {
 	            "key": {
@@ -1394,34 +1394,6 @@
 	              "rule": "repeated",
 	              "type": "Context",
 	              "id": 1
-	            }
-	          }
-	        },
-	        "ContextLoadingStatus": {
-	          "values": {
-	            "IN_PROGRESS": 0,
-	            "FAILED": 1,
-	            "FINISHED": 2
-	          }
-	        },
-	        "ContextLoadingUpdate": {
-	          "options": {
-	            "(.interop.message_id)": "interop.ContextLoadingUpdate"
-	          },
-	          "fields": {
-	            "status": {
-	              "type": "ContextLoadingStatus",
-	              "id": 1
-	            },
-	            "loadedAppDescriptors": {
-	              "rule": "repeated",
-	              "type": "interop.AppConnectionDescriptor",
-	              "id": 2
-	            },
-	            "failedAppDescriptors": {
-	              "rule": "repeated",
-	              "type": "interop.AppConnectionDescriptor",
-	              "id": 3
 	            }
 	          }
 	        },
@@ -1487,41 +1459,17 @@
 	            }
 	          }
 	        },
-	        "AttachRequest": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AttachRequest"
-	          },
-	          "fields": {
-	            "appInstanceId": {
-	              "type": "UniqueId",
-	              "id": 1
-	            },
-	            "context": {
-	              "type": "Context",
-	              "id": 2
-	            }
-	          }
-	        },
 	        "ContextLinkageService": {
 	          "options": {
 	            "(.interop.service_id)": "interop.ContextLinkageService"
 	          },
 	          "methods": {
-	            "ContextLoadedStream": {
-	              "requestType": "Context",
-	              "responseType": "ContextLoadingUpdate",
-	              "responseStream": true
-	            },
 	            "CreateContext": {
 	              "requestType": "google.protobuf.Empty",
 	              "responseType": "Context"
 	            },
 	            "JoinContext": {
 	              "requestType": "Context",
-	              "responseType": "google.protobuf.Empty"
-	            },
-	            "AttachApplicationToContext": {
-	              "requestType": "AttachRequest",
 	              "responseType": "google.protobuf.Empty"
 	            },
 	            "GetContexts": {
@@ -1674,12 +1622,6 @@
 			"id": "interop.ContextLinkageService",
 			"methods": [
 				{
-					"name": "ContextLoadedStream",
-					"request": "interop.Context",
-					"response": "interop.ContextLoadingUpdate",
-					"type": "ServerStreaming"
-				},
-				{
 					"name": "CreateContext",
 					"request": "google.protobuf.Empty",
 					"response": "interop.Context",
@@ -1688,12 +1630,6 @@
 				{
 					"name": "JoinContext",
 					"request": "interop.Context",
-					"response": "google.protobuf.Empty",
-					"type": "Unary"
-				},
-				{
-					"name": "AttachApplicationToContext",
-					"request": "interop.AttachRequest",
 					"response": "google.protobuf.Empty",
 					"type": "Unary"
 				},
@@ -1767,16 +1703,10 @@
 					"service": "interop.ContextLinkageService",
 					"methods": [
 						{
-							"name": "ContextLoadedStream"
-						},
-						{
 							"name": "CreateContext"
 						},
 						{
 							"name": "JoinContext"
-						},
-						{
-							"name": "AttachApplicationToContext"
 						},
 						{
 							"name": "GetContexts"

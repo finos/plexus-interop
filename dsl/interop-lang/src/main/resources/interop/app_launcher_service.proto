@@ -19,11 +19,15 @@ syntax = "proto3";
 
 package interop;
 
+import "google/protobuf/empty.proto";
+
 import "interop/unique_id.proto";
 import "interop/app_launch_mode.proto";
 
 service AppLauncherService {
 	rpc Launch(AppLaunchRequest) returns (AppLaunchResponse);
+
+	//rpc AppLaunchedEventStream(.google.protobuf.Empty) returns (stream AppLaunchedEvent);
 }
 
 message AppLaunchRequest {
@@ -43,3 +47,8 @@ message AppLaunchReferrer {
 message AppLaunchResponse {
 	UniqueId app_instance_id = 1;
 }
+
+// message AppLaunchedEvent {
+// 	UniqueId app_instance_id = 1;
+// 	repeated string app_ids = 2;
+// }
