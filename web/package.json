@@ -33,7 +33,7 @@
   "devDependencies": {
     "cross-var": "1.1.0",
     "electron": "1.8.8",
-    "lerna": "2.8.0",
+    "lerna": "^3.18.4",
     "minimist": "1.2.0",
     "npm-run-all": "4.1.1",
     "shx": "0.2.2",
