@@ -1813,6 +1813,9 @@
 					"methods": [
 						{
 							"name": "Launch"
+						},
+						{
+							"name": "AppLaunchedEventStream"
 						}
 					],
 					"to": [
