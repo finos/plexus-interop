@@ -17,8 +17,10 @@
   "dependencies": {
     "long": "^4.0.0",
     "@plexus-interop/transport-common": "0.1.0",
+    "@plexus-interop/common": "0.1.0",
+    "@plexus-interop/protocol": "0.1.0",
     "reflect-metadata": "^0.1.10",
-    "tslib": "1.9.0"
+    "tslib": "1.10.0"
   },
   "peerDependencies": {
     "protobufjs": "6.8.6",

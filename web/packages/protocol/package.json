@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@types/long": "^4.0.0",
+    "@plexus-interop/common": "0.1.0",
     "long": "^4.0.0"  
   },
   "peerDependencies": {

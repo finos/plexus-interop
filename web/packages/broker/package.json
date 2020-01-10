@@ -17,12 +17,14 @@
   "dependencies": {
     "@plexus-interop/client": "0.1.0",
     "@plexus-interop/transport-common": "0.1.0",
+    "@plexus-interop/common": "0.1.0",
+    "@plexus-interop/metadata": "0.1.0",
+    "@plexus-interop/protocol": "0.1.0",
+    "@plexus-interop/client-api": "0.1.0",
     "ya-js-storage": "0.1.4",
     "long": "^4.0.0",
-    "protobufjs": "6.8.6",
     "reflect-metadata": "^0.1.10",
-    "rxjs": "^5.5.2",
-    "tslib": "1.9.0"
+    "tslib": "1.10.0"
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {
@@ -39,6 +41,10 @@
     "tslint": "5.8.0",
     "typescript": "3.7.2",
     "yarn": "^1.17.3"
+  },
+  "peerDependencies": {
+    "protobufjs": "6.8.6",
+    "rxjs": "^5.5.2"
   },
   "jest": {
     "testEnvironment": "node",
