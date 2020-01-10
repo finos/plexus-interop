@@ -17,9 +17,7 @@
   "dependencies": {
     "long": "^4.0.0",
     "@plexus-interop/transport-common": "0.1.0",
-    "protobufjs": "6.8.6",
     "reflect-metadata": "^0.1.10",
-    "rxjs": "^5.5.2",
     "tslib": "1.9.0"
   },
   "peerDependencies": {
@@ -39,7 +37,7 @@
     "trash-cli": "^1.4.0",
     "tslint": "5.8.0",
     "typescript": "3.3.3",
-    "yarn": "1.17.3"
+    "yarn": "^1.17.3"
   },
   "jest": {
     "testEnvironment": "node",
