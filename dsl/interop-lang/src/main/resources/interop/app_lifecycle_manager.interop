@@ -30,5 +30,5 @@ application AppLifecycleManager {
 
 	provides AppMetadataService { GetAppMetadataChangedEventStream; GetMetamodelChangedEventStream; }
 
-	provides ContextLinkageService { CreateContext; JoinContext; GetContexts; GetLinkedInvocations; GetAllLinkedInvocations; }
+	provides ContextLinkageService { ContextLoadedStream; CreateContext; JoinContext; GetContexts; GetLinkedInvocations; GetAllLinkedInvocations; }
 }

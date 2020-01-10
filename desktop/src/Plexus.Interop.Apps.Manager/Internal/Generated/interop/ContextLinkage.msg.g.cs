@@ -27,37 +27,47 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "Ch1pbnRlcm9wL2NvbnRleHRfbGlua2FnZS5wcm90bxIHaW50ZXJvcBobZ29v",
             "Z2xlL3Byb3RvYnVmL2VtcHR5LnByb3RvGhdpbnRlcm9wL3VuaXF1ZV9pZC5w",
             "cm90bxonaW50ZXJvcC9hcHBfY29ubmVjdGlvbl9kZXNjcmlwdG9yLnByb3Rv",
-            "GhVpbnRlcm9wL29wdGlvbnMucHJvdG8iKgoHQ29udGV4dBIKCgJpZBgBIAEo",
-            "CToTktsED2ludGVyb3AuQ29udGV4dCJMCgxDb250ZXh0c0xpc3QSIgoIY29u",
-            "dGV4dHMYASADKAsyEC5pbnRlcm9wLkNvbnRleHQ6GJLbBBRpbnRlcm9wLkNv",
-            "bnRleHRzTGlzdCKaAQoNSW52b2NhdGlvblJlZhISCgpzZXJ2aWNlX2lkGAEg",
-            "ASgJEhUKDXNlcnZpY2VfYWxpYXMYAiABKAkSEQoJbWV0aG9kX2lkGAMgASgJ",
-            "EjAKBnRhcmdldBgEIAEoCzIgLmludGVyb3AuQXBwQ29ubmVjdGlvbkRlc2Ny",
-            "aXB0b3I6GZLbBBVpbnRlcm9wLkludm9jYXRpb25SZWYiWwoPSW52b2NhdGlv",
-            "bnNMaXN0EisKC2ludm9jYXRpb25zGAEgAygLMhYuaW50ZXJvcC5JbnZvY2F0",
-            "aW9uUmVmOhuS2wQXaW50ZXJvcC5JbnZvY2F0aW9uc0xpc3QiigEKFENvbnRl",
-            "eHRUb0ludm9jYXRpb25zEiEKB2NvbnRleHQYASABKAsyEC5pbnRlcm9wLkNv",
-            "bnRleHQSLQoLaW52b2NhdGlvbnMYAiABKAsyGC5pbnRlcm9wLkludm9jYXRp",
-            "b25zTGlzdDogktsEHGludGVyb3AuQ29udGV4dFRvSW52b2NhdGlvbnMicQoY",
-            "Q29udGV4dFRvSW52b2NhdGlvbnNMaXN0Ei8KCGNvbnRleHRzGAEgAygLMh0u",
-            "aW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0aW9uczokktsEIGludGVyb3AuQ29u",
-            "dGV4dFRvSW52b2NhdGlvbnNMaXN0MoYDChVDb250ZXh0TGlua2FnZVNlcnZp",
-            "Y2USOQoNQ3JlYXRlQ29udGV4dBIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRoQ",
-            "LmludGVyb3AuQ29udGV4dBI3CgtKb2luQ29udGV4dBIQLmludGVyb3AuQ29u",
-            "dGV4dBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRI8CgtHZXRDb250ZXh0cxIW",
-            "Lmdvb2dsZS5wcm90b2J1Zi5FbXB0eRoVLmludGVyb3AuQ29udGV4dHNMaXN0",
-            "EkIKFEdldExpbmtlZEludm9jYXRpb25zEhAuaW50ZXJvcC5Db250ZXh0Ghgu",
-            "aW50ZXJvcC5JbnZvY2F0aW9uc0xpc3QSVAoXR2V0QWxsTGlua2VkSW52b2Nh",
-            "dGlvbnMSFi5nb29nbGUucHJvdG9idWYuRW1wdHkaIS5pbnRlcm9wLkNvbnRl",
-            "eHRUb0ludm9jYXRpb25zTGlzdBohktsEHWludGVyb3AuQ29udGV4dExpbmth",
-            "Z2VTZXJ2aWNlQimqAiZQbGV4dXMuSW50ZXJvcC5BcHBzLkludGVybmFsLkdl",
-            "bmVyYXRlZGIGcHJvdG8z"));
+            "GiJpbnRlcm9wL2FwcF9tZXRhZGF0YV9zZXJ2aWNlLnByb3RvGhVpbnRlcm9w",
+            "L29wdGlvbnMucHJvdG8iKgoHQ29udGV4dBIKCgJpZBgBIAEoCToTktsED2lu",
+            "dGVyb3AuQ29udGV4dCJMCgxDb250ZXh0c0xpc3QSIgoIY29udGV4dHMYASAD",
+            "KAsyEC5pbnRlcm9wLkNvbnRleHQ6GJLbBBRpbnRlcm9wLkNvbnRleHRzTGlz",
+            "dCLrAQoUQ29udGV4dExvYWRpbmdVcGRhdGUSLQoGc3RhdHVzGAEgASgOMh0u",
+            "aW50ZXJvcC5Db250ZXh0TG9hZGluZ1N0YXR1cxJAChZsb2FkZWRfYXBwX2Rl",
+            "c2NyaXB0b3JzGAIgAygLMiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3Jp",
+            "cHRvchJAChZmYWlsZWRfYXBwX2Rlc2NyaXB0b3JzGAMgAygLMiAuaW50ZXJv",
+            "cC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvcjogktsEHGludGVyb3AuQ29udGV4",
+            "dExvYWRpbmdVcGRhdGUiiQEKDUludm9jYXRpb25SZWYSKwoIYXBwX2luZm8Y",
+            "ASABKAsyGS5pbnRlcm9wLkFwcE1ldGFtb2RlbEluZm8SMAoGdGFyZ2V0GAIg",
+            "ASgLMiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvcjoZktsEFWlu",
+            "dGVyb3AuSW52b2NhdGlvblJlZiJbCg9JbnZvY2F0aW9uc0xpc3QSKwoLaW52",
+            "b2NhdGlvbnMYASADKAsyFi5pbnRlcm9wLkludm9jYXRpb25SZWY6G5LbBBdp",
+            "bnRlcm9wLkludm9jYXRpb25zTGlzdCKKAQoUQ29udGV4dFRvSW52b2NhdGlv",
+            "bnMSIQoHY29udGV4dBgBIAEoCzIQLmludGVyb3AuQ29udGV4dBItCgtpbnZv",
+            "Y2F0aW9ucxgCIAEoCzIYLmludGVyb3AuSW52b2NhdGlvbnNMaXN0OiCS2wQc",
+            "aW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0aW9ucyJxChhDb250ZXh0VG9JbnZv",
+            "Y2F0aW9uc0xpc3QSLwoIY29udGV4dHMYASADKAsyHS5pbnRlcm9wLkNvbnRl",
+            "eHRUb0ludm9jYXRpb25zOiSS2wQgaW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0",
+            "aW9uc0xpc3QqQQoUQ29udGV4dExvYWRpbmdTdGF0dXMSDwoLSU5fUFJPR1JF",
+            "U1MQABIKCgZGQUlMRUQQARIMCghGSU5JU0hFRBACMtADChVDb250ZXh0TGlu",
+            "a2FnZVNlcnZpY2USSAoTQ29udGV4dExvYWRlZFN0cmVhbRIQLmludGVyb3Au",
+            "Q29udGV4dBodLmludGVyb3AuQ29udGV4dExvYWRpbmdVcGRhdGUwARI5Cg1D",
+            "cmVhdGVDb250ZXh0EhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5GhAuaW50ZXJv",
+            "cC5Db250ZXh0EjcKC0pvaW5Db250ZXh0EhAuaW50ZXJvcC5Db250ZXh0GhYu",
+            "Z29vZ2xlLnByb3RvYnVmLkVtcHR5EjwKC0dldENvbnRleHRzEhYuZ29vZ2xl",
+            "LnByb3RvYnVmLkVtcHR5GhUuaW50ZXJvcC5Db250ZXh0c0xpc3QSQgoUR2V0",
+            "TGlua2VkSW52b2NhdGlvbnMSEC5pbnRlcm9wLkNvbnRleHQaGC5pbnRlcm9w",
+            "Lkludm9jYXRpb25zTGlzdBJUChdHZXRBbGxMaW5rZWRJbnZvY2F0aW9ucxIW",
+            "Lmdvb2dsZS5wcm90b2J1Zi5FbXB0eRohLmludGVyb3AuQ29udGV4dFRvSW52",
+            "b2NhdGlvbnNMaXN0GiGS2wQdaW50ZXJvcC5Db250ZXh0TGlua2FnZVNlcnZp",
+            "Y2VCKaoCJlBsZXh1cy5JbnRlcm9wLkFwcHMuSW50ZXJuYWwuR2VuZXJhdGVk",
+            "YgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingStatus), }, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.Context), global::Plexus.Interop.Apps.Internal.Generated.Context.Parser, new[]{ "Id" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextsList), global::Plexus.Interop.Apps.Internal.Generated.ContextsList.Parser, new[]{ "Contexts" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationRef), global::Plexus.Interop.Apps.Internal.Generated.InvocationRef.Parser, new[]{ "ServiceId", "ServiceAlias", "MethodId", "Target" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate), global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate.Parser, new[]{ "Status", "LoadedAppDescriptors", "FailedAppDescriptors" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationRef), global::Plexus.Interop.Apps.Internal.Generated.InvocationRef.Parser, new[]{ "AppInfo", "Target" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationsList), global::Plexus.Interop.Apps.Internal.Generated.InvocationsList.Parser, new[]{ "Invocations" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocations), global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocations.Parser, new[]{ "Context", "Invocations" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList), global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList.Parser, new[]{ "Contexts" }, null, null, null)
@@ -66,6 +76,24 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endregion
 
   }
+  #region Enums
+  internal enum ContextLoadingStatus {
+    /// <summary>
+    /// intermediate state, some of apps within context already loaded
+    /// </summary>
+    [pbr::OriginalName("IN_PROGRESS")] InProgress = 0,
+    /// <summary>
+    /// termination state, some of apps failed to start/connect to plexus, no more apps "in progress"
+    /// </summary>
+    [pbr::OriginalName("FAILED")] Failed = 1,
+    /// <summary>
+    /// termination state, all apps within context are loaded
+    /// </summary>
+    [pbr::OriginalName("FINISHED")] Finished = 2,
+  }
+
+  #endregion
+
   #region Messages
   internal sealed partial class Context : pb::IMessage<Context> {
     private static readonly pb::MessageParser<Context> _parser = new pb::MessageParser<Context>(() => new Context());
@@ -317,6 +345,181 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
+  internal sealed partial class ContextLoadingUpdate : pb::IMessage<ContextLoadingUpdate> {
+    private static readonly pb::MessageParser<ContextLoadingUpdate> _parser = new pb::MessageParser<ContextLoadingUpdate>(() => new ContextLoadingUpdate());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<ContextLoadingUpdate> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ContextLoadingUpdate() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ContextLoadingUpdate(ContextLoadingUpdate other) : this() {
+      status_ = other.status_;
+      loadedAppDescriptors_ = other.loadedAppDescriptors_.Clone();
+      failedAppDescriptors_ = other.failedAppDescriptors_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ContextLoadingUpdate Clone() {
+      return new ContextLoadingUpdate(this);
+    }
+
+    /// <summary>Field number for the "status" field.</summary>
+    public const int StatusFieldNumber = 1;
+    private global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingStatus status_ = 0;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingStatus Status {
+      get { return status_; }
+      set {
+        status_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "loaded_app_descriptors" field.</summary>
+    public const int LoadedAppDescriptorsFieldNumber = 2;
+    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor> _repeated_loadedAppDescriptors_codec
+        = pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor.Parser);
+    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor> loadedAppDescriptors_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor>();
+    /// <summary>
+    /// loaded apps within context at this moment of time
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor> LoadedAppDescriptors {
+      get { return loadedAppDescriptors_; }
+    }
+
+    /// <summary>Field number for the "failed_app_descriptors" field.</summary>
+    public const int FailedAppDescriptorsFieldNumber = 3;
+    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor> _repeated_failedAppDescriptors_codec
+        = pb::FieldCodec.ForMessage(26, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor.Parser);
+    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor> failedAppDescriptors_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor>();
+    /// <summary>
+    /// apps registered in context, but failed to load
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor> FailedAppDescriptors {
+      get { return failedAppDescriptors_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as ContextLoadingUpdate);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(ContextLoadingUpdate other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Status != other.Status) return false;
+      if(!loadedAppDescriptors_.Equals(other.loadedAppDescriptors_)) return false;
+      if(!failedAppDescriptors_.Equals(other.failedAppDescriptors_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Status != 0) hash ^= Status.GetHashCode();
+      hash ^= loadedAppDescriptors_.GetHashCode();
+      hash ^= failedAppDescriptors_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Status != 0) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Status);
+      }
+      loadedAppDescriptors_.WriteTo(output, _repeated_loadedAppDescriptors_codec);
+      failedAppDescriptors_.WriteTo(output, _repeated_failedAppDescriptors_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Status != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Status);
+      }
+      size += loadedAppDescriptors_.CalculateSize(_repeated_loadedAppDescriptors_codec);
+      size += failedAppDescriptors_.CalculateSize(_repeated_failedAppDescriptors_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(ContextLoadingUpdate other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Status != 0) {
+        Status = other.Status;
+      }
+      loadedAppDescriptors_.Add(other.loadedAppDescriptors_);
+      failedAppDescriptors_.Add(other.failedAppDescriptors_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            status_ = (global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingStatus) input.ReadEnum();
+            break;
+          }
+          case 18: {
+            loadedAppDescriptors_.AddEntriesFrom(input, _repeated_loadedAppDescriptors_codec);
+            break;
+          }
+          case 26: {
+            failedAppDescriptors_.AddEntriesFrom(input, _repeated_failedAppDescriptors_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   internal sealed partial class InvocationRef : pb::IMessage<InvocationRef> {
     private static readonly pb::MessageParser<InvocationRef> _parser = new pb::MessageParser<InvocationRef>(() => new InvocationRef());
     private pb::UnknownFieldSet _unknownFields;
@@ -325,7 +528,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -342,9 +545,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public InvocationRef(InvocationRef other) : this() {
-      serviceId_ = other.serviceId_;
-      serviceAlias_ = other.serviceAlias_;
-      methodId_ = other.methodId_;
+      AppInfo = other.appInfo_ != null ? other.AppInfo.Clone() : null;
       Target = other.target_ != null ? other.Target.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -354,41 +555,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       return new InvocationRef(this);
     }
 
-    /// <summary>Field number for the "service_id" field.</summary>
-    public const int ServiceIdFieldNumber = 1;
-    private string serviceId_ = "";
+    /// <summary>Field number for the "app_info" field.</summary>
+    public const int AppInfoFieldNumber = 1;
+    private global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo appInfo_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string ServiceId {
-      get { return serviceId_; }
+    public global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo AppInfo {
+      get { return appInfo_; }
       set {
-        serviceId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "service_alias" field.</summary>
-    public const int ServiceAliasFieldNumber = 2;
-    private string serviceAlias_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string ServiceAlias {
-      get { return serviceAlias_; }
-      set {
-        serviceAlias_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "method_id" field.</summary>
-    public const int MethodIdFieldNumber = 3;
-    private string methodId_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string MethodId {
-      get { return methodId_; }
-      set {
-        methodId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        appInfo_ = value;
       }
     }
 
     /// <summary>Field number for the "target" field.</summary>
-    public const int TargetFieldNumber = 4;
+    public const int TargetFieldNumber = 2;
     private global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor target_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor Target {
@@ -411,9 +590,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (ServiceId != other.ServiceId) return false;
-      if (ServiceAlias != other.ServiceAlias) return false;
-      if (MethodId != other.MethodId) return false;
+      if (!object.Equals(AppInfo, other.AppInfo)) return false;
       if (!object.Equals(Target, other.Target)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -421,9 +598,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (ServiceId.Length != 0) hash ^= ServiceId.GetHashCode();
-      if (ServiceAlias.Length != 0) hash ^= ServiceAlias.GetHashCode();
-      if (MethodId.Length != 0) hash ^= MethodId.GetHashCode();
+      if (appInfo_ != null) hash ^= AppInfo.GetHashCode();
       if (target_ != null) hash ^= Target.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -438,20 +613,12 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (ServiceId.Length != 0) {
+      if (appInfo_ != null) {
         output.WriteRawTag(10);
-        output.WriteString(ServiceId);
-      }
-      if (ServiceAlias.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(ServiceAlias);
-      }
-      if (MethodId.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(MethodId);
+        output.WriteMessage(AppInfo);
       }
       if (target_ != null) {
-        output.WriteRawTag(34);
+        output.WriteRawTag(18);
         output.WriteMessage(Target);
       }
       if (_unknownFields != null) {
@@ -462,14 +629,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (ServiceId.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceId);
-      }
-      if (ServiceAlias.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceAlias);
-      }
-      if (MethodId.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(MethodId);
+      if (appInfo_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(AppInfo);
       }
       if (target_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Target);
@@ -485,14 +646,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (other == null) {
         return;
       }
-      if (other.ServiceId.Length != 0) {
-        ServiceId = other.ServiceId;
-      }
-      if (other.ServiceAlias.Length != 0) {
-        ServiceAlias = other.ServiceAlias;
-      }
-      if (other.MethodId.Length != 0) {
-        MethodId = other.MethodId;
+      if (other.appInfo_ != null) {
+        if (appInfo_ == null) {
+          appInfo_ = new global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo();
+        }
+        AppInfo.MergeFrom(other.AppInfo);
       }
       if (other.target_ != null) {
         if (target_ == null) {
@@ -512,18 +670,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            ServiceId = input.ReadString();
+            if (appInfo_ == null) {
+              appInfo_ = new global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo();
+            }
+            input.ReadMessage(appInfo_);
             break;
           }
           case 18: {
-            ServiceAlias = input.ReadString();
-            break;
-          }
-          case 26: {
-            MethodId = input.ReadString();
-            break;
-          }
-          case 34: {
             if (target_ == null) {
               target_ = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptor();
             }
@@ -544,7 +697,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -665,7 +818,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -834,7 +987,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

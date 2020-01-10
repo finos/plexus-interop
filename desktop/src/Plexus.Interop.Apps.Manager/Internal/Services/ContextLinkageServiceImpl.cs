@@ -21,6 +21,7 @@ namespace Plexus.Interop.Apps.Internal.Services
     using System.Linq;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
+    using Plexus.Channels;
     using Plexus.Interop.Apps.Internal.Generated;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
     using ContextDto = Generated.Context;
@@ -144,6 +145,11 @@ namespace Plexus.Interop.Apps.Internal.Services
                     })}
                 };
             });
+        }
+
+        public Task ContextLoadedStream(ContextDto request, IWritableChannel<ContextLoadingUpdate> responseStream, MethodCallContext context)
+        {
+            throw new NotImplementedException();
         }
 
         private static InvocationsList CreateInvocationsList(Context context)

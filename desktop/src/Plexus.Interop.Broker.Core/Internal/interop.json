@@ -1422,26 +1422,46 @@
 	            }
 	          }
 	        },
+	        "ContextLoadingStatus": {
+	          "values": {
+	            "IN_PROGRESS": 0,
+	            "FAILED": 1,
+	            "FINISHED": 2
+	          }
+	        },
+	        "ContextLoadingUpdate": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ContextLoadingUpdate"
+	          },
+	          "fields": {
+	            "status": {
+	              "type": "ContextLoadingStatus",
+	              "id": 1
+	            },
+	            "loadedAppDescriptors": {
+	              "rule": "repeated",
+	              "type": "interop.AppConnectionDescriptor",
+	              "id": 2
+	            },
+	            "failedAppDescriptors": {
+	              "rule": "repeated",
+	              "type": "interop.AppConnectionDescriptor",
+	              "id": 3
+	            }
+	          }
+	        },
 	        "InvocationRef": {
 	          "options": {
 	            "(.interop.message_id)": "interop.InvocationRef"
 	          },
 	          "fields": {
-	            "serviceId": {
-	              "type": "string",
+	            "appInfo": {
+	              "type": "interop.AppMetamodelInfo",
 	              "id": 1
-	            },
-	            "serviceAlias": {
-	              "type": "string",
-	              "id": 2
-	            },
-	            "methodId": {
-	              "type": "string",
-	              "id": 3
 	            },
 	            "target": {
 	              "type": "interop.AppConnectionDescriptor",
-	              "id": 4
+	              "id": 2
 	            }
 	          }
 	        },
@@ -1489,6 +1509,11 @@
 	            "(.interop.service_id)": "interop.ContextLinkageService"
 	          },
 	          "methods": {
+	            "ContextLoadedStream": {
+	              "requestType": "Context",
+	              "responseType": "ContextLoadingUpdate",
+	              "responseStream": true
+	            },
 	            "CreateContext": {
 	              "requestType": "google.protobuf.Empty",
 	              "responseType": "Context"
@@ -1653,6 +1678,12 @@
 			"id": "interop.ContextLinkageService",
 			"methods": [
 				{
+					"name": "ContextLoadedStream",
+					"request": "interop.Context",
+					"response": "interop.ContextLoadingUpdate",
+					"type": "ServerStreaming"
+				},
+				{
 					"name": "CreateContext",
 					"request": "google.protobuf.Empty",
 					"response": "interop.Context",
@@ -1736,6 +1767,9 @@
 				{
 					"service": "interop.ContextLinkageService",
 					"methods": [
+						{
+							"name": "ContextLoadedStream"
+						},
 						{
 							"name": "CreateContext"
 						},
