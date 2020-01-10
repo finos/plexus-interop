@@ -906,6 +906,11 @@
 	            "Launch": {
 	              "requestType": "AppLaunchRequest",
 	              "responseType": "AppLaunchResponse"
+	            },
+	            "AppLaunchedEventStream": {
+	              "requestType": ".google.protobuf.Empty",
+	              "responseType": "AppLaunchedEvent",
+	              "responseStream": true
 	            }
 	          }
 	        },
@@ -963,6 +968,26 @@
 	            "appInstanceId": {
 	              "type": "UniqueId",
 	              "id": 1
+	            }
+	          }
+	        },
+	        "AppLaunchedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchedEvent"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            },
+	            "appIds": {
+	              "rule": "repeated",
+	              "type": "string",
+	              "id": 2
+	            },
+	            "referrer": {
+	              "type": "AppLaunchReferrer",
+	              "id": 3
 	            }
 	          }
 	        },
@@ -1557,6 +1582,12 @@
 					"request": "interop.AppLaunchRequest",
 					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
+				},
+				{
+					"name": "AppLaunchedEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.AppLaunchedEvent",
+					"type": "ServerStreaming"
 				}
 			],
 			"options": [
@@ -1669,6 +1700,9 @@
 					"methods": [
 						{
 							"name": "Launch"
+						},
+						{
+							"name": "AppLaunchedEventStream"
 						}
 					]
 				}

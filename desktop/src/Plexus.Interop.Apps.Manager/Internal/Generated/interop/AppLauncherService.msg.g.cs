@@ -41,29 +41,36 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiJpbnRlcm9wL2FwcF9sYXVuY2hlcl9zZXJ2aWNlLnByb3RvEgdpbnRlcm9w",
-            "GhdpbnRlcm9wL3VuaXF1ZV9pZC5wcm90bxodaW50ZXJvcC9hcHBfbGF1bmNo",
-            "X21vZGUucHJvdG8aFWludGVyb3Avb3B0aW9ucy5wcm90byLtAQoQQXBwTGF1",
-            "bmNoUmVxdWVzdBIOCgZhcHBfaWQYASABKAkSGgoSbGF1bmNoX3BhcmFtc19q",
-            "c29uGAIgASgJEisKC2xhdW5jaF9tb2RlGAMgASgOMhYuaW50ZXJvcC5BcHBM",
-            "YXVuY2hNb2RlEjQKGXN1Z2dlc3RlZF9hcHBfaW5zdGFuY2VfaWQYBCABKAsy",
-            "ES5pbnRlcm9wLlVuaXF1ZUlkEiwKCHJlZmVycmVyGAUgASgLMhouaW50ZXJv",
-            "cC5BcHBMYXVuY2hSZWZlcnJlcjocktsEGGludGVyb3AuQXBwTGF1bmNoUmVx",
-            "dWVzdCKYAQoRQXBwTGF1bmNoUmVmZXJyZXISDgoGYXBwX2lkGAEgASgJEioK",
-            "D2FwcF9pbnN0YW5jZV9pZBgCIAEoCzIRLmludGVyb3AuVW5pcXVlSWQSKAoN",
-            "Y29ubmVjdGlvbl9pZBgDIAEoCzIRLmludGVyb3AuVW5pcXVlSWQ6HZLbBBlp",
-            "bnRlcm9wLkFwcExhdW5jaFJlZmVycmVyIl4KEUFwcExhdW5jaFJlc3BvbnNl",
-            "EioKD2FwcF9pbnN0YW5jZV9pZBgBIAEoCzIRLmludGVyb3AuVW5pcXVlSWQ6",
-            "HZLbBBlpbnRlcm9wLkFwcExhdW5jaFJlc3BvbnNlMnUKEkFwcExhdW5jaGVy",
-            "U2VydmljZRI/CgZMYXVuY2gSGS5pbnRlcm9wLkFwcExhdW5jaFJlcXVlc3Qa",
-            "Gi5pbnRlcm9wLkFwcExhdW5jaFJlc3BvbnNlGh6S2wQaaW50ZXJvcC5BcHBM",
-            "YXVuY2hlclNlcnZpY2VCKaoCJlBsZXh1cy5JbnRlcm9wLkFwcHMuSW50ZXJu",
-            "YWwuR2VuZXJhdGVkYgZwcm90bzM="));
+            "Ghtnb29nbGUvcHJvdG9idWYvZW1wdHkucHJvdG8aF2ludGVyb3AvdW5pcXVl",
+            "X2lkLnByb3RvGh1pbnRlcm9wL2FwcF9sYXVuY2hfbW9kZS5wcm90bxoVaW50",
+            "ZXJvcC9vcHRpb25zLnByb3RvIu0BChBBcHBMYXVuY2hSZXF1ZXN0Eg4KBmFw",
+            "cF9pZBgBIAEoCRIaChJsYXVuY2hfcGFyYW1zX2pzb24YAiABKAkSKwoLbGF1",
+            "bmNoX21vZGUYAyABKA4yFi5pbnRlcm9wLkFwcExhdW5jaE1vZGUSNAoZc3Vn",
+            "Z2VzdGVkX2FwcF9pbnN0YW5jZV9pZBgEIAEoCzIRLmludGVyb3AuVW5pcXVl",
+            "SWQSLAoIcmVmZXJyZXIYBSABKAsyGi5pbnRlcm9wLkFwcExhdW5jaFJlZmVy",
+            "cmVyOhyS2wQYaW50ZXJvcC5BcHBMYXVuY2hSZXF1ZXN0IpgBChFBcHBMYXVu",
+            "Y2hSZWZlcnJlchIOCgZhcHBfaWQYASABKAkSKgoPYXBwX2luc3RhbmNlX2lk",
+            "GAIgASgLMhEuaW50ZXJvcC5VbmlxdWVJZBIoCg1jb25uZWN0aW9uX2lkGAMg",
+            "ASgLMhEuaW50ZXJvcC5VbmlxdWVJZDodktsEGWludGVyb3AuQXBwTGF1bmNo",
+            "UmVmZXJyZXIiXgoRQXBwTGF1bmNoUmVzcG9uc2USKgoPYXBwX2luc3RhbmNl",
+            "X2lkGAEgASgLMhEuaW50ZXJvcC5VbmlxdWVJZDodktsEGWludGVyb3AuQXBw",
+            "TGF1bmNoUmVzcG9uc2UimwEKEEFwcExhdW5jaGVkRXZlbnQSKgoPYXBwX2lu",
+            "c3RhbmNlX2lkGAEgASgLMhEuaW50ZXJvcC5VbmlxdWVJZBIPCgdhcHBfaWRz",
+            "GAIgAygJEiwKCHJlZmVycmVyGAMgASgLMhouaW50ZXJvcC5BcHBMYXVuY2hS",
+            "ZWZlcnJlcjocktsEGGludGVyb3AuQXBwTGF1bmNoZWRFdmVudDLEAQoSQXBw",
+            "TGF1bmNoZXJTZXJ2aWNlEj8KBkxhdW5jaBIZLmludGVyb3AuQXBwTGF1bmNo",
+            "UmVxdWVzdBoaLmludGVyb3AuQXBwTGF1bmNoUmVzcG9uc2USTQoWQXBwTGF1",
+            "bmNoZWRFdmVudFN0cmVhbRIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRoZLmlu",
+            "dGVyb3AuQXBwTGF1bmNoZWRFdmVudDABGh6S2wQaaW50ZXJvcC5BcHBMYXVu",
+            "Y2hlclNlcnZpY2VCKaoCJlBsZXh1cy5JbnRlcm9wLkFwcHMuSW50ZXJuYWwu",
+            "R2VuZXJhdGVkYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchModeReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchModeReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest), global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest.Parser, new[]{ "AppId", "LaunchParamsJson", "LaunchMode", "SuggestedAppInstanceId", "Referrer" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchReferrer), global::Plexus.Interop.Apps.Internal.Generated.AppLaunchReferrer.Parser, new[]{ "AppId", "AppInstanceId", "ConnectionId" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse), global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse.Parser, new[]{ "AppInstanceId" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse), global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse.Parser, new[]{ "AppInstanceId" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent), global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent.Parser, new[]{ "AppInstanceId", "AppIds", "Referrer" }, null, null, null)
           }));
     }
     #endregion
@@ -647,6 +654,195 @@ namespace Plexus.Interop.Apps.Internal.Generated {
               appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
             }
             input.ReadMessage(appInstanceId_);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class AppLaunchedEvent : pb::IMessage<AppLaunchedEvent> {
+    private static readonly pb::MessageParser<AppLaunchedEvent> _parser = new pb::MessageParser<AppLaunchedEvent>(() => new AppLaunchedEvent());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<AppLaunchedEvent> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLauncherServiceReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AppLaunchedEvent() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AppLaunchedEvent(AppLaunchedEvent other) : this() {
+      AppInstanceId = other.appInstanceId_ != null ? other.AppInstanceId.Clone() : null;
+      appIds_ = other.appIds_.Clone();
+      Referrer = other.referrer_ != null ? other.Referrer.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AppLaunchedEvent Clone() {
+      return new AppLaunchedEvent(this);
+    }
+
+    /// <summary>Field number for the "app_instance_id" field.</summary>
+    public const int AppInstanceIdFieldNumber = 1;
+    private global::Plexus.Interop.Apps.Internal.Generated.UniqueId appInstanceId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Plexus.Interop.Apps.Internal.Generated.UniqueId AppInstanceId {
+      get { return appInstanceId_; }
+      set {
+        appInstanceId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "app_ids" field.</summary>
+    public const int AppIdsFieldNumber = 2;
+    private static readonly pb::FieldCodec<string> _repeated_appIds_codec
+        = pb::FieldCodec.ForString(18);
+    private readonly pbc::RepeatedField<string> appIds_ = new pbc::RepeatedField<string>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<string> AppIds {
+      get { return appIds_; }
+    }
+
+    /// <summary>Field number for the "referrer" field.</summary>
+    public const int ReferrerFieldNumber = 3;
+    private global::Plexus.Interop.Apps.Internal.Generated.AppLaunchReferrer referrer_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Plexus.Interop.Apps.Internal.Generated.AppLaunchReferrer Referrer {
+      get { return referrer_; }
+      set {
+        referrer_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as AppLaunchedEvent);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(AppLaunchedEvent other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(AppInstanceId, other.AppInstanceId)) return false;
+      if(!appIds_.Equals(other.appIds_)) return false;
+      if (!object.Equals(Referrer, other.Referrer)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (appInstanceId_ != null) hash ^= AppInstanceId.GetHashCode();
+      hash ^= appIds_.GetHashCode();
+      if (referrer_ != null) hash ^= Referrer.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (appInstanceId_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(AppInstanceId);
+      }
+      appIds_.WriteTo(output, _repeated_appIds_codec);
+      if (referrer_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Referrer);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (appInstanceId_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(AppInstanceId);
+      }
+      size += appIds_.CalculateSize(_repeated_appIds_codec);
+      if (referrer_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Referrer);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(AppLaunchedEvent other) {
+      if (other == null) {
+        return;
+      }
+      if (other.appInstanceId_ != null) {
+        if (appInstanceId_ == null) {
+          appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+        }
+        AppInstanceId.MergeFrom(other.AppInstanceId);
+      }
+      appIds_.Add(other.appIds_);
+      if (other.referrer_ != null) {
+        if (referrer_ == null) {
+          referrer_ = new global::Plexus.Interop.Apps.Internal.Generated.AppLaunchReferrer();
+        }
+        Referrer.MergeFrom(other.Referrer);
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (appInstanceId_ == null) {
+              appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+            }
+            input.ReadMessage(appInstanceId_);
+            break;
+          }
+          case 18: {
+            appIds_.AddEntriesFrom(input, _repeated_appIds_codec);
+            break;
+          }
+          case 26: {
+            if (referrer_ == null) {
+              referrer_ = new global::Plexus.Interop.Apps.Internal.Generated.AppLaunchReferrer();
+            }
+            input.ReadMessage(referrer_);
             break;
           }
         }

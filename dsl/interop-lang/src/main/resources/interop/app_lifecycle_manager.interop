@@ -24,7 +24,7 @@ import "interop/context_linkage.proto";
 
 application AppLifecycleManager {
 
-	consumes AppLauncherService { Launch; }
+	consumes AppLauncherService { Launch; AppLaunchedEventStream; }
 
 	provides AppLifecycleService { ResolveApp; GetLifecycleEventStream; GetInvocationEventStream; }
 

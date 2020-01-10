@@ -1,137 +1,348 @@
-﻿namespace Plexus.Interop.Apps.Internal.Services
+﻿/**
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+namespace Plexus.Interop.Apps.Internal.Services
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
-    using Plexus.Channels;
     using Plexus.Interop.Apps.Internal.Generated;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
+    using ContextDto = Generated.Context;
     using UniqueId = Plexus.UniqueId;
 
     internal class ContextLinkageServiceImpl : AppLifecycleManagerClient.IContextLinkageServiceImpl
     {
+        private readonly IAppLifecycleManager _appLifecycleManager;
+
         public ContextLinkageServiceImpl(IAppLifecycleManager appLifecycleManager)
         {
-            appLifecycleManager.AppLaunchedAndConnected += OnAppLaunchedAndConnected;
+            _appLifecycleManager = appLifecycleManager;
             appLifecycleManager.AppConnected += OnAppConnected;
+            appLifecycleManager.AppDisconnected += OnAppDisconnected;
         }
 
-        private readonly ConcurrentDictionary<UniqueId, ConcurrentSet<string>> _contextsOfApp = new ConcurrentDictionary<UniqueId, ConcurrentSet<string>>();
-        private readonly ConcurrentDictionary<UniqueId, ConcurrentSet<AppConnectionDescriptor>> _connectionsOfApp = new ConcurrentDictionary<UniqueId, ConcurrentSet<AppConnectionDescriptor>>();
+        private readonly ContextsSet _contextsSet = new ContextsSet();
 
-        private void OnAppLaunchedAndConnected(AppLaunchedAndConnected newApplicationInfo)
+        public Task<ContextDto> CreateContext(Empty request, MethodCallContext callContext)
         {
-            foreach (var refererContextId in GetContextOfApplication(newApplicationInfo.ReferrerConnectionInfo.ApplicationInstanceId))
+            return Task.Factory.StartNew(() =>
             {
-                SetContextIdForApp(newApplicationInfo.AppInstanceId, refererContextId);
+                var newContext = _contextsSet.CreateContext();
+                foreach (var appConnection in _appLifecycleManager.GetAppInstanceConnections(callContext.ConsumerApplicationInstanceId))
+                {
+                    newContext.AppConnected(appConnection.Info);
+                }
+                return new ContextDto { Id = newContext.Id };
+            });
+        }
+
+        public void OnAppLaunched(AppLaunchedEvent appLaunchedEvent)
+        {
+            if (appLaunchedEvent.AppIds.Count == 0)
+            {
+                return;
+            }
+
+            var refererAppContexts = _contextsSet.GetContextsOf(appLaunchedEvent.Referrer.AppInstanceId.ToUniqueId());
+
+            var appInstanceId = appLaunchedEvent.AppInstanceId.ToUniqueId();
+
+            foreach (var refererContext in refererAppContexts)
+            {
+                refererContext.AppLaunched(appInstanceId, appLaunchedEvent.AppIds);
             }
         }
 
-        private void OnAppConnected(AppConnectionDescriptor obj)
+        private void OnAppConnected(AppConnectionDescriptor appConnection)
         {
-
+            var contextsOfApp = _contextsSet.GetContextsOf(appConnection.ApplicationInstanceId);
+            foreach (var context in contextsOfApp)
+            {
+                context.AppConnected(appConnection);
+            }
         }
 
-        public Task ContextLoadedStream(Context request, IWritableChannel<ContextLoadingUpdate> responseStream, MethodCallContext context)
+        private void OnAppDisconnected(AppConnectionDescriptor connectionDescriptor)
         {
-            throw new NotImplementedException();
+            var contextsOfApp = _contextsSet.GetContextsOf(connectionDescriptor.ApplicationInstanceId);
+            foreach (var context in contextsOfApp)
+            {
+                context.AppDisconnected(connectionDescriptor);
+            }
         }
 
-        public Task<Context> CreateContext(Empty request, MethodCallContext context)
+        public Task<Empty> JoinContext(ContextDto request, MethodCallContext callContext)
         {
             return Task.Factory.StartNew(() =>
             {
-                var newContextId = Guid.NewGuid().ToString();
-                SetContextIdForApp(context.ConsumerApplicationInstanceId, newContextId);
-                return new Context { Id = newContextId };
-            });
-        }
-
-        public Task<Empty> JoinContext(Context request, MethodCallContext context)
-        {
-            return Task.Factory.StartNew(() =>
-            {
-                SetContextIdForApp(context.ConsumerApplicationInstanceId, request.Id);
+                var context = _contextsSet.GetContext(request.Id);
+                if (context == null)
+                {
+                    throw new Exception($"There is no context with {request.Id} id");
+                }
+                foreach (var appConnection in _appLifecycleManager.GetAppInstanceConnections(callContext.ConsumerApplicationInstanceId))
+                {
+                    context.AppConnected(appConnection.Info);
+                }
                 return new Empty();
             });
         }
 
-        public Task<Empty> AttachApplicationToContext(AttachRequest request, MethodCallContext context)
+        public Task<ContextsList> GetContexts(Empty request, MethodCallContext callContext)
         {
             return Task.Factory.StartNew(() =>
             {
-                SetContextIdForApp(request.AppInstanceId.ToUniqueId(), request.Context.Id);
-                return new Empty();
-            });
-        }
-
-        public Task<ContextsList> GetContexts(Empty request, MethodCallContext context)
-        {
-            return Task.Factory.StartNew(() =>
-            {
-                var allContexts = new HashSet<string>(_contextsOfApp.Values.SelectMany(set => set.AsEnumerable()));
+                var allContexts = _contextsSet.GetContextsOf(callContext.ConsumerApplicationInstanceId);
                 return new ContextsList
                 {
-                    Contexts = { allContexts.Select(contextId => new Context { Id = contextId }) }
+                    Contexts = { allContexts.Select(context => new ContextDto { Id = context.Id }) }
                 };
             });
         }
 
-        public Task<InvocationsList> GetLinkedInvocations(Context request, MethodCallContext context)
+        public Task<InvocationsList> GetLinkedInvocations(ContextDto request, MethodCallContext callContext)
         {
             return Task.Factory.StartNew(() =>
             {
-                var allAppsInContext = _contextsOfApp.Where(pair => pair.Value.Contains(request.Id)).Select(pair => pair.Key);
-                var allConnectionsOfApps = allAppsInContext.SelectMany(GetConnectionsOfApp);
-                return new InvocationsList
+                var context = _contextsSet.GetContext(request.Id);
+                if (context == null)
                 {
-                    Invocations = { allConnectionsOfApps.Select(appConnection  => new InvocationRef
+                    throw new Exception($"There is no context with {request.Id} id");
+                }
+
+                return CreateInvocationsList(context);
+            });
+        }
+
+        public Task<ContextToInvocationsList> GetAllLinkedInvocations(Empty request, MethodCallContext callContext)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var allContexts = _contextsSet.GetAllContexts();
+                return new ContextToInvocationsList
+                {
+                    Contexts = { allContexts.Select(context => new ContextToInvocations
                     {
-                        Target = new Generated.AppConnectionDescriptor
-                        {
-                            AppInstanceId = appConnection.ApplicationInstanceId.ToProto(),
-                            AppId = appConnection.ApplicationId,
-                            ConnectionId = appConnection.ConnectionId.ToProto(),
-                        },
-                        
+                        Context = new ContextDto {Id = context.Id},
+                        Invocations = CreateInvocationsList(context),
                     })}
                 };
             });
         }
 
-        public Task<ContextToInvocationsList> GetAllLinkedInvocations(Empty request, MethodCallContext context)
+        private static InvocationsList CreateInvocationsList(Context context)
         {
-            throw new NotImplementedException();
+            return new InvocationsList
+            {
+                Invocations =
+                {
+                    context.GetConnectedApps().Select(connection => new InvocationRef
+                    {
+                        Target = new Generated.AppConnectionDescriptor
+                        {
+                            AppInstanceId = connection.ApplicationInstanceId.ToProto(),
+                            AppId = connection.ApplicationId,
+                            ConnectionId = connection.ConnectionId.ToProto(),
+                        }
+                    })
+                }
+            };
         }
 
-        private void SetContextIdForApp(UniqueId appInstanceId, string contextId)
+        private class ContextsSet
         {
-            _contextsOfApp.AddOrUpdate(appInstanceId, s => new ConcurrentSet<string> { contextId }, (s, bag) =>
+            public Context CreateContext()
             {
-                bag.Add(contextId);
-                return bag;
-            });
-        }
-
-        private IEnumerable<string> GetContextOfApplication(UniqueId appInstanceId)
-        {
-            if (_contextsOfApp.TryGetValue(appInstanceId, out var contexts))
-            {
-                return contexts.Select(i => i.ToString()).ToList();
+                var context = new Context(this);
+                _contexts[context.Id] = context;
+                return context;
             }
-            return Enumerable.Empty<string>();
+
+            public IReadOnlyCollection<Context> GetContextsOf(UniqueId appInstanceId)
+            {
+                lock (_lock)
+                {
+                    if (_contextsOfAppInstance.TryGetValue(appInstanceId, out var contexts))
+                    {
+                        return contexts.ToArray();
+                    }
+                }
+                return new Context[0];
+            }
+
+            private readonly object _lock = new object();
+
+            private readonly Dictionary<UniqueId, HashSet<Context>> _contextsOfAppInstance = new Dictionary<UniqueId, HashSet<Context>>();
+            private readonly Dictionary<string, Context> _contexts = new Dictionary<string, Context>();
+
+            public Context GetContext(string contextId)
+            {
+                lock (_lock)
+                {
+                    _contexts.TryGetValue(contextId, out var context);
+                    return context;
+                }
+            }
+
+            public void BindContext(UniqueId appInstanceId, Context context)
+            {
+                lock (_lock)
+                {
+                    if (!_contextsOfAppInstance.TryGetValue(appInstanceId, out var contexts))
+                    {
+                        contexts = new HashSet<Context>();
+                        _contextsOfAppInstance[appInstanceId] = contexts;
+                    }
+                    contexts.Add(context);
+                }
+            }
+
+            public IReadOnlyCollection<Context> GetAllContexts()
+            {
+                lock (_lock)
+                {
+                    return _contexts.Values.ToArray();
+                }
+            }
         }
 
-        private IEnumerable<AppConnectionDescriptor> GetConnectionsOfApp(UniqueId appInstanceId)
+        private class Context
         {
-            if (_connectionsOfApp.TryGetValue(appInstanceId, out var connectionDescriptors))
+            private readonly ContextsSet _contextsSet;
+
+            public Context(ContextsSet contextsSet)
             {
-                return connectionDescriptors;
+                _contextsSet = contextsSet;
             }
-            return Enumerable.Empty<AppConnectionDescriptor>();
+
+            public string Id { get; } = Guid.NewGuid().ToString();
+
+            private readonly object _lock = new object();
+
+            private readonly Dictionary<UniqueId, AppConnectionsSet> _appInstanceIdsToConnections = new Dictionary<UniqueId, AppConnectionsSet>();
+
+            public void AppLaunched(UniqueId appInstanceId, IEnumerable<string> appIds)
+            {
+                _contextsSet.BindContext(appInstanceId, this);
+                var appConnectionsSet = GetOrCreateAppConnectionsSet(appInstanceId);
+                appConnectionsSet.AppLaunched(appIds);
+            }
+
+            public void AppConnected(AppConnectionDescriptor appConnection)
+            {
+                _contextsSet.BindContext(appConnection.ApplicationInstanceId, this);
+                var appConnectionsSet = GetOrCreateAppConnectionsSet(appConnection.ApplicationInstanceId);
+                appConnectionsSet.AppConnected(appConnection);
+            }
+
+            public void AppDisconnected(AppConnectionDescriptor appConnection)
+            {
+                lock (_lock)
+                {
+                    if (_appInstanceIdsToConnections.TryGetValue(appConnection.ApplicationInstanceId, out var appConnectionsSet))
+                    {
+                        appConnectionsSet.AppDisconnected(appConnection);
+                    }
+                }
+            }
+
+            private AppConnectionsSet GetOrCreateAppConnectionsSet(UniqueId appInstanceId)
+            {
+                AppConnectionsSet appConnectionsSet;
+                lock (_lock)
+                {
+                    if (!_appInstanceIdsToConnections.TryGetValue(appInstanceId, out appConnectionsSet))
+                    {
+                        appConnectionsSet = new AppConnectionsSet(appInstanceId);
+                        _appInstanceIdsToConnections[appInstanceId] = appConnectionsSet;
+                    }
+                }
+
+                return appConnectionsSet;
+            }
+
+            public IReadOnlyCollection<AppConnectionDescriptor> GetConnectedApps()
+            {
+                lock (_lock)
+                {
+                    return _appInstanceIdsToConnections.Values.SelectMany(connections => connections.GetOnlineConnections()).ToArray();
+                }
+            }
+        }
+
+        private class AppConnectionsSet
+        {
+            private readonly UniqueId _appInstanceId;
+
+            private readonly object _lock = new object();
+            private readonly Dictionary<string, AppConnectionDescriptor> _appConnectionMap = new Dictionary<string, AppConnectionDescriptor>();
+            private int _loadingAppsCount = 0;
+
+            public AppConnectionsSet(UniqueId appInstanceId)
+            {
+                _appInstanceId = appInstanceId;
+            }
+
+            public void AppLaunched(IEnumerable<string> appIds)
+            {
+                lock (_lock)
+                {
+                    foreach (var appId in appIds)
+                    {
+                        if (!_appConnectionMap.ContainsKey(appId))
+                        {
+                            _appConnectionMap[appId] = null;
+                            _loadingAppsCount++;
+                        }
+                    }
+                }
+            }
+
+            public void AppConnected(AppConnectionDescriptor appConnection)
+            {
+                lock (_lock)
+                {
+                    var appId = appConnection.ApplicationId;
+                    if (_appConnectionMap.TryGetValue(appId, out var connectionDescriptor) && connectionDescriptor == null)
+                    {
+                        _loadingAppsCount--;
+                    }
+                    _appConnectionMap[appId] = appConnection;
+                }
+            }
+
+            public void AppDisconnected(AppConnectionDescriptor appConnection)
+            {
+                lock (_lock)
+                {
+                    var appId = appConnection.ApplicationId;
+                    _appConnectionMap.Remove(appId);
+                }
+            }
+
+            public IReadOnlyCollection<AppConnectionDescriptor> GetOnlineConnections()
+            {
+                lock (_lock)
+                {
+                    return _appConnectionMap.Values.Where(descriptor => descriptor != null).ToArray();
+                }
+            }
         }
     }
 }

@@ -41,6 +41,6 @@
 
         event Action<AppConnectionDescriptor> AppDisconnected;
 
-        event Action<AppLaunchedAndConnected> AppLaunchedAndConnected;
+        IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId);
     }
 }

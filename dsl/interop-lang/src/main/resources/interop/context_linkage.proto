@@ -5,6 +5,7 @@ package interop;
 import "google/protobuf/empty.proto";
 import "interop/unique_id.proto";
 import "interop/app_connection_descriptor.proto";
+import "interop/app_metadata_service.proto";
 
 message Context {
 	string id = 1;
@@ -15,10 +16,8 @@ message ContextsList {
 }
 
 message InvocationRef {
-	string service_id = 1;
-	string service_alias = 2;
-	string method_id = 3;
-	interop.AppConnectionDescriptor target = 4;
+	interop.AppMetamodelInfo app_info = 1;
+	interop.AppConnectionDescriptor target = 2;
 }
 
 message InvocationsList {

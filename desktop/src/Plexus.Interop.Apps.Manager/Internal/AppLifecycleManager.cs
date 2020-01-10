@@ -40,21 +40,33 @@ namespace Plexus.Interop.Apps.Internal
             = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
 
         private readonly IAppRegistryProvider _appRegistryProvider;
-        private readonly Lazy<IClient> _clientLazy;
+        private readonly Lazy<AppLauncherService.ILaunchProxy> _appLauncherLazy;
 
-        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, Lazy<IClient> clientLazy)
+        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, Lazy<AppLauncherService.ILaunchProxy> appLauncherLazy)
         {
             _appRegistryProvider = appRegistryProvider;
-            _clientLazy = clientLazy;
+            _appLauncherLazy = appLauncherLazy;
         }        
 
         private ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();
+
+        public event Action<AppLaunchedEvent> AppLaunched = delegate { }; 
 
         public event Action<AppConnectionDescriptor> AppConnected = delegate { };
 
         public event Action<AppConnectionDescriptor> AppDisconnected = delegate { };
 
-        public event Action<AppLaunchedAndConnected> AppLaunchedAndConnected = delegate { };
+        public IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId)
+        {
+            lock (_connections)
+            {
+                if (_appInstanceConnections.TryGetValue(appInstanceId, out Dictionary<string, IAppConnection> connections))
+                {
+                    return connections.Values.ToList();
+                }
+                return new IAppConnection[0];
+            }
+        }
 
         public IAppConnection AcceptConnection(
             ITransportConnection connection,
@@ -226,8 +238,6 @@ namespace Plexus.Interop.Apps.Internal
 
                 var appConnection = await connectionPromise.Task.ConfigureAwait(false);
 
-                AppLaunchedAndConnected(new AppLaunchedAndConnected(appInstanceId, appId, appConnection, referrerConnectionInfo));
-
                 return appConnection;
             }
             finally
@@ -258,9 +268,6 @@ namespace Plexus.Interop.Apps.Internal
 
             Log.Debug("Sending request to launcher {0}: appId={1}, params={2}", appDto.LauncherId, appId, appDto.LauncherParams);
 
-            var launchMethodReference =
-                ProvidedMethodReference.Create("interop.AppLauncherService", "Launch", appDto.LauncherId);
-
             var referrer = new AppLaunchReferrer
             {
                 AppId = referrerConnectionInfo.ApplicationId,
@@ -277,9 +284,7 @@ namespace Plexus.Interop.Apps.Internal
                 Referrer = referrer
             };
 
-            var response = await _clientLazy.Value.CallInvoker
-                .CallUnary<AppLaunchRequest, AppLaunchResponse>(launchMethodReference.CallDescriptor, request)
-                .ConfigureAwait(false);
+            var response = await _appLauncherLazy.Value.Launch(request).ConfigureAwait(false);
 
             var appInstanceId = UniqueId.FromHiLo(response.AppInstanceId.Hi, response.AppInstanceId.Lo);
 
