@@ -13,6 +13,13 @@
     <ProjectReference Include="..\Plexus.Common.Contracts\Plexus.Common.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Apps.Manager.Contracts\Plexus.Interop.Apps.Manager.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Client\Plexus.Interop.Client.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Metamodel.Contracts\Plexus.Interop.Metamodel.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reactive">
+      <Version>3.1.1</Version>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

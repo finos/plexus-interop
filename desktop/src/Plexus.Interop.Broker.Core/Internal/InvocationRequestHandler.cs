@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@ namespace Plexus.Interop.Broker.Internal
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly IRegistryService _registryService;
+        private readonly IInvocationEventProvider _invocationEventProvider;
         private readonly IProtocolMessageFactory _protocolMessageFactory;
         private readonly IProtocolSerializer _protocolSerializer;
         private readonly InvocationTargetHandler<IInvocationStartRequested, IAppConnection> _createRequestHandler;
@@ -44,12 +45,14 @@ namespace Plexus.Interop.Broker.Internal
         public InvocationRequestHandler(
             IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
-            IRegistryService registryService)
+            IRegistryService registryService,
+            IInvocationEventProvider invocationEventProvider)
         {
             _appLifecycleManager = appLifecycleManager;            
             _protocolMessageFactory = protocol.MessageFactory;
             _protocolSerializer = protocol.Serializer;
             _registryService = registryService;
+            _invocationEventProvider = invocationEventProvider;
             _createRequestHandler = new InvocationTargetHandler<IInvocationStartRequested, IAppConnection>(CreateInvocationTarget, CreateInvocationTarget);
             _resolveTargetConnectionHandler = new InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection>(ResolveTargetConnectionAsync, ResolveTargetConnectionAsync);
             _stopwatch.Start();
@@ -90,7 +93,7 @@ namespace Plexus.Interop.Broker.Internal
                         invocationRequested.ServiceId, 
                         invocationRequested.ServiceAlias.GetValueOrDefault(), 
                         invocationRequested.MethodId);
-                    _appLifecycleManager.OnInvocationStarted(new InvocationStartedEventDescriptor(callDescriptor));
+                    _invocationEventProvider.OnInvocationStarted(new InvocationStartedEventDescriptor(callDescriptor));
                     var serialized = _protocolSerializer.Serialize(invocationRequested);
                     try
                     {
@@ -148,7 +151,7 @@ namespace Plexus.Interop.Broker.Internal
             {
                 return;
             }
-            _appLifecycleManager.OnInvocationFinished(
+            _invocationEventProvider.OnInvocationFinished(
                 new InvocationFinishedEventDescriptor(
                     callDescriptor,
                     callResult,

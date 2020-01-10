@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,16 +16,13 @@
  */
 ﻿namespace Plexus.Interop.Apps
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Plexus.Interop.Transport;
 
     public interface IAppLifecycleManager
     {
-        Task StartAsync();
-
-        Task StopAsync();
-
         IAppConnection AcceptConnection(ITransportConnection connection, AppConnectionDescriptor connectionInfo);
 
         void RemoveConnection(IAppConnection connection);
@@ -40,8 +37,8 @@
 
         Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
 
-        void OnInvocationStarted(InvocationStartedEventDescriptor eventData);
+        event Action<AppConnectionDescriptor> AppConnected;
 
-        void OnInvocationFinished(InvocationFinishedEventDescriptor eventData);
+        event Action<AppConnectionDescriptor> AppDisconnected;
     }
 }

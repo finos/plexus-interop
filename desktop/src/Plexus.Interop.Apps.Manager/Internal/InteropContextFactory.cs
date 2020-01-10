@@ -1,5 +1,5 @@
-/**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+﻿/**
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps
+namespace Plexus.Interop.Apps.Internal
 {
-    using Plexus.Interop.Apps.Internal;
+    using Plexus.Interop.Metamodel;
 
-    public sealed class AppLifecycleManagerFactory
+    public sealed class InteropContextFactory
     {
-        public static AppLifecycleManagerFactory Instance = new AppLifecycleManagerFactory();
+        public static readonly InteropContextFactory Instance = new InteropContextFactory();
 
-        public IAppLifecycleManager Create(string metadataDir)
+        public IInteropContext Create(string metadataDir, IRegistryProvider registryProvider)
         {
-            return new AppLifecycleManager(metadataDir);
+            return new InteropContext(metadataDir, registryProvider);
         }
     }
 }

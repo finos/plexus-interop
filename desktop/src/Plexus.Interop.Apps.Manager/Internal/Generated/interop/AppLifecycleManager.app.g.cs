@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,10 +48,12 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		
 		public AppLifecycleManagerClient(
 			AppLifecycleManagerClient.IAppLifecycleServiceImpl appLifecycleService,
+			AppLifecycleManagerClient.IAppMetadataServiceImpl appMetadataService,
 			Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null
 		)
 		:this(new AppLifecycleManagerClient.ServiceBinder(
-			appLifecycleService
+			appLifecycleService,
+			appMetadataService
 		), setup) { }
 		
 		public AppLifecycleManagerClient(AppLifecycleManagerClient.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
@@ -62,15 +64,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		public sealed partial class ServiceBinder {
 			
 			public ServiceBinder(
-				AppLifecycleManagerClient.IAppLifecycleServiceImpl appLifecycleService
+				AppLifecycleManagerClient.IAppLifecycleServiceImpl appLifecycleService,
+				AppLifecycleManagerClient.IAppMetadataServiceImpl appMetadataService
 			) {
 				_appLifecycleServiceBinder = new AppLifecycleManagerClient.AppLifecycleServiceBinder(appLifecycleService);
+				_appMetadataServiceBinder = new AppLifecycleManagerClient.AppMetadataServiceBinder(appMetadataService);
 			}
 			
 			private AppLifecycleServiceBinder _appLifecycleServiceBinder;
+			private AppMetadataServiceBinder _appMetadataServiceBinder;
 			
 			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
 				builder = _appLifecycleServiceBinder.Bind(builder);
+				builder = _appMetadataServiceBinder.Bind(builder);
 				return builder;
 			}
 		}
@@ -153,6 +159,73 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			public Task GetInvocationEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent> responseStream, MethodCallContext context) {
 				return _impl.GetInvocationEventStream(request, responseStream, context);
+			}
+		}
+		
+		public partial interface IAppMetadataServiceImpl:
+			global::Plexus.Interop.Apps.Internal.Generated.AppMetadataService.IGetAppMetadataChangedEventStreamImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppMetadataService.IGetMetamodelChangedEventStreamImpl
+		{ }
+		
+		private sealed partial class AppMetadataServiceBinder {
+			
+			
+			private readonly IAppMetadataServiceImpl _impl;
+			
+			public AppMetadataServiceBinder(IAppMetadataServiceImpl impl) {
+				_impl = impl;
+			}
+			
+			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
+				return builder.WithProvidedService(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataService.Id, Bind);
+			}
+			
+			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
+				builder = builder.WithServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent>(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataService.GetAppMetadataChangedEventStreamMethodId, _impl.GetAppMetadataChangedEventStream);
+				builder = builder.WithServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent>(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataService.GetMetamodelChangedEventStreamMethodId, _impl.GetMetamodelChangedEventStream);
+				return builder; 							
+			}
+		}
+		
+		public sealed partial class AppMetadataServiceImpl: IAppMetadataServiceImpl
+		{
+			private readonly ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> _getAppMetadataChangedEventStreamHandler;
+			private readonly ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> _getMetamodelChangedEventStreamHandler;
+			
+			public AppMetadataServiceImpl(
+				ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> getAppMetadataChangedEventStreamHandler,
+				ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> getMetamodelChangedEventStreamHandler
+			) {
+				_getAppMetadataChangedEventStreamHandler = getAppMetadataChangedEventStreamHandler;
+				_getMetamodelChangedEventStreamHandler = getMetamodelChangedEventStreamHandler;
+			}
+			
+			public Task GetAppMetadataChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> responseStream, MethodCallContext context) {
+				return _getAppMetadataChangedEventStreamHandler(request, responseStream, context);
+			}
+			
+			public Task GetMetamodelChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> responseStream, MethodCallContext context) {
+				return _getMetamodelChangedEventStreamHandler(request, responseStream, context);
+			}
+		}					
+		
+		public sealed partial class AppMetadataServiceImpl<T>: IAppMetadataServiceImpl
+			where T:
+			global::Plexus.Interop.Apps.Internal.Generated.AppMetadataService.IGetAppMetadataChangedEventStreamImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppMetadataService.IGetMetamodelChangedEventStreamImpl
+		{
+			private readonly T _impl;
+			
+			public AppMetadataServiceImpl(T impl) {
+				_impl = impl;
+			}
+			
+			public Task GetAppMetadataChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent> responseStream, MethodCallContext context) {
+				return _impl.GetAppMetadataChangedEventStream(request, responseStream, context);
+			}
+			
+			public Task GetMetamodelChangedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent> responseStream, MethodCallContext context) {
+				return _impl.GetMetamodelChangedEventStream(request, responseStream, context);
 			}
 		}
 		
