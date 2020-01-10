@@ -20,7 +20,6 @@
     "@plexus-interop/metadata": "0.1.0",
     "@plexus-interop/client": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
-    "rxjs": "^5.5.2",
     "tslib": "1.9.0"
   },
   "main": "dist/main/src/index.js",
@@ -30,6 +29,7 @@
     "jest": "^23.5.0",
     "trash-cli": "^1.4.0",
     "tslint": "5.8.0",
+    "rxjs": "^5.5.2",
     "typescript": "3.7.2",
     "browserify": "^14.5.0",
     "yarn": "^1.17.3"

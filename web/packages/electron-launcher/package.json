@@ -12,7 +12,6 @@
     "package": "browserify ./dist/main/src/launcher/Main.js -x electron --ignore-missing --node --outfile ./dist/electronLauncher.bundle.js",
     "copy-gen-folders": "copyfiles src/launcher/gen/* dist/main",
     "build:main": "tsc -p tsconfig.json",
-    "republish": "echo 'Not implemented'",
     "pretest": "yarn lint",
     "test": "yarn unit",
     "unit": "yarn build && jest --coverage",

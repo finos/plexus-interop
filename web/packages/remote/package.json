@@ -16,9 +16,11 @@
   },
   "dependencies": {
     "@plexus-interop/common": "0.1.0",
-    "rxjs": "^5.5.2",
     "superagent": "3.8.2",
     "tslib": "1.9.0"
+  },
+  "peerDependencies": {
+    "rxjs": "^5.5.2"
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {

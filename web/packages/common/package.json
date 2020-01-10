@@ -18,7 +18,6 @@
   "dependencies": {
     "@types/loglevel": "^1.4.29",
     "@types/long": "^4.0.0",
-    "core-js": "^2.5.3",
     "loglevel": "^1.4.1",
     "loglevel-plugin-prefix": "^0.5.3",
     "long": "^4.0.0",

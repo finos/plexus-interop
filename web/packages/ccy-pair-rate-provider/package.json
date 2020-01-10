@@ -15,8 +15,7 @@
     "copy-assets": "copyfiles src/gen/* dist/main && copyfiles -f src/views/* dist",
     "package": "browserify ./dist/main/src/index.js --outfile ./dist/app.bundle.js",
     "build": "npm run compile && npm run copy-assets && npm run package",
-    "postbuild": "copyfiles ./dist/* -f ../../../bin/win-x86/samples/quick-start/apps/WebCcyPairRateProvider",
-    "republish": "echo 'Not implemented'"
+    "postbuild": "copyfiles ./dist/* -f ../../../bin/win-x86/samples/quick-start/apps/WebCcyPairRateProvider"
   },
   "devDependencies": {
     "browserify": "^14.5.0",
