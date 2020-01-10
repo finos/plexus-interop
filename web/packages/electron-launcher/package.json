@@ -30,6 +30,9 @@
   ],
   "dependencies": {
     "@plexus-interop/client": "0.1.0",
+    "@plexus-interop/common": "0.1.0",
+    "@plexus-interop/transport-common": "0.1.0",
+    "@plexus-interop/protocol": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
     "minimist": "^1.2.0",
     "strip-bom": "^3.0.0",

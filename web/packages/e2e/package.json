@@ -40,6 +40,7 @@
     "@plexus-interop/common-api-impl": "0.1.0",
     "@plexus-interop/client-api": "0.1.0",
     "@plexus-interop/common": "0.1.0",
+    "@plexus-interop/io": "0.1.0",
     "@plexus-interop/transport-common": "0.1.0",
     "@plexus-interop/protocol": "0.1.0",
     "@plexus-interop/metadata": "0.1.0",
