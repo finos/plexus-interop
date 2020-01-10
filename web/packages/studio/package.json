@@ -69,7 +69,7 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "5.8.0",
-    "typescript": "3.3.3",
+    "typescript": "3.7.2",
     "prr": "1.0.1"
   },
   "jest": {
