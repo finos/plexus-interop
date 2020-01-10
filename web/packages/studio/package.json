@@ -58,7 +58,7 @@
     "copyfiles": "^1.2.0",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",
-    "jest": "23.5.0",
+    "jest": "^23.5.0",
     "jest-preset-angular": "^6.0.0",
     "karma": "^1.7.1",
     "karma-chrome-launcher": "^2.2.0",

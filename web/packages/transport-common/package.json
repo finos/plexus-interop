@@ -42,7 +42,7 @@
     "copyfiles": "^1.2.0",
     "glob": "^7.1.2",
     "jasmine-reporters": "^2.2.0",
-    "jest": "23.5.0",
+    "jest": "^23.5.0",
     "jest-cli": "^23.0.0",
     "minimist": "^1.2.0",
     "mocha": "^3.5.0",

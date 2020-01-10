@@ -42,7 +42,7 @@
     "@types/fs-extra": "5.0.1",
     "chai": "^4.1.0",
     "if-env": "1.0.0",
-    "jest": "23.5.0",
+    "jest": "^23.5.0",
     "copyfiles": "^1.2.0",
     "renamer": "^0.6.1",
     "trash": "^4.1.0",
