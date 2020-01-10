@@ -52,7 +52,7 @@ namespace Plexus.Interop.Apps.Internal
 
             var appMetadataService = new AppMetadataServiceImpl(appRegistryProvider, registryProvider);
             _appLifecycleService = new AppLifecycleServiceImpl(_appLifecycleManager);
-            _contextLinkageService = new ContextLinkageServiceImpl(_appLifecycleManager);
+            _contextLinkageService = new ContextLinkageServiceImpl(registryProvider, _appLifecycleManager);
 
             _lifecycleManagerClient = new AppLifecycleManagerClient(
                 _appLifecycleService,

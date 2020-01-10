@@ -19,26 +19,31 @@ namespace Plexus.Interop.Apps.Internal.Services
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
     using Plexus.Channels;
     using Plexus.Interop.Apps.Internal.Generated;
+    using Plexus.Interop.Metamodel;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
     using ContextDto = Generated.Context;
     using UniqueId = Plexus.UniqueId;
 
     internal class ContextLinkageServiceImpl : AppLifecycleManagerClient.IContextLinkageServiceImpl
     {
+        private readonly IRegistryProvider _appRegistryProvider;
         private readonly IAppLifecycleManager _appLifecycleManager;
 
-        public ContextLinkageServiceImpl(IAppLifecycleManager appLifecycleManager)
+        private readonly ContextsSet _contextsSet = new ContextsSet();
+
+        public ContextLinkageServiceImpl(IRegistryProvider appRegistryProvider, IAppLifecycleManager appLifecycleManager)
         {
+            _appRegistryProvider = appRegistryProvider;
             _appLifecycleManager = appLifecycleManager;
             appLifecycleManager.AppConnected += OnAppConnected;
             appLifecycleManager.AppDisconnected += OnAppDisconnected;
         }
-
-        private readonly ContextsSet _contextsSet = new ContextsSet();
 
         public Task<ContextDto> CreateContext(Empty request, MethodCallContext callContext)
         {
@@ -147,12 +152,17 @@ namespace Plexus.Interop.Apps.Internal.Services
             });
         }
 
-        public Task ContextLoadedStream(ContextDto request, IWritableChannel<ContextLoadingUpdate> responseStream, MethodCallContext context)
+        public async Task ContextLoadedStream(ContextDto request, IWritableChannel<ContextLoadingUpdate> responseStream, MethodCallContext callContext)
         {
-            throw new NotImplementedException();
+            await _contextsSet.LoadingStatusChanged
+                .Select(context => new ContextLoadingUpdate
+                {
+                    LoadedAppDescriptors = { context.GetConnectedApps().Select(ConvertToProto) },
+                    Status = context.IsLoading ? ContextLoadingStatus.InProgress : ContextLoadingStatus.Finished,
+                }).PipeAsync(responseStream, callContext.CancellationToken);
         }
 
-        private static InvocationsList CreateInvocationsList(Context context)
+        private InvocationsList CreateInvocationsList(Context context)
         {
             return new InvocationsList
             {
@@ -160,23 +170,45 @@ namespace Plexus.Interop.Apps.Internal.Services
                 {
                     context.GetConnectedApps().Select(connection => new InvocationRef
                     {
-                        Target = new Generated.AppConnectionDescriptor
-                        {
-                            AppInstanceId = connection.ApplicationInstanceId.ToProto(),
-                            AppId = connection.ApplicationId,
-                            ConnectionId = connection.ConnectionId.ToProto(),
-                        }
+                        Target = ConvertToProto(connection),
+                        AppInfo = GetAppInfo(connection.ApplicationId),
                     })
                 }
             };
         }
 
+        private static Generated.AppConnectionDescriptor ConvertToProto(AppConnectionDescriptor connection)
+        {
+            return new Generated.AppConnectionDescriptor
+            {
+                AppInstanceId = connection.ApplicationInstanceId.ToProto(),
+                AppId = connection.ApplicationId,
+                ConnectionId = connection.ConnectionId.ToProto(),
+            };
+        }
+
+        private AppMetamodelInfo GetAppInfo(string appId)
+        {
+            var appInfo = _appRegistryProvider.Current.Applications[appId];
+            return AppMetadataServiceImpl.ConvertToAppMetamodelInfo(appInfo);
+        }
+
         private class ContextsSet
         {
+            public ContextsSet()
+            {
+                LoadingStatusChanged = _loadingStatusSubject;
+            }
+
+            private readonly Subject<Context> _loadingStatusSubject = new Subject<Context>();
+
+            public IObservable<Context> LoadingStatusChanged { get; }
+
             public Context CreateContext()
             {
                 var context = new Context(this);
                 _contexts[context.Id] = context;
+                context.IsLoadingStatus.Select(isLoading => context).Subscribe(_loadingStatusSubject);
                 return context;
             }
 
@@ -235,13 +267,21 @@ namespace Plexus.Interop.Apps.Internal.Services
             public Context(ContextsSet contextsSet)
             {
                 _contextsSet = contextsSet;
+                IsLoadingStatus = _loadingStatusSubject.DistinctUntilChanged();
             }
 
             public string Id { get; } = Guid.NewGuid().ToString();
 
             private readonly object _lock = new object();
 
+            private readonly HashSet<AppConnectionsSet> _loadingAppsSet = new HashSet<AppConnectionsSet>();
             private readonly Dictionary<UniqueId, AppConnectionsSet> _appInstanceIdsToConnections = new Dictionary<UniqueId, AppConnectionsSet>();
+
+            private readonly BehaviorSubject<bool> _loadingStatusSubject = new BehaviorSubject<bool>(false);
+
+            public IObservable<bool> IsLoadingStatus { get; }
+
+            public bool IsLoading => _loadingStatusSubject.Value;
 
             public void AppLaunched(UniqueId appInstanceId, IEnumerable<string> appIds)
             {
@@ -276,11 +316,32 @@ namespace Plexus.Interop.Apps.Internal.Services
                     if (!_appInstanceIdsToConnections.TryGetValue(appInstanceId, out appConnectionsSet))
                     {
                         appConnectionsSet = new AppConnectionsSet(appInstanceId);
+                        appConnectionsSet.IsLoadingStatus.Subscribe(newStatus => AppConnectionsSetLoadingStatusChanged(appConnectionsSet, newStatus));
                         _appInstanceIdsToConnections[appInstanceId] = appConnectionsSet;
                     }
                 }
 
                 return appConnectionsSet;
+            }
+
+            private void AppConnectionsSetLoadingStatusChanged(AppConnectionsSet connectionSet, bool isLoading)
+            {
+                bool newLoadingStatus;
+                lock (_lock)
+                {
+                    if (isLoading)
+                    {
+                        _loadingAppsSet.Add(connectionSet);
+                    }
+                    else
+                    {
+                        _loadingAppsSet.Remove(connectionSet);
+                    }
+
+                    newLoadingStatus = _loadingAppsSet.Count > 0;
+                }
+
+                _loadingStatusSubject.OnNext(newLoadingStatus);
             }
 
             public IReadOnlyCollection<AppConnectionDescriptor> GetConnectedApps()
@@ -297,49 +358,65 @@ namespace Plexus.Interop.Apps.Internal.Services
             private readonly UniqueId _appInstanceId;
 
             private readonly object _lock = new object();
+
+            private readonly HashSet<string> _loadingApps = new HashSet<string>();
             private readonly Dictionary<string, AppConnectionDescriptor> _appConnectionMap = new Dictionary<string, AppConnectionDescriptor>();
-            private int _loadingAppsCount = 0;
+
+            private readonly BehaviorSubject<bool> _loadingStatusSubject = new BehaviorSubject<bool>(false);
+
+            public IObservable<bool> IsLoadingStatus { get; }
 
             public AppConnectionsSet(UniqueId appInstanceId)
             {
                 _appInstanceId = appInstanceId;
+                IsLoadingStatus = _loadingStatusSubject.DistinctUntilChanged();
             }
 
             public void AppLaunched(IEnumerable<string> appIds)
             {
+                bool newLoadingStatus;
                 lock (_lock)
                 {
                     foreach (var appId in appIds)
                     {
                         if (!_appConnectionMap.ContainsKey(appId))
                         {
-                            _appConnectionMap[appId] = null;
-                            _loadingAppsCount++;
+                            _loadingApps.Add(appId);
                         }
                     }
+
+                    newLoadingStatus = _loadingApps.Count > 0;
                 }
+
+                _loadingStatusSubject.OnNext(newLoadingStatus);
             }
 
             public void AppConnected(AppConnectionDescriptor appConnection)
             {
+                bool newLoadingStatus;
                 lock (_lock)
                 {
                     var appId = appConnection.ApplicationId;
-                    if (_appConnectionMap.TryGetValue(appId, out var connectionDescriptor) && connectionDescriptor == null)
-                    {
-                        _loadingAppsCount--;
-                    }
                     _appConnectionMap[appId] = appConnection;
+                    _loadingApps.Remove(appId);
+                    newLoadingStatus = _loadingApps.Count > 0;
                 }
+
+                _loadingStatusSubject.OnNext(newLoadingStatus);
             }
 
             public void AppDisconnected(AppConnectionDescriptor appConnection)
             {
+                bool newLoadingStatus;
                 lock (_lock)
                 {
                     var appId = appConnection.ApplicationId;
                     _appConnectionMap.Remove(appId);
+                    _loadingApps.Remove(appId);
+                    newLoadingStatus = _loadingApps.Count > 0;
                 }
+
+                _loadingStatusSubject.OnNext(newLoadingStatus);
             }
 
             public IReadOnlyCollection<AppConnectionDescriptor> GetOnlineConnections()

@@ -57,7 +57,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		}
 		
 		public partial interface IContextLoadedStreamImpl {
-			Task ContextLoadedStream(global::Plexus.Interop.Apps.Internal.Generated.Context request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate> responseStream, MethodCallContext context);
+			Task ContextLoadedStream(global::Plexus.Interop.Apps.Internal.Generated.Context request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate> responseStream, MethodCallContext callContext);
 		}
 		
 		public partial interface ICreateContextImpl {
