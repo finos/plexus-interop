@@ -30,7 +30,7 @@
     "request": "2.75.0",
     "fs-extra": "5.0.0",
     "adm-zip": "0.4.11",
-    "tar-fs": "1.13.2",
+    "tar-fs": "1.16.2",
     "tar": "4.4.1",
     "tslib": "1.9.0"
   },
@@ -50,7 +50,7 @@
     "ts-mockito": "2.0.2",
     "tslint": "5.8.0",
     "typescript": "3.3.3",
-    "yarn": "1.4.0"
+    "yarn": "1.17.3"
   },
   "jest": {
     "testEnvironment": "node",
