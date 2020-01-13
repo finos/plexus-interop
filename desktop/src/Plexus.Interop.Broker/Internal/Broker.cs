@@ -54,11 +54,6 @@ namespace Plexus.Interop.Internal
 
         public Broker(BrokerOptions options, IRegistryProvider registryProvider = null)
         {
-            if (!Debugger.IsAttached)
-            {
-                Debugger.Launch();
-            }
-
             _workingDir = Directory.GetCurrentDirectory();
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var studioDir = Path.Combine(binDir, "studio");
