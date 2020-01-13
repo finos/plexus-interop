@@ -25,7 +25,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@plexus-interop/client": "0.1.0",
-    "@plexus-interop/websocket-transport": "0.1.0"
+    "@plexus-interop/websocket-transport": "0.1.0",
+    "@plexus-interop/transport-common": "0.1.0",
+    "@plexus-interop/common": "0.1.0"
   },
   "devDependencies": {
     "browserify": "^14.5.0",

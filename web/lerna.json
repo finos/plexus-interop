@@ -9,7 +9,7 @@
       "exact": true
     },
     "bootstrap": {
-      "hoist": true
+      "hoist": false
     }
   }
 }
