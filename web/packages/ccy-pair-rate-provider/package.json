@@ -20,6 +20,8 @@
     "postbuild": "copyfiles ./dist/* -f ../../../bin/win-x86/samples/quick-start/apps/WebCcyPairRateProvider"
   },
   "devDependencies": {
+    "@types/long": "^4.0.0",
+    "@types/node": "^7.0.5",
     "browserify": "^14.5.0",
     "copyfiles": "^1.2.0",
     "electron": "1.8.8",

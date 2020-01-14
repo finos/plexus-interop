@@ -30,6 +30,7 @@
     "@plexus-interop/common": "0.1.0"
   },
   "devDependencies": {
+    "@types/long": "^4.0.0",
     "browserify": "^14.5.0",
     "copyfiles": "^1.2.0",
     "electron": "1.8.8",
