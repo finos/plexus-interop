@@ -24,6 +24,7 @@
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {
+    "rxjs": "^5.5.2",
     "@types/loglevel": "^1.4.29",
     "@types/long": "^4.0.0",
     "@types/jest": "^23.1.3",
