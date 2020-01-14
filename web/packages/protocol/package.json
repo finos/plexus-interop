@@ -21,6 +21,7 @@
   "dependencies": {
     "@types/long": "^4.0.0",
     "@plexus-interop/common": "0.1.0",
+    "protobufjs": "6.8.6",
     "long": "^4.0.0"
   },
   "peerDependencies": {

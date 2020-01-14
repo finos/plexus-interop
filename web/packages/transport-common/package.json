@@ -15,6 +15,8 @@
     "test": "jest --coverage --runInBand"
   },
   "dependencies": {
+    "rxjs": "^5.5.2",
+    "protobufjs": "6.8.6",
     "@types/loglevel": "^1.4.29",
     "@types/long": "^4.0.0",
     "@plexus-interop/common": "0.1.0",
@@ -30,7 +32,6 @@
     "rxjs": "^5.5.2"
   },
   "devDependencies": {
-    "rxjs": "^5.5.2",
     "@types/long": "^4.0.0",
     "@types/chai": "^4.0.2",
     "@types/jest": "^23.1.3",
