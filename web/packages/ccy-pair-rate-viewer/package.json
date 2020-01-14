@@ -7,7 +7,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@plexus-interop/client": "0.1.0",
-    "@plexus-interop/websocket-transport": "0.1.0"
+    "@plexus-interop/websocket-transport": "0.1.0",
+    "@plexus-interop/transport-common": "0.1.0",
+    "@plexus-interop/common": "0.1.0"
   },
   "scripts": {
     "prebuild": "trash dist",
@@ -18,11 +20,11 @@
     "postbuild": "copyfiles ./dist/* -f ../../../bin/win-x86/samples/quick-start/apps/WebCcyPairRateViewer"
   },
   "devDependencies": {
-    "browserify": "^14.4.0",
+    "browserify": "^14.5.0",
     "copyfiles": "^1.2.0",
     "electron": "1.8.8",
     "trash": "^4.1.0",
     "trash-cli": "^1.4.0",
-    "typescript": "3.3.3"
+    "typescript": "3.7.2"
   }
 }

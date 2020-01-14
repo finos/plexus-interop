@@ -20,20 +20,20 @@
   },
   "dependencies": {
     "@types/long": "^4.0.0",
-    "long": "^4.0.0",
-    "protobufjs": "6.8.6"
+    "@plexus-interop/common": "0.1.0",
+    "long": "^4.0.0"
   },
   "peerDependencies": {
     "protobufjs": "6.8.6"
   },
   "devDependencies": {
-    "@types/jest": "^23.0.0",
+    "@types/jest": "^23.1.3",
     "@types/node": "^7.0.5",
     "trash-cli": "^1.4.0",
-    "typescript": "3.3.3",
-    "yarn": "1.17.3",
+    "typescript": "3.7.2",
+    "yarn": "^1.17.3",
     "copyfiles": "^1.2.0",
-    "jest": "23.5.0",
+    "jest": "^23.5.0",
     "espree": "^3.4.3"
   },
   "jest": {
