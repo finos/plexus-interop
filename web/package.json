@@ -5,9 +5,9 @@
 	"license": "Apache-2.0",
 	"description": "Plexus Web Interop root module",
 	"scripts": {
-	  "prebootstrap": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
+	  "prebootstrap": "node ./scripts/replace-lock-registry.js && lerna exec -- node ../../scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
 	  "bootstrap": "lerna bootstrap -- --check-files --ignore-optional",
-	  "postbootstrap": "node ./scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
+	  "postbootstrap": "node ./scripts/replace-lock-registry.js --backward && lerna exec -- node ../../scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
 	  "preinstall": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
 	  "prebuild": "run-s bootstrap",
 	  "build": "run-s build-only",
