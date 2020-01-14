@@ -30,6 +30,7 @@
     "rxjs": "^5.5.2"
   },
   "devDependencies": {
+    "rxjs": "^5.5.2",
     "@types/long": "^4.0.0",
     "@types/chai": "^4.0.2",
     "@types/jest": "^23.1.3",
