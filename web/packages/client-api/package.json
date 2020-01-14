@@ -13,19 +13,21 @@
   },
   "dependencies": {
     "@types/loglevel": "^1.4.29",
-    "@plexus-interop/transport-common": "0.1.0",
     "@types/long": "^4.0.0",
+    "@plexus-interop/transport-common": "0.1.0",
+    "@plexus-interop/protocol": "0.1.0",
+    "@plexus-interop/common": "0.1.0",
     "loglevel": "^1.4.1",
     "long": "^4.0.0",
     "reflect-metadata": "^0.1.10",
-    "tslib": "^1.6.0"
+    "tslib": "1.10.0"
   },
   "devDependencies": {
     "trash": "^4.1.0",
     "trash-cli": "^1.4.0",
     "tslint": "5.8.0",
-    "typescript": "3.3.3",
-    "yarn": "1.17.3"
+    "typescript": "3.7.2",
+    "yarn": "^1.17.3"
   },
   "jest": {
     "moduleFileExtensions": [

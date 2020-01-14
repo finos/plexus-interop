@@ -81,7 +81,7 @@ describe('WebSocketFramedTransport', () => {
             const frame = ChannelOpenFrame.fromHeaderData({ channelId: UniqueId.generateNew() });
             mockServer.send(messagesConverter.serialize(frame));
             transport.open({
-                next: (receivedFrame) => {
+                next: receivedFrame => {
                     const channelFrame = receivedFrame as ChannelOpenFrame;
                     expect(receivedFrame).toBeDefined();
                     expect(channelFrame).toEqual(frame);
@@ -98,9 +98,9 @@ describe('WebSocketFramedTransport', () => {
         transport.connectionEstablished().then(() => {
             transport.disconnect().then(() => {
                 transport.open({
-                    next: (n) => { },
+                    next: () => { },
                     complete: () => { },
-                    error: (w) => { }
+                    error: () => { }
                 })
                 .catch(() => done());
             });
@@ -139,7 +139,7 @@ describe('WebSocketFramedTransport', () => {
             mockServer.send(messagesConverter.serialize(messageHeaderFrame));
             mockServer.send(payload);
             transport.open({
-                next: (receivedFrame) => {
+                next: receivedFrame => {
                     expect(receivedFrame).toBeDefined();
                     const receivedMessageFrame: MessageFrame = receivedFrame as MessageFrame;
                     expect(receivedMessageFrame.getHeaderData()).toEqual(messageHeaderFrame.getHeaderData());
