@@ -49,6 +49,7 @@
     "@types/long": "^4.0.0"
   },
   "devDependencies": {
+    "@types/long": "^4.0.0",
     "@types/chai": "^4.0.2",
     "@types/mocha": "^2.2.43",
     "@types/node": "^7.0.5",
