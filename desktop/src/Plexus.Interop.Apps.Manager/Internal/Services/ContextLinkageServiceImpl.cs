@@ -37,10 +37,13 @@ namespace Plexus.Interop.Apps.Internal.Services
 
         private readonly ContextsSet _contextsSet = new ContextsSet();
 
-        public ContextLinkageServiceImpl(IRegistryProvider appRegistryProvider, IAppLifecycleManager appLifecycleManager)
+        public ContextLinkageServiceImpl(IRegistryProvider appRegistryProvider, IAppLifecycleManager appLifecycleManager, IAppLaunchedEventProvider appLaunchedEventProvider)
         {
             _appRegistryProvider = appRegistryProvider;
             _appLifecycleManager = appLifecycleManager;
+
+            appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnAppLaunched);
+
             appLifecycleManager.AppConnected += OnAppConnected;
             appLifecycleManager.AppDisconnected += OnAppDisconnected;
         }
@@ -58,7 +61,7 @@ namespace Plexus.Interop.Apps.Internal.Services
             });
         }
 
-        public void OnAppLaunched(AppLaunchedEvent appLaunchedEvent)
+        private void OnAppLaunched(AppLaunchedEvent appLaunchedEvent)
         {
             if (appLaunchedEvent.AppIds.Count == 0)
             {

@@ -40,17 +40,15 @@ namespace Plexus.Interop.Apps.Internal
             = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
 
         private readonly IAppRegistryProvider _appRegistryProvider;
-        private readonly Lazy<AppLauncherService.ILaunchProxy> _appLauncherLazy;
+        private readonly Lazy<IClient> _clientLazy;
 
-        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, Lazy<AppLauncherService.ILaunchProxy> appLauncherLazy)
+        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, Lazy<IClient> clientLazy)
         {
             _appRegistryProvider = appRegistryProvider;
-            _appLauncherLazy = appLauncherLazy;
+            _clientLazy = clientLazy;
         }        
 
         private ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();
-
-        public event Action<AppLaunchedEvent> AppLaunched = delegate { }; 
 
         public event Action<AppConnectionDescriptor> AppConnected = delegate { };
 
@@ -236,9 +234,7 @@ namespace Plexus.Interop.Apps.Internal
                     }
                 }
 
-                var appConnection = await connectionPromise.Task.ConfigureAwait(false);
-
-                return appConnection;
+                return await connectionPromise.Task.ConfigureAwait(false);
             }
             finally
             {
@@ -284,13 +280,26 @@ namespace Plexus.Interop.Apps.Internal
                 Referrer = referrer
             };
 
-            var response = await _appLauncherLazy.Value.Launch(request).ConfigureAwait(false);
+            var response = await LaunchUsingLauncherAsync(appDto.LauncherId, request).ConfigureAwait(false);
 
             var appInstanceId = UniqueId.FromHiLo(response.AppInstanceId.Hi, response.AppInstanceId.Lo);
 
             Log.Info("Received launch response for app {0} from {1}: {2}", appId, appDto.LauncherId, response);
 
             return appInstanceId;
+        }
+
+        private async Task<AppLaunchResponse> LaunchUsingLauncherAsync(string launcherId, AppLaunchRequest request)
+        {
+            var appLauncherServiceId = AppLauncherService.Id;
+            var launchMethodId = AppLauncherService.LaunchMethodId;
+            var launchMethodReference = ProvidedMethodReference.Create(appLauncherServiceId, launchMethodId, launcherId);
+
+            var response = await _clientLazy.Value.CallInvoker
+                .CallUnary<AppLaunchRequest, AppLaunchResponse>(launchMethodReference.CallDescriptor, request)
+                .ConfigureAwait(false);
+
+            return response;
         }
 
         private static AppLaunchMode Convert(ResolveMode resolveMode)

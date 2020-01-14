@@ -48,11 +48,13 @@ namespace Plexus.Interop.Apps.Internal
             var appRegistryProvider = JsonFileAppRegistryProvider.Initialize(Path.Combine(metadataDir, "apps.json"));
             _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir);
 
-            _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, new Lazy<AppLauncherService.ILaunchProxy>(() => _lifecycleManagerClient.AppLauncherService));
+            var clientLazy = new Lazy<IClient>(() => _lifecycleManagerClient);
+            _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, clientLazy);
+            var appLaunchedEventProvider = new AppLaunchedEventProvider(_appLifecycleManager, registryProvider, clientLazy);
 
             var appMetadataService = new AppMetadataServiceImpl(appRegistryProvider, registryProvider);
             _appLifecycleService = new AppLifecycleServiceImpl(_appLifecycleManager);
-            _contextLinkageService = new ContextLinkageServiceImpl(registryProvider, _appLifecycleManager);
+            _contextLinkageService = new ContextLinkageServiceImpl(registryProvider, _appLifecycleManager, appLaunchedEventProvider);
 
             _lifecycleManagerClient = new AppLifecycleManagerClient(
                 _appLifecycleService,
@@ -68,13 +70,7 @@ namespace Plexus.Interop.Apps.Internal
         {
             await Task.WhenAll(_lifecycleManagerClient.ConnectAsync(), _nativeAppLauncherClient.StartAsync());
 
-            var cancellationTokenSource = new CancellationTokenSource();
-            OnStop(() => cancellationTokenSource.Cancel());
-
-            var appLaunchedEventStreamSubscription = _lifecycleManagerClient.AppLauncherService.AppLaunchedEventStream(new Empty()).ResponseStream
-                .ConsumeAsync(appLaunchedEvent => _contextLinkageService.OnAppLaunched(appLaunchedEvent), cancellationTokenSource.Token);
-
-            return Task.WhenAll(_lifecycleManagerClient.Completion, _nativeAppLauncherClient.Completion, appLaunchedEventStreamSubscription);
+            return Task.WhenAll(_lifecycleManagerClient.Completion, _nativeAppLauncherClient.Completion);
         }
     }
 }
