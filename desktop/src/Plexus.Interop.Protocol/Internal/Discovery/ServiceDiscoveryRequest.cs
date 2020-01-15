@@ -25,6 +25,8 @@
 
         public DiscoveryMode DiscoveryMode { get; set; }
 
+        public Maybe<IContextLinkageDiscoveryOptions> ContextLinkageDiscoveryOptions { get; set; }
+
         public T Handle<T, TArgs>(ClientToBrokerRequestHandler<T, TArgs> handler, TArgs args = default)
         {
             return handler.Handle(this, args);
@@ -35,6 +37,7 @@
             ConsumedService.GetValueOrDefault()?.Dispose();
             ConsumedService = default;
             DiscoveryMode = default;
+            ContextLinkageDiscoveryOptions = default;
         }
 
         public override string ToString()

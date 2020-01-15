@@ -42,7 +42,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
             _protocol = protocol;
         }
 
-        public async Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverAsync(MethodDiscoveryQuery query, bool online = false)
+        public async Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverAsync(MethodDiscoveryQuery query, ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions = null, bool online = false)
         {
             var channel = await _transportConnection.CreateChannelAsync().ConfigureAwait(false);
             try
@@ -83,7 +83,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
             }
         }
 
-        public async Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query, bool online = false)
+        public async Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query, ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions = null, bool online = false)
         {
             var channel = await _transportConnection.CreateChannelAsync().ConfigureAwait(false);
             try

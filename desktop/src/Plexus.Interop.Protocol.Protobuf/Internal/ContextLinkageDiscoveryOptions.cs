@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,18 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol
+namespace Plexus.Interop.Protocol.Protobuf.Internal
 {
-    public interface IProvidedServiceReference : IProtocolMessage
+    using Plexus.Pools;
+
+    internal partial class ContextLinkageDiscoveryOptions : PooledObject<ContextLinkageDiscoveryOptions>
     {
-        string ServiceId { get; }
-
-        Maybe<string> ServiceAlias { get; }
-
-        string ApplicationId { get; }
-
-        Maybe<UniqueId> ConnectionId { get; }
-
-        Maybe<UniqueId> ApplicationInstanceId { get; }
+        protected override void Cleanup()
+        {
+            ClearMode();
+        }
     }
 }

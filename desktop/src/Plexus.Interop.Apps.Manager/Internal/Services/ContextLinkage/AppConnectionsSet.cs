@@ -95,5 +95,16 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
                 return _appConnectionMap.Values.Where(descriptor => descriptor != null).ToArray();
             }
         }
+
+        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAllApps()
+        {
+            lock (_lock)
+            {
+                return _appConnectionMap.Select(pair =>
+                        (_appInstanceId, pair.Value.ApplicationId, new Maybe<UniqueId>(pair.Value.ConnectionId)))
+                    .Concat(_loadingApps.Select(appId => (_appInstanceId, appId, Maybe<UniqueId>.Nothing)))
+                    .Distinct().ToArray();
+            }
+        }
     }
 }

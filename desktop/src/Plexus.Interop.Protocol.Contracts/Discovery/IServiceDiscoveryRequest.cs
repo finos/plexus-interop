@@ -21,5 +21,7 @@
         Maybe<IConsumedServiceReference> ConsumedService { get; }
 
         DiscoveryMode DiscoveryMode { get; }
+
+        Maybe<IContextLinkageDiscoveryOptions> ContextLinkageDiscoveryOptions { get; set; }
     }
 }

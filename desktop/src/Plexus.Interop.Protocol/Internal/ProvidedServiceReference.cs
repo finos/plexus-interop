@@ -28,17 +28,20 @@
 
         public Maybe<UniqueId> ConnectionId { get; set; }
 
+        public Maybe<UniqueId> ApplicationInstanceId { get; set; }
+
         protected override void Cleanup()
         {
             ServiceAlias = default;
             ServiceId = default;
             ApplicationId = default;
             ConnectionId = default;
+            ApplicationInstanceId = default;
         }
 
         public override string ToString()
         {
-            return $"{nameof(ServiceId)}: {ServiceId}, {nameof(ServiceAlias)}: {ServiceAlias}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}";
+            return $"{nameof(ServiceId)}: {ServiceId}, {nameof(ServiceAlias)}: {ServiceAlias}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}";
         }
 
         private bool Equals(ProvidedServiceReference other)

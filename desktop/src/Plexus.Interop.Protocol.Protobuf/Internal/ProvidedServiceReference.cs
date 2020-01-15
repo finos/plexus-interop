@@ -25,7 +25,8 @@
             ServiceId = string.Empty;
             ServiceAlias = string.Empty;
             ApplicationId = string.Empty;
-            ConnectionId = default;            
+            ConnectionId = default;
+            ApplicationInstanceId = default;
         }
     }
 }

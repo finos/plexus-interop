@@ -35,10 +35,13 @@ namespace Plexus.Interop.Protocol
             string serviceId,
             Maybe<string> serviceAlias,
             string applicationId,
-            Maybe<UniqueId> connectionId);
+            Maybe<UniqueId> connectionId,
+            Maybe<UniqueId> applicationInstanceId);
 
         IProvidedMethodReference CreateProvidedMethodReference(
             IProvidedServiceReference providedService,
             string methodId);
+
+        IContextLinkageDiscoveryOptions CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId);
     }
 }

@@ -20,7 +20,11 @@ namespace Plexus.Interop.Protocol.Discovery
 {
     public interface IDiscoveryProtocolMessageFactory
     {
-        IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService, DiscoveryMode discoveryMode);
+        IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService,
+            DiscoveryMode discoveryMode, IContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions);
+
+        IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService,
+            DiscoveryMode discoveryMode);
 
         IServiceDiscoveryResponse CreateServiceDiscoveryResponse(IReadOnlyCollection<IDiscoveredService> services);
 

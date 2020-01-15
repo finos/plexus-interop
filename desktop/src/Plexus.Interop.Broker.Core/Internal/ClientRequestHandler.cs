@@ -38,10 +38,11 @@
             IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
             IRegistryService registryService,
-            IInvocationEventProvider invocationEventProvider)
+            IInvocationEventProvider invocationEventProvider,
+            IContextLinkageManager contextLinkageManager)
         {
             _protocolSerializer = protocol.Serializer;
-            _discoveryRequestHandler = new DiscoveryRequestHandler(appLifecycleManager, protocol, registryService);
+            _discoveryRequestHandler = new DiscoveryRequestHandler(appLifecycleManager, protocol, registryService, contextLinkageManager);
             _invocationRequestHandler = new InvocationRequestHandler(appLifecycleManager, protocol, registryService, invocationEventProvider);
             _clientToBrokerRequestHandler =
                 new ClientToBrokerRequestHandler<Task, (IAppConnection, ITransportChannel)>(

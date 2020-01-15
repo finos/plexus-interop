@@ -53,7 +53,8 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
                             Info.Method.ServiceId,
                             Info.Target.Value.ServiceAliasId,
                             Info.Target.Value.ApplicationId,
-                            Info.Target.Value.ConnectionId),
+                            Info.Target.Value.ConnectionId,
+                            Info.Target.Value.ApplicationInstanceId),
                         Info.Method.MethodId)
                     : _protocol.MessageFactory.CreateConsumedMethodReference(
                         _protocol.MessageFactory.CreateConsumedServiceReference(Info.Method.ServiceId, Info.Method.ServiceAliasId),

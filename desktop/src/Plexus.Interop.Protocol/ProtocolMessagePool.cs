@@ -89,11 +89,22 @@ namespace Plexus.Interop.Protocol
             return obj;
         }
 
+        public IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService,
+            DiscoveryMode mode, IContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions)
+        {
+            var obj = ServiceDiscoveryRequest.Rent();
+            obj.ConsumedService = consumedService;
+            obj.DiscoveryMode = mode;
+            obj.ContextLinkageDiscoveryOptions = new Maybe<IContextLinkageDiscoveryOptions>(contextLinkageDiscoveryOptions);
+            return obj;
+        }
+
         public IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService, DiscoveryMode mode)
         {
             var obj = ServiceDiscoveryRequest.Rent();
             obj.ConsumedService = consumedService;
             obj.DiscoveryMode = mode;
+            obj.ContextLinkageDiscoveryOptions = Maybe<IContextLinkageDiscoveryOptions>.Nothing;
             return obj;
         }
 
@@ -204,13 +215,14 @@ namespace Plexus.Interop.Protocol
             return obj;
         }
 
-        public IProvidedServiceReference CreateProvidedServiceReference(string serviceId, Maybe<string> serviceAlias, string applicationId, Maybe<UniqueId> connectionId)
+        public IProvidedServiceReference CreateProvidedServiceReference(string serviceId, Maybe<string> serviceAlias, string applicationId, Maybe<UniqueId> connectionId, Maybe<UniqueId> applicationInstanceId)
         {
             var obj = ProvidedServiceReference.Rent();
             obj.ServiceId = serviceId;
             obj.ServiceAlias = serviceAlias;
             obj.ApplicationId = applicationId;
             obj.ConnectionId = connectionId;
+            obj.ApplicationInstanceId = applicationInstanceId;
             return obj;
         }
 
@@ -219,6 +231,14 @@ namespace Plexus.Interop.Protocol
             var obj = ProvidedMethodReference.Rent();
             obj.ProvidedService = providedService;
             obj.MethodId = methodId;
+            return obj;
+        }
+
+        public IContextLinkageDiscoveryOptions CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId)
+        {
+            var obj = ContextLinkageDiscoveryOptions.Rent();
+            obj.Mode = contextLinkageDiscoveryMode;
+            obj.SpecificContext = specificContextId;
             return obj;
         }
     }
