@@ -31,6 +31,8 @@ namespace Plexus.Interop.Apps.Internal
         private readonly IRegistryProvider _registryProvider;
         private readonly Lazy<IClient> _client;
 
+        private readonly Subject<AppLaunchedEvent> _appLaunchedSubject = new Subject<AppLaunchedEvent>();
+
         public AppLaunchedEventProvider(IAppLifecycleManager appLifecycleManager, IRegistryProvider registryProvider, Lazy<IClient> client)
         {
             _registryProvider = registryProvider;
@@ -39,8 +41,6 @@ namespace Plexus.Interop.Apps.Internal
 
             AppLaunchedStream = _appLaunchedSubject;
         }
-
-        private readonly Subject<AppLaunchedEvent> _appLaunchedSubject = new Subject<AppLaunchedEvent>();
 
         private void OnAppConnected(AppConnectionDescriptor appConnectionDescriptor)
         {

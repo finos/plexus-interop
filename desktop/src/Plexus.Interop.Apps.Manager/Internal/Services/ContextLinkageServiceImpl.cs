@@ -17,16 +17,16 @@
 namespace Plexus.Interop.Apps.Internal.Services
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
     using Plexus.Channels;
     using Plexus.Interop.Apps.Internal.Generated;
+    using Plexus.Interop.Apps.Internal.Services.ContextLinkage;
     using Plexus.Interop.Metamodel;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
+    using Context = Plexus.Interop.Apps.Internal.Services.ContextLinkage.Context;
     using ContextDto = Generated.Context;
     using UniqueId = Plexus.UniqueId;
 
@@ -196,239 +196,16 @@ namespace Plexus.Interop.Apps.Internal.Services
             return AppMetadataServiceImpl.ConvertToAppMetamodelInfo(appInfo);
         }
 
-        private class ContextsSet
+        public class AppContextBindingEvent
         {
-            public ContextsSet()
+            public AppContextBindingEvent(Context context, UniqueId appInstanceId)
             {
-                LoadingStatusChanged = _loadingStatusSubject;
+                Context = context;
+                AppInstanceId = appInstanceId;
             }
 
-            private readonly Subject<Context> _loadingStatusSubject = new Subject<Context>();
-
-            public IObservable<Context> LoadingStatusChanged { get; }
-
-            public Context CreateContext()
-            {
-                var context = new Context(this);
-                _contexts[context.Id] = context;
-                context.IsLoadingStatus.Select(isLoading => context).Subscribe(_loadingStatusSubject);
-                return context;
-            }
-
-            public IReadOnlyCollection<Context> GetContextsOf(UniqueId appInstanceId)
-            {
-                lock (_lock)
-                {
-                    if (_contextsOfAppInstance.TryGetValue(appInstanceId, out var contexts))
-                    {
-                        return contexts.ToArray();
-                    }
-                }
-                return new Context[0];
-            }
-
-            private readonly object _lock = new object();
-
-            private readonly Dictionary<UniqueId, HashSet<Context>> _contextsOfAppInstance = new Dictionary<UniqueId, HashSet<Context>>();
-            private readonly Dictionary<string, Context> _contexts = new Dictionary<string, Context>();
-
-            public Context GetContext(string contextId)
-            {
-                lock (_lock)
-                {
-                    _contexts.TryGetValue(contextId, out var context);
-                    return context;
-                }
-            }
-
-            public void BindContext(UniqueId appInstanceId, Context context)
-            {
-                lock (_lock)
-                {
-                    if (!_contextsOfAppInstance.TryGetValue(appInstanceId, out var contexts))
-                    {
-                        contexts = new HashSet<Context>();
-                        _contextsOfAppInstance[appInstanceId] = contexts;
-                    }
-                    contexts.Add(context);
-                }
-            }
-
-            public IReadOnlyCollection<Context> GetAllContexts()
-            {
-                lock (_lock)
-                {
-                    return _contexts.Values.ToArray();
-                }
-            }
-        }
-
-        private class Context
-        {
-            private readonly ContextsSet _contextsSet;
-
-            public Context(ContextsSet contextsSet)
-            {
-                _contextsSet = contextsSet;
-                IsLoadingStatus = _loadingStatusSubject.DistinctUntilChanged();
-            }
-
-            public string Id { get; } = Guid.NewGuid().ToString();
-
-            private readonly object _lock = new object();
-
-            private readonly HashSet<AppConnectionsSet> _loadingAppsSet = new HashSet<AppConnectionsSet>();
-            private readonly Dictionary<UniqueId, AppConnectionsSet> _appInstanceIdsToConnections = new Dictionary<UniqueId, AppConnectionsSet>();
-
-            private readonly BehaviorSubject<bool> _loadingStatusSubject = new BehaviorSubject<bool>(false);
-
-            public IObservable<bool> IsLoadingStatus { get; }
-
-            public bool IsLoading => _loadingStatusSubject.Value;
-
-            public void AppLaunched(UniqueId appInstanceId, IEnumerable<string> appIds)
-            {
-                _contextsSet.BindContext(appInstanceId, this);
-                var appConnectionsSet = GetOrCreateAppConnectionsSet(appInstanceId);
-                appConnectionsSet.AppLaunched(appIds);
-            }
-
-            public void AppConnected(AppConnectionDescriptor appConnection)
-            {
-                _contextsSet.BindContext(appConnection.ApplicationInstanceId, this);
-                var appConnectionsSet = GetOrCreateAppConnectionsSet(appConnection.ApplicationInstanceId);
-                appConnectionsSet.AppConnected(appConnection);
-            }
-
-            public void AppDisconnected(AppConnectionDescriptor appConnection)
-            {
-                lock (_lock)
-                {
-                    if (_appInstanceIdsToConnections.TryGetValue(appConnection.ApplicationInstanceId, out var appConnectionsSet))
-                    {
-                        appConnectionsSet.AppDisconnected(appConnection);
-                    }
-                }
-            }
-
-            private AppConnectionsSet GetOrCreateAppConnectionsSet(UniqueId appInstanceId)
-            {
-                AppConnectionsSet appConnectionsSet;
-                lock (_lock)
-                {
-                    if (!_appInstanceIdsToConnections.TryGetValue(appInstanceId, out appConnectionsSet))
-                    {
-                        appConnectionsSet = new AppConnectionsSet(appInstanceId);
-                        appConnectionsSet.IsLoadingStatus.Subscribe(newStatus => AppConnectionsSetLoadingStatusChanged(appConnectionsSet, newStatus));
-                        _appInstanceIdsToConnections[appInstanceId] = appConnectionsSet;
-                    }
-                }
-
-                return appConnectionsSet;
-            }
-
-            private void AppConnectionsSetLoadingStatusChanged(AppConnectionsSet connectionSet, bool isLoading)
-            {
-                bool newLoadingStatus;
-                lock (_lock)
-                {
-                    if (isLoading)
-                    {
-                        _loadingAppsSet.Add(connectionSet);
-                    }
-                    else
-                    {
-                        _loadingAppsSet.Remove(connectionSet);
-                    }
-
-                    newLoadingStatus = _loadingAppsSet.Count > 0;
-                }
-
-                _loadingStatusSubject.OnNext(newLoadingStatus);
-            }
-
-            public IReadOnlyCollection<AppConnectionDescriptor> GetConnectedApps()
-            {
-                lock (_lock)
-                {
-                    return _appInstanceIdsToConnections.Values.SelectMany(connections => connections.GetOnlineConnections()).ToArray();
-                }
-            }
-        }
-
-        private class AppConnectionsSet
-        {
-            private readonly UniqueId _appInstanceId;
-
-            private readonly object _lock = new object();
-
-            private readonly HashSet<string> _loadingApps = new HashSet<string>();
-            private readonly Dictionary<string, AppConnectionDescriptor> _appConnectionMap = new Dictionary<string, AppConnectionDescriptor>();
-
-            private readonly BehaviorSubject<bool> _loadingStatusSubject = new BehaviorSubject<bool>(false);
-
-            public IObservable<bool> IsLoadingStatus { get; }
-
-            public AppConnectionsSet(UniqueId appInstanceId)
-            {
-                _appInstanceId = appInstanceId;
-                IsLoadingStatus = _loadingStatusSubject.DistinctUntilChanged();
-            }
-
-            public void AppLaunched(IEnumerable<string> appIds)
-            {
-                bool newLoadingStatus;
-                lock (_lock)
-                {
-                    foreach (var appId in appIds)
-                    {
-                        if (!_appConnectionMap.ContainsKey(appId))
-                        {
-                            _loadingApps.Add(appId);
-                        }
-                    }
-
-                    newLoadingStatus = _loadingApps.Count > 0;
-                }
-
-                _loadingStatusSubject.OnNext(newLoadingStatus);
-            }
-
-            public void AppConnected(AppConnectionDescriptor appConnection)
-            {
-                bool newLoadingStatus;
-                lock (_lock)
-                {
-                    var appId = appConnection.ApplicationId;
-                    _appConnectionMap[appId] = appConnection;
-                    _loadingApps.Remove(appId);
-                    newLoadingStatus = _loadingApps.Count > 0;
-                }
-
-                _loadingStatusSubject.OnNext(newLoadingStatus);
-            }
-
-            public void AppDisconnected(AppConnectionDescriptor appConnection)
-            {
-                bool newLoadingStatus;
-                lock (_lock)
-                {
-                    var appId = appConnection.ApplicationId;
-                    _appConnectionMap.Remove(appId);
-                    _loadingApps.Remove(appId);
-                    newLoadingStatus = _loadingApps.Count > 0;
-                }
-
-                _loadingStatusSubject.OnNext(newLoadingStatus);
-            }
-
-            public IReadOnlyCollection<AppConnectionDescriptor> GetOnlineConnections()
-            {
-                lock (_lock)
-                {
-                    return _appConnectionMap.Values.Where(descriptor => descriptor != null).ToArray();
-                }
-            }
+            public Context Context { get; }
+            public UniqueId AppInstanceId { get; }
         }
     }
 }
