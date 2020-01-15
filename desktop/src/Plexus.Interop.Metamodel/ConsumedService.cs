@@ -31,5 +31,10 @@
         public Dictionary<string, IConsumedMethod> Methods { get; set; } = new Dictionary<string, IConsumedMethod>();
 
         IReadOnlyDictionary<string, IConsumedMethod> IConsumedService.Methods => Methods;
+
+        public override string ToString()
+        {
+            return $"{nameof(Service)}: {Service.Id}, {nameof(Alias)}: {Alias}, {nameof(From)}: {From}";
+        }
     }
 }

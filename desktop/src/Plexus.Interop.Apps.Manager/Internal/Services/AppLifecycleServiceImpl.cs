@@ -23,9 +23,9 @@ namespace Plexus.Interop.Apps.Internal.Services
     using Plexus.Interop.Apps.Internal.Generated;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
 
-    internal class AppLifecycleService : IAppLifecycleService
+    internal class AppLifecycleServiceImpl : IAppLifecycleService
     {
-        private ILogger Log { get; } = LogManager.GetLogger<AppLifecycleService>();
+        private ILogger Log { get; } = LogManager.GetLogger<AppLifecycleServiceImpl>();
 
         private readonly IAppLifecycleManager _appLifecycleManager;
 
@@ -35,7 +35,7 @@ namespace Plexus.Interop.Apps.Internal.Services
         private readonly EventBroadcaster<InvocationEvent> _invocationEventBroadcaster
             = new EventBroadcaster<InvocationEvent>();
 
-        public AppLifecycleService(IAppLifecycleManager appLifecycleManager)
+        public AppLifecycleServiceImpl(IAppLifecycleManager appLifecycleManager)
         {
             _appLifecycleManager = appLifecycleManager;
 

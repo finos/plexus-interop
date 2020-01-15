@@ -35,5 +35,10 @@
         IReadOnlyDictionary<string, IProvidedMethod> IProvidedService.Methods => Methods;
 
         public Maybe<LaunchMode> LaunchMode { get; set; } = Metamodel.LaunchMode.SingleInstance;
+
+        public override string ToString()
+        {
+            return $"{nameof(Service)}: {Service.Id}, {nameof(Alias)}: {Alias}, {nameof(Title)}: {Title}, {nameof(To)}: {To}, {nameof(LaunchMode)}: {LaunchMode}";
+        }
     }
 }

@@ -906,6 +906,11 @@
 	            "Launch": {
 	              "requestType": "AppLaunchRequest",
 	              "responseType": "AppLaunchResponse"
+	            },
+	            "AppLaunchedEventStream": {
+	              "requestType": ".google.protobuf.Empty",
+	              "responseType": "AppLaunchedEvent",
+	              "responseStream": true
 	            }
 	          }
 	        },
@@ -963,6 +968,26 @@
 	            "appInstanceId": {
 	              "type": "UniqueId",
 	              "id": 1
+	            }
+	          }
+	        },
+	        "AppLaunchedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchedEvent"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            },
+	            "appIds": {
+	              "rule": "repeated",
+	              "type": "string",
+	              "id": 2
+	            },
+	            "referrer": {
+	              "type": "AppLaunchReferrer",
+	              "id": 3
 	            }
 	          }
 	        },
@@ -1374,6 +1399,143 @@
 	            }
 	          }
 	        },
+	        "Context": {
+	          "options": {
+	            "(.interop.message_id)": "interop.Context"
+	          },
+	          "fields": {
+	            "id": {
+	              "type": "string",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "ContextsList": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ContextsList"
+	          },
+	          "fields": {
+	            "contexts": {
+	              "rule": "repeated",
+	              "type": "Context",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "ContextLoadingStatus": {
+	          "values": {
+	            "IN_PROGRESS": 0,
+	            "FAILED": 1,
+	            "FINISHED": 2
+	          }
+	        },
+	        "ContextLoadingUpdate": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ContextLoadingUpdate"
+	          },
+	          "fields": {
+	            "status": {
+	              "type": "ContextLoadingStatus",
+	              "id": 1
+	            },
+	            "loadedAppDescriptors": {
+	              "rule": "repeated",
+	              "type": "interop.AppConnectionDescriptor",
+	              "id": 2
+	            },
+	            "failedAppDescriptors": {
+	              "rule": "repeated",
+	              "type": "interop.AppConnectionDescriptor",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "InvocationRef": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationRef"
+	          },
+	          "fields": {
+	            "appInfo": {
+	              "type": "interop.AppMetamodelInfo",
+	              "id": 1
+	            },
+	            "target": {
+	              "type": "interop.AppConnectionDescriptor",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "InvocationsList": {
+	          "options": {
+	            "(.interop.message_id)": "interop.InvocationsList"
+	          },
+	          "fields": {
+	            "invocations": {
+	              "rule": "repeated",
+	              "type": "InvocationRef",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "ContextToInvocations": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ContextToInvocations"
+	          },
+	          "fields": {
+	            "context": {
+	              "type": "Context",
+	              "id": 1
+	            },
+	            "invocations": {
+	              "type": "InvocationsList",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "ContextToInvocationsList": {
+	          "options": {
+	            "(.interop.message_id)": "interop.ContextToInvocationsList"
+	          },
+	          "fields": {
+	            "contexts": {
+	              "rule": "repeated",
+	              "type": "ContextToInvocations",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "ContextLinkageService": {
+	          "options": {
+	            "(.interop.service_id)": "interop.ContextLinkageService"
+	          },
+	          "methods": {
+	            "ContextLoadedStream": {
+	              "requestType": "Context",
+	              "responseType": "ContextLoadingUpdate",
+	              "responseStream": true
+	            },
+	            "CreateContext": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "Context"
+	            },
+	            "JoinContext": {
+	              "requestType": "Context",
+	              "responseType": "google.protobuf.Empty"
+	            },
+	            "GetContexts": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "ContextsList"
+	            },
+	            "GetLinkedInvocations": {
+	              "requestType": "Context",
+	              "responseType": "InvocationsList"
+	            },
+	            "GetAllLinkedInvocations": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "ContextToInvocationsList"
+	            }
+	          }
+	        },
 	        "InvocationDescriptor": {
 	          "options": {
 	            "(.interop.message_id)": "interop.InvocationDescriptor"
@@ -1445,6 +1607,12 @@
 					"request": "interop.AppLaunchRequest",
 					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
+				},
+				{
+					"name": "AppLaunchedEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.AppLaunchedEvent",
+					"type": "ServerStreaming"
 				}
 			],
 			"options": [
@@ -1505,6 +1673,53 @@
 					"value": "interop.AppMetadataService"
 				}
 			]
+		},
+		{
+			"id": "interop.ContextLinkageService",
+			"methods": [
+				{
+					"name": "ContextLoadedStream",
+					"request": "interop.Context",
+					"response": "interop.ContextLoadingUpdate",
+					"type": "ServerStreaming"
+				},
+				{
+					"name": "CreateContext",
+					"request": "google.protobuf.Empty",
+					"response": "interop.Context",
+					"type": "Unary"
+				},
+				{
+					"name": "JoinContext",
+					"request": "interop.Context",
+					"response": "google.protobuf.Empty",
+					"type": "Unary"
+				},
+				{
+					"name": "GetContexts",
+					"request": "google.protobuf.Empty",
+					"response": "interop.ContextsList",
+					"type": "Unary"
+				},
+				{
+					"name": "GetLinkedInvocations",
+					"request": "interop.Context",
+					"response": "interop.InvocationsList",
+					"type": "Unary"
+				},
+				{
+					"name": "GetAllLinkedInvocations",
+					"request": "google.protobuf.Empty",
+					"response": "interop.ContextToInvocationsList",
+					"type": "Unary"
+				}
+			],
+			"options": [
+				{
+					"id": "interop.service_id",
+					"value": "interop.ContextLinkageService"
+				}
+			]
 		}
 	],
 	"applications": [
@@ -1516,6 +1731,9 @@
 					"methods": [
 						{
 							"name": "Launch"
+						},
+						{
+							"name": "AppLaunchedEventStream"
 						}
 					]
 				}
@@ -1545,6 +1763,29 @@
 							"name": "GetMetamodelChangedEventStream"
 						}
 					]
+				},
+				{
+					"service": "interop.ContextLinkageService",
+					"methods": [
+						{
+							"name": "ContextLoadedStream"
+						},
+						{
+							"name": "CreateContext"
+						},
+						{
+							"name": "JoinContext"
+						},
+						{
+							"name": "GetContexts"
+						},
+						{
+							"name": "GetLinkedInvocations"
+						},
+						{
+							"name": "GetAllLinkedInvocations"
+						}
+					]
 				}
 			]
 		},
@@ -1572,6 +1813,9 @@
 					"methods": [
 						{
 							"name": "Launch"
+						},
+						{
+							"name": "AppLaunchedEventStream"
 						}
 					],
 					"to": [

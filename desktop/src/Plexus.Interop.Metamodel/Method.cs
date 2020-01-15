@@ -47,5 +47,10 @@ namespace Plexus.Interop.Metamodel
                 return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ (Service != null ? Service.GetHashCode() : 0);
             }
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Name)}: {Name}, {nameof(Type)}: {Type}";
+        }
     }
 }

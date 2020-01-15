@@ -27,12 +27,12 @@ namespace Plexus.Interop.Internal
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using Plexus.Processes;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal;
-    using Plexus.Interop.Apps.Internal.Services;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
 

@@ -1,5 +1,5 @@
-/**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+﻿/**
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Metamodel
+namespace Plexus.Interop.Apps.Internal
 {
-    public sealed class Option : IOption
-    {
-        public string Id { get; set; }
-        public string Value { get; set; }
+    using System;
+    using Plexus.Interop.Apps.Internal.Generated;
 
-        public override string ToString()
-        {
-            return $"{nameof(Id)}: {Id}, {nameof(Value)}: {Value}";
-        }
+    internal interface IAppLaunchedEventProvider
+    {
+        IObservable<AppLaunchedEvent> AppLaunchedStream { get; }
     }
 }
