@@ -68,9 +68,10 @@ namespace Plexus.Interop.Broker.Internal
             IEnumerable<IGrouping<(IConsumedService ConsumedService, IProvidedService ProvidedService, Maybe<UniqueId> ConnectionId, Maybe<UniqueId> ApplicationInstanceId), IProvidedMethod>> groupedMethods;
 
             var online = request.DiscoveryMode == DiscoveryMode.Online;
-            if (request.ContextLinkageDiscoveryOptions.Mode != ContextLinkageDiscoveryMode.None)
+            IReadOnlyCollection<string> contexts;
+            if (request.ContextLinkageDiscoveryOptions.Mode != ContextLinkageDiscoveryMode.None 
+                && (contexts = GetContextsIds(request.ContextLinkageDiscoveryOptions, sourceConnection)).Any())
             {
-                var contexts = GetContextsIds(request.ContextLinkageDiscoveryOptions, sourceConnection);
                 groupedMethods = _contextLinkageManager.GetAppsInContexts(contexts, online)
                     .Join(methodMatches, x => x.AppId, y => y.Provided.ProvidedService.Service.Id,
                         (x, y) => (y.Consumed, y.Provided, x.AppInstanceId, x.ConnectionId))
@@ -178,10 +179,11 @@ namespace Plexus.Interop.Broker.Internal
             }
             IEnumerable<IDiscoveredMethod> discoveredMethods;
 
+            IReadOnlyCollection<string> contexts;
             bool online = request.DiscoveryMode == DiscoveryMode.Online;
-            if (request.ContextLinkageDiscoveryOptions.Mode != ContextLinkageDiscoveryMode.None)
+            if (request.ContextLinkageDiscoveryOptions.Mode != ContextLinkageDiscoveryMode.None
+                && (contexts = GetContextsIds(request.ContextLinkageDiscoveryOptions, sourceConnection)).Any())
             {
-                var contexts = GetContextsIds(request.ContextLinkageDiscoveryOptions, sourceConnection);
                 discoveredMethods = _contextLinkageManager.GetAppsInContexts(contexts, online)
                     .Join(matchingProvidedMethods, x => x.AppId, y => y.ProvidedService.Application.Id,
                         (connection, method) => (method, connection))
