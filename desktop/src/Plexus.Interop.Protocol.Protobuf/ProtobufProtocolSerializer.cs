@@ -512,9 +512,15 @@ namespace Plexus.Interop.Protocol.Protobuf
 
         private IContextLinkageDiscoveryOptions ConvertFromProtoStrict(ContextLinkageDiscoveryOptions proto)
         {
+            if (proto == null || proto.ModeCase == ContextLinkageDiscoveryOptions.ModeOneofCase.None)
+            {
+                return _messageFactory.CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode.None, Maybe<string>.Nothing);
+            }
             return _messageFactory.CreateContextLinkageDiscoveryOptions(
                 ConvertFromProto(proto.ModeCase),
-                proto.ModeCase == ContextLinkageDiscoveryOptions.ModeOneofCase.SpecificContextId ? new Maybe<string>(proto.SpecificContextId) : Maybe<string>.Nothing);
+                proto.ModeCase == ContextLinkageDiscoveryOptions.ModeOneofCase.SpecificContextId 
+                    ? new Maybe<string>(proto.SpecificContextId) 
+                    : Maybe<string>.Nothing);
         }
 
         private IDiscoveredService ConvertFromProto(DiscoveredService proto)

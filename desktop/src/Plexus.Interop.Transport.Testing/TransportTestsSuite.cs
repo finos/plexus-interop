@@ -285,9 +285,9 @@ namespace Plexus.Interop.Transport
                                 {
                                     break;
                                 }
-                                lock (Md5)
+                                lock (Sha256)
                                 {
-                                    received.Add(Md5.ComputeHash(receivedMsg.Value));
+                                    received.Add(Sha256.ComputeHash(receivedMsg.Value));
                                 }
                             }
                         });
@@ -295,9 +295,9 @@ namespace Plexus.Interop.Transport
                 {
                     var msg = TestsSuite.Random.GetRandomBytes(length);
                     await c.SendMessageAsync(msg).ConfigureAwait(false);
-                    lock (Md5)
+                    lock (Sha256)
                     {
-                        sent.Add(Md5.ComputeHash(msg));
+                        sent.Add(Sha256.ComputeHash(msg));
                     }
                 }
                 c.Out.TryComplete();
