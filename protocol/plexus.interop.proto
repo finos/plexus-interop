@@ -114,6 +114,8 @@ message InvocationStartRequest {
 		// Invocation to the specific implementation of method
 		ProvidedMethodReference provided_method = 2;
 	}
+
+	ContextLinkageOptions context_linkage_options = 3;
 }
 
 // broker -> source
@@ -187,7 +189,7 @@ enum MethodType {
 	DuplexStreaming = 3;
 }
 
-message ContextLinkageDiscoveryOptions {	
+message ContextLinkageOptions {	
 	oneof mode {
 		string specific_context_id = 1;
 		Empty current_context = 2;
@@ -204,7 +206,7 @@ message ServiceDiscoveryRequest {
 
 	DiscoveryMode discovery_mode = 2;
 
-	ContextLinkageDiscoveryOptions context_linkage_options = 3;
+	ContextLinkageOptions context_linkage_options = 3;
 }
 
 // broker -> client
@@ -253,7 +255,7 @@ message MethodDiscoveryRequest {
 
 	DiscoveryMode discovery_mode = 4;
 
-	ContextLinkageDiscoveryOptions context_linkage_options = 5;
+	ContextLinkageOptions context_linkage_options = 5;
 }
 
 message MethodDiscoveryResponse {

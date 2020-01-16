@@ -30,7 +30,7 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
             {
                 ConsumedMethod.GetValueOrDefault()?.Dispose();
             }
-            ContextLinkageDiscoveryOptions = default;
+            ContextLinkageOptions = default;
             ConsumedMethod = default;
         }
 
@@ -47,7 +47,7 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
 
         public DiscoveryMode DiscoveryMode { get; set; }
 
-        public IContextLinkageDiscoveryOptions ContextLinkageDiscoveryOptions { get; set; }
+        public IContextLinkageOptions ContextLinkageOptions { get; set; }
 
         public override string ToString()
         {

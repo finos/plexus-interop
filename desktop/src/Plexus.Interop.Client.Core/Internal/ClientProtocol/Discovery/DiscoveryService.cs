@@ -116,7 +116,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
             }
         }
 
-        private IContextLinkageDiscoveryOptions Convert(ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions)
+        private IContextLinkageOptions Convert(ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions)
         {
             if (contextLinkageDiscoveryOptions == null)
             {

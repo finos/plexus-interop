@@ -91,7 +91,7 @@ namespace Plexus.Interop.Protocol.Protobuf
                 var proto = ServiceDiscoveryRequest.Rent();
                 proto.DiscoveryMode = ConvertToProto(msg.DiscoveryMode);
                 proto.ConsumedService = ConvertToProto(msg.ConsumedService);
-                proto.ContextLinkageOptions = ConvertToProto(msg.ContextLinkageDiscoveryOptions);
+                proto.ContextLinkageOptions = ConvertToProto(msg.ContextLinkageOptions);
                 envelope.ServiceDiscoveryRequest = proto;
                 return envelope.Serialize();
             }
@@ -403,9 +403,9 @@ namespace Plexus.Interop.Protocol.Protobuf
             return proto;
         }
 
-        private ContextLinkageDiscoveryOptions ConvertToProto(IContextLinkageDiscoveryOptions obj)
+        private ContextLinkageOptions ConvertToProto(IContextLinkageOptions obj)
         {
-            var proto = ContextLinkageDiscoveryOptions.Rent();
+            var proto = ContextLinkageOptions.Rent();
             switch (obj.Mode)
             {
                 case ContextLinkageDiscoveryMode.None:
@@ -510,15 +510,15 @@ namespace Plexus.Interop.Protocol.Protobuf
                 : new Maybe<IConsumedServiceReference>(ConvertFromProtoStrict(proto));
         }
 
-        private IContextLinkageDiscoveryOptions ConvertFromProtoStrict(ContextLinkageDiscoveryOptions proto)
+        private IContextLinkageOptions ConvertFromProtoStrict(ContextLinkageOptions proto)
         {
-            if (proto == null || proto.ModeCase == ContextLinkageDiscoveryOptions.ModeOneofCase.None)
+            if (proto == null || proto.ModeCase == ContextLinkageOptions.ModeOneofCase.None)
             {
                 return _messageFactory.CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode.None, Maybe<string>.Nothing);
             }
             return _messageFactory.CreateContextLinkageDiscoveryOptions(
                 ConvertFromProto(proto.ModeCase),
-                proto.ModeCase == ContextLinkageDiscoveryOptions.ModeOneofCase.SpecificContextId 
+                proto.ModeCase == ContextLinkageOptions.ModeOneofCase.SpecificContextId 
                     ? new Maybe<string>(proto.SpecificContextId) 
                     : Maybe<string>.Nothing);
         }
@@ -576,15 +576,15 @@ namespace Plexus.Interop.Protocol.Protobuf
             }
         }
 
-        private ContextLinkageDiscoveryMode ConvertFromProto(ContextLinkageDiscoveryOptions.ModeOneofCase protoModeCase)
+        private ContextLinkageDiscoveryMode ConvertFromProto(ContextLinkageOptions.ModeOneofCase protoModeCase)
         {
             switch (protoModeCase)
             {
-                case ContextLinkageDiscoveryOptions.ModeOneofCase.None:
+                case ContextLinkageOptions.ModeOneofCase.None:
                     return ContextLinkageDiscoveryMode.None;
-                case ContextLinkageDiscoveryOptions.ModeOneofCase.SpecificContextId:
+                case ContextLinkageOptions.ModeOneofCase.SpecificContextId:
                     return ContextLinkageDiscoveryMode.SpecificContext;
-                case ContextLinkageDiscoveryOptions.ModeOneofCase.CurrentContext:
+                case ContextLinkageOptions.ModeOneofCase.CurrentContext:
                     return ContextLinkageDiscoveryMode.CurrentContext;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(protoModeCase), protoModeCase, null);

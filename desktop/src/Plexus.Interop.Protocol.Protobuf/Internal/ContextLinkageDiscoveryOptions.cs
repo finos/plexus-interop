@@ -18,7 +18,7 @@ namespace Plexus.Interop.Protocol.Protobuf.Internal
 {
     using Plexus.Pools;
 
-    internal partial class ContextLinkageDiscoveryOptions : PooledObject<ContextLinkageDiscoveryOptions>
+    internal partial class ContextLinkageOptions : PooledObject<ContextLinkageOptions>
     {
         protected override void Cleanup()
         {

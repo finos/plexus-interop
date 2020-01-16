@@ -14,12 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Protocol
+namespace Plexus.Interop.Protocol.Internal.Discovery
 {
-    public interface IContextLinkageDiscoveryOptions
-    {
-        ContextLinkageDiscoveryMode Mode { get; }
+    using Plexus.Pools;
 
-        Maybe<string> SpecificContext { get; }
+    internal class ContextLinkageOptions : PooledObject<ContextLinkageOptions>, IContextLinkageOptions
+    {
+        public ContextLinkageDiscoveryMode Mode { get; set; }
+
+        public Maybe<string> SpecificContext { get; set; }
+
+        protected override void Cleanup()
+        {
+            SpecificContext = Maybe<string>.Nothing;
+            Mode = ContextLinkageDiscoveryMode.None;
+        }
     }
 }

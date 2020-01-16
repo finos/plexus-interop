@@ -69,8 +69,8 @@ namespace Plexus.Interop.Broker.Internal
 
             var online = request.DiscoveryMode == DiscoveryMode.Online;
             IReadOnlyCollection<string> contexts;
-            if (request.ContextLinkageDiscoveryOptions.Mode != ContextLinkageDiscoveryMode.None 
-                && (contexts = GetContextsIds(request.ContextLinkageDiscoveryOptions, sourceConnection)).Any())
+            if (request.ContextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None 
+                && (contexts = GetContextsIds(request.ContextLinkageOptions, sourceConnection)).Any())
             {
                 groupedMethods = _contextLinkageManager.GetAppsInContexts(contexts, online)
                     .Join(methodMatches, x => x.AppId, y => y.Provided.ProvidedService.Service.Id,
@@ -181,8 +181,8 @@ namespace Plexus.Interop.Broker.Internal
 
             IReadOnlyCollection<string> contexts;
             bool online = request.DiscoveryMode == DiscoveryMode.Online;
-            if (request.ContextLinkageDiscoveryOptions.Mode != ContextLinkageDiscoveryMode.None
-                && (contexts = GetContextsIds(request.ContextLinkageDiscoveryOptions, sourceConnection)).Any())
+            if (request.ContextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None
+                && (contexts = GetContextsIds(request.ContextLinkageOptions, sourceConnection)).Any())
             {
                 discoveredMethods = _contextLinkageManager.GetAppsInContexts(contexts, online)
                     .Join(matchingProvidedMethods, x => x.AppId, y => y.ProvidedService.Application.Id,
@@ -232,12 +232,12 @@ namespace Plexus.Interop.Broker.Internal
             }
         }
 
-        private IReadOnlyCollection<string> GetContextsIds(IContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions, IAppConnection sourceConnection)
+        private IReadOnlyCollection<string> GetContextsIds(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
         {
-            var mode = contextLinkageDiscoveryOptions.Mode;
+            var mode = contextLinkageOptions.Mode;
             var contexts = mode == ContextLinkageDiscoveryMode.CurrentContext
                 ? _contextLinkageManager.GetApplicationContexts(sourceConnection.Info.ApplicationInstanceId)
-                : new[] { contextLinkageDiscoveryOptions.SpecificContext.Value};
+                : new[] { contextLinkageOptions.SpecificContext.Value};
             return contexts;
         }
 

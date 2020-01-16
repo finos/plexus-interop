@@ -90,12 +90,12 @@ namespace Plexus.Interop.Protocol
         }
 
         public IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService,
-            DiscoveryMode mode, IContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions)
+            DiscoveryMode mode, IContextLinkageOptions contextLinkageOptions)
         {
             var obj = ServiceDiscoveryRequest.Rent();
             obj.ConsumedService = consumedService;
             obj.DiscoveryMode = mode;
-            obj.ContextLinkageDiscoveryOptions = contextLinkageDiscoveryOptions;
+            obj.ContextLinkageOptions = contextLinkageOptions;
             return obj;
         }
 
@@ -143,14 +143,14 @@ namespace Plexus.Interop.Protocol
             Maybe<string> outputMessageId,
             Maybe<IConsumedMethodReference> method, 
             DiscoveryMode discoveryMode,
-            IContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions)
+            IContextLinkageOptions contextLinkageOptions)
         {
             var obj = MethodDiscoveryRequest.Rent();
             obj.InputMessageId = inputMessageId;
             obj.OutputMessageId = outputMessageId;
             obj.ConsumedMethod = method;
             obj.DiscoveryMode = discoveryMode;
-            obj.ContextLinkageDiscoveryOptions = contextLinkageDiscoveryOptions;
+            obj.ContextLinkageOptions = contextLinkageOptions;
             return obj;
         }
 
@@ -227,9 +227,9 @@ namespace Plexus.Interop.Protocol
             return obj;
         }
 
-        public IContextLinkageDiscoveryOptions CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId)
+        public IContextLinkageOptions CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId)
         {
-            var obj = ContextLinkageDiscoveryOptions.Rent();
+            var obj = ContextLinkageOptions.Rent();
             obj.Mode = contextLinkageDiscoveryMode;
             obj.SpecificContext = specificContextId;
             return obj;
