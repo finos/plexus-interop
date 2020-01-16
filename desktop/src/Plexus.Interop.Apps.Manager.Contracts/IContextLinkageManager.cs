@@ -6,6 +6,6 @@
     {
         IReadOnlyCollection<string> GetApplicationContexts(UniqueId applicationInstanceId);
 
-        IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContexts(IEnumerable<string> contextIds);
+        IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContexts(IEnumerable<string> contextIds, bool online);
     }
 }

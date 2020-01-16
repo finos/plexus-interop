@@ -95,16 +95,7 @@ namespace Plexus.Interop.Protocol
             var obj = ServiceDiscoveryRequest.Rent();
             obj.ConsumedService = consumedService;
             obj.DiscoveryMode = mode;
-            obj.ContextLinkageDiscoveryOptions = new Maybe<IContextLinkageDiscoveryOptions>(contextLinkageDiscoveryOptions);
-            return obj;
-        }
-
-        public IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService, DiscoveryMode mode)
-        {
-            var obj = ServiceDiscoveryRequest.Rent();
-            obj.ConsumedService = consumedService;
-            obj.DiscoveryMode = mode;
-            obj.ContextLinkageDiscoveryOptions = Maybe<IContextLinkageDiscoveryOptions>.Nothing;
+            obj.ContextLinkageDiscoveryOptions = contextLinkageDiscoveryOptions;
             return obj;
         }
 
@@ -151,13 +142,15 @@ namespace Plexus.Interop.Protocol
             Maybe<string> inputMessageId, 
             Maybe<string> outputMessageId,
             Maybe<IConsumedMethodReference> method, 
-            DiscoveryMode discoveryMode)
+            DiscoveryMode discoveryMode,
+            IContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions)
         {
             var obj = MethodDiscoveryRequest.Rent();
             obj.InputMessageId = inputMessageId;
             obj.OutputMessageId = outputMessageId;
             obj.ConsumedMethod = method;
             obj.DiscoveryMode = discoveryMode;
+            obj.ContextLinkageDiscoveryOptions = contextLinkageDiscoveryOptions;
             return obj;
         }
 

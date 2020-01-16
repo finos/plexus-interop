@@ -22,6 +22,6 @@
 
         DiscoveryMode DiscoveryMode { get; }
 
-        Maybe<IContextLinkageDiscoveryOptions> ContextLinkageDiscoveryOptions { get; set; }
+        IContextLinkageDiscoveryOptions ContextLinkageDiscoveryOptions { get; }
     }
 }

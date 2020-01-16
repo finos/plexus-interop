@@ -23,9 +23,6 @@ namespace Plexus.Interop.Protocol.Discovery
         IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService,
             DiscoveryMode discoveryMode, IContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions);
 
-        IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService,
-            DiscoveryMode discoveryMode);
-
         IServiceDiscoveryResponse CreateServiceDiscoveryResponse(IReadOnlyCollection<IDiscoveredService> services);
 
         IDiscoveredService CreateDiscoveredService(
@@ -46,7 +43,8 @@ namespace Plexus.Interop.Protocol.Discovery
             Maybe<string> inputMessageId,
             Maybe<string> outputMessageId,
             Maybe<IConsumedMethodReference> method, 
-            DiscoveryMode discoveryMode);
+            DiscoveryMode discoveryMode, 
+            IContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions);
 
         IDiscoveredMethod CreateDiscoveredMethod(
             IProvidedMethodReference providedMethod,

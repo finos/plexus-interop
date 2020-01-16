@@ -215,10 +215,10 @@ namespace Plexus.Interop.Apps.Internal.Services
             return _contextsSet.GetContextsOf(applicationInstanceId).Select(context => context.Id).ToArray();
         }
 
-        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContexts(IEnumerable<string> contextIds)
+        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContexts(IEnumerable<string> contextIds, bool online)
         {
             return contextIds.Select(id => _contextsSet.GetContext(id)).Where(context => context != null)
-                .SelectMany(context => context.GetAllAppsInContext()).Distinct().ToArray();
+                .SelectMany(context => context.GetAppsInContext(online)).Distinct().ToArray();
         }
     }
 }

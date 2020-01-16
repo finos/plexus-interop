@@ -25,7 +25,7 @@
 
         public DiscoveryMode DiscoveryMode { get; set; }
 
-        public Maybe<IContextLinkageDiscoveryOptions> ContextLinkageDiscoveryOptions { get; set; }
+        public IContextLinkageDiscoveryOptions ContextLinkageDiscoveryOptions { get; set; }
 
         public T Handle<T, TArgs>(ClientToBrokerRequestHandler<T, TArgs> handler, TArgs args = default)
         {

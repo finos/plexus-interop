@@ -25,5 +25,7 @@
         Maybe<IConsumedMethodReference> ConsumedMethod { get; }
             
         DiscoveryMode DiscoveryMode { get; }
+
+        IContextLinkageDiscoveryOptions ContextLinkageDiscoveryOptions { get; }
     }
 }

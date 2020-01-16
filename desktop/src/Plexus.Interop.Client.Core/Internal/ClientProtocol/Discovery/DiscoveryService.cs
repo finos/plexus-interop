@@ -52,7 +52,8 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
                         query.InputMessageId,
                         query.OutputMessageId,
                         Convert(query.MethodReference),
-                        online ? DiscoveryMode.Online : DiscoveryMode.Offline))
+                        online ? DiscoveryMode.Online : DiscoveryMode.Offline, 
+                        Convert(contextLinkageDiscoveryOptions)))
                 {
                     var serializedRequest = _protocol.Serializer.Serialize(msg);
                     try
@@ -91,7 +92,8 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
                 using (var msg = _protocol.MessageFactory
                     .CreateServiceDiscoveryRequest(
                         Convert(query.ConsumedService),
-                        online ? DiscoveryMode.Online : DiscoveryMode.Offline))
+                        online ? DiscoveryMode.Online : DiscoveryMode.Offline, 
+                        Convert(contextLinkageDiscoveryOptions)))
                 {
                     var serializedRequest = _protocol.Serializer.Serialize(msg);
                     await channel.Out.WriteOrDisposeAsync(new TransportMessageFrame(serializedRequest)).ConfigureAwait(false);
@@ -112,6 +114,18 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
             {
                 await channel.Completion.ConfigureAwait(false);
             }
+        }
+
+        private IContextLinkageDiscoveryOptions Convert(ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions)
+        {
+            if (contextLinkageDiscoveryOptions == null)
+            {
+                return _protocol.MessageFactory.CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode.None,
+                    Maybe<string>.Nothing);
+            }
+
+            return _protocol.MessageFactory.CreateContextLinkageDiscoveryOptions(contextLinkageDiscoveryOptions.Mode,
+                contextLinkageDiscoveryOptions.SpecifiedContextId);
         }
 
         private IReadOnlyCollection<DiscoveredService> Convert(IServiceDiscoveryResponse discoveryResponse)

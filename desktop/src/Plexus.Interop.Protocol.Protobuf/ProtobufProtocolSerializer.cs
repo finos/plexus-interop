@@ -403,23 +403,20 @@ namespace Plexus.Interop.Protocol.Protobuf
             return proto;
         }
 
-        private ContextLinkageDiscoveryOptions ConvertToProto(Maybe<IContextLinkageDiscoveryOptions> obj)
+        private ContextLinkageDiscoveryOptions ConvertToProto(IContextLinkageDiscoveryOptions obj)
         {
             var proto = ContextLinkageDiscoveryOptions.Rent();
-            if (obj.HasValue)
+            switch (obj.Mode)
             {
-                switch (obj.Value.Mode)
-                {
-                    case ContextLinkageDiscoveryMode.None:
-                        proto.ClearMode();
-                        break;
-                    case ContextLinkageDiscoveryMode.SpecificContext:
-                        proto.SpecificContextId = obj.Value.SpecificContext.Value;
-                        break;
-                    case ContextLinkageDiscoveryMode.CurrentContext:
-                        proto.CurrentContext = Empty.Instance;
-                        break;
-                }
+                case ContextLinkageDiscoveryMode.None:
+                    proto.ClearMode();
+                    break;
+                case ContextLinkageDiscoveryMode.SpecificContext:
+                    proto.SpecificContextId = obj.SpecificContext.Value;
+                    break;
+                case ContextLinkageDiscoveryMode.CurrentContext:
+                    proto.CurrentContext = Empty.Instance;
+                    break;
             }
             return proto;
         }
@@ -456,7 +453,8 @@ namespace Plexus.Interop.Protocol.Protobuf
                 proto.InputMessageId.ConvertFromProto(),
                 proto.OutputMessageId.ConvertFromProto(),
                 ConvertFromProto(proto.ConsumedMethod),
-                ConvertFromProto(proto.DiscoveryMode));
+                ConvertFromProto(proto.DiscoveryMode),
+                ConvertFromProtoStrict(proto.ContextLinkageOptions));
         }
 
         private Maybe<IConsumedMethodReference> ConvertFromProto(ConsumedMethodReference proto)

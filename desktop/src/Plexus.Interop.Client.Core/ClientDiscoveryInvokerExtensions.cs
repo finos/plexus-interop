@@ -76,6 +76,13 @@
             return DiscoverOnlineAsync(invoker, MethodDiscoveryQuery.Create(method));
         }
 
+        public static async Task<IReadOnlyCollection<DiscoveredOnlineUnaryMethod<TRequest, TResponse>>> DiscoverInCurrentContextAsync<TRequest, TResponse>(
+            this IClientDiscoveryInvoker invoker, UnaryMethod<TRequest, TResponse> method)
+        {
+            return (await invoker.DiscoverInCurrentContextAsync(MethodDiscoveryQuery.Create(method)))
+                .Select(x => new DiscoveredOnlineUnaryMethod<TRequest, TResponse>(x)).ToList();
+        }
+
         public static async Task<IReadOnlyCollection<DiscoveredServerStreamingMethod<TRequest, TResponse>>> DiscoverAsync<TRequest, TResponse>(
             this IClientDiscoveryInvoker invoker, ServerStreamingMethodDiscoveryQuery<TRequest, TResponse> query)
         {

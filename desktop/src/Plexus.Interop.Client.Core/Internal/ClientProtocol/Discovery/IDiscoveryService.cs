@@ -18,7 +18,6 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Plexus.Interop.Protocol;
 
     internal interface IDiscoveryService
     {

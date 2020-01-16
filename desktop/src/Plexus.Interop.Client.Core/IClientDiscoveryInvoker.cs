@@ -29,10 +29,18 @@
 
         Task<IReadOnlyCollection<DiscoveredOnlineMethod<TRequest, TResponse>>> DiscoverOnlineAsync<TRequest, TResponse>(MethodDiscoveryQuery<TRequest, TResponse> query);
 
-        Task<IReadOnlyCollection<DiscoveredOnlineMethod<TRequest, Nothing>>> DiscoverOnlineAsync<TRequest, TResponse>(MethodDiscoveryQuery<TRequest, Nothing> query);
+        Task<IReadOnlyCollection<DiscoveredOnlineMethod<TRequest, Nothing>>> DiscoverOnlineAsync<TRequest>(MethodDiscoveryQuery<TRequest, Nothing> query);
 
         Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query);
 
         Task<IReadOnlyCollection<DiscoveredOnlineService>> DiscoverOnlineAsync(ServiceDiscoveryQuery query);
+
+        Task<IReadOnlyCollection<DiscoveredOnlineMethod<TRequest, TResponse>>> DiscoverInCurrentContextAsync<TRequest, TResponse>(MethodDiscoveryQuery<TRequest, TResponse> query);
+
+        Task<IReadOnlyCollection<DiscoveredOnlineMethod<TRequest, TResponse>>> DiscoverInSpecificContextAsync<TRequest, TResponse>(MethodDiscoveryQuery<TRequest, TResponse> query, string contextId);
+
+        Task<IReadOnlyCollection<DiscoveredOnlineService>> DiscoverInCurrentContextAsync(ServiceDiscoveryQuery query);
+
+        Task<IReadOnlyCollection<DiscoveredOnlineService>> DiscoverInSpecificContextAsync(ServiceDiscoveryQuery query, string contextId);
     }
 }

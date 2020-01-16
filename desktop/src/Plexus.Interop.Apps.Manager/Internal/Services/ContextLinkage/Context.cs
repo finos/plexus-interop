@@ -113,11 +113,11 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
             }
         }
 
-        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAllAppsInContext()
+        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContext(bool online)
         {
             lock (_lock)
             {
-                return _appInstanceIdsToConnections.Values.SelectMany(set => set.GetAllApps()).ToArray();
+                return _appInstanceIdsToConnections.Values.SelectMany(set => set.GetConnections(online)).ToArray();
             }
         }
     }
