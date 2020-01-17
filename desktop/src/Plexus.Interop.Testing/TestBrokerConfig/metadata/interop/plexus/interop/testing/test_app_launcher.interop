@@ -17,12 +17,14 @@
 
 import "interop/app_launcher_service.proto";
 import "interop/app_lifecycle_service.proto";
+import "interop/context_linkage.proto";
 
 package plexus.interop.testing;
 
 application TestAppLauncher {
 
-	provides .interop.AppLauncherService to interop.AppLifecycleManager { Launch; }
+	provides .interop.AppLauncherService to interop.AppLifecycleManager { Launch; AppLaunchedEventStream; }
 
+	consumes .interop.ContextLinkageService { ContextLoadedStream; CreateContext; JoinContext; GetContexts; GetLinkedInvocations; GetAllLinkedInvocations; }
 	consumes .interop.AppLifecycleService from interop.AppLifecycleManager { GetLifecycleEventStream; GetInvocationEventStream; }
 }

@@ -86,7 +86,7 @@ namespace Plexus.Interop.Internal
         public IUnaryMethodCall CallUnary<TRequest>(MethodCallDescriptor descriptor, TRequest request)
         {
             _log.Debug("Starting unary call: {0}", descriptor);
-            var call = new UnaryMethodCall<TRequest, Nothing>(() => _outcomingInvocationFactory.CreateAsync<TRequest, Nothing>(descriptor, request));
+            var call = new UnaryMethodCall<TRequest, Nothing>(context => _outcomingInvocationFactory.CreateAsync<TRequest, Nothing>(descriptor, request, context));
             call.Start();
             return call;
         }
@@ -99,7 +99,7 @@ namespace Plexus.Interop.Internal
         public IUnaryMethodCall<TResponse> CallUnary<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request)
         {
             _log.Debug("Starting unary call: {0}", descriptor);
-            var call = new UnaryMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request));
+            var call = new UnaryMethodCall<TRequest, TResponse>(context => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request, context));
             call.Start();
             return call;
         }
@@ -112,7 +112,7 @@ namespace Plexus.Interop.Internal
         public IServerStreamingMethodCall<TResponse> CallServerStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request)
         {
             _log.Debug("Starting server streaming call: {0}", descriptor);
-            var call = new ServerStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request));
+            var call = new ServerStreamingMethodCall<TRequest, TResponse>(context => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request, context));
             call.Start();
             return call;
         }
@@ -125,7 +125,7 @@ namespace Plexus.Interop.Internal
         public IClientStreamingMethodCall<TRequest, TResponse> CallClientStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor)
         {
             _log.Debug("Starting client streaming call: {0}", descriptor);
-            var call = new ClientStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor));
+            var call = new ClientStreamingMethodCall<TRequest, TResponse>(context => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, contextLinkageOptions: context));
             call.Start();
             return call;
         }
@@ -138,7 +138,7 @@ namespace Plexus.Interop.Internal
         public IDuplexStreamingMethodCall<TRequest, TResponse> CallDuplexStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor)
         {
             _log.Debug("Starting duplex streaming call: {0}", descriptor);
-            var call = new DuplexStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor));
+            var call = new DuplexStreamingMethodCall<TRequest, TResponse>(context => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, contextLinkageOptions: context));
             call.Start();
             return call;
         }

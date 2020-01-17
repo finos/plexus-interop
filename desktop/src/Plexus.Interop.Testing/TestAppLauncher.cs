@@ -21,8 +21,10 @@ namespace Plexus.Interop.Testing
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
+    using Plexus.Channels;
     using UniqueId = Plexus.UniqueId;
 
     internal sealed class TestAppLauncher : ProcessBase, TestAppLauncherClient.IAppLauncherServiceImpl
@@ -38,6 +40,8 @@ namespace Plexus.Interop.Testing
 
         private readonly Dictionary<string, List<IClient>> _createdClients
             = new Dictionary<string, List<IClient>>();
+
+        private readonly Subject<AppLaunchedEvent> _appLaunchedEvents = new Subject<AppLaunchedEvent>();
 
         public TestAppLauncher(ITestBroker broker, Dictionary<string, TestClientFactory> clientFactories)
         {
@@ -78,7 +82,7 @@ namespace Plexus.Interop.Testing
                     }
                 }
 
-                clientTask = clientTask ?? CreateClientAsync(appId, suggestedAppInstanceId);
+                clientTask = clientTask ?? CreateClientAsync(appId, suggestedAppInstanceId, request.Referrer);
             }
 
             var client = await clientTask.ConfigureAwait(false);
@@ -104,20 +108,18 @@ namespace Plexus.Interop.Testing
 
             return new AppLaunchResponse
             {
-                AppInstanceId = new Generated.UniqueId
-                {
-                    Hi = client.ApplicationInstanceId.Hi,
-                    Lo = client.ApplicationInstanceId.Lo
-                }
+                AppInstanceId = ConvertUniqueId(client.ApplicationInstanceId)
             };
         }
 
-        private async Task<IClient> CreateClientAsync(string appId, UniqueId suggestedAppInstanceId)
+        private async Task<IClient> CreateClientAsync(string appId, UniqueId suggestedAppInstanceId, AppLaunchReferrer requestReferrer)
         {
             if (!_clientFactories.TryGetValue(appId, out var clientFactory))
             {
                 throw new InvalidOperationException($"Unknown application launch requested: {appId}");
             }
+
+            _appLaunchedEvents.OnNext(new AppLaunchedEvent {AppInstanceId = ConvertUniqueId(suggestedAppInstanceId), Referrer = requestReferrer});
             
             var client = await clientFactory.CreateClientAsync(_broker, suggestedAppInstanceId).ConfigureAwait(false);
 
@@ -151,6 +153,20 @@ namespace Plexus.Interop.Testing
         public IServerStreamingMethodCall<InvocationEvent> GetInvocationEventStream()
         {
             return _client.AppLifecycleService.GetInvocationEventStream(new Empty());
+        }
+
+        public Task AppLaunchedEventStream(Empty request, IWritableChannel<AppLaunchedEvent> responseStream, MethodCallContext context)
+        {
+            return _appLaunchedEvents.PipeAsync(responseStream, context.CancellationToken);
+        }
+
+        private static Generated.UniqueId ConvertUniqueId(UniqueId suggestedAppInstanceId)
+        {
+            return new Generated.UniqueId
+            {
+                Hi = suggestedAppInstanceId.Hi,
+                Lo = suggestedAppInstanceId.Lo,
+            };
         }
     }
 }

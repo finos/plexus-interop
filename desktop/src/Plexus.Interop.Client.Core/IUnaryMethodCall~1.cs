@@ -18,7 +18,7 @@
 {    
     using System.Threading.Tasks;
 
-    public interface IUnaryMethodCall<TResponse> : IMethodCall
+    public interface IUnaryMethodCall<TResponse> : IMethodCall, IContextAwareMethodCall<IUnaryMethodCall<TResponse>>
     {
         /// <summary>
         /// Asynchronous call result.

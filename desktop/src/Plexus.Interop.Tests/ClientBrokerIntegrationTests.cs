@@ -1143,6 +1143,55 @@ namespace Plexus.Interop
             });
         }
 
+        [Fact]
+        public void NewAppInstanceWillBeLaunchedForContext()
+        {
+            Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
+            {
+                return Task.FromResult(new GreetingResponse { Greeting = greetingRequest.Name + "1" });
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                var serverCreatedCount = 0;
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithAppInstanceId(id)
+                            .WithApplicationId(EchoServerClient.Id)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                GreetingService.Id,
+                                "LaunchGreetingService",
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+
+                        serverCreatedCount++;
+
+                        return ClientFactory.Instance.Create(optionsBuilder.Build());
+                    });
+
+                var appLauncher = RegisterDisposable(
+                    new TestAppLauncher(
+                        _testBrokerFixture.SharedInstance,
+                        new Dictionary<string, TestClientFactory>
+                        {
+                            {EchoServerClient.Id, echoServerFactory}
+                        }
+                    )
+                );
+                await appLauncher.StartAsync();
+                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
+                await client.ConnectAsync();
+                var result = await client.GreetingService.Hello(new GreetingRequest {Name = "Test"}).WithCurrentContext();
+                
+                result.Greeting.ShouldBe("Test1");
+
+                serverCreatedCount.ShouldBe(1);
+            });
+        }
+
         private IClient ConnectEchoClient(ITestBroker testBroker = null)
         {
             testBroker = testBroker ?? _testBrokerFixture.SharedInstance;

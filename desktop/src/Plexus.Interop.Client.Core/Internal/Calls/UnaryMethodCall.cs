@@ -25,12 +25,14 @@ namespace Plexus.Interop.Internal.Calls
     internal sealed class UnaryMethodCall<TRequest, TResponse> 
         : ProcessBase, IUnaryMethodCall<TResponse>, IUnaryMethodCall
     {
-        private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
+        private readonly Func<ContextLinkageOptions, ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
+        private readonly ContextLinkageOptions _contextLinkageOptions;
         private TResponse _response;
 
-        public UnaryMethodCall(Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> invocationFactory)
+        public UnaryMethodCall(Func<ContextLinkageOptions, ValueTask<IOutcomingInvocation<TRequest, TResponse>>> invocationFactory, ContextLinkageOptions contextLinkageOptions = default)
         {
             _invocationFactory = invocationFactory;
+            _contextLinkageOptions = contextLinkageOptions;
             Completion.LogCompletion(Log);
             ResponseAsync = Completion.ContinueWithSynchronously(t =>
             {
@@ -58,7 +60,7 @@ namespace Plexus.Interop.Internal.Calls
         protected override async Task<Task> StartCoreAsync()
         {
             Log.Trace("Creating invocation");
-            var invocation = await _invocationFactory().ConfigureAwait(false);
+            var invocation = await _invocationFactory(_contextLinkageOptions).ConfigureAwait(false);
             OnStop(() => invocation.Out.TryTerminate());
             await invocation.StartCompletion.ConfigureAwait(false);
             return ProcessAsync(invocation);
@@ -84,6 +86,11 @@ namespace Plexus.Interop.Internal.Calls
                 Log.Trace("Awaiting invocation completion");
                 await invocation.Completion.ConfigureAwait(false);
             }
+        }
+
+        IUnaryMethodCall<TResponse> IContextAwareMethodCall<IUnaryMethodCall<TResponse>>.WithCurrentContext()
+        {
+            return new UnaryMethodCall<TRequest, TResponse>(_invocationFactory, ContextLinkageOptions.WithCurrentContext());
         }
     }
 }

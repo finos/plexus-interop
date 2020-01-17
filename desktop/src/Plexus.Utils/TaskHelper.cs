@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Apps.Internal
+namespace Plexus
 {
     using System;
     using System.Threading.Tasks;
 
-    internal static class TaskHelper
+    public static class TaskHelper
     {
         public static Task CompletedTask
         {

@@ -25,7 +25,7 @@
     /// </summary>
     /// <typeparam name="TRequest">Request message type for this call.</typeparam>
     /// <typeparam name="TResponse">Response message type for this call.</typeparam>
-    public interface IClientStreamingMethodCall<in TRequest, TResponse> : IMethodCall
+    public interface IClientStreamingMethodCall<in TRequest, TResponse> : IMethodCall, IContextAwareMethodCall<IClientStreamingMethodCall<TRequest, TResponse>>
     {
         /// <summary>
         /// Async stream to send streaming requests.
