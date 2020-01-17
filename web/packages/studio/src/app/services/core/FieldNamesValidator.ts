@@ -80,7 +80,7 @@ export class FieldNamesValidator {
 
         let visitsCount = visitedNestedTypes.get(message.id) || 0;
         if (visitsCount > maxRecursiveDepth) {
-            // already visited few times, skip nested fields 
+            // already visited few times, skip nested fields
             return;
         }
         visitedNestedTypes.set(message.id, visitsCount + 1);
@@ -90,7 +90,7 @@ export class FieldNamesValidator {
                 const type = !!field ? this.messageGenerator.lookupMessageByFieldType(message.id, field.type) : undefined;
                 return { field, type, fieldName };
             })
-            // fields with message type goes at the end, so we have better chances to process 
+            // fields with message type goes at the end, so we have better chances to process
             // simple types before got recursive call issue
             .sort((first, second) => {
                 const firstScore = !!first.type ? 1 : 0;

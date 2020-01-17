@@ -24,6 +24,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
+    "protobufjs": "6.8.6",
     "@plexus-interop/client": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
     "@plexus-interop/transport-common": "0.1.0",
