@@ -24,7 +24,7 @@
         private readonly Func<IProvidedMethodReference, TArgs, T> _providedMethodHandler;
 
         public InvocationTargetHandler(
-            Func<IConsumedMethodReference, TArgs, T> consumedMethodHandler, 
+            Func<IConsumedMethodReference, TArgs, T> consumedMethodHandler,
             Func<IProvidedMethodReference, TArgs, T> providedMethodHandler)
         {
             _consumedMethodHandler = consumedMethodHandler;
@@ -39,6 +39,30 @@
         public T Handle(IProvidedMethodReference target, TArgs args)
         {
             return _providedMethodHandler(target, args);
+        }
+    }
+
+    public sealed class InvocationTargetHandler<T, TArgs1, TArgs2>
+    {
+        private readonly Func<IConsumedMethodReference, TArgs1, TArgs2, T> _consumedMethodHandler;
+        private readonly Func<IProvidedMethodReference, TArgs1, TArgs2, T> _providedMethodHandler;
+
+        public InvocationTargetHandler(
+            Func<IConsumedMethodReference, TArgs1, TArgs2, T> consumedMethodHandler, 
+            Func<IProvidedMethodReference, TArgs1, TArgs2, T> providedMethodHandler)
+        {
+            _consumedMethodHandler = consumedMethodHandler;
+            _providedMethodHandler = providedMethodHandler;
+        }
+
+        public T Handle(IConsumedMethodReference target, TArgs1 args1, TArgs2 args2)
+        {
+            return _consumedMethodHandler(target, args1, args2);
+        }
+
+        public T Handle(IProvidedMethodReference target, TArgs1 args1, TArgs2 args2)
+        {
+            return _providedMethodHandler(target, args1, args2);
         }
     }
 }

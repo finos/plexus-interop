@@ -29,5 +29,10 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
             SpecificContext = Maybe<string>.Nothing;
             Mode = ContextLinkageDiscoveryMode.None;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Mode)}: {Mode}, {nameof(SpecificContext)}: {SpecificContext}";
+        }
     }
 }

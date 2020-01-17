@@ -42,6 +42,6 @@ namespace Plexus.Interop.Protocol
             IProvidedServiceReference providedService,
             string methodId);
 
-        IContextLinkageOptions CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId);
+        IContextLinkageOptions CreateContextLinkageOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId);
     }
 }

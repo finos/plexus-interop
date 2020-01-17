@@ -59,7 +59,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
                     : _protocol.MessageFactory.CreateConsumedMethodReference(
                         _protocol.MessageFactory.CreateConsumedServiceReference(Info.Method.ServiceId, Info.Method.ServiceAliasId),
                         Info.Method.MethodId);
-            using (var request = _protocol.MessageFactory.CreateInvocationStartRequest(target))
+            using (var request = _protocol.MessageFactory.CreateInvocationStartRequest(target, null))
             {
                 var serialized = _protocol.Serializer.Serialize(request);
                 try

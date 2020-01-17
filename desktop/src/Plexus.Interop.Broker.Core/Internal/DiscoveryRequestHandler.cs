@@ -68,11 +68,9 @@ namespace Plexus.Interop.Broker.Internal
             IEnumerable<IGrouping<(IConsumedService ConsumedService, IProvidedService ProvidedService, Maybe<UniqueId> ConnectionId, Maybe<UniqueId> ApplicationInstanceId), IProvidedMethod>> groupedMethods;
 
             var online = request.DiscoveryMode == DiscoveryMode.Online;
-            IReadOnlyCollection<string> contexts;
-            if (request.ContextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None 
-                && (contexts = GetContextsIds(request.ContextLinkageOptions, sourceConnection)).Any())
+            if (_contextLinkageManager.IsContextShouldBeConsidered(request.ContextLinkageOptions, sourceConnection))
             {
-                groupedMethods = _contextLinkageManager.GetAppsInContexts(contexts, online)
+                groupedMethods = _contextLinkageManager.GetAppsInContexts(request.ContextLinkageOptions, sourceConnection, online)
                     .Join(methodMatches, x => x.AppId, y => y.Provided.ProvidedService.Service.Id,
                         (x, y) => (y.Consumed, y.Provided, x.AppInstanceId, x.ConnectionId))
                     .GroupBy(x => (x.Consumed.ConsumedService, x.Provided.ProvidedService, x.ConnectionId, new Maybe<UniqueId>(x.AppInstanceId)), x => x.Provided);
@@ -179,12 +177,10 @@ namespace Plexus.Interop.Broker.Internal
             }
             IEnumerable<IDiscoveredMethod> discoveredMethods;
 
-            IReadOnlyCollection<string> contexts;
             bool online = request.DiscoveryMode == DiscoveryMode.Online;
-            if (request.ContextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None
-                && (contexts = GetContextsIds(request.ContextLinkageOptions, sourceConnection)).Any())
+            if (_contextLinkageManager.IsContextShouldBeConsidered(request.ContextLinkageOptions, sourceConnection))
             {
-                discoveredMethods = _contextLinkageManager.GetAppsInContexts(contexts, online)
+                discoveredMethods = _contextLinkageManager.GetAppsInContexts(request.ContextLinkageOptions, sourceConnection, online)
                     .Join(matchingProvidedMethods, x => x.AppId, y => y.ProvidedService.Application.Id,
                         (connection, method) => (method, connection))
                     .Select(pm => Convert(pm.method, pm.connection.ConnectionId,
@@ -230,15 +226,6 @@ namespace Plexus.Interop.Broker.Internal
                     throw;
                 }
             }
-        }
-
-        private IReadOnlyCollection<string> GetContextsIds(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
-        {
-            var mode = contextLinkageOptions.Mode;
-            var contexts = mode == ContextLinkageDiscoveryMode.CurrentContext
-                ? _contextLinkageManager.GetApplicationContexts(sourceConnection.Info.ApplicationInstanceId)
-                : new[] { contextLinkageOptions.SpecificContext.Value};
-            return contexts;
         }
 
         private IDiscoveredMethod Convert(IProvidedMethod pm, Maybe<UniqueId> connectionId, Maybe<UniqueId> appInstanceId)

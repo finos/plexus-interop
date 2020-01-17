@@ -196,7 +196,8 @@ namespace Plexus.Interop.Protocol.Protobuf
                             default:
                                 throw new InvalidOperationException($"Unexpected target payload: {invocationRequest.TargetCase}");
                         }
-                        return _messageFactory.CreateInvocationStartRequest(target);
+                        var contextLinkageOptions = ConvertFromProtoStrict(invocationRequest.ContextLinkageOptions);
+                        return _messageFactory.CreateInvocationStartRequest(target, contextLinkageOptions);
                     case ClientToBrokerRequestEnvelope.PayloadOneofCase.ServiceDiscoveryRequest:
                         return ConvertFromProtoStrict(envelope.ServiceDiscoveryRequest);
                     case ClientToBrokerRequestEnvelope.PayloadOneofCase.MethodDiscoveryRequest:
@@ -514,9 +515,9 @@ namespace Plexus.Interop.Protocol.Protobuf
         {
             if (proto == null || proto.ModeCase == ContextLinkageOptions.ModeOneofCase.None)
             {
-                return _messageFactory.CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode.None, Maybe<string>.Nothing);
+                return _messageFactory.CreateContextLinkageOptions(ContextLinkageDiscoveryMode.None, Maybe<string>.Nothing);
             }
-            return _messageFactory.CreateContextLinkageDiscoveryOptions(
+            return _messageFactory.CreateContextLinkageOptions(
                 ConvertFromProto(proto.ModeCase),
                 proto.ModeCase == ContextLinkageOptions.ModeOneofCase.SpecificContextId 
                     ? new Maybe<string>(proto.SpecificContextId) 

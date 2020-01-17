@@ -210,15 +210,34 @@ namespace Plexus.Interop.Apps.Internal.Services
             public UniqueId AppInstanceId { get; }
         }
 
-        public IReadOnlyCollection<string> GetApplicationContexts(UniqueId applicationInstanceId)
+        public bool IsContextShouldBeConsidered(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
         {
-            return _contextsSet.GetContextsOf(applicationInstanceId).Select(context => context.Id).ToArray();
+            return contextLinkageOptions != null 
+                   && contextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None 
+                   && GetApplicationContexts(contextLinkageOptions, sourceConnection).Any();
         }
 
-        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContexts(IEnumerable<string> contextIds, bool online)
+        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContexts(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection, bool online)
         {
-            return contextIds.Select(id => _contextsSet.GetContext(id)).Where(context => context != null)
-                .SelectMany(context => context.GetAppsInContext(online)).Distinct().ToArray();
+            return GetApplicationContexts(contextLinkageOptions, sourceConnection)
+                .Select(id => _contextsSet.GetContext(id))
+                .Where(context => context != null)
+                .SelectMany(context => context.GetAppsInContext(online))
+                .Distinct().ToArray();
+        }
+
+        private IReadOnlyCollection<string> GetApplicationContexts(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
+        {
+            switch (contextLinkageOptions.Mode)
+            {
+                case ContextLinkageDiscoveryMode.CurrentContext:
+                    return _contextsSet.GetContextsOf(sourceConnection.Info.ApplicationInstanceId)
+                        .Select(context => context.Id).ToArray();
+                case ContextLinkageDiscoveryMode.SpecificContext when contextLinkageOptions.SpecificContext.HasValue:
+                    return new[] {contextLinkageOptions.SpecificContext.Value};
+                default:
+                    return new string[0];
+            }
         }
     }
 }

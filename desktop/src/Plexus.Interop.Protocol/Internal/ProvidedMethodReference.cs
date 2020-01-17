@@ -26,6 +26,11 @@
             return handler.Handle(this, args);
         }
 
+        public T Handle<T, TArg1, TArg2>(InvocationTargetHandler<T, TArg1, TArg2> handler, TArg1 arg1 = default, TArg2 arg2 = default)
+        {
+            return handler.Handle(this, arg1, arg2);
+        }
+
         public IProvidedServiceReference ProvidedService { get; set; }
 
         public string MethodId { get; set; }

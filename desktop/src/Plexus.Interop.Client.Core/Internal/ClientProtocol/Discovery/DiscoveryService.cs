@@ -120,10 +120,10 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
         {
             if (contextLinkageDiscoveryOptions == null)
             {
-                return _protocol.MessageFactory.CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode.None, Maybe<string>.Nothing);
+                return _protocol.MessageFactory.CreateContextLinkageOptions(ContextLinkageDiscoveryMode.None, Maybe<string>.Nothing);
             }
 
-            return _protocol.MessageFactory.CreateContextLinkageDiscoveryOptions(contextLinkageDiscoveryOptions.Mode,
+            return _protocol.MessageFactory.CreateContextLinkageOptions(contextLinkageDiscoveryOptions.Mode,
                 contextLinkageDiscoveryOptions.SpecifiedContextId);
         }
 

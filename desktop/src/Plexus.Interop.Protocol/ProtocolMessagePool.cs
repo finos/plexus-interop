@@ -54,10 +54,11 @@ namespace Plexus.Interop.Protocol
             return InvocationMessageReceived.Instance;
         }
 
-        public IInvocationStart CreateInvocationStartRequest(IInvocationTarget target)
+        public IInvocationStart CreateInvocationStartRequest(IInvocationTarget target, IContextLinkageOptions contextLinkageOptions)
         {
             var obj = InvocationStart.Rent();
             obj.Target = target;
+            obj.ContextLinkageOptions = contextLinkageOptions ?? CreateContextLinkageOptions(ContextLinkageDiscoveryMode.None);
             return obj;
         }
 
@@ -227,7 +228,7 @@ namespace Plexus.Interop.Protocol
             return obj;
         }
 
-        public IContextLinkageOptions CreateContextLinkageDiscoveryOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId)
+        public IContextLinkageOptions CreateContextLinkageOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId = default)
         {
             var obj = ContextLinkageOptions.Rent();
             obj.Mode = contextLinkageDiscoveryMode;
