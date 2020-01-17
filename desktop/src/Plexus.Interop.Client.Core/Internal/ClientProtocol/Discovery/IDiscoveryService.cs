@@ -21,8 +21,8 @@
 
     internal interface IDiscoveryService
     {
-        Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverAsync(MethodDiscoveryQuery query, ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions = null, bool online = false);
+        Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverAsync(MethodDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false);
 
-        Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query, ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions = null, bool online = false);
+        Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false);
     }
 }

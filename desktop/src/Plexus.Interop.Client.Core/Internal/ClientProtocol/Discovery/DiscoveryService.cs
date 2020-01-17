@@ -42,7 +42,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
             _protocol = protocol;
         }
 
-        public async Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverAsync(MethodDiscoveryQuery query, ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions = null, bool online = false)
+        public async Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverAsync(MethodDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false)
         {
             var channel = await _transportConnection.CreateChannelAsync().ConfigureAwait(false);
             try
@@ -53,7 +53,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
                         query.OutputMessageId,
                         Convert(query.MethodReference),
                         online ? DiscoveryMode.Online : DiscoveryMode.Offline, 
-                        Convert(contextLinkageDiscoveryOptions)))
+                        contextLinkageDiscoveryOptions.Convert(_protocol.MessageFactory)))
                 {
                     var serializedRequest = _protocol.Serializer.Serialize(msg);
                     try
@@ -84,7 +84,7 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
             }
         }
 
-        public async Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query, ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions = null, bool online = false)
+        public async Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false)
         {
             var channel = await _transportConnection.CreateChannelAsync().ConfigureAwait(false);
             try
@@ -92,8 +92,8 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
                 using (var msg = _protocol.MessageFactory
                     .CreateServiceDiscoveryRequest(
                         Convert(query.ConsumedService),
-                        online ? DiscoveryMode.Online : DiscoveryMode.Offline, 
-                        Convert(contextLinkageDiscoveryOptions)))
+                        online ? DiscoveryMode.Online : DiscoveryMode.Offline,
+                        contextLinkageDiscoveryOptions.Convert(_protocol.MessageFactory)))
                 {
                     var serializedRequest = _protocol.Serializer.Serialize(msg);
                     await channel.Out.WriteOrDisposeAsync(new TransportMessageFrame(serializedRequest)).ConfigureAwait(false);
@@ -114,17 +114,6 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
             {
                 await channel.Completion.ConfigureAwait(false);
             }
-        }
-
-        private IContextLinkageOptions Convert(ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions)
-        {
-            if (contextLinkageDiscoveryOptions == null)
-            {
-                return _protocol.MessageFactory.CreateContextLinkageOptions(ContextLinkageDiscoveryMode.None, Maybe<string>.Nothing);
-            }
-
-            return _protocol.MessageFactory.CreateContextLinkageOptions(contextLinkageDiscoveryOptions.Mode,
-                contextLinkageDiscoveryOptions.SpecifiedContextId);
         }
 
         private IReadOnlyCollection<DiscoveredService> Convert(IServiceDiscoveryResponse discoveryResponse)

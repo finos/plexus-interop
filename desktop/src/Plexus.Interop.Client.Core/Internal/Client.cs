@@ -174,13 +174,13 @@ namespace Plexus.Interop.Internal
 
         public async Task<IReadOnlyCollection<DiscoveredOnlineMethod<TRequest, TResponse>>> DiscoverInCurrentContextAsync<TRequest, TResponse>(MethodDiscoveryQuery<TRequest, TResponse> query)
         {
-            var discoveryResults = await DiscoverInternalAsync(ConvertQuery(query), ContextLinkageDiscoveryOptions.WithCurrentContext(), true).ConfigureAwait(false);
+            var discoveryResults = await DiscoverInternalAsync(ConvertQuery(query), ContextLinkageOptions.WithCurrentContext(), true).ConfigureAwait(false);
             return discoveryResults.Select(x => new DiscoveredOnlineMethod<TRequest, TResponse>(x)).ToList();
         }
 
         public async Task<IReadOnlyCollection<DiscoveredOnlineMethod<TRequest, TResponse>>> DiscoverInSpecificContextAsync<TRequest, TResponse>(MethodDiscoveryQuery<TRequest, TResponse> query, string contextId)
         {
-            var discoveryResults = await DiscoverInternalAsync(ConvertQuery(query), new ContextLinkageDiscoveryOptions(contextId), true).ConfigureAwait(false);
+            var discoveryResults = await DiscoverInternalAsync(ConvertQuery(query), new ContextLinkageOptions(contextId), true).ConfigureAwait(false);
             return discoveryResults.Select(x => new DiscoveredOnlineMethod<TRequest, TResponse>(x)).ToList();
         }
 
@@ -197,13 +197,13 @@ namespace Plexus.Interop.Internal
 
         public async Task<IReadOnlyCollection<DiscoveredOnlineService>> DiscoverInCurrentContextAsync(ServiceDiscoveryQuery query)
         {
-            var discoveryResults = await DiscoverInternalAsync(query, ContextLinkageDiscoveryOptions.WithCurrentContext(), true).ConfigureAwait(false);
+            var discoveryResults = await DiscoverInternalAsync(query, ContextLinkageOptions.WithCurrentContext(), true).ConfigureAwait(false);
             return discoveryResults.Select(x => new DiscoveredOnlineService(x)).ToList();
         }
         
         public async Task<IReadOnlyCollection<DiscoveredOnlineService>> DiscoverInSpecificContextAsync(ServiceDiscoveryQuery query, string contextId)
         {
-            var discoveryResults = await DiscoverInternalAsync(query, new ContextLinkageDiscoveryOptions(contextId), true).ConfigureAwait(false);
+            var discoveryResults = await DiscoverInternalAsync(query, new ContextLinkageOptions(contextId), true).ConfigureAwait(false);
             return discoveryResults.Select(x => new DiscoveredOnlineService(x)).ToList();
         }
 
@@ -322,7 +322,7 @@ namespace Plexus.Interop.Internal
         }
 
         private async Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverInternalAsync(
-            MethodDiscoveryQuery query, ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions = null, bool online = false)
+            MethodDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false)
         {
             _log.Debug("Method discovery {0}", query);
             var task = _discoveryService.DiscoverAsync(query, contextLinkageDiscoveryOptions, online);            
@@ -334,7 +334,7 @@ namespace Plexus.Interop.Internal
         }
 
         private async Task<IReadOnlyCollection<DiscoveredService>> DiscoverInternalAsync(
-            ServiceDiscoveryQuery query, ContextLinkageDiscoveryOptions contextLinkageDiscoveryOptions = null, bool online = false)
+            ServiceDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false)
         {
             _log.Debug("Service discovery {0}", query);
             var task = _discoveryService.DiscoverAsync(query, contextLinkageDiscoveryOptions, online);            

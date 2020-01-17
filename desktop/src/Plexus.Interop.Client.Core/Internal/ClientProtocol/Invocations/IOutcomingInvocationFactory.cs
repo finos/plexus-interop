@@ -21,6 +21,6 @@
     internal interface IOutcomingInvocationFactory
     {
         ValueTask<IOutcomingInvocation<TRequest, TResponse>> CreateAsync<TRequest, TResponse>(
-            MethodCallDescriptor descriptor, Maybe<TRequest> request = default);
+            MethodCallDescriptor descriptor, Maybe<TRequest> request = default, Maybe<ContextLinkageOptions> contextLinkageOptions = default);
     }
 }
