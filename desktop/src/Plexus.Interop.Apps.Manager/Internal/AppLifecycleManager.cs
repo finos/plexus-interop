@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,26 +16,22 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
-    using Google.Protobuf.WellKnownTypes;
-    using Plexus.Channels;
     using Plexus.Interop.Transport;
-    using Plexus.Processes;
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal.Generated;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
     using UniqueId = Plexus.UniqueId;
 
-    internal sealed class AppLifecycleManager : ProcessBase, IAppLifecycleManager, Generated.AppLifecycleManagerClient.IAppLifecycleServiceImpl
+    internal sealed class AppLifecycleManager : IAppLifecycleManager
     {        
         private readonly Dictionary<UniqueId, IAppConnection> _connections
             = new Dictionary<UniqueId, IAppConnection>();
 
-        private readonly Dictionary<(UniqueId AppInstanceId, string AppId), List<IAppConnection>> _appInstanceConnections
-            = new Dictionary<(UniqueId, string), List<IAppConnection>>();
+        private readonly Dictionary<UniqueId, Dictionary<string, IAppConnection>> _appInstanceConnections
+            = new Dictionary<UniqueId, Dictionary<string, IAppConnection>>();
 
         private readonly Dictionary<string, List<IAppConnection>> _appConnections
             = new Dictionary<string, List<IAppConnection>>();
@@ -43,34 +39,31 @@ namespace Plexus.Interop.Apps.Internal
         private readonly Dictionary<(UniqueId AppInstanceId, string AppId), Promise<IAppConnection>> _appInstanceConnectionsInProgress
             = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
 
-        private readonly AppLifecycleManagerEventBroadcaster<Generated.AppLifecycleEvent> _appLifecycleEventBroadcaster
-            = new AppLifecycleManagerEventBroadcaster<Generated.AppLifecycleEvent>();
-
-        private readonly AppLifecycleManagerEventBroadcaster<Generated.InvocationEvent> _invocationEventBroadcaster
-            = new AppLifecycleManagerEventBroadcaster<Generated.InvocationEvent>();
-
         private readonly IAppRegistryProvider _appRegistryProvider;
+        private readonly Lazy<IClient> _clientLazy;
 
-        private readonly Generated.IAppLifecycleManagerClient _client;
-        private readonly NativeAppLauncherClient _nativeAppLauncherClient;
-
-        public AppLifecycleManager(string metadataDir)
+        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, Lazy<IClient> clientLazy)
         {
-            _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir);
-            _appRegistryProvider = JsonFileAppRegistryProvider.Initialize(Path.Combine(metadataDir, "apps.json"));
-            _client = new Generated.AppLifecycleManagerClient(
-                this, 
-                s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
-            OnStop(_nativeAppLauncherClient.Stop);
-            OnStop(_client.Disconnect);
+            _appRegistryProvider = appRegistryProvider;
+            _clientLazy = clientLazy;
         }        
 
-        protected override ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();        
+        private ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();
 
-        protected override async Task<Task> StartCoreAsync()
+        public event Action<AppConnectionDescriptor> AppConnected = delegate { };
+
+        public event Action<AppConnectionDescriptor> AppDisconnected = delegate { };
+
+        public IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId)
         {
-            await Task.WhenAll(_client.ConnectAsync(), _nativeAppLauncherClient.StartAsync());
-            return Task.WhenAll(_client.Completion, _nativeAppLauncherClient.Completion);
+            lock (_connections)
+            {
+                if (_appInstanceConnections.TryGetValue(appInstanceId, out Dictionary<string, IAppConnection> connections))
+                {
+                    return connections.Values.ToList();
+                }
+                return new IAppConnection[0];
+            }
         }
 
         public IAppConnection AcceptConnection(
@@ -86,13 +79,13 @@ namespace Plexus.Interop.Apps.Internal
                 }
 
                 _connections[clientConnection.Id] = clientConnection;
-                var deferredConnectionKey = (clientConnection.Info.ApplicationInstanceId, clientConnection.Info.ApplicationId);
-                if (!_appInstanceConnections.TryGetValue(deferredConnectionKey, out var connectionList))
+                var appInstanceId = clientConnection.Info.ApplicationInstanceId;
+                if (!_appInstanceConnections.TryGetValue(appInstanceId, out var appConnections))
                 {
-                    connectionList = new List<IAppConnection>();
-                    _appInstanceConnections[deferredConnectionKey] = connectionList;
+                    appConnections = new Dictionary<string, IAppConnection>();
+                    _appInstanceConnections[appInstanceId] = appConnections;
                 }
-                connectionList.Add(clientConnection);
+                appConnections[clientConnection.Info.ApplicationId] = clientConnection;
 
                 var appId = clientConnection.Info.ApplicationId;
                 if (!_appConnections.TryGetValue(appId, out var appConnectionList))
@@ -104,14 +97,9 @@ namespace Plexus.Interop.Apps.Internal
 
                 Log.Debug("New connection accepted: {{{0}}}", clientConnection);
 
-                BroadcastEvent(new Generated.AppLifecycleEvent
-                {
-                    Connected = new Generated.AppConnectedEvent
-                    {
-                        ConnectionDescriptor = connectionInfo.ToProto()
-                    }
-                });
+                AppConnected(connectionInfo);
 
+                var deferredConnectionKey = (appInstanceId, appId);
                 if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
                     Log.Debug("Resolving deferred connection {{{0}}} to accepted connection {{{1}}}", deferredConnectionKey, connection);
@@ -131,17 +119,17 @@ namespace Plexus.Interop.Apps.Internal
             {                
                 _connections.Remove(connection.Id);
 
-                var deferredConnectionKey = (connection.Info.ApplicationInstanceId, connection.Info.ApplicationId);
-                if (_appInstanceConnections.TryGetValue(deferredConnectionKey, out var list))
+                var appInstanceId = connection.Info.ApplicationInstanceId;
+                var appId = connection.Info.ApplicationId;
+                if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections))
                 {
-                    list.Remove(connection);
-                    if (list.Count == 0)
+                    connections.Remove(appId);
+                    if (connections.Count == 0)
                     {
-                        _appInstanceConnections.Remove(deferredConnectionKey);
+                        _appInstanceConnections.Remove(appInstanceId);
                     }
                 }
 
-                var appId = connection.Info.ApplicationId;
                 if (_appConnections.TryGetValue(appId, out var appConnectionList))
                 {
                     appConnectionList.Remove(connection);
@@ -151,6 +139,7 @@ namespace Plexus.Interop.Apps.Internal
                     }
                 }
 
+                var deferredConnectionKey = (appInstanceId, connection.Info.ApplicationId);
                 if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
                     waiter.TryCancel();
@@ -158,13 +147,7 @@ namespace Plexus.Interop.Apps.Internal
                 }
             }
 
-            BroadcastEvent(new Generated.AppLifecycleEvent
-            {
-                Disconnected = new Generated.AppDisconnectedEvent
-                {
-                    ConnectionDescriptor = connection.Info.ToProto()
-                }
-            });
+            AppDisconnected(connection.Info);
         }
 
         public bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection)
@@ -213,88 +196,12 @@ namespace Plexus.Interop.Apps.Internal
             return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Id);
         }
 
-        public void OnInvocationStarted(InvocationStartedEventDescriptor eventData)
-        {
-            BroadcastEvent(new Generated.InvocationEvent
-            {
-                InvocationStarted = new Generated.InvocationStartedEvent
-                {
-                    InvocationDescriptor = eventData.InvocationDescriptor.ToProto()
-                }
-            });
-        }
-
-        public void OnInvocationFinished(InvocationFinishedEventDescriptor eventData)
-        {
-            BroadcastEvent(new Generated.InvocationEvent
-            {
-                InvocationFinished = new Generated.InvocationFinishedEvent
-                {
-                    InvocationDescriptor = eventData.MethodCallDescriptor.ToProto(),
-                    Result = eventData.Result.ToProto(),
-                    DurationMs = eventData.DurationMs
-                }
-            });
-        }
-
         public IReadOnlyCollection<IAppConnection> GetOnlineConnections()
         {
             lock (_connections)
             {
                 return _connections.Values.ToList();
             }
-        }
-
-        async Task<Generated.ResolveAppResponse> Generated.AppLifecycleService.IResolveAppImpl.ResolveApp(
-            Generated.ResolveAppRequest request, MethodCallContext context)
-        {
-            Log.Info("Resolving app by request {{{0}}} from {{{1}}}", request, context);
-            var referrerConnectionInfo = new AppConnectionDescriptor(
-                context.ConsumerConnectionId, 
-                context.ConsumerApplicationId,
-                context.ConsumerApplicationInstanceId);
-            var resolvedConnection = await ResolveConnectionAsync(
-                request.AppId, Convert(request.AppResolveMode),referrerConnectionInfo).ConfigureAwait(false);
-            var info = resolvedConnection.AppConnection.Info;
-            Log.Info("App connection {{{0}}} resolved by request from {{{1}}}", resolvedConnection, context);
-            var response = new Generated.ResolveAppResponse
-            {
-                AppConnectionId = new Generated.UniqueId
-                {
-                    Hi = info.ConnectionId.Hi,
-                    Lo = info.ConnectionId.Lo
-                },
-                AppInstanceId = new Generated.UniqueId
-                {
-                    Hi = info.ApplicationInstanceId.Hi,
-                    Lo = info.ApplicationInstanceId.Lo
-                },
-                IsNewInstanceLaunched = resolvedConnection.IsNewInstance
-            };
-            return response;
-        }
-        
-        Task Generated.AppLifecycleService.IGetLifecycleEventStreamImpl.GetLifecycleEventStream(
-            Empty request, IWritableChannel<Generated.AppLifecycleEvent> responseStream, MethodCallContext context)
-        {
-            return _appLifecycleEventBroadcaster.Subscribe(responseStream, context);
-        }
-
-        Task Generated.AppLifecycleService.IGetInvocationEventStreamImpl.GetInvocationEventStream(
-            Empty request, IWritableChannel<InvocationEvent> responseStream, MethodCallContext context)
-        {
-            return _invocationEventBroadcaster.Subscribe(responseStream, context);
-        }
-
-
-        private void BroadcastEvent(Generated.AppLifecycleEvent evt)
-        {
-            _appLifecycleEventBroadcaster.BroadcastEvent(evt);
-        }
-
-        private void BroadcastEvent(Generated.InvocationEvent evt)
-        {
-            _invocationEventBroadcaster.BroadcastEvent(evt);
         }
 
         private async Task<IAppConnection> LaunchAndWaitConnectionAsync(
@@ -315,9 +222,9 @@ namespace Plexus.Interop.Apps.Internal
 
                 lock (_connections)
                 {
-                    if (_appInstanceConnections.TryGetValue(deferredConnectionKey, out var connectionList) && connectionList.Any())
+                    if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.Any())
                     {
-                        var existingConnection = connectionList.First();
+                        var existingConnection = connections.First().Value;
                         Log.Debug("Resolving deferred connection {{{0}}} to existing connection {{{1}}}", deferredConnectionKey, existingConnection);
                         connectionPromise.TryComplete(existingConnection);
                     }
@@ -357,17 +264,14 @@ namespace Plexus.Interop.Apps.Internal
 
             Log.Debug("Sending request to launcher {0}: appId={1}, params={2}", appDto.LauncherId, appId, appDto.LauncherParams);
 
-            var launchMethodReference =
-                ProvidedMethodReference.Create("interop.AppLauncherService", "Launch", appDto.LauncherId);
-
-            var referrer = new Generated.AppLaunchReferrer
+            var referrer = new AppLaunchReferrer
             {
                 AppId = referrerConnectionInfo.ApplicationId,
                 AppInstanceId = referrerConnectionInfo.ApplicationInstanceId.ToProto(),
                 ConnectionId = referrerConnectionInfo.ConnectionId.ToProto()
             };
 
-            var request = new Generated.AppLaunchRequest
+            var request = new AppLaunchRequest
             {
                 AppId = appId,
                 LaunchParamsJson = JsonConvert.Serialize(appDto.LauncherParams),
@@ -376,9 +280,7 @@ namespace Plexus.Interop.Apps.Internal
                 Referrer = referrer
             };
 
-            var response = await _client.CallInvoker
-                .CallUnary<Generated.AppLaunchRequest, Generated.AppLaunchResponse>(launchMethodReference.CallDescriptor, request)
-                .ConfigureAwait(false);
+            var response = await LaunchUsingLauncherAsync(appDto.LauncherId, request).ConfigureAwait(false);
 
             var appInstanceId = UniqueId.FromHiLo(response.AppInstanceId.Hi, response.AppInstanceId.Lo);
 
@@ -387,27 +289,27 @@ namespace Plexus.Interop.Apps.Internal
             return appInstanceId;
         }
 
-        private static ResolveMode Convert(Generated.AppLaunchMode launchMode)
+        private async Task<AppLaunchResponse> LaunchUsingLauncherAsync(string launcherId, AppLaunchRequest request)
         {
-            switch (launchMode)
-            {
-                case Generated.AppLaunchMode.SingleInstance:
-                    return ResolveMode.SingleInstance;
-                case Generated.AppLaunchMode.MultiInstance:
-                    return ResolveMode.MultiInstance;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(launchMode), launchMode, null);
-            }
+            var appLauncherServiceId = AppLauncherService.Id;
+            var launchMethodId = AppLauncherService.LaunchMethodId;
+            var launchMethodReference = ProvidedMethodReference.Create(appLauncherServiceId, launchMethodId, launcherId);
+
+            var response = await _clientLazy.Value.CallInvoker
+                .CallUnary<AppLaunchRequest, AppLaunchResponse>(launchMethodReference.CallDescriptor, request)
+                .ConfigureAwait(false);
+
+            return response;
         }
 
-        private static Generated.AppLaunchMode Convert(ResolveMode resolveMode)
+        private static AppLaunchMode Convert(ResolveMode resolveMode)
         {
             switch (resolveMode)
             {
                 case ResolveMode.SingleInstance:
-                    return Generated.AppLaunchMode.SingleInstance;
+                    return AppLaunchMode.SingleInstance;
                 case ResolveMode.MultiInstance:
-                    return Generated.AppLaunchMode.MultiInstance;
+                    return AppLaunchMode.MultiInstance;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(resolveMode), resolveMode, null);
             }

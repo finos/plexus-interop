@@ -21,5 +21,10 @@
         public IMethod Method { get; set; }
 
         public IConsumedService ConsumedService { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Method)}: {Method}";
+        }
     }
 }

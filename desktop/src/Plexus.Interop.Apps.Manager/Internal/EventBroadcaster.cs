@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,9 +23,9 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal sealed class AppLifecycleManagerEventBroadcaster<T> : IDisposable
+    internal sealed class EventBroadcaster<T> : IDisposable
     {
-        private static readonly ILogger Log = LogManager.GetLogger(typeof(AppLifecycleManagerEventBroadcaster<T>));
+        private static readonly ILogger Log = LogManager.GetLogger(typeof(EventBroadcaster<T>));
 
         private readonly HashSet<IWritableChannel<T>> _subscribers = new HashSet<IWritableChannel<T>>();
 

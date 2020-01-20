@@ -48,5 +48,10 @@
         {
             return (Id != null ? Id.GetHashCode() : 0);
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Id)}: {Id}, {nameof(LaunchMode)}: {LaunchMode}";
+        }
     }
 }

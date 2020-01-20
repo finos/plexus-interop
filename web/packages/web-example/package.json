@@ -24,15 +24,19 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
+    "protobufjs": "6.8.6",
     "@plexus-interop/client": "0.1.0",
-    "@plexus-interop/websocket-transport": "0.1.0"
+    "@plexus-interop/websocket-transport": "0.1.0",
+    "@plexus-interop/transport-common": "0.1.0",
+    "@plexus-interop/common": "0.1.0"
   },
   "devDependencies": {
-    "browserify": "^14.4.0",
+    "@types/long": "^4.0.0",
+    "browserify": "^14.5.0",
     "copyfiles": "^1.2.0",
     "electron": "1.8.8",
-    "http-server": "^0.10.0",
+    "http-server": "^0.11.1",
     "trash-cli": "^1.4.0",
-    "typescript": "3.3.3"
+    "typescript": "3.7.2"
   }
 }

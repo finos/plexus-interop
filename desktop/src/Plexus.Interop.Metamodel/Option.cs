@@ -20,5 +20,10 @@
     {
         public string Id { get; set; }
         public string Value { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Id)}: {Id}, {nameof(Value)}: {Value}";
+        }
     }
 }

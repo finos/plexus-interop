@@ -1,17 +1,15 @@
 {
-  "lerna": "2.8.0",
   "packages": [
     "packages/*"
   ],
-  "npmClient": "yarn",
-  "useWorkspaces": true,
+  "npmClient": "npm",
   "version": "0.1.0",
   "command": {
     "init": {
       "exact": true
     },
     "bootstrap": {
-      "hoist": true
+      "hoist": false
     }
   }
 }
