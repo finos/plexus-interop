@@ -97,7 +97,7 @@ export class Effects {
             const application = action.payload;
             const appId = application.id;
 
-            const interopClient = await this.interopClientFactory.connect(appId, services.interopRegistryService, services.�?onnectionProvider);
+            const interopClient = await this.interopClientFactory.connect(appId, services.interopRegistryService, services.connectionProvider);
 
             return {
                 type: AppActions.CONNECT_TO_APP_SUCCESS,

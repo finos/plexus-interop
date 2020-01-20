@@ -24,7 +24,7 @@ import { MethodDiscoveryResponse } from '@plexus-interop/client-api';
 
 export interface ServicesSnapshot {
     interopRegistryService: InteropRegistryService,
-    �?onnectionProvider: TransportConnectionProvider,
+    connectionProvider: TransportConnectionProvider,
     interopClient: InteropClient
 }
 
@@ -35,7 +35,7 @@ export interface StudioState {
     consumedMethod: ConsumedMethodState,
     providedMethod: ProvidedMethodState,
     appsFilter?: string,
-    serviceFilter?: string, 
+    serviceFilter?: string,
     apps: Application[],
     services: ServicesSnapshot
 }
@@ -74,7 +74,7 @@ export interface ProvidedMethodState {
 export interface PlexusConnectedActionParams {
     apps: Application[],
     interopRegistryService: InteropRegistryService,
-    �?onnectionProvider: TransportConnectionProvider
+    connectionProvider: TransportConnectionProvider
 }
 
 export interface AppConnectedActionParams {
