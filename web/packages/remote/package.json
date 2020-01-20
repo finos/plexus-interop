@@ -15,7 +15,6 @@
     "test": "yarn unit"
   },
   "dependencies": {
-    "rxjs": "^5.5.2",
     "@plexus-interop/common": "0.1.0",
     "superagent": "3.8.2",
     "tslib": "1.10.0"
@@ -25,6 +24,7 @@
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {
+    "rxjs": "^5.5.2",
     "@types/loglevel": "^1.4.29",
     "@types/long": "^4.0.0",
     "@types/jest": "^23.1.3",

@@ -19,8 +19,8 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "../../../node_modules/bootswatch/dist/yeti/bootstrap.min.css",
-        "../../../node_modules/font-awesome/css/font-awesome.min.css",
+        "./../node_modules/bootswatch/dist/yeti/bootstrap.min.css",
+        "./../node_modules/font-awesome/css/font-awesome.min.css",
         "styles.css"
       ],
       "scripts": [],

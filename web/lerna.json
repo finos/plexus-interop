@@ -9,7 +9,8 @@
       "exact": true
     },
     "bootstrap": {
-      "hoist": false
+      "hoist": false,
+      "ignoreScripts": true
     }
   }
 }
