@@ -67,14 +67,14 @@ export async function connectionSetupEffect(
         const apps = interopRegistryService.getRegistry().applications.valuesArray();
         log.info(`Successfully loaded metadata from ${metadataUrl}`);
 
-        const �?onnectionProvider = await transportConnectionFactory.getConnectionProvider(connectionDetails);
+        const connectionProvider = await transportConnectionFactory.getConnectionProvider(connectionDetails);
         log.info(`Connection provider created`);
         return {
             type: AppActions.CONNECTION_SETUP_SUCCESS,
             payload: {
                 apps,
                 interopRegistryService,
-                �?onnectionProvider
+                connectionProvider
             }
         };
     } catch (error) {
