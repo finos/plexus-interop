@@ -23,6 +23,7 @@ namespace Plexus.Interop.Broker.Internal
     using Plexus.Interop.Protocol.Invocation;
     using Plexus.Interop.Transport;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
@@ -254,21 +255,32 @@ namespace Plexus.Interop.Broker.Internal
                 var appIds = _appLifecycleManager.FilterCanBeLaunched(
                     targetMethods.Select(x => x.ProvidedService.Application.Id).Distinct());
                 targetMethods = targetMethods.Join(appIds, x => x.ProvidedService.Application.Id, y => y, (x, y) => x).ToArray();
-                var singleInstanceMethods = targetMethods
-                    .Where(x => GetLaunchMode(x) == LaunchMode.SingleInstance)
-                    .ToArray();
-                var candidate = singleInstanceMethods.FirstOrDefault(x => !x.ProvidedService.Application.Id.Equals(source.Info.ApplicationId));
+
+                var singleInstanceMethods = targetMethods.Where(x => GetLaunchMode(x) == LaunchMode.SingleInstance).ToArray();
+
+                var onlineConnections = new HashSet<string>(_appLifecycleManager.GetOnlineConnections().Select(connection => connection.Info.ApplicationId));
+
+                var candidate = singleInstanceMethods.FirstOrDefault(x => !x.ProvidedService.Application.Id.Equals(source.Info.ApplicationId) && !onlineConnections.Contains(x.ProvidedService.Application.Id));
                 resolveMode = ResolveMode.SingleInstance;
+
                 if (candidate == null)
                 {
-                    candidate = singleInstanceMethods.FirstOrDefault();
+                    candidate = singleInstanceMethods.FirstOrDefault(x => !onlineConnections.Contains(x.ProvidedService.Application.Id));
                     resolveMode = ResolveMode.SingleInstance;
                 }
+
                 if (candidate == null)
                 {
                     candidate = targetMethods.FirstOrDefault(x => GetLaunchMode(x) == LaunchMode.MultiInstance);
                     resolveMode = ResolveMode.MultiInstance;
                 }
+
+                if (candidate == null)
+                {
+                    candidate = targetMethods.FirstOrDefault(x => GetLaunchMode(x) != LaunchMode.None);
+                    resolveMode = ResolveMode.MultiInstance;
+                }
+
                 if (candidate == null)
                 {
                     throw new InvalidOperationException($"Cannot resolve target for invocation {{{method}}} from {{{source}}}");
@@ -304,7 +316,7 @@ namespace Plexus.Interop.Broker.Internal
                     ? method.ProvidedService.LaunchMode.Value
                     : method.ProvidedService.Application.LaunchMode.HasValue
                         ? method.ProvidedService.Application.LaunchMode.Value
-                        : LaunchMode.None;
+                        : LaunchMode.SingleInstance;
         }
 
         private IInvocationStartRequested CreateInvocationTarget(IProvidedMethodReference reference, IAppConnection sourceConnection)
