@@ -51,7 +51,7 @@ const initialState: StudioState = {
     services: {
         interopRegistryService: undefined,
         interopClient: undefined,
-        �?onnectionProvider: undefined
+        connectionProvider: undefined
     }
 };
 
@@ -75,7 +75,7 @@ export function reducer(
                 services: {
                     ...state.services,
                     interopRegistryService: payload.interopRegistryService,
-                    �?onnectionProvider: payload.�?onnectionProvider
+                    connectionProvider: payload.connectionProvider
                 },
                 loading: false
             };
