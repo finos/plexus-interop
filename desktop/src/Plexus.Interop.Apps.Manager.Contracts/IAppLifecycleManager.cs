@@ -35,7 +35,7 @@
 
         bool CanBeLaunched(string appId);
 
-        Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
+        Task<ResolvedConnection> LaunchAndConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
 
         event Action<AppConnectionDescriptor> AppConnected;
 

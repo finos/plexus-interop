@@ -24,7 +24,7 @@
     /// </summary>
     /// <typeparam name="TRequest">Request message type for this call.</typeparam>
     /// <typeparam name="TResponse">Response message type for this call.</typeparam>
-    public interface IDuplexStreamingMethodCall<in TRequest, TResponse> : IMethodCall, IContextAwareMethodCall<IDuplexStreamingMethodCall<TRequest, TResponse>>
+    public interface IDuplexStreamingMethodCall<in TRequest, TResponse> : IMethodCall
     {
         /// <summary>
         /// Async stream to read streaming responses.

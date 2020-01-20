@@ -41,7 +41,7 @@ namespace Plexus.Interop.Testing
         private readonly Dictionary<string, List<IClient>> _createdClients
             = new Dictionary<string, List<IClient>>();
 
-        private readonly Subject<AppLaunchedEvent> _appLaunchedEvents = new Subject<AppLaunchedEvent>();
+        private readonly ReplaySubject<AppLaunchedEvent> _appLaunchedEvents = new ReplaySubject<AppLaunchedEvent>(5);
 
         public TestAppLauncher(ITestBroker broker, Dictionary<string, TestClientFactory> clientFactories)
         {
@@ -119,8 +119,8 @@ namespace Plexus.Interop.Testing
                 throw new InvalidOperationException($"Unknown application launch requested: {appId}");
             }
 
-            _appLaunchedEvents.OnNext(new AppLaunchedEvent {AppInstanceId = ConvertUniqueId(suggestedAppInstanceId), Referrer = requestReferrer});
-            
+            _appLaunchedEvents.OnNext(new AppLaunchedEvent { AppInstanceId = ConvertUniqueId(suggestedAppInstanceId), Referrer = requestReferrer, AppIds = { appId } });
+
             var client = await clientFactory.CreateClientAsync(_broker, suggestedAppInstanceId).ConfigureAwait(false);
 
             lock (_sync)
@@ -155,9 +155,11 @@ namespace Plexus.Interop.Testing
             return _client.AppLifecycleService.GetInvocationEventStream(new Empty());
         }
 
-        public Task AppLaunchedEventStream(Empty request, IWritableChannel<AppLaunchedEvent> responseStream, MethodCallContext context)
+        public async Task AppLaunchedEventStream(Empty request, IWritableChannel<AppLaunchedEvent> responseStream, MethodCallContext context)
         {
-            return _appLaunchedEvents.PipeAsync(responseStream, context.CancellationToken);
+            Log.Debug("AppLaunchedEventStream pipe started");
+            await _appLaunchedEvents.PipeAsync(responseStream, context.CancellationToken).ConfigureAwait(false);
+            Log.Debug("AppLaunchedEventStream pipe finished");
         }
 
         private static Generated.UniqueId ConvertUniqueId(UniqueId suggestedAppInstanceId)

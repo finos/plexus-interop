@@ -2143,6 +2143,29 @@
 					"from": [
 						"plexus.interop.testing.*"
 					]
+				},
+				{
+					"service": "interop.ContextLinkageService",
+					"methods": [
+						{
+							"name": "ContextLoadedStream"
+						},
+						{
+							"name": "CreateContext"
+						},
+						{
+							"name": "JoinContext"
+						},
+						{
+							"name": "GetContexts"
+						},
+						{
+							"name": "GetLinkedInvocations"
+						},
+						{
+							"name": "GetAllLinkedInvocations"
+						}
+					]
 				}
 			]
 		},

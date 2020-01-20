@@ -17,6 +17,7 @@
 namespace Plexus.Interop.Apps.Internal.Services
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
     using Plexus.Channels;
@@ -96,22 +97,30 @@ namespace Plexus.Interop.Apps.Internal.Services
                 context.ConsumerConnectionId,
                 context.ConsumerApplicationId,
                 context.ConsumerApplicationInstanceId);
-            var resolvedConnection = await _appLifecycleManager.ResolveConnectionAsync(
-                request.AppId, Convert(request.AppResolveMode), referrerConnectionInfo).ConfigureAwait(false);
+            var resolveMode = Convert(request.AppResolveMode);
+            if (resolveMode == ResolveMode.SingleInstance)
+            {
+                var connection = _appLifecycleManager.GetOnlineConnections().FirstOrDefault(c => c.Info.ApplicationId.Equals(request.AppId));
+                Log.Debug("Resolved connection for app {0} with mode {1} to online instance {{{2}}}", connection, resolveMode, connection);
+                if (connection != null)
+                {
+                    return new ResolveAppResponse
+                    {
+                        AppInstanceId = connection.Info.ApplicationInstanceId.ToProto(),
+                        AppConnectionId = connection.Info.ConnectionId.ToProto(),
+                        IsNewInstanceLaunched = false,
+                    };
+                }
+            }
+
+            var resolvedConnection = await _appLifecycleManager.LaunchAndConnectionAsync(
+                request.AppId, resolveMode, referrerConnectionInfo).ConfigureAwait(false);
             var info = resolvedConnection.AppConnection.Info;
             Log.Info("App connection {{{0}}} resolved by request from {{{1}}}", resolvedConnection, context);
             var response = new ResolveAppResponse
             {
-                AppConnectionId = new UniqueId
-                {
-                    Hi = info.ConnectionId.Hi,
-                    Lo = info.ConnectionId.Lo
-                },
-                AppInstanceId = new UniqueId
-                {
-                    Hi = info.ApplicationInstanceId.Hi,
-                    Lo = info.ApplicationInstanceId.Lo
-                },
+                AppConnectionId = info.ConnectionId.ToProto(),
+                AppInstanceId = info.ApplicationInstanceId.ToProto(),
                 IsNewInstanceLaunched = resolvedConnection.IsNewInstance
             };
             return response;

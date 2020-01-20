@@ -210,7 +210,7 @@ namespace Plexus.Interop.Broker.Internal
 
                 var resolveMode = ConvertToResolveMode(launchMode);
 
-                resolveTask = _appLifecycleManager.ResolveConnectionAsync(appId, resolveMode, source.Info);
+                resolveTask = _appLifecycleManager.LaunchAndConnectionAsync(appId, resolveMode, source.Info);
             }
             var resolvedConnection = await resolveTask.ConfigureAwait(false);
             return resolvedConnection.AppConnection;
@@ -277,7 +277,7 @@ namespace Plexus.Interop.Broker.Internal
                 appId = candidate.ProvidedService.Application.Id;
             }
             var resolvedConnection = await _appLifecycleManager
-                .ResolveConnectionAsync(appId, resolveMode, source.Info)
+                .LaunchAndConnectionAsync(appId, resolveMode, source.Info)
                 .ConfigureAwait(false);
 
             return resolvedConnection.AppConnection;
@@ -304,7 +304,7 @@ namespace Plexus.Interop.Broker.Internal
                     ? method.ProvidedService.LaunchMode.Value
                     : method.ProvidedService.Application.LaunchMode.HasValue
                         ? method.ProvidedService.Application.LaunchMode.Value
-                        : LaunchMode.SingleInstance;
+                        : LaunchMode.None;
         }
 
         private IInvocationStartRequested CreateInvocationTarget(IProvidedMethodReference reference, IAppConnection sourceConnection)

@@ -19,10 +19,13 @@ package plexus.interop.testing;
 
 import "plexus/interop/testing/echo_service.proto";
 import "plexus/interop/testing/greeting_service.proto";
+import "interop/context_linkage.proto";
 
 application EchoClient {
 	
 	consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
 
 	consumes plexus.interop.testing.GreetingService from plexus.interop.testing.* { Hello; } 
+		
+	consumes .interop.ContextLinkageService { ContextLoadedStream; CreateContext; JoinContext; GetContexts; GetLinkedInvocations; GetAllLinkedInvocations; }
 }

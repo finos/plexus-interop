@@ -26,14 +26,12 @@ namespace Plexus.Interop.Internal.Calls
         ProcessBase, IClientStreamingMethodCall<TRequest, TResponse>
     {
         private readonly IChannel<TRequest> _requestStream = new BufferedChannel<TRequest>(1);
-        private readonly Func<ContextLinkageOptions, ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
-        private readonly ContextLinkageOptions _contextLinkageOptions;
+        private readonly Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> _invocationFactory;
         private readonly Promise<TResponse> _responseCompletion = new Promise<TResponse>();
 
-        public ClientStreamingMethodCall(Func<ContextLinkageOptions, ValueTask<IOutcomingInvocation<TRequest, TResponse>>> invocationFactory, ContextLinkageOptions contextLinkageOptions = default)
+        public ClientStreamingMethodCall(Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> invocationFactory)
         {
             _invocationFactory = invocationFactory;
-            _contextLinkageOptions = contextLinkageOptions;
             Completion.LogCompletion(Log);
         }
 
@@ -46,7 +44,7 @@ namespace Plexus.Interop.Internal.Calls
         protected override async Task<Task> StartCoreAsync()
         {
             Log.Trace("Creating invocation");
-            var invocation = await _invocationFactory(_contextLinkageOptions).ConfigureAwait(false);
+            var invocation = await _invocationFactory().ConfigureAwait(false);
             OnStop(() => invocation.Out.TryTerminate());
             await invocation.StartCompletion.ConfigureAwait(false);
             var processRequestsAsync = ProcessRequestsAsync(invocation);
@@ -112,11 +110,6 @@ namespace Plexus.Interop.Internal.Calls
                 Log.Trace("Awaiting request invocation completion");
                 await invocation.Out.Completion.ConfigureAwait(false);
             }
-        }
-
-        IClientStreamingMethodCall<TRequest, TResponse> IContextAwareMethodCall<IClientStreamingMethodCall<TRequest, TResponse>>.WithCurrentContext()
-        {
-            return new ClientStreamingMethodCall<TRequest, TResponse>(_invocationFactory, ContextLinkageOptions.WithCurrentContext());
         }
     }
 }

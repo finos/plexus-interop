@@ -281,6 +281,7 @@ namespace Plexus.Interop.Protocol.Protobuf
             {
                 var proto = InvocationStartRequest.Rent();
                 message.Target.Handle(_setInvocationTargetHandler, proto);
+                proto.ContextLinkageOptions = ConvertToProto(message.ContextLinkageOptions);
                 envelope.InvocationStartRequest = proto;
                 return envelope.Serialize();
             }
@@ -407,17 +408,20 @@ namespace Plexus.Interop.Protocol.Protobuf
         private ContextLinkageOptions ConvertToProto(IContextLinkageOptions obj)
         {
             var proto = ContextLinkageOptions.Rent();
-            switch (obj.Mode)
+            if (obj != null)
             {
-                case ContextLinkageDiscoveryMode.None:
-                    proto.ClearMode();
-                    break;
-                case ContextLinkageDiscoveryMode.SpecificContext:
-                    proto.SpecificContextId = obj.SpecificContext.Value;
-                    break;
-                case ContextLinkageDiscoveryMode.CurrentContext:
-                    proto.CurrentContext = Empty.Instance;
-                    break;
+                switch (obj.Mode)
+                {
+                    case ContextLinkageDiscoveryMode.None:
+                        proto.ClearMode();
+                        break;
+                    case ContextLinkageDiscoveryMode.SpecificContext:
+                        proto.SpecificContextId = obj.SpecificContext.Value;
+                        break;
+                    case ContextLinkageDiscoveryMode.CurrentContext:
+                        proto.CurrentContext = Empty.Instance;
+                        break;
+                }
             }
             return proto;
         }

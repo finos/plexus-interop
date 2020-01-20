@@ -23,7 +23,7 @@
     /// Return type for server streaming calls.
     /// </summary>
     /// <typeparam name="TResponse">Response message type for this call.</typeparam>
-    public interface IServerStreamingMethodCall<TResponse> : IMethodCall, IContextAwareMethodCall<IServerStreamingMethodCall<TResponse>>
+    public interface IServerStreamingMethodCall<TResponse> : IMethodCall
     {
         /// <summary>
         /// Async stream to read streaming responses.

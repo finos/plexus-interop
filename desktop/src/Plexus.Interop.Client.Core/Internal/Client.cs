@@ -78,67 +78,67 @@ namespace Plexus.Interop.Internal
 
         public Task DisconnectAsync() => StopAsync();
 
-        public IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request)
+        public IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
-            return CallUnary(method.CallDescriptor, request);
+            return CallUnary(method.CallDescriptor, request, contextLinkageOptions);
         }
 
-        public IUnaryMethodCall CallUnary<TRequest>(MethodCallDescriptor descriptor, TRequest request)
+        public IUnaryMethodCall CallUnary<TRequest>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
             _log.Debug("Starting unary call: {0}", descriptor);
-            var call = new UnaryMethodCall<TRequest, Nothing>(context => _outcomingInvocationFactory.CreateAsync<TRequest, Nothing>(descriptor, request, context));
+            var call = new UnaryMethodCall<TRequest, Nothing>(() => _outcomingInvocationFactory.CreateAsync<TRequest, Nothing>(descriptor, request, contextLinkageOptions));
             call.Start();
             return call;
         }
 
-        public IUnaryMethodCall<TResponse> Call<TRequest, TResponse>(IUnaryMethod<TRequest, TResponse> method, TRequest request)
+        public IUnaryMethodCall<TResponse> Call<TRequest, TResponse>(IUnaryMethod<TRequest, TResponse> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
-            return CallUnary<TRequest, TResponse>(method.CallDescriptor, request);
+            return CallUnary<TRequest, TResponse>(method.CallDescriptor, request, contextLinkageOptions);
         }
 
-        public IUnaryMethodCall<TResponse> CallUnary<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request)
+        public IUnaryMethodCall<TResponse> CallUnary<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
             _log.Debug("Starting unary call: {0}", descriptor);
-            var call = new UnaryMethodCall<TRequest, TResponse>(context => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request, context));
+            var call = new UnaryMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request, contextLinkageOptions));
             call.Start();
             return call;
         }
 
-        public IServerStreamingMethodCall<TResponse> Call<TRequest, TResponse>(IServerStreamingMethod<TRequest, TResponse> method, TRequest request)
+        public IServerStreamingMethodCall<TResponse> Call<TRequest, TResponse>(IServerStreamingMethod<TRequest, TResponse> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
-            return CallServerStreaming<TRequest, TResponse>(method.CallDescriptor, request);
+            return CallServerStreaming<TRequest, TResponse>(method.CallDescriptor, request, contextLinkageOptions);
         }
 
-        public IServerStreamingMethodCall<TResponse> CallServerStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request)
+        public IServerStreamingMethodCall<TResponse> CallServerStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
             _log.Debug("Starting server streaming call: {0}", descriptor);
-            var call = new ServerStreamingMethodCall<TRequest, TResponse>(context => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request, context));
+            var call = new ServerStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request, contextLinkageOptions));
             call.Start();
             return call;
         }
 
-        public IClientStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IClientStreamingMethod<TRequest, TResponse> method)
+        public IClientStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IClientStreamingMethod<TRequest, TResponse> method, ContextLinkageOptions contextLinkageOptions = default)
         {
-            return CallClientStreaming<TRequest, TResponse>(method.CallDescriptor);
+            return CallClientStreaming<TRequest, TResponse>(method.CallDescriptor, contextLinkageOptions);
         }
 
-        public IClientStreamingMethodCall<TRequest, TResponse> CallClientStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor)
+        public IClientStreamingMethodCall<TRequest, TResponse> CallClientStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, ContextLinkageOptions contextLinkageOptions = default)
         {
             _log.Debug("Starting client streaming call: {0}", descriptor);
-            var call = new ClientStreamingMethodCall<TRequest, TResponse>(context => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, contextLinkageOptions: context));
+            var call = new ClientStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, contextLinkageOptions: contextLinkageOptions));
             call.Start();
             return call;
         }
 
-        public IDuplexStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IDuplexStreamingMethod<TRequest, TResponse> method)
+        public IDuplexStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IDuplexStreamingMethod<TRequest, TResponse> method, ContextLinkageOptions contextLinkageOptions = default)
         {
-            return CallDuplexStreaming<TRequest, TResponse>(method.CallDescriptor);
+            return CallDuplexStreaming<TRequest, TResponse>(method.CallDescriptor, contextLinkageOptions);
         }
 
-        public IDuplexStreamingMethodCall<TRequest, TResponse> CallDuplexStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor)
+        public IDuplexStreamingMethodCall<TRequest, TResponse> CallDuplexStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, ContextLinkageOptions contextLinkageOptions = default)
         {
             _log.Debug("Starting duplex streaming call: {0}", descriptor);
-            var call = new DuplexStreamingMethodCall<TRequest, TResponse>(context => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, contextLinkageOptions: context));
+            var call = new DuplexStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, contextLinkageOptions: contextLinkageOptions));
             call.Start();
             return call;
         }
