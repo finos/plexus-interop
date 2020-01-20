@@ -26,12 +26,12 @@ namespace Plexus.Interop.Apps.Internal.Services
     using Plexus.Interop.Apps.Internal.Generated;
     using Plexus.Interop.Metamodel;
 
-    internal class AppMetadataService : IAppMetadataService
+    internal class AppMetadataServiceImpl : IAppMetadataService
     {
         private readonly BehaviorSubject<IRegistry> _metamodelSubject;
         private readonly BehaviorSubject<AppRegistry> _appRegistrySubject;
 
-        public AppMetadataService(IAppRegistryProvider appRegistryProvider, IRegistryProvider registryProvider)
+        public AppMetadataServiceImpl(IAppRegistryProvider appRegistryProvider, IRegistryProvider registryProvider)
         {
             _appRegistrySubject = new BehaviorSubject<AppRegistry>(appRegistryProvider.Current);
             appRegistryProvider.Updated += registry => _appRegistrySubject.OnNext(registry);
@@ -50,7 +50,7 @@ namespace Plexus.Interop.Apps.Internal.Services
             await _metamodelSubject.Select(ConvertToMetamodelChangedEvent).PipeAsync(responseStream).ConfigureAwait(false);
         }
 
-        private AppMetadataChangedEvent ConvertToAppRegistryChangedEvent(AppRegistry registry)
+        private static AppMetadataChangedEvent ConvertToAppRegistryChangedEvent(AppRegistry registry)
         {
             return new AppMetadataChangedEvent
             {
@@ -68,28 +68,7 @@ namespace Plexus.Interop.Apps.Internal.Services
         {
             return new MetamodelChangedEvent
             {
-                Applications = { registry.Applications.Values.Select(appInfo => new AppMetamodelInfo
-                {
-                    Id = appInfo.Id,
-                    ConsumedServices = { appInfo.ConsumedServices.Select(service => new ConsumedService
-                    {
-                        ServiceId = service.Service.Id,
-                        Alias = service.Alias.GetValueOrDefault(string.Empty),
-                        Methods = { service.Methods.Values.Select(method => new ConsumedMethod { Name = method.Method.Name })}
-                    }) },
-                    ProvidedServices = { appInfo.ProvidedServices.Select(service => new ProvidedService
-                    {
-                        ServiceId = service.Service.Id,
-                        Alias = service.Alias.GetValueOrDefault(string.Empty),
-                        Methods = { service.Methods.Values.Select(method => new ProvidedMethod {
-                            Name = method.Method.Name,
-                            LaunchMode = ConvertLaunchMode(method.LaunchMode),
-                            Title = method.Title.GetValueOrDefault(string.Empty),
-                            TimeoutMs = method.TimeoutMs,
-                            Options = { method.Options.Select(option => new OptionParameter { Key = option.Id, Value = option.Value})}
-                        })}
-                    }) },
-                }) },
+                Applications = { registry.Applications.Values.Select(ConvertToAppMetamodelInfo) },
                 Services = { registry.Services.Values.Select(service => new Service
                 {
                     Id = service.Id,
@@ -101,6 +80,32 @@ namespace Plexus.Interop.Apps.Internal.Services
                         ResponseMessageId = method.OutputMessage.Id,
                     })}
                 })}
+            };
+        }
+
+        internal static AppMetamodelInfo ConvertToAppMetamodelInfo(IApplication appInfo)
+        {
+            return new AppMetamodelInfo
+            {
+                Id = appInfo.Id,
+                ConsumedServices = { appInfo.ConsumedServices.Select(service => new ConsumedService
+                {
+                    ServiceId = service.Service.Id,
+                    Alias = service.Alias.GetValueOrDefault(string.Empty),
+                    Methods = { service.Methods.Values.Select(method => new ConsumedMethod { Name = method.Method.Name })}
+                }) },
+                ProvidedServices = { appInfo.ProvidedServices.Select(service => new ProvidedService
+                {
+                    ServiceId = service.Service.Id,
+                    Alias = service.Alias.GetValueOrDefault(string.Empty),
+                    Methods = { service.Methods.Values.Select(method => new ProvidedMethod {
+                        Name = method.Method.Name,
+                        LaunchMode = ConvertLaunchMode(method.LaunchMode),
+                        Title = method.Title.GetValueOrDefault(string.Empty),
+                        TimeoutMs = method.TimeoutMs,
+                        Options = { method.Options.Select(option => new OptionParameter { Key = option.Id, Value = option.Value})}
+                    })}
+                }) },
             };
         }
 

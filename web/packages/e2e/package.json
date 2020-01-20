@@ -46,7 +46,9 @@
     "@plexus-interop/metadata": "0.1.0",
     "@plexus-interop/client": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
-    "@types/long": "^4.0.0"
+    "@types/long": "^4.0.0",
+    "protobufjs": "6.8.6",
+    "long": "^4.0.0"
   },
   "devDependencies": {
     "@types/long": "^4.0.0",

@@ -18,17 +18,18 @@ namespace Plexus.Interop.Apps.Internal
 {
     using System;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
+    using Google.Protobuf.WellKnownTypes;
+    using Plexus.Channels;
     using Plexus.Interop.Apps.Internal.Generated;
+    using Plexus.Interop.Apps.Internal.Services;
     using Plexus.Interop.Metamodel;
     using Plexus.Processes;
-    using AppLifecycleService = Services.AppLifecycleService;
 
     internal class InteropContext : ProcessBase, IInteropContext
     {
         public IRegistryProvider RegistryProvider { get; }
-
-        public IClient LifecycleManagerClient => _lifecycleManagerClient;
 
         public IAppLifecycleManager AppLifecycleManager => _appLifecycleManager;
 
@@ -37,7 +38,9 @@ namespace Plexus.Interop.Apps.Internal
         private readonly NativeAppLauncherClient _nativeAppLauncherClient;
         private readonly AppLifecycleManagerClient _lifecycleManagerClient;
         private readonly AppLifecycleManager _appLifecycleManager;
-        private readonly AppLifecycleService _appLifecycleService;
+
+        private readonly AppLifecycleServiceImpl _appLifecycleService;
+        private readonly ContextLinkageServiceImpl _contextLinkageService;
 
         public InteropContext(string metadataDir, IRegistryProvider registryProvider)
         {
@@ -45,24 +48,29 @@ namespace Plexus.Interop.Apps.Internal
             var appRegistryProvider = JsonFileAppRegistryProvider.Initialize(Path.Combine(metadataDir, "apps.json"));
             _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir);
 
-            _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, new Lazy<IClient>(() => LifecycleManagerClient));
+            var clientLazy = new Lazy<IClient>(() => _lifecycleManagerClient);
+            _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, clientLazy);
+            var appLaunchedEventProvider = new AppLaunchedEventProvider(_appLifecycleManager, registryProvider, clientLazy);
 
-            var appMetadataService = new Services.AppMetadataService(appRegistryProvider, registryProvider);
-            _appLifecycleService = new AppLifecycleService(_appLifecycleManager);
+            var appMetadataService = new AppMetadataServiceImpl(appRegistryProvider, registryProvider);
+            _appLifecycleService = new AppLifecycleServiceImpl(_appLifecycleManager);
+            _contextLinkageService = new ContextLinkageServiceImpl(registryProvider, _appLifecycleManager, appLaunchedEventProvider);
 
             _lifecycleManagerClient = new AppLifecycleManagerClient(
                 _appLifecycleService,
                 appMetadataService,
+                _contextLinkageService,
                 s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
 
             OnStop(_nativeAppLauncherClient.Stop);
-            OnStop(LifecycleManagerClient.Disconnect);
+            OnStop(_lifecycleManagerClient.Disconnect);
         }
 
         protected override async Task<Task> StartCoreAsync()
         {
-            await Task.WhenAll(LifecycleManagerClient.ConnectAsync(), _nativeAppLauncherClient.StartAsync());
-            return Task.WhenAll(LifecycleManagerClient.Completion, _nativeAppLauncherClient.Completion);
+            await Task.WhenAll(_lifecycleManagerClient.ConnectAsync(), _nativeAppLauncherClient.StartAsync());
+
+            return Task.WhenAll(_lifecycleManagerClient.Completion, _nativeAppLauncherClient.Completion);
         }
     }
 }

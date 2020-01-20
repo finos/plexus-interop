@@ -32,6 +32,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		
 		public const string Id = "interop.AppLauncherService";			
 		public const string LaunchMethodId = "Launch";
+		public const string AppLaunchedEventStreamMethodId = "AppLaunchedEventStream";
 		
 		public static readonly AppLauncherService.Descriptor DefaultDescriptor = CreateDescriptor();
 		
@@ -47,20 +48,31 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse> Launch(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest request);
 		}
 		
+		public partial interface IAppLaunchedEventStreamProxy {
+			IServerStreamingMethodCall<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent> AppLaunchedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
+		}
+		
 		public partial interface ILaunchImpl {
 			Task<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse> Launch(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest request, MethodCallContext context);
+		}
+		
+		public partial interface IAppLaunchedEventStreamImpl {
+			Task AppLaunchedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent> responseStream, MethodCallContext context);
 		}
 		
 		public sealed partial class Descriptor {
 		
 			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse> LaunchMethod {get; private set; }
+			public ServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent> AppLaunchedEventStreamMethod {get; private set; }
 			
 			public Descriptor() {				
 				LaunchMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse>(Id, LaunchMethodId);
+				AppLaunchedEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent>(Id, AppLaunchedEventStreamMethodId);
 			}
 		
 			public Descriptor(string alias) {
 				LaunchMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse>(Id, alias, LaunchMethodId);
+				AppLaunchedEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent>(Id, alias, AppLaunchedEventStreamMethodId);
 			}
 		}
 	}

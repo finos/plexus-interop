@@ -43,6 +43,7 @@
     "bootswatch": "^4.1.0",
     "core-js": "^2.5.3",
     "font-awesome": "^4.7.0",
+    "typescript-collections": "1.2.3",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
     "rxjs": "^5.5.2",
@@ -84,11 +85,11 @@
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/src/setup-jest.ts",
     "transform": {
-      "^.+\\.(ts|js|html)$": "<rootDir>/../../node_modules/jest-preset-angular/preprocessor.js"
+      "^.+\\.(ts|js|html)$": "<rootDir>/node_modules/jest-preset-angular/preprocessor.js"
     },
     "snapshotSerializers": [
-      "<rootDir>/../../node_modules/jest-preset-angular/AngularSnapshotSerializer.js",
-      "<rootDir>/../../node_modules/jest-preset-angular/HTMLCommentSerializer.js"
+      "<rootDir>/node_modules/jest-preset-angular/AngularSnapshotSerializer.js",
+      "<rootDir>/node_modules/jest-preset-angular/HTMLCommentSerializer.js"
     ]
   }
 }

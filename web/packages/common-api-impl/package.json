@@ -16,7 +16,6 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "rxjs": "^5.5.2",
     "@plexus-interop/protocol": "0.1.0",
     "@plexus-interop/remote": "0.1.0",
     "@plexus-interop/common": "0.1.0",
