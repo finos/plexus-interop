@@ -48,7 +48,7 @@ namespace Plexus.Interop.Broker.Internal
             var protocol = new ProtocolImplementation(DefaultProtocolMessageFactory, serializerFactory);
             _appLifecycleManager = interopContext.AppLifecycleManager;
             _authenticationHandler = new AuthenticationHandler(interopContext.AppLifecycleManager, protocol, registryService);
-            _clientRequestHandler = new ClientRequestHandler(interopContext.AppLifecycleManager, protocol, registryService, interopContext.InvocationEventProvider);
+            _clientRequestHandler = new ClientRequestHandler(interopContext.AppLifecycleManager, protocol, registryService, interopContext.InvocationEventProvider, interopContext.ContextLinkageManager);
         }
 
         protected override ILogger Log { get; } = LogManager.GetLogger<BrokerProcessor>();

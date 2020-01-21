@@ -30,8 +30,8 @@ namespace Plexus.Interop.Internal.Calls
 
         public ServerStreamingMethodCall(Func<ValueTask<IOutcomingInvocation<TRequest, TResponse>>> invocationFactory)
         {
-            Completion.LogCompletion(Log);
             _invocationFactory = invocationFactory;
+            Completion.LogCompletion(Log);
             _responseStream.PropagateCompletionFrom(Completion);
         }
 

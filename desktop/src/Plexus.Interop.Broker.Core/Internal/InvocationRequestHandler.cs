@@ -23,6 +23,7 @@ namespace Plexus.Interop.Broker.Internal
     using Plexus.Interop.Protocol.Invocation;
     using Plexus.Interop.Transport;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
@@ -35,10 +36,11 @@ namespace Plexus.Interop.Broker.Internal
         private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly IRegistryService _registryService;
         private readonly IInvocationEventProvider _invocationEventProvider;
+        private readonly IContextLinkageManager _contextLinkageManager;
         private readonly IProtocolMessageFactory _protocolMessageFactory;
         private readonly IProtocolSerializer _protocolSerializer;
         private readonly InvocationTargetHandler<IInvocationStartRequested, IAppConnection> _createRequestHandler;
-        private readonly InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection> _resolveTargetConnectionHandler;
+        private readonly InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection, IContextLinkageOptions> _resolveTargetConnectionHandler;
 
         private readonly object _resolveConnectionSync = new object();
 
@@ -46,15 +48,17 @@ namespace Plexus.Interop.Broker.Internal
             IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
             IRegistryService registryService,
-            IInvocationEventProvider invocationEventProvider)
+            IInvocationEventProvider invocationEventProvider,
+            IContextLinkageManager contextLinkageManager)
         {
             _appLifecycleManager = appLifecycleManager;            
             _protocolMessageFactory = protocol.MessageFactory;
             _protocolSerializer = protocol.Serializer;
             _registryService = registryService;
             _invocationEventProvider = invocationEventProvider;
+            _contextLinkageManager = contextLinkageManager;
             _createRequestHandler = new InvocationTargetHandler<IInvocationStartRequested, IAppConnection>(CreateInvocationTarget, CreateInvocationTarget);
-            _resolveTargetConnectionHandler = new InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection>(ResolveTargetConnectionAsync, ResolveTargetConnectionAsync);
+            _resolveTargetConnectionHandler = new InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection, IContextLinkageOptions>(ResolveTargetConnectionAsync, ResolveTargetConnectionAsync);
             _stopwatch.Start();
         }
         
@@ -67,7 +71,7 @@ namespace Plexus.Interop.Broker.Internal
             try
             {
                 Log.Info("Handling invocation {0} from {{{1}}}: {{{2}}}", sourceChannel.Id, sourceConnection, request);
-                targetConnection = await request.Target.Handle(_resolveTargetConnectionHandler, sourceConnection).ConfigureAwait(false);
+                targetConnection = await request.Target.Handle(_resolveTargetConnectionHandler, sourceConnection, request.ContextLinkageOptions).ConfigureAwait(false);
                 targetChannel = await targetConnection.CreateChannelAsync().ConfigureAwait(false);
                 Log.Debug("Created channel {0} for invocation {1} from {{{2}}} to {{{3}}}: {{{4}}}", targetChannel.Id, sourceChannel.Id, sourceConnection, targetConnection, request);
                 using (var invocationStarting = _protocolMessageFactory.CreateInvocationStarting())
@@ -106,8 +110,8 @@ namespace Plexus.Interop.Broker.Internal
                         throw;
                     }
                 }
-                var propagateTask1 = TaskRunner.RunInBackground(() => PropagateAsync(sourceChannel.In, targetChannel.Out));
-                var propagateTask2 = TaskRunner.RunInBackground(() => PropagateAsync(targetChannel.In, sourceChannel.Out));
+                var propagateTask1 = TaskRunner.RunInBackground(() => PropagateAsync(sourceChannel, targetChannel));
+                var propagateTask2 = TaskRunner.RunInBackground(() => PropagateAsync(targetChannel, sourceChannel));
                 await Task.WhenAll(propagateTask1, propagateTask2).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -160,7 +164,8 @@ namespace Plexus.Interop.Broker.Internal
 
         private async ValueTask<IAppConnection> ResolveTargetConnectionAsync(
             IProvidedMethodReference methodReference, 
-            IAppConnection source)
+            IAppConnection source, 
+            IContextLinkageOptions contextLinkageOptions)
         {
             var method = _registryService.GetProvidedMethod(methodReference);
             var launchMode = GetLaunchMode(method);
@@ -184,6 +189,14 @@ namespace Plexus.Interop.Broker.Internal
                         .Where(x => x.Info.ApplicationId.Equals(appId) &&
                                     !x.Id.Equals(source.Id)).ToArray();
 
+                    if (_contextLinkageManager.IsContextShouldBeConsidered(contextLinkageOptions, source))
+                    {
+                        onlineConnections = _contextLinkageManager
+                            .GetAppsInContexts(contextLinkageOptions, source, true)
+                            .Join(onlineConnections, x => x.ConnectionId.Value, y => y.Id, (x, y) => y)
+                            .ToArray();
+                    }
+
                     if (onlineConnections.Any())
                     {
                         return onlineConnections.First();
@@ -198,7 +211,7 @@ namespace Plexus.Interop.Broker.Internal
 
                 var resolveMode = ConvertToResolveMode(launchMode);
 
-                resolveTask = _appLifecycleManager.ResolveConnectionAsync(appId, resolveMode, source.Info);
+                resolveTask = _appLifecycleManager.LaunchAndConnectAsync(appId, resolveMode, source.Info);
             }
             var resolvedConnection = await resolveTask.ConfigureAwait(false);
             return resolvedConnection.AppConnection;
@@ -206,7 +219,8 @@ namespace Plexus.Interop.Broker.Internal
 
         private async ValueTask<IAppConnection> ResolveTargetConnectionAsync(
             IConsumedMethodReference method, 
-            IAppConnection source)
+            IAppConnection source,
+            IContextLinkageOptions contextLinkageOptions)
         {
             Log.Debug("Resolving target connection for call {{{0}}} from {{{1}}}", method, source);
             string appId;
@@ -221,6 +235,13 @@ namespace Plexus.Interop.Broker.Internal
                         x => x.Info.ApplicationId, y => y.ProvidedService.Application.Id,
                         (x, y) => (Method: y, AppConnection: x))
                     .ToArray();
+
+            if (_contextLinkageManager.IsContextShouldBeConsidered(contextLinkageOptions, source))
+            {
+                onlineProvidedMethods = _contextLinkageManager.GetAppsInContexts(contextLinkageOptions, source, true)
+                    .Join(onlineProvidedMethods, x => x.ConnectionId.Value, y => y.AppConnection.Id, (x, y) => y).ToArray();
+            }
+
             if (onlineProvidedMethods.Any())
             {
                 var connection = onlineProvidedMethods.First().AppConnection;
@@ -234,21 +255,32 @@ namespace Plexus.Interop.Broker.Internal
                 var appIds = _appLifecycleManager.FilterCanBeLaunched(
                     targetMethods.Select(x => x.ProvidedService.Application.Id).Distinct());
                 targetMethods = targetMethods.Join(appIds, x => x.ProvidedService.Application.Id, y => y, (x, y) => x).ToArray();
-                var singleInstanceMethods = targetMethods
-                    .Where(x => GetLaunchMode(x) == LaunchMode.SingleInstance)
-                    .ToArray();
-                var candidate = singleInstanceMethods.FirstOrDefault(x => !x.ProvidedService.Application.Id.Equals(source.Info.ApplicationId));
+
+                var singleInstanceMethods = targetMethods.Where(x => GetLaunchMode(x) == LaunchMode.SingleInstance).ToArray();
+
+                var onlineConnections = new HashSet<string>(_appLifecycleManager.GetOnlineConnections().Select(connection => connection.Info.ApplicationId));
+
+                var candidate = singleInstanceMethods.FirstOrDefault(x => !x.ProvidedService.Application.Id.Equals(source.Info.ApplicationId) && !onlineConnections.Contains(x.ProvidedService.Application.Id));
                 resolveMode = ResolveMode.SingleInstance;
+
                 if (candidate == null)
                 {
-                    candidate = singleInstanceMethods.FirstOrDefault();
+                    candidate = singleInstanceMethods.FirstOrDefault(x => !onlineConnections.Contains(x.ProvidedService.Application.Id));
                     resolveMode = ResolveMode.SingleInstance;
                 }
+
                 if (candidate == null)
                 {
                     candidate = targetMethods.FirstOrDefault(x => GetLaunchMode(x) == LaunchMode.MultiInstance);
                     resolveMode = ResolveMode.MultiInstance;
                 }
+
+                if (candidate == null)
+                {
+                    candidate = targetMethods.FirstOrDefault(x => GetLaunchMode(x) != LaunchMode.None);
+                    resolveMode = ResolveMode.MultiInstance;
+                }
+
                 if (candidate == null)
                 {
                     throw new InvalidOperationException($"Cannot resolve target for invocation {{{method}}} from {{{source}}}");
@@ -257,7 +289,7 @@ namespace Plexus.Interop.Broker.Internal
                 appId = candidate.ProvidedService.Application.Id;
             }
             var resolvedConnection = await _appLifecycleManager
-                .ResolveConnectionAsync(appId, resolveMode, source.Info)
+                .LaunchAndConnectAsync(appId, resolveMode, source.Info)
                 .ConfigureAwait(false);
 
             return resolvedConnection.AppConnection;
@@ -314,25 +346,40 @@ namespace Plexus.Interop.Broker.Internal
             frame.Dispose();
         }
 
-        private static async Task PropagateAsync(IReadableChannel<TransportMessageFrame> channel1, ITerminatableWritableChannel<TransportMessageFrame> channel2)
+        private static async Task PropagateAsync(ITransportChannel source, ITransportChannel target)
         {
             try
             {
+                int propagatedMessageCount = 0;
                 while (true)
                 {
-                    var result = await channel1.TryReadAsync().ConfigureAwait(false);
+                    Log.Trace($"Waiting for TransportMessageFrame from {source.Id} to propagate to {target.Id}");
+
+                    var result = await source.In.TryReadAsync().ConfigureAwait(false);
+
                     if (!result.HasValue)
                     {
+                        Log.Trace($"Received empty TransportMessageFrame from {source.Id}. Will complete {target.Id} channel");
                         break;
                     }
-                    await channel2.WriteAsync(result.Value).ConfigureAwait(false);
+
+                    var messageFrame = result.Value;
+
+                    Log.Trace($"Received TransportMessageFrame {messageFrame} from {source.Id}. Will try to propagate it to {target.Id} channel");
+                    await target.Out.WriteAsync(messageFrame).ConfigureAwait(false);
+
+                    propagatedMessageCount++;
+
+                    Log.Trace($"TransportMessageFrame {messageFrame} successfully propagated to {target.Id} (received from {source.Id})");
                 }
 
-                channel2.TryComplete();
+                target.Out.TryComplete();
+                Log.Trace($"Successfully completed TransportMessageFrame propagation from {source.Id} to {target.Id}. Total {propagatedMessageCount} messages propagated");
             }
             catch (Exception ex)
             {
-                channel2.TryTerminate(ex);
+                Log.Warn($"Caught exception during attempt to propagate TransportMessageFrame from {source.Id} to {target.Id}", ex);
+                target.Out.TryTerminate(ex);
             }
         }
     }

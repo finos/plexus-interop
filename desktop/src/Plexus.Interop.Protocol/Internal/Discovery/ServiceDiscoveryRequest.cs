@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol.Internal.Discovery
+ namespace Plexus.Interop.Protocol.Internal.Discovery
 {
     using Plexus.Interop.Protocol.Discovery;
     using Plexus.Pools;
@@ -24,6 +24,8 @@
         public Maybe<IConsumedServiceReference> ConsumedService { get; set; }
 
         public DiscoveryMode DiscoveryMode { get; set; }
+
+        public IContextLinkageOptions ContextLinkageOptions { get; set; }
 
         public T Handle<T, TArgs>(ClientToBrokerRequestHandler<T, TArgs> handler, TArgs args = default)
         {
@@ -35,6 +37,7 @@
             ConsumedService.GetValueOrDefault()?.Dispose();
             ConsumedService = default;
             DiscoveryMode = default;
+            ContextLinkageOptions = default;
         }
 
         public override string ToString()

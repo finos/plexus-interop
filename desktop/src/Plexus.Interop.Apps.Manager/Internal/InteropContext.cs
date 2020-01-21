@@ -26,6 +26,7 @@ namespace Plexus.Interop.Apps.Internal
     using Plexus.Interop.Apps.Internal.Services;
     using Plexus.Interop.Metamodel;
     using Plexus.Processes;
+    using IContextLinkageManager = Plexus.Interop.Apps.IContextLinkageManager;
 
     internal class InteropContext : ProcessBase, IInteropContext
     {
@@ -34,6 +35,7 @@ namespace Plexus.Interop.Apps.Internal
         public IAppLifecycleManager AppLifecycleManager => _appLifecycleManager;
 
         public IInvocationEventProvider InvocationEventProvider => _appLifecycleService;
+        public IContextLinkageManager ContextLinkageManager => _contextLinkageService;
 
         private readonly NativeAppLauncherClient _nativeAppLauncherClient;
         private readonly AppLifecycleManagerClient _lifecycleManagerClient;

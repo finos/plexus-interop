@@ -1,5 +1,5 @@
-/**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+﻿/**
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol
+namespace Plexus
 {
-    public interface IProvidedServiceReference : IProtocolMessage
+    using System;
+    using System.Threading.Tasks;
+
+    public static class TaskHelper
     {
-        string ServiceId { get; }
+        public static Task CompletedTask
+        {
+            get
+            {
+#if NET45
+                return Task.FromResult<object>(null);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+        }
 
-        Maybe<string> ServiceAlias { get; }
-
-        string ApplicationId { get; }
-
-        Maybe<UniqueId> ConnectionId { get; }
-
-        Maybe<UniqueId> ApplicationInstanceId { get; }
+#pragma warning disable 1998
+        public static async Task FromException(Exception exception)
+#pragma warning restore 1998
+        {
+            throw exception;
+        }
     }
 }

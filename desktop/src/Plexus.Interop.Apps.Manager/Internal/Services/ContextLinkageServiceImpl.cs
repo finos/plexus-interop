@@ -17,6 +17,7 @@
 namespace Plexus.Interop.Apps.Internal.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -25,12 +26,13 @@ namespace Plexus.Interop.Apps.Internal.Services
     using Plexus.Interop.Apps.Internal.Generated;
     using Plexus.Interop.Apps.Internal.Services.ContextLinkage;
     using Plexus.Interop.Metamodel;
+    using Plexus.Interop.Protocol;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
     using Context = Plexus.Interop.Apps.Internal.Services.ContextLinkage.Context;
     using ContextDto = Generated.Context;
     using UniqueId = Plexus.UniqueId;
 
-    internal class ContextLinkageServiceImpl : AppLifecycleManagerClient.IContextLinkageServiceImpl
+    internal class ContextLinkageServiceImpl : AppLifecycleManagerClient.IContextLinkageServiceImpl, IContextLinkageManager
     {
         private readonly IRegistryProvider _appRegistryProvider;
         private readonly IAppLifecycleManager _appLifecycleManager;
@@ -206,6 +208,36 @@ namespace Plexus.Interop.Apps.Internal.Services
 
             public Context Context { get; }
             public UniqueId AppInstanceId { get; }
+        }
+
+        public bool IsContextShouldBeConsidered(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
+        {
+            return contextLinkageOptions != null 
+                   && contextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None 
+                   && GetApplicationContexts(contextLinkageOptions, sourceConnection).Any();
+        }
+
+        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContexts(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection, bool online)
+        {
+            return GetApplicationContexts(contextLinkageOptions, sourceConnection)
+                .Select(id => _contextsSet.GetContext(id))
+                .Where(context => context != null)
+                .SelectMany(context => context.GetAppsInContext(online))
+                .Distinct().ToArray();
+        }
+
+        private IReadOnlyCollection<string> GetApplicationContexts(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
+        {
+            switch (contextLinkageOptions.Mode)
+            {
+                case ContextLinkageDiscoveryMode.CurrentContext:
+                    return _contextsSet.GetContextsOf(sourceConnection.Info.ApplicationInstanceId)
+                        .Select(context => context.Id).ToArray();
+                case ContextLinkageDiscoveryMode.SpecificContext when contextLinkageOptions.SpecificContext.HasValue:
+                    return new[] {contextLinkageOptions.SpecificContext.Value};
+                default:
+                    return new string[0];
+            }
         }
     }
 }

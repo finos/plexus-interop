@@ -53,6 +53,8 @@ message ProvidedServiceReference {
 	string application_id = 3;
 
 	.plexus.UniqueId connection_id = 4;
+
+	.plexus.UniqueId application_instance_id = 5;
 }
 
 message ProvidedMethodReference {
@@ -112,6 +114,8 @@ message InvocationStartRequest {
 		// Invocation to the specific implementation of method
 		ProvidedMethodReference provided_method = 2;
 	}
+
+	ContextLinkageOptions context_linkage_options = 3;
 }
 
 // broker -> source
@@ -185,6 +189,15 @@ enum MethodType {
 	DuplexStreaming = 3;
 }
 
+message ContextLinkageOptions {	
+	oneof mode {
+		string specific_context_id = 1;
+		Empty current_context = 2;
+	}
+}
+
+message Empty { }
+
 // client -> broker
 // Sent by client to initiate discovery of services
 message ServiceDiscoveryRequest {
@@ -192,6 +205,8 @@ message ServiceDiscoveryRequest {
 	ConsumedServiceReference consumed_service = 1;
 
 	DiscoveryMode discovery_mode = 2;
+
+	ContextLinkageOptions context_linkage_options = 3;
 }
 
 // broker -> client
@@ -239,6 +254,8 @@ message MethodDiscoveryRequest {
 	ConsumedMethodReference consumed_method = 3;
 
 	DiscoveryMode discovery_mode = 4;
+
+	ContextLinkageOptions context_linkage_options = 5;
 }
 
 message MethodDiscoveryResponse {

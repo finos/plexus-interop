@@ -25,7 +25,7 @@
             return factory.CreateInvocationStartRequest(
                 factory.CreateConsumedMethodReference(
                     factory.CreateConsumedServiceReference(serviceId, Maybe<string>.Nothing),
-                    methodId));
+                    methodId), null);
         }
 
         public static IInvocationStart CreateInvocationStartRequest(this IProtocolMessageFactory factory, string serviceId, Maybe<string> serviceAlias, string methodId)
@@ -33,7 +33,7 @@
             return factory.CreateInvocationStartRequest(
                 factory.CreateConsumedMethodReference(
                     factory.CreateConsumedServiceReference(serviceId, serviceAlias),
-                    methodId));
+                    methodId), null);
         }
     }
 }

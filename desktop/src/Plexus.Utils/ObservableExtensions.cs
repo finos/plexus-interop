@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Apps.Internal
+namespace Plexus
 {
     using System;
     using System.Reactive;
@@ -24,7 +24,7 @@ namespace Plexus.Interop.Apps.Internal
     using System.Threading.Tasks;
     using Plexus.Channels;
 
-    internal static class ObservableExtensions
+    public static class ObservableExtensions
     {
         public static Task PipeAsync<T>(
             this IObservable<T> observable,

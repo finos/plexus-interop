@@ -18,7 +18,7 @@
 {
     public interface IInvocationProtocolMessageFactory
     {
-        IInvocationStart CreateInvocationStartRequest(IInvocationTarget target);
+        IInvocationStart CreateInvocationStartRequest(IInvocationTarget target, IContextLinkageOptions contextLinkageOptions);
 
         IInvocationStartRequested CreateInvocationStartRequested(
             string serviceId,

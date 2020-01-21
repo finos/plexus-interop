@@ -19,5 +19,6 @@
     public interface IInvocationStart : IClientToBrokerRequest
     {
         IInvocationTarget Target { get; }
+        IContextLinkageOptions ContextLinkageOptions { get; }
     }
 }

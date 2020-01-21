@@ -27,5 +27,6 @@ namespace Plexus.Interop.Apps
         IRegistryProvider RegistryProvider { get; }
         IAppLifecycleManager AppLifecycleManager { get; }
         IInvocationEventProvider InvocationEventProvider { get; }
+        IContextLinkageManager ContextLinkageManager { get; }
     }
 }

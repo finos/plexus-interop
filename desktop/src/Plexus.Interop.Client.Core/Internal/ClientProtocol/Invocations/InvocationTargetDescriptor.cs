@@ -23,11 +23,13 @@
         public InvocationTargetDescriptor(
             string applicationId = default,
             Maybe<UniqueId> connectionId = default,
-            Maybe<string> serviceAliasId = default)
+            Maybe<string> serviceAliasId = default,
+            Maybe<UniqueId> applicationInstanceId = default)
         {
             ApplicationId = applicationId;
             ConnectionId = connectionId;
             ServiceAliasId = serviceAliasId;
+            ApplicationInstanceId = applicationInstanceId;
         }
 
         public string ApplicationId { get; }
@@ -35,6 +37,8 @@
         public Maybe<UniqueId> ConnectionId { get; }
 
         public Maybe<string> ServiceAliasId { get; }
+
+        public Maybe<UniqueId> ApplicationInstanceId { get; }
 
         public override bool Equals(object obj)
         {
@@ -50,12 +54,13 @@
             hashCode = hashCode * -1521134295 + EqualityComparer<Maybe<string>>.Default.GetHashCode(ApplicationId);
             hashCode = hashCode * -1521134295 + EqualityComparer<Maybe<UniqueId>>.Default.GetHashCode(ConnectionId);
             hashCode = hashCode * -1521134295 + EqualityComparer<Maybe<string>>.Default.GetHashCode(ServiceAliasId);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Maybe<UniqueId>>.Default.GetHashCode(ApplicationInstanceId);
             return hashCode;
         }
 
         public override string ToString()
         {
-            return $"{{{nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}, {nameof(ServiceAliasId)}: {ServiceAliasId}}}";
+            return $"{nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}, {nameof(ServiceAliasId)}: {ServiceAliasId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}";
         }
     }
 }

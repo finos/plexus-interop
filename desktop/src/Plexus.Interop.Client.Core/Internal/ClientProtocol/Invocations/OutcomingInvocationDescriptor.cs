@@ -20,15 +20,20 @@
     {
         public OutcomingInvocationDescriptor(
             InvocationMethodDescriptor method,
-            InvocationTargetDescriptor target = null)
+            InvocationTargetDescriptor target = null,
+            Maybe<ContextLinkageOptions> contextLinkageOptions = default)
         {
             Method = method;
             Target = target ?? Maybe<InvocationTargetDescriptor>.Nothing;
+            ContextLinkageOptions = contextLinkageOptions; 
         }
+
 
         public InvocationMethodDescriptor Method { get; }
 
         public Maybe<InvocationTargetDescriptor> Target { get; }
+
+        public Maybe<ContextLinkageOptions> ContextLinkageOptions { get; }
 
         public override string ToString()
         {

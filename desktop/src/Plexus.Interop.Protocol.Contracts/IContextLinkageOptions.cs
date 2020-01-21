@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,30 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Apps.Internal
+namespace Plexus.Interop.Protocol
 {
-    using System;
-    using System.Threading.Tasks;
-
-    internal static class TaskHelper
+    public interface IContextLinkageOptions
     {
-        public static Task CompletedTask
-        {
-            get
-            {
-#if NET45
-                return Task.FromResult<object>(null);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-        }
+        ContextLinkageDiscoveryMode Mode { get; }
 
-#pragma warning disable 1998
-        public static async Task FromException(Exception exception)
-#pragma warning restore 1998
-        {
-            throw exception;
-        }
+        Maybe<string> SpecificContext { get; }
     }
 }

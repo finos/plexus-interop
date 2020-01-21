@@ -30,6 +30,7 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
             {
                 ConsumedMethod.GetValueOrDefault()?.Dispose();
             }
+            ContextLinkageOptions = default;
             ConsumedMethod = default;
         }
 
@@ -45,6 +46,8 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
         public Maybe<IConsumedMethodReference> ConsumedMethod { get; set; }
 
         public DiscoveryMode DiscoveryMode { get; set; }
+
+        public IContextLinkageOptions ContextLinkageOptions { get; set; }
 
         public override string ToString()
         {

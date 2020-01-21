@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal.ClientProtocol.Discovery
+ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
     internal interface IDiscoveryService
     {
-        Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverAsync(MethodDiscoveryQuery query, bool online = false);
+        Task<IReadOnlyCollection<DiscoveredMethod>> DiscoverAsync(MethodDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false);
 
-        Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query, bool online = false);
+        Task<IReadOnlyCollection<DiscoveredService>> DiscoverAsync(ServiceDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false);
     }
 }

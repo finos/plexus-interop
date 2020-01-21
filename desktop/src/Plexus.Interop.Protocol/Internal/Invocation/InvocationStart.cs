@@ -33,26 +33,39 @@
 
         public IInvocationTarget Target { get; set; }
 
+        public IContextLinkageOptions ContextLinkageOptions { get; set; }
+
         public override string ToString()
         {
-            return $"{nameof(Target)}: {Target}";
+            return $"{nameof(Target)}: {Target}, {nameof(ContextLinkageOptions)}: {ContextLinkageOptions}";
         }
 
         private bool Equals(InvocationStart other)
         {
-            return Equals(Target, other.Target);
+            return Equals(Target, other.Target) && Equals(ContextLinkageOptions, other.ContextLinkageOptions);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj is InvocationStart && Equals((InvocationStart) obj);
+            return ReferenceEquals(this, obj) || obj is InvocationStart other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return (Target != null ? Target.GetHashCode() : 0);
+            unchecked
+            {
+                return ((Target != null ? Target.GetHashCode() : 0) * 397) ^ (ContextLinkageOptions != null ? ContextLinkageOptions.GetHashCode() : 0);
+            }
+        }
+
+        public static bool operator ==(InvocationStart left, InvocationStart right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(InvocationStart left, InvocationStart right)
+        {
+            return !Equals(left, right);
         }
     }
 }

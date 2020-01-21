@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using Plexus.Interop.Protocol.Discovery;
+ using Plexus.Interop.Protocol.Discovery;
 using Plexus.Interop.Protocol.Connect;
 using Plexus.Interop.Protocol.Invocation;
 
@@ -35,10 +35,13 @@ namespace Plexus.Interop.Protocol
             string serviceId,
             Maybe<string> serviceAlias,
             string applicationId,
-            Maybe<UniqueId> connectionId);
+            Maybe<UniqueId> connectionId,
+            Maybe<UniqueId> applicationInstanceId);
 
         IProvidedMethodReference CreateProvidedMethodReference(
             IProvidedServiceReference providedService,
             string methodId);
+
+        IContextLinkageOptions CreateContextLinkageOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId);
     }
 }

@@ -24,6 +24,7 @@
         {
             ConsumedMethod?.Dispose();
             ProvidedMethod?.Dispose();
+            ContextLinkageOptions?.Dispose();
             ClearTarget();
         }
     }

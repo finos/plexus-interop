@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,13 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Collections.Generic;
+ using System.Collections.Generic;
 
 namespace Plexus.Interop.Protocol.Discovery
 {
     public interface IDiscoveryProtocolMessageFactory
     {
-        IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService, DiscoveryMode discoveryMode);
+        IServiceDiscoveryRequest CreateServiceDiscoveryRequest(
+            Maybe<IConsumedServiceReference> consumedService,
+            DiscoveryMode discoveryMode, 
+            IContextLinkageOptions contextLinkageOptions);
 
         IServiceDiscoveryResponse CreateServiceDiscoveryResponse(IReadOnlyCollection<IDiscoveredService> services);
 
@@ -42,7 +45,8 @@ namespace Plexus.Interop.Protocol.Discovery
             Maybe<string> inputMessageId,
             Maybe<string> outputMessageId,
             Maybe<IConsumedMethodReference> method, 
-            DiscoveryMode discoveryMode);
+            DiscoveryMode discoveryMode, 
+            IContextLinkageOptions contextLinkageOptions);
 
         IDiscoveredMethod CreateDiscoveredMethod(
             IProvidedMethodReference providedMethod,

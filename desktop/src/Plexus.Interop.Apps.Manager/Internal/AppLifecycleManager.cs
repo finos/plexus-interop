@@ -168,28 +168,12 @@ namespace Plexus.Interop.Apps.Internal
             return FilterCanBeLaunched(new[] { appId }).Contains(appId);
         }
 
-        public async Task<ResolvedConnection> ResolveConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo)
+        public async Task<ResolvedConnection> LaunchAndConnectAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo)
         {
-            Log.Debug("Resolving connection for app {0} with mode {1} by request from {{{2}}}", appId, mode, referrerConnectionInfo);
-            Task<IAppConnection> connectionTask;
-            UniqueId suggestedInstanceId;
-            lock (_connections)
-            {
-                if (mode == ResolveMode.SingleInstance &&
-                    _appConnections.TryGetValue(appId, out var appConnectionList) &&
-                    appConnectionList.Any())
-                {
-                    var connection = appConnectionList.First();
-                    Log.Debug("Resolved connection for app {0} with mode {1} to online instance {{{2}}}",
-                        appId, mode, connection);
-                    return new ResolvedConnection(connection, false);
-                }
-
-                suggestedInstanceId = UniqueId.Generate();
-                Log.Debug("Resolving connection for app {0} with mode {1} to new instance with suggested id {2}",
-                    appId, mode, suggestedInstanceId);
-                connectionTask = LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo);
-            }
+            var suggestedInstanceId = UniqueId.Generate();
+            Log.Debug("Resolving connection for app {0} with mode {1} to new instance with suggested id {2}",
+                appId, mode, suggestedInstanceId);
+            var connectionTask = LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo);
             var resolvedConnection = await connectionTask.ConfigureAwait(false);
             Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}} by request from {{{3}}}", 
                 appId, mode, resolvedConnection, referrerConnectionInfo);

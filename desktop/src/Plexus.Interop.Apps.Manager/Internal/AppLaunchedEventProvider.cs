@@ -28,10 +28,12 @@ namespace Plexus.Interop.Apps.Internal
 
     internal class AppLaunchedEventProvider : IAppLaunchedEventProvider
     {
+        private ILogger Log { get; } = LogManager.GetLogger<AppLaunchedEventProvider>();
+
         private readonly IRegistryProvider _registryProvider;
         private readonly Lazy<IClient> _client;
 
-        private readonly Subject<AppLaunchedEvent> _appLaunchedSubject = new Subject<AppLaunchedEvent>();
+        private readonly ReplaySubject<AppLaunchedEvent> _appLaunchedSubject = new ReplaySubject<AppLaunchedEvent>(10);
 
         public AppLaunchedEventProvider(IAppLifecycleManager appLifecycleManager, IRegistryProvider registryProvider, Lazy<IClient> client)
         {
@@ -66,9 +68,11 @@ namespace Plexus.Interop.Apps.Internal
 
             Task.Factory.StartNew(async () =>
             {
+                Log.Info($"Subscribing to ApplicationLaunchedEventStream of {connectionId} application ({applicationId})");
                 await _client.Value.CallInvoker
                     .CallServerStreaming<Empty, AppLaunchedEvent>(methodCallDescriptor.CallDescriptor, new Empty())
                     .ResponseStream.PipeAsync(_appLaunchedSubject).ConfigureAwait(false);
+                Log.Info($"Subscription to ApplicationLaunchedEventStream of {connectionId} application ({applicationId}) have finished");
             }, TaskCreationOptions.LongRunning);
         }
 

@@ -29,6 +29,7 @@ namespace Plexus.Interop
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Google.Protobuf.WellKnownTypes;
     using WebSocket4Net;
     using Xunit;
     using Xunit.Abstractions;
@@ -1140,6 +1141,127 @@ namespace Plexus.Interop
                 await Task.WhenAll(sendWorker, receiveWorker).ConfigureAwait(false);
                 await call.Completion.ConfigureAwait(false);
                 receivedResponsesCount.ShouldBe(requestsCount * responsesPerRequest);
+            });
+        }
+
+        [Fact]
+        public void NewAppInstanceWillBeLaunchedOnInvocation()
+        {
+            Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
+            {
+                return Task.FromResult(new GreetingResponse { Greeting = greetingRequest.Name + "1" });
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                var serverCreatedCount = 0;
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithAppInstanceId(id)
+                            .WithApplicationId(EchoServerClient.Id)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                GreetingService.Id,
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+
+                        serverCreatedCount++;
+
+                        return ClientFactory.Instance.Create(optionsBuilder.Build());
+                    });
+
+                var appLauncher = RegisterDisposable(
+                    new TestAppLauncher(
+                        _testBrokerFixture.SharedInstance,
+                        new Dictionary<string, TestClientFactory>
+                        {
+                            {EchoServerClient.Id, echoServerFactory}
+                        }
+                    )
+                );
+                await appLauncher.StartAsync();
+                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
+                await client.ConnectAsync();
+                var result = client.GreetingService.Hello(new GreetingRequest { Name = "Test" }).AsTask().ShouldCompleteIn(Timeout1Sec);
+
+                result.Greeting.ShouldBe("Test1");
+
+                serverCreatedCount.ShouldBe(1);
+            });
+        }
+
+        [Fact]
+        public void NewAppInstanceWillBeLaunchedOnInvocationWithinContext()
+        {
+            var serverCreatedCount = 0;
+
+            Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
+            {
+                return Task.FromResult(new GreetingResponse { Greeting = greetingRequest.Name + (serverCreatedCount) });
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithAppInstanceId(id)
+                            .WithApplicationId(EchoServerClient.Id)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                GreetingService.Id,
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+
+                        serverCreatedCount++;
+
+                        return ClientFactory.Instance.Create(optionsBuilder.Build());
+                    });
+
+                var appLauncher = RegisterDisposable(
+                    new TestAppLauncher(
+                        _testBrokerFixture.SharedInstance,
+                        new Dictionary<string, TestClientFactory>
+                        {
+                            {EchoServerClient.Id, echoServerFactory}
+                        }
+                    )
+                );
+                await appLauncher.StartAsync();
+                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
+                await client.ConnectAsync();
+
+                var result1 = await client.GreetingService.Hello(new GreetingRequest { Name = "Test1" });
+                result1.Greeting.ShouldBe("Test11");
+
+                var result2 = await client.GreetingService.Hello(new GreetingRequest { Name = "Test2" });
+                result2.Greeting.ShouldBe("Test21");
+
+                serverCreatedCount.ShouldBe(1);
+
+                var newContext = await client.ContextLinkageService.CreateContext(new Empty());
+                var allContexts = await client.ContextLinkageService.GetContexts(new Empty());
+
+                allContexts.Contexts.Count.ShouldBe(1);
+                allContexts.Contexts[0].Id.ShouldBe(newContext.Id);
+
+                var result3 = await client.CallInvoker.Call(
+                    GreetingService.DefaultDescriptor.HelloMethod, 
+                    new GreetingRequest {Name = "Test3"},
+                    ContextLinkageOptions.WithCurrentContext());
+
+                result3.Greeting.ShouldBe("Test32");
+                
+                serverCreatedCount.ShouldBe(2);
+
+                var linkedInvocations = await client.ContextLinkageService.GetLinkedInvocations(newContext);
+
+                linkedInvocations.Invocations
+                    .Single(reference => reference.AppInfo.ProvidedServices.Any(service => service.ServiceId == GreetingService.Id))
+                    .ShouldNotBeNull();
             });
         }
 

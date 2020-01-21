@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol.Discovery
+ namespace Plexus.Interop.Protocol.Discovery
 {
     public interface IMethodDiscoveryRequest : IClientToBrokerRequest
     {
@@ -25,5 +25,7 @@
         Maybe<IConsumedMethodReference> ConsumedMethod { get; }
             
         DiscoveryMode DiscoveryMode { get; }
+
+        IContextLinkageOptions ContextLinkageOptions { get; }
     }
 }

@@ -19,5 +19,7 @@
     public interface IInvocationTarget : IProtocolMessage
     {
         T Handle<T, TArgs>(InvocationTargetHandler<T, TArgs> handler, TArgs args = default);
+
+        T Handle<T, TArg1, TArg2>(InvocationTargetHandler<T, TArg1, TArg2> handler, TArg1 arg1 = default, TArg2 arg2 = default);
     }
 }

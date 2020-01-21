@@ -91,6 +91,7 @@ namespace Plexus.Interop.Protocol.Protobuf
                 var proto = ServiceDiscoveryRequest.Rent();
                 proto.DiscoveryMode = ConvertToProto(msg.DiscoveryMode);
                 proto.ConsumedService = ConvertToProto(msg.ConsumedService);
+                proto.ContextLinkageOptions = ConvertToProto(msg.ContextLinkageOptions);
                 envelope.ServiceDiscoveryRequest = proto;
                 return envelope.Serialize();
             }
@@ -195,7 +196,8 @@ namespace Plexus.Interop.Protocol.Protobuf
                             default:
                                 throw new InvalidOperationException($"Unexpected target payload: {invocationRequest.TargetCase}");
                         }
-                        return _messageFactory.CreateInvocationStartRequest(target);
+                        var contextLinkageOptions = ConvertFromProtoStrict(invocationRequest.ContextLinkageOptions);
+                        return _messageFactory.CreateInvocationStartRequest(target, contextLinkageOptions);
                     case ClientToBrokerRequestEnvelope.PayloadOneofCase.ServiceDiscoveryRequest:
                         return ConvertFromProtoStrict(envelope.ServiceDiscoveryRequest);
                     case ClientToBrokerRequestEnvelope.PayloadOneofCase.MethodDiscoveryRequest:
@@ -279,6 +281,7 @@ namespace Plexus.Interop.Protocol.Protobuf
             {
                 var proto = InvocationStartRequest.Rent();
                 message.Target.Handle(_setInvocationTargetHandler, proto);
+                proto.ContextLinkageOptions = ConvertToProto(message.ContextLinkageOptions);
                 envelope.InvocationStartRequest = proto;
                 return envelope.Serialize();
             }
@@ -402,6 +405,27 @@ namespace Plexus.Interop.Protocol.Protobuf
             return proto;
         }
 
+        private ContextLinkageOptions ConvertToProto(IContextLinkageOptions obj)
+        {
+            var proto = ContextLinkageOptions.Rent();
+            if (obj != null)
+            {
+                switch (obj.Mode)
+                {
+                    case ContextLinkageDiscoveryMode.None:
+                        proto.ClearMode();
+                        break;
+                    case ContextLinkageDiscoveryMode.SpecificContext:
+                        proto.SpecificContextId = obj.SpecificContext.Value;
+                        break;
+                    case ContextLinkageDiscoveryMode.CurrentContext:
+                        proto.CurrentContext = Empty.Instance;
+                        break;
+                }
+            }
+            return proto;
+        }
+
         private Internal.DiscoveryMode ConvertToProto(DiscoveryMode discoveryMode)
         {
             switch (discoveryMode)
@@ -434,7 +458,8 @@ namespace Plexus.Interop.Protocol.Protobuf
                 proto.InputMessageId.ConvertFromProto(),
                 proto.OutputMessageId.ConvertFromProto(),
                 ConvertFromProto(proto.ConsumedMethod),
-                ConvertFromProto(proto.DiscoveryMode));
+                ConvertFromProto(proto.DiscoveryMode),
+                ConvertFromProtoStrict(proto.ContextLinkageOptions));
         }
 
         private Maybe<IConsumedMethodReference> ConvertFromProto(ConsumedMethodReference proto)
@@ -448,7 +473,8 @@ namespace Plexus.Interop.Protocol.Protobuf
         {
             return _messageFactory.CreateServiceDiscoveryRequest(
                 ConvertFromProto(proto.ConsumedService),
-                ConvertFromProto(proto.DiscoveryMode));
+                ConvertFromProto(proto.DiscoveryMode),
+                ConvertFromProtoStrict(proto.ContextLinkageOptions));
         }
 
         private IProvidedMethodReference ConvertFromProtoStrict(ProvidedMethodReference proto)
@@ -464,7 +490,8 @@ namespace Plexus.Interop.Protocol.Protobuf
                 proto.ServiceId.ConvertFromProtoStrict(),
                 proto.ServiceAlias.ConvertFromProto(),
                 proto.ApplicationId.ConvertFromProtoStrict(),
-                proto.ConnectionId.ConvertFromProto());
+                proto.ConnectionId.ConvertFromProto(),
+                proto.ApplicationInstanceId.ConvertFromProto());
         }
 
         private IConsumedMethodReference ConvertFromProtoStrict(ConsumedMethodReference proto)
@@ -488,6 +515,18 @@ namespace Plexus.Interop.Protocol.Protobuf
                 : new Maybe<IConsumedServiceReference>(ConvertFromProtoStrict(proto));
         }
 
+        private IContextLinkageOptions ConvertFromProtoStrict(ContextLinkageOptions proto)
+        {
+            if (proto == null || proto.ModeCase == ContextLinkageOptions.ModeOneofCase.None)
+            {
+                return _messageFactory.CreateContextLinkageOptions(ContextLinkageDiscoveryMode.None, Maybe<string>.Nothing);
+            }
+            return _messageFactory.CreateContextLinkageOptions(
+                ConvertFromProto(proto.ModeCase),
+                proto.ModeCase == ContextLinkageOptions.ModeOneofCase.SpecificContextId 
+                    ? new Maybe<string>(proto.SpecificContextId) 
+                    : Maybe<string>.Nothing);
+        }
 
         private IDiscoveredService ConvertFromProto(DiscoveredService proto)
         {
@@ -539,6 +578,21 @@ namespace Plexus.Interop.Protocol.Protobuf
                     return DiscoveryMethodType.DuplexStreaming;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(proto), proto, null);
+            }
+        }
+
+        private ContextLinkageDiscoveryMode ConvertFromProto(ContextLinkageOptions.ModeOneofCase protoModeCase)
+        {
+            switch (protoModeCase)
+            {
+                case ContextLinkageOptions.ModeOneofCase.None:
+                    return ContextLinkageDiscoveryMode.None;
+                case ContextLinkageOptions.ModeOneofCase.SpecificContextId:
+                    return ContextLinkageDiscoveryMode.SpecificContext;
+                case ContextLinkageOptions.ModeOneofCase.CurrentContext:
+                    return ContextLinkageDiscoveryMode.CurrentContext;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(protoModeCase), protoModeCase, null);
             }
         }
 
