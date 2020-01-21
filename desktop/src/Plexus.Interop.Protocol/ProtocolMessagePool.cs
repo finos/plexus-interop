@@ -90,8 +90,10 @@ namespace Plexus.Interop.Protocol
             return obj;
         }
 
-        public IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService,
-            DiscoveryMode mode, IContextLinkageOptions contextLinkageOptions)
+        public IServiceDiscoveryRequest CreateServiceDiscoveryRequest(
+            Maybe<IConsumedServiceReference> consumedService,
+            DiscoveryMode mode, 
+            IContextLinkageOptions contextLinkageOptions)
         {
             var obj = ServiceDiscoveryRequest.Rent();
             obj.ConsumedService = consumedService;

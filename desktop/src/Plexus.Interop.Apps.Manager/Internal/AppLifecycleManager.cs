@@ -168,7 +168,7 @@ namespace Plexus.Interop.Apps.Internal
             return FilterCanBeLaunched(new[] { appId }).Contains(appId);
         }
 
-        public async Task<ResolvedConnection> LaunchAndConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo)
+        public async Task<ResolvedConnection> LaunchAndConnectAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo)
         {
             var suggestedInstanceId = UniqueId.Generate();
             Log.Debug("Resolving connection for app {0} with mode {1} to new instance with suggested id {2}",

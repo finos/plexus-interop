@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps
+namespace Plexus.Interop.Apps
 {
     using System;
     using System.Collections.Generic;
@@ -35,7 +35,7 @@
 
         bool CanBeLaunched(string appId);
 
-        Task<ResolvedConnection> LaunchAndConnectionAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
+        Task<ResolvedConnection> LaunchAndConnectAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
 
         event Action<AppConnectionDescriptor> AppConnected;
 

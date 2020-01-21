@@ -113,7 +113,7 @@ namespace Plexus.Interop.Apps.Internal.Services
                 }
             }
 
-            var resolvedConnection = await _appLifecycleManager.LaunchAndConnectionAsync(
+            var resolvedConnection = await _appLifecycleManager.LaunchAndConnectAsync(
                 request.AppId, resolveMode, referrerConnectionInfo).ConfigureAwait(false);
             var info = resolvedConnection.AppConnection.Info;
             Log.Info("App connection {{{0}}} resolved by request from {{{1}}}", resolvedConnection, context);

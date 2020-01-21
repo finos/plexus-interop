@@ -98,7 +98,10 @@ namespace Plexus.Interop.Broker.Internal
                         .ToArray();
                     var availableProviderApps = FilterAvailableApps(providerApps);
                     groupedMethods = methodMatches
-                        .Join(availableProviderApps, x => x.Provided.ProvidedService.Application.Id, y => y,
+                        .Join(
+                            availableProviderApps, 
+                            x => x.Provided.ProvidedService.Application.Id, 
+                            y => y,
                             (x, y) => x)
                         .GroupBy(
                             x => (
