@@ -36,13 +36,13 @@ namespace Plexus.Interop.Apps.Internal.Services
     {
         private readonly IRegistryProvider _appRegistryProvider;
         private readonly IAppLifecycleManager _appLifecycleManager;
-
-        private readonly ContextsSet _contextsSet = new ContextsSet();
+        private readonly ContextsSet _contextsSet;
 
         public ContextLinkageServiceImpl(IRegistryProvider appRegistryProvider, IAppLifecycleManager appLifecycleManager, IAppLaunchedEventProvider appLaunchedEventProvider)
         {
             _appRegistryProvider = appRegistryProvider;
             _appLifecycleManager = appLifecycleManager;
+            _contextsSet = new ContextsSet(appLifecycleManager);
 
             appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnAppLaunched);
 
@@ -198,22 +198,10 @@ namespace Plexus.Interop.Apps.Internal.Services
             return AppMetadataServiceImpl.ConvertToAppMetamodelInfo(appInfo);
         }
 
-        public class AppContextBindingEvent
-        {
-            public AppContextBindingEvent(Context context, UniqueId appInstanceId)
-            {
-                Context = context;
-                AppInstanceId = appInstanceId;
-            }
-
-            public Context Context { get; }
-            public UniqueId AppInstanceId { get; }
-        }
-
         public bool IsContextShouldBeConsidered(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
         {
-            return contextLinkageOptions != null 
-                   && contextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None 
+            return contextLinkageOptions != null
+                   && contextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None
                    && GetApplicationContexts(contextLinkageOptions, sourceConnection).Any();
         }
 
@@ -234,10 +222,50 @@ namespace Plexus.Interop.Apps.Internal.Services
                     return _contextsSet.GetContextsOf(sourceConnection.Info.ApplicationInstanceId)
                         .Select(context => context.Id).ToArray();
                 case ContextLinkageDiscoveryMode.SpecificContext when contextLinkageOptions.SpecificContext.HasValue:
-                    return new[] {contextLinkageOptions.SpecificContext.Value};
+                    return new[] { contextLinkageOptions.SpecificContext.Value };
                 default:
                     return new string[0];
             }
+        }
+
+        public Task AppJoinedContextStream(Empty request, IWritableChannel<AppJoinedContextEvent> responseStream, MethodCallContext context)
+        {
+            return _contextsSet.AppContextBindingEvents
+                .Select(ev => new AppJoinedContextEvent
+                {
+                    AppInstanceId = ev.AppInstanceId.ToProto(),
+                    Context = new ContextDto { Id = ev.Context.Id }
+                })
+                .PipeAsync(responseStream, context.CancellationToken);
+        }
+
+        public Task<RestoreContextsLinkageResponse> RestoreContextsLinkage(RestoreContextsLinkageRequest request, MethodCallContext callContext)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var newCreatedContexts = new Dictionary<string, Context>();
+                foreach (var restoringAppInstance in request.Apps)
+                {
+                    foreach (var contextId in restoringAppInstance.ContextIds)
+                    {
+                        if (!newCreatedContexts.TryGetValue(contextId, out var context))
+                        {
+                            context = _contextsSet.CreateContext();
+                            newCreatedContexts[contextId] = context;
+                        }
+
+                        context.AppLaunched(restoringAppInstance.AppInstanceId.ToUniqueId(),
+                            restoringAppInstance.AppIds);
+                    }
+                }
+
+                var response = new RestoreContextsLinkageResponse();
+                foreach (var pair in newCreatedContexts)
+                {
+                    response.CreatedContextsMap[pair.Key] = new ContextDto { Id = pair.Value.Id };
+                }
+                return response;
+            });
         }
     }
 }

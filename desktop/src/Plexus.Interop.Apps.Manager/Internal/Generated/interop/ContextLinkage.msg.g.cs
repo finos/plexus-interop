@@ -63,20 +63,38 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "aW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0aW9ucyJxChhDb250ZXh0VG9JbnZv",
             "Y2F0aW9uc0xpc3QSLwoIY29udGV4dHMYASADKAsyHS5pbnRlcm9wLkNvbnRl",
             "eHRUb0ludm9jYXRpb25zOiSS2wQgaW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0",
-            "aW9uc0xpc3QqQQoUQ29udGV4dExvYWRpbmdTdGF0dXMSDwoLSU5fUFJPR1JF",
-            "U1MQABIKCgZGQUlMRUQQARIMCghGSU5JU0hFRBACMtADChVDb250ZXh0TGlu",
-            "a2FnZVNlcnZpY2USSAoTQ29udGV4dExvYWRlZFN0cmVhbRIQLmludGVyb3Au",
-            "Q29udGV4dBodLmludGVyb3AuQ29udGV4dExvYWRpbmdVcGRhdGUwARI5Cg1D",
-            "cmVhdGVDb250ZXh0EhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5GhAuaW50ZXJv",
-            "cC5Db250ZXh0EjcKC0pvaW5Db250ZXh0EhAuaW50ZXJvcC5Db250ZXh0GhYu",
-            "Z29vZ2xlLnByb3RvYnVmLkVtcHR5EjwKC0dldENvbnRleHRzEhYuZ29vZ2xl",
-            "LnByb3RvYnVmLkVtcHR5GhUuaW50ZXJvcC5Db250ZXh0c0xpc3QSQgoUR2V0",
-            "TGlua2VkSW52b2NhdGlvbnMSEC5pbnRlcm9wLkNvbnRleHQaGC5pbnRlcm9w",
-            "Lkludm9jYXRpb25zTGlzdBJUChdHZXRBbGxMaW5rZWRJbnZvY2F0aW9ucxIW",
-            "Lmdvb2dsZS5wcm90b2J1Zi5FbXB0eRohLmludGVyb3AuQ29udGV4dFRvSW52",
-            "b2NhdGlvbnNMaXN0GiGS2wQdaW50ZXJvcC5Db250ZXh0TGlua2FnZVNlcnZp",
-            "Y2VCKaoCJlBsZXh1cy5JbnRlcm9wLkFwcHMuSW50ZXJuYWwuR2VuZXJhdGVk",
-            "YgZwcm90bzM="));
+            "aW9uc0xpc3QiiQEKFUFwcEpvaW5lZENvbnRleHRFdmVudBIhCgdjb250ZXh0",
+            "GAEgASgLMhAuaW50ZXJvcC5Db250ZXh0EioKD2FwcF9pbnN0YW5jZV9pZBgC",
+            "IAEoCzIRLmludGVyb3AuVW5pcXVlSWQ6IZLbBB1pbnRlcm9wLkFwcEpvaW5l",
+            "ZENvbnRleHRFdmVudCJ3Ch1SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVxdWVz",
+            "dBIrCgRhcHBzGAEgAygLMh0uaW50ZXJvcC5SZXN0b3JpbmdBcHBJbnN0YW5j",
+            "ZTopktsEJWludGVyb3AuUmVzdG9yZUNvbnRleHRzTGlua2FnZVJlcXVlc3Qi",
+            "igEKFFJlc3RvcmluZ0FwcEluc3RhbmNlEioKD2FwcF9pbnN0YW5jZV9pZBgB",
+            "IAEoCzIRLmludGVyb3AuVW5pcXVlSWQSDwoHYXBwX2lkcxgCIAMoCRITCgtj",
+            "b250ZXh0X2lkcxgDIAMoCTogktsEHGludGVyb3AuUmVzdG9yaW5nQXBwSW5z",
+            "dGFuY2Ui+AEKHlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZRJdChRj",
+            "cmVhdGVkX2NvbnRleHRzX21hcBgBIAMoCzI/LmludGVyb3AuUmVzdG9yZUNv",
+            "bnRleHRzTGlua2FnZVJlc3BvbnNlLkNyZWF0ZWRDb250ZXh0c01hcEVudHJ5",
+            "GksKF0NyZWF0ZWRDb250ZXh0c01hcEVudHJ5EgsKA2tleRgBIAEoCRIfCgV2",
+            "YWx1ZRgCIAEoCzIQLmludGVyb3AuQ29udGV4dDoCOAE6KpLbBCZpbnRlcm9w",
+            "LlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZSpBChRDb250ZXh0TG9h",
+            "ZGluZ1N0YXR1cxIPCgtJTl9QUk9HUkVTUxAAEgoKBkZBSUxFRBABEgwKCEZJ",
+            "TklTSEVEEAIyjwUKFUNvbnRleHRMaW5rYWdlU2VydmljZRJIChNDb250ZXh0",
+            "TG9hZGVkU3RyZWFtEhAuaW50ZXJvcC5Db250ZXh0Gh0uaW50ZXJvcC5Db250",
+            "ZXh0TG9hZGluZ1VwZGF0ZTABEjkKDUNyZWF0ZUNvbnRleHQSFi5nb29nbGUu",
+            "cHJvdG9idWYuRW1wdHkaEC5pbnRlcm9wLkNvbnRleHQSNwoLSm9pbkNvbnRl",
+            "eHQSEC5pbnRlcm9wLkNvbnRleHQaFi5nb29nbGUucHJvdG9idWYuRW1wdHkS",
+            "PAoLR2V0Q29udGV4dHMSFi5nb29nbGUucHJvdG9idWYuRW1wdHkaFS5pbnRl",
+            "cm9wLkNvbnRleHRzTGlzdBJCChRHZXRMaW5rZWRJbnZvY2F0aW9ucxIQLmlu",
+            "dGVyb3AuQ29udGV4dBoYLmludGVyb3AuSW52b2NhdGlvbnNMaXN0ElQKF0dl",
+            "dEFsbExpbmtlZEludm9jYXRpb25zEhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5",
+            "GiEuaW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0aW9uc0xpc3QSUgoWQXBwSm9p",
+            "bmVkQ29udGV4dFN0cmVhbRIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRoeLmlu",
+            "dGVyb3AuQXBwSm9pbmVkQ29udGV4dEV2ZW50MAESaQoWUmVzdG9yZUNvbnRl",
+            "eHRzTGlua2FnZRImLmludGVyb3AuUmVzdG9yZUNvbnRleHRzTGlua2FnZVJl",
+            "cXVlc3QaJy5pbnRlcm9wLlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25z",
+            "ZRohktsEHWludGVyb3AuQ29udGV4dExpbmthZ2VTZXJ2aWNlQimqAiZQbGV4",
+            "dXMuSW50ZXJvcC5BcHBzLkludGVybmFsLkdlbmVyYXRlZGIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingStatus), }, new pbr::GeneratedClrTypeInfo[] {
@@ -86,7 +104,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationRef), global::Plexus.Interop.Apps.Internal.Generated.InvocationRef.Parser, new[]{ "AppInfo", "Target" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationsList), global::Plexus.Interop.Apps.Internal.Generated.InvocationsList.Parser, new[]{ "Invocations" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocations), global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocations.Parser, new[]{ "Context", "Invocations" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList), global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList.Parser, new[]{ "Contexts" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList), global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList.Parser, new[]{ "Contexts" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent), global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent.Parser, new[]{ "Context", "AppInstanceId" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest), global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest.Parser, new[]{ "Apps" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance), global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance.Parser, new[]{ "AppInstanceId", "AppIds", "ContextIds" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse), global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse.Parser, new[]{ "CreatedContextsMap" }, null, null, new pbr::GeneratedClrTypeInfo[] { null, })
           }));
     }
     #endregion
@@ -1108,6 +1130,592 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           case 10: {
             contexts_.AddEntriesFrom(input, _repeated_contexts_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class AppJoinedContextEvent : pb::IMessage<AppJoinedContextEvent> {
+    private static readonly pb::MessageParser<AppJoinedContextEvent> _parser = new pb::MessageParser<AppJoinedContextEvent>(() => new AppJoinedContextEvent());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<AppJoinedContextEvent> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[7]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AppJoinedContextEvent() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AppJoinedContextEvent(AppJoinedContextEvent other) : this() {
+      Context = other.context_ != null ? other.Context.Clone() : null;
+      AppInstanceId = other.appInstanceId_ != null ? other.AppInstanceId.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AppJoinedContextEvent Clone() {
+      return new AppJoinedContextEvent(this);
+    }
+
+    /// <summary>Field number for the "context" field.</summary>
+    public const int ContextFieldNumber = 1;
+    private global::Plexus.Interop.Apps.Internal.Generated.Context context_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Plexus.Interop.Apps.Internal.Generated.Context Context {
+      get { return context_; }
+      set {
+        context_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "app_instance_id" field.</summary>
+    public const int AppInstanceIdFieldNumber = 2;
+    private global::Plexus.Interop.Apps.Internal.Generated.UniqueId appInstanceId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Plexus.Interop.Apps.Internal.Generated.UniqueId AppInstanceId {
+      get { return appInstanceId_; }
+      set {
+        appInstanceId_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as AppJoinedContextEvent);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(AppJoinedContextEvent other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(Context, other.Context)) return false;
+      if (!object.Equals(AppInstanceId, other.AppInstanceId)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (context_ != null) hash ^= Context.GetHashCode();
+      if (appInstanceId_ != null) hash ^= AppInstanceId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (context_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Context);
+      }
+      if (appInstanceId_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(AppInstanceId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (context_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Context);
+      }
+      if (appInstanceId_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(AppInstanceId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(AppJoinedContextEvent other) {
+      if (other == null) {
+        return;
+      }
+      if (other.context_ != null) {
+        if (context_ == null) {
+          context_ = new global::Plexus.Interop.Apps.Internal.Generated.Context();
+        }
+        Context.MergeFrom(other.Context);
+      }
+      if (other.appInstanceId_ != null) {
+        if (appInstanceId_ == null) {
+          appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+        }
+        AppInstanceId.MergeFrom(other.AppInstanceId);
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (context_ == null) {
+              context_ = new global::Plexus.Interop.Apps.Internal.Generated.Context();
+            }
+            input.ReadMessage(context_);
+            break;
+          }
+          case 18: {
+            if (appInstanceId_ == null) {
+              appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+            }
+            input.ReadMessage(appInstanceId_);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class RestoreContextsLinkageRequest : pb::IMessage<RestoreContextsLinkageRequest> {
+    private static readonly pb::MessageParser<RestoreContextsLinkageRequest> _parser = new pb::MessageParser<RestoreContextsLinkageRequest>(() => new RestoreContextsLinkageRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<RestoreContextsLinkageRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[8]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoreContextsLinkageRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoreContextsLinkageRequest(RestoreContextsLinkageRequest other) : this() {
+      apps_ = other.apps_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoreContextsLinkageRequest Clone() {
+      return new RestoreContextsLinkageRequest(this);
+    }
+
+    /// <summary>Field number for the "apps" field.</summary>
+    public const int AppsFieldNumber = 1;
+    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance> _repeated_apps_codec
+        = pb::FieldCodec.ForMessage(10, global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance.Parser);
+    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance> apps_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance> Apps {
+      get { return apps_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as RestoreContextsLinkageRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(RestoreContextsLinkageRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if(!apps_.Equals(other.apps_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      hash ^= apps_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      apps_.WriteTo(output, _repeated_apps_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      size += apps_.CalculateSize(_repeated_apps_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(RestoreContextsLinkageRequest other) {
+      if (other == null) {
+        return;
+      }
+      apps_.Add(other.apps_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            apps_.AddEntriesFrom(input, _repeated_apps_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class RestoringAppInstance : pb::IMessage<RestoringAppInstance> {
+    private static readonly pb::MessageParser<RestoringAppInstance> _parser = new pb::MessageParser<RestoringAppInstance>(() => new RestoringAppInstance());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<RestoringAppInstance> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[9]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoringAppInstance() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoringAppInstance(RestoringAppInstance other) : this() {
+      AppInstanceId = other.appInstanceId_ != null ? other.AppInstanceId.Clone() : null;
+      appIds_ = other.appIds_.Clone();
+      contextIds_ = other.contextIds_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoringAppInstance Clone() {
+      return new RestoringAppInstance(this);
+    }
+
+    /// <summary>Field number for the "app_instance_id" field.</summary>
+    public const int AppInstanceIdFieldNumber = 1;
+    private global::Plexus.Interop.Apps.Internal.Generated.UniqueId appInstanceId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Plexus.Interop.Apps.Internal.Generated.UniqueId AppInstanceId {
+      get { return appInstanceId_; }
+      set {
+        appInstanceId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "app_ids" field.</summary>
+    public const int AppIdsFieldNumber = 2;
+    private static readonly pb::FieldCodec<string> _repeated_appIds_codec
+        = pb::FieldCodec.ForString(18);
+    private readonly pbc::RepeatedField<string> appIds_ = new pbc::RepeatedField<string>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<string> AppIds {
+      get { return appIds_; }
+    }
+
+    /// <summary>Field number for the "context_ids" field.</summary>
+    public const int ContextIdsFieldNumber = 3;
+    private static readonly pb::FieldCodec<string> _repeated_contextIds_codec
+        = pb::FieldCodec.ForString(26);
+    private readonly pbc::RepeatedField<string> contextIds_ = new pbc::RepeatedField<string>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<string> ContextIds {
+      get { return contextIds_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as RestoringAppInstance);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(RestoringAppInstance other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(AppInstanceId, other.AppInstanceId)) return false;
+      if(!appIds_.Equals(other.appIds_)) return false;
+      if(!contextIds_.Equals(other.contextIds_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (appInstanceId_ != null) hash ^= AppInstanceId.GetHashCode();
+      hash ^= appIds_.GetHashCode();
+      hash ^= contextIds_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (appInstanceId_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(AppInstanceId);
+      }
+      appIds_.WriteTo(output, _repeated_appIds_codec);
+      contextIds_.WriteTo(output, _repeated_contextIds_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (appInstanceId_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(AppInstanceId);
+      }
+      size += appIds_.CalculateSize(_repeated_appIds_codec);
+      size += contextIds_.CalculateSize(_repeated_contextIds_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(RestoringAppInstance other) {
+      if (other == null) {
+        return;
+      }
+      if (other.appInstanceId_ != null) {
+        if (appInstanceId_ == null) {
+          appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+        }
+        AppInstanceId.MergeFrom(other.AppInstanceId);
+      }
+      appIds_.Add(other.appIds_);
+      contextIds_.Add(other.contextIds_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (appInstanceId_ == null) {
+              appInstanceId_ = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+            }
+            input.ReadMessage(appInstanceId_);
+            break;
+          }
+          case 18: {
+            appIds_.AddEntriesFrom(input, _repeated_appIds_codec);
+            break;
+          }
+          case 26: {
+            contextIds_.AddEntriesFrom(input, _repeated_contextIds_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class RestoreContextsLinkageResponse : pb::IMessage<RestoreContextsLinkageResponse> {
+    private static readonly pb::MessageParser<RestoreContextsLinkageResponse> _parser = new pb::MessageParser<RestoreContextsLinkageResponse>(() => new RestoreContextsLinkageResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<RestoreContextsLinkageResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[10]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoreContextsLinkageResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoreContextsLinkageResponse(RestoreContextsLinkageResponse other) : this() {
+      createdContextsMap_ = other.createdContextsMap_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public RestoreContextsLinkageResponse Clone() {
+      return new RestoreContextsLinkageResponse(this);
+    }
+
+    /// <summary>Field number for the "created_contexts_map" field.</summary>
+    public const int CreatedContextsMapFieldNumber = 1;
+    private static readonly pbc::MapField<string, global::Plexus.Interop.Apps.Internal.Generated.Context>.Codec _map_createdContextsMap_codec
+        = new pbc::MapField<string, global::Plexus.Interop.Apps.Internal.Generated.Context>.Codec(pb::FieldCodec.ForString(10), pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.Context.Parser), 10);
+    private readonly pbc::MapField<string, global::Plexus.Interop.Apps.Internal.Generated.Context> createdContextsMap_ = new pbc::MapField<string, global::Plexus.Interop.Apps.Internal.Generated.Context>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::MapField<string, global::Plexus.Interop.Apps.Internal.Generated.Context> CreatedContextsMap {
+      get { return createdContextsMap_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as RestoreContextsLinkageResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(RestoreContextsLinkageResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!CreatedContextsMap.Equals(other.CreatedContextsMap)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      hash ^= CreatedContextsMap.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      createdContextsMap_.WriteTo(output, _map_createdContextsMap_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      size += createdContextsMap_.CalculateSize(_map_createdContextsMap_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(RestoreContextsLinkageResponse other) {
+      if (other == null) {
+        return;
+      }
+      createdContextsMap_.Add(other.createdContextsMap_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            createdContextsMap_.AddEntriesFrom(input, _map_createdContextsMap_codec);
             break;
           }
         }

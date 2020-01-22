@@ -67,6 +67,25 @@ message ContextToInvocationsList {
 	repeated ContextToInvocations contexts = 1;
 }
 
+message AppJoinedContextEvent {
+	Context context = 1;	
+    UniqueId app_instance_id = 2;
+}
+
+message RestoreContextsLinkageRequest {
+	repeated RestoringAppInstance apps = 1;
+}
+
+message RestoringAppInstance {
+	UniqueId app_instance_id = 1;
+	repeated string app_ids = 2;
+	repeated string context_ids = 3;
+}
+
+message RestoreContextsLinkageResponse {
+	map<string, Context> created_contexts_map = 1;
+}
+
 service ContextLinkageService {
 	/**
 	* Stream, provides status of context loading, order and loading status of linked applications
@@ -97,4 +116,8 @@ service ContextLinkageService {
 	* Get Linked Invocations for all associated contexts
 	*/
 	rpc GetAllLinkedInvocations(google.protobuf.Empty) returns (ContextToInvocationsList);
+
+	rpc AppJoinedContextStream(google.protobuf.Empty) returns (stream AppJoinedContextEvent);
+
+	rpc RestoreContextsLinkage(RestoreContextsLinkageRequest) returns (RestoreContextsLinkageResponse);
 }

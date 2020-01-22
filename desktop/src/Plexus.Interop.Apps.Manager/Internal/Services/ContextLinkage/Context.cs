@@ -24,6 +24,8 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
 
     internal class Context
     {
+        private readonly IAppLifecycleManager _appLifecycleManager;
+
         public string Id { get; } = Guid.NewGuid().ToString();
 
         private readonly object _lock = new object();
@@ -32,28 +34,36 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
         private readonly Dictionary<UniqueId, AppConnectionsSet> _appInstanceIdsToConnections = new Dictionary<UniqueId, AppConnectionsSet>();
 
         private readonly BehaviorSubject<bool> _loadingStatusSubject = new BehaviorSubject<bool>(false);
-        private readonly IObserver<ContextLinkageServiceImpl.AppContextBindingEvent> _bindingObserver;
+        private readonly Subject<AppContextBindingEvent> _bindingSubject = new Subject<AppContextBindingEvent>();
 
-        public Context(IObserver<ContextLinkageServiceImpl.AppContextBindingEvent> bindingObserver)
+        public Context(IAppLifecycleManager appLifecycleManager)
         {
-            _bindingObserver = bindingObserver;
+            _appLifecycleManager = appLifecycleManager;
             IsLoadingStatus = _loadingStatusSubject.DistinctUntilChanged();
+            AppContextBindings = _bindingSubject;
         }
 
         public IObservable<bool> IsLoadingStatus { get; }
+
+        public IObservable<AppContextBindingEvent> AppContextBindings { get; }
 
         public bool IsLoading => _loadingStatusSubject.Value;
 
         public void AppLaunched(UniqueId appInstanceId, IEnumerable<string> appIds)
         {
-            _bindingObserver.OnNext(new ContextLinkageServiceImpl.AppContextBindingEvent(this, appInstanceId));
+            _bindingSubject.OnNext(new AppContextBindingEvent(this, appInstanceId));
             var appConnectionsSet = GetOrCreateAppConnectionsSet(appInstanceId);
             appConnectionsSet.AppLaunched(appIds);
+
+            foreach (var appConnection in _appLifecycleManager.GetAppInstanceConnections(appInstanceId))
+            {
+                AppConnected(appConnection.Info);
+            }
         }
 
         public void AppConnected(AppConnectionDescriptor appConnection)
         {
-            _bindingObserver.OnNext(new ContextLinkageServiceImpl.AppContextBindingEvent(this, appConnection.ApplicationInstanceId));
+            _bindingSubject.OnNext(new AppContextBindingEvent(this, appConnection.ApplicationInstanceId));
             var appConnectionsSet = GetOrCreateAppConnectionsSet(appConnection.ApplicationInstanceId);
             appConnectionsSet.AppConnected(appConnection);
         }
