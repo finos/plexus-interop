@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,5 +19,7 @@
     public interface IInvocationTarget : IProtocolMessage
     {
         T Handle<T, TArgs>(InvocationTargetHandler<T, TArgs> handler, TArgs args = default);
+
+        T Handle<T, TArg1, TArg2>(InvocationTargetHandler<T, TArg1, TArg2> handler, TArg1 arg1 = default, TArg2 arg2 = default);
     }
 }

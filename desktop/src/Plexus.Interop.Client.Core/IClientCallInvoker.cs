@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,57 +21,57 @@
         /// <summary>
         /// Invokes a simple remote call asynchronously.
         /// </summary>
-        IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request);
+        IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes a simple remote call asynchronously.
         /// </summary>
-        IUnaryMethodCall CallUnary<TRequest>(MethodCallDescriptor descriptor, TRequest request);
+        IUnaryMethodCall CallUnary<TRequest>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes a simple remote call asynchronously.
         /// </summary>
-        IUnaryMethodCall<TResponse> Call<TRequest, TResponse>(IUnaryMethod<TRequest, TResponse> method, TRequest request);
+        IUnaryMethodCall<TResponse> Call<TRequest, TResponse>(IUnaryMethod<TRequest, TResponse> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes a simple remote call asynchronously.
         /// </summary>
-        IUnaryMethodCall<TResponse> CallUnary<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request);
+        IUnaryMethodCall<TResponse> CallUnary<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes server streaming call asynchronously.
         /// In server streaming scenario, client sends a single request and server responds with a stream of responses.
         /// </summary>
-        IServerStreamingMethodCall<TResponse> Call<TRequest, TResponse>(IServerStreamingMethod<TRequest, TResponse> method, TRequest request);
+        IServerStreamingMethodCall<TResponse> Call<TRequest, TResponse>(IServerStreamingMethod<TRequest, TResponse> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes server streaming call asynchronously.
         /// In server streaming scenario, client sends a single request and server responds with a stream of responses.
         /// </summary>
-        IServerStreamingMethodCall<TResponse> CallServerStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request);
+        IServerStreamingMethodCall<TResponse> CallServerStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes a client streaming call asynchronously.
         /// In client streaming scenario, client sends a stream of requests and server responds with a single response.
         /// </summary>
-        IClientStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IClientStreamingMethod<TRequest, TResponse> method);
+        IClientStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IClientStreamingMethod<TRequest, TResponse> method, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes a client streaming call asynchronously.
         /// In client streaming scenario, client sends a stream of requests and server responds with a single response.
         /// </summary>
-        IClientStreamingMethodCall<TRequest, TResponse> CallClientStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor);
+        IClientStreamingMethodCall<TRequest, TResponse> CallClientStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes a client streaming call asynchronously.
         /// In client streaming scenario, client sends a stream of requests and server responds with a single response.
         /// </summary>
-        IDuplexStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IDuplexStreamingMethod<TRequest, TResponse> method);
+        IDuplexStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IDuplexStreamingMethod<TRequest, TResponse> method, ContextLinkageOptions contextLinkageOptions = default);
 
         /// <summary>
         /// Invokes a client streaming call asynchronously.
         /// In client streaming scenario, client sends a stream of requests and server responds with a single response.
         /// </summary>
-        IDuplexStreamingMethodCall<TRequest, TResponse> CallDuplexStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor);
+        IDuplexStreamingMethodCall<TRequest, TResponse> CallDuplexStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, ContextLinkageOptions contextLinkageOptions = default);
     }
 }

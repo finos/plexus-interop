@@ -14,6 +14,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="2018.3.0" PrivateAssets="All" />
     <PackageReference Include="SmartThreadPool.dll" Version="2.2.6" Condition="'$(TargetFramework)' == 'net45'" />
     <PackageReference Include="System.Buffers" Version="4.5.0" />
+    <PackageReference Include="System.Reactive.Linq" Version="3.1.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
   </ItemGroup>
 

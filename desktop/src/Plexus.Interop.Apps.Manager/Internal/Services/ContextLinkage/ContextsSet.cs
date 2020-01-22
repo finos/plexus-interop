@@ -1,3 +1,19 @@
+/**
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 ﻿/**
  * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
@@ -19,27 +35,33 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
 
     internal class ContextsSet
     {
+        private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly Subject<Context> _loadingStatusSubject = new Subject<Context>();
-        private readonly Subject<ContextLinkageServiceImpl.AppContextBindingEvent> _contextBindingEventsSubject = new Subject<ContextLinkageServiceImpl.AppContextBindingEvent>();
+        private readonly Subject<AppContextBindingEvent> _appContextBindingSubject = new Subject<AppContextBindingEvent>();
 
-        public ContextsSet()
+        public ContextsSet(IAppLifecycleManager appLifecycleManager)
         {
+            _appLifecycleManager = appLifecycleManager;
             LoadingStatusChanged = _loadingStatusSubject;
-            _contextBindingEventsSubject.Subscribe(BindContext);
+            AppContextBindingEvents = _appContextBindingSubject.ObserveOn(TaskPoolScheduler.Default);
         }
 
         public IObservable<Context> LoadingStatusChanged { get; }
 
+        public IObservable<AppContextBindingEvent> AppContextBindingEvents { get; }
+
         public Context CreateContext()
         {
-            var context = new Context(_contextBindingEventsSubject);
+            var context = new Context(_appLifecycleManager);
             _contexts[context.Id] = context;
             context.IsLoadingStatus.Select(isLoading => context).Subscribe(_loadingStatusSubject);
+            context.AppContextBindings.Subscribe(BindContext);
             return context;
         }
 
@@ -69,7 +91,7 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
             }
         }
 
-        private void BindContext(ContextLinkageServiceImpl.AppContextBindingEvent bindingEvent)
+        private void BindContext(AppContextBindingEvent bindingEvent)
         {
             var appInstanceId = bindingEvent.AppInstanceId;
             var context = bindingEvent.Context;
@@ -80,7 +102,11 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
                     contexts = new HashSet<Context>();
                     _contextsOfAppInstance[appInstanceId] = contexts;
                 }
-                contexts.Add(context);
+
+                if (contexts.Add(context))
+                {
+                    _appContextBindingSubject.OnNext(bindingEvent);
+                }
             }
         }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,6 @@
     internal interface IOutcomingInvocationFactory
     {
         ValueTask<IOutcomingInvocation<TRequest, TResponse>> CreateAsync<TRequest, TResponse>(
-            MethodCallDescriptor descriptor, Maybe<TRequest> request = default);
+            MethodCallDescriptor descriptor, Maybe<TRequest> request = default, Maybe<ContextLinkageOptions> contextLinkageOptions = default);
     }
 }

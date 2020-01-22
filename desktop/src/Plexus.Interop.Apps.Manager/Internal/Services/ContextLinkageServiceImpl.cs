@@ -17,6 +17,7 @@
 namespace Plexus.Interop.Apps.Internal.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -25,22 +26,23 @@ namespace Plexus.Interop.Apps.Internal.Services
     using Plexus.Interop.Apps.Internal.Generated;
     using Plexus.Interop.Apps.Internal.Services.ContextLinkage;
     using Plexus.Interop.Metamodel;
+    using Plexus.Interop.Protocol;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
     using Context = Plexus.Interop.Apps.Internal.Services.ContextLinkage.Context;
     using ContextDto = Generated.Context;
     using UniqueId = Plexus.UniqueId;
 
-    internal class ContextLinkageServiceImpl : AppLifecycleManagerClient.IContextLinkageServiceImpl
+    internal class ContextLinkageServiceImpl : AppLifecycleManagerClient.IContextLinkageServiceImpl, IContextLinkageManager
     {
         private readonly IRegistryProvider _appRegistryProvider;
         private readonly IAppLifecycleManager _appLifecycleManager;
-
-        private readonly ContextsSet _contextsSet = new ContextsSet();
+        private readonly ContextsSet _contextsSet;
 
         public ContextLinkageServiceImpl(IRegistryProvider appRegistryProvider, IAppLifecycleManager appLifecycleManager, IAppLaunchedEventProvider appLaunchedEventProvider)
         {
             _appRegistryProvider = appRegistryProvider;
             _appLifecycleManager = appLifecycleManager;
+            _contextsSet = new ContextsSet(appLifecycleManager);
 
             appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnAppLaunched);
 
@@ -196,16 +198,74 @@ namespace Plexus.Interop.Apps.Internal.Services
             return AppMetadataServiceImpl.ConvertToAppMetamodelInfo(appInfo);
         }
 
-        public class AppContextBindingEvent
+        public bool IsContextShouldBeConsidered(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
         {
-            public AppContextBindingEvent(Context context, UniqueId appInstanceId)
-            {
-                Context = context;
-                AppInstanceId = appInstanceId;
-            }
+            return contextLinkageOptions != null
+                   && contextLinkageOptions.Mode != ContextLinkageDiscoveryMode.None
+                   && GetApplicationContexts(contextLinkageOptions, sourceConnection).Any();
+        }
 
-            public Context Context { get; }
-            public UniqueId AppInstanceId { get; }
+        public IReadOnlyCollection<(UniqueId AppInstanceId, string AppId, Maybe<UniqueId> ConnectionId)> GetAppsInContexts(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection, bool online)
+        {
+            return GetApplicationContexts(contextLinkageOptions, sourceConnection)
+                .Select(id => _contextsSet.GetContext(id))
+                .Where(context => context != null)
+                .SelectMany(context => context.GetAppsInContext(online))
+                .Distinct().ToArray();
+        }
+
+        private IReadOnlyCollection<string> GetApplicationContexts(IContextLinkageOptions contextLinkageOptions, IAppConnection sourceConnection)
+        {
+            switch (contextLinkageOptions.Mode)
+            {
+                case ContextLinkageDiscoveryMode.CurrentContext:
+                    return _contextsSet.GetContextsOf(sourceConnection.Info.ApplicationInstanceId)
+                        .Select(context => context.Id).ToArray();
+                case ContextLinkageDiscoveryMode.SpecificContext when contextLinkageOptions.SpecificContext.HasValue:
+                    return new[] { contextLinkageOptions.SpecificContext.Value };
+                default:
+                    return new string[0];
+            }
+        }
+
+        public Task AppJoinedContextStream(Empty request, IWritableChannel<AppJoinedContextEvent> responseStream, MethodCallContext context)
+        {
+            return _contextsSet.AppContextBindingEvents
+                .Select(ev => new AppJoinedContextEvent
+                {
+                    AppInstanceId = ev.AppInstanceId.ToProto(),
+                    Context = new ContextDto { Id = ev.Context.Id }
+                })
+                .PipeAsync(responseStream, context.CancellationToken);
+        }
+
+        public Task<RestoreContextsLinkageResponse> RestoreContextsLinkage(RestoreContextsLinkageRequest request, MethodCallContext callContext)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var newCreatedContexts = new Dictionary<string, Context>();
+                foreach (var restoringAppInstance in request.Apps)
+                {
+                    foreach (var contextId in restoringAppInstance.ContextIds)
+                    {
+                        if (!newCreatedContexts.TryGetValue(contextId, out var context))
+                        {
+                            context = _contextsSet.CreateContext();
+                            newCreatedContexts[contextId] = context;
+                        }
+
+                        context.AppLaunched(restoringAppInstance.AppInstanceId.ToUniqueId(),
+                            restoringAppInstance.AppIds);
+                    }
+                }
+
+                var response = new RestoreContextsLinkageResponse();
+                foreach (var pair in newCreatedContexts)
+                {
+                    response.CreatedContextsMap[pair.Key] = new ContextDto { Id = pair.Value.Id };
+                }
+                return response;
+            });
         }
     }
 }

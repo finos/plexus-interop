@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,7 @@
         }
 
         public async ValueTask<IOutcomingInvocation<TRequest, TResponse>> CreateAsync<TRequest, TResponse>(
-            MethodCallDescriptor methodCall, Maybe<TRequest> request = default)
+            MethodCallDescriptor methodCall, Maybe<TRequest> request = default, Maybe<ContextLinkageOptions> contextLinkageOptions = default)
         {
             var channel = await _connection.CreateChannelAsync().ConfigureAwait(false);
             InvocationMethodDescriptor methodDescriptor = null;
@@ -56,7 +56,7 @@
                 methodDescriptor = new InvocationMethodDescriptor(method.ProvidedService.ServiceId, method.Name, method.ProvidedService.ServiceId);
                 targetDescriptor = new InvocationTargetDescriptor(method.ProvidedService.ApplicationId, method.ProvidedService.ConnectionId, method.ProvidedService.ServiceAlias);
             }
-            var descriptor = new OutcomingInvocationDescriptor(methodDescriptor, targetDescriptor);
+            var descriptor = new OutcomingInvocationDescriptor(methodDescriptor, targetDescriptor, contextLinkageOptions);
             var invocation = new OutcomingInvocation<TRequest, TResponse>(
                 descriptor,
                 channel,

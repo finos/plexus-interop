@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,11 @@
         public T Handle<T, TArgs>(InvocationTargetHandler<T, TArgs> handler, TArgs args)
         {
             return handler.Handle(this, args);
+        }
+
+        public T Handle<T, TArg1, TArg2>(InvocationTargetHandler<T, TArg1, TArg2> handler, TArg1 arg1 = default, TArg2 arg2 = default)
+        {
+            return handler.Handle(this, arg1, arg2);
         }
 
         public IProvidedServiceReference ProvidedService { get; set; }

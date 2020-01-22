@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,8 @@ namespace Plexus.Interop.Testing.Generated {
 					
 					
 	public partial interface ITestAppLauncherClient: IClient {
+		TestAppLauncherClient.IContextLinkageServiceProxy ContextLinkageService { get; }
+		
 		TestAppLauncherClient.IAppLifecycleServiceProxy AppLifecycleService { get; }
 	}
 	
@@ -56,6 +58,7 @@ namespace Plexus.Interop.Testing.Generated {
 		
 		public TestAppLauncherClient(TestAppLauncherClient.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
 		{
+			ContextLinkageService = new TestAppLauncherClient.ContextLinkageServiceProxy(this.CallInvoker);
 			AppLifecycleService = new TestAppLauncherClient.AppLifecycleServiceProxy(this.CallInvoker);
 		}
 	
@@ -76,7 +79,8 @@ namespace Plexus.Interop.Testing.Generated {
 		}
 	
 		public partial interface IAppLauncherServiceImpl:
-			global::Plexus.Interop.Testing.Generated.AppLauncherService.ILaunchImpl
+			global::Plexus.Interop.Testing.Generated.AppLauncherService.ILaunchImpl,
+			global::Plexus.Interop.Testing.Generated.AppLauncherService.IAppLaunchedEventStreamImpl
 		{ }
 		
 		private sealed partial class AppLauncherServiceBinder {
@@ -94,6 +98,7 @@ namespace Plexus.Interop.Testing.Generated {
 			
 			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
 				builder = builder.WithUnaryMethod<global::Plexus.Interop.Testing.Generated.AppLaunchRequest, global::Plexus.Interop.Testing.Generated.AppLaunchResponse>(global::Plexus.Interop.Testing.Generated.AppLauncherService.LaunchMethodId, _impl.Launch);
+				builder = builder.WithServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Testing.Generated.AppLaunchedEvent>(global::Plexus.Interop.Testing.Generated.AppLauncherService.AppLaunchedEventStreamMethodId, _impl.AppLaunchedEventStream);
 				return builder; 							
 			}
 		}
@@ -101,21 +106,29 @@ namespace Plexus.Interop.Testing.Generated {
 		public sealed partial class AppLauncherServiceImpl: IAppLauncherServiceImpl
 		{
 			private readonly UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.AppLaunchRequest, global::Plexus.Interop.Testing.Generated.AppLaunchResponse> _launchHandler;
+			private readonly ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Testing.Generated.AppLaunchedEvent> _appLaunchedEventStreamHandler;
 			
 			public AppLauncherServiceImpl(
-				UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.AppLaunchRequest, global::Plexus.Interop.Testing.Generated.AppLaunchResponse> launchHandler
+				UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.AppLaunchRequest, global::Plexus.Interop.Testing.Generated.AppLaunchResponse> launchHandler,
+				ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Testing.Generated.AppLaunchedEvent> appLaunchedEventStreamHandler
 			) {
 				_launchHandler = launchHandler;
+				_appLaunchedEventStreamHandler = appLaunchedEventStreamHandler;
 			}
 			
 			public Task<global::Plexus.Interop.Testing.Generated.AppLaunchResponse> Launch(global::Plexus.Interop.Testing.Generated.AppLaunchRequest request, MethodCallContext context) {
 				return _launchHandler(request, context);
 			}
+			
+			public Task AppLaunchedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Testing.Generated.AppLaunchedEvent> responseStream, MethodCallContext context) {
+				return _appLaunchedEventStreamHandler(request, responseStream, context);
+			}
 		}					
 		
 		public sealed partial class AppLauncherServiceImpl<T>: IAppLauncherServiceImpl
 			where T:
-			global::Plexus.Interop.Testing.Generated.AppLauncherService.ILaunchImpl
+			global::Plexus.Interop.Testing.Generated.AppLauncherService.ILaunchImpl,
+			global::Plexus.Interop.Testing.Generated.AppLauncherService.IAppLaunchedEventStreamImpl
 		{
 			private readonly T _impl;
 			
@@ -126,7 +139,57 @@ namespace Plexus.Interop.Testing.Generated {
 			public Task<global::Plexus.Interop.Testing.Generated.AppLaunchResponse> Launch(global::Plexus.Interop.Testing.Generated.AppLaunchRequest request, MethodCallContext context) {
 				return _impl.Launch(request, context);
 			}
+			
+			public Task AppLaunchedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Testing.Generated.AppLaunchedEvent> responseStream, MethodCallContext context) {
+				return _impl.AppLaunchedEventStream(request, responseStream, context);
+			}
 		}
+		
+		public partial interface IContextLinkageServiceProxy:
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IContextLoadedStreamProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.ICreateContextProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IJoinContextProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IGetContextsProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IGetLinkedInvocationsProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IGetAllLinkedInvocationsProxy
+		{ }
+		
+		public sealed partial class ContextLinkageServiceProxy: IContextLinkageServiceProxy {
+			
+			public static global::Plexus.Interop.Testing.Generated.ContextLinkageService.Descriptor Descriptor = global::Plexus.Interop.Testing.Generated.ContextLinkageService.DefaultDescriptor;
+			
+			private readonly IClientCallInvoker _callInvoker;
+									
+			public ContextLinkageServiceProxy(IClientCallInvoker callInvoker) {
+				_callInvoker = callInvoker;
+			}						
+			
+			public IServerStreamingMethodCall<global::Plexus.Interop.Testing.Generated.ContextLoadingUpdate> ContextLoadedStream(global::Plexus.Interop.Testing.Generated.Context request) {
+				return _callInvoker.Call(Descriptor.ContextLoadedStreamMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.Context> CreateContext(global::Google.Protobuf.WellKnownTypes.Empty request) {
+				return _callInvoker.Call(Descriptor.CreateContextMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Google.Protobuf.WellKnownTypes.Empty> JoinContext(global::Plexus.Interop.Testing.Generated.Context request) {
+				return _callInvoker.Call(Descriptor.JoinContextMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.ContextsList> GetContexts(global::Google.Protobuf.WellKnownTypes.Empty request) {
+				return _callInvoker.Call(Descriptor.GetContextsMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.InvocationsList> GetLinkedInvocations(global::Plexus.Interop.Testing.Generated.Context request) {
+				return _callInvoker.Call(Descriptor.GetLinkedInvocationsMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.ContextToInvocationsList> GetAllLinkedInvocations(global::Google.Protobuf.WellKnownTypes.Empty request) {
+				return _callInvoker.Call(Descriptor.GetAllLinkedInvocationsMethod, request);
+			}
+		}
+		
+		public IContextLinkageServiceProxy ContextLinkageService { get; private set; }
 		
 		public partial interface IAppLifecycleServiceProxy:
 			global::Plexus.Interop.Testing.Generated.AppLifecycleService.IGetLifecycleEventStreamProxy,

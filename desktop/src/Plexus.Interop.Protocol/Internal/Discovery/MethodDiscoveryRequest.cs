@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
             {
                 ConsumedMethod.GetValueOrDefault()?.Dispose();
             }
+            ContextLinkageOptions = default;
             ConsumedMethod = default;
         }
 
@@ -45,6 +46,8 @@ namespace Plexus.Interop.Protocol.Internal.Discovery
         public Maybe<IConsumedMethodReference> ConsumedMethod { get; set; }
 
         public DiscoveryMode DiscoveryMode { get; set; }
+
+        public IContextLinkageOptions ContextLinkageOptions { get; set; }
 
         public override string ToString()
         {

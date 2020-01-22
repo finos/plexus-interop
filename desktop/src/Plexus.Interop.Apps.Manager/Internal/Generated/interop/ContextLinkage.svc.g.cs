@@ -37,6 +37,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		public const string GetContextsMethodId = "GetContexts";
 		public const string GetLinkedInvocationsMethodId = "GetLinkedInvocations";
 		public const string GetAllLinkedInvocationsMethodId = "GetAllLinkedInvocations";
+		public const string AppJoinedContextStreamMethodId = "AppJoinedContextStream";
+		public const string RestoreContextsLinkageMethodId = "RestoreContextsLinkage";
 		
 		public static readonly ContextLinkageService.Descriptor DefaultDescriptor = CreateDescriptor();
 		
@@ -72,6 +74,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList> GetAllLinkedInvocations(global::Google.Protobuf.WellKnownTypes.Empty request);
 		}
 		
+		public partial interface IAppJoinedContextStreamProxy {
+			IServerStreamingMethodCall<global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent> AppJoinedContextStream(global::Google.Protobuf.WellKnownTypes.Empty request);
+		}
+		
+		public partial interface IRestoreContextsLinkageProxy {
+			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse> RestoreContextsLinkage(global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest request);
+		}
+		
 		public partial interface IContextLoadedStreamImpl {
 			Task ContextLoadedStream(global::Plexus.Interop.Apps.Internal.Generated.Context request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate> responseStream, MethodCallContext context);
 		}
@@ -96,6 +106,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			Task<global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList> GetAllLinkedInvocations(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context);
 		}
 		
+		public partial interface IAppJoinedContextStreamImpl {
+			Task AppJoinedContextStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent> responseStream, MethodCallContext context);
+		}
+		
+		public partial interface IRestoreContextsLinkageImpl {
+			Task<global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse> RestoreContextsLinkage(global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest request, MethodCallContext context);
+		}
+		
 		public sealed partial class Descriptor {
 		
 			public ServerStreamingMethod<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate> ContextLoadedStreamMethod {get; private set; }
@@ -104,6 +122,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			public UnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList> GetContextsMethod {get; private set; }
 			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList> GetLinkedInvocationsMethod {get; private set; }
 			public UnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList> GetAllLinkedInvocationsMethod {get; private set; }
+			public ServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent> AppJoinedContextStreamMethod {get; private set; }
+			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest, global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse> RestoreContextsLinkageMethod {get; private set; }
 			
 			public Descriptor() {				
 				ContextLoadedStreamMethod = Method.ServerStreaming<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate>(Id, ContextLoadedStreamMethodId);
@@ -112,6 +132,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 				GetContextsMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList>(Id, GetContextsMethodId);
 				GetLinkedInvocationsMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList>(Id, GetLinkedInvocationsMethodId);
 				GetAllLinkedInvocationsMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList>(Id, GetAllLinkedInvocationsMethodId);
+				AppJoinedContextStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent>(Id, AppJoinedContextStreamMethodId);
+				RestoreContextsLinkageMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest, global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse>(Id, RestoreContextsLinkageMethodId);
 			}
 		
 			public Descriptor(string alias) {
@@ -121,6 +143,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 				GetContextsMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList>(Id, alias, GetContextsMethodId);
 				GetLinkedInvocationsMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList>(Id, alias, GetLinkedInvocationsMethodId);
 				GetAllLinkedInvocationsMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList>(Id, alias, GetAllLinkedInvocationsMethodId);
+				AppJoinedContextStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent>(Id, alias, AppJoinedContextStreamMethodId);
+				RestoreContextsLinkageMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest, global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse>(Id, alias, RestoreContextsLinkageMethodId);
 			}
 		}
 	}

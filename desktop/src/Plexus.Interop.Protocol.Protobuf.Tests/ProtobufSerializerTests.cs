@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,6 +47,38 @@
                                     target.ConsumedService.ServiceAlias.ShouldBe(Maybe<string>.Nothing);
                                     return Nothing.Instance;
                                 },
+                            (target, __) => throw new InvalidOperationException($"Unexpected target: {target}")));
+                    },
+                    (msg, _) => throw new InvalidOperationException($"Unexpected message: {msg}"),
+                    (msg, _) => throw new InvalidOperationException($"Unexpected message: {msg}")));
+            }
+        }
+
+        [Theory]
+        [InlineData(ContextLinkageDiscoveryMode.None)]
+        [InlineData(ContextLinkageDiscoveryMode.CurrentContext)]
+        public void ContextLinkageInfoIsSerializedCorrectly(ContextLinkageDiscoveryMode mode)
+        {
+            var serializer = SerializerFactory.Create(MessageFactory);
+            var serviceReference = MessageFactory.CreateConsumedServiceReference("plexus.interop.testing.EchoService", Maybe<string>.Nothing);
+            var methodReference = MessageFactory.CreateConsumedMethodReference(serviceReference, "Unary");
+            var contextLinkageOptions = MessageFactory.CreateContextLinkageOptions(mode, Maybe<string>.Nothing);
+            using (var request = MessageFactory.CreateInvocationStartRequest(methodReference, contextLinkageOptions))
+            using (var serialized = serializer.Serialize(request))
+            using (var deserialized = serializer.DeserializeClientToBrokerRequest(serialized))
+            {
+                deserialized.Handle(new ClientToBrokerRequestHandler<Nothing, Nothing>(
+                    (msg, _) =>
+                    {
+                        msg.ContextLinkageOptions.Mode.ShouldBe(mode);
+                        return msg.Target.Handle(new InvocationTargetHandler<Nothing, Nothing>(
+                            (target, __) =>
+                            {
+                                target.MethodId.ShouldBe("Unary");
+                                target.ConsumedService.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                                target.ConsumedService.ServiceAlias.ShouldBe(Maybe<string>.Nothing);
+                                return Nothing.Instance;
+                            },
                             (target, __) => throw new InvalidOperationException($"Unexpected target: {target}")));
                     },
                     (msg, _) => throw new InvalidOperationException($"Unexpected message: {msg}"),

@@ -24,7 +24,7 @@
 		"ci-build": "run-s build",
 		"ci-build-e2e": "run-s build e2e-native e2e-web",
 		"ci-publish": "run-s bump-version build publish-all",
-		"bump-version": "cross-var lerna publish --repo-version $PLEXUS_BUILD_NPM_PACKAGE_VERSION --skip-git --exact --skip-npm --yes --verbose --force-publish=*",
+		"bump-version": "cross-var lerna publish --repo-version $PLEXUS_BUILD_NPM_PACKAGE_VERSION --no-git-tag-version --no-push --exact --skip-npm --yes --loglevel=silly --force-publish=*",
 		"benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
 	},
 	"workspaces": [
