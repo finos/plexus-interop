@@ -1504,6 +1504,66 @@
 	            }
 	          }
 	        },
+	        "AppJoinedContextEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppJoinedContextEvent"
+	          },
+	          "fields": {
+	            "context": {
+	              "type": "Context",
+	              "id": 1
+	            },
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "RestoreContextsLinkageRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RestoreContextsLinkageRequest"
+	          },
+	          "fields": {
+	            "apps": {
+	              "rule": "repeated",
+	              "type": "RestoringAppInstance",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "RestoringAppInstance": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RestoringAppInstance"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            },
+	            "appIds": {
+	              "rule": "repeated",
+	              "type": "string",
+	              "id": 2
+	            },
+	            "contextIds": {
+	              "rule": "repeated",
+	              "type": "string",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "RestoreContextsLinkageResponse": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RestoreContextsLinkageResponse"
+	          },
+	          "fields": {
+	            "createdContextsMap": {
+	              "keyType": "string",
+	              "type": "Context",
+	              "id": 1
+	            }
+	          }
+	        },
 	        "ContextLinkageService": {
 	          "options": {
 	            "(.interop.service_id)": "interop.ContextLinkageService"
@@ -1533,6 +1593,15 @@
 	            "GetAllLinkedInvocations": {
 	              "requestType": "google.protobuf.Empty",
 	              "responseType": "ContextToInvocationsList"
+	            },
+	            "AppJoinedContextStream": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "AppJoinedContextEvent",
+	              "responseStream": true
+	            },
+	            "RestoreContextsLinkage": {
+	              "requestType": "RestoreContextsLinkageRequest",
+	              "responseType": "RestoreContextsLinkageResponse"
 	            }
 	          }
 	        },
@@ -1712,6 +1781,18 @@
 					"request": "google.protobuf.Empty",
 					"response": "interop.ContextToInvocationsList",
 					"type": "Unary"
+				},
+				{
+					"name": "AppJoinedContextStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.AppJoinedContextEvent",
+					"type": "ServerStreaming"
+				},
+				{
+					"name": "RestoreContextsLinkage",
+					"request": "interop.RestoreContextsLinkageRequest",
+					"response": "interop.RestoreContextsLinkageResponse",
+					"type": "Unary"
 				}
 			],
 			"options": [
@@ -1784,6 +1865,12 @@
 						},
 						{
 							"name": "GetAllLinkedInvocations"
+						},
+						{
+							"name": "AppJoinedContextStream"
+						},
+						{
+							"name": "RestoreContextsLinkage"
 						}
 					]
 				}

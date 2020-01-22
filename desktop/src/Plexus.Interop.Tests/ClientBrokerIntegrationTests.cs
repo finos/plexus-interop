@@ -1257,6 +1257,8 @@ namespace Plexus.Interop
                 
                 serverCreatedCount.ShouldBe(2);
 
+                await Task.Delay(500);
+
                 var linkedInvocations = await client.ContextLinkageService.GetLinkedInvocations(newContext);
 
                 linkedInvocations.Invocations

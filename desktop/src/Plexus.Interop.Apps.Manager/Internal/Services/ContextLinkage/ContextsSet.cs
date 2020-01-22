@@ -35,27 +35,33 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
 
     internal class ContextsSet
     {
+        private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly Subject<Context> _loadingStatusSubject = new Subject<Context>();
-        private readonly Subject<ContextLinkageServiceImpl.AppContextBindingEvent> _contextBindingEventsSubject = new Subject<ContextLinkageServiceImpl.AppContextBindingEvent>();
+        private readonly Subject<AppContextBindingEvent> _appContextBindingSubject = new Subject<AppContextBindingEvent>();
 
-        public ContextsSet()
+        public ContextsSet(IAppLifecycleManager appLifecycleManager)
         {
+            _appLifecycleManager = appLifecycleManager;
             LoadingStatusChanged = _loadingStatusSubject;
-            _contextBindingEventsSubject.Subscribe(BindContext);
+            AppContextBindingEvents = _appContextBindingSubject.ObserveOn(TaskPoolScheduler.Default);
         }
 
         public IObservable<Context> LoadingStatusChanged { get; }
 
+        public IObservable<AppContextBindingEvent> AppContextBindingEvents { get; }
+
         public Context CreateContext()
         {
-            var context = new Context(_contextBindingEventsSubject);
+            var context = new Context(_appLifecycleManager);
             _contexts[context.Id] = context;
             context.IsLoadingStatus.Select(isLoading => context).Subscribe(_loadingStatusSubject);
+            context.AppContextBindings.Subscribe(BindContext);
             return context;
         }
 
@@ -85,7 +91,7 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
             }
         }
 
-        private void BindContext(ContextLinkageServiceImpl.AppContextBindingEvent bindingEvent)
+        private void BindContext(AppContextBindingEvent bindingEvent)
         {
             var appInstanceId = bindingEvent.AppInstanceId;
             var context = bindingEvent.Context;
@@ -96,7 +102,11 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
                     contexts = new HashSet<Context>();
                     _contextsOfAppInstance[appInstanceId] = contexts;
                 }
-                contexts.Add(context);
+
+                if (contexts.Add(context))
+                {
+                    _appContextBindingSubject.OnNext(bindingEvent);
+                }
             }
         }
 
