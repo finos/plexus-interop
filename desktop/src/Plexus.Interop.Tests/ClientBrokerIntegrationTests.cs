@@ -27,6 +27,9 @@ namespace Plexus.Interop
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Reactive.Subjects;
     using System.Threading;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
@@ -34,12 +37,13 @@ namespace Plexus.Interop
     using Xunit;
     using Xunit.Abstractions;
     using ErrorEventArgs = SuperSocket.ClientEngine.ErrorEventArgs;
+    using UniqueId = Plexus.UniqueId;
 
     public sealed class ClientBrokerIntegrationTests : TestsSuite, IClassFixture<TestBrokerFixture>
     {
         private static readonly UnaryMethod<EchoRequest, EchoRequest> EchoUnaryMethod =
             Method.Unary<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "Unary");
-        
+
         private static readonly ServerStreamingMethod<EchoRequest, EchoRequest> EchoServerStreamingMethod =
             Method.ServerStreaming<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "ServerStreaming");
 
@@ -122,8 +126,8 @@ namespace Plexus.Interop
                 await appLauncher.StartAsync();
                 var stream = appLauncher.GetLifecycleEventStream().ResponseStream;
                 await Task.Delay(Timeout500Ms);
-                var client = ConnectEchoClient();                
-                await client.DisconnectAsync();  
+                var client = ConnectEchoClient();
+                await client.DisconnectAsync();
                 var evt1 = await stream.ReadAsync();
                 var evt2 = await stream.ReadAsync();
 
@@ -221,7 +225,7 @@ namespace Plexus.Interop
                         new Dictionary<string, TestClientFactory>()
                     )
                 );
-                await appLauncher.StartAsync();                
+                await appLauncher.StartAsync();
 
                 Task<EchoRequest> HandleAsync(EchoRequest request, MethodCallContext context)
                 {
@@ -273,7 +277,7 @@ namespace Plexus.Interop
                 EnumField = EchoRequest.Types.SubEnum.ValueTwo,
                 Uint32Field = uint.MinValue
             };
-            sentRequest.RepeatedDoubleField.Add(new[] {0, -0.5, 123.1});
+            sentRequest.RepeatedDoubleField.Add(new[] { 0, -0.5, 123.1 });
             sentRequest.RepeatedSubMessageField.Add(
                 new EchoRequest.Types.SubMessage
                 {
@@ -436,7 +440,7 @@ namespace Plexus.Interop
                 Console.WriteLine("Response received");
             });
         }
-        
+
         [Fact]
         public void ServerStreamingCall()
         {
@@ -637,7 +641,7 @@ namespace Plexus.Interop
             });
         }
 
-        [Fact]        
+        [Fact]
         public void DiscoveryByMethod()
         {
             RunWith10SecTimeout(async () =>
@@ -655,7 +659,7 @@ namespace Plexus.Interop
                 discoveryResult.InputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
                 discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
                 discoveryResult.Type.ShouldBe(MethodType.Unary);
-                discoveryResult.Options.Count.ShouldBe(3);                
+                discoveryResult.Options.Count.ShouldBe(3);
                 discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
                 discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
                 discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
@@ -741,7 +745,7 @@ namespace Plexus.Interop
                     discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
                     discoveryResult.Type.ShouldBe(MethodType.Unary);
                     discoveryResult.ProviderConnectionId.ShouldBeOneOf(server1.ConnectionId, server2.ConnectionId);
-                    discoveryResult.Options.Count.ShouldBe(3);                
+                    discoveryResult.Options.Count.ShouldBe(3);
                     discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
                     discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
                     discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
@@ -1053,7 +1057,7 @@ namespace Plexus.Interop
                 var callDescriptor = new MethodCallDescriptor(
                     ProvidedMethodReference.Create(GreetingService.Id, "NeverLaunchGreetingService", "Hello", EchoServerClient.Id));
                 client.CallInvoker
-                    .CallUnary(callDescriptor, new GreetingRequest {Name = "Test"})
+                    .CallUnary(callDescriptor, new GreetingRequest { Name = "Test" })
                     .AsTask()
                     .ShouldThrow<RemoteErrorException>();
                 serverCreatedCount.ShouldBe(0);
@@ -1066,7 +1070,7 @@ namespace Plexus.Interop
         [InlineData(1, 1)]
         [InlineData(1, 10)]
         [InlineData(10, 0)]
-        [InlineData(10, 1)]        
+        [InlineData(10, 1)]
         [InlineData(10, 10)]
         [InlineData(100, 10)]
         public void DuplexStreamingStress(int requestsCount, int responsesPerRequest)
@@ -1075,7 +1079,7 @@ namespace Plexus.Interop
                 IReadableChannel<EchoRequest> requestStream,
                 IWritableChannel<EchoRequest> responseStream,
                 MethodCallContext context)
-            {                
+            {
                 WriteLog("Provider: Started request");
                 var x = 0;
                 do
@@ -1083,7 +1087,7 @@ namespace Plexus.Interop
                     while (requestStream.TryRead(out var item))
                     {
                         var stopwatch = new Stopwatch();
-                        Log.Info($"Provider: request {x} received");                        
+                        Log.Info($"Provider: request {x} received");
                         for (var i = 0; i < responsesPerRequest; i++)
                         {
                             var y = x * responsesPerRequest + i;
@@ -1249,12 +1253,12 @@ namespace Plexus.Interop
                 allContexts.Contexts[0].Id.ShouldBe(newContext.Id);
 
                 var result3 = await client.CallInvoker.Call(
-                    GreetingService.DefaultDescriptor.HelloMethod, 
-                    new GreetingRequest {Name = "Test3"},
+                    GreetingService.DefaultDescriptor.HelloMethod,
+                    new GreetingRequest { Name = "Test3" },
                     ContextLinkageOptions.WithCurrentContext());
 
                 result3.Greeting.ShouldBe("Test32");
-                
+
                 serverCreatedCount.ShouldBe(2);
 
                 await Task.Delay(500);
@@ -1264,6 +1268,89 @@ namespace Plexus.Interop
                 linkedInvocations.Invocations
                     .Single(reference => reference.AppInfo.ProvidedServices.Any(service => service.ServiceId == GreetingService.Id))
                     .ShouldNotBeNull();
+            });
+        }
+
+        [Fact]
+        public void AppLaunchedWithUnexpectedAppInstanceShouldBeResolved()
+        {
+            Task<GreetingResponse> HandleGreetingRequestAsync(GreetingRequest greetingRequest, MethodCallContext context)
+            {
+                return Task.FromResult(new GreetingResponse { Greeting = "Polo" });
+            }
+
+            IClient CreateEchoServerClient(UniqueId clientAppInstanceId)
+            {
+                var optionsBuilder = new ClientOptionsBuilder()
+                    .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                    .WithAppInstanceId(clientAppInstanceId)
+                    .WithApplicationId(EchoServerClient.Id)
+                    .WithDefaultConfiguration()
+                    .WithProvidedService(
+                        GreetingService.Id,
+                        x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>(GreetingService.HelloMethodId, HandleGreetingRequestAsync));
+                return ClientFactory.Instance.Create(optionsBuilder.Build());
+            }
+
+            TaskCompletionSource<UniqueId> echoServerClientLaunchedCompletionSource = new TaskCompletionSource<UniqueId>();
+            Subject<AppLaunchedEvent> launchEventsSubject = new Subject<AppLaunchedEvent>();
+
+            Task<AppLaunchResponse> HandleAppLaunchRequestAsync(AppLaunchRequest request, MethodCallContext context)
+            {
+                var uniqueId = UniqueId.Generate();
+                var appInstanceId = new Testing.Generated.UniqueId { Hi = uniqueId.Hi, Lo = uniqueId.Lo };
+                echoServerClientLaunchedCompletionSource.SetResult(uniqueId);
+                launchEventsSubject.OnNext(new AppLaunchedEvent
+                {
+                    AppInstanceId = appInstanceId,
+                    Referrer = request.Referrer
+                });
+                return Task.FromResult(new AppLaunchResponse
+                {
+                    AppInstanceId = appInstanceId
+                });
+            }
+
+            async Task Handler(Empty request, IWritableChannel<AppLaunchedEvent> responseStream, MethodCallContext context)
+            {
+                await launchEventsSubject.ObserveOn(ThreadPoolScheduler.Instance).PipeAsync(responseStream, context.CancellationToken).ConfigureAwait(false);
+            }
+
+            RunWith10SecTimeout(async () =>
+            {
+                var launcherClient = ClientFactory.Instance.Create(
+                    new ClientOptionsBuilder()
+                        .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                        .WithApplicationId(TestAppLauncherClient.Id)
+                        .WithDefaultConfiguration()
+                        .WithProvidedService(AppLauncherService.Id,
+                            x => x.WithUnaryMethod<AppLaunchRequest, AppLaunchResponse>(
+                                AppLauncherService.LaunchMethodId,
+                                HandleAppLaunchRequestAsync)
+                                .WithServerStreamingMethod<Empty, AppLaunchedEvent>(AppLauncherService.AppLaunchedEventStreamMethodId, Handler))
+                        .Build());
+
+                await launcherClient.ConnectAsync();
+
+                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
+                await client.ConnectAsync();
+
+                var responseTask = client.GreetingService.Hello(new GreetingRequest {Name = "Marco"}).AsTask();
+                var echoClientLaunchTask = echoServerClientLaunchedCompletionSource.Task;
+                var finishedTask1 = await Task.WhenAny(responseTask, echoClientLaunchTask);
+
+                finishedTask1.ShouldBe(echoClientLaunchTask);
+
+                var delay = Task.Delay(Timeout1Sec);
+                var finishedTask2 = await Task.WhenAny(responseTask, delay);
+
+                finishedTask2.ShouldBe(delay);
+
+                var echoServerClient = CreateEchoServerClient(echoClientLaunchTask.Result);
+                await echoServerClient.ConnectAsync();
+
+                var response = await responseTask;
+                response.Greeting.ShouldBe("Polo");
             });
         }
 
