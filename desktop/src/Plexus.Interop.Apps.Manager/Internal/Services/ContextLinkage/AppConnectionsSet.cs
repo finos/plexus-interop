@@ -35,6 +35,8 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
 
@@ -47,61 +49,71 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
         private readonly HashSet<string> _loadingApps = new HashSet<string>();
         private readonly Dictionary<string, AppConnectionDescriptor> _appConnectionMap = new Dictionary<string, AppConnectionDescriptor>();
 
-        private readonly BehaviorSubject<bool> _loadingStatusSubject = new BehaviorSubject<bool>(false);
-
-        public IObservable<bool> IsLoadingStatus { get; }
+        private readonly BehaviorSubject<Unit> _updatedSubject = new BehaviorSubject<Unit>(Unit.Default);
 
         public AppConnectionsSet(UniqueId appInstanceId)
         {
             _appInstanceId = appInstanceId;
-            IsLoadingStatus = _loadingStatusSubject.DistinctUntilChanged();
+            UpdatedEventStream = _updatedSubject.ObserveOn(TaskPoolScheduler.Default);
         }
+
+        public IObservable<Unit> UpdatedEventStream { get; }
 
         public void AppLaunched(IEnumerable<string> appIds)
         {
-            bool newLoadingStatus;
+            var updated = false;
             lock (_lock)
             {
                 foreach (var appId in appIds)
                 {
                     if (!_appConnectionMap.ContainsKey(appId))
                     {
-                        _loadingApps.Add(appId);
+                        updated |= _loadingApps.Add(appId);
                     }
                 }
-
-                newLoadingStatus = _loadingApps.Count > 0;
             }
 
-            _loadingStatusSubject.OnNext(newLoadingStatus);
+            if (updated)
+            {
+                _updatedSubject.OnNext(Unit.Default);
+            }
         }
 
         public void AppConnected(AppConnectionDescriptor appConnection)
         {
-            bool newLoadingStatus;
+            var updated = false;
             lock (_lock)
             {
                 var appId = appConnection.ApplicationId;
-                _appConnectionMap[appId] = appConnection;
-                _loadingApps.Remove(appId);
-                newLoadingStatus = _loadingApps.Count > 0;
+                if (!_appConnectionMap.TryGetValue(appId, out var existingAppConnection) 
+                    || !Equals(appConnection, existingAppConnection))
+                {
+                    _appConnectionMap[appId] = appConnection;
+                    updated = true;
+                }
+                updated |= _loadingApps.Remove(appId);
             }
 
-            _loadingStatusSubject.OnNext(newLoadingStatus);
+            if (updated)
+            {
+                _updatedSubject.OnNext(Unit.Default);
+            }
         }
 
         public void AppDisconnected(AppConnectionDescriptor appConnection)
         {
-            bool newLoadingStatus;
+            var updated = false;
             lock (_lock)
             {
                 var appId = appConnection.ApplicationId;
-                _appConnectionMap.Remove(appId);
-                _loadingApps.Remove(appId);
-                newLoadingStatus = _loadingApps.Count > 0;
+                updated |= _appConnectionMap.Remove(appId);
+                updated |= _loadingApps.Remove(appId);
             }
 
-            _loadingStatusSubject.OnNext(newLoadingStatus);
+            if (updated)
+            {
+                _updatedSubject.OnNext(Unit.Default);
+            }
         }
 
         public IReadOnlyCollection<AppConnectionDescriptor> GetOnlineConnections()
@@ -109,6 +121,17 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
             lock (_lock)
             {
                 return _appConnectionMap.Values.Where(descriptor => descriptor != null).ToArray();
+            }
+        }
+
+        public bool HasLoadingApps
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _loadingApps.Any();
+                }
             }
         }
 

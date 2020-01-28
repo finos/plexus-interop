@@ -39,7 +39,7 @@ namespace Plexus.Interop
     using ErrorEventArgs = SuperSocket.ClientEngine.ErrorEventArgs;
     using UniqueId = Plexus.UniqueId;
 
-    public sealed class ClientBrokerIntegrationTests : TestsSuite, IClassFixture<TestBrokerFixture>
+    public sealed class ClientBrokerIntegrationTests : BaseClientBrokerTestsSuite
     {
         private static readonly UnaryMethod<EchoRequest, EchoRequest> EchoUnaryMethod =
             Method.Unary<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "Unary");
@@ -53,54 +53,9 @@ namespace Plexus.Interop
         private static readonly DuplexStreamingMethod<EchoRequest, EchoRequest> EchoDuplexStreamingMethod =
             Method.DuplexStreaming<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "DuplexStreaming");
 
-        private readonly TestBrokerFixture _testBrokerFixture;
-
-        private readonly List<Exception> _unobservedExceptions = new List<Exception>();
-
-        public ClientBrokerIntegrationTests(ITestOutputHelper output, TestBrokerFixture testBrokerFixture) : base(output)
-        {
-            _testBrokerFixture = testBrokerFixture;
-            _testBrokerFixture.OnBeforeTest();
-            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-        }
-
-        private void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
-        {
-            lock (_unobservedExceptions)
-            {
-                _unobservedExceptions.AddRange(e.Exception.InnerExceptions);
-            }
-        }
-
-        public override void Dispose()
-        {
-            try
-            {
-                base.Dispose();
-                _testBrokerFixture.OnAfterTest();
-                VerifyNoUnobservedTaskExceptions();
-            }
-            finally
-            {
-                TaskScheduler.UnobservedTaskException -= OnUnobservedTaskException;
-            }
-        }
-
-        private void VerifyNoUnobservedTaskExceptions()
-        {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-            lock (_unobservedExceptions)
-            {
-                if (_unobservedExceptions.Count > 0)
-                {
-                    throw new AggregateException(
-                        "Unhandled task exceptions after test run",
-                        _unobservedExceptions);
-                }
-            }
-        }
+        public ClientBrokerIntegrationTests(ITestOutputHelper output, TestBrokerFixture testBrokerFixture)
+            : base(output, testBrokerFixture)
+        { }
 
         [Fact]
         public void ClientConnectDisconnect()
@@ -908,11 +863,17 @@ namespace Plexus.Interop
         [Fact]
         public void InvocationShouldAlwaysTriggerLaunchWhenMethodLaunchModeSetToAlways()
         {
+            const string applicationId = EchoServerClient.Id;
+            const string serverServiceId = GreetingService.Id;
+            const string methodName = GreetingService.HelloMethodId;
+            const string serviceAliasId = "AlwaysLaunchGreetingService";
+
             Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
             {
                 return Task.FromResult(new GreetingResponse { Greeting = greetingRequest.Name });
             }
 
+            var brokerInstance = _testBrokerFixture.SharedInstance;
             RunWith10SecTimeout(async () =>
             {
                 var serverCreatedCount = 0;
@@ -920,14 +881,14 @@ namespace Plexus.Interop
                     (broker, id) =>
                     {
                         var optionsBuilder = new ClientOptionsBuilder()
-                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithBrokerWorkingDir(brokerInstance.WorkingDir)
                             .WithAppInstanceId(id)
-                            .WithApplicationId(EchoServerClient.Id)
+                            .WithApplicationId(applicationId)
                             .WithDefaultConfiguration()
                             .WithProvidedService(
-                                GreetingService.Id,
-                                "AlwaysLaunchGreetingService",
-                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+                                serverServiceId,
+                                serviceAliasId,
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>(methodName, HandleAsync));
 
                         serverCreatedCount++;
 
@@ -936,19 +897,18 @@ namespace Plexus.Interop
 
                 var appLauncher = RegisterDisposable(
                     new TestAppLauncher(
-                        _testBrokerFixture.SharedInstance,
+                        brokerInstance,
                         new Dictionary<string, TestClientFactory>
                         {
-                            {EchoServerClient.Id, echoServerFactory}
+                            {applicationId, echoServerFactory}
                         }
                     )
                 );
                 await appLauncher.StartAsync();
                 ConnectEchoServer();
-                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
+                var client = new EchoClient(s => s.WithBrokerWorkingDir(brokerInstance.WorkingDir));
                 client.ConnectAsync().ShouldCompleteIn(Timeout5Sec);
-                var callDescriptor = new MethodCallDescriptor(
-                    ProvidedMethodReference.Create(GreetingService.Id, "AlwaysLaunchGreetingService", "Hello", EchoServerClient.Id));
+                var callDescriptor = new MethodCallDescriptor(ProvidedMethodReference.Create(serverServiceId, serviceAliasId, methodName, applicationId));
                 await client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
                 await client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
                 serverCreatedCount.ShouldBe(2);
@@ -958,7 +918,12 @@ namespace Plexus.Interop
         [Fact]
         public void InvocationShouldTriggerLaunchWithSingleInstanceModeByDefault()
         {
+            const string serverAppId = EchoServerClient.Id;
+            const string serverServiceId = GreetingService.Id;
+            const string methodName = GreetingService.HelloMethodId;
+
             var serverInvokedCount = 0;
+            var serverCreatedCount = 0;
 
             Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
             {
@@ -966,51 +931,51 @@ namespace Plexus.Interop
                 return Task.FromResult(new GreetingResponse { Greeting = greetingRequest.Name });
             }
 
-            RunWith10SecTimeout(async () =>
+            using (var brokerInstance = _testBrokerFixture.CreateBroker())
             {
-                var serverCreatedCount = 0;
-                var echoServerFactory = new TestClientFactory(
+                RunWith10SecTimeout(async () =>
+                {
+                    await brokerInstance.StartAsync();
+
+                    var echoServerFactory = new TestClientFactory(
                     (broker, id) =>
                     {
                         WriteLog("Launching server on demand");
 
                         var optionsBuilder = new ClientOptionsBuilder()
-                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
+                            .WithBrokerWorkingDir(brokerInstance.WorkingDir)
                             .WithAppInstanceId(id)
-                            .WithApplicationId(EchoServerClient.Id)
+                            .WithApplicationId(serverAppId)
                             .WithDefaultConfiguration()
                             .WithProvidedService(
-                                GreetingService.Id,
-                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
+                                serverServiceId,
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>(methodName, HandleAsync));
 
-                        serverCreatedCount++;
+                        Interlocked.Increment(ref serverCreatedCount);
 
                         return ClientFactory.Instance.Create(optionsBuilder.Build());
                     });
 
-                var appLauncher = RegisterDisposable(
-                    new TestAppLauncher(
-                        _testBrokerFixture.SharedInstance,
-                        new Dictionary<string, TestClientFactory>
-                        {
-                            {EchoServerClient.Id, echoServerFactory}
-                        }
-                    )
-                );
-                await appLauncher.StartAsync();
-                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
-                client.ConnectAsync().ShouldCompleteIn(Timeout5Sec);
-                var callDescriptor = new MethodCallDescriptor(
-                    ProvidedMethodReference.Create(GreetingService.Id, "Hello", EchoServerClient.Id));
-                var call1 = client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
-                var call2 = client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
-                await Task.WhenAny(call1.AsTask(), call2.AsTask());
-                WriteLog("Call 1 completed");
-                await Task.WhenAll(call1.AsTask(), call2.AsTask());
-                WriteLog("Call 2 completed");
-                serverCreatedCount.ShouldBe(1);
-                serverInvokedCount.ShouldBe(2);
-            });
+                    var appLauncher = RegisterDisposable(
+                        new TestAppLauncher(
+                            brokerInstance,
+                            new Dictionary<string, TestClientFactory> { { serverAppId, echoServerFactory } }
+                        )
+                    );
+                    await appLauncher.StartAsync();
+                    var client = new EchoClient(s => s.WithBrokerWorkingDir(brokerInstance.WorkingDir));
+                    client.ConnectAsync().ShouldCompleteIn(Timeout5Sec);
+                    var callDescriptor = new MethodCallDescriptor(ProvidedMethodReference.Create(serverServiceId, methodName, serverAppId));
+                    var call1 = client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
+                    var call2 = client.CallInvoker.CallUnary(callDescriptor, new GreetingRequest { Name = "Test" });
+                    await Task.WhenAny(call1.AsTask(), call2.AsTask());
+                    WriteLog("Call 1 completed");
+                    await Task.WhenAll(call1.AsTask(), call2.AsTask());
+                    WriteLog("Call 2 completed");
+                    Volatile.Read(ref serverCreatedCount).ShouldBe(1, "Unexpected serverCreatedCount");
+                    Volatile.Read(ref serverInvokedCount).ShouldBe(2, "Unexpected serverInvokedCount");
+                });
+            }
         }
 
         [Fact]
@@ -1197,81 +1162,6 @@ namespace Plexus.Interop
         }
 
         [Fact]
-        public void NewAppInstanceWillBeLaunchedOnInvocationWithinContext()
-        {
-            var serverCreatedCount = 0;
-
-            Task<GreetingResponse> HandleAsync(GreetingRequest greetingRequest, MethodCallContext context)
-            {
-                return Task.FromResult(new GreetingResponse { Greeting = greetingRequest.Name + (serverCreatedCount) });
-            }
-
-            RunWith10SecTimeout(async () =>
-            {
-                var echoServerFactory = new TestClientFactory(
-                    (broker, id) =>
-                    {
-                        var optionsBuilder = new ClientOptionsBuilder()
-                            .WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir)
-                            .WithAppInstanceId(id)
-                            .WithApplicationId(EchoServerClient.Id)
-                            .WithDefaultConfiguration()
-                            .WithProvidedService(
-                                GreetingService.Id,
-                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>("Hello", HandleAsync));
-
-                        serverCreatedCount++;
-
-                        return ClientFactory.Instance.Create(optionsBuilder.Build());
-                    });
-
-                var appLauncher = RegisterDisposable(
-                    new TestAppLauncher(
-                        _testBrokerFixture.SharedInstance,
-                        new Dictionary<string, TestClientFactory>
-                        {
-                            {EchoServerClient.Id, echoServerFactory}
-                        }
-                    )
-                );
-                await appLauncher.StartAsync();
-                var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
-                await client.ConnectAsync();
-
-                var result1 = await client.GreetingService.Hello(new GreetingRequest { Name = "Test1" });
-                result1.Greeting.ShouldBe("Test11");
-
-                var result2 = await client.GreetingService.Hello(new GreetingRequest { Name = "Test2" });
-                result2.Greeting.ShouldBe("Test21");
-
-                serverCreatedCount.ShouldBe(1);
-
-                var newContext = await client.ContextLinkageService.CreateContext(new Empty());
-                var allContexts = await client.ContextLinkageService.GetContexts(new Empty());
-
-                allContexts.Contexts.Count.ShouldBe(1);
-                allContexts.Contexts[0].Id.ShouldBe(newContext.Id);
-
-                var result3 = await client.CallInvoker.Call(
-                    GreetingService.DefaultDescriptor.HelloMethod,
-                    new GreetingRequest { Name = "Test3" },
-                    ContextLinkageOptions.WithCurrentContext());
-
-                result3.Greeting.ShouldBe("Test32");
-
-                serverCreatedCount.ShouldBe(2);
-
-                await Task.Delay(500);
-
-                var linkedInvocations = await client.ContextLinkageService.GetLinkedInvocations(newContext);
-
-                linkedInvocations.Invocations
-                    .Single(reference => reference.AppInfo.ProvidedServices.Any(service => service.ServiceId == GreetingService.Id))
-                    .ShouldNotBeNull();
-            });
-        }
-
-        [Fact]
         public void AppLaunchedWithUnexpectedAppInstanceShouldBeResolved()
         {
             Task<GreetingResponse> HandleGreetingRequestAsync(GreetingRequest greetingRequest, MethodCallContext context)
@@ -1335,7 +1225,7 @@ namespace Plexus.Interop
                 var client = new EchoClient(s => s.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir));
                 await client.ConnectAsync();
 
-                var responseTask = client.GreetingService.Hello(new GreetingRequest {Name = "Marco"}).AsTask();
+                var responseTask = client.GreetingService.Hello(new GreetingRequest { Name = "Marco" }).AsTask();
                 var echoClientLaunchTask = echoServerClientLaunchedCompletionSource.Task;
                 var finishedTask1 = await Task.WhenAny(responseTask, echoClientLaunchTask);
 

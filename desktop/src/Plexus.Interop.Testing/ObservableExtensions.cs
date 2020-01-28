@@ -19,6 +19,7 @@ namespace Plexus.Interop.Testing
     using System;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reactive.Subjects;
     using System.Reactive.Threading.Tasks;
     using System.Threading;
     using System.Threading.Tasks;

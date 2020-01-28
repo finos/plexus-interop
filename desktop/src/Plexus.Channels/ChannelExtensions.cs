@@ -212,5 +212,42 @@ namespace Plexus.Channels
                 }
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static async ValueTask<T> FirstAsync<T>(
+            this IReadableChannel<T> channel,
+            Func<T, bool> predicate,
+            CancellationToken cancellationToken = default)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var item = await channel.TryReadAsync(cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (item.HasValue && predicate(item.Value))
+                {
+                    return item.Value;
+                }
+            }
+
+            throw new Exception("There is no first element in sequence");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static async ValueTask<T> FirstAsync<T>(
+            this IReadableChannel<T> channel,
+            CancellationToken cancellationToken = default)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var item = await channel.TryReadAsync(cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (item.HasValue)
+                {
+                    return item.Value;
+                }
+            }
+
+            throw new Exception("There is no first element in sequence");
+        }
     }
 }

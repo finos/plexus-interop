@@ -20,6 +20,9 @@ namespace Plexus.Interop.Apps.Internal
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal.Generated;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
@@ -42,17 +45,18 @@ namespace Plexus.Interop.Apps.Internal
         private readonly IAppRegistryProvider _appRegistryProvider;
         private readonly Lazy<IClient> _clientLazy;
 
+        private readonly Subject<AppConnectionEvent> _connectionSubject = new Subject<AppConnectionEvent>();
+
         public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, Lazy<IClient> clientLazy)
         {
             _appRegistryProvider = appRegistryProvider;
             _clientLazy = clientLazy;
+            ConnectionEventsStream = _connectionSubject.ObserveOn(TaskPoolScheduler.Default);
         }        
 
         private ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();
 
-        public event Action<AppConnectionDescriptor> AppConnected = delegate { };
-
-        public event Action<AppConnectionDescriptor> AppDisconnected = delegate { };
+        public IObservable<AppConnectionEvent> ConnectionEventsStream { get; }
 
         public IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId)
         {
@@ -97,8 +101,6 @@ namespace Plexus.Interop.Apps.Internal
 
                 Log.Debug("New connection accepted: {{{0}}}", clientConnection);
 
-                AppConnected(connectionInfo);
-
                 var deferredConnectionKey = (appInstanceId, appId);
                 if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
@@ -106,6 +108,8 @@ namespace Plexus.Interop.Apps.Internal
                     waiter.TryComplete(clientConnection);
                     _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
                 }
+
+                _connectionSubject.OnNext(new AppConnectionEvent(connectionInfo, ConnectionEventType.AppConnected));
 
                 return clientConnection;
             }
@@ -147,7 +151,7 @@ namespace Plexus.Interop.Apps.Internal
                 }
             }
 
-            AppDisconnected(connection.Info);
+            _connectionSubject.OnNext(new AppConnectionEvent(connection.Info, ConnectionEventType.AppDisconnected));
         }
 
         public bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection)
