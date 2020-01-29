@@ -18,7 +18,10 @@ namespace Plexus.Interop.Apps.Internal.Services
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
@@ -34,6 +37,8 @@ namespace Plexus.Interop.Apps.Internal.Services
 
     internal class ContextLinkageServiceImpl : AppLifecycleManagerClient.IContextLinkageServiceImpl, IContextLinkageManager
     {
+        private ILogger Log { get; } = LogManager.GetLogger<ContextLinkageServiceImpl>();
+
         private readonly IRegistryProvider _appRegistryProvider;
         private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly ContextsSet _contextsSet;
@@ -45,9 +50,7 @@ namespace Plexus.Interop.Apps.Internal.Services
             _contextsSet = new ContextsSet(appLifecycleManager);
 
             appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnAppLaunched);
-
-            appLifecycleManager.AppConnected += OnAppConnected;
-            appLifecycleManager.AppDisconnected += OnAppDisconnected;
+            appLifecycleManager.ConnectionEventsStream.Subscribe(OnAppConnectedOrDisconnected);
         }
 
         public Task<ContextDto> CreateContext(Empty request, MethodCallContext callContext)
@@ -72,6 +75,11 @@ namespace Plexus.Interop.Apps.Internal.Services
 
             var refererAppContexts = _contextsSet.GetContextsOf(appLaunchedEvent.Referrer.AppInstanceId.ToUniqueId());
 
+            if (!refererAppContexts.Any())
+            {
+                return;
+            }
+
             var appInstanceId = appLaunchedEvent.AppInstanceId.ToUniqueId();
 
             foreach (var refererContext in refererAppContexts)
@@ -80,21 +88,20 @@ namespace Plexus.Interop.Apps.Internal.Services
             }
         }
 
-        private void OnAppConnected(AppConnectionDescriptor appConnection)
+        private void OnAppConnectedOrDisconnected(AppConnectionEvent connectionEvent)
         {
-            var contextsOfApp = _contextsSet.GetContextsOf(appConnection.ApplicationInstanceId);
+            var connection = connectionEvent.Connection;
+            var contextsOfApp = _contextsSet.GetContextsOf(connection.ApplicationInstanceId);
             foreach (var context in contextsOfApp)
             {
-                context.AppConnected(appConnection);
-            }
-        }
-
-        private void OnAppDisconnected(AppConnectionDescriptor connectionDescriptor)
-        {
-            var contextsOfApp = _contextsSet.GetContextsOf(connectionDescriptor.ApplicationInstanceId);
-            foreach (var context in contextsOfApp)
-            {
-                context.AppDisconnected(connectionDescriptor);
+                if (connectionEvent.Type == ConnectionEventType.AppConnected)
+                {
+                    context.AppConnected(connection);
+                }
+                else
+                {
+                    context.AppDisconnected(connection);
+                }
             }
         }
 
@@ -159,12 +166,31 @@ namespace Plexus.Interop.Apps.Internal.Services
 
         public async Task ContextLoadedStream(ContextDto request, IWritableChannel<ContextLoadingUpdate> responseStream, MethodCallContext callContext)
         {
-            await _contextsSet.LoadingStatusChanged
-                .Select(context => new ContextLoadingUpdate
+            var context = _contextsSet.GetContext(request.Id);
+            if (context == null)
+            {
+                throw new Exception($"There is no context with {request.Id} id");
+            }
+
+            await Observable.Return(Unit.Default)
+                .Merge(context.ContextUpdatedEventStream)
+                .ObserveOn(TaskPoolScheduler.Default)
+                .Throttle(TimeSpan.FromMilliseconds(200))
+                .Select(_ => new ContextLoadingUpdate
                 {
-                    LoadedAppDescriptors = { context.GetConnectedApps().Select(ConvertToProto) },
+                    LoadedAppDescriptors =
+                    {
+                        context.GetConnectedApps().Select(ConvertToProto)
+                    },
                     Status = context.IsLoading ? ContextLoadingStatus.InProgress : ContextLoadingStatus.Finished,
-                }).PipeAsync(responseStream, callContext.CancellationToken);
+                })
+                .DistinctUntilChanged()
+                .Do(update =>
+                {
+                    Log.Debug(
+                        $"Sending context linkage update for context {context.Id}: LoadedAppDescriptorsCount={update.LoadedAppDescriptors.Count}");
+                })
+                .PipeAsync(responseStream, callContext.CancellationToken);
         }
 
         private InvocationsList CreateInvocationsList(Context context)

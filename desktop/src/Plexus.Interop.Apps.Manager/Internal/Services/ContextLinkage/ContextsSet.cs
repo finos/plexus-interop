@@ -42,17 +42,13 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
     internal class ContextsSet
     {
         private readonly IAppLifecycleManager _appLifecycleManager;
-        private readonly Subject<Context> _loadingStatusSubject = new Subject<Context>();
         private readonly Subject<AppContextBindingEvent> _appContextBindingSubject = new Subject<AppContextBindingEvent>();
 
         public ContextsSet(IAppLifecycleManager appLifecycleManager)
         {
             _appLifecycleManager = appLifecycleManager;
-            LoadingStatusChanged = _loadingStatusSubject;
             AppContextBindingEvents = _appContextBindingSubject.ObserveOn(TaskPoolScheduler.Default);
         }
-
-        public IObservable<Context> LoadingStatusChanged { get; }
 
         public IObservable<AppContextBindingEvent> AppContextBindingEvents { get; }
 
@@ -60,7 +56,6 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
         {
             var context = new Context(_appLifecycleManager);
             _contexts[context.Id] = context;
-            context.IsLoadingStatus.Select(isLoading => context).Subscribe(_loadingStatusSubject);
             context.AppContextBindings.Subscribe(BindContext);
             return context;
         }

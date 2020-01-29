@@ -39,9 +39,7 @@ namespace Plexus.Interop.Apps.Internal.Services
         public AppLifecycleServiceImpl(IAppLifecycleManager appLifecycleManager)
         {
             _appLifecycleManager = appLifecycleManager;
-
-            appLifecycleManager.AppConnected += OnAppConnected;
-            appLifecycleManager.AppDisconnected += OnAppDisconnected;
+            _appLifecycleManager.ConnectionEventsStream.Subscribe(BroadcastConnectionEvents);
         }
 
         public void OnInvocationStarted(InvocationStartedEventDescriptor eventData)
@@ -68,26 +66,24 @@ namespace Plexus.Interop.Apps.Internal.Services
             });
         }
 
-        private void OnAppConnected(AppConnectionDescriptor connectionDescriptor)
+        private void BroadcastConnectionEvents(AppConnectionEvent connectionEvent)
         {
-            _appLifecycleEventBroadcaster.BroadcastEvent(new AppLifecycleEvent
+            var lifecycleEvent = new AppLifecycleEvent();
+            if (connectionEvent.Type == ConnectionEventType.AppConnected)
             {
-                Connected = new AppConnectedEvent
+                lifecycleEvent.Connected = new AppConnectedEvent
                 {
-                    ConnectionDescriptor = connectionDescriptor.ToProto(),
-                }
-            });
-        }
-
-        private void OnAppDisconnected(AppConnectionDescriptor connectionDescriptor)
-        {
-            _appLifecycleEventBroadcaster.BroadcastEvent(new AppLifecycleEvent
+                    ConnectionDescriptor = connectionEvent.Connection.ToProto()
+                };
+            }
+            else
             {
-                Disconnected = new AppDisconnectedEvent
+                lifecycleEvent.Disconnected = new AppDisconnectedEvent
                 {
-                    ConnectionDescriptor = connectionDescriptor.ToProto(),
-                }
-            });
+                    ConnectionDescriptor = connectionEvent.Connection.ToProto()
+                };
+            }
+            _appLifecycleEventBroadcaster.BroadcastEvent(lifecycleEvent);
         }
 
         public async Task<ResolveAppResponse> ResolveApp(ResolveAppRequest request, MethodCallContext context)

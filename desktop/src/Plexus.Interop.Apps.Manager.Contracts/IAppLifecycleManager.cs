@@ -16,12 +16,11 @@
  */
 namespace Plexus.Interop.Apps
 {
-    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Plexus.Interop.Transport;
 
-    public interface IAppLifecycleManager
+    public interface IAppLifecycleManager : IAppConnectedEventProvider
     {
         IAppConnection AcceptConnection(ITransportConnection connection, AppConnectionDescriptor connectionInfo);
 
@@ -36,10 +35,6 @@ namespace Plexus.Interop.Apps
         bool CanBeLaunched(string appId);
 
         Task<ResolvedConnection> LaunchAndConnectAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
-
-        event Action<AppConnectionDescriptor> AppConnected;
-
-        event Action<AppConnectionDescriptor> AppDisconnected;
 
         IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId);
     }

@@ -18,6 +18,7 @@ namespace Plexus.Interop.Apps.Internal
 {
     using System;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
@@ -35,11 +36,14 @@ namespace Plexus.Interop.Apps.Internal
 
         private readonly ReplaySubject<AppLaunchedEvent> _appLaunchedSubject = new ReplaySubject<AppLaunchedEvent>(10);
 
-        public AppLaunchedEventProvider(IAppLifecycleManager appLifecycleManager, IRegistryProvider registryProvider, Lazy<IClient> client)
+        public AppLaunchedEventProvider(IAppConnectedEventProvider appConnectedEventProvider, IRegistryProvider registryProvider, Lazy<IClient> client)
         {
             _registryProvider = registryProvider;
             _client = client;
-            appLifecycleManager.AppConnected += OnAppConnected;
+            appConnectedEventProvider.ConnectionEventsStream
+                .Where(ev => ev.Type == ConnectionEventType.AppConnected)
+                .Select(ev => ev.Connection)
+                .Subscribe(OnAppConnected);
 
             AppLaunchedStream = _appLaunchedSubject;
         }

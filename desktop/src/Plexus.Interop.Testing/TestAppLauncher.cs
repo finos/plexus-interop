@@ -108,7 +108,7 @@ namespace Plexus.Interop.Testing
 
             return new AppLaunchResponse
             {
-                AppInstanceId = ConvertUniqueId(client.ApplicationInstanceId)
+                AppInstanceId = ConvertUniqueId(client.ApplicationInstanceId),
             };
         }
 
