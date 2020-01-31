@@ -51,6 +51,7 @@ namespace Plexus.Host
                     invokedVerbInstance = subOptions;
                 }))
             {
+                Console.WriteLine("There is no mandatory cmd argument. Exit immediately");
                 return Parser.DefaultExitCodeFail;
             }
 
@@ -67,6 +68,7 @@ namespace Plexus.Host
                 case "studio":
                     return await StartStudioAsync().ConfigureAwait(false);
                 default:
+                    Console.WriteLine("There is no mandatory cmd argument. Exit immediately");
                     return Parser.DefaultExitCodeFail;
             }
 #else
