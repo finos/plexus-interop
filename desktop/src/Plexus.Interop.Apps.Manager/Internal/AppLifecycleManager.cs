@@ -181,7 +181,7 @@ namespace Plexus.Interop.Apps.Internal
             var resolvedConnection = await connectionTask.ConfigureAwait(false);
             Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}} by request from {{{3}}}", 
                 appId, mode, resolvedConnection, referrerConnectionInfo);
-            return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Id);
+            return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Info.ApplicationInstanceId);
         }
 
         public IReadOnlyCollection<IAppConnection> GetOnlineConnections()
