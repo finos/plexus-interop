@@ -181,7 +181,7 @@ namespace Plexus.Interop.Apps.Internal
             var resolvedConnection = await connectionTask.ConfigureAwait(false);
             Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}} by request from {{{3}}}", 
                 appId, mode, resolvedConnection, referrerConnectionInfo);
-            return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Id);
+            return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Info.ApplicationInstanceId);
         }
 
         public IReadOnlyCollection<IAppConnection> GetOnlineConnections()
@@ -210,9 +210,8 @@ namespace Plexus.Interop.Apps.Internal
 
                 lock (_connections)
                 {
-                    if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.Any())
+                    if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.TryGetValue(appId, out var existingConnection))
                     {
-                        var existingConnection = connections.First().Value;
                         Log.Debug("Resolving deferred connection {{{0}}} to existing connection {{{1}}}", deferredConnectionKey, existingConnection);
                         connectionPromise.TryComplete(existingConnection);
                     }
