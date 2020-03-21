@@ -1,4 +1,5 @@
 # Plexus Interop [![FINOS - Incubating](https://cdn.rawgit.com/finos/contrib-toolbox/master/images/badge-incubating.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Incubating) [![AppVeyor Plexus Interop CI status](https://ci.appveyor.com/api/projects/status/sfjvccbssn9hwbkh/branch/master?svg=true)](https://ci.appveyor.com/project/finos-admin/plexus-interop/branch/master) [![Plexus Interop MyGet Build Status](https://www.myget.org/BuildSource/Badge/plexus?identifier=bd2cfabe-2a11-4584-9a39-80251218fd94)](https://www.myget.org/)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffinos-plexus%2Fplexus-interop.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffinos-plexus%2Fplexus-interop?ref=badge_shield)
 
 ## Overview
 
@@ -171,3 +172,6 @@ As described above, public documentation is served using [GitHub Pages](https://
 The code in this repository is distributed under the Apache License, Version 2.0.
 
 Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffinos-plexus%2Fplexus-interop.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffinos-plexus%2Fplexus-interop?ref=badge_large)
