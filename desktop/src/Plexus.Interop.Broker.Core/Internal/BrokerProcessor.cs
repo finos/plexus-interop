@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@ namespace Plexus.Interop.Broker.Internal
     using System.Threading.Tasks;
     using Plexus.Channels;
     using Plexus.Interop.Apps;
-    using Plexus.Interop.Metamodel;
     using Plexus.Interop.Protocol;
     using Plexus.Interop.Transport;
     using Plexus.Processes;
@@ -41,16 +40,15 @@ namespace Plexus.Interop.Broker.Internal
 
         public BrokerProcessor(
             IReadableChannel<ITransportConnection> incomingConnections,
-            IRegistryProvider registryProvider,
             IProtocolSerializerFactory serializerFactory,
-            IAppLifecycleManager appLifecycleManager)
+            IInteropContext interopContext)
         {
             _incomingConnections = incomingConnections;
-            _appLifecycleManager = appLifecycleManager;
-            var registryService = new RegistryService(registryProvider);
+            var registryService = new RegistryService(interopContext.RegistryProvider);
             var protocol = new ProtocolImplementation(DefaultProtocolMessageFactory, serializerFactory);
-            _authenticationHandler = new AuthenticationHandler(appLifecycleManager, protocol, registryService);
-            _clientRequestHandler = new ClientRequestHandler(appLifecycleManager, protocol, registryService);
+            _appLifecycleManager = interopContext.AppLifecycleManager;
+            _authenticationHandler = new AuthenticationHandler(interopContext.AppLifecycleManager, protocol, registryService);
+            _clientRequestHandler = new ClientRequestHandler(interopContext.AppLifecycleManager, protocol, registryService, interopContext.InvocationEventProvider, interopContext.ContextLinkageManager);
         }
 
         protected override ILogger Log { get; } = LogManager.GetLogger<BrokerProcessor>();

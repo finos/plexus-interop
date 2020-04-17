@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +46,11 @@ namespace Plexus.Interop.Metamodel
             {
                 return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ (Service != null ? Service.GetHashCode() : 0);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Name)}: {Name}, {nameof(Type)}: {Type}";
         }
     }
 }

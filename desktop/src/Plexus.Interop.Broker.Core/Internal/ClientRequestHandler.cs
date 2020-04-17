@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,11 +37,13 @@
         public ClientRequestHandler(
             IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
-            IRegistryService registryService)
+            IRegistryService registryService,
+            IInvocationEventProvider invocationEventProvider,
+            IContextLinkageManager contextLinkageManager)
         {
             _protocolSerializer = protocol.Serializer;
-            _discoveryRequestHandler = new DiscoveryRequestHandler(appLifecycleManager, protocol, registryService);
-            _invocationRequestHandler = new InvocationRequestHandler(appLifecycleManager, protocol, registryService);
+            _discoveryRequestHandler = new DiscoveryRequestHandler(appLifecycleManager, protocol, registryService, contextLinkageManager);
+            _invocationRequestHandler = new InvocationRequestHandler(appLifecycleManager, protocol, registryService, invocationEventProvider, contextLinkageManager);
             _clientToBrokerRequestHandler =
                 new ClientToBrokerRequestHandler<Task, (IAppConnection, ITransportChannel)>(
                     HandleInvocationAsync,

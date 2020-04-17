@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,6 +74,13 @@
             this IClientDiscoveryInvoker invoker, UnaryMethod<TRequest, TResponse> method)
         {
             return DiscoverOnlineAsync(invoker, MethodDiscoveryQuery.Create(method));
+        }
+
+        public static async Task<IReadOnlyCollection<DiscoveredOnlineUnaryMethod<TRequest, TResponse>>> DiscoverInCurrentContextAsync<TRequest, TResponse>(
+            this IClientDiscoveryInvoker invoker, UnaryMethod<TRequest, TResponse> method)
+        {
+            return (await invoker.DiscoverInCurrentContextAsync(MethodDiscoveryQuery.Create(method)))
+                .Select(x => new DiscoveredOnlineUnaryMethod<TRequest, TResponse>(x)).ToList();
         }
 
         public static async Task<IReadOnlyCollection<DiscoveredServerStreamingMethod<TRequest, TResponse>>> DiscoverAsync<TRequest, TResponse>(

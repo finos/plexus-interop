@@ -1,5 +1,5 @@
 //
-// Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+// Copyright 2017-2020 Plexus Interop Deutsche Bank AG
 // SPDX-License-Identifier: Apache-2.0
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,12 +17,14 @@
 
 import "interop/app_launcher_service.proto";
 import "interop/app_lifecycle_service.proto";
+import "interop/context_linkage.proto";
 
 package plexus.interop.testing;
 
 application TestAppLauncher {
 
-	provides .interop.AppLauncherService to interop.AppLifecycleManager { Launch; }
+	provides .interop.AppLauncherService to interop.AppLifecycleManager { Launch; AppLaunchedEventStream; }
 
+	consumes .interop.ContextLinkageService { ContextLoadedStream; CreateContext; JoinContext; GetContexts; GetLinkedInvocations; GetAllLinkedInvocations; }
 	consumes .interop.AppLifecycleService from interop.AppLifecycleManager { GetLifecycleEventStream; GetInvocationEventStream; }
 }

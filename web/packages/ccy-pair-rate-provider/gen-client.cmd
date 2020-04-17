@@ -1,1 +1,1 @@
-java -jar ../../../bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=../../../samples/quick-start/registry --input=web_ccy_pair_rate_provider.interop --out=./src/gen --protoc=../../node_modules/.bin/pbts.cmd
+java -jar ../../../bin/win-x86/sdk/plexusgen.jar --type=ts --baseDir=../../../samples/quick-start/registry --input=web_ccy_pair_rate_provider.interop --out=./src/gen --protoc=./node_modules/.bin/pbts.cmd

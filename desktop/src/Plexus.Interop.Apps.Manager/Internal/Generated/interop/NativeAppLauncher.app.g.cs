@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,7 +74,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		}
 	
 		public partial interface IAppLauncherServiceImpl:
-			global::Plexus.Interop.Apps.Internal.Generated.AppLauncherService.ILaunchImpl
+			global::Plexus.Interop.Apps.Internal.Generated.AppLauncherService.ILaunchImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppLauncherService.IAppLaunchedEventStreamImpl
 		{ }
 		
 		private sealed partial class AppLauncherServiceBinder {
@@ -92,6 +93,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
 				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse>(global::Plexus.Interop.Apps.Internal.Generated.AppLauncherService.LaunchMethodId, _impl.Launch);
+				builder = builder.WithServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent>(global::Plexus.Interop.Apps.Internal.Generated.AppLauncherService.AppLaunchedEventStreamMethodId, _impl.AppLaunchedEventStream);
 				return builder; 							
 			}
 		}
@@ -99,21 +101,29 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		public sealed partial class AppLauncherServiceImpl: IAppLauncherServiceImpl
 		{
 			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse> _launchHandler;
+			private readonly ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent> _appLaunchedEventStreamHandler;
 			
 			public AppLauncherServiceImpl(
-				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse> launchHandler
+				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse> launchHandler,
+				ServerStreamingMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent> appLaunchedEventStreamHandler
 			) {
 				_launchHandler = launchHandler;
+				_appLaunchedEventStreamHandler = appLaunchedEventStreamHandler;
 			}
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse> Launch(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest request, MethodCallContext context) {
 				return _launchHandler(request, context);
 			}
+			
+			public Task AppLaunchedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent> responseStream, MethodCallContext context) {
+				return _appLaunchedEventStreamHandler(request, responseStream, context);
+			}
 		}					
 		
 		public sealed partial class AppLauncherServiceImpl<T>: IAppLauncherServiceImpl
 			where T:
-			global::Plexus.Interop.Apps.Internal.Generated.AppLauncherService.ILaunchImpl
+			global::Plexus.Interop.Apps.Internal.Generated.AppLauncherService.ILaunchImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppLauncherService.IAppLaunchedEventStreamImpl
 		{
 			private readonly T _impl;
 			
@@ -123,6 +133,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchResponse> Launch(global::Plexus.Interop.Apps.Internal.Generated.AppLaunchRequest request, MethodCallContext context) {
 				return _impl.Launch(request, context);
+			}
+			
+			public Task AppLaunchedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Apps.Internal.Generated.AppLaunchedEvent> responseStream, MethodCallContext context) {
+				return _impl.AppLaunchedEventStream(request, responseStream, context);
 			}
 		}
 		

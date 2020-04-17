@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,8 @@ namespace Plexus.Interop.Testing.Generated {
 		EchoClient.IEchoServiceProxy EchoService { get; }
 		
 		EchoClient.IGreetingServiceProxy GreetingService { get; }
+		
+		EchoClient.IContextLinkageServiceProxy ContextLinkageService { get; }
 	}
 	
 	public sealed partial class EchoClient: ClientBase, IEchoClient {
@@ -51,6 +53,7 @@ namespace Plexus.Interop.Testing.Generated {
 		{ 
 			EchoService = new EchoClient.EchoServiceProxy(this.CallInvoker);
 			GreetingService = new EchoClient.GreetingServiceProxy(this.CallInvoker);
+			ContextLinkageService = new EchoClient.ContextLinkageServiceProxy(this.CallInvoker);
 		}
 		
 		public partial interface IEchoServiceProxy:
@@ -109,6 +112,52 @@ namespace Plexus.Interop.Testing.Generated {
 		}
 		
 		public IGreetingServiceProxy GreetingService { get; private set; }
+		
+		public partial interface IContextLinkageServiceProxy:
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IContextLoadedStreamProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.ICreateContextProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IJoinContextProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IGetContextsProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IGetLinkedInvocationsProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IGetAllLinkedInvocationsProxy
+		{ }
+		
+		public sealed partial class ContextLinkageServiceProxy: IContextLinkageServiceProxy {
+			
+			public static global::Plexus.Interop.Testing.Generated.ContextLinkageService.Descriptor Descriptor = global::Plexus.Interop.Testing.Generated.ContextLinkageService.DefaultDescriptor;
+			
+			private readonly IClientCallInvoker _callInvoker;
+									
+			public ContextLinkageServiceProxy(IClientCallInvoker callInvoker) {
+				_callInvoker = callInvoker;
+			}						
+			
+			public IServerStreamingMethodCall<global::Plexus.Interop.Testing.Generated.ContextLoadingUpdate> ContextLoadedStream(global::Plexus.Interop.Testing.Generated.Context request) {
+				return _callInvoker.Call(Descriptor.ContextLoadedStreamMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.Context> CreateContext(global::Google.Protobuf.WellKnownTypes.Empty request) {
+				return _callInvoker.Call(Descriptor.CreateContextMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Google.Protobuf.WellKnownTypes.Empty> JoinContext(global::Plexus.Interop.Testing.Generated.Context request) {
+				return _callInvoker.Call(Descriptor.JoinContextMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.ContextsList> GetContexts(global::Google.Protobuf.WellKnownTypes.Empty request) {
+				return _callInvoker.Call(Descriptor.GetContextsMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.InvocationsList> GetLinkedInvocations(global::Plexus.Interop.Testing.Generated.Context request) {
+				return _callInvoker.Call(Descriptor.GetLinkedInvocationsMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.ContextToInvocationsList> GetAllLinkedInvocations(global::Google.Protobuf.WellKnownTypes.Empty request) {
+				return _callInvoker.Call(Descriptor.GetAllLinkedInvocationsMethod, request);
+			}
+		}
+		
+		public IContextLinkageServiceProxy ContextLinkageService { get; private set; }
 	}
 }
 #endregion Designer generated code

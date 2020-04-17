@@ -1,0 +1,123 @@
+//
+// Copyright 2017-2020 Plexus Interop Deutsche Bank AG
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+syntax = "proto3";
+
+package interop;
+
+import "google/protobuf/empty.proto";
+import "interop/unique_id.proto";
+import "interop/app_connection_descriptor.proto";
+import "interop/app_metadata_service.proto";
+
+message Context {
+	string id = 1;
+}
+
+message ContextsList {
+	repeated Context contexts = 1;
+}
+
+enum ContextLoadingStatus {
+	// intermediate state, some of apps within context already loaded
+	IN_PROGRESS = 0;
+	// termination state, some of apps failed to start/connect to plexus, no more apps "in progress"
+	FAILED = 1;
+	// termination state, all apps within context are loaded
+	FINISHED = 2;
+}
+
+message ContextLoadingUpdate {
+	ContextLoadingStatus status = 1;
+	// loaded apps within context at this moment of time
+	repeated interop.AppConnectionDescriptor loaded_app_descriptors = 2;
+	// apps registered in context, but failed to load
+	repeated interop.AppConnectionDescriptor failed_app_descriptors = 3;
+}
+
+message InvocationRef {
+	interop.AppMetamodelInfo app_info = 1;
+	interop.AppConnectionDescriptor target = 2;
+}
+
+message InvocationsList {
+	repeated InvocationRef invocations = 1;
+}
+
+message ContextToInvocations {
+	Context context = 1;
+	InvocationsList invocations = 2;
+}
+
+message ContextToInvocationsList {
+	repeated ContextToInvocations contexts = 1;
+}
+
+message AppJoinedContextEvent {
+	Context context = 1;	
+    UniqueId app_instance_id = 2;
+}
+
+message RestoreContextsLinkageRequest {
+	repeated RestoringAppInstance apps = 1;
+}
+
+message RestoringAppInstance {
+	UniqueId app_instance_id = 1;
+	repeated string app_ids = 2;
+	repeated string context_ids = 3;
+}
+
+message RestoreContextsLinkageResponse {
+	map<string, Context> created_contexts_map = 1;
+}
+
+service ContextLinkageService {
+	/**
+	* Stream, provides status of context loading, order and loading status of linked applications
+	*/
+	rpc ContextLoadedStream(Context) returns (stream ContextLoadingUpdate);
+
+	/**
+	* Creates new context and associates running instance to it 
+	*/
+	rpc CreateContext(google.protobuf.Empty) returns (Context);
+
+	/**
+	* Associates running instance with provided context, useful if we want to link already running instance
+	*/
+	rpc JoinContext(Context) returns (google.protobuf.Empty);
+
+	/**
+	* Get list of associated contexts
+	*/
+	rpc GetContexts(google.protobuf.Empty) returns (ContextsList);
+
+	/**
+	* Discover list of linked invocations for specified context
+	*/
+	rpc GetLinkedInvocations(Context) returns (InvocationsList);
+
+	/**
+	* Get Linked Invocations for all associated contexts
+	*/
+	rpc GetAllLinkedInvocations(google.protobuf.Empty) returns (ContextToInvocationsList);
+
+	rpc AppJoinedContextStream(google.protobuf.Empty) returns (stream AppJoinedContextEvent);
+
+	rpc RestoreContextsLinkage(RestoreContextsLinkageRequest) returns (RestoreContextsLinkageResponse);
+}

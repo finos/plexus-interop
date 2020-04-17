@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +21,10 @@ namespace Plexus.Interop.Testing
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
+    using Plexus.Channels;
     using UniqueId = Plexus.UniqueId;
 
     internal sealed class TestAppLauncher : ProcessBase, TestAppLauncherClient.IAppLauncherServiceImpl
@@ -38,6 +40,8 @@ namespace Plexus.Interop.Testing
 
         private readonly Dictionary<string, List<IClient>> _createdClients
             = new Dictionary<string, List<IClient>>();
+
+        private readonly ReplaySubject<AppLaunchedEvent> _appLaunchedEvents = new ReplaySubject<AppLaunchedEvent>(5);
 
         public TestAppLauncher(ITestBroker broker, Dictionary<string, TestClientFactory> clientFactories)
         {
@@ -78,7 +82,7 @@ namespace Plexus.Interop.Testing
                     }
                 }
 
-                clientTask = clientTask ?? CreateClientAsync(appId, suggestedAppInstanceId);
+                clientTask = clientTask ?? CreateClientAsync(appId, suggestedAppInstanceId, request.Referrer);
             }
 
             var client = await clientTask.ConfigureAwait(false);
@@ -104,21 +108,19 @@ namespace Plexus.Interop.Testing
 
             return new AppLaunchResponse
             {
-                AppInstanceId = new Generated.UniqueId
-                {
-                    Hi = client.ApplicationInstanceId.Hi,
-                    Lo = client.ApplicationInstanceId.Lo
-                }
+                AppInstanceId = ConvertUniqueId(client.ApplicationInstanceId),
             };
         }
 
-        private async Task<IClient> CreateClientAsync(string appId, UniqueId suggestedAppInstanceId)
+        private async Task<IClient> CreateClientAsync(string appId, UniqueId suggestedAppInstanceId, AppLaunchReferrer requestReferrer)
         {
             if (!_clientFactories.TryGetValue(appId, out var clientFactory))
             {
                 throw new InvalidOperationException($"Unknown application launch requested: {appId}");
             }
-            
+
+            _appLaunchedEvents.OnNext(new AppLaunchedEvent { AppInstanceId = ConvertUniqueId(suggestedAppInstanceId), Referrer = requestReferrer, AppIds = { appId } });
+
             var client = await clientFactory.CreateClientAsync(_broker, suggestedAppInstanceId).ConfigureAwait(false);
 
             lock (_sync)
@@ -151,6 +153,22 @@ namespace Plexus.Interop.Testing
         public IServerStreamingMethodCall<InvocationEvent> GetInvocationEventStream()
         {
             return _client.AppLifecycleService.GetInvocationEventStream(new Empty());
+        }
+
+        public async Task AppLaunchedEventStream(Empty request, IWritableChannel<AppLaunchedEvent> responseStream, MethodCallContext context)
+        {
+            Log.Debug("AppLaunchedEventStream pipe started");
+            await _appLaunchedEvents.PipeAsync(responseStream, context.CancellationToken).ConfigureAwait(false);
+            Log.Debug("AppLaunchedEventStream pipe finished");
+        }
+
+        private static Generated.UniqueId ConvertUniqueId(UniqueId suggestedAppInstanceId)
+        {
+            return new Generated.UniqueId
+            {
+                Hi = suggestedAppInstanceId.Hi,
+                Lo = suggestedAppInstanceId.Lo,
+            };
         }
     }
 }

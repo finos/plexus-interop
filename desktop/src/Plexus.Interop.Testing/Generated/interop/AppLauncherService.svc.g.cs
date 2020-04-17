@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,7 @@ namespace Plexus.Interop.Testing.Generated {
 		
 		public const string Id = "interop.AppLauncherService";			
 		public const string LaunchMethodId = "Launch";
+		public const string AppLaunchedEventStreamMethodId = "AppLaunchedEventStream";
 		
 		public static readonly AppLauncherService.Descriptor DefaultDescriptor = CreateDescriptor();
 		
@@ -47,20 +48,31 @@ namespace Plexus.Interop.Testing.Generated {
 			IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.AppLaunchResponse> Launch(global::Plexus.Interop.Testing.Generated.AppLaunchRequest request);
 		}
 		
+		public partial interface IAppLaunchedEventStreamProxy {
+			IServerStreamingMethodCall<global::Plexus.Interop.Testing.Generated.AppLaunchedEvent> AppLaunchedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
+		}
+		
 		public partial interface ILaunchImpl {
 			Task<global::Plexus.Interop.Testing.Generated.AppLaunchResponse> Launch(global::Plexus.Interop.Testing.Generated.AppLaunchRequest request, MethodCallContext context);
+		}
+		
+		public partial interface IAppLaunchedEventStreamImpl {
+			Task AppLaunchedEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Interop.Testing.Generated.AppLaunchedEvent> responseStream, MethodCallContext context);
 		}
 		
 		public sealed partial class Descriptor {
 		
 			public UnaryMethod<global::Plexus.Interop.Testing.Generated.AppLaunchRequest, global::Plexus.Interop.Testing.Generated.AppLaunchResponse> LaunchMethod {get; private set; }
+			public ServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Testing.Generated.AppLaunchedEvent> AppLaunchedEventStreamMethod {get; private set; }
 			
 			public Descriptor() {				
 				LaunchMethod = Method.Unary<global::Plexus.Interop.Testing.Generated.AppLaunchRequest, global::Plexus.Interop.Testing.Generated.AppLaunchResponse>(Id, LaunchMethodId);
+				AppLaunchedEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Testing.Generated.AppLaunchedEvent>(Id, AppLaunchedEventStreamMethodId);
 			}
 		
 			public Descriptor(string alias) {
 				LaunchMethod = Method.Unary<global::Plexus.Interop.Testing.Generated.AppLaunchRequest, global::Plexus.Interop.Testing.Generated.AppLaunchResponse>(Id, alias, LaunchMethodId);
+				AppLaunchedEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Testing.Generated.AppLaunchedEvent>(Id, alias, AppLaunchedEventStreamMethodId);
 			}
 		}
 	}

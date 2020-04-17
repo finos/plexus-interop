@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,6 @@ namespace Plexus.Interop.Broker.Internal
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
     using MethodType = Plexus.Interop.Protocol.Discovery.MethodType;
@@ -35,23 +34,26 @@ namespace Plexus.Interop.Broker.Internal
 
         private readonly IProtocolImplementation _protocol;
         private readonly IRegistryService _registryService;
+        private readonly IContextLinkageManager _contextLinkageManager;
         private readonly IAppLifecycleManager _appLifecycleManager;
 
         public DiscoveryRequestHandler(
             IAppLifecycleManager appLifecycleManager,
             IProtocolImplementation protocol,
-            IRegistryService registryService)
+            IRegistryService registryService,
+            IContextLinkageManager contextLinkageManager)
         {
             _appLifecycleManager = appLifecycleManager;
             _protocol = protocol;
             _registryService = registryService;
+            _contextLinkageManager = contextLinkageManager;
         }
 
         public async Task HandleAsync(
-            IServiceDiscoveryRequest request, 
-            IAppConnection sourceConnection, 
+            IServiceDiscoveryRequest request,
+            IAppConnection sourceConnection,
             ITransportChannel sourceChannel)
-        {            
+        {
             IReadOnlyCollection<(IConsumedMethod Consumed, IProvidedMethod Provided)> methodMatches;
             if (request.ConsumedService.HasValue)
             {
@@ -63,31 +65,52 @@ namespace Plexus.Interop.Broker.Internal
             {
                 methodMatches = _registryService.GetMethodMatches(sourceConnection.Info.ApplicationId);
             }
-            IEnumerable<IGrouping<(IConsumedService ConsumedService, IProvidedService ProvidedService, Maybe<UniqueId> ConnectionId), IProvidedMethod>> groupedMethods;
-            if (request.DiscoveryMode == DiscoveryMode.Offline)
+            IEnumerable<IGrouping<(IConsumedService ConsumedService, IProvidedService ProvidedService, Maybe<UniqueId> ConnectionId, Maybe<UniqueId> ApplicationInstanceId), IProvidedMethod>> groupedMethods;
+
+            var online = request.DiscoveryMode == DiscoveryMode.Online;
+            if (_contextLinkageManager.IsContextShouldBeConsidered(request.ContextLinkageOptions, sourceConnection))
             {
-                var providerApps = methodMatches.Select(x => x.Provided.ProvidedService.Application.Id).Distinct().ToArray();
-                var availableProviderApps = FilterAvailableApps(providerApps);
-                groupedMethods = methodMatches
-                    .Join(availableProviderApps, x=>x.Provided.ProvidedService.Application.Id, y=>y, (x, y) => x)
-                    .GroupBy(
-                        x => (
-                            x.Consumed.ConsumedService,
-                            x.Provided.ProvidedService,
-                            ConnectionId: Maybe<UniqueId>.Nothing),
-                        x => x.Provided);
+                groupedMethods = _contextLinkageManager.GetAppsInContexts(request.ContextLinkageOptions, sourceConnection, online)
+                    .Join(methodMatches, x => x.AppId, y => y.Provided.ProvidedService.Service.Id,
+                        (x, y) => (y.Consumed, y.Provided, x.AppInstanceId, x.ConnectionId))
+                    .GroupBy(x => (x.Consumed.ConsumedService, x.Provided.ProvidedService, x.ConnectionId, new Maybe<UniqueId>(x.AppInstanceId)), x => x.Provided);
             }
             else
             {
-                var onlineConnections = _appLifecycleManager.GetOnlineConnections();
-                groupedMethods = methodMatches
-                    .Join(onlineConnections, x=> x.Provided.ProvidedService.Application.Id, y=>y.Info.ApplicationId, (x, y) => (Match: x, ConnectionId: y.Id))
-                    .GroupBy(
-                        x => (
-                            x.Match.Consumed.ConsumedService,
-                            x.Match.Provided.ProvidedService,
-                            new Maybe<UniqueId>(x.ConnectionId)),
-                        x => x.Match.Provided);
+                if (online)
+                {
+                    var onlineConnections = _appLifecycleManager.GetOnlineConnections();
+                    groupedMethods = methodMatches
+                        .Join(onlineConnections, x => x.Provided.ProvidedService.Application.Id,
+                            y => y.Info.ApplicationId,
+                            (x, y) => (Match: x, ConnectionId: y.Id, y.Info.ApplicationInstanceId))
+                        .GroupBy(
+                            x => (
+                                x.Match.Consumed.ConsumedService,
+                                x.Match.Provided.ProvidedService,
+                                new Maybe<UniqueId>(x.ConnectionId),
+                                new Maybe<UniqueId>(x.ApplicationInstanceId)),
+                            x => x.Match.Provided);
+                }
+                else
+                {
+                    var providerApps = methodMatches.Select(x => x.Provided.ProvidedService.Application.Id).Distinct()
+                        .ToArray();
+                    var availableProviderApps = FilterAvailableApps(providerApps);
+                    groupedMethods = methodMatches
+                        .Join(
+                            availableProviderApps, 
+                            x => x.Provided.ProvidedService.Application.Id, 
+                            y => y,
+                            (x, y) => x)
+                        .GroupBy(
+                            x => (
+                                x.Consumed.ConsumedService,
+                                x.Provided.ProvidedService,
+                                ConnectionId: Maybe<UniqueId>.Nothing,
+                                ApplicationInstanceId: Maybe<UniqueId>.Nothing),
+                            x => x.Provided);
+                }
             }
 
             var discoveredServices =
@@ -95,6 +118,7 @@ namespace Plexus.Interop.Broker.Internal
                 let consumedService = s.Key.ConsumedService
                 let providedService = s.Key.ProvidedService
                 let connectionId = s.Key.ConnectionId
+                let applicationInstanceId = s.Key.ApplicationInstanceId
                 select _protocol.MessageFactory.CreateDiscoveredService(
                     _protocol.MessageFactory.CreateConsumedServiceReference(
                         consumedService.Service.Id,
@@ -103,7 +127,8 @@ namespace Plexus.Interop.Broker.Internal
                         providedService.Service.Id,
                         providedService.Alias,
                         providedService.Application.Id,
-                        connectionId),
+                        connectionId,
+                        applicationInstanceId),
                     s.Key.ProvidedService.Title,
                     s.Select(m =>
                             _protocol.MessageFactory.CreateDiscoveredServiceMethod(
@@ -133,7 +158,7 @@ namespace Plexus.Interop.Broker.Internal
         }
 
         public async Task HandleAsync(
-            IMethodDiscoveryRequest request, 
+            IMethodDiscoveryRequest request,
             IAppConnection sourceConnection,
             ITransportChannel sourceChannel)
         {
@@ -154,32 +179,46 @@ namespace Plexus.Interop.Broker.Internal
                     .Where(x => string.Equals(x.Method.OutputMessage.Id, request.OutputMessageId.Value));
             }
             IEnumerable<IDiscoveredMethod> discoveredMethods;
-            if (request.DiscoveryMode == DiscoveryMode.Online)
+
+            bool online = request.DiscoveryMode == DiscoveryMode.Online;
+            if (_contextLinkageManager.IsContextShouldBeConsidered(request.ContextLinkageOptions, sourceConnection))
             {
-                var onlineConnections = _appLifecycleManager.GetOnlineConnections();
-                discoveredMethods = matchingProvidedMethods
-                    .Join(
-                        onlineConnections,
-                        x => x.ProvidedService.Application.Id,
-                        y => y.Info.ApplicationId,
-                        (method, connection) => (method, connection))
-                    .Select(pm => Convert(pm.method, pm.connection.Id));
+                discoveredMethods = _contextLinkageManager.GetAppsInContexts(request.ContextLinkageOptions, sourceConnection, online)
+                    .Join(matchingProvidedMethods, x => x.AppId, y => y.ProvidedService.Application.Id,
+                        (connection, method) => (method, connection))
+                    .Select(pm => Convert(pm.method, pm.connection.ConnectionId,
+                        new Maybe<UniqueId>(pm.connection.AppInstanceId)));
             }
             else
             {
-                var providedMethods = matchingProvidedMethods.ToArray();
-                var providerApps = providedMethods.Select(x => x.ProvidedService.Application.Id).Distinct().ToArray();
-                var availableProviderApps = FilterAvailableApps(providerApps);
-                discoveredMethods = providedMethods
-                    .Join(availableProviderApps, x => x.ProvidedService.Application.Id, y => y, (x, y) => x)
-                    .Select(pm => Convert(pm, Maybe<UniqueId>.Nothing));
+                if (online)
+                {
+                    var onlineConnections = _appLifecycleManager.GetOnlineConnections();
+                    discoveredMethods = matchingProvidedMethods
+                        .Join(
+                            onlineConnections,
+                            x => x.ProvidedService.Application.Id,
+                            y => y.Info.ApplicationId,
+                            (method, connection) => (method, connection))
+                        .Select(pm => Convert(pm.method, pm.connection.Id, pm.connection.Info.ApplicationInstanceId));
+                }
+                else
+                {
+                    var providedMethods = matchingProvidedMethods.ToArray();
+                    var providerApps = providedMethods.Select(x => x.ProvidedService.Application.Id).Distinct().ToArray();
+                    var availableProviderApps = FilterAvailableApps(providerApps);
+                    discoveredMethods = providedMethods
+                        .Join(availableProviderApps, x => x.ProvidedService.Application.Id, y => y, (x, y) => x)
+                        .Select(pm => Convert(pm, Maybe<UniqueId>.Nothing, Maybe<UniqueId>.Nothing));
+                }
             }
+            
             using (var response = _protocol.MessageFactory.CreateMethodDiscoveryResponse(discoveredMethods.ToList()))
             {
                 Log.Info("Completed method discovery request {{{0}}} from {{{1}}}: {2}", request, sourceConnection, response);
                 var serializedResponse = _protocol.Serializer.Serialize(response);
                 try
-                {                    
+                {
                     await sourceChannel.Out
                         .WriteAsync(new TransportMessageFrame(serializedResponse))
                         .ConfigureAwait(false);
@@ -192,7 +231,7 @@ namespace Plexus.Interop.Broker.Internal
             }
         }
 
-        private IDiscoveredMethod Convert(IProvidedMethod pm, Maybe<UniqueId> connectionId)
+        private IDiscoveredMethod Convert(IProvidedMethod pm, Maybe<UniqueId> connectionId, Maybe<UniqueId> appInstanceId)
         {
             return _protocol.MessageFactory.CreateDiscoveredMethod(
                 _protocol.MessageFactory.CreateProvidedMethodReference(
@@ -200,7 +239,8 @@ namespace Plexus.Interop.Broker.Internal
                         pm.ProvidedService.Service.Id,
                         pm.ProvidedService.Alias,
                         pm.ProvidedService.Application.Id,
-                        connectionId),
+                        connectionId,
+                        appInstanceId),
                     pm.Method.Name),
                 pm.Title,
                 pm.Method.InputMessage.Id,

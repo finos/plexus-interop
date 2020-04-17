@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,10 +54,11 @@ namespace Plexus.Interop.Protocol
             return InvocationMessageReceived.Instance;
         }
 
-        public IInvocationStart CreateInvocationStartRequest(IInvocationTarget target)
+        public IInvocationStart CreateInvocationStartRequest(IInvocationTarget target, IContextLinkageOptions contextLinkageOptions)
         {
             var obj = InvocationStart.Rent();
             obj.Target = target;
+            obj.ContextLinkageOptions = contextLinkageOptions ?? CreateContextLinkageOptions(ContextLinkageDiscoveryMode.None);
             return obj;
         }
 
@@ -89,11 +90,15 @@ namespace Plexus.Interop.Protocol
             return obj;
         }
 
-        public IServiceDiscoveryRequest CreateServiceDiscoveryRequest(Maybe<IConsumedServiceReference> consumedService, DiscoveryMode mode)
+        public IServiceDiscoveryRequest CreateServiceDiscoveryRequest(
+            Maybe<IConsumedServiceReference> consumedService,
+            DiscoveryMode mode, 
+            IContextLinkageOptions contextLinkageOptions)
         {
             var obj = ServiceDiscoveryRequest.Rent();
             obj.ConsumedService = consumedService;
             obj.DiscoveryMode = mode;
+            obj.ContextLinkageOptions = contextLinkageOptions;
             return obj;
         }
 
@@ -140,13 +145,15 @@ namespace Plexus.Interop.Protocol
             Maybe<string> inputMessageId, 
             Maybe<string> outputMessageId,
             Maybe<IConsumedMethodReference> method, 
-            DiscoveryMode discoveryMode)
+            DiscoveryMode discoveryMode,
+            IContextLinkageOptions contextLinkageOptions)
         {
             var obj = MethodDiscoveryRequest.Rent();
             obj.InputMessageId = inputMessageId;
             obj.OutputMessageId = outputMessageId;
             obj.ConsumedMethod = method;
             obj.DiscoveryMode = discoveryMode;
+            obj.ContextLinkageOptions = contextLinkageOptions;
             return obj;
         }
 
@@ -204,13 +211,14 @@ namespace Plexus.Interop.Protocol
             return obj;
         }
 
-        public IProvidedServiceReference CreateProvidedServiceReference(string serviceId, Maybe<string> serviceAlias, string applicationId, Maybe<UniqueId> connectionId)
+        public IProvidedServiceReference CreateProvidedServiceReference(string serviceId, Maybe<string> serviceAlias, string applicationId, Maybe<UniqueId> connectionId, Maybe<UniqueId> applicationInstanceId)
         {
             var obj = ProvidedServiceReference.Rent();
             obj.ServiceId = serviceId;
             obj.ServiceAlias = serviceAlias;
             obj.ApplicationId = applicationId;
             obj.ConnectionId = connectionId;
+            obj.ApplicationInstanceId = applicationInstanceId;
             return obj;
         }
 
@@ -219,6 +227,14 @@ namespace Plexus.Interop.Protocol
             var obj = ProvidedMethodReference.Rent();
             obj.ProvidedService = providedService;
             obj.MethodId = methodId;
+            return obj;
+        }
+
+        public IContextLinkageOptions CreateContextLinkageOptions(ContextLinkageDiscoveryMode contextLinkageDiscoveryMode, Maybe<string> specificContextId = default)
+        {
+            var obj = ContextLinkageOptions.Rent();
+            obj.Mode = contextLinkageDiscoveryMode;
+            obj.SpecificContext = specificContextId;
             return obj;
         }
     }

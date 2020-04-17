@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,15 +20,20 @@
     {
         public OutcomingInvocationDescriptor(
             InvocationMethodDescriptor method,
-            InvocationTargetDescriptor target = null)
+            InvocationTargetDescriptor target = null,
+            Maybe<ContextLinkageOptions> contextLinkageOptions = default)
         {
             Method = method;
             Target = target ?? Maybe<InvocationTargetDescriptor>.Nothing;
+            ContextLinkageOptions = contextLinkageOptions; 
         }
+
 
         public InvocationMethodDescriptor Method { get; }
 
         public Maybe<InvocationTargetDescriptor> Target { get; }
+
+        public Maybe<ContextLinkageOptions> ContextLinkageOptions { get; }
 
         public override string ToString()
         {

@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -211,6 +211,43 @@ namespace Plexus.Channels
                     throw;
                 }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static async ValueTask<T> FirstAsync<T>(
+            this IReadableChannel<T> channel,
+            Func<T, bool> predicate,
+            CancellationToken cancellationToken = default)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var item = await channel.TryReadAsync(cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (item.HasValue && predicate(item.Value))
+                {
+                    return item.Value;
+                }
+            }
+
+            throw new Exception("There is no first element in sequence");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static async ValueTask<T> FirstAsync<T>(
+            this IReadableChannel<T> channel,
+            CancellationToken cancellationToken = default)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var item = await channel.TryReadAsync(cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (item.HasValue)
+                {
+                    return item.Value;
+                }
+            }
+
+            throw new Exception("There is no first element in sequence");
         }
     }
 }

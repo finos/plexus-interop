@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,10 +27,12 @@ namespace Plexus.Interop.Internal
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using Plexus.Processes;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
+    using Plexus.Interop.Apps.Internal;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
 
@@ -46,7 +48,7 @@ namespace Plexus.Interop.Internal
         private readonly ServerConnectionListener _connectionListener;
         private readonly IBrokerProcessor _brokerProcessor;
         private readonly IReadOnlyCollection<ITransportServer> _transportServers;
-        private readonly IAppLifecycleManager _appLifecycleManager;
+        private readonly IInteropContext _interopContext;
 
         protected override ILogger Log { get; } = LogManager.GetLogger<Broker>();
 
@@ -78,12 +80,11 @@ namespace Plexus.Interop.Internal
             };
             _connectionListener = new ServerConnectionListener(_transportServers);
             registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
-            _appLifecycleManager = AppLifecycleManagerFactory.Instance.Create(metadataDir);
+            _interopContext = InteropContextFactory.Instance.Create(metadataDir, registryProvider);
             _brokerProcessor = BrokerProcessorFactory.Instance.Create(
                 _connectionListener.In,
-                registryProvider,
                 DefaultProtocolSerializationProvider,
-                _appLifecycleManager);
+                _interopContext);
             OnStop(_connectionListener.Stop);
         }
 
@@ -94,7 +95,7 @@ namespace Plexus.Interop.Internal
                 .WhenAll(
                     _connectionListener.StartAsync(),
                     _brokerProcessor.StartAsync(),
-                    _appLifecycleManager.StartAsync())
+                    _interopContext.StartAsync())
                 .ConfigureAwait(false);
             Log.Info("Broker started in directory {0}", _workingDir);
             return ProcessAsync();
@@ -108,7 +109,7 @@ namespace Plexus.Interop.Internal
             }
             finally
             {
-                await _appLifecycleManager.StopAsync().IgnoreExceptions().ConfigureAwait(false);
+                await _interopContext.StopAsync().IgnoreExceptions().ConfigureAwait(false);
                 await Task.WhenAll(_transportServers.Select(x => x.StopAsync())).ConfigureAwait(false);
             }
         }

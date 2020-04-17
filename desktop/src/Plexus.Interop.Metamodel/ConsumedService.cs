@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,5 +31,10 @@
         public Dictionary<string, IConsumedMethod> Methods { get; set; } = new Dictionary<string, IConsumedMethod>();
 
         IReadOnlyDictionary<string, IConsumedMethod> IConsumedService.Methods => Methods;
+
+        public override string ToString()
+        {
+            return $"{nameof(Service)}: {Service.Id}, {nameof(Alias)}: {Alias}, {nameof(From)}: {From}";
+        }
     }
 }

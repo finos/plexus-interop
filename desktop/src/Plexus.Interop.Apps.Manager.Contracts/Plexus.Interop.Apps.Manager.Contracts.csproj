@@ -11,6 +11,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plexus.Common.Contracts\Plexus.Common.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Metamodel.Contracts\Plexus.Interop.Metamodel.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Protocol.Contracts\Plexus.Interop.Protocol.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Contracts\Plexus.Interop.Transport.Contracts.csproj" />
   </ItemGroup>
 </Project>

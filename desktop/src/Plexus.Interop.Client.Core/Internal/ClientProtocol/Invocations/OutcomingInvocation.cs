@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,12 +53,13 @@ namespace Plexus.Interop.Internal.ClientProtocol.Invocations
                             Info.Method.ServiceId,
                             Info.Target.Value.ServiceAliasId,
                             Info.Target.Value.ApplicationId,
-                            Info.Target.Value.ConnectionId),
+                            Info.Target.Value.ConnectionId,
+                            Info.Target.Value.ApplicationInstanceId),
                         Info.Method.MethodId)
                     : _protocol.MessageFactory.CreateConsumedMethodReference(
                         _protocol.MessageFactory.CreateConsumedServiceReference(Info.Method.ServiceId, Info.Method.ServiceAliasId),
                         Info.Method.MethodId);
-            using (var request = _protocol.MessageFactory.CreateInvocationStartRequest(target))
+            using (var request = _protocol.MessageFactory.CreateInvocationStartRequest(target, Info.ContextLinkageOptions.Convert(_protocol.MessageFactory)))
             {
                 var serialized = _protocol.Serializer.Serialize(request);
                 try

@@ -1,42 +1,43 @@
 {
-  "private": true,
-  "name": "@plexus-interop/web",
-  "version": "0.1.0",
-  "license": "Apache-2.0",
-  "description": "Plexus Web Interop root module",
-  "scripts": {
-    "prebootstrap": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
-    "bootstrap": "lerna bootstrap -- --check-files --ignore-optional",
-    "postbootstrap": "node ./scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
-    "preinstall": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
-    "prebuild": "run-s bootstrap",
-    "build": "run-s build-only",
-    "build-only": "lerna run build --stream --concurrency 1",
-    "prepublish-all": "node ./scripts/replace-auth-vars.js --publish && lerna exec -- cross-var shx cp $LERNA_ROOT_PATH/.npmrc .npmrc",
-    "publish-all": "lerna exec --stream --scope {@plexus-interop/broker,@plexus-interop/cli,@plexus-interop/client,@plexus-interop/client-api,@plexus-interop/common,@plexus-interop/protocol,@plexus-interop/transport-common,@plexus-interop/websocket-transport,@plexus-interop/io,@plexus-interop/metadata,@plexus-interop/remote,@plexus-interop/common-api-impl,@plexus-interop/studio} --concurrency 1 -- npm publish --verbose --access=public",
-    "postpublish-all": "shx rm -rf .npmrc && lerna exec -- shx rm -rf .npmrc",
-    "e2e-native": "cd ./packages/e2e && yarn e2e-native",
-    "poste2e-native": "yarn coverage",
-    "e2e-web": "cd ./packages/e2e && yarn e2e-web-electron",
-    "poste2e-web": "yarn coverage",
-    "coverage": "nyc report --reporter=text --reporter=html",
-    "build-e2e": "run-s build e2e-native e2e-web",
-    "ci-build": "run-s build",
-    "ci-build-e2e": "run-s build e2e-native e2e-web",
-    "ci-publish": "run-s bump-version build publish-all",
-    "bump-version": "cross-var lerna publish --repo-version $PLEXUS_BUILD_NPM_PACKAGE_VERSION --skip-git --exact --skip-npm --yes --verbose --force-publish=*",
-    "benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
-  },
-  "workspaces": [
-    "packages/*"
-  ],
-  "devDependencies": {
-    "cross-var": "1.1.0",
-    "electron": "1.8.8",
-    "lerna": "2.8.0",
-    "minimist": "1.2.0",
-    "npm-run-all": "4.1.1",
-    "shx": "0.2.2",
-    "yarn": "1.17.3"
-  }
+	"private": true,
+	"name": "@plexus-interop/web",
+	"version": "0.1.0",
+	"license": "Apache-2.0",
+	"description": "Plexus Web Interop root module",
+	"scripts": {
+		"prebootstrap": "node ./scripts/replace-lock-registry.js && lerna exec -- node ../../scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
+		"bootstrap": "lerna bootstrap -- --check-files --ignore-optional",
+		"postbootstrap": "node ./scripts/replace-lock-registry.js --backward && lerna exec -- node ../../scripts/replace-lock-registry.js --backward && shx rm -rf .npmrc",
+		"preinstall": "node ./scripts/replace-lock-registry.js && node ./scripts/replace-auth-vars.js --install",
+		"prebuild": "run-s bootstrap",
+		"build": "run-s build-only",
+		"build-only": "lerna run build --stream --concurrency 1",
+		"prepublish-all": "node ./scripts/replace-auth-vars.js --publish && lerna exec -- cross-var shx cp $LERNA_ROOT_PATH/.npmrc .npmrc",
+		"publish-all": "lerna exec --stream --scope {@plexus-interop/broker,@plexus-interop/cli,@plexus-interop/client,@plexus-interop/client-api,@plexus-interop/common,@plexus-interop/protocol,@plexus-interop/transport-common,@plexus-interop/websocket-transport,@plexus-interop/io,@plexus-interop/metadata,@plexus-interop/remote,@plexus-interop/common-api-impl,@plexus-interop/studio} --concurrency 1 -- npm publish --verbose --access=public",
+		"postpublish-all": "shx rm -rf .npmrc && lerna exec -- shx rm -rf .npmrc",
+		"e2e-native": "cd ./packages/e2e && yarn e2e-native",
+		"poste2e-native": "yarn coverage",
+		"e2e-web": "cd ./packages/e2e && yarn e2e-web-electron",
+		"poste2e-web": "yarn coverage",
+		"coverage": "nyc report --reporter=text --reporter=html",
+		"build-e2e": "run-s build e2e-native e2e-web",
+		"ci-build": "run-s build",
+		"ci-build-e2e": "run-s build e2e-native e2e-web",
+		"ci-publish": "run-s bump-version build publish-all",
+		"bump-version": "cross-var lerna publish --repo-version $PLEXUS_BUILD_NPM_PACKAGE_VERSION --no-git-tag-version --no-push --exact --skip-npm --yes --loglevel=silly --force-publish=*",
+		"benchmarks": "cd ./packages/e2e && yarn native-broker-benchmarks && yarn web-broker-benchmarks"
+	},
+	"workspaces": [
+		"packages/*"
+	],
+	"devDependencies": {
+		"cross-var": "1.1.0",
+		"lerna": "^3.18.4",
+		"minimist": "^1.2.0",
+		"electron": "1.8.8",
+		"nyc": "^11.2.1",
+		"npm-run-all": "4.1.1",
+		"shx": "0.2.2",
+		"yarn": "^1.17.3"
+	}
 }

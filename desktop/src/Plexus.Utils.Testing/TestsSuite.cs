@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2019 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@ namespace Plexus
     using System;
     using System.Collections.Concurrent;
     using System.Diagnostics;
-    using System.IO;
     using System.Security.Cryptography;
     using System.Threading;
     using System.Threading.Tasks;
@@ -34,7 +33,7 @@ namespace Plexus
 
         protected static readonly Random Random = new Random(42);
 
-        protected static readonly MD5 Md5 = MD5.Create();
+        protected static readonly SHA256 Sha256 = SHA256.Create();
 
         protected static readonly TimeSpan Timeout10Ms = TimeoutConstants.Timeout10Ms;
         protected static readonly TimeSpan Timeout50Ms = TimeoutConstants.Timeout50Ms;
