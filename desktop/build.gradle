@@ -16,7 +16,7 @@ if (!fullDotNetBuild) {
 }
 
 license {
-    header file("${rootDir}/LICENSE_HEADER")
+    header file("${rootDir}/FILE_HEADER")
     mapping {
         cs='JAVADOC_STYLE'
         proto='DOUBLESLASH_STYLE'

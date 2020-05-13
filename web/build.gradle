@@ -22,7 +22,7 @@ node {
 }
 
 license {
-    header file("${rootDir}/LICENSE_HEADER")
+    header file("${rootDir}/FILE_HEADER")
     mapping {
         ts='JAVADOC_STYLE'
         proto='DOUBLESLASH_STYLE'
