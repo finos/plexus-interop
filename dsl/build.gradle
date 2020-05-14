@@ -22,7 +22,7 @@ subprojects {
     apply plugin: "com.github.hierynomus.license"
 
     license {
-        header file("${rootDir}/LICENSE_HEADER")
+        header file("${rootDir}/FILE_HEADER")
         mapping {
             xtend='JAVADOC_STYLE'
             mwe2='JAVADOC_STYLE'
