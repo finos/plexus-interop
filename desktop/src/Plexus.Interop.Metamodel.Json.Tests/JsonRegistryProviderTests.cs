@@ -25,7 +25,7 @@
         [Fact]
         public void ParsesRegistryJson()
         {
-            using (var provider = JsonRegistryProvider.Initialize("interop.json"))
+            using (var provider = new JsonRegistryProvider("interop.json"))
             {
                 var registry = provider.Current;
 

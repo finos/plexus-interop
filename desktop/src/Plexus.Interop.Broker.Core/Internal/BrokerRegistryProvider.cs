@@ -30,8 +30,7 @@
         {
             _baseRegistryProvider = baseRegistryProvider;
             var type = typeof(BrokerRegistryProvider);
-            _embeddedRegistry = JsonRegistry.LoadRegistry(
-                type.GetTypeInfo().Assembly.GetManifestResourceStream(type.Namespace + ".interop.json"));
+            _embeddedRegistry = JsonRegistry.LoadRegistry(type.GetTypeInfo().Assembly.GetManifestResourceStream(type.Namespace + ".interop.json"));
             Current = _embeddedRegistry.MergeWith(baseRegistryProvider.Current);
             _baseRegistryProvider.Updated += OnUpdated;
         }
