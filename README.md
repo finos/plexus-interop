@@ -122,7 +122,7 @@ Run .Net to Web interop example on Windows:
 
 ## Documentation
 
-To check out docs, visit [https://finos-plexus.github.io/plexus-interop](https://finos-plexus.github.io/plexus-interop).
+To check out docs, visit [plexus.finos.org](https://plexus.finos.org).
 
 Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/).
 
@@ -138,7 +138,7 @@ After successful build documentation is available via:
 
 ## Contributing
 
-1. Fork it (<https://github.com/finos-plexus/plexus-interop/fork>)
+1. Fork it (<https://github.com/finos/plexus-interop/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Read our [contribution guidelines](.github/CONTRIBUTING.md) and [Community Code of Conduct](https://www.finos.org/code-of-conduct)
 4. Commit your changes (`git commit -am 'Add some fooBar'`)
