@@ -79,7 +79,7 @@ namespace Plexus.Interop.Internal
                     DefaultTransportSerializationProvider)
             };
             _connectionListener = new ServerConnectionListener(_transportServers);
-            registryProvider = registryProvider ?? JsonRegistryProvider.Initialize(Path.Combine(metadataDir, "interop.json"));
+            registryProvider = registryProvider ?? new JsonRegistryProvider(Path.Combine(metadataDir, "interop.json"));
             _interopContext = InteropContextFactory.Instance.Create(metadataDir, registryProvider);
             _brokerProcessor = BrokerProcessorFactory.Instance.Create(
                 _connectionListener.In,

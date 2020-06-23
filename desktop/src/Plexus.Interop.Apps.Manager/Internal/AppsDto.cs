@@ -25,6 +25,6 @@ namespace Plexus.Interop.Apps.Internal
         [DataMember(Name = "apps")]
         public List<AppDto> Apps { get; set; } = new List<AppDto>();
 
-        public static AppsDto Load(string filePath) => JsonConvert.DeserializeFromFile<AppsDto>(filePath);
+        public static AppsDto FromContent(string content) => JsonConvert.Deserialize<AppsDto>(content);
     }
 }
