@@ -47,7 +47,7 @@ namespace Plexus.Interop.Apps.Internal
         public InteropContext(string metadataDir, IRegistryProvider registryProvider)
         {
             RegistryProvider = registryProvider;
-            var appRegistryProvider = JsonFileAppRegistryProvider.Initialize(Path.Combine(metadataDir, "apps.json"));
+            var appRegistryProvider = new JsonFileAppRegistryProvider(Path.Combine(metadataDir, "apps.json"));
             _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir);
 
             var clientLazy = new Lazy<IClient>(() => _lifecycleManagerClient);

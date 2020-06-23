@@ -34,13 +34,22 @@ namespace Plexus.Interop.Metamodel.Json
 
         public static IRegistry LoadRegistry(Stream stream)
         {
-            var dto = RegistryDto.LoadFromStream(stream);
+            return LoadRegistry(RegistryDto.LoadFromStream(stream));
+        }
+
+        public static IRegistry FromContent(string registryContent)
+        {
+            return LoadRegistry(RegistryDto.Parse(registryContent));
+        }
+
+        private static IRegistry LoadRegistry(RegistryDto dto)
+        {
             var messageIds =
                 from svcDto in dto.Services
                 from metDto in svcDto.Methods
-                from mid in new[] { metDto.RequestMessageId, metDto.ResponseMessageId }
+                from mid in new[] {metDto.RequestMessageId, metDto.ResponseMessageId}
                 select mid;
-            var messages = messageIds.Distinct().ToDictionary(x => x, x => (IMessage)new Message { Id = x });
+            var messages = messageIds.Distinct().ToDictionary(x => x, x => (IMessage) new Message {Id = x});
             var services = dto.Services.Select(x => Convert(messages, x)).ToDictionary(x => x.Id, x => x);
             var applications = dto.Applications.Select(x => Convert(services, x)).ToDictionary(x => x.Id, x => x);
             return new Registry

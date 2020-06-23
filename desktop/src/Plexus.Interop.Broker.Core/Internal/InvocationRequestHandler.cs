@@ -378,7 +378,7 @@ namespace Plexus.Interop.Broker.Internal
             }
             catch (Exception ex)
             {
-                Log.Warn($"Caught exception during attempt to propagate TransportMessageFrame from {source.Id} to {target.Id}", ex);
+                Log.Warn(ex, $"Caught exception during attempt to propagate TransportMessageFrame from {source.Id} to {target.Id}");
                 target.Out.TryTerminate(ex);
             }
         }

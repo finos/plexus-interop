@@ -28,7 +28,7 @@
 
         public RegistryServiceTests()
         {
-            _sut = new RegistryService(JsonRegistryProvider.Initialize("RegistryServiceTests.interop.json"));
+            _sut = new RegistryService(new JsonRegistryProvider("RegistryServiceTests.interop.json"));
         }
 
         [Fact]
