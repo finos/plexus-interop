@@ -348,9 +348,9 @@ namespace Plexus.Interop.Broker.Internal
 
         private static async Task PropagateAsync(ITransportChannel source, ITransportChannel target)
         {
+            int propagatedMessageCount = 0;
             try
             {
-                int propagatedMessageCount = 0;
                 while (true)
                 {
                     Log.Trace($"Waiting for TransportMessageFrame from {source.Id} to propagate to {target.Id}");
@@ -378,7 +378,7 @@ namespace Plexus.Interop.Broker.Internal
             }
             catch (Exception ex)
             {
-                Log.Warn(ex, $"Caught exception during attempt to propagate TransportMessageFrame from {source.Id} to {target.Id}");
+                Log.Warn(ex, $"Caught exception during attempt to propagate TransportMessageFrame from {source.Id} to {target.Id}. Total {propagatedMessageCount} messages propagated");
                 target.Out.TryTerminate(ex);
             }
         }
