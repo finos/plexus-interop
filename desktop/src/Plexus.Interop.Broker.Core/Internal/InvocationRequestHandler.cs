@@ -349,36 +349,61 @@ namespace Plexus.Interop.Broker.Internal
         private static async Task PropagateAsync(ITransportChannel source, ITransportChannel target)
         {
             int propagatedMessageCount = 0;
+            var targetId = target.Id;
+            var sourceId = source.Id;
+            bool exceptionLogged = false;
             try
             {
                 while (true)
                 {
-                    Log.Trace($"Waiting for TransportMessageFrame from {source.Id} to propagate to {target.Id}");
+                    Log.Trace($"Waiting for TransportMessageFrame from {sourceId} to propagate to {targetId}");
 
-                    var result = await source.In.TryReadAsync().ConfigureAwait(false);
+                    Maybe<TransportMessageFrame> result;
+                    try
+                    {
+                        result = await source.In.TryReadAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warn(ex, $"Caught exception during attempt to read TransportMessageFrame from source channel {sourceId} to propagate it to {targetId} channel. Total {propagatedMessageCount} messages propagated");
+                        exceptionLogged = true;
+                        throw;
+                    }
 
                     if (!result.HasValue)
                     {
-                        Log.Trace($"Received empty TransportMessageFrame from {source.Id}. Will complete {target.Id} channel");
+                        Log.Trace($"Received empty TransportMessageFrame from {sourceId}. Will complete {targetId} channel");
                         break;
                     }
 
                     var messageFrame = result.Value;
 
-                    Log.Trace($"Received TransportMessageFrame {messageFrame} from {source.Id}. Will try to propagate it to {target.Id} channel");
-                    await target.Out.WriteAsync(messageFrame).ConfigureAwait(false);
+                    Log.Trace($"Received TransportMessageFrame {messageFrame} from {sourceId}. Will try to propagate it to {targetId} channel");
+                    try
+                    {
+                        await target.Out.WriteAsync(messageFrame).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warn(ex, $"Caught exception during attempt to write TransportMessageFrame to target channel {targetId} to propagate it from {sourceId} channel. Total {propagatedMessageCount} messages propagated");
+                        exceptionLogged = true;
+                        throw;
+                    }
 
                     propagatedMessageCount++;
 
-                    Log.Trace($"TransportMessageFrame {messageFrame} successfully propagated to {target.Id} (received from {source.Id})");
+                    Log.Trace($"TransportMessageFrame {messageFrame} successfully propagated to {targetId} (received from {sourceId})");
                 }
 
                 target.Out.TryComplete();
-                Log.Trace($"Successfully completed TransportMessageFrame propagation from {source.Id} to {target.Id}. Total {propagatedMessageCount} messages propagated");
+                Log.Trace($"Successfully completed TransportMessageFrame propagation from {sourceId} to {targetId}. Total {propagatedMessageCount} messages propagated");
             }
             catch (Exception ex)
             {
-                Log.Warn(ex, $"Caught exception during attempt to propagate TransportMessageFrame from {source.Id} to {target.Id}. Total {propagatedMessageCount} messages propagated");
+                if (!exceptionLogged)
+                {
+                    Log.Warn(ex, $"Caught exception during attempt to propagate TransportMessageFrame from {sourceId} to {targetId}. Total {propagatedMessageCount} messages propagated");
+                }
                 target.Out.TryTerminate(ex);
             }
         }
