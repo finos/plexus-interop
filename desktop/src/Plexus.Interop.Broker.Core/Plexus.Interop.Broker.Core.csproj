@@ -20,6 +20,7 @@
     <ProjectReference Include="..\Plexus.Interop.Metamodel.Json\Plexus.Interop.Metamodel.Json.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Protocol\Plexus.Interop.Protocol.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Contracts\Plexus.Interop.Transport.Contracts.csproj" />
+    <ProjectReference Include="..\Plexus.Interop.Transport.Protocol.Contracts\Plexus.Interop.Transport.Protocol.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
   </ItemGroup>
 

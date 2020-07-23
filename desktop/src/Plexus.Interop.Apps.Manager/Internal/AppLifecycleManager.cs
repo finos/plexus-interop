@@ -249,7 +249,7 @@ namespace Plexus.Interop.Apps.Internal
                 throw new InvalidOperationException($"Launcher is not defined for application {appId}");
             }
 
-            Log.Debug("Sending request to launcher {0}: appId={1}, params={2}", appDto.LauncherId, appId, appDto.LauncherParams);
+            Log.Debug("Sending request to launcher {0}: appId={1}, params={2}", appDto.LauncherId, appId, string.Join("; ", appDto.LauncherParams.Select(kvp => $"{kvp.Key}:{kvp.Value}")));
 
             var referrer = new AppLaunchReferrer
             {

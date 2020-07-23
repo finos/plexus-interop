@@ -66,9 +66,11 @@ namespace Plexus.Interop.Transport.Transmission.Streams
                 {
                     await Task.WhenAny(_writer.Completion, _reader.In.Completion).Unwrap().ConfigureAwait(false);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _log.Warn(ex, $"Caught exception during {nameof(ProcessAsync)}({Id})");
                     _cancellation.Cancel();
+                    throw;
                 }
                 await Task.WhenAll(_writer.Completion, _reader.In.Completion).ConfigureAwait(false);
                 _log.Trace("Processing completed. Disposing stream.");

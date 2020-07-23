@@ -90,16 +90,28 @@
 
         private async Task<int> ReadLengthAsync()
         {
+            var readBytes = await ReadAsync(_lengthBuffer, 0, 2);
+            while (readBytes < 2)
+            {
+                _log.Info($"Read {readBytes} while reading length. Will try to read next byte");
+                readBytes += await ReadAsync(_lengthBuffer, readBytes, 2 - readBytes);
+            }
+            return (_lengthBuffer[0] << 8) | _lengthBuffer[1];
+        }
+
+        private async Task<int> ReadAsync(byte[] buffer, int offset, int count)
+        {
+            int readBytes;
 #if NETSTANDARD2_0
-            var length = await _stream.ReadAsync(_lengthBuffer, 0, 2, _cancellationToken).ConfigureAwait(false);
+            readBytes = await _stream.ReadAsync(buffer, offset, count, _cancellationToken).ConfigureAwait(false);
 #else
-            var length = await _stream.ReadAsync(_lengthBuffer, 0, 2, _cancellationToken).WithCancellation(_cancellationToken).ConfigureAwait(false);
+            readBytes = await _stream.ReadAsync(buffer, offset, count, _cancellationToken).WithCancellation(_cancellationToken).ConfigureAwait(false);
 #endif
-            if (length != 2)
+            if (readBytes == 0)
             {
                 throw new InvalidOperationException("Stream completed unexpectedly");
             }
-            return (_lengthBuffer[0] << 8) | _lengthBuffer[1];
+            return readBytes;
         }
     }
 }

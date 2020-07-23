@@ -23,6 +23,7 @@ namespace Plexus.Interop.Broker.Internal
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using Plexus.Interop.Transport.Protocol;
 
     internal sealed class RegistryService : IRegistryService, IDisposable
     {
@@ -71,7 +72,11 @@ namespace Plexus.Interop.Broker.Internal
             _registryLock.EnterReadLock();
             try
             {
-                return _registry.Applications[appId];
+                if (_registry.Applications.TryGetValue(appId, out var application))
+                {
+                    return application;
+                }
+                throw new MetadataViolationException($"Application {appId} do not exist in metadata. Available applications: {string.Join(", ", _registry.Applications.Keys)}");
             }
             finally
             {
@@ -84,9 +89,14 @@ namespace Plexus.Interop.Broker.Internal
             _registryLock.EnterReadLock();
             try
             {
-                return _registry.Applications[appId].ConsumedServices
-                    .FirstOrDefault(x =>
-                        Equals(x.Service.Id, reference.ServiceId) && Equals(x.Alias, reference.ServiceAlias));
+                var application = GetApplication(appId);
+                var consumedService = application.ConsumedServices
+                    .FirstOrDefault(service => Equals(service.Service.Id, reference.ServiceId) && Equals(service.Alias, reference.ServiceAlias));
+                if (consumedService != null)
+                {
+                    return consumedService;
+                }
+                throw new MetadataViolationException($"Service {reference.ServiceId} with alias {reference.ServiceAlias} do not exist or is not consumed by {appId} application. Available services: {string.Join(", ", application.ConsumedServices.Select(service => service.Service.Id))}");
             }
             finally
             {
@@ -99,8 +109,13 @@ namespace Plexus.Interop.Broker.Internal
             _registryLock.EnterReadLock();
             try
             {
+                var methodId = reference.MethodId;
                 var service = GetConsumedService(appId, reference.ConsumedService);
-                return service.Methods[reference.MethodId];
+                if (service.Methods.TryGetValue(methodId, out var consumedMethod))
+                {
+                    return consumedMethod;
+                }
+                throw new MetadataViolationException($"Method {methodId} do not exist in service {service.Service.Id} or is not consumed by {appId} application. Available methods: {string.Join(", ", service.Methods.Keys)}");
             }
             finally
             {
