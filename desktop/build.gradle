@@ -8,9 +8,11 @@ plugins {
 def dotnetSdkVersion = "2.1"
 def buildCache = System.getenv("PLEXUS_BUILD_CACHE_DIR") ?: new File("${rootDir}/build").absolutePath
 def fullDotNetBuild = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['PLEXUS_BUILD_FULL_DOTNET'] != 'false'
+def skipNugetPublish = System.env['PLEXUS_BUILD_SKIP_DOTNET_PUBLISH'] == 'true'
 def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] != 'true'
 def nugetVersion = System.getenv("PLEXUS_BUILD_NUGET_VERSION") ?: System.getenv("APPVEYOR_REPO_TAG_NAME")
 def dotnetParams = nugetVersion == null ? " " : "/p:Version=$nugetVersion"
+
 if (!fullDotNetBuild) {
     dotnetParams += " /p:CORE_ONLY=true"
 }
@@ -128,7 +130,7 @@ if (testsEnabled) {
     }
 }
 
-if (nugetVersion != null) {
+if (nugetVersion != null && !skipNugetPublish) {
     task push(dependsOn: test, type:Exec) {
         dependsOn prepareDotnet
         workingDir projectDir
@@ -141,7 +143,7 @@ if (nugetVersion != null) {
 } else {
    task push(dependsOn: test) {
         doLast {
-            println "Skipping push because nuget version is not specified"
+            println "Skipping push because nuget version is not specified, or publish disabled"
         }
     }
 }
