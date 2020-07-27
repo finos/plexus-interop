@@ -16,12 +16,13 @@
  */
 ﻿namespace Plexus.Interop.Broker.Internal
 {
+    using System;
     using System.Threading.Tasks;
 
     internal interface IAppConnectionProcessor
     {
         UniqueId Id { get; }
 
-        Task Completion { get; }
+        Task ProcessAsync(Action connectionCompletedAction);
     }
 }

@@ -74,9 +74,10 @@ namespace Plexus.Interop.Apps.Internal
             ITransportConnection connection,
             AppConnectionDescriptor connectionInfo)
         {
+            AppConnection clientConnection;
             lock (_connections)
             {
-                var clientConnection = new AppConnection(connection, connectionInfo);
+                clientConnection = new AppConnection(connection, connectionInfo);
                 if (_connections.ContainsKey(clientConnection.Id))
                 {
                     throw new InvalidOperationException($"Connection id already exists: {clientConnection.Id}");
@@ -105,23 +106,26 @@ namespace Plexus.Interop.Apps.Internal
                 if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
                     Log.Debug("Resolving deferred connection {{{0}}} to accepted connection {{{1}}}", deferredConnectionKey, connection);
-                    waiter.TryComplete(clientConnection);
+                    TaskRunner.RunInBackground(() => { waiter.TryComplete(clientConnection); });
                     _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
                 }
-
-                _connectionSubject.OnNext(new AppConnectionEvent(connectionInfo, ConnectionEventType.AppConnected));
-
-                return clientConnection;
             }
+
+            _connectionSubject.OnNext(new AppConnectionEvent(connectionInfo, ConnectionEventType.AppConnected));
+
+            return clientConnection;
         }
 
-        public void RemoveConnection(IAppConnection connection)
+        public bool TryRemoveConnection(IAppConnection connection)
         {
             Log.Debug("Removing connection {0}", connection.Info);
 
             lock (_connections)
-            {                
-                _connections.Remove(connection.Id);
+            {
+                if (!_connections.Remove(connection.Id))
+                {
+                    return false;
+                }
 
                 var appInstanceId = connection.Info.ApplicationInstanceId;
                 var appId = connection.Info.ApplicationId;
@@ -146,12 +150,13 @@ namespace Plexus.Interop.Apps.Internal
                 var deferredConnectionKey = (appInstanceId, connection.Info.ApplicationId);
                 if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
                 {
-                    waiter.TryCancel();
+                    TaskRunner.RunInBackground(() => { waiter.TryCancel(); });
                     _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
                 }
             }
 
             _connectionSubject.OnNext(new AppConnectionEvent(connection.Info, ConnectionEventType.AppDisconnected));
+            return true;
         }
 
         public bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection)
@@ -213,7 +218,8 @@ namespace Plexus.Interop.Apps.Internal
                     if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.TryGetValue(appId, out var existingConnection))
                     {
                         Log.Debug("Resolving deferred connection {{{0}}} to existing connection {{{1}}}", deferredConnectionKey, existingConnection);
-                        connectionPromise.TryComplete(existingConnection);
+                        TaskRunner.RunInBackground(() => connectionPromise.TryComplete(existingConnection))
+                            .IgnoreAwait(Log, $"Failed to complete connection promise for {appId} application with {appInstanceId} app instance id");
                     }
                     else
                     {

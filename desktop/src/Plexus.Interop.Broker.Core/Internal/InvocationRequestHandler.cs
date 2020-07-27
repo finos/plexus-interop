@@ -26,6 +26,7 @@ namespace Plexus.Interop.Broker.Internal
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     internal sealed class InvocationRequestHandler : IInvocationRequestHandler
@@ -40,7 +41,7 @@ namespace Plexus.Interop.Broker.Internal
         private readonly IProtocolMessageFactory _protocolMessageFactory;
         private readonly IProtocolSerializer _protocolSerializer;
         private readonly InvocationTargetHandler<IInvocationStartRequested, IAppConnection> _createRequestHandler;
-        private readonly InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection, IContextLinkageOptions> _resolveTargetConnectionHandler;
+        private readonly InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection, ITransportChannel, IContextLinkageOptions> _resolveTargetConnectionHandler;
 
         private readonly object _resolveConnectionSync = new object();
 
@@ -58,7 +59,7 @@ namespace Plexus.Interop.Broker.Internal
             _invocationEventProvider = invocationEventProvider;
             _contextLinkageManager = contextLinkageManager;
             _createRequestHandler = new InvocationTargetHandler<IInvocationStartRequested, IAppConnection>(CreateInvocationTarget, CreateInvocationTarget);
-            _resolveTargetConnectionHandler = new InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection, IContextLinkageOptions>(ResolveTargetConnectionAsync, ResolveTargetConnectionAsync);
+            _resolveTargetConnectionHandler = new InvocationTargetHandler<ValueTask<IAppConnection>, IAppConnection, ITransportChannel, IContextLinkageOptions>(ResolveTargetConnectionAsync, ResolveTargetConnectionAsync);
             _stopwatch.Start();
         }
         
@@ -71,16 +72,20 @@ namespace Plexus.Interop.Broker.Internal
             try
             {
                 Log.Info("Handling invocation {0} from {{{1}}}: {{{2}}}", sourceChannel.Id, sourceConnection, request);
-                targetConnection = await request.Target.Handle(_resolveTargetConnectionHandler, sourceConnection, request.ContextLinkageOptions).ConfigureAwait(false);
+
+                targetConnection = await request.Target.Handle(_resolveTargetConnectionHandler, sourceConnection, sourceChannel, request.ContextLinkageOptions).ConfigureAwait(false);
+                Log.Debug($"Resolved target connection {targetConnection} for invocation {sourceChannel.Id} from {{{sourceConnection}}}: {{{request}}}");
+
                 targetChannel = await targetConnection.CreateChannelAsync().ConfigureAwait(false);
                 Log.Debug("Created channel {0} for invocation {1} from {{{2}}} to {{{3}}}: {{{4}}}", targetChannel.Id, sourceChannel.Id, sourceConnection, targetConnection, request);
+
                 using (var invocationStarting = _protocolMessageFactory.CreateInvocationStarting())
                 {
                     var serialized = _protocolSerializer.Serialize(invocationStarting);
                     try
                     {
                         await sourceChannel.Out.WriteAsync(new TransportMessageFrame(serialized)).ConfigureAwait(false);
-                        Log.Trace("Sent starting event for invocation {0}", sourceChannel.Id);
+                        Log.Debug($"Sent starting event for invocation {sourceChannel.Id}");
                     }
                     catch
                     {
@@ -102,7 +107,7 @@ namespace Plexus.Interop.Broker.Internal
                     try
                     {
                         await targetChannel.Out.WriteAsync(new TransportMessageFrame(serialized)).ConfigureAwait(false);
-                        Log.Trace("Sent requested event for invocation {0} to {1}", targetChannel.Id, targetConnection);
+                        Log.Debug($"Sent requested event for invocation {targetChannel.Id} to {targetConnection} (for invocation {sourceChannel.Id})");
                     }
                     catch
                     {
@@ -110,9 +115,16 @@ namespace Plexus.Interop.Broker.Internal
                         throw;
                     }
                 }
-                var propagateTask1 = TaskRunner.RunInBackground(() => PropagateAsync(sourceChannel, targetChannel));
-                var propagateTask2 = TaskRunner.RunInBackground(() => PropagateAsync(targetChannel, sourceChannel));
-                await Task.WhenAll(propagateTask1, propagateTask2).ConfigureAwait(false);
+
+                var cts = new CancellationTokenSource();
+                var fromSourceToTarget = TaskRunner.RunInBackground(() => PropagateAsync(sourceChannel, targetChannel, cts.Token), cts.Token);
+                var fromTargetToSource = TaskRunner.RunInBackground(() => PropagateAsync(targetChannel, sourceChannel, cts.Token), cts.Token);
+
+                await Task.WhenAny(fromSourceToTarget, fromTargetToSource).ConfigureAwait(false);
+
+                cts.Cancel();
+
+                await Task.WhenAll(fromSourceToTarget, fromTargetToSource).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -165,6 +177,7 @@ namespace Plexus.Interop.Broker.Internal
         private async ValueTask<IAppConnection> ResolveTargetConnectionAsync(
             IProvidedMethodReference methodReference, 
             IAppConnection source, 
+            ITransportChannel sourceChannel,
             IContextLinkageOptions contextLinkageOptions)
         {
             var method = _registryService.GetProvidedMethod(methodReference);
@@ -220,9 +233,10 @@ namespace Plexus.Interop.Broker.Internal
         private async ValueTask<IAppConnection> ResolveTargetConnectionAsync(
             IConsumedMethodReference method, 
             IAppConnection source,
+            ITransportChannel sourceChannel,
             IContextLinkageOptions contextLinkageOptions)
         {
-            Log.Debug("Resolving target connection for call {{{0}}} from {{{1}}}", method, source);
+            Log.Debug("Resolving target connection for call {{{0}}} from {{{1}}} for {2} invocation", method, source, sourceChannel.Id);
             string appId;
             ResolveMode resolveMode;
             var targetMethods = _registryService.GetMatchingProvidedMethods(source.Info.ApplicationId, method);
@@ -245,13 +259,13 @@ namespace Plexus.Interop.Broker.Internal
             if (onlineProvidedMethods.Any())
             {
                 var connection = onlineProvidedMethods.First().AppConnection;
-                Log.Debug("Resolved target connection for call {{{0}}} from {{{1}}} to online connection: {{{2}}}", method, source, connection);
+                Log.Debug("Resolved target connection for call {{{0}}} from {{{1}}} to online connection {{{2}}} for {3} invocation", method, source, connection, sourceChannel.Id);
                 return connection;
             }
 
             lock (_resolveConnectionSync)
             {
-                Log.Debug("Resolving target connection for call {{{0}}} from {{{1}}} to offline connection", method, source);
+                Log.Debug("Resolving target connection for call {{{0}}} (invocation {2}) from {{{1}}} to offline connection", method, source, sourceChannel.Id);
                 var appIds = _appLifecycleManager.FilterCanBeLaunched(
                     targetMethods.Select(x => x.ProvidedService.Application.Id).Distinct());
                 targetMethods = targetMethods.Join(appIds, x => x.ProvidedService.Application.Id, y => y, (x, y) => x).ToArray();
@@ -283,16 +297,23 @@ namespace Plexus.Interop.Broker.Internal
 
                 if (candidate == null)
                 {
-                    throw new InvalidOperationException($"Cannot resolve target for invocation {{{method}}} from {{{source}}}");
+                    throw new InvalidOperationException($"Cannot resolve target for invocation {{{method}}} from {{{source}}} for {sourceChannel.Id} invocation");
                 }
-                Log.Debug("Resolved target connection for call {{{0}}} from {{{1}}} to provided method {{{2}}}", method, source, candidate);
+                Log.Debug("Resolved target connection for call {{{0}}} from {{{1}}} to provided method {{{2}}} for {3} invocation", method, source, candidate, sourceChannel.Id);
                 appId = candidate.ProvidedService.Application.Id;
             }
-            var resolvedConnection = await _appLifecycleManager
-                .LaunchAndConnectAsync(appId, resolveMode, source.Info)
-                .ConfigureAwait(false);
 
-            return resolvedConnection.AppConnection;
+            var launchAppTask = _appLifecycleManager.LaunchAndConnectAsync(appId, resolveMode, source.Info);
+
+            var completedTask = await Task.WhenAny(launchAppTask, source.IncomingChannels.Completion).ConfigureAwait(false);
+
+            if (completedTask == launchAppTask)
+            {
+                var resolvedConnection = await launchAppTask.ConfigureAwait(false);
+                return resolvedConnection.AppConnection;
+            }
+
+            throw new TaskCanceledException($"Launch of application {appId} canceled because source connection {source.Info} is completed");
         }
 
         private static ResolveMode ConvertToResolveMode(LaunchMode launchMode)
@@ -346,7 +367,7 @@ namespace Plexus.Interop.Broker.Internal
             frame.Dispose();
         }
 
-        private static async Task PropagateAsync(ITransportChannel source, ITransportChannel target)
+        private static async Task PropagateAsync(ITransportChannel source, ITransportChannel target, CancellationToken cancellationToken)
         {
             int propagatedMessageCount = 0;
             var targetId = target.Id;
@@ -361,7 +382,7 @@ namespace Plexus.Interop.Broker.Internal
                     Maybe<TransportMessageFrame> result;
                     try
                     {
-                        result = await source.In.TryReadAsync().ConfigureAwait(false);
+                        result = await source.In.TryReadAsync(cancellationToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -381,7 +402,7 @@ namespace Plexus.Interop.Broker.Internal
                     Log.Trace($"Received TransportMessageFrame {messageFrame} from {sourceId}. Will try to propagate it to {targetId} channel");
                     try
                     {
-                        await target.Out.WriteAsync(messageFrame).ConfigureAwait(false);
+                        await target.Out.WriteAsync(messageFrame, cancellationToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {

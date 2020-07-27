@@ -20,6 +20,7 @@ namespace Plexus.Interop.Broker.Internal
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps;
 
@@ -29,7 +30,7 @@ namespace Plexus.Interop.Broker.Internal
 
         private readonly IAppConnection _connection;
         private readonly IClientRequestHandler _clientRequestHandler;
-        private readonly HashSet<Task> _runnningTasks = new HashSet<Task>();
+        private readonly Dictionary<ITransportChannel, Task> _handleChannelTasks = new Dictionary<ITransportChannel, Task>();
 
         public AppConnectionProcessor(IAppConnection connection, IClientRequestHandler clientRequestHandler)
         {
@@ -37,38 +38,40 @@ namespace Plexus.Interop.Broker.Internal
             Id = _connection.Id;
             _log = LogManager.GetLogger<AppConnectionProcessor>(Id.ToString());
             _clientRequestHandler = clientRequestHandler;
-            Completion = ProcessAsync();
         }
 
         public UniqueId Id { get; }
 
-        public Task Completion { get; }
-
-        private async Task ProcessAsync()
+        public async Task ProcessAsync(Action connectionCompletedAction)
         {
             _log.Debug("Listening for incoming channels: {0}", _connection);
             var listenChannelTask = _connection.IncomingChannels.ConsumeAsync((Action<ITransportChannel>)HandleChannel).IgnoreExceptions();
-            lock (_runnningTasks)
-            {
-                _runnningTasks.Add(listenChannelTask);
-            }
+
+            await listenChannelTask.ConfigureAwait(false);
+            _log.Debug($"Listening for incoming channels completed: {_connection}");
+
+            connectionCompletedAction();
+
             await _connection.Completion.ConfigureAwait(false);
+            _log.Debug($"Connection completed: {_connection}");
+
             Task completion;
-            lock (_runnningTasks)
+            lock (_handleChannelTasks)
             {
-                completion = Task.WhenAll(_runnningTasks);
+                completion = Task.WhenAll(_handleChannelTasks.Values);
+                _log.Debug($"Waiting to completion of {_handleChannelTasks.Count} running channels ({string.Join(", ", _handleChannelTasks.Keys.Select(channel => channel.Id))}) tasks of {_connection}");
             }
             await completion.ConfigureAwait(false);
-            _log.Debug("Listening for incoming channels completed: {0}", _connection);
+            _log.Debug($"Completed processing running tasks of connection {_connection}");
         }
 
         private void HandleChannel(ITransportChannel channel)
         {
             _log.Debug("Processing new channel {0} from connection {1}", channel.Id, _connection);
             var task = TaskRunner.RunInBackground(HandleChannelAsync, channel);
-            lock (_runnningTasks)
+            lock (_handleChannelTasks)
             {
-                _runnningTasks.Add(task);
+                _handleChannelTasks.Add(channel, task);
             }
             task.ContinueWithSynchronously((Action<Task, object>)OnTaskCompleted, channel);
         }
@@ -90,9 +93,11 @@ namespace Plexus.Interop.Broker.Internal
 
         private void OnTaskCompleted(Task task, object state)
         {
-            lock (_runnningTasks)
+            var channel = (ITransportChannel)state;
+            _log.Debug($"Completed processing of channel {channel.Id} from connection {_connection} in state {task.Status}");
+            lock (_handleChannelTasks)
             {
-                _runnningTasks.Remove(task);
+                _handleChannelTasks.Remove(channel);
             }
         }
     }

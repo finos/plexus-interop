@@ -121,11 +121,11 @@ namespace Plexus.Interop.Broker.Internal
             {
                 Log.Info("New connection accepted: {0}", clientConnection);
                 var clientConnectionProcessor = new AppConnectionProcessor(clientConnection, _clientRequestHandler);
-                await clientConnectionProcessor.Completion.ConfigureAwait(false);
+                await clientConnectionProcessor.ProcessAsync(() => _appLifecycleManager.TryRemoveConnection(clientConnection)).ConfigureAwait(false);
             }
             finally
             {
-                _appLifecycleManager.RemoveConnection(clientConnection);
+                _appLifecycleManager.TryRemoveConnection(clientConnection);
             }
         }
 
