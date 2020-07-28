@@ -116,13 +116,8 @@ namespace Plexus.Interop.Broker.Internal
                     }
                 }
 
-                var cts = new CancellationTokenSource();
-                var fromSourceToTarget = TaskRunner.RunInBackground(() => PropagateAsync(sourceChannel, targetChannel, cts.Token), cts.Token);
-                var fromTargetToSource = TaskRunner.RunInBackground(() => PropagateAsync(targetChannel, sourceChannel, cts.Token), cts.Token);
-
-                await Task.WhenAny(fromSourceToTarget, fromTargetToSource).ConfigureAwait(false);
-
-                cts.Cancel();
+                var fromSourceToTarget = TaskRunner.RunInBackground(() => PropagateAsync(sourceChannel, targetChannel));
+                var fromTargetToSource = TaskRunner.RunInBackground(() => PropagateAsync(targetChannel, sourceChannel));
 
                 await Task.WhenAll(fromSourceToTarget, fromTargetToSource).ConfigureAwait(false);
             }
@@ -367,7 +362,7 @@ namespace Plexus.Interop.Broker.Internal
             frame.Dispose();
         }
 
-        private static async Task PropagateAsync(ITransportChannel source, ITransportChannel target, CancellationToken cancellationToken)
+        private static async Task PropagateAsync(ITransportChannel source, ITransportChannel target, CancellationToken cancellationToken = default)
         {
             int propagatedMessageCount = 0;
             var targetId = target.Id;

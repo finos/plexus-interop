@@ -75,6 +75,7 @@ namespace Plexus.Interop.Apps.Internal
             AppConnectionDescriptor connectionInfo)
         {
             AppConnection clientConnection;
+            Promise<IAppConnection> waiter;
             lock (_connections)
             {
                 clientConnection = new AppConnection(connection, connectionInfo);
@@ -103,14 +104,14 @@ namespace Plexus.Interop.Apps.Internal
                 Log.Debug("New connection accepted: {{{0}}}", clientConnection);
 
                 var deferredConnectionKey = (appInstanceId, appId);
-                if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
+                if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out waiter))
                 {
                     Log.Debug("Resolving deferred connection {{{0}}} to accepted connection {{{1}}}", deferredConnectionKey, connection);
-                    TaskRunner.RunInBackground(() => { waiter.TryComplete(clientConnection); });
                     _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
                 }
             }
 
+            waiter?.TryComplete(clientConnection);
             _connectionSubject.OnNext(new AppConnectionEvent(connectionInfo, ConnectionEventType.AppConnected));
 
             return clientConnection;
@@ -119,7 +120,7 @@ namespace Plexus.Interop.Apps.Internal
         public bool TryRemoveConnection(IAppConnection connection)
         {
             Log.Debug("Removing connection {0}", connection.Info);
-
+            Promise<IAppConnection> waiter;
             lock (_connections)
             {
                 if (!_connections.Remove(connection.Id))
@@ -148,13 +149,13 @@ namespace Plexus.Interop.Apps.Internal
                 }
 
                 var deferredConnectionKey = (appInstanceId, connection.Info.ApplicationId);
-                if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var waiter))
+                if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out waiter))
                 {
-                    TaskRunner.RunInBackground(() => { waiter.TryCancel(); });
                     _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
                 }
             }
 
+            waiter?.TryCancel();
             _connectionSubject.OnNext(new AppConnectionEvent(connection.Info, ConnectionEventType.AppDisconnected));
             return true;
         }
