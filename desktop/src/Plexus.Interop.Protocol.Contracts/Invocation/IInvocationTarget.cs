@@ -21,5 +21,7 @@
         T Handle<T, TArgs>(InvocationTargetHandler<T, TArgs> handler, TArgs args = default);
 
         T Handle<T, TArg1, TArg2>(InvocationTargetHandler<T, TArg1, TArg2> handler, TArg1 arg1 = default, TArg2 arg2 = default);
+
+        T Handle<T, TArg1, TArg2, TArg3>(InvocationTargetHandler<T, TArg1, TArg2, TArg3> handler, TArg1 arg1 = default, TArg2 arg2 = default, TArg3 arg3 = default);
     }
 }
