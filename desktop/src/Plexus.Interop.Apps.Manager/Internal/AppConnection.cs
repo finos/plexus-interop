@@ -79,16 +79,6 @@ namespace Plexus.Interop.Apps.Internal
             return 1340155117 + EqualityComparer<AppConnectionDescriptor>.Default.GetHashCode(Info);
         }
 
-        public bool TryTerminate(Exception error = null)
-        {
-            return _connection.TryTerminate(error);
-        }
-
-        public bool TryComplete()
-        {
-            return _connection.TryComplete();
-        }
-
         public override string ToString()
         {
             return Info.ToString();

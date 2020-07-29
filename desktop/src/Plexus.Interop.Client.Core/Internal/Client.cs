@@ -34,7 +34,8 @@ namespace Plexus.Interop.Internal
     {        
         private readonly ClientOptions _options;
         private readonly BrokerToClientRequestHandler<Task, ITransportChannel> _incomingRequestHandler;
-        private readonly ConcurrentDictionary<Task, Nothing> _runningTasks = new ConcurrentDictionary<Task, Nothing>();
+        private readonly ConcurrentDictionary<Task, Nothing> _discoveryTasks = new ConcurrentDictionary<Task, Nothing>();
+        private readonly ConcurrentDictionary<ITransportChannel, Task> _handleChannelTasks = new ConcurrentDictionary<ITransportChannel, Task>();
 
         private ILogger _log = LogManager.GetLogger<Client>();
         private IOutcomingInvocationFactory _outcomingInvocationFactory;
@@ -226,36 +227,39 @@ namespace Plexus.Interop.Internal
                 }
                 finally
                 {
-                    _log.Debug("Connection closed. Awaiting for {0} active tasks completion.", _runningTasks.Count);
-                    await Task.WhenAll(_runningTasks.Keys).IgnoreExceptions().ConfigureAwait(false);
+                    _log.Debug($"Connection closed. Awaiting for {_discoveryTasks.Count} discovery tasks and {_handleChannelTasks.Count} channel handling tasks ({string.Join(", ", _handleChannelTasks.Keys.Select(channel => channel.Id))})");
+                    await Task.WhenAll(_discoveryTasks.Keys.Concat(_handleChannelTasks.Values)).IgnoreExceptions().ConfigureAwait(false);
+                    _log.Debug($"Completed processing running tasks of connection {_connection.Id}");
                 }
             }
         }
 
-        private async Task ListenIncomingInvocationsAsync(ITransportConnection connection)
+        private Task ListenIncomingInvocationsAsync(ITransportConnection connection)
         {
-            await connection
+            return connection
                 .IncomingChannels
                 .ConsumeAsync((Action<ITransportChannel>)HandleIncomingChannel)
-                .IgnoreExceptions()
-                .ConfigureAwait(false);
+                .IgnoreExceptions();
         }
 
         private void HandleIncomingChannel(ITransportChannel channel)
         {
             var channelHandleTask = TaskRunner.RunInBackground(HandleIncomingChannelAsync, channel);
-            _runningTasks[channelHandleTask] = Nothing.Instance;
-            channelHandleTask.ContinueWithSynchronously((Action<Task>)OnTaskCompleted);
+            _handleChannelTasks[channel] = channelHandleTask;
+            channelHandleTask.ContinueWithSynchronously((Action<Task, object>)OnTaskCompleted, channel);
         }
 
-        private void OnTaskCompleted(Task task)
+        private void OnTaskCompleted(Task task, object state)
         {
-            _runningTasks.TryRemove(task, out _);
+            var channel = (ITransportChannel)state;
+            _log.Debug($"Completed processing of channel {channel.Id} from connection {_connection.Id} in state {task.Status}");
+            _handleChannelTasks.TryRemove(channel, out _);
         }
 
         private async Task HandleIncomingChannelAsync(object state)
         {
             var channel = (ITransportChannel)state;
+            _log.Debug("Started processing new channel {0} from connection {1}", channel.Id, _connection.Id);
             try
             {                
                 try
@@ -282,9 +286,9 @@ namespace Plexus.Interop.Internal
             }
         }
 
-        private async Task HandleInvocationStartRequestAsync(IInvocationStartRequested request, ITransportChannel channel)
+        private Task HandleInvocationStartRequestAsync(IInvocationStartRequested request, ITransportChannel channel)
         {
-            _log.Debug("Handling invocation start request: {0}", request);
+            _log.Debug($"Handling invocation start request {request} on channel {channel.Id}");
             if (!_options.ServicesDictionary.TryGetValue((request.ServiceId, request.ServiceAlias), out var providedService))
             {
                 throw new InvalidOperationException($"Service implementation with alias {request.ServiceAlias} not provided: {request.ServiceId}");
@@ -303,7 +307,7 @@ namespace Plexus.Interop.Internal
                         request.ConsumerApplicationId,
                         request.ConsumerApplicationInstanceId,
                         request.ConsumerConnectionId));
-            await callHandler.HandleAsync(invocationInfo, channel).ConfigureAwait(false);
+            return callHandler.HandleAsync(invocationInfo, channel);
         }
 
         private MethodDiscoveryQuery ConvertQuery<TRequest, TResponse>(MethodDiscoveryQuery<TRequest, TResponse> query)
@@ -325,9 +329,9 @@ namespace Plexus.Interop.Internal
             MethodDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false)
         {
             _log.Debug("Method discovery {0}", query);
-            var task = _discoveryService.DiscoverAsync(query, contextLinkageDiscoveryOptions, online);            
-            _runningTasks[task] = Nothing.Instance;
-            ((Task)task).ContinueWithSynchronously((Action<Task>)OnTaskCompleted).IgnoreAwait();
+            var task = _discoveryService.DiscoverAsync(query, contextLinkageDiscoveryOptions, online);
+            _discoveryTasks[task] = Nothing.Instance;
+            ((Task)task).ContinueWithSynchronously((Action<Task>)OnDiscoveryTaskCompleted).IgnoreAwait();
             var response = await task.ConfigureAwait(false);
             _log.Debug("Method discovery response: {0}", response);
             return response;
@@ -337,12 +341,17 @@ namespace Plexus.Interop.Internal
             ServiceDiscoveryQuery query, ContextLinkageOptions contextLinkageDiscoveryOptions = null, bool online = false)
         {
             _log.Debug("Service discovery {0}", query);
-            var task = _discoveryService.DiscoverAsync(query, contextLinkageDiscoveryOptions, online);            
-            _runningTasks[task] = Nothing.Instance;
-            ((Task)task).ContinueWithSynchronously((Action<Task>)OnTaskCompleted).IgnoreAwait();
+            var task = _discoveryService.DiscoverAsync(query, contextLinkageDiscoveryOptions, online);
+            _discoveryTasks[task] = Nothing.Instance;
+            ((Task)task).ContinueWithSynchronously((Action<Task>)OnDiscoveryTaskCompleted).IgnoreAwait();
             var response = await task.ConfigureAwait(false);
             _log.Debug("Service discovery response: {0}", response.FormatEnumerable());
             return response;
+        }
+
+        private void OnDiscoveryTaskCompleted(Task task)
+        {
+            _discoveryTasks.TryRemove(task, out _);
         }
     }
 }
