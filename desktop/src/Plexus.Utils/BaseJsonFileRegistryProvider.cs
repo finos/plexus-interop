@@ -116,24 +116,32 @@ namespace Plexus
                 }
 
                 memoryStream.Position = 0;
-                var md5 = CalculateMd5(memoryStream);
+                var sha1 = CalculateSha1(memoryStream);
                 var creationTime = File.GetCreationTime(jsonFileName);
                 var lastWriteTime = File.GetLastWriteTime(jsonFileName);
                 var length = memoryStream.Length;
 
-                Log.Info($"Successfully loaded registry from {jsonFileName}. CreationTime: {creationTime}; LastWriteTime: {lastWriteTime}; Length: {length}; MD5: {md5}");
+                Log.Info($"Successfully loaded registry from {jsonFileName}. CreationTime: {creationTime}; LastWriteTime: {lastWriteTime}; Length: {length}; SHA1: {sha1}");
 
                 return registry;
             }
         }
 
 
-        private string CalculateMd5(Stream stream)
+        private string CalculateSha1(Stream stream)
         {
-            using (var md5 = MD5.Create())
+            try
             {
-                var hash = md5.ComputeHash(stream);
-                return ToHashString(hash);
+                using (var sha1 = SHA1.Create())
+                {
+                    var hash = sha1.ComputeHash(stream);
+                    return ToHashString(hash);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warn(ex, "Failed to calculate SHA1 hash");
+                return string.Empty;
             }
         }
 
