@@ -70,7 +70,7 @@ namespace Plexus.Interop.Transport.Transmission.Streams
                 }
                 catch (Exception ex)
                 {
-                    _log.Warn(ex, $"Caught exception during {nameof(ProcessAsync)}({Id})");
+                    _log.Warn(ex, $"Caught exception during {nameof(ProcessAsync)}");
                     _cancellation.Cancel();
                     throw;
                 }
@@ -87,7 +87,7 @@ namespace Plexus.Interop.Transport.Transmission.Streams
             }
             catch (Exception ex)
             {
-                _log.Warn(ex, $"Caught exception during {nameof(GetReaderCompletion)}({Id})");
+                _log.Warn(ex, $"Caught exception during {nameof(GetReaderCompletion)}");
                 throw;
             }
         }
@@ -100,7 +100,7 @@ namespace Plexus.Interop.Transport.Transmission.Streams
             }
             catch (Exception ex)
             {
-                _log.Warn(ex, $"Caught exception during {nameof(GetWriterCompletion)}({Id})");
+                _log.Warn(ex, $"Caught exception during {nameof(GetWriterCompletion)}");
                 throw;
             }
         }
