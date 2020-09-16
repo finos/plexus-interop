@@ -18,6 +18,9 @@ namespace Plexus.Interop.Apps.Internal.Services
 {
     using System;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Google.Protobuf.WellKnownTypes;
     using Plexus.Channels;
@@ -30,11 +33,11 @@ namespace Plexus.Interop.Apps.Internal.Services
 
         private readonly IAppLifecycleManager _appLifecycleManager;
 
-        private readonly EventBroadcaster<AppLifecycleEvent> _appLifecycleEventBroadcaster
-            = new EventBroadcaster<AppLifecycleEvent>();
+        private readonly Subject<AppLifecycleEvent> _appLifecycleEventBroadcaster
+            = new Subject<AppLifecycleEvent>();
 
-        private readonly EventBroadcaster<InvocationEvent> _invocationEventBroadcaster
-            = new EventBroadcaster<InvocationEvent>();
+        private readonly Subject<InvocationEvent> _invocationEventBroadcaster
+            = new Subject<InvocationEvent>();
 
         public AppLifecycleServiceImpl(IAppLifecycleManager appLifecycleManager)
         {
@@ -44,7 +47,7 @@ namespace Plexus.Interop.Apps.Internal.Services
 
         public void OnInvocationStarted(InvocationStartedEventDescriptor eventData)
         {
-            _invocationEventBroadcaster.BroadcastEvent(new InvocationEvent
+            _invocationEventBroadcaster.OnNext(new InvocationEvent
             {
                 InvocationStarted = new InvocationStartedEvent
                 {
@@ -55,7 +58,7 @@ namespace Plexus.Interop.Apps.Internal.Services
 
         public void OnInvocationFinished(InvocationFinishedEventDescriptor eventData)
         {
-            _invocationEventBroadcaster.BroadcastEvent(new InvocationEvent
+            _invocationEventBroadcaster.OnNext(new InvocationEvent
             {
                 InvocationFinished = new InvocationFinishedEvent
                 {
@@ -83,7 +86,7 @@ namespace Plexus.Interop.Apps.Internal.Services
                     ConnectionDescriptor = connectionEvent.Connection.ToProto()
                 };
             }
-            _appLifecycleEventBroadcaster.BroadcastEvent(lifecycleEvent);
+            _appLifecycleEventBroadcaster.OnNext(lifecycleEvent);
         }
 
         public async Task<ResolveAppResponse> ResolveApp(ResolveAppRequest request, MethodCallContext context)
@@ -124,12 +127,12 @@ namespace Plexus.Interop.Apps.Internal.Services
 
         public Task GetLifecycleEventStream(Empty request, IWritableChannel<AppLifecycleEvent> responseStream, MethodCallContext context)
         {
-            return _appLifecycleEventBroadcaster.Subscribe(responseStream, context);
+            return _appLifecycleEventBroadcaster.ObserveOn(TaskPoolScheduler.Default).PipeAsync(responseStream, context.CancellationToken);
         }
 
         public Task GetInvocationEventStream(Empty request, IWritableChannel<InvocationEvent> responseStream, MethodCallContext context)
         {
-            return _invocationEventBroadcaster.Subscribe(responseStream, context);
+            return _invocationEventBroadcaster.ObserveOn(TaskPoolScheduler.Default).PipeAsync(responseStream, context.CancellationToken);
         }
 
         private static ResolveMode Convert(AppLaunchMode launchMode)
