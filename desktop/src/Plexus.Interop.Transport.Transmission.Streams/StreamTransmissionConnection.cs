@@ -62,18 +62,46 @@ namespace Plexus.Interop.Transport.Transmission.Streams
         {
             using (_stream)
             {
+                var writerCompletion = GetWriterCompletion();
+                var readerCompletion = GetReaderCompletion();
                 try
                 {
-                    await Task.WhenAny(_writer.Completion, _reader.In.Completion).Unwrap().ConfigureAwait(false);
+                    await Task.WhenAny(writerCompletion, readerCompletion).Unwrap().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    _log.Warn(ex, $"Caught exception during {nameof(ProcessAsync)}({Id})");
+                    _log.Warn(ex, $"Caught exception during {nameof(ProcessAsync)}");
                     _cancellation.Cancel();
                     throw;
                 }
-                await Task.WhenAll(_writer.Completion, _reader.In.Completion).ConfigureAwait(false);
+                await Task.WhenAll(writerCompletion, readerCompletion).ConfigureAwait(false);
                 _log.Trace("Processing completed. Disposing stream.");
+            }
+        }
+
+        private async Task GetReaderCompletion()
+        {
+            try
+            {
+                await _reader.In.Completion;
+            }
+            catch (Exception ex)
+            {
+                _log.Warn(ex, $"Caught exception during {nameof(GetReaderCompletion)}");
+                throw;
+            }
+        }
+
+        private async Task GetWriterCompletion()
+        {
+            try
+            {
+                await _writer.Completion;
+            }
+            catch (Exception ex)
+            {
+                _log.Warn(ex, $"Caught exception during {nameof(GetWriterCompletion)}");
+                throw;
             }
         }
 
