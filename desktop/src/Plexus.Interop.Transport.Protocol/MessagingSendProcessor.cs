@@ -53,11 +53,11 @@ namespace Plexus.Interop.Transport.Protocol
             try
             {
                 await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);
-                _log.Trace("Sending completed");
+                _log.Info("Sending completed");
             }
             catch (Exception ex)
             {
-                _log.Trace("Sending failed: {0}", ex.FormatTypeAndMessage());
+                _log.Warn("Sending failed: {0}", ex.FormatTypeAndMessage());
                 _buffer.Out.TryTerminate(ex);
                 _buffer.In.DisposeBufferedItems();
                 throw;
@@ -70,11 +70,27 @@ namespace Plexus.Interop.Transport.Protocol
             using (var header = message.Header)
             {
                 var serializedHeader = _serializer.Serialize(header);
-                await SendAsync(serializedHeader).ConfigureAwait(false);
+                try
+                {
+                    await SendAsync(serializedHeader).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _log.Warn(ex, $"Exception occurred while sending header of message: {message}");
+                    throw;
+                }
                 if (message.Payload.HasValue)
                 {
                     var payload = message.Payload.Value;
-                    await SendAsync(payload).ConfigureAwait(false);
+                    try
+                    {
+                        await SendAsync(payload).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Warn(ex, $"Exception occurred while sending payload of message: {message}");
+                        throw;
+                    }
                 }
             }
         }
