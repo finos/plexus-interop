@@ -70,39 +70,25 @@ namespace Plexus.Interop.Transport.Protocol
             using (var header = message.Header)
             {
                 var serializedHeader = _serializer.Serialize(header);
-                try
-                {
-                    await SendAsync(serializedHeader).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    _log.Warn(ex, $"Exception occurred while sending header of message: {message}");
-                    throw;
-                }
+                await SendAsync(serializedHeader, message, true).ConfigureAwait(false);
                 if (message.Payload.HasValue)
                 {
                     var payload = message.Payload.Value;
-                    try
-                    {
-                        await SendAsync(payload).ConfigureAwait(false);
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.Warn(ex, $"Exception occurred while sending payload of message: {message}");
-                        throw;
-                    }
+                    await SendAsync(payload, message, false).ConfigureAwait(false);
                 }
             }
         }
 
-        private async Task SendAsync(IPooledBuffer message)
+        private async Task SendAsync(IPooledBuffer message, TransportMessage originalMessage, bool isHeader)
         {
             try
             {
                 await _connection.Out.WriteAsync(message).ConfigureAwait(false);
             }
-            catch
+            catch (Exception ex)
             {
+                var payloadType = isHeader ? "header" : "payload";
+                _log.Warn(ex, $"Exception occurred while sending {payloadType} of message: {originalMessage}");
                 message.Dispose();
                 throw;
             }
