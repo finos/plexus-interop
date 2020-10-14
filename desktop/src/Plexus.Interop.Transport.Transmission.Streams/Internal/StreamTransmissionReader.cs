@@ -62,18 +62,8 @@
                         break;
                     }
                     _log.Trace("Reading message {0} of length {1}", _count, length);
-                    var datagram = await PooledBuffer
-                        .Get(_stream, length, _cancellationToken)
-                        .ConfigureAwait(false);
-                    try
-                    {
-                        await _buffer.Out.WriteAsync(datagram, _cancellationToken).ConfigureAwait(false);
-                    }
-                    catch
-                    {
-                        datagram.Dispose();
-                        throw;
-                    }
+                    var datagram = await ReadDatagram(length);
+                    await WriteDatagram(datagram);
                     _log.Trace("Received message {0} of length {1}", _count, length);
                     _count++;
                 }
@@ -81,7 +71,7 @@
             }
             catch (Exception ex)
             {
-                _log.Trace("Process failed: {0}", ex.FormatTypeAndMessage());
+                _log.Warn(ex, "Process failed");
                 _buffer.Out.TryTerminate(ex);
                 _buffer.In.DisposeBufferedItems();
                 throw;
@@ -90,13 +80,21 @@
 
         private async Task<int> ReadLengthAsync()
         {
-            var readBytes = await ReadAsync(_lengthBuffer, 0, 2);
-            while (readBytes < 2)
+            try
             {
-                _log.Info($"Read {readBytes} while reading length. Will try to read next byte");
-                readBytes += await ReadAsync(_lengthBuffer, readBytes, 2 - readBytes);
+                var readBytes = await ReadAsync(_lengthBuffer, 0, 2);
+                while (readBytes < 2)
+                {
+                    _log.Info($"Read {readBytes} while reading length. Will try to read next byte");
+                    readBytes += await ReadAsync(_lengthBuffer, readBytes, 2 - readBytes);
+                }
+                return (_lengthBuffer[0] << 8) | _lengthBuffer[1];
             }
-            return (_lengthBuffer[0] << 8) | _lengthBuffer[1];
+            catch (Exception ex)
+            {
+                _log.Warn(ex, "Caught exception during attempt to read length");
+                throw;
+            }
         }
 
         private async Task<int> ReadAsync(byte[] buffer, int offset, int count)
@@ -112,6 +110,36 @@
                 throw new InvalidOperationException("Stream completed unexpectedly");
             }
             return readBytes;
+        }
+
+        private async Task<IPooledBuffer> ReadDatagram(int length)
+        {
+            try
+            {
+                var datagram = await PooledBuffer
+                    .Get(_stream, length, _cancellationToken)
+                    .ConfigureAwait(false);
+                return datagram;
+            }
+            catch (Exception ex)
+            {
+                _log.Warn(ex, $"Caught exception during attempt to read datagram of length {length}");
+                throw;
+            }
+        }
+
+        private async Task WriteDatagram(IPooledBuffer datagram)
+        {
+            try
+            {
+                await _buffer.Out.WriteAsync(datagram, _cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _log.Warn(ex, $"Caught exception during attempt to write datagram of length {datagram.Count}");
+                datagram.Dispose();
+                throw;
+            }
         }
     }
 }

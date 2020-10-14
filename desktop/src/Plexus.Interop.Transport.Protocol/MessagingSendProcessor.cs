@@ -53,11 +53,11 @@ namespace Plexus.Interop.Transport.Protocol
             try
             {
                 await _buffer.In.ConsumeAsync(SendAsync).ConfigureAwait(false);
-                _log.Trace("Sending completed");
+                _log.Info("Sending completed");
             }
             catch (Exception ex)
             {
-                _log.Trace("Sending failed: {0}", ex.FormatTypeAndMessage());
+                _log.Warn("Sending failed: {0}", ex.FormatTypeAndMessage());
                 _buffer.Out.TryTerminate(ex);
                 _buffer.In.DisposeBufferedItems();
                 throw;
@@ -70,23 +70,25 @@ namespace Plexus.Interop.Transport.Protocol
             using (var header = message.Header)
             {
                 var serializedHeader = _serializer.Serialize(header);
-                await SendAsync(serializedHeader).ConfigureAwait(false);
+                await SendAsync(serializedHeader, message, true).ConfigureAwait(false);
                 if (message.Payload.HasValue)
                 {
                     var payload = message.Payload.Value;
-                    await SendAsync(payload).ConfigureAwait(false);
+                    await SendAsync(payload, message, false).ConfigureAwait(false);
                 }
             }
         }
 
-        private async Task SendAsync(IPooledBuffer message)
+        private async Task SendAsync(IPooledBuffer message, TransportMessage originalMessage, bool isHeader)
         {
             try
             {
                 await _connection.Out.WriteAsync(message).ConfigureAwait(false);
             }
-            catch
+            catch (Exception ex)
             {
+                var payloadType = isHeader ? "header" : "payload";
+                _log.Warn(ex, $"Exception occurred while sending {payloadType} of message: {originalMessage}");
                 message.Dispose();
                 throw;
             }
