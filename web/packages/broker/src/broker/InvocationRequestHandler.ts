@@ -187,7 +187,7 @@ export class InvocationRequestHandler {
             const targetMethods = this.registryService.getMatchingProvidedMethods(sourceConnection.applicationId, methodReference);
             if (
                 targetMethods.length === 1 &&
-                targetMethods[0].options.filter(o => o.id === "interop.ProvidedMethodOptions.launch_on_call" && o.value === "ALWAYS").length > 0
+                targetMethods[0].options.filter(o => o.id === 'interop.ProvidedMethodOptions.launch_on_call' && o.value === 'ALWAYS').length > 0
             ) {
                 const appConnection = await this.appLifeCycleManager.spawnConnection(targetMethods[0].providedService.application.id);
                 return appConnection;
