@@ -185,12 +185,18 @@ export class InvocationRequestHandler {
             return appConnection;
         } else {
             const targetMethods = this.registryService.getMatchingProvidedMethods(sourceConnection.applicationId, methodReference);
-            const targetAppIds = targetMethods
-                .map(method => method.providedService.application.id);
-            const appConnection = await this.appLifeCycleManager.getOrSpawnConnectionForOneOf(targetAppIds, sourceConnection.instanceId);
-            return appConnection;
+            if (
+                targetMethods.length === 1 &&
+                targetMethods[0].options.filter(o => o.id === "interop.ProvidedMethodOptions.launch_on_call" && o.value === "ALWAYS").length > 0
+            ) {
+                const appConnection = await this.appLifeCycleManager.spawnConnection(targetMethods[0].providedService.application.id);
+                return appConnection;
+            } else {
+                const targetAppIds = targetMethods
+                    .map(method => method.providedService.application.id);
+                const appConnection = await this.appLifeCycleManager.getOrSpawnConnectionForOneOf(targetAppIds, sourceConnection.instanceId);
+                return appConnection;
+            }
         }
     }
-
-
 }
