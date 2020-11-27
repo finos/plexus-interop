@@ -68,7 +68,7 @@ namespace Plexus.Interop.Apps.Internal
         {
             var appLauncherServiceId = AppLauncherService.Id;
             var appLaunchedEventStreamMethodId = AppLauncherService.AppLaunchedEventStreamMethodId;
-            var methodCallDescriptor = ProvidedMethodReference.Create(appLauncherServiceId, appLaunchedEventStreamMethodId, applicationId, connectionId);
+            var methodCallDescriptor = ProvidedMethodReference.CreateWithConnectionId(appLauncherServiceId, appLaunchedEventStreamMethodId, applicationId, connectionId);
 
             Task.Factory.StartNew(async () =>
             {

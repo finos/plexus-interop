@@ -45,7 +45,8 @@
             return obj is InvocationTargetDescriptor descriptor &&
                    ApplicationId.Equals(descriptor.ApplicationId) &&
                    ConnectionId.Equals(descriptor.ConnectionId) &&
-                   ServiceAliasId.Equals(descriptor.ServiceAliasId);
+                   ServiceAliasId.Equals(descriptor.ServiceAliasId) &&
+                   ApplicationInstanceId.Equals(descriptor.ApplicationInstanceId);
         }
 
         public override int GetHashCode()

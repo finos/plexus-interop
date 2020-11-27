@@ -20,34 +20,45 @@
     {
         public static ProvidedServiceReference Create(string serviceId, string applicationId)
         {
-            return new ProvidedServiceReference(serviceId, default, applicationId, default);
+            return new ProvidedServiceReference(serviceId, default, applicationId, default, default);
         }
 
         public static ProvidedServiceReference Create(string serviceId, string serviceAliasId, string applicationId)
         {
-            return new ProvidedServiceReference(serviceId, serviceAliasId, applicationId, default);
+            return new ProvidedServiceReference(serviceId, serviceAliasId, applicationId, default, default);
         }
 
-        public static ProvidedServiceReference Create(string serviceId, string applicationId, UniqueId connectionId)
+        public static ProvidedServiceReference CreateWithConnectionId(string serviceId, string applicationId, UniqueId connectionId)
         {
-            return new ProvidedServiceReference(serviceId, default, applicationId, connectionId);
+            return new ProvidedServiceReference(serviceId, default, applicationId, connectionId, default);
         }
 
-        public static ProvidedServiceReference Create(string serviceId, string serviceAliasId, string applicationId, UniqueId connectionId)
+        public static ProvidedServiceReference CreateWithAppInstanceId(string serviceId, string applicationId, UniqueId appInstanceId)
         {
-            return new ProvidedServiceReference(serviceId, serviceAliasId, applicationId, connectionId);
+            return new ProvidedServiceReference(serviceId, default, applicationId, default, appInstanceId);
         }
 
-        internal ProvidedServiceReference(
-            string serviceId, 
-            Maybe<string> serviceAlias,             
-            string applicationId, 
-            Maybe<UniqueId> connectionId)
+        public static ProvidedServiceReference CreateWithConnectionId(string serviceId, string serviceAliasId, string applicationId, UniqueId connectionId)
+        {
+            return new ProvidedServiceReference(serviceId, serviceAliasId, applicationId, connectionId, default);
+        }
+
+        public static ProvidedServiceReference CreateWithAppInstanceId(string serviceId, string serviceAliasId, string applicationId, UniqueId appInstanceId)
+        {
+            return new ProvidedServiceReference(serviceId, serviceAliasId, applicationId, default, appInstanceId);
+        }
+
+        internal ProvidedServiceReference(string serviceId,
+            Maybe<string> serviceAlias,
+            string applicationId,
+            Maybe<UniqueId> connectionId, 
+            Maybe<UniqueId> applicationInstanceId)
         {
             ServiceId = serviceId;
             ServiceAlias = serviceAlias;
             ApplicationId = applicationId;
             ConnectionId = connectionId;
+            ApplicationInstanceId = applicationInstanceId;
         }
 
         public string ServiceId { get; }
@@ -58,9 +69,11 @@
 
         public Maybe<UniqueId> ConnectionId { get; }
 
+        public Maybe<UniqueId> ApplicationInstanceId { get; }
+
         public override string ToString()
         {
-            return $"{nameof(ServiceId)}: {ServiceId}, {nameof(ServiceAlias)}: {ServiceAlias}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}";
+            return $"{nameof(ServiceId)}: {ServiceId}, {nameof(ServiceAlias)}: {ServiceAlias}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}: {ConnectionId}";
         }
     }
 }

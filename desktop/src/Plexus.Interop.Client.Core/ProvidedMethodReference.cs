@@ -33,14 +33,24 @@
             return Create(ProvidedServiceReference.Create(serviceId, serviceAliasId, applicationId), methodName);
         }
 
-        public static ProvidedMethodReference Create(string serviceId, string methodName, string applicationId, UniqueId connectionId)
+        public static ProvidedMethodReference CreateWithConnectionId(string serviceId, string methodName, string applicationId, UniqueId connectionId)
         {
-            return Create(ProvidedServiceReference.Create(serviceId, applicationId, connectionId), methodName);
+            return Create(ProvidedServiceReference.CreateWithConnectionId(serviceId, applicationId, connectionId), methodName);
         }
 
-        public static ProvidedMethodReference Create(string serviceId, string serviceAliasId, string methodName, string applicationId, UniqueId connectionId)
+        public static ProvidedMethodReference CreateWithConnectionId(string serviceId, string serviceAliasId, string methodName, string applicationId, UniqueId connectionId)
         {
-            return Create(ProvidedServiceReference.Create(serviceId, serviceAliasId, applicationId, connectionId), methodName);
+            return Create(ProvidedServiceReference.CreateWithConnectionId(serviceId, serviceAliasId, applicationId, connectionId), methodName);
+        }
+
+        public static ProvidedMethodReference CreateWithAppInstanceId(string serviceId, string methodName, string applicationId, UniqueId appInstanceId)
+        {
+            return Create(ProvidedServiceReference.CreateWithAppInstanceId(serviceId, applicationId, appInstanceId), methodName);
+        }
+
+        public static ProvidedMethodReference CreateWithAppInstanceId(string serviceId, string serviceAliasId, string methodName, string applicationId, UniqueId appInstanceId)
+        {
+            return Create(ProvidedServiceReference.CreateWithAppInstanceId(serviceId, serviceAliasId, applicationId, appInstanceId), methodName);
         }
 
         internal ProvidedMethodReference(ProvidedServiceReference providedService, string methodName)

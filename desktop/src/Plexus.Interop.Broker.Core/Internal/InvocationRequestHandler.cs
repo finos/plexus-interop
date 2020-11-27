@@ -187,6 +187,19 @@ namespace Plexus.Interop.Broker.Internal
                 }
                 return connection;
             }
+
+            if (methodReference.ProvidedService.ApplicationInstanceId.HasValue)
+            {
+                var appInstanceId = methodReference.ProvidedService.ApplicationInstanceId.Value;
+                var connection = _appLifecycleManager.GetAppInstanceConnections(appInstanceId).FirstOrDefault(c => c.Info.ApplicationId.Equals(appId));
+                if (connection == null)
+                {
+                    throw new InvalidOperationException($"App instance {appInstanceId} is doesn't have connection with {appId} app id");
+                }
+
+                return connection;
+            }
+
             Task<ResolvedConnection> resolveTask;
             lock (_resolveConnectionSync)
             {
