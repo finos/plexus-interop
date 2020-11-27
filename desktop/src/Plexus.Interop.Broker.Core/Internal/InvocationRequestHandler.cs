@@ -191,13 +191,28 @@ namespace Plexus.Interop.Broker.Internal
             if (methodReference.ProvidedService.ApplicationInstanceId.HasValue)
             {
                 var appInstanceId = methodReference.ProvidedService.ApplicationInstanceId.Value;
-                var connection = _appLifecycleManager.GetAppInstanceConnections(appInstanceId).FirstOrDefault(c => c.Info.ApplicationId.Equals(appId));
+                var connections = _appLifecycleManager.GetAppInstanceConnections(appInstanceId).ToList();
+                if (connections.Count == 0)
+                {
+                    throw new InvalidOperationException($"App instance {appInstanceId} is doesn't have online connections");
+                }
+
+                if (string.IsNullOrEmpty(appId))
+                {
+                    if (connections.Count == 1)
+                    {
+                        return connections.Single();
+                    }
+                    throw new InvalidOperationException($"App instance {appInstanceId} has several connections, you need to specify {appId} ensure call to specific connection");
+                }
+
+                var connection = connections.FirstOrDefault(c => c.Info.ApplicationId.Equals(appId));
                 if (connection == null)
                 {
                     throw new InvalidOperationException($"App instance {appInstanceId} is doesn't have connection with {appId} app id");
                 }
-
                 return connection;
+
             }
 
             Task<ResolvedConnection> resolveTask;

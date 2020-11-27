@@ -26,7 +26,9 @@ namespace Plexus.Interop.Apps
 
         bool TryRemoveConnection(IAppConnection connection);
 
-        bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection);
+        bool TryGetOnlineConnection(UniqueId connectionId, out IAppConnection connection);
+
+        bool TryGetOnlineConnection(UniqueId appInstanceId, string app, out IAppConnection connection);
 
         IReadOnlyCollection<IAppConnection> GetOnlineConnections();
         
@@ -37,5 +39,7 @@ namespace Plexus.Interop.Apps
         Task<ResolvedConnection> LaunchAndConnectAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo);
 
         IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId);
+
+        IReadOnlyCollection<IAppConnection> GetAppConnections(string appId);
     }
 }

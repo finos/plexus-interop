@@ -70,6 +70,18 @@ namespace Plexus.Interop.Apps.Internal
             }
         }
 
+        public IReadOnlyCollection<IAppConnection> GetAppConnections(string appId)
+        {
+            lock (_connections)
+            {
+                if (_appConnections.TryGetValue(appId, out var appConnections))
+                {
+                    return appConnections.ToList();
+                }
+                return new IAppConnection[0];
+            }
+        }
+
         public IAppConnection AcceptConnection(
             ITransportConnection connection,
             AppConnectionDescriptor connectionInfo)
@@ -160,11 +172,21 @@ namespace Plexus.Interop.Apps.Internal
             return true;
         }
 
-        public bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection)
+        public bool TryGetOnlineConnection(UniqueId connectionId, out IAppConnection connection)
         {
             lock (_connections)
             {
-                return _connections.TryGetValue(id, out connection);
+                return _connections.TryGetValue(connectionId, out connection);
+            }
+        }
+
+        public bool TryGetOnlineConnection(UniqueId appInstanceId, string app, out IAppConnection connection)
+        {
+            connection = null;
+            lock (_connections)
+            {
+                return _appInstanceConnections.TryGetValue(appInstanceId, out var appConnections) &&
+                       appConnections.TryGetValue(app, out connection);
             }
         }
 
