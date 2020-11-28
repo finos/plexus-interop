@@ -14,85 +14,184 @@
         { }
 
         [Fact]
-        public async Task InvokeTargetUsingConnectionId()
+        public void InvokeTargetUsingConnectionId()
         {
-            var server1RequestCount = 0;
-            var server1 = ConnectEchoServer((request, context) =>
+            RunWith10SecTimeout(async () =>
             {
-                server1RequestCount++;
-                return Task.FromResult(new GreetingResponse {Greeting = "FromServer1"});
+                var server1RequestCount = 0;
+                var server1 = ConnectEchoServer((request, context) =>
+                {
+                    server1RequestCount++;
+                    return Task.FromResult(new GreetingResponse { Greeting = "FromServer1" });
+                });
+
+                var server2RequestCount = 0;
+                var server2 = ConnectEchoServer((request, context) =>
+                {
+                    server2RequestCount++;
+                    return Task.FromResult(new GreetingResponse { Greeting = "FromServer2" });
+                });
+
+                var client = CreateClient<EchoClient>();
+                await client.ConnectAsync();
+
+                server1RequestCount.ShouldBe(0);
+                server2RequestCount.ShouldBe(0);
+
+                var providedMethodReference = ProvidedMethodReference.CreateWithConnectionId(GreetingService.Id, GreetingService.HelloMethodId, server1.ApplicationId, server1.ConnectionId);
+                var methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                var greetingRequest = new GreetingRequest { Name = "Client" };
+                var response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
+
+                response.Greeting.ShouldBe("FromServer1");
+                server1RequestCount.ShouldBe(1);
+                server2RequestCount.ShouldBe(0);
+
+                providedMethodReference = ProvidedMethodReference.CreateWithConnectionId(GreetingService.Id, GreetingService.HelloMethodId, server2.ApplicationId, server2.ConnectionId);
+                methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
+
+                response.Greeting.ShouldBe("FromServer2");
+                server1RequestCount.ShouldBe(1);
+                server2RequestCount.ShouldBe(1);
             });
-
-            var server2RequestCount = 0;
-            var server2 = ConnectEchoServer((request, context) =>
-            {
-                server2RequestCount++;
-                return Task.FromResult(new GreetingResponse { Greeting = "FromServer2" });
-            });
-
-            var client = CreateClient<EchoClient>();
-            await client.ConnectAsync();
-
-            server1RequestCount.ShouldBe(0);
-            server2RequestCount.ShouldBe(0);
-
-            var providedMethodReference = ProvidedMethodReference.CreateWithConnectionId(GreetingService.Id, GreetingService.HelloMethodId, server1.ApplicationId, server1.ConnectionId);
-            var methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
-            var greetingRequest = new GreetingRequest {Name = "Client"};
-            var response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
-
-            response.Greeting.ShouldBe("FromServer1");
-            server1RequestCount.ShouldBe(1);
-            server2RequestCount.ShouldBe(0);
-
-            providedMethodReference = ProvidedMethodReference.CreateWithConnectionId(GreetingService.Id, GreetingService.HelloMethodId, server2.ApplicationId, server2.ConnectionId);
-            methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
-            response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
-
-            response.Greeting.ShouldBe("FromServer2");
-            server1RequestCount.ShouldBe(1);
-            server2RequestCount.ShouldBe(1);
         }
 
         [Fact]
-        public async Task InvokeTargetUsingAppInstanceId()
+        public void InvokeTargetUsingAppInstanceId()
         {
-            var server1RequestCount = 0;
-            var server1 = ConnectEchoServer((request, context) =>
+            RunWith10SecTimeout(async () =>
             {
-                server1RequestCount++;
-                return Task.FromResult(new GreetingResponse { Greeting = "FromServer1" });
-            });
+                var server1RequestCount = 0;
+                var server1 = ConnectEchoServer((request, context) =>
+                {
+                    server1RequestCount++;
+                    return Task.FromResult(new GreetingResponse { Greeting = "FromServer1" });
+                });
 
-            var server2RequestCount = 0;
-            var server2 = ConnectEchoServer((request, context) =>
+                var server2RequestCount = 0;
+                var server2 = ConnectEchoServer((request, context) =>
+                {
+                    server2RequestCount++;
+                    return Task.FromResult(new GreetingResponse { Greeting = "FromServer2" });
+                });
+
+                var client = CreateClient<EchoClient>();
+                await client.ConnectAsync();
+
+                server1RequestCount.ShouldBe(0);
+                server2RequestCount.ShouldBe(0);
+
+                var providedMethodReference = ProvidedMethodReference.CreateWithAppInstanceId(GreetingService.Id, GreetingService.HelloMethodId, server1.ApplicationId, server1.ApplicationInstanceId);
+                var methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                var greetingRequest = new GreetingRequest { Name = "Client" };
+                var response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
+
+                response.Greeting.ShouldBe("FromServer1");
+                server1RequestCount.ShouldBe(1);
+                server2RequestCount.ShouldBe(0);
+
+                providedMethodReference = ProvidedMethodReference.CreateWithAppInstanceId(GreetingService.Id, GreetingService.HelloMethodId, server2.ApplicationId, server2.ApplicationInstanceId);
+                methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
+
+                response.Greeting.ShouldBe("FromServer2");
+                server1RequestCount.ShouldBe(1);
+                server2RequestCount.ShouldBe(1);
+            });
+        }
+
+        [Fact]
+        public void InvokeTargetUsingAppInstanceIdWithoutAppId()
+        {
+            RunWith10SecTimeout(async () =>
             {
-                server2RequestCount++;
-                return Task.FromResult(new GreetingResponse { Greeting = "FromServer2" });
+                var server1RequestCount = 0;
+                var server1 = ConnectEchoServer((request, context) =>
+                {
+                    server1RequestCount++;
+                    return Task.FromResult(new GreetingResponse { Greeting = "FromServer1" });
+                });
+
+                var server2RequestCount = 0;
+                var server2 = ConnectEchoServer((request, context) =>
+                {
+                    server2RequestCount++;
+                    return Task.FromResult(new GreetingResponse { Greeting = "FromServer2" });
+                });
+
+                var client = CreateClient<EchoClient>();
+                await client.ConnectAsync();
+
+                server1RequestCount.ShouldBe(0);
+                server2RequestCount.ShouldBe(0);
+
+                var providedMethodReference = ProvidedMethodReference.CreateWithAppInstanceId(GreetingService.Id, GreetingService.HelloMethodId, server1.ApplicationInstanceId);
+                var methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                var greetingRequest = new GreetingRequest { Name = "Client" };
+                var response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
+
+                response.Greeting.ShouldBe("FromServer1");
+                server1RequestCount.ShouldBe(1);
+                server2RequestCount.ShouldBe(0);
+
+                providedMethodReference = ProvidedMethodReference.CreateWithAppInstanceId(GreetingService.Id, GreetingService.HelloMethodId, server2.ApplicationInstanceId);
+                methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
+
+                response.Greeting.ShouldBe("FromServer2");
+                server1RequestCount.ShouldBe(1);
+                server2RequestCount.ShouldBe(1);
             });
+        }
 
-            var client = CreateClient<EchoClient>();
-            await client.ConnectAsync();
+        [Fact]
+        public void InvokeTargetUsingConnectionIdWithoutAppId()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                var server1RequestCount = 0;
+                var server1 = ConnectEchoServer((request, context) =>
+                {
+                    server1RequestCount++;
+                    return Task.FromResult(new GreetingResponse { Greeting = "FromServer1" });
+                });
 
-            server1RequestCount.ShouldBe(0);
-            server2RequestCount.ShouldBe(0);
+                var server2RequestCount = 0;
+                var server2 = ConnectEchoServer((request, context) =>
+                {
+                    server2RequestCount++;
+                    return Task.FromResult(new GreetingResponse { Greeting = "FromServer2" });
+                });
 
-            var providedMethodReference = ProvidedMethodReference.CreateWithAppInstanceId(GreetingService.Id, GreetingService.HelloMethodId, server1.ApplicationId, server1.ApplicationInstanceId);
-            var methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
-            var greetingRequest = new GreetingRequest { Name = "Client" };
-            var response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
+                var client = CreateClient<EchoClient>();
+                await client.ConnectAsync();
 
-            response.Greeting.ShouldBe("FromServer1");
-            server1RequestCount.ShouldBe(1);
-            server2RequestCount.ShouldBe(0);
+                server1RequestCount.ShouldBe(0);
+                server2RequestCount.ShouldBe(0);
 
-            providedMethodReference = ProvidedMethodReference.CreateWithAppInstanceId(GreetingService.Id, GreetingService.HelloMethodId, server2.ApplicationId, server2.ApplicationInstanceId);
-            methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
-            response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor, greetingRequest);
+                var providedMethodReference = ProvidedMethodReference.CreateWithConnectionId(GreetingService.Id,
+                    GreetingService.HelloMethodId, server1.ConnectionId);
+                var methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                var greetingRequest = new GreetingRequest { Name = "Client" };
+                var response =
+                    await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor,
+                        greetingRequest);
 
-            response.Greeting.ShouldBe("FromServer2");
-            server1RequestCount.ShouldBe(1);
-            server2RequestCount.ShouldBe(1);
+                response.Greeting.ShouldBe("FromServer1");
+                server1RequestCount.ShouldBe(1);
+                server2RequestCount.ShouldBe(0);
+
+                providedMethodReference = ProvidedMethodReference.CreateWithConnectionId(GreetingService.Id,
+                    GreetingService.HelloMethodId, server2.ConnectionId);
+                methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                response = await client.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor,
+                    greetingRequest);
+
+                response.Greeting.ShouldBe("FromServer2");
+                server1RequestCount.ShouldBe(1);
+                server2RequestCount.ShouldBe(1);
+            });
         }
 
         private IClient ConnectEchoServer(UnaryMethodHandler<GreetingRequest, GreetingResponse> handleHello)

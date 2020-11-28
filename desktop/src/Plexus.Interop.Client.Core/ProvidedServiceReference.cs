@@ -50,7 +50,7 @@
 
         internal ProvidedServiceReference(string serviceId,
             Maybe<string> serviceAlias,
-            string applicationId,
+            Maybe<string> applicationId,
             Maybe<UniqueId> connectionId, 
             Maybe<UniqueId> applicationInstanceId)
         {
@@ -65,7 +65,7 @@
 
         public Maybe<string> ServiceAlias { get; }
 
-        public string ApplicationId { get; }
+        public Maybe<string> ApplicationId { get; }
 
         public Maybe<UniqueId> ConnectionId { get; }
 

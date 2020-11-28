@@ -175,18 +175,17 @@ namespace Plexus.Interop.Broker.Internal
             ITransportChannel sourceChannel,
             IContextLinkageOptions contextLinkageOptions)
         {
-            var method = _registryService.GetProvidedMethod(methodReference);
-            var launchMode = GetLaunchMode(method);
-            var appId = methodReference.ProvidedService.ApplicationId;
             if (methodReference.ProvidedService.ConnectionId.HasValue)
             {
                 var connectionId = methodReference.ProvidedService.ConnectionId.Value;
                 if (!_appLifecycleManager.TryGetOnlineConnection(connectionId, out var connection))
                 {
-                    throw new InvalidOperationException($"The requested app {appId} connection {connectionId} is not online");
+                    throw new InvalidOperationException($"The requested connection {connectionId} is not online");
                 }
                 return connection;
             }
+
+            var appId = methodReference.ProvidedService.ApplicationId;
 
             if (methodReference.ProvidedService.ApplicationInstanceId.HasValue)
             {
@@ -197,23 +196,34 @@ namespace Plexus.Interop.Broker.Internal
                     throw new InvalidOperationException($"App instance {appInstanceId} is doesn't have online connections");
                 }
 
-                if (string.IsNullOrEmpty(appId))
+                if (appId.HasValue)
                 {
-                    if (connections.Count == 1)
+                    var connection = connections.FirstOrDefault(c => c.Info.ApplicationId.Equals(appId.Value));
+                    if (connection == null)
                     {
-                        return connections.Single();
+                        throw new InvalidOperationException(
+                            $"App instance {appInstanceId} is doesn't have connection with {appId.Value} application id");
                     }
-                    throw new InvalidOperationException($"App instance {appInstanceId} has several connections, you need to specify {appId} ensure call to specific connection");
+
+                    return connection;
                 }
 
-                var connection = connections.FirstOrDefault(c => c.Info.ApplicationId.Equals(appId));
-                if (connection == null)
+                if (connections.Count == 1)
                 {
-                    throw new InvalidOperationException($"App instance {appInstanceId} is doesn't have connection with {appId} app id");
+                    return connections.Single();
                 }
-                return connection;
 
+                throw new InvalidOperationException($"App instance {appInstanceId} has several connections, you need to specify ApplicationId to make call to specific connection");
             }
+
+            if (!appId.HasValue)
+            {
+                throw new InvalidOperationException($"AppId is required to resolve target connection for {methodReference} provided method reference");
+            }
+            var appIdValue = appId.Value;
+
+            var method = _registryService.GetProvidedMethod(methodReference);
+            var launchMode = GetLaunchMode(method);
 
             Task<ResolvedConnection> resolveTask;
             lock (_resolveConnectionSync)
@@ -222,7 +232,7 @@ namespace Plexus.Interop.Broker.Internal
                 {
                     var onlineConnections = _appLifecycleManager
                         .GetOnlineConnections()
-                        .Where(x => x.Info.ApplicationId.Equals(appId) &&
+                        .Where(x => x.Info.ApplicationId.Equals(appIdValue) &&
                                     !x.Id.Equals(source.Id)).ToArray();
 
                     if (_contextLinkageManager.IsContextShouldBeConsidered(contextLinkageOptions, source))
@@ -239,15 +249,15 @@ namespace Plexus.Interop.Broker.Internal
                     }
                 }
 
-                if (launchMode == LaunchMode.None || !_appLifecycleManager.CanBeLaunched(appId))
+                if (launchMode == LaunchMode.None || !_appLifecycleManager.CanBeLaunched(appIdValue))
                 {
                     throw new InvalidOperationException(
-                        $"The requested app {appId} is not online and cannot be launched");
+                        $"The requested app {appIdValue} is not online and cannot be launched");
                 }
 
                 var resolveMode = ConvertToResolveMode(launchMode);
 
-                resolveTask = _appLifecycleManager.LaunchAndConnectAsync(appId, resolveMode, source.Info);
+                resolveTask = _appLifecycleManager.LaunchAndConnectAsync(appIdValue, resolveMode, source.Info);
             }
             var resolvedConnection = await resolveTask.ConfigureAwait(false);
             return resolvedConnection.AppConnection;

@@ -489,7 +489,7 @@ namespace Plexus.Interop.Protocol.Protobuf
             return _messageFactory.CreateProvidedServiceReference(
                 proto.ServiceId.ConvertFromProtoStrict(),
                 proto.ServiceAlias.ConvertFromProto(),
-                proto.ApplicationId.ConvertFromProtoStrict(),
+                proto.ApplicationId.ConvertFromProto(),
                 proto.ConnectionId.ConvertFromProto(),
                 proto.ApplicationInstanceId.ConvertFromProto());
         }
@@ -638,7 +638,7 @@ namespace Plexus.Interop.Protocol.Protobuf
         {
             var proto = ProvidedServiceReference.Rent();
             proto.ServiceId = obj.ServiceId.ConvertToProtoStrict();
-            proto.ApplicationId = obj.ApplicationId.ConvertToProtoStrict();
+            proto.ApplicationId = obj.ApplicationId.ConvertToProto();
             proto.ConnectionId = proto.ConnectionId.MergeFrom(obj.ConnectionId);
             proto.ServiceAlias = obj.ServiceAlias.ConvertToProto();
             proto.ApplicationInstanceId = proto.ApplicationInstanceId.MergeFrom(obj.ApplicationInstanceId);

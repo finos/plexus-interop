@@ -33,6 +33,11 @@
             return Create(ProvidedServiceReference.Create(serviceId, serviceAliasId, applicationId), methodName);
         }
 
+        public static ProvidedMethodReference CreateWithConnectionId(string serviceId, string methodName, UniqueId connectionId)
+        {
+            return Create(ProvidedServiceReference.CreateWithConnectionId(serviceId, default, connectionId), methodName);
+        }
+
         public static ProvidedMethodReference CreateWithConnectionId(string serviceId, string methodName, string applicationId, UniqueId connectionId)
         {
             return Create(ProvidedServiceReference.CreateWithConnectionId(serviceId, applicationId, connectionId), methodName);
@@ -41,6 +46,11 @@
         public static ProvidedMethodReference CreateWithConnectionId(string serviceId, string serviceAliasId, string methodName, string applicationId, UniqueId connectionId)
         {
             return Create(ProvidedServiceReference.CreateWithConnectionId(serviceId, serviceAliasId, applicationId, connectionId), methodName);
+        }
+
+        public static ProvidedMethodReference CreateWithAppInstanceId(string serviceId, string methodName, UniqueId appInstanceId)
+        {
+            return Create(ProvidedServiceReference.CreateWithAppInstanceId(serviceId, default, appInstanceId), methodName);
         }
 
         public static ProvidedMethodReference CreateWithAppInstanceId(string serviceId, string methodName, string applicationId, UniqueId appInstanceId)

@@ -22,7 +22,7 @@
 
         Maybe<string> ServiceAlias { get; }
 
-        string ApplicationId { get; }
+        Maybe<string> ApplicationId { get; }
 
         Maybe<UniqueId> ConnectionId { get; }
 

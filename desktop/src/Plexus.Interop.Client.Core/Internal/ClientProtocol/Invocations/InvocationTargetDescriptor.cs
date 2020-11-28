@@ -21,7 +21,7 @@
     internal sealed class InvocationTargetDescriptor
     {
         public InvocationTargetDescriptor(
-            string applicationId = default,
+            Maybe<string> applicationId = default,
             Maybe<UniqueId> connectionId = default,
             Maybe<string> serviceAliasId = default,
             Maybe<UniqueId> applicationInstanceId = default)
@@ -32,7 +32,7 @@
             ApplicationInstanceId = applicationInstanceId;
         }
 
-        public string ApplicationId { get; }
+        public Maybe<string> ApplicationId { get; }
 
         public Maybe<UniqueId> ConnectionId { get; }
 
