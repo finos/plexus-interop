@@ -1009,6 +1009,15 @@
 	              "requestType": "google.protobuf.Empty",
 	              "responseType": "InvocationEvent",
 	              "responseStream": true
+	            },
+	            "GetConnections": {
+	              "requestType": "GetConnectionsRequest",
+	              "responseType": "GetConnectionsResponse"
+	            },
+	            "GetConnectionsStream": {
+	              "requestType": "GetConnectionsRequest",
+	              "responseType": "GetConnectionsEvent",
+	              "responseStream": true
 	            }
 	          }
 	        },
@@ -1149,6 +1158,65 @@
 	            "Succeeded": 0,
 	            "Canceled": 1,
 	            "Failed": 2
+	          }
+	        },
+	        "GetConnectionsRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.GetConnectionsRequest"
+	          },
+	          "fields": {
+	            "applicationId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 2
+	            },
+	            "connectionId": {
+	              "type": "UniqueId",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "GetConnectionsResponse": {
+	          "options": {
+	            "(.interop.message_id)": "interop.GetConnectionsResponse"
+	          },
+	          "fields": {
+	            "connections": {
+	              "rule": "repeated",
+	              "type": "AppConnectionDescriptor",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "GetConnectionsEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.GetConnectionsEvent"
+	          },
+	          "oneofs": {
+	            "event": {
+	              "oneof": [
+	                "newConnection",
+	                "closedConnection"
+	              ]
+	            }
+	          },
+	          "fields": {
+	            "connections": {
+	              "rule": "repeated",
+	              "type": "AppConnectionDescriptor",
+	              "id": 1
+	            },
+	            "newConnection": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 2
+	            },
+	            "closedConnection": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 3
+	            }
 	          }
 	        },
 	        "AppMetadataService": {
@@ -1504,6 +1572,66 @@
 	            }
 	          }
 	        },
+	        "AppJoinedContextEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppJoinedContextEvent"
+	          },
+	          "fields": {
+	            "context": {
+	              "type": "Context",
+	              "id": 1
+	            },
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 2
+	            }
+	          }
+	        },
+	        "RestoreContextsLinkageRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RestoreContextsLinkageRequest"
+	          },
+	          "fields": {
+	            "apps": {
+	              "rule": "repeated",
+	              "type": "RestoringAppInstance",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "RestoringAppInstance": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RestoringAppInstance"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            },
+	            "appIds": {
+	              "rule": "repeated",
+	              "type": "string",
+	              "id": 2
+	            },
+	            "contextIds": {
+	              "rule": "repeated",
+	              "type": "string",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "RestoreContextsLinkageResponse": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RestoreContextsLinkageResponse"
+	          },
+	          "fields": {
+	            "createdContextsMap": {
+	              "keyType": "string",
+	              "type": "Context",
+	              "id": 1
+	            }
+	          }
+	        },
 	        "ContextLinkageService": {
 	          "options": {
 	            "(.interop.service_id)": "interop.ContextLinkageService"
@@ -1533,6 +1661,15 @@
 	            "GetAllLinkedInvocations": {
 	              "requestType": "google.protobuf.Empty",
 	              "responseType": "ContextToInvocationsList"
+	            },
+	            "AppJoinedContextStream": {
+	              "requestType": "google.protobuf.Empty",
+	              "responseType": "AppJoinedContextEvent",
+	              "responseStream": true
+	            },
+	            "RestoreContextsLinkage": {
+	              "requestType": "RestoreContextsLinkageRequest",
+	              "responseType": "RestoreContextsLinkageResponse"
 	            }
 	          }
 	        },
@@ -1876,6 +2013,18 @@
 					"request": "google.protobuf.Empty",
 					"response": "interop.InvocationEvent",
 					"type": "ServerStreaming"
+				},
+				{
+					"name": "GetConnections",
+					"request": "interop.GetConnectionsRequest",
+					"response": "interop.GetConnectionsResponse",
+					"type": "Unary"
+				},
+				{
+					"name": "GetConnectionsStream",
+					"request": "interop.GetConnectionsRequest",
+					"response": "interop.GetConnectionsEvent",
+					"type": "ServerStreaming"
 				}
 			],
 			"options": [
@@ -1945,6 +2094,18 @@
 					"name": "GetAllLinkedInvocations",
 					"request": "google.protobuf.Empty",
 					"response": "interop.ContextToInvocationsList",
+					"type": "Unary"
+				},
+				{
+					"name": "AppJoinedContextStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.AppJoinedContextEvent",
+					"type": "ServerStreaming"
+				},
+				{
+					"name": "RestoreContextsLinkage",
+					"request": "interop.RestoreContextsLinkageRequest",
+					"response": "interop.RestoreContextsLinkageResponse",
 					"type": "Unary"
 				}
 			],
@@ -2036,6 +2197,12 @@
 						},
 						{
 							"name": "GetInvocationEventStream"
+						},
+						{
+							"name": "GetConnections"
+						},
+						{
+							"name": "GetConnectionsStream"
 						}
 					]
 				},
@@ -2070,6 +2237,12 @@
 						},
 						{
 							"name": "GetAllLinkedInvocations"
+						},
+						{
+							"name": "AppJoinedContextStream"
+						},
+						{
+							"name": "RestoreContextsLinkage"
 						}
 					]
 				}
@@ -2142,6 +2315,20 @@
 					],
 					"from": [
 						"plexus.interop.testing.*"
+					]
+				},
+				{
+					"service": "interop.AppLifecycleService",
+					"methods": [
+						{
+							"name": "GetConnections"
+						},
+						{
+							"name": "GetConnectionsStream"
+						}
+					],
+					"from": [
+						"interop.AppLifecycleManager"
 					]
 				},
 				{
