@@ -188,11 +188,6 @@ namespace Plexus.Interop.Broker.Internal
                 return connection;
             }
 
-            if (!Debugger.IsAttached)
-            {
-                Debugger.Launch();
-            }
-
             if (methodReference.ProvidedService.ApplicationInstanceId.HasValue)
             {
                 var appInstanceId = methodReference.ProvidedService.ApplicationInstanceId.Value;

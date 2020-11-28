@@ -641,6 +641,7 @@ namespace Plexus.Interop.Protocol.Protobuf
             proto.ApplicationId = obj.ApplicationId.ConvertToProtoStrict();
             proto.ConnectionId = proto.ConnectionId.MergeFrom(obj.ConnectionId);
             proto.ServiceAlias = obj.ServiceAlias.ConvertToProto();
+            proto.ApplicationInstanceId = proto.ApplicationInstanceId.MergeFrom(obj.ApplicationInstanceId);
             return proto;
         }
     }
