@@ -1,16 +1,18 @@
 ﻿namespace Plexus.Interop
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Plexus.Interop.Testing;
     using Plexus.Interop.Testing.Generated;
     using Shouldly;
     using Xunit;
     using Xunit.Abstractions;
+    using UniqueId = Plexus.UniqueId;
 
-    public class ProvidedMethodReferenceIntegrationTests : BaseClientBrokerTestsSuite
+    public class SpecificAppInstanceCallIntegrationTests : BaseClientBrokerTestsSuite
     {
-        public ProvidedMethodReferenceIntegrationTests(ITestOutputHelper output, TestBrokerFixture testBrokerFixture) : base(output, testBrokerFixture)
+        public SpecificAppInstanceCallIntegrationTests(ITestOutputHelper output, TestBrokerFixture testBrokerFixture) : base(output, testBrokerFixture)
         { }
 
         [Fact]
@@ -191,6 +193,87 @@
                 response.Greeting.ShouldBe("FromServer2");
                 server1RequestCount.ShouldBe(1);
                 server2RequestCount.ShouldBe(1);
+            });
+        }
+
+        [Fact]
+        public void InvokeApplicationBeforeItsConnection()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                Task<GreetingResponse> HandleAsync(GreetingRequest request, MethodCallContext context)
+                {
+                    return Task.FromResult(new GreetingResponse {Greeting = request.Name + "1"});
+                }
+
+                var brokerInstance = _testBrokerFixture.SharedInstance;
+                var createdServersCount = 0;
+                var createdServerClient = new TaskCompletionSource<IClient>();
+                var echoServerFactory = new TestClientFactory(
+                    (broker, id) =>
+                    {
+                        var optionsBuilder = new ClientOptionsBuilder()
+                            .WithBrokerWorkingDir(brokerInstance.WorkingDir)
+                            .WithAppInstanceId(id)
+                            .WithApplicationId(EchoServerClient.Id)
+                            .WithDefaultConfiguration()
+                            .WithProvidedService(
+                                GreetingService.Id,
+                                x => x.WithUnaryMethod<GreetingRequest, GreetingResponse>(GreetingService.HelloMethodId,
+                                    HandleAsync));
+                        var serverClient = ClientFactory.Instance.Create(optionsBuilder.Build());
+                        createdServerClient.SetResult(serverClient);
+                        createdServersCount++;
+                        return Task.FromResult(serverClient);
+                    });
+
+                var appLauncher = RegisterDisposable(
+                    new TestAppLauncher(
+                        brokerInstance,
+                        new Dictionary<string, TestClientFactory>
+                        {
+                            {EchoServerClient.Id, echoServerFactory}
+                        },
+                        false
+                    )
+                );
+                await appLauncher.StartAsync();
+
+                var client1 = CreateClient<EchoClient>();
+                await client1.ConnectAsync();
+
+                var client2 = CreateClient<EchoClient>();
+                await client2.ConnectAsync();
+
+                var helloTask = client1.GreetingService.Hello(new GreetingRequest() {Name = "Test1"}).ResponseAsync;
+                var callUnconnectedServerTask = createdServerClient.Task.ContinueWith(async task =>
+                {
+                    var serverClient = task.Result;
+                    var providedMethodReference = ProvidedMethodReference.CreateWithAppInstanceId(GreetingService.Id,
+                        GreetingService.HelloMethodId, EchoServerClient.Id, serverClient.ApplicationInstanceId);
+                    var methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
+                    await client2.CallInvoker.CallUnary<GreetingRequest, GreetingResponse>(methodCallDescriptor,
+                        new GreetingRequest() {Name = "Test2"});
+                }).Unwrap();
+
+                var connectedServerAfterDelayTask = createdServerClient.Task.ContinueWith(async task =>
+                {
+                    var serverClient = task.Result;
+
+                    await Task.Delay(TimeSpan.FromSeconds(3));
+
+                    serverClient.ConnectionId.ShouldBe(UniqueId.Empty);
+                    var onlineConnectionsResponse =
+                        await client1.AppLifecycleService.GetConnections(new GetConnectionsRequest
+                            {AppInstanceId = serverClient.ApplicationInstanceId});
+                    onlineConnectionsResponse.Connections.Count.ShouldBe(0);
+
+                    await serverClient.ConnectAsync();
+                }).Unwrap();
+
+                await Task.WhenAll(helloTask, callUnconnectedServerTask, connectedServerAfterDelayTask);
+
+                createdServersCount.ShouldBe(1);
             });
         }
 

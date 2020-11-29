@@ -137,8 +137,8 @@ namespace Plexus.Interop
                 contextLoadingUpdate = await contextStatusUpdateStream.FirstAsync(update =>
                     update.Status == ContextLoadingStatus.Finished && update.LoadedAppDescriptors.Count == 2);
 
-                contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => Equals(descriptor.AppInstanceId, client1.ApplicationInstanceId));
-                contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => Equals(descriptor.AppInstanceId, client2.ApplicationInstanceId));
+                contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => descriptor.AppInstanceId.Equals(client1.ApplicationInstanceId));
+                contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => descriptor.AppInstanceId.Equals(client2.ApplicationInstanceId));
             });
         }
     }

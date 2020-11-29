@@ -31,6 +31,7 @@ namespace Plexus.Interop.Testing
     {
         private readonly ITestBroker _broker;
         private readonly Dictionary<string, TestClientFactory> _clientFactories;
+        private readonly bool _connectClients;
         private readonly ITestAppLauncherClient _client;
 
         private readonly object _sync = new object();
@@ -43,10 +44,11 @@ namespace Plexus.Interop.Testing
 
         private readonly ReplaySubject<AppLaunchedEvent> _appLaunchedEvents = new ReplaySubject<AppLaunchedEvent>(5);
 
-        public TestAppLauncher(ITestBroker broker, Dictionary<string, TestClientFactory> clientFactories)
+        public TestAppLauncher(ITestBroker broker, Dictionary<string, TestClientFactory> clientFactories, bool connectClients = true)
         {
             _broker = broker;
             _clientFactories = clientFactories;
+            _connectClients = connectClients;
             _client = new TestAppLauncherClient(this, s => s.WithBrokerWorkingDir(broker.WorkingDir));
             OnStop(_client.Disconnect);
         }
@@ -89,7 +91,10 @@ namespace Plexus.Interop.Testing
 
             OnStop(client.Disconnect);
 
-            await client.ConnectAsync().ConfigureAwait(false);
+            if (_connectClients)
+            {
+                await client.ConnectAsync().ConfigureAwait(false);
+            }
 
             if (client.ApplicationInstanceId == suggestedAppInstanceId)
             {

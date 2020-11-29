@@ -41,5 +41,7 @@ namespace Plexus.Interop.Apps
         IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId);
 
         IReadOnlyCollection<IAppConnection> GetAppConnections(string appId);
+
+        bool TryGetConnectionInProgress(UniqueId appInstanceId, string appId, out Task<IAppConnection> appConnection);
     }
 }

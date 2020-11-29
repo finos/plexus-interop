@@ -190,6 +190,10 @@ namespace Plexus.Interop.Broker.Internal
             if (methodReference.ProvidedService.ApplicationInstanceId.HasValue)
             {
                 var appInstanceId = methodReference.ProvidedService.ApplicationInstanceId.Value;
+                if (appId.HasValue && _appLifecycleManager.TryGetConnectionInProgress(appInstanceId, appId.Value, out var connectionInProgress))
+                {
+                    return await connectionInProgress;
+                }
                 var connections = _appLifecycleManager.GetAppInstanceConnections(appInstanceId).ToList();
                 if (connections.Count == 0)
                 {
@@ -201,10 +205,8 @@ namespace Plexus.Interop.Broker.Internal
                     var connection = connections.FirstOrDefault(c => c.Info.ApplicationId.Equals(appId.Value));
                     if (connection == null)
                     {
-                        throw new InvalidOperationException(
-                            $"App instance {appInstanceId} is doesn't have connection with {appId.Value} application id");
+                        throw new InvalidOperationException($"App instance {appInstanceId} is doesn't have connection with {appId.Value} application id");
                     }
-
                     return connection;
                 }
 

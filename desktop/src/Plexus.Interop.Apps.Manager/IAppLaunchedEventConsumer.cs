@@ -14,17 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Apps.Internal
+namespace Plexus.Interop.Apps
 {
     using System;
-    using System.Reactive.Subjects;
     using Plexus.Interop.Apps.Internal.Generated;
 
-    internal class AppLaunchedEventProvider : IAppLaunchedEventProvider, IAppLaunchedEventConsumer
+    interface IAppLaunchedEventConsumer
     {
-        private readonly ReplaySubject<AppLaunchedEvent> _appLaunchedSubject = new ReplaySubject<AppLaunchedEvent>(10);
-
-        public IObservable<AppLaunchedEvent> AppLaunchedStream => _appLaunchedSubject;
-        public IObserver<AppLaunchedEvent> AppLaunchedEventObserver => _appLaunchedSubject;
+        IObserver<AppLaunchedEvent> AppLaunchedEventObserver { get; }
     }
 }
