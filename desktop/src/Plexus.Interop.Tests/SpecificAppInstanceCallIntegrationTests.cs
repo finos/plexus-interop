@@ -245,10 +245,11 @@
                 var client2 = CreateClient<EchoClient>();
                 await client2.ConnectAsync();
 
-                var helloTask = client1.GreetingService.Hello(new GreetingRequest() {Name = "Test1"}).ResponseAsync;
+                var helloTask = client1.GreetingService.Hello(new GreetingRequest {Name = "Test1"}).ResponseAsync;
                 var callUnconnectedServerTask = createdServerClient.Task.ContinueWith(async task =>
                 {
                     var serverClient = task.Result;
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                     var providedMethodReference = ProvidedMethodReference.CreateWithAppInstanceId(GreetingService.Id,
                         GreetingService.HelloMethodId, EchoServerClient.Id, serverClient.ApplicationInstanceId);
                     var methodCallDescriptor = new MethodCallDescriptor(providedMethodReference);
