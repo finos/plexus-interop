@@ -29,6 +29,8 @@ service AppLifecycleService {
 	rpc ResolveApp (ResolveAppRequest) returns (ResolveAppResponse);
 	rpc GetLifecycleEventStream (google.protobuf.Empty) returns (stream AppLifecycleEvent);
 	rpc GetInvocationEventStream (google.protobuf.Empty) returns (stream InvocationEvent);
+	rpc GetConnections (GetConnectionsRequest) returns (GetConnectionsResponse);
+	rpc GetConnectionsStream (GetConnectionsRequest) returns (stream GetConnectionsEvent);
 }
 
 message ResolveAppRequest {
@@ -78,4 +80,22 @@ enum InvocationResult {
 	Succeeded = 0;
 	Canceled = 1;
 	Failed = 2;
+}
+
+message GetConnectionsRequest {
+	string application_id = 1;
+	UniqueId app_instance_id = 2;
+	UniqueId connection_id = 3;
+}
+
+message GetConnectionsResponse {
+	repeated AppConnectionDescriptor connections = 1;
+}
+
+message GetConnectionsEvent {
+	repeated AppConnectionDescriptor connections = 1;
+	oneof event {
+		AppConnectionDescriptor new_connection = 2;
+		AppConnectionDescriptor closed_connection = 3;
+	}
 }

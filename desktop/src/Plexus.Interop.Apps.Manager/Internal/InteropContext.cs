@@ -43,6 +43,7 @@ namespace Plexus.Interop.Apps.Internal
 
         private readonly AppLifecycleServiceImpl _appLifecycleService;
         private readonly ContextLinkageServiceImpl _contextLinkageService;
+        private AppLaunchedEventSubscriber _appLaunchedEventSubscriber;
 
         public InteropContext(string metadataDir, IRegistryProvider registryProvider)
         {
@@ -51,8 +52,9 @@ namespace Plexus.Interop.Apps.Internal
             _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir);
 
             var clientLazy = new Lazy<IClient>(() => _lifecycleManagerClient);
-            _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, clientLazy);
-            var appLaunchedEventProvider = new AppLaunchedEventProvider(_appLifecycleManager, registryProvider, clientLazy);
+            var appLaunchedEventProvider = new AppLaunchedEventProvider();
+            _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, appLaunchedEventProvider, clientLazy);
+            _appLaunchedEventSubscriber = new AppLaunchedEventSubscriber(_appLifecycleManager, registryProvider, appLaunchedEventProvider, clientLazy);
 
             var appMetadataService = new AppMetadataServiceImpl(appRegistryProvider, registryProvider);
             _appLifecycleService = new AppLifecycleServiceImpl(_appLifecycleManager);

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,18 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Protocol
+namespace Plexus.Interop.Apps
 {
-    public interface IProvidedServiceReference : IProtocolMessage
+    using System;
+    using Plexus.Interop.Apps.Internal.Generated;
+
+    interface IAppLaunchedEventConsumer
     {
-        string ServiceId { get; }
-
-        Maybe<string> ServiceAlias { get; }
-
-        Maybe<string> ApplicationId { get; }
-
-        Maybe<UniqueId> ConnectionId { get; }
-
-        Maybe<UniqueId> ApplicationInstanceId { get; }
+        IObserver<AppLaunchedEvent> AppLaunchedEventObserver { get; }
     }
 }

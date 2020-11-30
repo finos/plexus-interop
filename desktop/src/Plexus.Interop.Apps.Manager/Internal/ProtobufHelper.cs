@@ -23,6 +23,10 @@
     {
         public static UniqueId ToUniqueId(this Generated.UniqueId uniqueId)
         {
+            if (uniqueId is null)
+            {
+                return UniqueId.Empty;
+            }
             return UniqueId.FromHiLo(uniqueId.Hi, uniqueId.Lo);
         }
 

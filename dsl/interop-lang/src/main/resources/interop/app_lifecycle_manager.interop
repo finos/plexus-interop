@@ -26,7 +26,7 @@ application AppLifecycleManager {
 
 	consumes AppLauncherService { Launch; AppLaunchedEventStream; }
 
-	provides AppLifecycleService { ResolveApp; GetLifecycleEventStream; GetInvocationEventStream; }
+	provides AppLifecycleService { ResolveApp; GetLifecycleEventStream; GetInvocationEventStream; GetConnections; GetConnectionsStream; }
 
 	provides AppMetadataService { GetAppMetadataChangedEventStream; GetMetamodelChangedEventStream; }
 

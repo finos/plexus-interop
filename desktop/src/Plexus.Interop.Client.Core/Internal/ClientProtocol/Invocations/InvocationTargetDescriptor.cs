@@ -21,7 +21,7 @@
     internal sealed class InvocationTargetDescriptor
     {
         public InvocationTargetDescriptor(
-            string applicationId = default,
+            Maybe<string> applicationId = default,
             Maybe<UniqueId> connectionId = default,
             Maybe<string> serviceAliasId = default,
             Maybe<UniqueId> applicationInstanceId = default)
@@ -32,7 +32,7 @@
             ApplicationInstanceId = applicationInstanceId;
         }
 
-        public string ApplicationId { get; }
+        public Maybe<string> ApplicationId { get; }
 
         public Maybe<UniqueId> ConnectionId { get; }
 
@@ -45,7 +45,8 @@
             return obj is InvocationTargetDescriptor descriptor &&
                    ApplicationId.Equals(descriptor.ApplicationId) &&
                    ConnectionId.Equals(descriptor.ConnectionId) &&
-                   ServiceAliasId.Equals(descriptor.ServiceAliasId);
+                   ServiceAliasId.Equals(descriptor.ServiceAliasId) &&
+                   ApplicationInstanceId.Equals(descriptor.ApplicationInstanceId);
         }
 
         public override int GetHashCode()

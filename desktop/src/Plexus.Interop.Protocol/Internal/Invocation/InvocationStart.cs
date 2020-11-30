@@ -37,7 +37,7 @@
 
         public override string ToString()
         {
-            return $"{nameof(Target)}: {Target}, {nameof(ContextLinkageOptions)}: {ContextLinkageOptions}";
+            return $"{nameof(Target)}: {Target}";
         }
 
         private bool Equals(InvocationStart other)

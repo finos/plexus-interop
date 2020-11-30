@@ -144,7 +144,8 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
                 providedService.ServiceId, 
                 providedService.ServiceAlias, 
                 providedService.ApplicationId, 
-                providedService.ConnectionId);
+                providedService.ConnectionId,
+                providedService.ApplicationInstanceId);
         }
 
         private Maybe<IConsumedServiceReference> Convert(Maybe<ServiceReference> consumedService)
@@ -170,7 +171,8 @@ namespace Plexus.Interop.Internal.ClientProtocol.Discovery
                         method.ProvidedMethod.ProvidedService.ServiceId,
                         method.ProvidedMethod.ProvidedService.ServiceAlias,                    
                         method.ProvidedMethod.ProvidedService.ApplicationId,
-                        method.ProvidedMethod.ProvidedService.ConnectionId),
+                        method.ProvidedMethod.ProvidedService.ConnectionId,
+                        method.ProvidedMethod.ProvidedService.ApplicationInstanceId),
                     method.ProvidedMethod.MethodId),
                 method.MethodTitle,
                 method.InputMessageId,

@@ -50,7 +50,7 @@ namespace Plexus.Interop.Protocol
         IProvidedServiceReference CreateProvidedServiceReference(
             string serviceId,
             Maybe<string> serviceAlias,
-            string applicationId,
+            Maybe<string> applicationId,
             Maybe<UniqueId> connectionId,
             Maybe<UniqueId> applicationInstanceId);
 
