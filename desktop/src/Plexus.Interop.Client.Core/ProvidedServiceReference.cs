@@ -73,7 +73,7 @@
 
         public override string ToString()
         {
-            return $"{nameof(ServiceId)}: {ServiceId}, {nameof(ServiceAlias)}: {ServiceAlias}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ConnectionId)}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}: {ConnectionId}";
+            return $"{nameof(ServiceId)}: {ServiceId}, {nameof(ServiceAlias)}: {ServiceAlias}, {nameof(ApplicationId)}: {ApplicationId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}, {nameof(ConnectionId)}: {ConnectionId}";
         }
     }
 }
