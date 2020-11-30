@@ -17,6 +17,7 @@
 namespace Plexus.Interop.Apps.Internal.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
@@ -26,6 +27,7 @@ namespace Plexus.Interop.Apps.Internal.Services
     using Plexus.Channels;
     using Plexus.Interop.Apps.Internal.Generated;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
+    using UniqueId = Plexus.UniqueId;
 
     internal class AppLifecycleServiceImpl : IAppLifecycleService
     {
@@ -146,6 +148,140 @@ namespace Plexus.Interop.Apps.Internal.Services
                 default:
                     throw new ArgumentOutOfRangeException(nameof(launchMode), launchMode, null);
             }
+        }
+
+        public Task<GetConnectionsResponse> GetConnections(GetConnectionsRequest request, MethodCallContext context)
+        {
+            var response = CreateConnectionsResponse(GetOnlineConnections(request));
+            if (response.Connections.Count == 0 && IsSingleConnectionRequest(request))
+            {
+                if (IsSpecificConnectionId(request, out var connectionId))
+                {
+                    throw new InvalidOperationException($"No connection with {connectionId} is found");
+                }
+
+                if (IsSpecificAppIdWithInstanceId(request, out var appId, out var appInstanceId))
+                {
+                    throw new InvalidOperationException($"No connection with for {appInstanceId} application instance id with {appId} app id is found");
+                }
+            }
+
+            return Task.FromResult(response);
+        }
+
+        public async Task GetConnectionsStream(GetConnectionsRequest request, IWritableChannel<GetConnectionsEvent> responseStream, MethodCallContext context)
+        {
+            await _appLifecycleManager.ConnectionEventsStream.Where(e => IsEventFitRequest(request, e.Connection))
+                .Select(e => CreateGetConnectionsEvent(request, e)).StartWith(CreateInitialGetConnectionsEvent(request))
+                .PipeAsync(responseStream);
+        }
+
+        private GetConnectionsEvent CreateInitialGetConnectionsEvent(GetConnectionsRequest request)
+        {
+            return new GetConnectionsEvent()
+            {
+                Connections = { GetOnlineConnections(request).Select(c => c.Info.ToProto()) }
+            };
+        }
+
+        private GetConnectionsEvent CreateGetConnectionsEvent(GetConnectionsRequest request, AppConnectionEvent appConnectionEvent)
+        {
+            var response = CreateInitialGetConnectionsEvent(request);
+            if (appConnectionEvent.Type == ConnectionEventType.AppConnected)
+            {
+                response.NewConnection = appConnectionEvent.Connection.ToProto();
+            }
+            else
+            {
+                response.ClosedConnection = appConnectionEvent.Connection.ToProto();
+            }
+            return response;
+        }
+
+        private static bool IsEventFitRequest(GetConnectionsRequest request, AppConnectionDescriptor connection)
+        {
+            var connectionId = request.ConnectionId.ToUniqueId();
+            if (connectionId != UniqueId.Empty)
+            {
+                return connectionId.Equals(connection.ConnectionId);
+            }
+            var appId = request.ApplicationId;
+            var appInstanceId = request.AppInstanceId.ToUniqueId();
+
+            if (appInstanceId != UniqueId.Empty && !connection.ApplicationInstanceId.Equals(appInstanceId))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(appId) && !connection.ApplicationId.Equals(appId))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsSingleConnectionRequest(GetConnectionsRequest request)
+        {
+            return IsSpecificConnectionId(request, out _) || IsSpecificAppIdWithInstanceId(request, out _, out _);
+        }
+
+        private static bool IsSpecificConnectionId(GetConnectionsRequest request, out UniqueId connectionId)
+        {
+            connectionId = request.ConnectionId.ToUniqueId();
+            var isSpecificConnectionId = connectionId != UniqueId.Empty;
+            return isSpecificConnectionId;
+        }
+
+        private static bool IsSpecificAppIdWithInstanceId(GetConnectionsRequest request, out string appId, out UniqueId appInstanceId)
+        {
+            appId = request.ApplicationId;
+            appInstanceId = request.AppInstanceId.ToUniqueId();
+            var isSpecificAppIdWithInstanceId = !string.IsNullOrEmpty(appId) && appInstanceId != UniqueId.Empty;
+            return isSpecificAppIdWithInstanceId;
+        }
+
+        private IEnumerable<IAppConnection> GetOnlineConnections(GetConnectionsRequest request)
+        {
+            var connectionId = request.ConnectionId.ToUniqueId();
+            if (connectionId != UniqueId.Empty)
+            {
+                if (_appLifecycleManager.TryGetOnlineConnection(connectionId, out var connectionInfo))
+                {
+                    return new[] { connectionInfo };
+                }
+                return Enumerable.Empty<IAppConnection>();
+            }
+
+            var appId = request.ApplicationId;
+            var appInstanceId = request.AppInstanceId.ToUniqueId();
+
+            if (appInstanceId != UniqueId.Empty)
+            {
+                if (!string.IsNullOrEmpty(appId))
+                {
+                    if (_appLifecycleManager.TryGetOnlineConnection(appInstanceId, appId, out var connection))
+                    {
+                        return new[] { connection };
+                    }
+                }
+                return _appLifecycleManager.GetAppInstanceConnections(appInstanceId);
+            }
+
+            if (!string.IsNullOrEmpty(appId))
+            {
+                return _appLifecycleManager.GetAppConnections(appId);
+            }
+
+            return _appLifecycleManager.GetOnlineConnections();
+        }
+
+        private static GetConnectionsResponse CreateConnectionsResponse(IEnumerable<IAppConnection> connectionDescriptors)
+        {
+            return new GetConnectionsResponse()
+            {
+                Connections = { connectionDescriptors.Select(descriptor => descriptor.Info.ToProto()) }
+            };
         }
     }
 }

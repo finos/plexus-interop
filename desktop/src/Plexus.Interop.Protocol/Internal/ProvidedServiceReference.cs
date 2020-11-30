@@ -24,7 +24,7 @@
 
         public Maybe<string> ServiceAlias { get; set; }
 
-        public string ApplicationId { get; set; }
+        public Maybe<string> ApplicationId { get; set; }
 
         public Maybe<UniqueId> ConnectionId { get; set; }
 

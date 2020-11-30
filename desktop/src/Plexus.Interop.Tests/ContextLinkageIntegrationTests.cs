@@ -16,7 +16,6 @@
  */
 namespace Plexus.Interop
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -138,22 +137,9 @@ namespace Plexus.Interop
                 contextLoadingUpdate = await contextStatusUpdateStream.FirstAsync(update =>
                     update.Status == ContextLoadingStatus.Finished && update.LoadedAppDescriptors.Count == 2);
 
-                contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => Equals(descriptor.AppInstanceId, client1.ApplicationInstanceId));
-                contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => Equals(descriptor.AppInstanceId, client2.ApplicationInstanceId));
+                contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => descriptor.AppInstanceId.Equals(client1.ApplicationInstanceId));
+                contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => descriptor.AppInstanceId.Equals(client2.ApplicationInstanceId));
             });
-        }
-
-        private T CreateClient<T>() where T : ClientBase
-        {
-            Func<ClientOptionsBuilder, ClientOptionsBuilder> builderFunc = builder => builder;
-            builderFunc = builder => builder.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir);
-
-            return (T)Activator.CreateInstance(typeof(T), builderFunc);
-        }
-
-        private static bool Equals(UniqueId uniqueId1, Plexus.UniqueId uniqueId2)
-        {
-            return uniqueId1.Hi.Equals(uniqueId2.Hi) && uniqueId1.Lo.Equals(uniqueId2.Lo);
         }
     }
 }

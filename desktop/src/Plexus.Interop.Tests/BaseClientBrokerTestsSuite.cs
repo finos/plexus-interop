@@ -73,5 +73,14 @@ namespace Plexus.Interop
                 }
             }
         }
+
+        protected T CreateClient<T>() where T : ClientBase
+        {
+            Func<ClientOptionsBuilder, ClientOptionsBuilder> builderFunc = builder => builder;
+            builderFunc = builder => builder.WithBrokerWorkingDir(_testBrokerFixture.SharedInstance.WorkingDir);
+            var instance = (T)Activator.CreateInstance(typeof(T), builderFunc);
+            RegisterDisposable(instance);
+            return instance;
+        }
     }
 }

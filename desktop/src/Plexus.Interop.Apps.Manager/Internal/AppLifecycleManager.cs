@@ -19,6 +19,7 @@ namespace Plexus.Interop.Apps.Internal
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
@@ -47,12 +48,13 @@ namespace Plexus.Interop.Apps.Internal
 
         private readonly Subject<AppConnectionEvent> _connectionSubject = new Subject<AppConnectionEvent>();
 
-        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, Lazy<IClient> clientLazy)
+        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, IAppLaunchedEventProvider appLaunchedEventProvider, Lazy<IClient> clientLazy)
         {
             _appRegistryProvider = appRegistryProvider;
             _clientLazy = clientLazy;
             ConnectionEventsStream = _connectionSubject.ObserveOn(TaskPoolScheduler.Default);
-        }        
+            appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnApplicationLaunchedEvent);
+        }
 
         private ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();
 
@@ -65,6 +67,18 @@ namespace Plexus.Interop.Apps.Internal
                 if (_appInstanceConnections.TryGetValue(appInstanceId, out Dictionary<string, IAppConnection> connections))
                 {
                     return connections.Values.ToList();
+                }
+                return new IAppConnection[0];
+            }
+        }
+
+        public IReadOnlyCollection<IAppConnection> GetAppConnections(string appId)
+        {
+            lock (_connections)
+            {
+                if (_appConnections.TryGetValue(appId, out var appConnections))
+                {
+                    return appConnections.ToList();
                 }
                 return new IAppConnection[0];
             }
@@ -160,11 +174,41 @@ namespace Plexus.Interop.Apps.Internal
             return true;
         }
 
-        public bool TryGetOnlineConnection(UniqueId id, out IAppConnection connection)
+        public bool TryGetConnectionInProgress(UniqueId appInstanceId, string appId, out Task<IAppConnection> appConnection)
         {
             lock (_connections)
             {
-                return _connections.TryGetValue(id, out connection);
+                if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.TryGetValue(appId, out var existingConnection))
+                {
+                    appConnection = Task.FromResult(existingConnection);
+                    return true;
+                }
+                if (_appInstanceConnectionsInProgress.TryGetValue((appInstanceId, appId), out var promise))
+                {
+                    appConnection = promise.Task;
+                    return true;
+                }
+
+                appConnection = null;
+                return false;
+            }
+        }
+
+        public bool TryGetOnlineConnection(UniqueId connectionId, out IAppConnection connection)
+        {
+            lock (_connections)
+            {
+                return _connections.TryGetValue(connectionId, out connection);
+            }
+        }
+
+        public bool TryGetOnlineConnection(UniqueId appInstanceId, string app, out IAppConnection connection)
+        {
+            connection = null;
+            lock (_connections)
+            {
+                return _appInstanceConnections.TryGetValue(appInstanceId, out var appConnections) &&
+                       appConnections.TryGetValue(app, out connection);
             }
         }
 
@@ -206,7 +250,6 @@ namespace Plexus.Interop.Apps.Internal
         {
             var appInstanceId = suggestedAppInstanceId;
             Log.Info("Launching {0}", appId);
-            var connectionPromise = new Promise<IAppConnection>();
             var deferredConnectionKey = (suggestedAppInstanceId, appId);
             try
             {
@@ -214,17 +257,25 @@ namespace Plexus.Interop.Apps.Internal
 
                 deferredConnectionKey = (appInstanceId, appId);
 
+                Promise<IAppConnection> connectionPromise;
                 lock (_connections)
                 {
                     if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.TryGetValue(appId, out var existingConnection))
                     {
                         Log.Debug("Resolving deferred connection {{{0}}} to existing connection {{{1}}}", deferredConnectionKey, existingConnection);
-                        TaskRunner.RunInBackground(() => connectionPromise.TryComplete(existingConnection))
-                            .IgnoreAwait(Log, $"Failed to complete connection promise for {appId} application with {appInstanceId} app instance id");
+                        return existingConnection;
                     }
                     else
                     {
-                        _appInstanceConnectionsInProgress[deferredConnectionKey] = connectionPromise;
+                        if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out var existingPromise))
+                        {
+                            connectionPromise = existingPromise;
+                        }
+                        else
+                        {
+                            connectionPromise = new Promise<IAppConnection>();
+                            _appInstanceConnectionsInProgress[deferredConnectionKey] = connectionPromise;
+                        }
                     }
                 }
 
@@ -235,6 +286,27 @@ namespace Plexus.Interop.Apps.Internal
                 lock (_connections)
                 {
                     _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
+                }
+            }
+        }
+
+        private void OnApplicationLaunchedEvent(AppLaunchedEvent appLaunchedEvent)
+        {
+            var appInstanceId = appLaunchedEvent.AppInstanceId.ToUniqueId();
+            lock (_connections)
+            {
+                foreach (var appId in appLaunchedEvent.AppIds)
+                {
+                    if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.TryGetValue(appId, out var _))
+                    {
+                        continue;
+                    }
+                    var deferredConnectionKey = (appInstanceId, appId);
+                    if (_appInstanceConnectionsInProgress.TryGetValue(deferredConnectionKey, out _))
+                    {
+                        continue;
+                    }
+                    _appInstanceConnectionsInProgress[deferredConnectionKey] = new Promise<IAppConnection>();
                 }
             }
         }

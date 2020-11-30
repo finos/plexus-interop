@@ -126,9 +126,13 @@ namespace Plexus.Interop.Broker.Internal
         public IProvidedService GetProvidedService(IProvidedServiceReference reference)
         {
             _registryLock.EnterReadLock();
+            if (!reference.ApplicationId.HasValue)
+            {
+                throw new InvalidOperationException($"Can't find provided services of unspecified application id ({reference})");
+            }
             try
             {
-                return _registry.Applications[reference.ApplicationId].ProvidedServices
+                return _registry.Applications[reference.ApplicationId.Value].ProvidedServices
                     .FirstOrDefault(x =>
                         Equals(x.Alias, reference.ServiceAlias) && Equals(x.Service.Id, reference.ServiceId));
             }

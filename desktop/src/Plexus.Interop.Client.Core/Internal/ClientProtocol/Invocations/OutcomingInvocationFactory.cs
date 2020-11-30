@@ -54,7 +54,7 @@
             {
                 var method = methodCall.ProvidedMethod.Value;
                 methodDescriptor = new InvocationMethodDescriptor(method.ProvidedService.ServiceId, method.Name, method.ProvidedService.ServiceId);
-                targetDescriptor = new InvocationTargetDescriptor(method.ProvidedService.ApplicationId, method.ProvidedService.ConnectionId, method.ProvidedService.ServiceAlias);
+                targetDescriptor = new InvocationTargetDescriptor(method.ProvidedService.ApplicationId, method.ProvidedService.ConnectionId, method.ProvidedService.ServiceAlias, method.ProvidedService.ApplicationInstanceId);
             }
             var descriptor = new OutcomingInvocationDescriptor(methodDescriptor, targetDescriptor, contextLinkageOptions);
             var invocation = new OutcomingInvocation<TRequest, TResponse>(
