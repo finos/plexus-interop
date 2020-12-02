@@ -54,5 +54,4 @@ if (backward) {
     to = temp;
 }
 
-replace(from, to, "yarn.lock");
 replace(from, to, "package-lock.json");

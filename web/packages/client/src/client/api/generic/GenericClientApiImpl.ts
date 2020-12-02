@@ -56,6 +56,14 @@ export class GenericClientApiImpl implements InternalGenericClientApi {
         return true;
     }
 
+    public getApplicationId(): string {
+        return this.genericClient.getApplicationId();
+    }
+
+    public getApplicationInstanceId(): UniqueId {
+        return this.genericClient.getApplicationInstanceId();
+    }
+
     public getConnectionId(): UniqueId {
         return this.genericClient.getConnectionId();
     }

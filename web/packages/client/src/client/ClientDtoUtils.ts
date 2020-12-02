@@ -33,7 +33,8 @@ export class ClientDtoUtils {
                 serviceAlias: providedMethod.providedService.serviceAlias || undefined,
                 methodId: providedMethod.methodId || undefined,
                 applicationId: providedMethod.providedService.applicationId || undefined,
-                connectionId: providedMethod.providedService.connectionId as UniqueId
+                connectionId: providedMethod.providedService.connectionId as UniqueId,
+                applicationInstanceId: providedMethod.providedService.applicationInstanceId as UniqueId
             };
         } else {
             return {
