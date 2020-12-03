@@ -23,11 +23,19 @@ import { InvocationObserver } from '../../generic';
 
 /**
  * Base class for all generated clients
- * 
+ *
  */
 export abstract class GenericClientApiBase implements GenericClientApi {
 
     public constructor(protected readonly client: GenericClientApi) { }
+
+    public getApplicationId(): string {
+        return this.client.getApplicationId();
+    }
+
+    public getApplicationInstanceId(): UniqueId {
+        return this.client.getApplicationInstanceId();
+    }
 
     public supported(apiFeature: Feature): boolean {
         return this.client.supported(apiFeature);

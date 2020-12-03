@@ -23,7 +23,7 @@ import { RequestedInvocation } from './RequestedInvocation';
 import { StateMaschine, StateMaschineBase, CancellationToken, Logger, LoggerFactory } from '@plexus-interop/common';
 import { AcceptedInvocation } from './AcceptedInvocation';
 import { Observer } from '@plexus-interop/common';
-import { ServiceDiscoveryRequest } from '@plexus-interop/client-api';
+import { ClientConnectRequest, ServiceDiscoveryRequest } from '@plexus-interop/client-api';
 import { ServiceDiscoveryResponse } from '@plexus-interop/client-api';
 import { SingleMessageRequest } from './SingleMessageRequst';
 import { ClientProtocolHelper as modelHelper, UniqueId } from '@plexus-interop/protocol';
@@ -46,6 +46,7 @@ export class GenericClientImpl implements GenericClient {
     private cancellationToken: CancellationToken = new CancellationToken();
 
     constructor(
+        private readonly clientInfo: ClientConnectRequest,
         private readonly connectionId: UniqueId,
         private readonly transportConnection: TransportConnection) {
         this.log = LoggerFactory.getLogger('GenericClient');
@@ -61,6 +62,14 @@ export class GenericClientImpl implements GenericClient {
             }
         ], this.log);
         this.log.trace('Created');
+    }
+
+    public getApplicationId(): string {
+        return this.clientInfo.applicationId;
+    }
+
+    public getApplicationInstanceId(): UniqueId {
+        return this.clientInfo.applicationInstanceId!;
     }
 
     public getConnectionId(): UniqueId {

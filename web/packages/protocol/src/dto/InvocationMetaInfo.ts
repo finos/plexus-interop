@@ -37,4 +37,5 @@ export interface InvocationRequestInfo {
 
     connectionId?: UniqueId;
 
+    applicationInstanceId?: UniqueId;
 }

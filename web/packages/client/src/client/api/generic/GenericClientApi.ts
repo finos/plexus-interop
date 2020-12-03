@@ -40,6 +40,10 @@ export enum Feature {
 
 export interface GenericClientApi {
 
+    getApplicationId(): string;
+
+    getApplicationInstanceId(): UniqueId;
+
     getConnectionId(): UniqueId;
 
     sendUnaryRequest(invocationInfo: GenericRequest, request: any, responseHandler: ValueHandler<any>, requestType: any, responseType: any): Promise<InvocationClient>;
@@ -47,11 +51,11 @@ export interface GenericClientApi {
     sendRawUnaryRequest(invocationInfo: GenericRequest, request: ArrayBuffer, responseHandler: ValueHandler<ArrayBuffer>): Promise<InvocationClient>;
 
     sendBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<StreamingInvocationClient<any>>;
-    
+
     sendRawBidirectionalStreamingRequest(invocationInfo: GenericRequest, responseObserver: InvocationObserver<ArrayBuffer>): Promise<StreamingInvocationClient<ArrayBuffer>>;
-    
+
     sendServerStreamingRequest(invocationInfo: GenericRequest, request: any, responseObserver: InvocationObserver<any>, requestType: any, responseType: any): Promise<InvocationClient>;
-    
+
     sendRawServerStreamingRequest(
         invocationInfo: InvocationRequestInfo,
         request: ArrayBuffer,
