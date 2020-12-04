@@ -28,4 +28,7 @@ export interface ProvidedServiceReference {
 
     /** ProvidedServiceReference connectionId */
     connectionId?: UniqueId;
+
+    /** ProvidedServiceReference appInstanceId */
+    applicationInstanceId?: UniqueId;
 }

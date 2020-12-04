@@ -36,6 +36,7 @@ export class GenericClientFactory {
             .then(response => {
                 this.log.info('Client connected');
                 return new GenericClientImpl(
+                    request,
                     UniqueId.fromProperties(response.connectionId as plexus.IUniqueId),
                     this.transportConnection);
             });

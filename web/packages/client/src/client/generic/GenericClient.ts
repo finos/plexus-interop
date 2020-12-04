@@ -28,6 +28,10 @@ import { UniqueId } from '@plexus-interop/transport-common';
 
 export interface GenericClient {
 
+    getApplicationId(): string;
+
+    getApplicationInstanceId(): UniqueId;
+
     getConnectionId(): UniqueId;
 
     requestInvocation(invocationInfo: InvocationMetaInfo): Promise<Invocation>;

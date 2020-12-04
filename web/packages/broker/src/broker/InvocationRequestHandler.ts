@@ -175,7 +175,26 @@ export class InvocationRequestHandler {
                 const connectionId = UniqueId.fromProperties(methodReference.providedService.connectionId as plexus.IUniqueId);
                 this.log.trace(`Looking for app by connection id [${connectionId.toString()}]`);
                 appConnection = onlineApps.find(a => connectionId.equals(a.connection.uuid()));
-            } else if (methodReference.providedService && methodReference.providedService.applicationId) {
+            } else if (methodReference.providedService && methodReference.providedService.applicationInstanceId) {
+                const onlineApps = await this.appLifeCycleManager.getOnlineConnections();
+                const appInstanceId = UniqueId.fromProperties(methodReference.providedService.applicationInstanceId as plexus.IUniqueId).toString();
+                this.log.trace(`Looking for app by appInstanceId [${appInstanceId}]`);
+                let connections = onlineApps.filter(a => appInstanceId === a.descriptor.instanceId);
+                if (methodReference.providedService.applicationId) {
+                    const appId = methodReference.providedService.applicationId;
+                    connections = connections.filter(a => appId === appId);
+                }
+                if (connections.length === 0) {
+                    appConnection = null;
+                }
+                else if (connections.length > 1) {
+                    throw new Error(`App instance ${appInstanceId} has several connections, you need to specify ApplicationId to make call to specific connection`);
+                }
+                else {
+                    appConnection = connections[0];
+                }
+            }
+             else if (methodReference.providedService && methodReference.providedService.applicationId) {
                 this.log.trace(`Looking for app by app id [${methodReference.providedService.applicationId}]`);
                 appConnection = this.appLifeCycleManager.getOrSpawnConnection(methodReference.providedService.applicationId, sourceConnection.instanceId);
             }
