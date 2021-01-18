@@ -25,7 +25,7 @@
     "@plexus-interop/metadata": "0.1.0",
     "@plexus-interop/client": "0.1.0",
     "@plexus-interop/websocket-transport": "0.1.0",
-    "tslib": "1.10.0"
+    "tslib": "^1.10.0"
   },
   "peerDependencies": {
     "rxjs": "^5.5.2"
