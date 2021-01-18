@@ -25,7 +25,7 @@
     "ya-js-storage": "0.1.4",
     "long": "^4.0.0",
     "reflect-metadata": "^0.1.10",
-    "tslib": "1.10.0"
+    "tslib": "^1.10.0"
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {
