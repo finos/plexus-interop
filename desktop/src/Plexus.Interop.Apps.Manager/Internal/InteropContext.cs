@@ -18,7 +18,6 @@ namespace Plexus.Interop.Apps.Internal
 {
     using System;
     using System.IO;
-    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal.Generated;
     using Plexus.Interop.Apps.Internal.Services;
@@ -75,24 +74,27 @@ namespace Plexus.Interop.Apps.Internal
 
         protected override ILogger Log { get; } = LogManager.GetLogger<InteropContext>();
 
-        protected override async Task<Task> StartCoreAsync()
+        protected override Task<Task> StartCoreAsync()
         {
             _started = true;
-            await Task.WhenAll(_lifecycleManagerClient.ConnectAsync(), _nativeAppLauncherClient.StartAsync());
-
-            return Task.WhenAll(StartLifecycleManagerClientWithReconnect(), _nativeAppLauncherClient.Completion);
+            var clientsCompletionTask = Task.WhenAll(StartLifecycleManagerClientWithReconnect(), StartNativeAppLauncherClient());
+            return Task.FromResult(clientsCompletionTask);
         }
 
         private async Task StartLifecycleManagerClientWithReconnect()
         {
             while (_started)
-                {
-                await _lifecycleManagerClient.Completion;
-
-                    Log.Warn("AppLifecycleManager disconnected. Automatically reconnecting");
+            {
+                Log.Warn("AppLifecycleManager disconnected. Automatically reconnecting");
                 await _lifecycleManagerClient.ConnectAsync();
+                await _lifecycleManagerClient.Completion;
             }
-            await _lifecycleManagerClient.Completion;
+        }
+
+        private async Task StartNativeAppLauncherClient()
+        {
+            await _nativeAppLauncherClient.StartAsync();
+            await _nativeAppLauncherClient.Completion;
         }
     }
 }
