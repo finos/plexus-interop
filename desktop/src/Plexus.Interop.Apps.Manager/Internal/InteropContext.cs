@@ -42,6 +42,7 @@ namespace Plexus.Interop.Apps.Internal
         private readonly AppLifecycleServiceImpl _appLifecycleService;
         private readonly ContextLinkageServiceImpl _contextLinkageService;
         private AppLaunchedEventSubscriber _appLaunchedEventSubscriber;
+        private bool _started = false;
 
         public InteropContext(string metadataDir, IRegistryProvider registryProvider)
         {
@@ -65,30 +66,33 @@ namespace Plexus.Interop.Apps.Internal
                 s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
 
             OnStop(_nativeAppLauncherClient.Stop);
-            OnStop(_lifecycleManagerClient.Disconnect);
-
-            AutoReconnectAppLifecycleManagerOnDisconnect();
+            OnStop(() =>
+            {
+                _started = false;
+                _lifecycleManagerClient.Disconnect();
+            });
         }
 
         protected override ILogger Log { get; } = LogManager.GetLogger<InteropContext>();
 
         protected override async Task<Task> StartCoreAsync()
         {
+            _started = true;
             await Task.WhenAll(_lifecycleManagerClient.ConnectAsync(), _nativeAppLauncherClient.StartAsync());
 
-            return Task.WhenAll(_lifecycleManagerClient.Completion, _nativeAppLauncherClient.Completion);
+            return Task.WhenAll(StartLifecycleManagerClientWithReconnect(), _nativeAppLauncherClient.Completion);
         }
 
-        private void AutoReconnectAppLifecycleManagerOnDisconnect()
+        private async Task StartLifecycleManagerClientWithReconnect()
         {
-            _appLifecycleManager.ConnectionEventsStream
-                .Where(e => e.Type == ConnectionEventType.AppDisconnected
-                            && e.Connection.ApplicationId == _lifecycleManagerClient.ApplicationId)
-                .Subscribe(e =>
+            while (_started)
                 {
+                await _lifecycleManagerClient.Completion;
+
                     Log.Warn("AppLifecycleManager disconnected. Automatically reconnecting");
-                    _lifecycleManagerClient.ConnectAsync().IgnoreAwait();
-                });
+                await _lifecycleManagerClient.ConnectAsync();
+            }
+            await _lifecycleManagerClient.Completion;
         }
     }
 }
