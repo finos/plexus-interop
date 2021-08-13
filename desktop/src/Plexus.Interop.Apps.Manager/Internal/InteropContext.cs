@@ -85,9 +85,20 @@ namespace Plexus.Interop.Apps.Internal
         {
             while (_started)
             {
-                Log.Warn("AppLifecycleManager disconnected. Automatically reconnecting");
                 await _lifecycleManagerClient.ConnectAsync();
+                try
+                {
                 await _lifecycleManagerClient.Completion;
+            }
+                catch (Exception ex)
+                {
+                    Log.Warn("AppLifecycleManager completed with error", ex);
+                }
+
+                if (_started)
+                {
+                    Log.Info("Trying to automatically reconnect AppLifecycleManager client");
+                }
             }
         }
 
