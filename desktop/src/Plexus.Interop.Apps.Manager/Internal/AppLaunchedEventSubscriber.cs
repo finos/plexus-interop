@@ -30,14 +30,18 @@ namespace Plexus.Interop.Apps.Internal
     {
         private readonly IRegistryProvider _registryProvider;
         private readonly IAppLaunchedEventConsumer _appLaunchedEventConsumer;
-        private readonly Lazy<IClient> _client;
+        private readonly Func<IClientCallInvoker> _getClientCallInvoker;
         private ILogger Log { get; } = LogManager.GetLogger<AppLaunchedEventSubscriber>();
 
-        public AppLaunchedEventSubscriber(IAppLifecycleManager appConnectedEventProvider, IRegistryProvider registryProvider, IAppLaunchedEventConsumer appLaunchedEventConsumer, Lazy<IClient> client)
+        public AppLaunchedEventSubscriber(
+            IAppLifecycleManager appConnectedEventProvider,
+            IRegistryProvider registryProvider,
+            IAppLaunchedEventConsumer appLaunchedEventConsumer,
+            Func<IClientCallInvoker> getClientCallInvoker)
         {
             _registryProvider = registryProvider;
             _appLaunchedEventConsumer = appLaunchedEventConsumer;
-            _client = client;
+            _getClientCallInvoker = getClientCallInvoker;
             appConnectedEventProvider.ConnectionEventsStream
                 .Where(ev => ev.Type == ConnectionEventType.AppConnected)
                 .Select(ev => ev.Connection)
@@ -69,7 +73,7 @@ namespace Plexus.Interop.Apps.Internal
             Task.Factory.StartNew(async () =>
             {
                 Log.Info($"Subscribing to ApplicationLaunchedEventStream of {connectionId} application ({applicationId})");
-                await _client.Value.CallInvoker
+                await _getClientCallInvoker()
                     .CallServerStreaming<Empty, AppLaunchedEvent>(methodCallDescriptor.CallDescriptor, new Empty())
                     .ResponseStream.PipeAsync(_appLaunchedEventConsumer.AppLaunchedEventObserver).ConfigureAwait(false);
                 Log.Info($"Subscription to ApplicationLaunchedEventStream of {connectionId} application ({applicationId}) have finished");

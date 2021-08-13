@@ -61,7 +61,7 @@ namespace Plexus.Processes
         }
 
         protected virtual Task OnCompletedAsync(Task completion)
-        {            
+        {
             return completion;
         }
 

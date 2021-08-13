@@ -19,7 +19,6 @@ namespace Plexus.Interop.Apps.Internal
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
@@ -44,14 +43,17 @@ namespace Plexus.Interop.Apps.Internal
             = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
 
         private readonly IAppRegistryProvider _appRegistryProvider;
-        private readonly Lazy<IClient> _clientLazy;
+        private readonly Func<IClientCallInvoker> _getClientCallInvoker;
 
         private readonly Subject<AppConnectionEvent> _connectionSubject = new Subject<AppConnectionEvent>();
 
-        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, IAppLaunchedEventProvider appLaunchedEventProvider, Lazy<IClient> clientLazy)
+        public AppLifecycleManager(
+            IAppRegistryProvider appRegistryProvider,
+            IAppLaunchedEventProvider appLaunchedEventProvider,
+            Func<IClientCallInvoker> getClientCallInvoker)
         {
             _appRegistryProvider = appRegistryProvider;
-            _clientLazy = clientLazy;
+            _getClientCallInvoker = getClientCallInvoker;
             ConnectionEventsStream = _connectionSubject.ObserveOn(TaskPoolScheduler.Default);
             appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnApplicationLaunchedEvent);
         }
@@ -359,7 +361,7 @@ namespace Plexus.Interop.Apps.Internal
             var launchMethodId = AppLauncherService.LaunchMethodId;
             var launchMethodReference = ProvidedMethodReference.Create(appLauncherServiceId, launchMethodId, launcherId);
 
-            var response = await _clientLazy.Value.CallInvoker
+            var response = await _getClientCallInvoker()
                 .CallUnary<AppLaunchRequest, AppLaunchResponse>(launchMethodReference.CallDescriptor, request)
                 .ConfigureAwait(false);
 
