@@ -225,12 +225,10 @@ namespace Plexus.Interop.Apps.Internal
         public async Task<ResolvedConnection> LaunchAndConnectAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo)
         {
             var suggestedInstanceId = UniqueId.Generate();
-            Log.Debug("Resolving connection for app {0} with mode {1} to new instance with suggested id {2}",
-                appId, mode, suggestedInstanceId);
-            var connectionTask = LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo);
-            var resolvedConnection = await connectionTask.ConfigureAwait(false);
-            Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}} by request from {{{3}}}", 
-                appId, mode, resolvedConnection, referrerConnectionInfo);
+            Log.Debug($"Resolving connection for app {appId} with mode {mode} to new instance with suggested id {suggestedInstanceId}");
+            var resolvedConnection = await LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo).ConfigureAwait(false);
+
+            Log.Debug($"Resolved connection for app {appId} with mode {mode} to launched instance {{{resolvedConnection}}} by request from {{{referrerConnectionInfo}}}");
             return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Info.ApplicationInstanceId);
         }
 
@@ -243,9 +241,9 @@ namespace Plexus.Interop.Apps.Internal
         }
 
         private async Task<IAppConnection> LaunchAndWaitConnectionAsync(
-            string appId, 
+            string appId,
             UniqueId suggestedAppInstanceId,
-            ResolveMode resolveMode, 
+            ResolveMode resolveMode,
             AppConnectionDescriptor referrerConnectionInfo)
         {
             var appInstanceId = suggestedAppInstanceId;
@@ -312,11 +310,11 @@ namespace Plexus.Interop.Apps.Internal
         }
 
         private async Task<UniqueId> LaunchAsync(
-            string appId, 
-            UniqueId suggestedAppInstanceId, 
+            string appId,
+            UniqueId suggestedAppInstanceId,
             ResolveMode resolveMode,
             AppConnectionDescriptor referrerConnectionInfo)
-        {            
+        {
             var appDto = _appRegistryProvider.Current.Apps.FirstOrDefault(x => string.Equals(x.Id, appId));
             if (appDto == null)
             {

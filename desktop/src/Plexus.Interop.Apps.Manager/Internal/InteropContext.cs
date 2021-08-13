@@ -18,10 +18,8 @@ namespace Plexus.Interop.Apps.Internal
 {
     using System;
     using System.IO;
-    using System.Threading;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using Google.Protobuf.WellKnownTypes;
-    using Plexus.Channels;
     using Plexus.Interop.Apps.Internal.Generated;
     using Plexus.Interop.Apps.Internal.Services;
     using Plexus.Interop.Metamodel;
@@ -68,13 +66,29 @@ namespace Plexus.Interop.Apps.Internal
 
             OnStop(_nativeAppLauncherClient.Stop);
             OnStop(_lifecycleManagerClient.Disconnect);
+
+            AutoReconnectAppLifecycleManagerOnDisconnect();
         }
+
+        protected override ILogger Log { get; } = LogManager.GetLogger<InteropContext>();
 
         protected override async Task<Task> StartCoreAsync()
         {
             await Task.WhenAll(_lifecycleManagerClient.ConnectAsync(), _nativeAppLauncherClient.StartAsync());
 
             return Task.WhenAll(_lifecycleManagerClient.Completion, _nativeAppLauncherClient.Completion);
+        }
+
+        private void AutoReconnectAppLifecycleManagerOnDisconnect()
+        {
+            _appLifecycleManager.ConnectionEventsStream
+                .Where(e => e.Type == ConnectionEventType.AppDisconnected
+                            && e.Connection.ApplicationId == _lifecycleManagerClient.ApplicationId)
+                .Subscribe(e =>
+                {
+                    Log.Warn("AppLifecycleManager disconnected. Automatically reconnecting");
+                    _lifecycleManagerClient.ConnectAsync().IgnoreAwait();
+                });
         }
     }
 }
