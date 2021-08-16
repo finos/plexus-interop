@@ -24,7 +24,7 @@
     using Plexus.Logging.NLog;
 
     internal sealed class ProgramLoader : IDisposable
-    {        
+    {
         private static readonly TimeSpan ShutdownTimeout = TimeoutConstants.Timeout5Sec;
 
         private readonly LoggingInitializer _loggingInitializer;
@@ -49,16 +49,14 @@
                 if (_program.InstanceAwareness == InstanceAwareness.SingleInstancePerDirectory)
                 {
                     var workingDir = Directory.GetCurrentDirectory();
-                    _log.Info("Checking if another instance of {0} is already running in directory {1}", 
-                        _program.Name, workingDir);
-                    var lockFileName = _program.InstanceKey + "-lock";                    
+                    _log.Info($"Checking if another instance of {_program.Name} is already running in directory {workingDir}");
+                    var lockFileName = _program.InstanceKey + "-lock";
                     lockFile = new LockFile(lockFileName, Process.GetCurrentProcess().Id.ToString());
                     _log.Info("Trying to acquire lock file {0}", lockFile.Name);
                     var isFirstInstance = lockFile.TryEnter(500);
                     if (!isFirstInstance)
                     {
-                        _log.Info("Another instance of {0} is already running in directory {1}. Exiting.",
-                            _program.InstanceKey, workingDir);
+                        _log.Info($"Another instance of {_program.InstanceKey} is already running in directory {workingDir}. Exiting.");
                         return 1;
                     }
                 }

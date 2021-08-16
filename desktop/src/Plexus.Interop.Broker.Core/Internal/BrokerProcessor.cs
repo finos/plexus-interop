@@ -113,8 +113,8 @@ namespace Plexus.Interop.Broker.Internal
         {
             var transportConnection = (ITransportConnection) state;
             Log.Debug("Accepting new incoming connection {0}", transportConnection.Id);
-            var appConnectionDescriptor =
-                await _authenticationHandler.AuthenticateAsync(transportConnection).ConfigureAwait(false);
+            var appConnectionDescriptor = await _authenticationHandler.AuthenticateAsync(transportConnection).ConfigureAwait(false);
+
             Log.Debug("New connection authenticated: {0}", appConnectionDescriptor);
             var clientConnection = _appLifecycleManager.AcceptConnection(transportConnection, appConnectionDescriptor);
             try

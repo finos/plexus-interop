@@ -30,14 +30,18 @@ namespace Plexus.Interop.Apps.Internal
     {
         private readonly IRegistryProvider _registryProvider;
         private readonly IAppLaunchedEventConsumer _appLaunchedEventConsumer;
-        private readonly Lazy<IClient> _client;
+        private readonly IAppLifecycleManagerClientClientRepository _lifecycleManagerClientRepo;
         private ILogger Log { get; } = LogManager.GetLogger<AppLaunchedEventSubscriber>();
 
-        public AppLaunchedEventSubscriber(IAppLifecycleManager appConnectedEventProvider, IRegistryProvider registryProvider, IAppLaunchedEventConsumer appLaunchedEventConsumer, Lazy<IClient> client)
+        public AppLaunchedEventSubscriber(
+            IAppLifecycleManager appConnectedEventProvider,
+            IRegistryProvider registryProvider,
+            IAppLaunchedEventConsumer appLaunchedEventConsumer,
+            IAppLifecycleManagerClientClientRepository lifecycleManagerClientRepo)
         {
             _registryProvider = registryProvider;
             _appLaunchedEventConsumer = appLaunchedEventConsumer;
-            _client = client;
+            _lifecycleManagerClientRepo = lifecycleManagerClientRepo;
             appConnectedEventProvider.ConnectionEventsStream
                 .Where(ev => ev.Type == ConnectionEventType.AppConnected)
                 .Select(ev => ev.Connection)
@@ -66,10 +70,17 @@ namespace Plexus.Interop.Apps.Internal
             var appLaunchedEventStreamMethodId = AppLauncherService.AppLaunchedEventStreamMethodId;
             var methodCallDescriptor = ProvidedMethodReference.CreateWithConnectionId(appLauncherServiceId, appLaunchedEventStreamMethodId, applicationId, connectionId);
 
+            _lifecycleManagerClientRepo.GetClientObservable()
+                .Subscribe(client => SubscribeToLaunchedEventStream(client, connectionId, applicationId, methodCallDescriptor));
+        }
+
+        private void SubscribeToLaunchedEventStream(AppLifecycleManagerClient client, UniqueId connectionId, string applicationId, ProvidedMethodReference methodCallDescriptor)
+        {
             Task.Factory.StartNew(async () =>
             {
-                Log.Info($"Subscribing to ApplicationLaunchedEventStream of {connectionId} application ({applicationId})");
-                await _client.Value.CallInvoker
+                Log.Info($"Subscribing client '{client.ApplicationInstanceId}' to ApplicationLaunchedEventStream of {connectionId} application ({applicationId})");
+
+                await client.CallInvoker
                     .CallServerStreaming<Empty, AppLaunchedEvent>(methodCallDescriptor.CallDescriptor, new Empty())
                     .ResponseStream.PipeAsync(_appLaunchedEventConsumer.AppLaunchedEventObserver).ConfigureAwait(false);
                 Log.Info($"Subscription to ApplicationLaunchedEventStream of {connectionId} application ({applicationId}) have finished");

@@ -19,7 +19,6 @@ namespace Plexus.Interop.Apps.Internal
     using Plexus.Interop.Transport;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
@@ -30,28 +29,25 @@ namespace Plexus.Interop.Apps.Internal
     using UniqueId = Plexus.UniqueId;
 
     internal sealed class AppLifecycleManager : IAppLifecycleManager
-    {        
-        private readonly Dictionary<UniqueId, IAppConnection> _connections
-            = new Dictionary<UniqueId, IAppConnection>();
+    {
+        private readonly Dictionary<UniqueId, IAppConnection> _connections = new Dictionary<UniqueId, IAppConnection>();
+        private readonly Dictionary<UniqueId, Dictionary<string, IAppConnection>> _appInstanceConnections = new Dictionary<UniqueId, Dictionary<string, IAppConnection>>();
+        private readonly Dictionary<string, List<IAppConnection>> _appConnections = new Dictionary<string, List<IAppConnection>>();
 
-        private readonly Dictionary<UniqueId, Dictionary<string, IAppConnection>> _appInstanceConnections
-            = new Dictionary<UniqueId, Dictionary<string, IAppConnection>>();
-
-        private readonly Dictionary<string, List<IAppConnection>> _appConnections
-            = new Dictionary<string, List<IAppConnection>>();
-
-        private readonly Dictionary<(UniqueId AppInstanceId, string AppId), Promise<IAppConnection>> _appInstanceConnectionsInProgress
-            = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
+        private readonly Dictionary<(UniqueId AppInstanceId, string AppId), Promise<IAppConnection>> _appInstanceConnectionsInProgress = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
 
         private readonly IAppRegistryProvider _appRegistryProvider;
-        private readonly Lazy<IClient> _clientLazy;
+        private readonly IAppLifecycleManagerClientClientRepository _appLifecycleManagerClientClientRepo;
 
         private readonly Subject<AppConnectionEvent> _connectionSubject = new Subject<AppConnectionEvent>();
 
-        public AppLifecycleManager(IAppRegistryProvider appRegistryProvider, IAppLaunchedEventProvider appLaunchedEventProvider, Lazy<IClient> clientLazy)
+        public AppLifecycleManager(
+            IAppRegistryProvider appRegistryProvider,
+            IAppLaunchedEventProvider appLaunchedEventProvider,
+            IAppLifecycleManagerClientClientRepository appLifecycleManagerClientClientRepo)
         {
             _appRegistryProvider = appRegistryProvider;
-            _clientLazy = clientLazy;
+            _appLifecycleManagerClientClientRepo = appLifecycleManagerClientClientRepo;
             ConnectionEventsStream = _connectionSubject.ObserveOn(TaskPoolScheduler.Default);
             appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnApplicationLaunchedEvent);
         }
@@ -225,12 +221,10 @@ namespace Plexus.Interop.Apps.Internal
         public async Task<ResolvedConnection> LaunchAndConnectAsync(string appId, ResolveMode mode, AppConnectionDescriptor referrerConnectionInfo)
         {
             var suggestedInstanceId = UniqueId.Generate();
-            Log.Debug("Resolving connection for app {0} with mode {1} to new instance with suggested id {2}",
-                appId, mode, suggestedInstanceId);
-            var connectionTask = LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo);
-            var resolvedConnection = await connectionTask.ConfigureAwait(false);
-            Log.Debug("Resolved connection for app {0} with mode {1} to launched instance {{{2}}} by request from {{{3}}}", 
-                appId, mode, resolvedConnection, referrerConnectionInfo);
+            Log.Debug($"Resolving connection for app {appId} with mode {mode} to new instance with suggested id {suggestedInstanceId}");
+            var resolvedConnection = await LaunchAndWaitConnectionAsync(appId, suggestedInstanceId, mode, referrerConnectionInfo).ConfigureAwait(false);
+
+            Log.Debug($"Resolved connection for app {appId} with mode {mode} to launched instance {{{resolvedConnection}}} by request from {{{referrerConnectionInfo}}}");
             return new ResolvedConnection(resolvedConnection, suggestedInstanceId == resolvedConnection.Info.ApplicationInstanceId);
         }
 
@@ -243,9 +237,9 @@ namespace Plexus.Interop.Apps.Internal
         }
 
         private async Task<IAppConnection> LaunchAndWaitConnectionAsync(
-            string appId, 
+            string appId,
             UniqueId suggestedAppInstanceId,
-            ResolveMode resolveMode, 
+            ResolveMode resolveMode,
             AppConnectionDescriptor referrerConnectionInfo)
         {
             var appInstanceId = suggestedAppInstanceId;
@@ -312,11 +306,11 @@ namespace Plexus.Interop.Apps.Internal
         }
 
         private async Task<UniqueId> LaunchAsync(
-            string appId, 
-            UniqueId suggestedAppInstanceId, 
+            string appId,
+            UniqueId suggestedAppInstanceId,
             ResolveMode resolveMode,
             AppConnectionDescriptor referrerConnectionInfo)
-        {            
+        {
             var appDto = _appRegistryProvider.Current.Apps.FirstOrDefault(x => string.Equals(x.Id, appId));
             if (appDto == null)
             {
@@ -361,7 +355,9 @@ namespace Plexus.Interop.Apps.Internal
             var launchMethodId = AppLauncherService.LaunchMethodId;
             var launchMethodReference = ProvidedMethodReference.Create(appLauncherServiceId, launchMethodId, launcherId);
 
-            var response = await _clientLazy.Value.CallInvoker
+            var client = await _appLifecycleManagerClientClientRepo.GetClientAsync().ConfigureAwait(false);
+
+            var response = await client.CallInvoker
                 .CallUnary<AppLaunchRequest, AppLaunchResponse>(launchMethodReference.CallDescriptor, request)
                 .ConfigureAwait(false);
 
