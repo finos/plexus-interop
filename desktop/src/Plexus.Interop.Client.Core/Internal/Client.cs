@@ -31,7 +31,11 @@ namespace Plexus.Interop.Internal
     using System.Threading.Tasks;
 
     internal sealed class Client : ProcessBase, IClient, IClientCallInvoker, IClientDiscoveryInvoker
-    {        
+    {
+        private bool _connected = false;
+        private volatile bool _disconnecting = false;
+        private volatile bool _disposing = false;
+
         private readonly ClientOptions _options;
         private readonly BrokerToClientRequestHandler<Task, ITransportChannel> _incomingRequestHandler;
         private readonly ConcurrentDictionary<Task, Nothing> _discoveryTasks = new ConcurrentDictionary<Task, Nothing>();
@@ -73,19 +77,49 @@ namespace Plexus.Interop.Internal
             return ProcessAsync();
         }
 
-        public Task ConnectAsync() => StartAsync();
+        public async Task ConnectAsync()
+        {
+            await StartAsync();
+            _connected = true;
+        }
 
-        public void Disconnect() => Stop();
+        public void Disconnect()
+        {
+            _disconnecting = true;
+            Stop();
+        }
 
-        public Task DisconnectAsync() => StopAsync();
+        public Task DisconnectAsync()
+        {
+            _disconnecting = true;
+            return StopAsync();
+        }
+
+        public override void Dispose()
+        {
+            _disposing = true;
+            base.Dispose();
+        }
+
+        private void CheckConnectionState()
+        {
+            if (!_connected)
+                throw new InvalidOperationException($"Client not connected (need wait for finish {nameof(ConnectAsync)}), options: {_options}");
+            if (_disconnecting)
+                throw new InvalidOperationException($"Client disconnecting ({nameof(Disconnect)} or {nameof(DisconnectAsync)} called), options: {_options}");
+            if (_disposing)
+                throw new InvalidOperationException($"Client disposing ({nameof(Dispose)} called), options: {_options}");
+        }
 
         public IUnaryMethodCall Call<TRequest>(IUnaryMethod<TRequest, Nothing> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             return CallUnary(method.CallDescriptor, request, contextLinkageOptions);
         }
 
         public IUnaryMethodCall CallUnary<TRequest>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             _log.Debug("Starting unary call: {0}", descriptor);
             var call = new UnaryMethodCall<TRequest, Nothing>(() => _outcomingInvocationFactory.CreateAsync<TRequest, Nothing>(descriptor, request, contextLinkageOptions));
             call.Start();
@@ -94,11 +128,13 @@ namespace Plexus.Interop.Internal
 
         public IUnaryMethodCall<TResponse> Call<TRequest, TResponse>(IUnaryMethod<TRequest, TResponse> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             return CallUnary<TRequest, TResponse>(method.CallDescriptor, request, contextLinkageOptions);
         }
 
         public IUnaryMethodCall<TResponse> CallUnary<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             _log.Debug("Starting unary call: {0}", descriptor);
             var call = new UnaryMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request, contextLinkageOptions));
             call.Start();
@@ -107,11 +143,13 @@ namespace Plexus.Interop.Internal
 
         public IServerStreamingMethodCall<TResponse> Call<TRequest, TResponse>(IServerStreamingMethod<TRequest, TResponse> method, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             return CallServerStreaming<TRequest, TResponse>(method.CallDescriptor, request, contextLinkageOptions);
         }
 
         public IServerStreamingMethodCall<TResponse> CallServerStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, TRequest request, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             _log.Debug("Starting server streaming call: {0}", descriptor);
             var call = new ServerStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, request, contextLinkageOptions));
             call.Start();
@@ -120,11 +158,13 @@ namespace Plexus.Interop.Internal
 
         public IClientStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IClientStreamingMethod<TRequest, TResponse> method, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             return CallClientStreaming<TRequest, TResponse>(method.CallDescriptor, contextLinkageOptions);
         }
 
         public IClientStreamingMethodCall<TRequest, TResponse> CallClientStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             _log.Debug("Starting client streaming call: {0}", descriptor);
             var call = new ClientStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, contextLinkageOptions: contextLinkageOptions));
             call.Start();
@@ -133,11 +173,13 @@ namespace Plexus.Interop.Internal
 
         public IDuplexStreamingMethodCall<TRequest, TResponse> Call<TRequest, TResponse>(IDuplexStreamingMethod<TRequest, TResponse> method, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             return CallDuplexStreaming<TRequest, TResponse>(method.CallDescriptor, contextLinkageOptions);
         }
 
         public IDuplexStreamingMethodCall<TRequest, TResponse> CallDuplexStreaming<TRequest, TResponse>(MethodCallDescriptor descriptor, ContextLinkageOptions contextLinkageOptions = default)
         {
+            CheckConnectionState();
             _log.Debug("Starting duplex streaming call: {0}", descriptor);
             var call = new DuplexStreamingMethodCall<TRequest, TResponse>(() => _outcomingInvocationFactory.CreateAsync<TRequest, TResponse>(descriptor, contextLinkageOptions: contextLinkageOptions));
             call.Start();
