@@ -29,31 +29,25 @@ namespace Plexus.Interop.Apps.Internal
     using UniqueId = Plexus.UniqueId;
 
     internal sealed class AppLifecycleManager : IAppLifecycleManager
-    {        
-        private readonly Dictionary<UniqueId, IAppConnection> _connections
-            = new Dictionary<UniqueId, IAppConnection>();
+    {
+        private readonly Dictionary<UniqueId, IAppConnection> _connections = new Dictionary<UniqueId, IAppConnection>();
+        private readonly Dictionary<UniqueId, Dictionary<string, IAppConnection>> _appInstanceConnections = new Dictionary<UniqueId, Dictionary<string, IAppConnection>>();
+        private readonly Dictionary<string, List<IAppConnection>> _appConnections = new Dictionary<string, List<IAppConnection>>();
 
-        private readonly Dictionary<UniqueId, Dictionary<string, IAppConnection>> _appInstanceConnections
-            = new Dictionary<UniqueId, Dictionary<string, IAppConnection>>();
-
-        private readonly Dictionary<string, List<IAppConnection>> _appConnections
-            = new Dictionary<string, List<IAppConnection>>();
-
-        private readonly Dictionary<(UniqueId AppInstanceId, string AppId), Promise<IAppConnection>> _appInstanceConnectionsInProgress
-            = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
+        private readonly Dictionary<(UniqueId AppInstanceId, string AppId), Promise<IAppConnection>> _appInstanceConnectionsInProgress = new Dictionary<(UniqueId, string), Promise<IAppConnection>>();
 
         private readonly IAppRegistryProvider _appRegistryProvider;
-        private readonly Func<IClientCallInvoker> _getClientCallInvoker;
+        private readonly IAppLifecycleManagerClientClientRepository _appLifecycleManagerClientClientRepo;
 
         private readonly Subject<AppConnectionEvent> _connectionSubject = new Subject<AppConnectionEvent>();
 
         public AppLifecycleManager(
             IAppRegistryProvider appRegistryProvider,
             IAppLaunchedEventProvider appLaunchedEventProvider,
-            Func<IClientCallInvoker> getClientCallInvoker)
+            IAppLifecycleManagerClientClientRepository appLifecycleManagerClientClientRepo)
         {
             _appRegistryProvider = appRegistryProvider;
-            _getClientCallInvoker = getClientCallInvoker;
+            _appLifecycleManagerClientClientRepo = appLifecycleManagerClientClientRepo;
             ConnectionEventsStream = _connectionSubject.ObserveOn(TaskPoolScheduler.Default);
             appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnApplicationLaunchedEvent);
         }
@@ -361,7 +355,9 @@ namespace Plexus.Interop.Apps.Internal
             var launchMethodId = AppLauncherService.LaunchMethodId;
             var launchMethodReference = ProvidedMethodReference.Create(appLauncherServiceId, launchMethodId, launcherId);
 
-            var response = await _getClientCallInvoker()
+            var client = await _appLifecycleManagerClientClientRepo.GetClientAsync().ConfigureAwait(false);
+
+            var response = await client.CallInvoker
                 .CallUnary<AppLaunchRequest, AppLaunchResponse>(launchMethodReference.CallDescriptor, request)
                 .ConfigureAwait(false);
 

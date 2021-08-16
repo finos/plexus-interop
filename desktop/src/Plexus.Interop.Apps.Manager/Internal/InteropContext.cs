@@ -16,7 +16,6 @@
  */
 namespace Plexus.Interop.Apps.Internal
 {
-    using System;
     using System.IO;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal.Generated;
@@ -39,11 +38,10 @@ namespace Plexus.Interop.Apps.Internal
 
         private readonly AppLifecycleServiceImpl _appLifecycleService;
         private readonly ContextLinkageServiceImpl _contextLinkageService;
-        private readonly AppMetadataServiceImpl _appMetadataService;
-        private AppLifecycleManagerClient _lifecycleManagerClient;
         private AppLaunchedEventSubscriber _appLaunchedEventSubscriber;
-        private bool _started = false;
-        private readonly object _lifecycleClientAccess = new object();
+        private readonly  AppMetadataServiceImpl _appMetadataService;
+        
+        private readonly AppLifecycleManagerClientClientRepository _appLifecycleManagerClientClientRepository;
 
         public InteropContext(string metadataDir, IRegistryProvider registryProvider)
         {
@@ -51,35 +49,32 @@ namespace Plexus.Interop.Apps.Internal
             var appRegistryProvider = new JsonFileAppRegistryProvider(Path.Combine(metadataDir, "apps.json"));
             _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir);
 
+            _appLifecycleManagerClientClientRepository = new AppLifecycleManagerClientClientRepository();
             var appLaunchedEventProvider = new AppLaunchedEventProvider();
-            _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, appLaunchedEventProvider, GetAppLifecycleManagerClientCallInvoker);
-            _appLaunchedEventSubscriber = new AppLaunchedEventSubscriber(_appLifecycleManager, registryProvider, appLaunchedEventProvider, GetAppLifecycleManagerClientCallInvoker);
+            _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, appLaunchedEventProvider, _appLifecycleManagerClientClientRepository);
+            _appLaunchedEventSubscriber = new AppLaunchedEventSubscriber(_appLifecycleManager, registryProvider, appLaunchedEventProvider, _appLifecycleManagerClientClientRepository);
 
-            
             _appMetadataService = new AppMetadataServiceImpl(appRegistryProvider, registryProvider);
             _appLifecycleService = new AppLifecycleServiceImpl(_appLifecycleManager);
             _contextLinkageService = new ContextLinkageServiceImpl(registryProvider, _appLifecycleManager, appLaunchedEventProvider);
 
-            _lifecycleManagerClient = CreateAppLifecycleManagerClient();
 
             OnStop(_nativeAppLauncherClient.Stop);
-            OnStop(() =>
-            {
-                _started = false;
-                lock (_lifecycleClientAccess)
-                {
-                    _lifecycleManagerClient.Disconnect();
-                }
-            });
+            OnStop(_appLifecycleManagerClientClientRepository.Stop);
         }
 
         protected override ILogger Log { get; } = LogManager.GetLogger<InteropContext>();
 
         protected override Task<Task> StartCoreAsync()
         {
-            _started = true;
-            var clientsCompletionTask = Task.WhenAll(StartLifecycleManagerClientWithReconnect(), StartNativeAppLauncherClient());
+            var clientsCompletionTask = Task.WhenAll(_appLifecycleManagerClientClientRepository.Start(CreateAppLifecycleManagerClient), StartNativeAppLauncherClient());
             return Task.FromResult(clientsCompletionTask);
+        }
+
+        private async Task StartNativeAppLauncherClient()
+        {
+            await _nativeAppLauncherClient.StartAsync();
+            await _nativeAppLauncherClient.Completion;
         }
 
         private AppLifecycleManagerClient CreateAppLifecycleManagerClient()
@@ -89,64 +84,6 @@ namespace Plexus.Interop.Apps.Internal
                 _appMetadataService,
                 _contextLinkageService,
                 s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
-        }
-
-        private IClientCallInvoker GetAppLifecycleManagerClientCallInvoker()
-        {
-            lock (_lifecycleClientAccess)
-            {
-                return _lifecycleManagerClient.CallInvoker;
-            }
-        }
-
-        private async Task StartNativeAppLauncherClient()
-        {
-            await _nativeAppLauncherClient.StartAsync();
-            await _nativeAppLauncherClient.Completion;
-        }
-
-        private async Task StartLifecycleManagerClientWithReconnect()
-        {
-            while (_started)
-            {
-                await ConnectLifecycleManagerClient();
-
-                try
-                {
-                    await GetLifecycleManagerClientCompletion();
-                }
-                catch (Exception ex)
-                {
-                    Log.Warn("AppLifecycleManager completed with error", ex);
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(5));
-                if (_started)
-                {
-                    Log.Info("Trying to automatically reconnect AppLifecycleManager client");
-                    lock (_lifecycleClientAccess)
-                    {
-                        _lifecycleManagerClient.Dispose();
-                        _lifecycleManagerClient = CreateAppLifecycleManagerClient();
-                    }
-                }
-            }
-        }
-
-        private Task ConnectLifecycleManagerClient()
-        {
-            lock (_lifecycleClientAccess)
-            {
-                return _lifecycleManagerClient.ConnectAsync();
-            }
-        }
-
-        private Task GetLifecycleManagerClientCompletion()
-        {
-            lock (_lifecycleClientAccess)
-            {
-                return _lifecycleManagerClient.Completion;
-            }
         }
     }
 }
