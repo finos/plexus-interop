@@ -26,7 +26,7 @@ namespace Plexus.Processes
         private readonly Latch _started = new Latch();
         private readonly Latch _stopped = new Latch();
         private readonly Promise _completion = new Promise();
-        private readonly Promise _startCompletion = new Promise();        
+        private readonly Promise _startCompletion = new Promise();
         private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private readonly ConcurrentBag<CancellationTokenRegistration> _registrations 
@@ -61,7 +61,7 @@ namespace Plexus.Processes
         }
 
         protected virtual Task OnCompletedAsync(Task completion)
-        {            
+        {
             return completion;
         }
 
@@ -86,7 +86,7 @@ namespace Plexus.Processes
             var startTask = StartCoreAsync();
             startTask.PropagateCompletionToPromise(_startCompletion);
             startTask
-                .Unwrap()                
+                .Unwrap()
                 .ContinueWithSynchronously(OnCompletedAsync, CancellationToken.None)
                 .PropagateCompletionToPromise(_completion);
         }
