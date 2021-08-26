@@ -166,6 +166,14 @@ namespace Plexus.Interop
             });
         }
 
+        [Fact]
+        public async Task UnaryCallThrowsCorrectExceptionWithoutConnectBeforeCall()
+        {
+            var client = CreateEchoClient();
+            var sentRequest = CreateTestRequest();
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await client.CallInvoker.Call(EchoUnaryMethod, sentRequest));
+        }
+
         [Theory]
         [InlineData(InvocationResult.Succeeded)]
         [InlineData(InvocationResult.Canceled)]
@@ -1244,7 +1252,7 @@ namespace Plexus.Interop
             });
         }
 
-        private IClient ConnectEchoClient(ITestBroker testBroker = null)
+        private IClient CreateEchoClient(ITestBroker testBroker = null)
         {
             testBroker = testBroker ?? _testBrokerFixture.SharedInstance;
             var clientOptions = new ClientOptionsBuilder()
@@ -1252,7 +1260,12 @@ namespace Plexus.Interop
                 .WithDefaultConfiguration()
                 .WithApplicationId("plexus.interop.testing.EchoClient")
                 .Build();
-            var client = RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
+            return RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
+        }
+
+        private IClient ConnectEchoClient(ITestBroker testBroker = null)
+        {
+            var client = CreateEchoClient(testBroker);
             client.ConnectAsync().ShouldCompleteIn(Timeout10Sec);
             return client;
         }
