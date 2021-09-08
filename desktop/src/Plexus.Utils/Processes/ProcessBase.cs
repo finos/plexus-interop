@@ -114,7 +114,7 @@ namespace Plexus.Processes
             await Completion.IgnoreExceptions().ConfigureAwait(false);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Log.Debug("Disposing");
             StopAsync().GetResult();
