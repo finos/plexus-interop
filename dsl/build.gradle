@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.xtext:xtext-gradle-plugin:1.0.18'    
+        classpath 'org.xtext:xtext-gradle-plugin:2.1.0'
         classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"   
     }
 }
