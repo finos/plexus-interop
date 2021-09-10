@@ -41,6 +41,8 @@ subprojects {
         exclude "**/xtend-gen/**"
         exclude "**/*/*._trace"
 	    exclude "**/google/protobuf/*.proto"
+        // HACK: exclude not working for **/xtext-gen/**
+        exclude "**/com/db/plexus/interop/dsl/protobuf/**"
         strictCheck true
     }
 
