@@ -16,24 +16,19 @@
 */
 namespace Plexus.Interop
 {
-    using Plexus.Interop.Broker;
-
     public sealed class BrokerOptions
     {
         public string MetadataDir { get; }
 
         public uint Port { get; }
 
-        public BrokerFeatures Features { get; }
-
-        public BrokerOptions(string metadataDir, uint port, BrokerFeatures features)
+        public BrokerOptions(string metadataDir, uint port)
         {
             MetadataDir = metadataDir;
             Port = port;
-            Features = features;
         }
 
         public override string ToString()
-            => $"{nameof(MetadataDir)}: {MetadataDir}, {nameof(Port)}: {Port}, {nameof(Features)}: {Features}";
+            => $"{nameof(MetadataDir)}: {MetadataDir}, {nameof(Port)}: {Port}";
     }
 }

@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Broker
+namespace Plexus
 {
     using System;
 
     [Flags]
-    public enum BrokerFeatures
+    public enum BrokerFeatures : long
     {
         None = 0,
         CheckAppInstanceId = 1,

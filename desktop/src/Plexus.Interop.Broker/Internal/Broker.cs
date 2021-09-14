@@ -44,6 +44,7 @@ namespace Plexus.Interop.Internal
         private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider 
             = new ProtobufProtocolSerializerFactory();
 
+        private readonly BrokerFeatures _features;
         private readonly string _workingDir;
         private readonly ServerConnectionListener _connectionListener;
         private readonly IBrokerProcessor _brokerProcessor;
@@ -54,7 +55,8 @@ namespace Plexus.Interop.Internal
 
         public Broker(BrokerOptions options, IRegistryProvider registryProvider = null)
         {
-            Log.Info($"Broker features: {options.Features}");
+            _features = EnvironmentHelper.GetBrokerFeatures();
+            Log.Info($"Broker features: {_features}");
             _workingDir = Directory.GetCurrentDirectory();
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var studioDir = Path.Combine(binDir, "studio");
@@ -86,7 +88,7 @@ namespace Plexus.Interop.Internal
                 _connectionListener.In,
                 DefaultProtocolSerializationProvider,
                 _interopContext,
-                options.Features);
+                _features);
             OnStop(_connectionListener.Stop);
         }
 

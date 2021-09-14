@@ -26,6 +26,7 @@
         public const string PlexusTimeoutMultiplier = "PLEXUS_TIMEOUT_MULTIPLIER";
         public const string PlexusBrokerWebSocketAddress = "PLEXUS_BROKER_WEBSOCKET_ADDRESS";
         public const string PlexusBrokerPipeAddress = "PLEXUS_BROKER_PIPE_ADDRESS";
+        public const string PlexusBrokerFeatures = "PLEXUS_BROKER_FEATURES";
 
         public static string GetBrokerWorkingDir()
         {
@@ -63,6 +64,14 @@
         public static string GetPipeAddress()
         {
             return Environment.GetEnvironmentVariable(PlexusBrokerPipeAddress);
+        }
+
+        public static BrokerFeatures GetBrokerFeatures()
+        {
+            var rawValue = Environment.GetEnvironmentVariable(PlexusBrokerFeatures);
+            return Enum.TryParse<BrokerFeatures>(rawValue, out var value)
+                ? value
+                : BrokerFeatures.None;
         }
     }
 }

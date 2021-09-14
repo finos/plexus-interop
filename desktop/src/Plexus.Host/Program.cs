@@ -101,17 +101,9 @@ namespace Plexus.Host
 
         private static async Task<int> StartBrokerAsync(StartCliOptions opts)
         {
-            var brokerOptions = new BrokerOptions(opts.Metadata, opts.Port, GetBrokerFeatures(opts));
+            var brokerOptions = new BrokerOptions(opts.Metadata, opts.Port);
             var program = new BrokerProgram(brokerOptions);
             return await LoadAndRunProgramAsync(program).ConfigureAwait(false);
-        }
-
-        private static BrokerFeatures GetBrokerFeatures(StartCliOptions opts)
-        {
-            var result = BrokerFeatures.None;
-            if (opts.CheckAppInstanceId)
-                result |= BrokerFeatures.CheckAppInstanceId;
-            return result;
         }
 
         private static async Task<int> StopBrokerAsync()
