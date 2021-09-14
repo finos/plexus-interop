@@ -24,6 +24,7 @@ namespace Plexus.Interop.Apps.Internal
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
     using System.Threading.Tasks;
+    using Google.Protobuf.Collections;
     using Plexus.Interop.Apps.Internal.Generated;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
     using UniqueId = Plexus.UniqueId;
@@ -287,9 +288,19 @@ namespace Plexus.Interop.Apps.Internal
         private void OnApplicationLaunchedEvent(AppLaunchedEvent appLaunchedEvent)
         {
             var appInstanceId = appLaunchedEvent.AppInstanceId.ToUniqueId();
+            RegisterAppInstanceConnection(appLaunchedEvent.AppIds, appInstanceId);
+        }
+
+        public void RegisterAppInstanceConnection(string appId, UniqueId appInstanceId)
+        {
+            RegisterAppInstanceConnection(new[] {appId}, appInstanceId);
+        }
+
+        private void RegisterAppInstanceConnection(IEnumerable<string> appIds, UniqueId appInstanceId)
+        {
             lock (_connections)
             {
-                foreach (var appId in appLaunchedEvent.AppIds)
+                foreach (var appId in appIds)
                 {
                     if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.TryGetValue(appId, out var _))
                     {
