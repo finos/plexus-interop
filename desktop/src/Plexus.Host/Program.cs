@@ -19,7 +19,6 @@ namespace Plexus.Host
     using CommandLine;
     using Plexus.Host.Internal;
     using Plexus.Interop;
-    using Plexus.Interop.Broker;
     using System;
     using System.Diagnostics;
     using System.IO;
