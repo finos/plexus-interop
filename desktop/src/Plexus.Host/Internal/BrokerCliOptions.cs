@@ -29,6 +29,9 @@
 
         [Option('p', "port", Required = false, HelpText = "Port number to listen. If omitted, free port is selected automatically.")]
         public uint Port { get; set; }
+
+        [Option("check-app-instance-id", HelpText = "Check application instance id on connect to broker if set.")]
+        public bool CheckAppInstanceId { get; set; }
     }
 
 #if !NET45

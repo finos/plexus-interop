@@ -54,6 +54,7 @@ namespace Plexus.Interop.Internal
 
         public Broker(BrokerOptions options, IRegistryProvider registryProvider = null)
         {
+            Log.Info($"Broker features: {options.Features}");
             _workingDir = Directory.GetCurrentDirectory();
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var studioDir = Path.Combine(binDir, "studio");
@@ -84,7 +85,8 @@ namespace Plexus.Interop.Internal
             _brokerProcessor = BrokerProcessorFactory.Instance.Create(
                 _connectionListener.In,
                 DefaultProtocolSerializationProvider,
-                _interopContext);
+                _interopContext,
+                options.Features);
             OnStop(_connectionListener.Stop);
         }
 
