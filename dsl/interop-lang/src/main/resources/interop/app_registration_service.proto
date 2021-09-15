@@ -25,4 +25,6 @@ service AppRegistrationService {
 	rpc RequestInstanceId(RequestInstanceIdRequest) returns (UniqueId);
 }
 
-message RequestInstanceIdRequest { }
+message RequestInstanceIdRequest {
+	string application_id = 1;
+}

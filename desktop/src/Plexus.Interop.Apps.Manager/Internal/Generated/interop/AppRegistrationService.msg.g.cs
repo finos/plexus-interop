@@ -42,16 +42,17 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           string.Concat(
             "CiZpbnRlcm9wL2FwcF9yZWdpc3RyYXRpb25fc2VydmljZS5wcm90bxIHaW50",
             "ZXJvcBoXaW50ZXJvcC91bmlxdWVfaWQucHJvdG8aFWludGVyb3Avb3B0aW9u",
-            "cy5wcm90byJAChhSZXF1ZXN0SW5zdGFuY2VJZFJlcXVlc3Q6JJLbBCBpbnRl",
-            "cm9wLlJlcXVlc3RJbnN0YW5jZUlkUmVxdWVzdDKHAQoWQXBwUmVnaXN0cmF0",
-            "aW9uU2VydmljZRJJChFSZXF1ZXN0SW5zdGFuY2VJZBIhLmludGVyb3AuUmVx",
-            "dWVzdEluc3RhbmNlSWRSZXF1ZXN0GhEuaW50ZXJvcC5VbmlxdWVJZBoiktsE",
-            "HmludGVyb3AuQXBwUmVnaXN0cmF0aW9uU2VydmljZUIpqgImUGxleHVzLklu",
-            "dGVyb3AuQXBwcy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3RvMw=="));
+            "cy5wcm90byJYChhSZXF1ZXN0SW5zdGFuY2VJZFJlcXVlc3QSFgoOYXBwbGlj",
+            "YXRpb25faWQYASABKAk6JJLbBCBpbnRlcm9wLlJlcXVlc3RJbnN0YW5jZUlk",
+            "UmVxdWVzdDKHAQoWQXBwUmVnaXN0cmF0aW9uU2VydmljZRJJChFSZXF1ZXN0",
+            "SW5zdGFuY2VJZBIhLmludGVyb3AuUmVxdWVzdEluc3RhbmNlSWRSZXF1ZXN0",
+            "GhEuaW50ZXJvcC5VbmlxdWVJZBoiktsEHmludGVyb3AuQXBwUmVnaXN0cmF0",
+            "aW9uU2VydmljZUIpqgImUGxleHVzLkludGVyb3AuQXBwcy5JbnRlcm5hbC5H",
+            "ZW5lcmF0ZWRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest), global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest.Parser, null, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest), global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest.Parser, new[]{ "ApplicationId" }, null, null, null, null)
           }));
     }
     #endregion
@@ -92,6 +93,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RequestInstanceIdRequest(RequestInstanceIdRequest other) : this() {
+      applicationId_ = other.applicationId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -99,6 +101,18 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RequestInstanceIdRequest Clone() {
       return new RequestInstanceIdRequest(this);
+    }
+
+    /// <summary>Field number for the "application_id" field.</summary>
+    public const int ApplicationIdFieldNumber = 1;
+    private string applicationId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ApplicationId {
+      get { return applicationId_; }
+      set {
+        applicationId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -116,6 +130,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (ApplicationId != other.ApplicationId) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -123,6 +138,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
+      if (ApplicationId.Length != 0) hash ^= ApplicationId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -141,6 +157,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
+      if (ApplicationId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ApplicationId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -151,6 +171,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (ApplicationId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ApplicationId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -161,6 +185,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
+      if (ApplicationId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ApplicationId);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -172,6 +199,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public void MergeFrom(RequestInstanceIdRequest other) {
       if (other == null) {
         return;
+      }
+      if (other.ApplicationId.Length != 0) {
+        ApplicationId = other.ApplicationId;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -188,6 +218,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
+          case 10: {
+            ApplicationId = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -203,6 +237,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
+          case 10: {
+            ApplicationId = input.ReadString();
+            break;
+          }
         }
       }
     }
