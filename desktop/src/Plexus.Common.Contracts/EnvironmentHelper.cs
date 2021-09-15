@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus
+namespace Plexus
 {
     using System;
 
@@ -70,17 +70,19 @@
         public static BrokerFeatures GetBrokerFeatures()
         {
             var rawValue = Environment.GetEnvironmentVariable(BrokerFeatures);
-            return Enum.TryParse<BrokerFeatures>(rawValue, out var value)
-                ? value
-                : Plexus.BrokerFeatures.None;
+            if (string.IsNullOrEmpty(rawValue))
+                return Plexus.BrokerFeatures.None;
+
+            return (BrokerFeatures)Enum.Parse(typeof(BrokerFeatures), rawValue);
         }
 
         public static UniqueId? GetLauncherAppInstanceId()
         {
             var rawValue = Environment.GetEnvironmentVariable(LauncherId);
-            return string.IsNullOrEmpty(rawValue)
-                ? null
-                : UniqueId.FromString(rawValue);
+            if (string.IsNullOrEmpty(rawValue))
+                return null;
+
+            return UniqueId.FromString(rawValue);
         }
     }
 }
