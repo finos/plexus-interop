@@ -23,8 +23,16 @@ import "interop/unique_id.proto";
 
 service AppRegistrationService {
 	rpc RequestInstanceId(RequestInstanceIdRequest) returns (UniqueId);
+	rpc RegisterInstanceId(RegisterInstanceIdRequest) returns (RegisterInstanceIdResponse);
 }
 
 message RequestInstanceIdRequest {
 	string application_id = 1;
 }
+
+message RegisterInstanceIdRequest {
+	string application_id = 1;
+	UniqueId app_instance_id = 2;
+}
+
+message RegisterInstanceIdResponse { }

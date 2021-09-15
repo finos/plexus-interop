@@ -32,6 +32,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		
 		public const string Id = "interop.AppRegistrationService";			
 		public const string RequestInstanceIdMethodId = "RequestInstanceId";
+		public const string RegisterInstanceIdMethodId = "RegisterInstanceId";
 		
 		public static readonly AppRegistrationService.Descriptor DefaultDescriptor = CreateDescriptor();
 		
@@ -47,20 +48,31 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest request);
 		}
 		
+		public partial interface IRegisterInstanceIdProxy {
+			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse> RegisterInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest request);
+		}
+		
 		public partial interface IRequestInstanceIdImpl {
 			Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest request, MethodCallContext context);
+		}
+		
+		public partial interface IRegisterInstanceIdImpl {
+			Task<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse> RegisterInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest request, MethodCallContext context);
 		}
 		
 		public sealed partial class Descriptor {
 		
 			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceIdMethod {get; private set; }
+			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse> RegisterInstanceIdMethod {get; private set; }
 			
 			public Descriptor() {				
 				RequestInstanceIdMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId>(Id, RequestInstanceIdMethodId);
+				RegisterInstanceIdMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse>(Id, RegisterInstanceIdMethodId);
 			}
 		
 			public Descriptor(string alias) {
 				RequestInstanceIdMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId>(Id, alias, RequestInstanceIdMethodId);
+				RegisterInstanceIdMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse>(Id, alias, RegisterInstanceIdMethodId);
 			}
 		}
 	}

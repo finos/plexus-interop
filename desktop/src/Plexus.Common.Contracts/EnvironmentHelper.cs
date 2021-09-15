@@ -79,7 +79,7 @@
         {
             var rawValue = Environment.GetEnvironmentVariable(LauncherId);
             return string.IsNullOrEmpty(rawValue)
-                ? null
+                ? (UniqueId?)null
                 : UniqueId.FromString(rawValue);
         }
     }
