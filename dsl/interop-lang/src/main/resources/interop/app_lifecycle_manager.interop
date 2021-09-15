@@ -21,6 +21,7 @@ import "interop/app_launcher_service.proto";
 import "interop/app_lifecycle_service.proto";
 import "interop/app_metadata_service.proto";
 import "interop/context_linkage.proto";
+import "interop/app_registration_service.proto";
 
 application AppLifecycleManager {
 
@@ -40,4 +41,6 @@ application AppLifecycleManager {
 		AppJoinedContextStream;
 		RestoreContextsLinkage;
 	}
+
+	provides AppRegistrationService { RequestInstanceId; }
 }
