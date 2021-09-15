@@ -19,8 +19,6 @@ syntax = "proto3";
 
 package interop;
 
-import "google/protobuf/empty.proto";
-
 import "interop/unique_id.proto";
 
 service AppRegistrationService {

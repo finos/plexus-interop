@@ -41,16 +41,15 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiZpbnRlcm9wL2FwcF9yZWdpc3RyYXRpb25fc2VydmljZS5wcm90bxIHaW50",
-            "ZXJvcBobZ29vZ2xlL3Byb3RvYnVmL2VtcHR5LnByb3RvGhdpbnRlcm9wL3Vu",
-            "aXF1ZV9pZC5wcm90bxoVaW50ZXJvcC9vcHRpb25zLnByb3RvIkAKGFJlcXVl",
-            "c3RJbnN0YW5jZUlkUmVxdWVzdDokktsEIGludGVyb3AuUmVxdWVzdEluc3Rh",
-            "bmNlSWRSZXF1ZXN0MocBChZBcHBSZWdpc3RyYXRpb25TZXJ2aWNlEkkKEVJl",
-            "cXVlc3RJbnN0YW5jZUlkEiEuaW50ZXJvcC5SZXF1ZXN0SW5zdGFuY2VJZFJl",
-            "cXVlc3QaES5pbnRlcm9wLlVuaXF1ZUlkGiKS2wQeaW50ZXJvcC5BcHBSZWdp",
-            "c3RyYXRpb25TZXJ2aWNlQimqAiZQbGV4dXMuSW50ZXJvcC5BcHBzLkludGVy",
-            "bmFsLkdlbmVyYXRlZGIGcHJvdG8z"));
+            "ZXJvcBoXaW50ZXJvcC91bmlxdWVfaWQucHJvdG8aFWludGVyb3Avb3B0aW9u",
+            "cy5wcm90byJAChhSZXF1ZXN0SW5zdGFuY2VJZFJlcXVlc3Q6JJLbBCBpbnRl",
+            "cm9wLlJlcXVlc3RJbnN0YW5jZUlkUmVxdWVzdDKHAQoWQXBwUmVnaXN0cmF0",
+            "aW9uU2VydmljZRJJChFSZXF1ZXN0SW5zdGFuY2VJZBIhLmludGVyb3AuUmVx",
+            "dWVzdEluc3RhbmNlSWRSZXF1ZXN0GhEuaW50ZXJvcC5VbmlxdWVJZBoiktsE",
+            "HmludGVyb3AuQXBwUmVnaXN0cmF0aW9uU2VydmljZUIpqgImUGxleHVzLklu",
+            "dGVyb3AuQXBwcy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest), global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest.Parser, null, null, null, null)
           }));
