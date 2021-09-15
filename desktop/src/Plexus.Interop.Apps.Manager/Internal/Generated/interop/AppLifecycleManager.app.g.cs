@@ -438,22 +438,22 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			}
 			
 			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
-				builder = builder.WithUnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.UniqueId>(global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.RequestInstanceIdMethodId, _impl.RequestInstanceId);
+				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId>(global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.RequestInstanceIdMethodId, _impl.RequestInstanceId);
 				return builder; 							
 			}
 		}
 		
 		public sealed partial class AppRegistrationServiceImpl: IAppRegistrationServiceImpl
 		{
-			private readonly UnaryMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> _requestInstanceIdHandler;
+			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> _requestInstanceIdHandler;
 			
 			public AppRegistrationServiceImpl(
-				UnaryMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> requestInstanceIdHandler
+				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> requestInstanceIdHandler
 			) {
 				_requestInstanceIdHandler = requestInstanceIdHandler;
 			}
 			
-			public Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context) {
+			public Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest request, MethodCallContext context) {
 				return _requestInstanceIdHandler(request, context);
 			}
 		}					
@@ -468,7 +468,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 				_impl = impl;
 			}
 			
-			public Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context) {
+			public Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest request, MethodCallContext context) {
 				return _impl.RequestInstanceId(request, context);
 			}
 		}

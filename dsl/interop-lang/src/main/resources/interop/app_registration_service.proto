@@ -24,5 +24,7 @@ import "google/protobuf/empty.proto";
 import "interop/unique_id.proto";
 
 service AppRegistrationService {
-	rpc RequestInstanceId(.google.protobuf.Empty) returns (UniqueId);
+	rpc RequestInstanceId(RequestInstanceIdRequest) returns (UniqueId);
 }
+
+message RequestInstanceIdRequest { }
