@@ -42,5 +42,5 @@ application AppLifecycleManager {
 		RestoreContextsLinkage;
 	}
 
-	provides AppRegistrationService { RequestInstanceId; }
+	provides AppRegistrationService { RequestInstanceId; RegisterInstanceId; }
 }

@@ -421,7 +421,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		}
 		
 		public partial interface IAppRegistrationServiceImpl:
-			global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.IRequestInstanceIdImpl
+			global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.IRequestInstanceIdImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.IRegisterInstanceIdImpl
 		{ }
 		
 		private sealed partial class AppRegistrationServiceBinder {
@@ -439,6 +440,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
 				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId>(global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.RequestInstanceIdMethodId, _impl.RequestInstanceId);
+				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse>(global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.RegisterInstanceIdMethodId, _impl.RegisterInstanceId);
 				return builder; 							
 			}
 		}
@@ -446,21 +448,29 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		public sealed partial class AppRegistrationServiceImpl: IAppRegistrationServiceImpl
 		{
 			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> _requestInstanceIdHandler;
+			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse> _registerInstanceIdHandler;
 			
 			public AppRegistrationServiceImpl(
-				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> requestInstanceIdHandler
+				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> requestInstanceIdHandler,
+				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest, global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse> registerInstanceIdHandler
 			) {
 				_requestInstanceIdHandler = requestInstanceIdHandler;
+				_registerInstanceIdHandler = registerInstanceIdHandler;
 			}
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest request, MethodCallContext context) {
 				return _requestInstanceIdHandler(request, context);
 			}
+			
+			public Task<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse> RegisterInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest request, MethodCallContext context) {
+				return _registerInstanceIdHandler(request, context);
+			}
 		}					
 		
 		public sealed partial class AppRegistrationServiceImpl<T>: IAppRegistrationServiceImpl
 			where T:
-			global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.IRequestInstanceIdImpl
+			global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.IRequestInstanceIdImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.IRegisterInstanceIdImpl
 		{
 			private readonly T _impl;
 			
@@ -470,6 +480,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest request, MethodCallContext context) {
 				return _impl.RequestInstanceId(request, context);
+			}
+			
+			public Task<global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse> RegisterInstanceId(global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest request, MethodCallContext context) {
+				return _impl.RegisterInstanceId(request, context);
 			}
 		}
 		
