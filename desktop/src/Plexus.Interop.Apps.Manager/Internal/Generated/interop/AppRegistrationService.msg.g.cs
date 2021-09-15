@@ -42,25 +42,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           string.Concat(
             "CiZpbnRlcm9wL2FwcF9yZWdpc3RyYXRpb25fc2VydmljZS5wcm90bxIHaW50",
             "ZXJvcBoXaW50ZXJvcC91bmlxdWVfaWQucHJvdG8aFWludGVyb3Avb3B0aW9u",
-            "cy5wcm90byJYChhSZXF1ZXN0SW5zdGFuY2VJZFJlcXVlc3QSFgoOYXBwbGlj",
-            "YXRpb25faWQYASABKAk6JJLbBCBpbnRlcm9wLlJlcXVlc3RJbnN0YW5jZUlk",
-            "UmVxdWVzdCKGAQoZUmVnaXN0ZXJJbnN0YW5jZUlkUmVxdWVzdBIWCg5hcHBs",
-            "aWNhdGlvbl9pZBgBIAEoCRIqCg9hcHBfaW5zdGFuY2VfaWQYAiABKAsyES5p",
-            "bnRlcm9wLlVuaXF1ZUlkOiWS2wQhaW50ZXJvcC5SZWdpc3Rlckluc3RhbmNl",
-            "SWRSZXF1ZXN0IkQKGlJlZ2lzdGVySW5zdGFuY2VJZFJlc3BvbnNlOiaS2wQi",
-            "aW50ZXJvcC5SZWdpc3Rlckluc3RhbmNlSWRSZXNwb25zZTLmAQoWQXBwUmVn",
-            "aXN0cmF0aW9uU2VydmljZRJJChFSZXF1ZXN0SW5zdGFuY2VJZBIhLmludGVy",
-            "b3AuUmVxdWVzdEluc3RhbmNlSWRSZXF1ZXN0GhEuaW50ZXJvcC5VbmlxdWVJ",
-            "ZBJdChJSZWdpc3Rlckluc3RhbmNlSWQSIi5pbnRlcm9wLlJlZ2lzdGVySW5z",
-            "dGFuY2VJZFJlcXVlc3QaIy5pbnRlcm9wLlJlZ2lzdGVySW5zdGFuY2VJZFJl",
-            "c3BvbnNlGiKS2wQeaW50ZXJvcC5BcHBSZWdpc3RyYXRpb25TZXJ2aWNlQimq",
-            "AiZQbGV4dXMuSW50ZXJvcC5BcHBzLkludGVybmFsLkdlbmVyYXRlZGIGcHJv",
-            "dG8z"));
+            "cy5wcm90byJAChhSZXF1ZXN0SW5zdGFuY2VJZFJlcXVlc3Q6JJLbBCBpbnRl",
+            "cm9wLlJlcXVlc3RJbnN0YW5jZUlkUmVxdWVzdCJuChlSZWdpc3Rlckluc3Rh",
+            "bmNlSWRSZXF1ZXN0EioKD2FwcF9pbnN0YW5jZV9pZBgBIAEoCzIRLmludGVy",
+            "b3AuVW5pcXVlSWQ6JZLbBCFpbnRlcm9wLlJlZ2lzdGVySW5zdGFuY2VJZFJl",
+            "cXVlc3QiRAoaUmVnaXN0ZXJJbnN0YW5jZUlkUmVzcG9uc2U6JpLbBCJpbnRl",
+            "cm9wLlJlZ2lzdGVySW5zdGFuY2VJZFJlc3BvbnNlMuYBChZBcHBSZWdpc3Ry",
+            "YXRpb25TZXJ2aWNlEkkKEVJlcXVlc3RJbnN0YW5jZUlkEiEuaW50ZXJvcC5S",
+            "ZXF1ZXN0SW5zdGFuY2VJZFJlcXVlc3QaES5pbnRlcm9wLlVuaXF1ZUlkEl0K",
+            "ElJlZ2lzdGVySW5zdGFuY2VJZBIiLmludGVyb3AuUmVnaXN0ZXJJbnN0YW5j",
+            "ZUlkUmVxdWVzdBojLmludGVyb3AuUmVnaXN0ZXJJbnN0YW5jZUlkUmVzcG9u",
+            "c2UaIpLbBB5pbnRlcm9wLkFwcFJlZ2lzdHJhdGlvblNlcnZpY2VCKaoCJlBs",
+            "ZXh1cy5JbnRlcm9wLkFwcHMuSW50ZXJuYWwuR2VuZXJhdGVkYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest), global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest.Parser, new[]{ "ApplicationId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest), global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest.Parser, new[]{ "ApplicationId", "AppInstanceId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest), global::Plexus.Interop.Apps.Internal.Generated.RequestInstanceIdRequest.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest), global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdRequest.Parser, new[]{ "AppInstanceId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse), global::Plexus.Interop.Apps.Internal.Generated.RegisterInstanceIdResponse.Parser, null, null, null, null, null)
           }));
     }
@@ -102,7 +100,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RequestInstanceIdRequest(RequestInstanceIdRequest other) : this() {
-      applicationId_ = other.applicationId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -110,18 +107,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RequestInstanceIdRequest Clone() {
       return new RequestInstanceIdRequest(this);
-    }
-
-    /// <summary>Field number for the "application_id" field.</summary>
-    public const int ApplicationIdFieldNumber = 1;
-    private string applicationId_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string ApplicationId {
-      get { return applicationId_; }
-      set {
-        applicationId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -139,7 +124,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (ApplicationId != other.ApplicationId) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -147,7 +131,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (ApplicationId.Length != 0) hash ^= ApplicationId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -166,10 +149,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (ApplicationId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(ApplicationId);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -180,10 +159,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (ApplicationId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(ApplicationId);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -194,9 +169,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (ApplicationId.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(ApplicationId);
-      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -208,9 +180,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public void MergeFrom(RequestInstanceIdRequest other) {
       if (other == null) {
         return;
-      }
-      if (other.ApplicationId.Length != 0) {
-        ApplicationId = other.ApplicationId;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -227,10 +196,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10: {
-            ApplicationId = input.ReadString();
-            break;
-          }
         }
       }
     #endif
@@ -246,10 +211,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 10: {
-            ApplicationId = input.ReadString();
-            break;
-          }
         }
       }
     }
@@ -291,7 +252,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public RegisterInstanceIdRequest(RegisterInstanceIdRequest other) : this() {
-      applicationId_ = other.applicationId_;
       appInstanceId_ = other.appInstanceId_ != null ? other.appInstanceId_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -302,20 +262,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       return new RegisterInstanceIdRequest(this);
     }
 
-    /// <summary>Field number for the "application_id" field.</summary>
-    public const int ApplicationIdFieldNumber = 1;
-    private string applicationId_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string ApplicationId {
-      get { return applicationId_; }
-      set {
-        applicationId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
     /// <summary>Field number for the "app_instance_id" field.</summary>
-    public const int AppInstanceIdFieldNumber = 2;
+    public const int AppInstanceIdFieldNumber = 1;
     private global::Plexus.Interop.Apps.Internal.Generated.UniqueId appInstanceId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -341,7 +289,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (ApplicationId != other.ApplicationId) return false;
       if (!object.Equals(AppInstanceId, other.AppInstanceId)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -350,7 +297,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (ApplicationId.Length != 0) hash ^= ApplicationId.GetHashCode();
       if (appInstanceId_ != null) hash ^= AppInstanceId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -370,12 +316,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (ApplicationId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(ApplicationId);
-      }
       if (appInstanceId_ != null) {
-        output.WriteRawTag(18);
+        output.WriteRawTag(10);
         output.WriteMessage(AppInstanceId);
       }
       if (_unknownFields != null) {
@@ -388,12 +330,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (ApplicationId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(ApplicationId);
-      }
       if (appInstanceId_ != null) {
-        output.WriteRawTag(18);
+        output.WriteRawTag(10);
         output.WriteMessage(AppInstanceId);
       }
       if (_unknownFields != null) {
@@ -406,9 +344,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (ApplicationId.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(ApplicationId);
-      }
       if (appInstanceId_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(AppInstanceId);
       }
@@ -423,9 +358,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public void MergeFrom(RegisterInstanceIdRequest other) {
       if (other == null) {
         return;
-      }
-      if (other.ApplicationId.Length != 0) {
-        ApplicationId = other.ApplicationId;
       }
       if (other.appInstanceId_ != null) {
         if (appInstanceId_ == null) {
@@ -449,10 +381,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            ApplicationId = input.ReadString();
-            break;
-          }
-          case 18: {
             if (appInstanceId_ == null) {
               AppInstanceId = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
             }
@@ -475,10 +403,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 10: {
-            ApplicationId = input.ReadString();
-            break;
-          }
-          case 18: {
             if (appInstanceId_ == null) {
               AppInstanceId = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
             }

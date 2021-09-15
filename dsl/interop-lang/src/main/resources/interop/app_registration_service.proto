@@ -27,12 +27,10 @@ service AppRegistrationService {
 }
 
 message RequestInstanceIdRequest {
-	string application_id = 1;
 }
 
 message RegisterInstanceIdRequest {
-	string application_id = 1;
-	UniqueId app_instance_id = 2;
+	UniqueId app_instance_id = 1;
 }
 
 message RegisterInstanceIdResponse { }
