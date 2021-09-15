@@ -293,7 +293,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public void RegisterAppInstanceConnection(string appId, UniqueId appInstanceId)
         {
-            RegisterAppInstanceConnection(new[] {appId}, appInstanceId);
+            RegisterAppInstanceConnection(new[] { appId }, appInstanceId);
         }
 
         private void RegisterAppInstanceConnection(IEnumerable<string> appIds, UniqueId appInstanceId)
