@@ -32,7 +32,7 @@ namespace Plexus.Interop.Apps.Internal.Services
         public Task<UniqueId> RequestInstanceId(RequestInstanceIdRequest request, MethodCallContext context)
         {
             var appInstanceId = Plexus.UniqueId.Generate();
-            _appLifecycleManager.RegisterAppInstanceConnection("TODO", appInstanceId);
+            _appLifecycleManager.RegisterAppInstanceConnection(request.ApplicationId, appInstanceId);
             return Task.FromResult(appInstanceId.ToProto());
         }
     }
