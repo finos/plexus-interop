@@ -24,7 +24,6 @@ namespace Plexus.Interop.Apps.Internal
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
     using System.Threading.Tasks;
-    using Google.Protobuf.Collections;
     using Plexus.Interop.Apps.Internal.Generated;
     using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
     using UniqueId = Plexus.UniqueId;
