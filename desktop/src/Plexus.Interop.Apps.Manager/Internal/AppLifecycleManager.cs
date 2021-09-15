@@ -31,6 +31,7 @@ namespace Plexus.Interop.Apps.Internal
 
     internal sealed class AppLifecycleManager : IAppLifecycleManager
     {
+        private readonly object _sync = new object();
         private readonly HashSet<UniqueId> _appInstanceIds = new HashSet<UniqueId>();
         private readonly Dictionary<UniqueId, IAppConnection> _connections = new Dictionary<UniqueId, IAppConnection>();
         private readonly Dictionary<UniqueId, Dictionary<string, IAppConnection>> _appInstanceConnections = new Dictionary<UniqueId, Dictionary<string, IAppConnection>>();
@@ -60,7 +61,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId)
         {
-            lock (_connections)
+            lock (_sync)
             {
                 if (_appInstanceConnections.TryGetValue(appInstanceId, out Dictionary<string, IAppConnection> connections))
                 {
@@ -72,7 +73,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public IReadOnlyCollection<IAppConnection> GetAppConnections(string appId)
         {
-            lock (_connections)
+            lock (_sync)
             {
                 if (_appConnections.TryGetValue(appId, out var appConnections))
                 {
@@ -88,7 +89,7 @@ namespace Plexus.Interop.Apps.Internal
         {
             AppConnection clientConnection;
             Promise<IAppConnection> waiter;
-            lock (_connections)
+            lock (_sync)
             {
                 clientConnection = new AppConnection(connection, connectionInfo);
                 if (_connections.ContainsKey(clientConnection.Id))
@@ -133,7 +134,7 @@ namespace Plexus.Interop.Apps.Internal
         {
             Log.Debug("Removing connection {0}", connection.Info);
             Promise<IAppConnection> waiter;
-            lock (_connections)
+            lock (_sync)
             {
                 if (!_connections.Remove(connection.Id))
                 {
@@ -174,7 +175,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public bool TryGetConnectionInProgress(UniqueId appInstanceId, string appId, out Task<IAppConnection> appConnection)
         {
-            lock (_connections)
+            lock (_sync)
             {
                 if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.TryGetValue(appId, out var existingConnection))
                 {
@@ -194,7 +195,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public bool TryGetOnlineConnection(UniqueId connectionId, out IAppConnection connection)
         {
-            lock (_connections)
+            lock (_sync)
             {
                 return _connections.TryGetValue(connectionId, out connection);
             }
@@ -203,7 +204,7 @@ namespace Plexus.Interop.Apps.Internal
         public bool TryGetOnlineConnection(UniqueId appInstanceId, string app, out IAppConnection connection)
         {
             connection = null;
-            lock (_connections)
+            lock (_sync)
             {
                 return _appInstanceConnections.TryGetValue(appInstanceId, out var appConnections) &&
                        appConnections.TryGetValue(app, out connection);
@@ -232,7 +233,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public IReadOnlyCollection<IAppConnection> GetOnlineConnections()
         {
-            lock (_connections)
+            lock (_sync)
             {
                 return _connections.Values.ToList();
             }
@@ -254,7 +255,7 @@ namespace Plexus.Interop.Apps.Internal
                 deferredConnectionKey = (appInstanceId, appId);
 
                 Promise<IAppConnection> connectionPromise;
-                lock (_connections)
+                lock (_sync)
                 {
                     if (_appInstanceConnections.TryGetValue(appInstanceId, out var connections) && connections.TryGetValue(appId, out var existingConnection))
                     {
@@ -279,7 +280,7 @@ namespace Plexus.Interop.Apps.Internal
             }
             finally
             {
-                lock (_connections)
+                lock (_sync)
                 {
                     _appInstanceConnectionsInProgress.Remove(deferredConnectionKey);
                 }
@@ -299,7 +300,7 @@ namespace Plexus.Interop.Apps.Internal
 
         private void RegisterAppInstanceConnection(IEnumerable<string> appIds, UniqueId appInstanceId)
         {
-            lock (_connections)
+            lock (_sync)
             {
                 foreach (var appId in appIds)
                 {
@@ -320,7 +321,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public void RegisterAppInstance(UniqueId appInstanceId)
         {
-            lock (_connections)
+            lock (_sync)
             {
                 _appInstanceIds.Add(appInstanceId);
             }
@@ -328,7 +329,7 @@ namespace Plexus.Interop.Apps.Internal
 
         public bool IsAppInstanceRegistered(UniqueId appInstanceId)
         {
-            lock (_connections)
+            lock (_sync)
             {
                 return _appInstanceIds.Contains(appInstanceId);
             }
