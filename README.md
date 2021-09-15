@@ -52,7 +52,7 @@ All Plexus Interop components can be built using [Gradle](https://gradle.org/) t
 
 Build produces artifacts into folder "bin"; the first run can take 10 minutes or more, depending on your Internet connection speed.
 
-### Build in retricted environment
+### Build in restricted environment
 
 Build configuration should work fine on standard setup, with access to Internet. However it is quite often to have Dev setup behind corporate proxy. To run build successfully you'll need to adjust few configuration items shown below:
 
