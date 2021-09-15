@@ -27,6 +27,7 @@
     {
         private static readonly ILogger Log = LogManager.GetLogger<AuthenticationHandler>();
 
+        private readonly UniqueId _launcherId;
         private readonly IAppLifecycleManager _connectionTracker;        
         private readonly IConnectProtocolMessageFactory _messageFactory;
         private readonly IConnectProtocolSerializer _serializer;
@@ -34,11 +35,13 @@
         private readonly BrokerFeatures _features;
 
         public AuthenticationHandler(
+            UniqueId launcherId,
             IAppLifecycleManager connectionTracker,
             IProtocolImplementation protocol,
             IRegistryService registryService,
             BrokerFeatures features)
         {
+            _launcherId = launcherId;
             _messageFactory = protocol.MessageFactory;
             _serializer = protocol.Serializer;
             _connectionTracker = connectionTracker;
@@ -59,6 +62,7 @@
                     throw new BrokerException($"Connection rejected because application id is unknown to broker: {connectRequest.ApplicationId}");
                 }
                 if (_features.HasFlag(BrokerFeatures.CheckAppInstanceId)
+                    && connectRequest.ApplicationInstanceId != _launcherId
                     && !_connectionTracker.TryGetConnectionInProgress(connectRequest.ApplicationInstanceId, connectRequest.ApplicationId, out var _))
                 {
                     throw new BrokerException("Connection rejected because application instance id is unknown to broker: "

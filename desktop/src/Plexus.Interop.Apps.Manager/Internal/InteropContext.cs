@@ -26,6 +26,7 @@ namespace Plexus.Interop.Apps.Internal
 
     internal class InteropContext : ProcessBase, IInteropContext
     {
+        public Plexus.UniqueId LauncherId { get; }
         public IRegistryProvider RegistryProvider { get; }
 
         public IAppLifecycleManager AppLifecycleManager => _appLifecycleManager;
@@ -40,11 +41,13 @@ namespace Plexus.Interop.Apps.Internal
         private readonly ContextLinkageServiceImpl _contextLinkageService;
         private AppLaunchedEventSubscriber _appLaunchedEventSubscriber;
         private readonly  AppMetadataServiceImpl _appMetadataService;
-        
+        private readonly AppRegistrationServiceImpl _appRegistrationService;
+
         private readonly AppLifecycleManagerClientClientRepository _appLifecycleManagerClientClientRepository;
 
-        public InteropContext(string metadataDir, IRegistryProvider registryProvider)
+        public InteropContext(Plexus.UniqueId launcherId, string metadataDir, IRegistryProvider registryProvider)
         {
+            LauncherId = launcherId;
             RegistryProvider = registryProvider;
             var appRegistryProvider = new JsonFileAppRegistryProvider(Path.Combine(metadataDir, "apps.json"));
 
@@ -60,7 +63,7 @@ namespace Plexus.Interop.Apps.Internal
             _appMetadataService = new AppMetadataServiceImpl(appRegistryProvider, registryProvider);
             _appLifecycleService = new AppLifecycleServiceImpl(_appLifecycleManager);
             _contextLinkageService = new ContextLinkageServiceImpl(registryProvider, _appLifecycleManager, appLaunchedEventProvider);
-
+            _appRegistrationService = new AppRegistrationServiceImpl(_appLifecycleManager);
 
             OnStop(_nativeAppLauncherClient.Stop);
             OnStop(_appLifecycleManagerClientClientRepository.Stop);
@@ -88,6 +91,7 @@ namespace Plexus.Interop.Apps.Internal
                 _appLifecycleService,
                 _appMetadataService,
                 _contextLinkageService,
+                _appRegistrationService,
                 s => s.WithAppInstanceId(id).WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
         }
     }

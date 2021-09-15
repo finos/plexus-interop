@@ -22,9 +22,9 @@ namespace Plexus.Interop.Apps.Internal
     {
         public static readonly InteropContextFactory Instance = new InteropContextFactory();
 
-        public IInteropContext Create(string metadataDir, IRegistryProvider registryProvider)
+        public IInteropContext Create(UniqueId launcherId, string metadataDir, IRegistryProvider registryProvider)
         {
-            return new InteropContext(metadataDir, registryProvider);
+            return new InteropContext(launcherId, metadataDir, registryProvider);
         }
     }
 }
