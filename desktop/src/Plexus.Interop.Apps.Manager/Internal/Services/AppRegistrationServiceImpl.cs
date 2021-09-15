@@ -29,11 +29,20 @@ namespace Plexus.Interop.Apps.Internal.Services
             _appLifecycleManager = appLifecycleManager;
         }
 
+        public Task<RegisterInstanceIdResponse> RegisterInstanceId(RegisterInstanceIdRequest request, MethodCallContext context)
+        {
+            RegisterInstanceId(request.ApplicationId, request.AppInstanceId.ToUniqueId());
+            return Task.FromResult(new RegisterInstanceIdResponse());
+        }
+
         public Task<UniqueId> RequestInstanceId(RequestInstanceIdRequest request, MethodCallContext context)
         {
             var appInstanceId = Plexus.UniqueId.Generate();
-            _appLifecycleManager.RegisterAppInstanceConnection(request.ApplicationId, appInstanceId);
+            RegisterInstanceId(request.ApplicationId, appInstanceId);
             return Task.FromResult(appInstanceId.ToProto());
         }
+
+        private void RegisterInstanceId(string applicationId, Plexus.UniqueId appInstanceId)
+            => _appLifecycleManager.RegisterAppInstanceConnection(applicationId, appInstanceId);
     }
 }
