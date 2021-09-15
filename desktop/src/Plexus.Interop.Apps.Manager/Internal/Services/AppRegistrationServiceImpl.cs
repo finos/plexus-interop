@@ -31,18 +31,18 @@ namespace Plexus.Interop.Apps.Internal.Services
 
         public Task<RegisterInstanceIdResponse> RegisterInstanceId(RegisterInstanceIdRequest request, MethodCallContext context)
         {
-            RegisterInstanceId(request.ApplicationId, request.AppInstanceId.ToUniqueId());
+            RegisterInstanceId(request.AppInstanceId.ToUniqueId());
             return Task.FromResult(new RegisterInstanceIdResponse());
         }
 
         public Task<UniqueId> RequestInstanceId(RequestInstanceIdRequest request, MethodCallContext context)
         {
             var appInstanceId = Plexus.UniqueId.Generate();
-            RegisterInstanceId(request.ApplicationId, appInstanceId);
+            RegisterInstanceId(appInstanceId);
             return Task.FromResult(appInstanceId.ToProto());
         }
 
-        private void RegisterInstanceId(string applicationId, Plexus.UniqueId appInstanceId)
-            => _appLifecycleManager.RegisterAppInstanceConnection(applicationId, appInstanceId);
+        private void RegisterInstanceId(Plexus.UniqueId appInstanceId)
+            => _appLifecycleManager.RegisterAppInstance(appInstanceId);
     }
 }

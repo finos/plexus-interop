@@ -31,6 +31,7 @@ namespace Plexus.Interop.Apps.Internal
 
     internal sealed class AppLifecycleManager : IAppLifecycleManager
     {
+        private readonly HashSet<UniqueId> _appInstanceIds = new HashSet<UniqueId>();
         private readonly Dictionary<UniqueId, IAppConnection> _connections = new Dictionary<UniqueId, IAppConnection>();
         private readonly Dictionary<UniqueId, Dictionary<string, IAppConnection>> _appInstanceConnections = new Dictionary<UniqueId, Dictionary<string, IAppConnection>>();
         private readonly Dictionary<string, List<IAppConnection>> _appConnections = new Dictionary<string, List<IAppConnection>>();
@@ -313,6 +314,23 @@ namespace Plexus.Interop.Apps.Internal
                     }
                     _appInstanceConnectionsInProgress[deferredConnectionKey] = new Promise<IAppConnection>();
                 }
+                RegisterAppInstance(appInstanceId);
+            }
+        }
+
+        public void RegisterAppInstance(UniqueId appInstanceId)
+        {
+            lock (_connections)
+            {
+                _appInstanceIds.Add(appInstanceId);
+            }
+        }
+
+        public bool IsAppInstanceRegistered(UniqueId appInstanceId)
+        {
+            lock (_connections)
+            {
+                return _appInstanceIds.Contains(appInstanceId);
             }
         }
 

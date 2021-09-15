@@ -44,5 +44,8 @@ namespace Plexus.Interop.Apps
 
         bool TryGetConnectionInProgress(UniqueId appInstanceId, string appId, out Task<IAppConnection> appConnection);
         void RegisterAppInstanceConnection(string appId, UniqueId appInstanceId);
+
+        void RegisterAppInstance(UniqueId appInstanceId);
+        bool IsAppInstanceRegistered(UniqueId appInstanceId);
     }
 }

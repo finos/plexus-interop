@@ -26,7 +26,6 @@ namespace Plexus.Interop.Apps.Internal
 
     internal class InteropContext : ProcessBase, IInteropContext
     {
-        public Plexus.UniqueId LauncherId { get; }
         public IRegistryProvider RegistryProvider { get; }
 
         public IAppLifecycleManager AppLifecycleManager => _appLifecycleManager;
@@ -47,13 +46,13 @@ namespace Plexus.Interop.Apps.Internal
 
         public InteropContext(Plexus.UniqueId launcherId, string metadataDir, IRegistryProvider registryProvider)
         {
-            LauncherId = launcherId;
             RegistryProvider = registryProvider;
             var appRegistryProvider = new JsonFileAppRegistryProvider(Path.Combine(metadataDir, "apps.json"));
 
             _appLifecycleManagerClientClientRepository = new AppLifecycleManagerClientClientRepository();
             var appLaunchedEventProvider = new AppLaunchedEventProvider();
             _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, appLaunchedEventProvider, _appLifecycleManagerClientClientRepository);
+            _appLifecycleManager.RegisterAppInstance(launcherId);
             _appLaunchedEventSubscriber = new AppLaunchedEventSubscriber(_appLifecycleManager, registryProvider, appLaunchedEventProvider, _appLifecycleManagerClientClientRepository);
 
             var nativeLauncherInstanceId = Plexus.UniqueId.Generate();
