@@ -90,29 +90,25 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "ZW5lcmF0ZWRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchModeReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptorReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent), global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent.Parser, new[]{ "Apps" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo), global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo.Parser, new[]{ "Id", "DisplayName", "LauncherId", "LauncherParams" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent), global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent.Parser, new[]{ "Applications", "Services" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo), global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo.Parser, new[]{ "Id", "ConsumedServices", "ProvidedServices" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedService), global::Plexus.Interop.Apps.Internal.Generated.ProvidedService.Parser, new[]{ "ServiceId", "Alias", "Methods" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ConsumedService), global::Plexus.Interop.Apps.Internal.Generated.ConsumedService.Parser, new[]{ "ServiceId", "Alias", "Methods" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod), global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod.Parser, new[]{ "Name" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod), global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Parser, new[]{ "Name", "Title", "LaunchMode", "TimeoutMs", "Options" }, null, new[]{ typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode) }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.Service), global::Plexus.Interop.Apps.Internal.Generated.Service.Parser, new[]{ "Id", "Methods", "Options" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.MethodInfo), global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Parser, new[]{ "Name", "RequestMessageId", "ResponseMessageId", "Type" }, null, new[]{ typeof(global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType) }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.OptionParameter), global::Plexus.Interop.Apps.Internal.Generated.OptionParameter.Parser, new[]{ "Key", "Value" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent), global::Plexus.Interop.Apps.Internal.Generated.AppMetadataChangedEvent.Parser, new[]{ "Apps" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo), global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo.Parser, new[]{ "Id", "DisplayName", "LauncherId", "LauncherParams" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent), global::Plexus.Interop.Apps.Internal.Generated.MetamodelChangedEvent.Parser, new[]{ "Applications", "Services" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo), global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo.Parser, new[]{ "Id", "ConsumedServices", "ProvidedServices" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedService), global::Plexus.Interop.Apps.Internal.Generated.ProvidedService.Parser, new[]{ "ServiceId", "Alias", "Methods" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ConsumedService), global::Plexus.Interop.Apps.Internal.Generated.ConsumedService.Parser, new[]{ "ServiceId", "Alias", "Methods" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod), global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod.Parser, new[]{ "Name" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod), global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Parser, new[]{ "Name", "Title", "LaunchMode", "TimeoutMs", "Options" }, null, new[]{ typeof(global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode) }, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.Service), global::Plexus.Interop.Apps.Internal.Generated.Service.Parser, new[]{ "Id", "Methods", "Options" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.MethodInfo), global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Parser, new[]{ "Name", "RequestMessageId", "ResponseMessageId", "Type" }, null, new[]{ typeof(global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType) }, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.OptionParameter), global::Plexus.Interop.Apps.Internal.Generated.OptionParameter.Parser, new[]{ "Key", "Value" }, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Messages
-  internal sealed partial class AppMetadataChangedEvent : pb::IMessage<AppMetadataChangedEvent>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class AppMetadataChangedEvent : pb::IMessage<AppMetadataChangedEvent> {
     private static readonly pb::MessageParser<AppMetadataChangedEvent> _parser = new pb::MessageParser<AppMetadataChangedEvent>(() => new AppMetadataChangedEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -190,25 +186,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       apps_.WriteTo(output, _repeated_apps_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      apps_.WriteTo(ref output, _repeated_apps_codec);
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -231,9 +213,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -246,34 +225,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            apps_.AddEntriesFrom(ref input, _repeated_apps_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 
-  internal sealed partial class AppMetadataInfo : pb::IMessage<AppMetadataInfo>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class AppMetadataInfo : pb::IMessage<AppMetadataInfo> {
     private static readonly pb::MessageParser<AppMetadataInfo> _parser = new pb::MessageParser<AppMetadataInfo>(() => new AppMetadataInfo());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -393,9 +349,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Id.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Id);
@@ -412,30 +365,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
-      }
-      if (DisplayName.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(DisplayName);
-      }
-      if (LauncherId.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(LauncherId);
-      }
-      launcherParams_.WriteTo(ref output, _repeated_launcherParams_codec);
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -476,9 +406,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -503,46 +430,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-          case 18: {
-            DisplayName = input.ReadString();
-            break;
-          }
-          case 26: {
-            LauncherId = input.ReadString();
-            break;
-          }
-          case 34: {
-            launcherParams_.AddEntriesFrom(ref input, _repeated_launcherParams_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 
-  internal sealed partial class MetamodelChangedEvent : pb::IMessage<MetamodelChangedEvent>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class MetamodelChangedEvent : pb::IMessage<MetamodelChangedEvent> {
     private static readonly pb::MessageParser<MetamodelChangedEvent> _parser = new pb::MessageParser<MetamodelChangedEvent>(() => new MetamodelChangedEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -633,27 +525,12 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       applications_.WriteTo(output, _repeated_applications_codec);
       services_.WriteTo(output, _repeated_services_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      applications_.WriteTo(ref output, _repeated_applications_codec);
-      services_.WriteTo(ref output, _repeated_services_codec);
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -678,9 +555,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -697,38 +571,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            applications_.AddEntriesFrom(ref input, _repeated_applications_codec);
-            break;
-          }
-          case 18: {
-            services_.AddEntriesFrom(ref input, _repeated_services_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 
-  internal sealed partial class AppMetamodelInfo : pb::IMessage<AppMetamodelInfo>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class AppMetamodelInfo : pb::IMessage<AppMetamodelInfo> {
     private static readonly pb::MessageParser<AppMetamodelInfo> _parser = new pb::MessageParser<AppMetamodelInfo>(() => new AppMetamodelInfo());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -833,9 +680,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Id.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Id);
@@ -845,23 +689,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
-      }
-      consumedServices_.WriteTo(ref output, _repeated_consumedServices_codec);
-      providedServices_.WriteTo(ref output, _repeated_providedServices_codec);
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -892,9 +720,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -915,42 +740,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-          case 18: {
-            consumedServices_.AddEntriesFrom(ref input, _repeated_consumedServices_codec);
-            break;
-          }
-          case 26: {
-            providedServices_.AddEntriesFrom(ref input, _repeated_providedServices_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 
-  internal sealed partial class ProvidedService : pb::IMessage<ProvidedService>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class ProvidedService : pb::IMessage<ProvidedService> {
     private static readonly pb::MessageParser<ProvidedService> _parser = new pb::MessageParser<ProvidedService>(() => new ProvidedService());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1056,9 +850,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (ServiceId.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(ServiceId);
@@ -1071,26 +862,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (ServiceId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(ServiceId);
-      }
-      if (Alias.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Alias);
-      }
-      methods_.WriteTo(ref output, _repeated_methods_codec);
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -1125,9 +897,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -1148,42 +917,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            ServiceId = input.ReadString();
-            break;
-          }
-          case 18: {
-            Alias = input.ReadString();
-            break;
-          }
-          case 26: {
-            methods_.AddEntriesFrom(ref input, _repeated_methods_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 
-  internal sealed partial class ConsumedService : pb::IMessage<ConsumedService>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class ConsumedService : pb::IMessage<ConsumedService> {
     private static readonly pb::MessageParser<ConsumedService> _parser = new pb::MessageParser<ConsumedService>(() => new ConsumedService());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1289,9 +1027,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (ServiceId.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(ServiceId);
@@ -1304,26 +1039,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (ServiceId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(ServiceId);
-      }
-      if (Alias.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Alias);
-      }
-      methods_.WriteTo(ref output, _repeated_methods_codec);
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -1358,9 +1074,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -1381,42 +1094,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            ServiceId = input.ReadString();
-            break;
-          }
-          case 18: {
-            Alias = input.ReadString();
-            break;
-          }
-          case 26: {
-            methods_.AddEntriesFrom(ref input, _repeated_methods_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 
-  internal sealed partial class ConsumedMethod : pb::IMessage<ConsumedMethod>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class ConsumedMethod : pb::IMessage<ConsumedMethod> {
     private static readonly pb::MessageParser<ConsumedMethod> _parser = new pb::MessageParser<ConsumedMethod>(() => new ConsumedMethod());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1495,9 +1177,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Name.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Name);
@@ -1505,21 +1184,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -1546,9 +1211,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -1561,34 +1223,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 
-  internal sealed partial class ProvidedMethod : pb::IMessage<ProvidedMethod>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class ProvidedMethod : pb::IMessage<ProvidedMethod> {
     private static readonly pb::MessageParser<ProvidedMethod> _parser = new pb::MessageParser<ProvidedMethod>(() => new ProvidedMethod());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1650,7 +1289,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "launch_mode" field.</summary>
     public const int LaunchModeFieldNumber = 3;
-    private global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode launchMode_ = global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode.None;
+    private global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode launchMode_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode LaunchMode {
       get { return launchMode_; }
@@ -1706,7 +1345,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (Title.Length != 0) hash ^= Title.GetHashCode();
-      if (LaunchMode != global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode.None) hash ^= LaunchMode.GetHashCode();
+      if (LaunchMode != 0) hash ^= LaunchMode.GetHashCode();
       if (TimeoutMs != 0) hash ^= TimeoutMs.GetHashCode();
       hash ^= options_.GetHashCode();
       if (_unknownFields != null) {
@@ -1722,9 +1361,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Name.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Name);
@@ -1733,7 +1369,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(18);
         output.WriteString(Title);
       }
-      if (LaunchMode != global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode.None) {
+      if (LaunchMode != 0) {
         output.WriteRawTag(24);
         output.WriteEnum((int) LaunchMode);
       }
@@ -1745,34 +1381,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (Title.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Title);
-      }
-      if (LaunchMode != global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode.None) {
-        output.WriteRawTag(24);
-        output.WriteEnum((int) LaunchMode);
-      }
-      if (TimeoutMs != 0) {
-        output.WriteRawTag(32);
-        output.WriteInt32(TimeoutMs);
-      }
-      options_.WriteTo(ref output, _repeated_options_codec);
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -1783,7 +1392,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Title.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Title);
       }
-      if (LaunchMode != global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode.None) {
+      if (LaunchMode != 0) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) LaunchMode);
       }
       if (TimeoutMs != 0) {
@@ -1807,7 +1416,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (other.Title.Length != 0) {
         Title = other.Title;
       }
-      if (other.LaunchMode != global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode.None) {
+      if (other.LaunchMode != 0) {
         LaunchMode = other.LaunchMode;
       }
       if (other.TimeoutMs != 0) {
@@ -1819,9 +1428,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -1837,7 +1443,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 24: {
-            LaunchMode = (global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode) input.ReadEnum();
+            launchMode_ = (global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode) input.ReadEnum();
             break;
           }
           case 32: {
@@ -1850,42 +1456,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 18: {
-            Title = input.ReadString();
-            break;
-          }
-          case 24: {
-            LaunchMode = (global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode) input.ReadEnum();
-            break;
-          }
-          case 32: {
-            TimeoutMs = input.ReadInt32();
-            break;
-          }
-          case 42: {
-            options_.AddEntriesFrom(ref input, _repeated_options_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
     #region Nested types
     /// <summary>Container for nested types declared in the ProvidedMethod message type.</summary>
@@ -1902,11 +1473,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class Service : pb::IMessage<Service>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class Service : pb::IMessage<Service> {
     private static readonly pb::MessageParser<Service> _parser = new pb::MessageParser<Service>(() => new Service());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2011,9 +1578,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Id.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Id);
@@ -2023,23 +1587,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
-      }
-      methods_.WriteTo(ref output, _repeated_methods_codec);
-      options_.WriteTo(ref output, _repeated_options_codec);
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -2070,9 +1618,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -2093,42 +1638,11 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-          case 18: {
-            methods_.AddEntriesFrom(ref input, _repeated_methods_codec);
-            break;
-          }
-          case 26: {
-            options_.AddEntriesFrom(ref input, _repeated_options_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 
-  internal sealed partial class MethodInfo : pb::IMessage<MethodInfo>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class MethodInfo : pb::IMessage<MethodInfo> {
     private static readonly pb::MessageParser<MethodInfo> _parser = new pb::MessageParser<MethodInfo>(() => new MethodInfo());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2200,7 +1714,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 5;
-    private global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType type_ = global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType.Unary;
+    private global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType type_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType Type {
       get { return type_; }
@@ -2235,7 +1749,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (RequestMessageId.Length != 0) hash ^= RequestMessageId.GetHashCode();
       if (ResponseMessageId.Length != 0) hash ^= ResponseMessageId.GetHashCode();
-      if (Type != global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType.Unary) hash ^= Type.GetHashCode();
+      if (Type != 0) hash ^= Type.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2249,9 +1763,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Name.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Name);
@@ -2264,40 +1775,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(34);
         output.WriteString(ResponseMessageId);
       }
-      if (Type != global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType.Unary) {
+      if (Type != 0) {
         output.WriteRawTag(40);
         output.WriteEnum((int) Type);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (RequestMessageId.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(RequestMessageId);
-      }
-      if (ResponseMessageId.Length != 0) {
-        output.WriteRawTag(34);
-        output.WriteString(ResponseMessageId);
-      }
-      if (Type != global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType.Unary) {
-        output.WriteRawTag(40);
-        output.WriteEnum((int) Type);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -2311,7 +1796,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (ResponseMessageId.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ResponseMessageId);
       }
-      if (Type != global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType.Unary) {
+      if (Type != 0) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
       }
       if (_unknownFields != null) {
@@ -2334,7 +1819,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (other.ResponseMessageId.Length != 0) {
         ResponseMessageId = other.ResponseMessageId;
       }
-      if (other.Type != global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType.Unary) {
+      if (other.Type != 0) {
         Type = other.Type;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -2342,9 +1827,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -2364,43 +1846,12 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           }
           case 40: {
-            Type = (global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType) input.ReadEnum();
-            break;
-          }
-        }
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 26: {
-            RequestMessageId = input.ReadString();
-            break;
-          }
-          case 34: {
-            ResponseMessageId = input.ReadString();
-            break;
-          }
-          case 40: {
-            Type = (global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType) input.ReadEnum();
+            type_ = (global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType) input.ReadEnum();
             break;
           }
         }
       }
     }
-    #endif
 
     #region Nested types
     /// <summary>Container for nested types declared in the MethodInfo message type.</summary>
@@ -2418,11 +1869,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
-  internal sealed partial class OptionParameter : pb::IMessage<OptionParameter>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
+  internal sealed partial class OptionParameter : pb::IMessage<OptionParameter> {
     private static readonly pb::MessageParser<OptionParameter> _parser = new pb::MessageParser<OptionParameter>(() => new OptionParameter());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2515,9 +1962,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Key.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Key);
@@ -2529,25 +1973,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Key.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Key);
-      }
-      if (Value.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Value);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -2580,9 +2006,6 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -2599,30 +2022,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
         }
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Key = input.ReadString();
-            break;
-          }
-          case 18: {
-            Value = input.ReadString();
-            break;
-          }
-        }
-      }
-    }
-    #endif
 
   }
 

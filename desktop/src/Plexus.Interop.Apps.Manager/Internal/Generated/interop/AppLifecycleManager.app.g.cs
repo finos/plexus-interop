@@ -50,12 +50,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			AppLifecycleManagerClient.IAppLifecycleServiceImpl appLifecycleService,
 			AppLifecycleManagerClient.IAppMetadataServiceImpl appMetadataService,
 			AppLifecycleManagerClient.IContextLinkageServiceImpl contextLinkageService,
+			AppLifecycleManagerClient.IAppRegistrationServiceImpl appRegistrationService,
 			Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null
 		)
 		:this(new AppLifecycleManagerClient.ServiceBinder(
 			appLifecycleService,
 			appMetadataService,
-			contextLinkageService
+			contextLinkageService,
+			appRegistrationService
 		), setup) { }
 		
 		public AppLifecycleManagerClient(AppLifecycleManagerClient.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
@@ -68,21 +70,25 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			public ServiceBinder(
 				AppLifecycleManagerClient.IAppLifecycleServiceImpl appLifecycleService,
 				AppLifecycleManagerClient.IAppMetadataServiceImpl appMetadataService,
-				AppLifecycleManagerClient.IContextLinkageServiceImpl contextLinkageService
+				AppLifecycleManagerClient.IContextLinkageServiceImpl contextLinkageService,
+				AppLifecycleManagerClient.IAppRegistrationServiceImpl appRegistrationService
 			) {
 				_appLifecycleServiceBinder = new AppLifecycleManagerClient.AppLifecycleServiceBinder(appLifecycleService);
 				_appMetadataServiceBinder = new AppLifecycleManagerClient.AppMetadataServiceBinder(appMetadataService);
 				_contextLinkageServiceBinder = new AppLifecycleManagerClient.ContextLinkageServiceBinder(contextLinkageService);
+				_appRegistrationServiceBinder = new AppLifecycleManagerClient.AppRegistrationServiceBinder(appRegistrationService);
 			}
 			
 			private AppLifecycleServiceBinder _appLifecycleServiceBinder;
 			private AppMetadataServiceBinder _appMetadataServiceBinder;
 			private ContextLinkageServiceBinder _contextLinkageServiceBinder;
+			private AppRegistrationServiceBinder _appRegistrationServiceBinder;
 			
 			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
 				builder = _appLifecycleServiceBinder.Bind(builder);
 				builder = _appMetadataServiceBinder.Bind(builder);
 				builder = _contextLinkageServiceBinder.Bind(builder);
+				builder = _appRegistrationServiceBinder.Bind(builder);
 				return builder;
 			}
 		}
@@ -411,6 +417,59 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse> RestoreContextsLinkage(global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest request, MethodCallContext context) {
 				return _impl.RestoreContextsLinkage(request, context);
+			}
+		}
+		
+		public partial interface IAppRegistrationServiceImpl:
+			global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.IRequestInstanceIdImpl
+		{ }
+		
+		private sealed partial class AppRegistrationServiceBinder {
+			
+			
+			private readonly IAppRegistrationServiceImpl _impl;
+			
+			public AppRegistrationServiceBinder(IAppRegistrationServiceImpl impl) {
+				_impl = impl;
+			}
+			
+			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
+				return builder.WithProvidedService(global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.Id, Bind);
+			}
+			
+			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
+				builder = builder.WithUnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.UniqueId>(global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.RequestInstanceIdMethodId, _impl.RequestInstanceId);
+				return builder; 							
+			}
+		}
+		
+		public sealed partial class AppRegistrationServiceImpl: IAppRegistrationServiceImpl
+		{
+			private readonly UnaryMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> _requestInstanceIdHandler;
+			
+			public AppRegistrationServiceImpl(
+				UnaryMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.UniqueId> requestInstanceIdHandler
+			) {
+				_requestInstanceIdHandler = requestInstanceIdHandler;
+			}
+			
+			public Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context) {
+				return _requestInstanceIdHandler(request, context);
+			}
+		}					
+		
+		public sealed partial class AppRegistrationServiceImpl<T>: IAppRegistrationServiceImpl
+			where T:
+			global::Plexus.Interop.Apps.Internal.Generated.AppRegistrationService.IRequestInstanceIdImpl
+		{
+			private readonly T _impl;
+			
+			public AppRegistrationServiceImpl(T impl) {
+				_impl = impl;
+			}
+			
+			public Task<global::Plexus.Interop.Apps.Internal.Generated.UniqueId> RequestInstanceId(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context) {
+				return _impl.RequestInstanceId(request, context);
 			}
 		}
 		
