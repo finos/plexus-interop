@@ -7,9 +7,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven {
-        url "https://plugins.gradle.org/m2/"
-    }
 }
 
 def dotnetSdkVersion = "2.1"
