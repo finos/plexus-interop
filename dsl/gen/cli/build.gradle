@@ -2,6 +2,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
 }
 
 dependencies {
@@ -24,7 +27,10 @@ dependencies {
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
+        maven {
+           url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
