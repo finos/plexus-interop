@@ -18,6 +18,12 @@ configurations.all {
             if (details.requested.group == 'org.eclipse.platform' && details.requested.name == 'org.eclipse.text') {
                 details.useVersion "3.10.0"
             }
+            if (details.requested.group == 'org.eclipse.platform' && details.requested.name == 'org.eclipse.core.jobs') {
+                details.useVersion "3.11.0"
+            }
+            if (details.requested.group == 'org.eclipse.platform' && details.requested.name == 'org.eclipse.core.contenttype') {
+                details.useVersion "3.7.0"
+            }
         }
     }
 }
