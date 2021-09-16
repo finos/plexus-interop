@@ -29,12 +29,14 @@
         public IBrokerProcessor Create(
             IReadableChannel<ITransportConnection> incomingConnections, 
             IProtocolSerializerFactory protocolSerializerFactory,
-            IInteropContext interopContext)
+            IInteropContext interopContext,
+            BrokerFeatures features)
         {
             return new BrokerProcessor(
                 incomingConnections,
                 protocolSerializerFactory,
-                interopContext);
+                interopContext,
+                features);
         }
     }
 }

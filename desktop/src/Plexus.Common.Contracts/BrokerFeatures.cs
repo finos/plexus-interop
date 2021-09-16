@@ -14,17 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Apps.Internal
+namespace Plexus
 {
-    using Plexus.Interop.Metamodel;
+    using System;
 
-    public sealed class InteropContextFactory
+    [Flags]
+    public enum BrokerFeatures : long
     {
-        public static readonly InteropContextFactory Instance = new InteropContextFactory();
-
-        public IInteropContext Create(UniqueId trustedLauncherId, string metadataDir, IRegistryProvider registryProvider)
-        {
-            return new InteropContext(trustedLauncherId, metadataDir, registryProvider);
-        }
+        None = 0,
+        CheckAppInstanceId = 1,
     }
 }

@@ -31,16 +31,19 @@
         private readonly IConnectProtocolMessageFactory _messageFactory;
         private readonly IConnectProtocolSerializer _serializer;
         private readonly IRegistryService _registryService;
+        private readonly BrokerFeatures _features;
 
         public AuthenticationHandler(
             IAppLifecycleManager connectionTracker,
             IProtocolImplementation protocol,
-            IRegistryService registryService)
+            IRegistryService registryService,
+            BrokerFeatures features)
         {
             _messageFactory = protocol.MessageFactory;
             _serializer = protocol.Serializer;
             _connectionTracker = connectionTracker;
             _registryService = registryService;
+            _features = features;
         }
 
         public async Task<AppConnectionDescriptor> AuthenticateAsync(ITransportConnection connection)
@@ -54,6 +57,12 @@
                 if (!_registryService.IsApplicationDefined(connectRequest.ApplicationId))
                 {
                     throw new BrokerException($"Connection rejected because application id is unknown to broker: {connectRequest.ApplicationId}");
+                }
+                if (_features.HasFlag(BrokerFeatures.CheckAppInstanceId)
+                    && !_connectionTracker.IsAppInstanceRegistered(connectRequest.ApplicationInstanceId))
+                {
+                    throw new BrokerException("Connection rejected because application instance id is unknown to broker: "
+                        + $"ApplicationInstanceId={connectRequest.ApplicationInstanceId}, ApplicationId={connectRequest.ApplicationId}");
                 }
                 using (var connectResponse = _messageFactory.CreateConnectResponse(connection.Id))
                 {

@@ -23,7 +23,6 @@ namespace Plexus.Interop.Apps
     {
         Task StartAsync();
         Task StopAsync();
-
         IRegistryProvider RegistryProvider { get; }
         IAppLifecycleManager AppLifecycleManager { get; }
         IInvocationEventProvider InvocationEventProvider { get; }

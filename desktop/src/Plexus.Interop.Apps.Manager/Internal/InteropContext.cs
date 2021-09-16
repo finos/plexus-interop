@@ -40,24 +40,29 @@ namespace Plexus.Interop.Apps.Internal
         private readonly ContextLinkageServiceImpl _contextLinkageService;
         private AppLaunchedEventSubscriber _appLaunchedEventSubscriber;
         private readonly  AppMetadataServiceImpl _appMetadataService;
-        
+        private readonly AppRegistrationServiceImpl _appRegistrationService;
+
         private readonly AppLifecycleManagerClientClientRepository _appLifecycleManagerClientClientRepository;
 
-        public InteropContext(string metadataDir, IRegistryProvider registryProvider)
+        public InteropContext(Plexus.UniqueId trustedLauncherId, string metadataDir, IRegistryProvider registryProvider)
         {
             RegistryProvider = registryProvider;
             var appRegistryProvider = new JsonFileAppRegistryProvider(Path.Combine(metadataDir, "apps.json"));
-            _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir);
 
             _appLifecycleManagerClientClientRepository = new AppLifecycleManagerClientClientRepository();
             var appLaunchedEventProvider = new AppLaunchedEventProvider();
             _appLifecycleManager = new AppLifecycleManager(appRegistryProvider, appLaunchedEventProvider, _appLifecycleManagerClientClientRepository);
+            _appLifecycleManager.RegisterAppInstance(trustedLauncherId);
             _appLaunchedEventSubscriber = new AppLaunchedEventSubscriber(_appLifecycleManager, registryProvider, appLaunchedEventProvider, _appLifecycleManagerClientClientRepository);
+
+            var nativeLauncherInstanceId = Plexus.UniqueId.Generate();
+            _appLifecycleManager.RegisterAppInstanceConnection(Generated.NativeAppLauncherClient.Id, nativeLauncherInstanceId);
+            _nativeAppLauncherClient = new NativeAppLauncherClient(metadataDir, nativeLauncherInstanceId);
 
             _appMetadataService = new AppMetadataServiceImpl(appRegistryProvider, registryProvider);
             _appLifecycleService = new AppLifecycleServiceImpl(_appLifecycleManager);
             _contextLinkageService = new ContextLinkageServiceImpl(registryProvider, _appLifecycleManager, appLaunchedEventProvider);
-
+            _appRegistrationService = new AppRegistrationServiceImpl(_appLifecycleManager);
 
             OnStop(_nativeAppLauncherClient.Stop);
             OnStop(_appLifecycleManagerClientClientRepository.Stop);
@@ -79,11 +84,14 @@ namespace Plexus.Interop.Apps.Internal
 
         private AppLifecycleManagerClient CreateAppLifecycleManagerClient()
         {
+            var id = Plexus.UniqueId.Generate();
+            _appLifecycleManager.RegisterAppInstanceConnection(AppLifecycleManagerClient.Id, id);
             return new AppLifecycleManagerClient(
                 _appLifecycleService,
                 _appMetadataService,
                 _contextLinkageService,
-                s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
+                _appRegistrationService,
+                s => s.WithAppInstanceId(id).WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
         }
     }
 }
