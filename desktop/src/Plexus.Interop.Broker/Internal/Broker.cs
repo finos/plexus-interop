@@ -57,9 +57,9 @@ namespace Plexus.Interop.Internal
         {
             _features = EnvironmentHelper.GetBrokerFeatures();
             Log.Info($"Broker features: {_features}");
-            var launcherId = EnvironmentHelper.GetLauncherAppInstanceId();
-            Log.Info($"App launcher application instance id: {launcherId}");
-            if (_features.HasFlag(BrokerFeatures.CheckAppInstanceId) && launcherId == null)
+            var trustedLauncherId = EnvironmentHelper.GetLauncherAppInstanceId();
+            Log.Info($"App launcher application instance id: {trustedLauncherId}");
+            if (_features.HasFlag(BrokerFeatures.CheckAppInstanceId) && trustedLauncherId == null)
                 throw new BrokerException($"{EnvironmentHelper.LauncherId} must be defined if {BrokerFeatures.CheckAppInstanceId} set.");
             _workingDir = Directory.GetCurrentDirectory();
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -87,7 +87,7 @@ namespace Plexus.Interop.Internal
             };
             _connectionListener = new ServerConnectionListener(_transportServers);
             registryProvider = registryProvider ?? new JsonRegistryProvider(Path.Combine(metadataDir, "interop.json"));
-            _interopContext = InteropContextFactory.Instance.Create(launcherId ?? default, metadataDir, registryProvider);
+            _interopContext = InteropContextFactory.Instance.Create(trustedLauncherId ?? default, metadataDir, registryProvider);
             _brokerProcessor = BrokerProcessorFactory.Instance.Create(
                 _connectionListener.In,
                 DefaultProtocolSerializationProvider,
