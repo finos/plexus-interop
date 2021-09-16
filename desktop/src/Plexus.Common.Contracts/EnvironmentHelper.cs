@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus
+namespace Plexus
 {
     using System;
 
@@ -26,6 +26,8 @@
         public const string PlexusTimeoutMultiplier = "PLEXUS_TIMEOUT_MULTIPLIER";
         public const string PlexusBrokerWebSocketAddress = "PLEXUS_BROKER_WEBSOCKET_ADDRESS";
         public const string PlexusBrokerPipeAddress = "PLEXUS_BROKER_PIPE_ADDRESS";
+        public const string BrokerFeatures = "PLEXUS_BROKER_FEATURES";
+        public const string LauncherId = "PLEXUS_TRUSTED_LAUNCHER_ID";
 
         public static string GetBrokerWorkingDir()
         {
@@ -63,6 +65,24 @@
         public static string GetPipeAddress()
         {
             return Environment.GetEnvironmentVariable(PlexusBrokerPipeAddress);
+        }
+
+        public static BrokerFeatures GetBrokerFeatures()
+        {
+            var rawValue = Environment.GetEnvironmentVariable(BrokerFeatures);
+            if (string.IsNullOrEmpty(rawValue))
+                return Plexus.BrokerFeatures.None;
+
+            return (BrokerFeatures)Enum.Parse(typeof(BrokerFeatures), rawValue);
+        }
+
+        public static UniqueId? GetLauncherAppInstanceId()
+        {
+            var rawValue = Environment.GetEnvironmentVariable(LauncherId);
+            if (string.IsNullOrEmpty(rawValue))
+                return null;
+
+            return UniqueId.FromString(rawValue);
         }
     }
 }

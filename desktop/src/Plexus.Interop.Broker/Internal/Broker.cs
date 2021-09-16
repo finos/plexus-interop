@@ -44,6 +44,7 @@ namespace Plexus.Interop.Internal
         private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider 
             = new ProtobufProtocolSerializerFactory();
 
+        private readonly BrokerFeatures _features;
         private readonly string _workingDir;
         private readonly ServerConnectionListener _connectionListener;
         private readonly IBrokerProcessor _brokerProcessor;
@@ -54,6 +55,12 @@ namespace Plexus.Interop.Internal
 
         public Broker(BrokerOptions options, IRegistryProvider registryProvider = null)
         {
+            _features = EnvironmentHelper.GetBrokerFeatures();
+            Log.Info($"Broker features: {_features}");
+            var trustedLauncherId = EnvironmentHelper.GetLauncherAppInstanceId();
+            Log.Info($"App launcher application instance id: {trustedLauncherId}");
+            if (_features.HasFlag(BrokerFeatures.CheckAppInstanceId) && trustedLauncherId == null)
+                throw new BrokerException($"{EnvironmentHelper.LauncherId} must be defined if {BrokerFeatures.CheckAppInstanceId} set.");
             _workingDir = Directory.GetCurrentDirectory();
             var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var studioDir = Path.Combine(binDir, "studio");
@@ -80,11 +87,12 @@ namespace Plexus.Interop.Internal
             };
             _connectionListener = new ServerConnectionListener(_transportServers);
             registryProvider = registryProvider ?? new JsonRegistryProvider(Path.Combine(metadataDir, "interop.json"));
-            _interopContext = InteropContextFactory.Instance.Create(metadataDir, registryProvider);
+            _interopContext = InteropContextFactory.Instance.Create(trustedLauncherId ?? default, metadataDir, registryProvider);
             _brokerProcessor = BrokerProcessorFactory.Instance.Create(
                 _connectionListener.In,
                 DefaultProtocolSerializationProvider,
-                _interopContext);
+                _interopContext,
+                _features);
             OnStop(_connectionListener.Stop);
         }
 

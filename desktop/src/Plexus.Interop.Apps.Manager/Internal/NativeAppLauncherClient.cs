@@ -34,9 +34,9 @@ namespace Plexus.Interop.Apps.Internal
 
         public Plexus.UniqueId Id { get; }
 
-        public NativeAppLauncherClient(string cmdBasePath)
+        public NativeAppLauncherClient(string cmdBasePath, Plexus.UniqueId id)
         {
-            Id = Plexus.UniqueId.Generate();
+            Id = id;
             _cmdBasePath = cmdBasePath;
             _subProcessLauncher = new SubProcessLauncher();
         }
@@ -47,7 +47,7 @@ namespace Plexus.Interop.Apps.Internal
         {
             _client = new Generated.NativeAppLauncherClient(
                 this,
-                s => s.WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
+                s => s.WithAppInstanceId(Id).WithBrokerWorkingDir(Directory.GetCurrentDirectory()));
             await _client.ConnectAsync().ConfigureAwait(false);
             Log.Debug("Connected");
             return ProcessAsync();
