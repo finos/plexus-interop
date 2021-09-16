@@ -116,19 +116,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<AppMetadataChangedEvent> _parser = new pb::MessageParser<AppMetadataChangedEvent>(() => new AppMetadataChangedEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<AppMetadataChangedEvent> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetadataChangedEvent() {
       OnConstruction();
     }
@@ -136,12 +140,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetadataChangedEvent(AppMetadataChangedEvent other) : this() {
       apps_ = other.apps_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetadataChangedEvent Clone() {
       return new AppMetadataChangedEvent(this);
     }
@@ -152,16 +158,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(10, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo> apps_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppMetadataInfo> Apps {
       get { return apps_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as AppMetadataChangedEvent);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(AppMetadataChangedEvent other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -174,6 +183,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       hash ^= apps_.GetHashCode();
@@ -184,11 +194,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -202,6 +214,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       apps_.WriteTo(ref output, _repeated_apps_codec);
       if (_unknownFields != null) {
@@ -211,6 +224,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       size += apps_.CalculateSize(_repeated_apps_codec);
@@ -221,6 +235,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(AppMetadataChangedEvent other) {
       if (other == null) {
         return;
@@ -230,6 +245,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -251,6 +267,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -277,19 +294,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<AppMetadataInfo> _parser = new pb::MessageParser<AppMetadataInfo>(() => new AppMetadataInfo());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<AppMetadataInfo> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetadataInfo() {
       OnConstruction();
     }
@@ -297,6 +318,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetadataInfo(AppMetadataInfo other) : this() {
       id_ = other.id_;
       displayName_ = other.displayName_;
@@ -306,6 +328,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetadataInfo Clone() {
       return new AppMetadataInfo(this);
     }
@@ -314,6 +337,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int IdFieldNumber = 1;
     private string id_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Id {
       get { return id_; }
       set {
@@ -325,6 +349,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int DisplayNameFieldNumber = 2;
     private string displayName_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string DisplayName {
       get { return displayName_; }
       set {
@@ -336,6 +361,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int LauncherIdFieldNumber = 3;
     private string launcherId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string LauncherId {
       get { return launcherId_; }
       set {
@@ -349,16 +375,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(34, global::Plexus.Interop.Apps.Internal.Generated.OptionParameter.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter> launcherParams_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter> LauncherParams {
       get { return launcherParams_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as AppMetadataInfo);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(AppMetadataInfo other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -374,6 +403,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Id.Length != 0) hash ^= Id.GetHashCode();
@@ -387,11 +417,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -417,6 +449,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Id.Length != 0) {
         output.WriteRawTag(10);
@@ -438,6 +471,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Id.Length != 0) {
@@ -457,6 +491,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(AppMetadataInfo other) {
       if (other == null) {
         return;
@@ -475,6 +510,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -508,6 +544,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -546,19 +583,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<MetamodelChangedEvent> _parser = new pb::MessageParser<MetamodelChangedEvent>(() => new MetamodelChangedEvent());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<MetamodelChangedEvent> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MetamodelChangedEvent() {
       OnConstruction();
     }
@@ -566,6 +607,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MetamodelChangedEvent(MetamodelChangedEvent other) : this() {
       applications_ = other.applications_.Clone();
       services_ = other.services_.Clone();
@@ -573,6 +615,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MetamodelChangedEvent Clone() {
       return new MetamodelChangedEvent(this);
     }
@@ -583,6 +626,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(10, global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo> applications_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.AppMetamodelInfo> Applications {
       get { return applications_; }
     }
@@ -593,16 +637,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.Service.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.Service> services_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.Service>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.Service> Services {
       get { return services_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as MetamodelChangedEvent);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(MetamodelChangedEvent other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -616,6 +663,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       hash ^= applications_.GetHashCode();
@@ -627,11 +675,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -646,6 +696,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       applications_.WriteTo(ref output, _repeated_applications_codec);
       services_.WriteTo(ref output, _repeated_services_codec);
@@ -656,6 +707,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       size += applications_.CalculateSize(_repeated_applications_codec);
@@ -667,6 +719,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(MetamodelChangedEvent other) {
       if (other == null) {
         return;
@@ -677,6 +730,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -702,6 +756,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -732,19 +787,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<AppMetamodelInfo> _parser = new pb::MessageParser<AppMetamodelInfo>(() => new AppMetamodelInfo());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<AppMetamodelInfo> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetamodelInfo() {
       OnConstruction();
     }
@@ -752,6 +811,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetamodelInfo(AppMetamodelInfo other) : this() {
       id_ = other.id_;
       consumedServices_ = other.consumedServices_.Clone();
@@ -760,6 +820,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppMetamodelInfo Clone() {
       return new AppMetamodelInfo(this);
     }
@@ -768,6 +829,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int IdFieldNumber = 1;
     private string id_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Id {
       get { return id_; }
       set {
@@ -781,6 +843,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.ConsumedService.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedService> consumedServices_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedService>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedService> ConsumedServices {
       get { return consumedServices_; }
     }
@@ -791,16 +854,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(26, global::Plexus.Interop.Apps.Internal.Generated.ProvidedService.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedService> providedServices_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedService>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedService> ProvidedServices {
       get { return providedServices_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as AppMetamodelInfo);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(AppMetamodelInfo other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -815,6 +881,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Id.Length != 0) hash ^= Id.GetHashCode();
@@ -827,11 +894,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -850,6 +919,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Id.Length != 0) {
         output.WriteRawTag(10);
@@ -864,6 +934,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Id.Length != 0) {
@@ -878,6 +949,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(AppMetamodelInfo other) {
       if (other == null) {
         return;
@@ -891,6 +963,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -920,6 +993,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -954,19 +1028,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<ProvidedService> _parser = new pb::MessageParser<ProvidedService>(() => new ProvidedService());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<ProvidedService> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ProvidedService() {
       OnConstruction();
     }
@@ -974,6 +1052,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ProvidedService(ProvidedService other) : this() {
       serviceId_ = other.serviceId_;
       alias_ = other.alias_;
@@ -982,6 +1061,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ProvidedService Clone() {
       return new ProvidedService(this);
     }
@@ -990,6 +1070,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int ServiceIdFieldNumber = 1;
     private string serviceId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string ServiceId {
       get { return serviceId_; }
       set {
@@ -1001,6 +1082,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int AliasFieldNumber = 2;
     private string alias_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Alias {
       get { return alias_; }
       set {
@@ -1014,16 +1096,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(26, global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod> methods_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod> Methods {
       get { return methods_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as ProvidedService);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(ProvidedService other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -1038,6 +1123,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (ServiceId.Length != 0) hash ^= ServiceId.GetHashCode();
@@ -1050,11 +1136,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -1076,6 +1164,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (ServiceId.Length != 0) {
         output.WriteRawTag(10);
@@ -1093,6 +1182,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (ServiceId.Length != 0) {
@@ -1109,6 +1199,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(ProvidedService other) {
       if (other == null) {
         return;
@@ -1124,6 +1215,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -1153,6 +1245,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -1187,19 +1280,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<ConsumedService> _parser = new pb::MessageParser<ConsumedService>(() => new ConsumedService());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<ConsumedService> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ConsumedService() {
       OnConstruction();
     }
@@ -1207,6 +1304,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ConsumedService(ConsumedService other) : this() {
       serviceId_ = other.serviceId_;
       alias_ = other.alias_;
@@ -1215,6 +1313,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ConsumedService Clone() {
       return new ConsumedService(this);
     }
@@ -1223,6 +1322,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int ServiceIdFieldNumber = 1;
     private string serviceId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string ServiceId {
       get { return serviceId_; }
       set {
@@ -1234,6 +1334,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int AliasFieldNumber = 2;
     private string alias_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Alias {
       get { return alias_; }
       set {
@@ -1247,16 +1348,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(26, global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod> methods_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.ConsumedMethod> Methods {
       get { return methods_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as ConsumedService);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(ConsumedService other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -1271,6 +1375,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (ServiceId.Length != 0) hash ^= ServiceId.GetHashCode();
@@ -1283,11 +1388,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -1309,6 +1416,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (ServiceId.Length != 0) {
         output.WriteRawTag(10);
@@ -1326,6 +1434,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (ServiceId.Length != 0) {
@@ -1342,6 +1451,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(ConsumedService other) {
       if (other == null) {
         return;
@@ -1357,6 +1467,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -1386,6 +1497,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -1420,19 +1532,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<ConsumedMethod> _parser = new pb::MessageParser<ConsumedMethod>(() => new ConsumedMethod());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<ConsumedMethod> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ConsumedMethod() {
       OnConstruction();
     }
@@ -1440,12 +1556,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ConsumedMethod(ConsumedMethod other) : this() {
       name_ = other.name_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ConsumedMethod Clone() {
       return new ConsumedMethod(this);
     }
@@ -1454,6 +1572,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int NameFieldNumber = 1;
     private string name_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Name {
       get { return name_; }
       set {
@@ -1462,11 +1581,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as ConsumedMethod);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(ConsumedMethod other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -1479,6 +1600,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
@@ -1489,11 +1611,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -1510,6 +1634,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Name.Length != 0) {
         output.WriteRawTag(10);
@@ -1522,6 +1647,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Name.Length != 0) {
@@ -1534,6 +1660,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(ConsumedMethod other) {
       if (other == null) {
         return;
@@ -1545,6 +1672,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -1566,6 +1694,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -1592,19 +1721,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<ProvidedMethod> _parser = new pb::MessageParser<ProvidedMethod>(() => new ProvidedMethod());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<ProvidedMethod> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ProvidedMethod() {
       OnConstruction();
     }
@@ -1612,6 +1745,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ProvidedMethod(ProvidedMethod other) : this() {
       name_ = other.name_;
       title_ = other.title_;
@@ -1622,6 +1756,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ProvidedMethod Clone() {
       return new ProvidedMethod(this);
     }
@@ -1630,6 +1765,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int NameFieldNumber = 1;
     private string name_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Name {
       get { return name_; }
       set {
@@ -1641,6 +1777,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int TitleFieldNumber = 2;
     private string title_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Title {
       get { return title_; }
       set {
@@ -1652,6 +1789,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int LaunchModeFieldNumber = 3;
     private global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode launchMode_ = global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Plexus.Interop.Apps.Internal.Generated.ProvidedMethod.Types.MetamodelLaunchMode LaunchMode {
       get { return launchMode_; }
       set {
@@ -1663,6 +1801,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int TimeoutMsFieldNumber = 4;
     private int timeoutMs_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int TimeoutMs {
       get { return timeoutMs_; }
       set {
@@ -1676,16 +1815,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(42, global::Plexus.Interop.Apps.Internal.Generated.OptionParameter.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter> options_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter> Options {
       get { return options_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as ProvidedMethod);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(ProvidedMethod other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -1702,6 +1844,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
@@ -1716,11 +1859,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -1750,6 +1895,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Name.Length != 0) {
         output.WriteRawTag(10);
@@ -1775,6 +1921,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Name.Length != 0) {
@@ -1797,6 +1944,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(ProvidedMethod other) {
       if (other == null) {
         return;
@@ -1818,6 +1966,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -1855,6 +2004,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -1890,6 +2040,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #region Nested types
     /// <summary>Container for nested types declared in the ProvidedMethod message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static partial class Types {
       internal enum MetamodelLaunchMode {
         [pbr::OriginalName("None")] None = 0,
@@ -1910,19 +2061,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<Service> _parser = new pb::MessageParser<Service>(() => new Service());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<Service> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Service() {
       OnConstruction();
     }
@@ -1930,6 +2085,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Service(Service other) : this() {
       id_ = other.id_;
       methods_ = other.methods_.Clone();
@@ -1938,6 +2094,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Service Clone() {
       return new Service(this);
     }
@@ -1946,6 +2103,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int IdFieldNumber = 1;
     private string id_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Id {
       get { return id_; }
       set {
@@ -1959,6 +2117,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(18, global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.MethodInfo> methods_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.MethodInfo>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.MethodInfo> Methods {
       get { return methods_; }
     }
@@ -1969,16 +2128,19 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         = pb::FieldCodec.ForMessage(26, global::Plexus.Interop.Apps.Internal.Generated.OptionParameter.Parser);
     private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter> options_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.OptionParameter> Options {
       get { return options_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as Service);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(Service other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -1993,6 +2155,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Id.Length != 0) hash ^= Id.GetHashCode();
@@ -2005,11 +2168,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -2028,6 +2193,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Id.Length != 0) {
         output.WriteRawTag(10);
@@ -2042,6 +2208,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Id.Length != 0) {
@@ -2056,6 +2223,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(Service other) {
       if (other == null) {
         return;
@@ -2069,6 +2237,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -2098,6 +2267,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -2132,19 +2302,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<MethodInfo> _parser = new pb::MessageParser<MethodInfo>(() => new MethodInfo());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<MethodInfo> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MethodInfo() {
       OnConstruction();
     }
@@ -2152,6 +2326,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MethodInfo(MethodInfo other) : this() {
       name_ = other.name_;
       requestMessageId_ = other.requestMessageId_;
@@ -2161,6 +2336,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public MethodInfo Clone() {
       return new MethodInfo(this);
     }
@@ -2169,6 +2345,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int NameFieldNumber = 1;
     private string name_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Name {
       get { return name_; }
       set {
@@ -2180,6 +2357,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int RequestMessageIdFieldNumber = 3;
     private string requestMessageId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string RequestMessageId {
       get { return requestMessageId_; }
       set {
@@ -2191,6 +2369,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int ResponseMessageIdFieldNumber = 4;
     private string responseMessageId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string ResponseMessageId {
       get { return responseMessageId_; }
       set {
@@ -2202,6 +2381,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int TypeFieldNumber = 5;
     private global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType type_ = global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType.Unary;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Plexus.Interop.Apps.Internal.Generated.MethodInfo.Types.MethodType Type {
       get { return type_; }
       set {
@@ -2210,11 +2390,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as MethodInfo);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(MethodInfo other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -2230,6 +2412,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
@@ -2243,11 +2426,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -2276,6 +2461,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Name.Length != 0) {
         output.WriteRawTag(10);
@@ -2300,6 +2486,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Name.Length != 0) {
@@ -2321,6 +2508,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(MethodInfo other) {
       if (other == null) {
         return;
@@ -2341,6 +2529,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -2374,6 +2563,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -2405,6 +2595,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #region Nested types
     /// <summary>Container for nested types declared in the MethodInfo message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static partial class Types {
       internal enum MethodType {
         [pbr::OriginalName("Unary")] Unary = 0,
@@ -2426,19 +2617,23 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::MessageParser<OptionParameter> _parser = new pb::MessageParser<OptionParameter>(() => new OptionParameter());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<OptionParameter> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public OptionParameter() {
       OnConstruction();
     }
@@ -2446,6 +2641,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public OptionParameter(OptionParameter other) : this() {
       key_ = other.key_;
       value_ = other.value_;
@@ -2453,6 +2649,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public OptionParameter Clone() {
       return new OptionParameter(this);
     }
@@ -2461,6 +2658,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int KeyFieldNumber = 1;
     private string key_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Key {
       get { return key_; }
       set {
@@ -2472,6 +2670,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public const int ValueFieldNumber = 2;
     private string value_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Value {
       get { return value_; }
       set {
@@ -2480,11 +2679,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as OptionParameter);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(OptionParameter other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -2498,6 +2699,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Key.Length != 0) hash ^= Key.GetHashCode();
@@ -2509,11 +2711,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -2534,6 +2738,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Key.Length != 0) {
         output.WriteRawTag(10);
@@ -2550,6 +2755,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Key.Length != 0) {
@@ -2565,6 +2771,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(OptionParameter other) {
       if (other == null) {
         return;
@@ -2579,6 +2786,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -2604,6 +2812,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
