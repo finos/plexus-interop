@@ -51,61 +51,64 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "dmVBcHBSZXNwb25zZRIqCg9hcHBfaW5zdGFuY2VfaWQYASABKAsyES5pbnRl",
             "cm9wLlVuaXF1ZUlkEiwKEWFwcF9jb25uZWN0aW9uX2lkGAIgASgLMhEuaW50",
             "ZXJvcC5VbmlxdWVJZBIgChhpc19uZXdfaW5zdGFuY2VfbGF1bmNoZWQYAyAB",
-            "KAg6HpLbBBppbnRlcm9wLlJlc29sdmVBcHBSZXNwb25zZSKjAQoRQXBwTGlm",
+            "KAg6HpLbBBppbnRlcm9wLlJlc29sdmVBcHBSZXNwb25zZSLWAQoRQXBwTGlm",
             "ZWN5Y2xlRXZlbnQSLwoJY29ubmVjdGVkGAEgASgLMhouaW50ZXJvcC5BcHBD",
             "b25uZWN0ZWRFdmVudEgAEjUKDGRpc2Nvbm5lY3RlZBgCIAEoCzIdLmludGVy",
-            "b3AuQXBwRGlzY29ubmVjdGVkRXZlbnRIADodktsEGWludGVyb3AuQXBwTGlm",
-            "ZWN5Y2xlRXZlbnRCBwoFZXZlbnQitwEKD0ludm9jYXRpb25FdmVudBI9ChJp",
-            "bnZvY2F0aW9uX3N0YXJ0ZWQYASABKAsyHy5pbnRlcm9wLkludm9jYXRpb25T",
-            "dGFydGVkRXZlbnRIABI/ChNpbnZvY2F0aW9uX2ZpbmlzaGVkGAIgASgLMiAu",
-            "aW50ZXJvcC5JbnZvY2F0aW9uRmluaXNoZWRFdmVudEgAOhuS2wQXaW50ZXJv",
-            "cC5JbnZvY2F0aW9uRXZlbnRCBwoFZXZlbnQicwoRQXBwQ29ubmVjdGVkRXZl",
-            "bnQSPwoVY29ubmVjdGlvbl9kZXNjcmlwdG9yGAEgASgLMiAuaW50ZXJvcC5B",
-            "cHBDb25uZWN0aW9uRGVzY3JpcHRvcjodktsEGWludGVyb3AuQXBwQ29ubmVj",
-            "dGVkRXZlbnQieQoUQXBwRGlzY29ubmVjdGVkRXZlbnQSPwoVY29ubmVjdGlv",
-            "bl9kZXNjcmlwdG9yGAEgASgLMiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVz",
-            "Y3JpcHRvcjogktsEHGludGVyb3AuQXBwRGlzY29ubmVjdGVkRXZlbnQiegoW",
-            "SW52b2NhdGlvblN0YXJ0ZWRFdmVudBI8ChVpbnZvY2F0aW9uX2Rlc2NyaXB0",
-            "b3IYASABKAsyHS5pbnRlcm9wLkludm9jYXRpb25EZXNjcmlwdG9yOiKS2wQe",
-            "aW50ZXJvcC5JbnZvY2F0aW9uU3RhcnRlZEV2ZW50IrwBChdJbnZvY2F0aW9u",
-            "RmluaXNoZWRFdmVudBI8ChVpbnZvY2F0aW9uX2Rlc2NyaXB0b3IYASABKAsy",
-            "HS5pbnRlcm9wLkludm9jYXRpb25EZXNjcmlwdG9yEikKBnJlc3VsdBgCIAEo",
-            "DjIZLmludGVyb3AuSW52b2NhdGlvblJlc3VsdBITCgtkdXJhdGlvbl9tcxgD",
-            "IAEoAzojktsEH2ludGVyb3AuSW52b2NhdGlvbkZpbmlzaGVkRXZlbnQiqAEK",
-            "FUdldENvbm5lY3Rpb25zUmVxdWVzdBIWCg5hcHBsaWNhdGlvbl9pZBgBIAEo",
-            "CRIqCg9hcHBfaW5zdGFuY2VfaWQYAiABKAsyES5pbnRlcm9wLlVuaXF1ZUlk",
-            "EigKDWNvbm5lY3Rpb25faWQYAyABKAsyES5pbnRlcm9wLlVuaXF1ZUlkOiGS",
-            "2wQdaW50ZXJvcC5HZXRDb25uZWN0aW9uc1JlcXVlc3QicwoWR2V0Q29ubmVj",
-            "dGlvbnNSZXNwb25zZRI1Cgtjb25uZWN0aW9ucxgBIAMoCzIgLmludGVyb3Au",
-            "QXBwQ29ubmVjdGlvbkRlc2NyaXB0b3I6IpLbBB5pbnRlcm9wLkdldENvbm5l",
-            "Y3Rpb25zUmVzcG9uc2Ui8QEKE0dldENvbm5lY3Rpb25zRXZlbnQSNQoLY29u",
+            "b3AuQXBwRGlzY29ubmVjdGVkRXZlbnRIABIxCgVlcnJvchgDIAEoCzIgLmlu",
+            "dGVyb3AuQXBwQ29ubmVjdGlvbkVycm9yRXZlbnRIADodktsEGWludGVyb3Au",
+            "QXBwTGlmZWN5Y2xlRXZlbnRCBwoFZXZlbnQitwEKD0ludm9jYXRpb25FdmVu",
+            "dBI9ChJpbnZvY2F0aW9uX3N0YXJ0ZWQYASABKAsyHy5pbnRlcm9wLkludm9j",
+            "YXRpb25TdGFydGVkRXZlbnRIABI/ChNpbnZvY2F0aW9uX2ZpbmlzaGVkGAIg",
+            "ASgLMiAuaW50ZXJvcC5JbnZvY2F0aW9uRmluaXNoZWRFdmVudEgAOhuS2wQX",
+            "aW50ZXJvcC5JbnZvY2F0aW9uRXZlbnRCBwoFZXZlbnQicwoRQXBwQ29ubmVj",
+            "dGVkRXZlbnQSPwoVY29ubmVjdGlvbl9kZXNjcmlwdG9yGAEgASgLMiAuaW50",
+            "ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvcjodktsEGWludGVyb3AuQXBw",
+            "Q29ubmVjdGVkRXZlbnQieQoUQXBwRGlzY29ubmVjdGVkRXZlbnQSPwoVY29u",
+            "bmVjdGlvbl9kZXNjcmlwdG9yGAEgASgLMiAuaW50ZXJvcC5BcHBDb25uZWN0",
+            "aW9uRGVzY3JpcHRvcjogktsEHGludGVyb3AuQXBwRGlzY29ubmVjdGVkRXZl",
+            "bnQiPgoXQXBwQ29ubmVjdGlvbkVycm9yRXZlbnQ6I5LbBB9pbnRlcm9wLkFw",
+            "cENvbm5lY3Rpb25FcnJvckV2ZW50InoKFkludm9jYXRpb25TdGFydGVkRXZl",
+            "bnQSPAoVaW52b2NhdGlvbl9kZXNjcmlwdG9yGAEgASgLMh0uaW50ZXJvcC5J",
+            "bnZvY2F0aW9uRGVzY3JpcHRvcjoiktsEHmludGVyb3AuSW52b2NhdGlvblN0",
+            "YXJ0ZWRFdmVudCK8AQoXSW52b2NhdGlvbkZpbmlzaGVkRXZlbnQSPAoVaW52",
+            "b2NhdGlvbl9kZXNjcmlwdG9yGAEgASgLMh0uaW50ZXJvcC5JbnZvY2F0aW9u",
+            "RGVzY3JpcHRvchIpCgZyZXN1bHQYAiABKA4yGS5pbnRlcm9wLkludm9jYXRp",
+            "b25SZXN1bHQSEwoLZHVyYXRpb25fbXMYAyABKAM6I5LbBB9pbnRlcm9wLklu",
+            "dm9jYXRpb25GaW5pc2hlZEV2ZW50IqgBChVHZXRDb25uZWN0aW9uc1JlcXVl",
+            "c3QSFgoOYXBwbGljYXRpb25faWQYASABKAkSKgoPYXBwX2luc3RhbmNlX2lk",
+            "GAIgASgLMhEuaW50ZXJvcC5VbmlxdWVJZBIoCg1jb25uZWN0aW9uX2lkGAMg",
+            "ASgLMhEuaW50ZXJvcC5VbmlxdWVJZDohktsEHWludGVyb3AuR2V0Q29ubmVj",
+            "dGlvbnNSZXF1ZXN0InMKFkdldENvbm5lY3Rpb25zUmVzcG9uc2USNQoLY29u",
             "bmVjdGlvbnMYASADKAsyIC5pbnRlcm9wLkFwcENvbm5lY3Rpb25EZXNjcmlw",
-            "dG9yEjoKDm5ld19jb25uZWN0aW9uGAIgASgLMiAuaW50ZXJvcC5BcHBDb25u",
-            "ZWN0aW9uRGVzY3JpcHRvckgAEj0KEWNsb3NlZF9jb25uZWN0aW9uGAMgASgL",
-            "MiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvckgAOh+S2wQbaW50",
-            "ZXJvcC5HZXRDb25uZWN0aW9uc0V2ZW50QgcKBWV2ZW50KjsKEEludm9jYXRp",
-            "b25SZXN1bHQSDQoJU3VjY2VlZGVkEAASDAoIQ2FuY2VsZWQQARIKCgZGYWls",
-            "ZWQQAjLJAwoTQXBwTGlmZWN5Y2xlU2VydmljZRJFCgpSZXNvbHZlQXBwEhou",
-            "aW50ZXJvcC5SZXNvbHZlQXBwUmVxdWVzdBobLmludGVyb3AuUmVzb2x2ZUFw",
-            "cFJlc3BvbnNlEk8KF0dldExpZmVjeWNsZUV2ZW50U3RyZWFtEhYuZ29vZ2xl",
-            "LnByb3RvYnVmLkVtcHR5GhouaW50ZXJvcC5BcHBMaWZlY3ljbGVFdmVudDAB",
-            "Ek4KGEdldEludm9jYXRpb25FdmVudFN0cmVhbRIWLmdvb2dsZS5wcm90b2J1",
-            "Zi5FbXB0eRoYLmludGVyb3AuSW52b2NhdGlvbkV2ZW50MAESUQoOR2V0Q29u",
-            "bmVjdGlvbnMSHi5pbnRlcm9wLkdldENvbm5lY3Rpb25zUmVxdWVzdBofLmlu",
-            "dGVyb3AuR2V0Q29ubmVjdGlvbnNSZXNwb25zZRJWChRHZXRDb25uZWN0aW9u",
-            "c1N0cmVhbRIeLmludGVyb3AuR2V0Q29ubmVjdGlvbnNSZXF1ZXN0GhwuaW50",
-            "ZXJvcC5HZXRDb25uZWN0aW9uc0V2ZW50MAEaH5LbBBtpbnRlcm9wLkFwcExp",
-            "ZmVjeWNsZVNlcnZpY2VCKaoCJlBsZXh1cy5JbnRlcm9wLkFwcHMuSW50ZXJu",
-            "YWwuR2VuZXJhdGVkYgZwcm90bzM="));
+            "dG9yOiKS2wQeaW50ZXJvcC5HZXRDb25uZWN0aW9uc1Jlc3BvbnNlIvEBChNH",
+            "ZXRDb25uZWN0aW9uc0V2ZW50EjUKC2Nvbm5lY3Rpb25zGAEgAygLMiAuaW50",
+            "ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvchI6Cg5uZXdfY29ubmVjdGlv",
+            "bhgCIAEoCzIgLmludGVyb3AuQXBwQ29ubmVjdGlvbkRlc2NyaXB0b3JIABI9",
+            "ChFjbG9zZWRfY29ubmVjdGlvbhgDIAEoCzIgLmludGVyb3AuQXBwQ29ubmVj",
+            "dGlvbkRlc2NyaXB0b3JIADofktsEG2ludGVyb3AuR2V0Q29ubmVjdGlvbnNF",
+            "dmVudEIHCgVldmVudCo7ChBJbnZvY2F0aW9uUmVzdWx0Eg0KCVN1Y2NlZWRl",
+            "ZBAAEgwKCENhbmNlbGVkEAESCgoGRmFpbGVkEAIyyQMKE0FwcExpZmVjeWNs",
+            "ZVNlcnZpY2USRQoKUmVzb2x2ZUFwcBIaLmludGVyb3AuUmVzb2x2ZUFwcFJl",
+            "cXVlc3QaGy5pbnRlcm9wLlJlc29sdmVBcHBSZXNwb25zZRJPChdHZXRMaWZl",
+            "Y3ljbGVFdmVudFN0cmVhbRIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRoaLmlu",
+            "dGVyb3AuQXBwTGlmZWN5Y2xlRXZlbnQwARJOChhHZXRJbnZvY2F0aW9uRXZl",
+            "bnRTdHJlYW0SFi5nb29nbGUucHJvdG9idWYuRW1wdHkaGC5pbnRlcm9wLklu",
+            "dm9jYXRpb25FdmVudDABElEKDkdldENvbm5lY3Rpb25zEh4uaW50ZXJvcC5H",
+            "ZXRDb25uZWN0aW9uc1JlcXVlc3QaHy5pbnRlcm9wLkdldENvbm5lY3Rpb25z",
+            "UmVzcG9uc2USVgoUR2V0Q29ubmVjdGlvbnNTdHJlYW0SHi5pbnRlcm9wLkdl",
+            "dENvbm5lY3Rpb25zUmVxdWVzdBocLmludGVyb3AuR2V0Q29ubmVjdGlvbnNF",
+            "dmVudDABGh+S2wQbaW50ZXJvcC5BcHBMaWZlY3ljbGVTZXJ2aWNlQimqAiZQ",
+            "bGV4dXMuSW50ZXJvcC5BcHBzLkludGVybmFsLkdlbmVyYXRlZGIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppLaunchModeReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.InvocationDescriptorReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationResult), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest), global::Plexus.Interop.Apps.Internal.Generated.ResolveAppRequest.Parser, new[]{ "AppId", "AppResolveMode" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse), global::Plexus.Interop.Apps.Internal.Generated.ResolveAppResponse.Parser, new[]{ "AppInstanceId", "AppConnectionId", "IsNewInstanceLaunched" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent), global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent.Parser, new[]{ "Connected", "Disconnected" }, new[]{ "Event" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent), global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleEvent.Parser, new[]{ "Connected", "Disconnected", "Error" }, new[]{ "Event" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent), global::Plexus.Interop.Apps.Internal.Generated.InvocationEvent.Parser, new[]{ "InvocationStarted", "InvocationFinished" }, new[]{ "Event" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent), global::Plexus.Interop.Apps.Internal.Generated.AppConnectedEvent.Parser, new[]{ "ConnectionDescriptor" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent), global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent.Parser, new[]{ "ConnectionDescriptor" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent), global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent), global::Plexus.Interop.Apps.Internal.Generated.InvocationStartedEvent.Parser, new[]{ "InvocationDescriptor" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent), global::Plexus.Interop.Apps.Internal.Generated.InvocationFinishedEvent.Parser, new[]{ "InvocationDescriptor", "Result", "DurationMs" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.GetConnectionsRequest), global::Plexus.Interop.Apps.Internal.Generated.GetConnectionsRequest.Parser, new[]{ "ApplicationId", "AppInstanceId", "ConnectionId" }, null, null, null, null),
@@ -674,6 +677,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         case EventOneofCase.Disconnected:
           Disconnected = other.Disconnected.Clone();
           break;
+        case EventOneofCase.Error:
+          Error = other.Error.Clone();
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -709,12 +715,25 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
+    /// <summary>Field number for the "error" field.</summary>
+    public const int ErrorFieldNumber = 3;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent Error {
+      get { return eventCase_ == EventOneofCase.Error ? (global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent) event_ : null; }
+      set {
+        event_ = value;
+        eventCase_ = value == null ? EventOneofCase.None : EventOneofCase.Error;
+      }
+    }
+
     private object event_;
     /// <summary>Enum of possible cases for the "event" oneof.</summary>
     public enum EventOneofCase {
       None = 0,
       Connected = 1,
       Disconnected = 2,
+      Error = 3,
     }
     private EventOneofCase eventCase_ = EventOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -747,6 +766,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (!object.Equals(Connected, other.Connected)) return false;
       if (!object.Equals(Disconnected, other.Disconnected)) return false;
+      if (!object.Equals(Error, other.Error)) return false;
       if (EventCase != other.EventCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -757,6 +777,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       int hash = 1;
       if (eventCase_ == EventOneofCase.Connected) hash ^= Connected.GetHashCode();
       if (eventCase_ == EventOneofCase.Disconnected) hash ^= Disconnected.GetHashCode();
+      if (eventCase_ == EventOneofCase.Error) hash ^= Error.GetHashCode();
       hash ^= (int) eventCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -784,6 +805,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(18);
         output.WriteMessage(Disconnected);
       }
+      if (eventCase_ == EventOneofCase.Error) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Error);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -802,6 +827,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(18);
         output.WriteMessage(Disconnected);
       }
+      if (eventCase_ == EventOneofCase.Error) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Error);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -817,6 +846,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (eventCase_ == EventOneofCase.Disconnected) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Disconnected);
+      }
+      if (eventCase_ == EventOneofCase.Error) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Error);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -842,6 +874,12 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             Disconnected = new global::Plexus.Interop.Apps.Internal.Generated.AppDisconnectedEvent();
           }
           Disconnected.MergeFrom(other.Disconnected);
+          break;
+        case EventOneofCase.Error:
+          if (Error == null) {
+            Error = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent();
+          }
+          Error.MergeFrom(other.Error);
           break;
       }
 
@@ -878,6 +916,15 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             Disconnected = subBuilder;
             break;
           }
+          case 26: {
+            global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent subBuilder = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent();
+            if (eventCase_ == EventOneofCase.Error) {
+              subBuilder.MergeFrom(Error);
+            }
+            input.ReadMessage(subBuilder);
+            Error = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -909,6 +956,15 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             }
             input.ReadMessage(subBuilder);
             Disconnected = subBuilder;
+            break;
+          }
+          case 26: {
+            global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent subBuilder = new global::Plexus.Interop.Apps.Internal.Generated.AppConnectionErrorEvent();
+            if (eventCase_ == EventOneofCase.Error) {
+              subBuilder.MergeFrom(Error);
+            }
+            input.ReadMessage(subBuilder);
+            Error = subBuilder;
             break;
           }
         }
@@ -1599,6 +1655,158 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
+  internal sealed partial class AppConnectionErrorEvent : pb::IMessage<AppConnectionErrorEvent>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<AppConnectionErrorEvent> _parser = new pb::MessageParser<AppConnectionErrorEvent>(() => new AppConnectionErrorEvent());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<AppConnectionErrorEvent> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[6]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AppConnectionErrorEvent() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AppConnectionErrorEvent(AppConnectionErrorEvent other) : this() {
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AppConnectionErrorEvent Clone() {
+      return new AppConnectionErrorEvent(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as AppConnectionErrorEvent);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(AppConnectionErrorEvent other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(AppConnectionErrorEvent other) {
+      if (other == null) {
+        return;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+        }
+      }
+    }
+    #endif
+
+  }
+
   internal sealed partial class InvocationStartedEvent : pb::IMessage<InvocationStartedEvent>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -1613,7 +1821,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1811,7 +2019,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2083,7 +2291,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2364,7 +2572,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2542,7 +2750,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[10]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.AppLifecycleServiceReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
