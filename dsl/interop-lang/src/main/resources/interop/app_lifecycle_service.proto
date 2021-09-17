@@ -68,6 +68,7 @@ message AppDisconnectedEvent {
 }
 
 message AppConnectionErrorEvent {
+	AppConnectionDescriptor connection_descriptor = 1;
 }
 
 message InvocationStartedEvent {	
