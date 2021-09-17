@@ -48,6 +48,7 @@ message AppLifecycleEvent {
 	oneof event {
 		AppConnectedEvent connected = 1;
 		AppDisconnectedEvent disconnected = 2;
+		AppConnectionErrorEvent error = 3;
 	}
 }
 
@@ -64,6 +65,9 @@ message AppConnectedEvent {
 
 message AppDisconnectedEvent {
 	AppConnectionDescriptor connection_descriptor = 1;	
+}
+
+message AppConnectionErrorEvent {
 }
 
 message InvocationStartedEvent {	
