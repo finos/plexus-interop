@@ -74,20 +74,30 @@ namespace Plexus.Interop.Apps.Internal.Services
         private void BroadcastConnectionEvents(AppConnectionEvent connectionEvent)
         {
             var lifecycleEvent = new AppLifecycleEvent();
-            if (connectionEvent.Type == ConnectionEventType.AppConnected)
+            switch (connectionEvent.Type)
             {
-                lifecycleEvent.Connected = new AppConnectedEvent
-                {
-                    ConnectionDescriptor = connectionEvent.Connection.ToProto()
-                };
-            }
-            else
-            {
-                lifecycleEvent.Disconnected = new AppDisconnectedEvent
-                {
-                    ConnectionDescriptor = connectionEvent.Connection.ToProto()
-                };
-            }
+                case ConnectionEventType.AppConnected:
+                    lifecycleEvent.Connected = new AppConnectedEvent
+                    {
+                        ConnectionDescriptor = connectionEvent.Connection.ToProto()
+                    };
+                    break;
+                case ConnectionEventType.AppDisconnected:
+                    lifecycleEvent.Disconnected = new AppDisconnectedEvent
+                    {
+                        ConnectionDescriptor = connectionEvent.Connection.ToProto()
+                    };
+                    break;
+                case ConnectionEventType.AppConnectionError:
+                    lifecycleEvent.Error = new AppConnectionErrorEvent
+                    {
+                        ConnectionDescriptor = connectionEvent.Connection.ToProto()
+                    };
+                    break;
+                default:
+                    Log.Error($"Unknown connection event type {connectionEvent.Type}");
+                    return;
+            };
             _appLifecycleEventBroadcaster.OnNext(lifecycleEvent);
         }
 
