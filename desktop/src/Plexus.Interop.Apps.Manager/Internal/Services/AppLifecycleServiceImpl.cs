@@ -181,8 +181,11 @@ namespace Plexus.Interop.Apps.Internal.Services
 
         public async Task GetConnectionsStream(GetConnectionsRequest request, IWritableChannel<GetConnectionsEvent> responseStream, MethodCallContext context)
         {
-            await _appLifecycleManager.ConnectionEventsStream.Where(e => IsEventFitRequest(request, e.Connection))
-                .Select(e => CreateGetConnectionsEvent(request, e)).StartWith(CreateInitialGetConnectionsEvent(request))
+            await _appLifecycleManager.ConnectionEventsStream
+                .Where(e => IsEventFitRequest(request, e.Connection))
+                .Select(e => CreateGetConnectionsEvent(request, e))
+                .Where(e => e != null)
+                .StartWith(CreateInitialGetConnectionsEvent(request))
                 .PipeAsync(responseStream);
         }
 
@@ -197,15 +200,17 @@ namespace Plexus.Interop.Apps.Internal.Services
         private GetConnectionsEvent CreateGetConnectionsEvent(GetConnectionsRequest request, AppConnectionEvent appConnectionEvent)
         {
             var response = CreateInitialGetConnectionsEvent(request);
-            if (appConnectionEvent.Type == ConnectionEventType.AppConnected)
+            switch (appConnectionEvent.Type)
             {
-                response.NewConnection = appConnectionEvent.Connection.ToProto();
+                case ConnectionEventType.AppConnected:
+                    response.NewConnection = appConnectionEvent.Connection.ToProto();
+                    return response;
+                case ConnectionEventType.AppDisconnected:
+                    response.ClosedConnection = appConnectionEvent.Connection.ToProto();
+                    return response;
+                default:
+                    return null;
             }
-            else
-            {
-                response.ClosedConnection = appConnectionEvent.Connection.ToProto();
-            }
-            return response;
         }
 
         private static bool IsEventFitRequest(GetConnectionsRequest request, AppConnectionDescriptor connection)
