@@ -1063,7 +1063,8 @@
 	            "event": {
 	              "oneof": [
 	                "connected",
-	                "disconnected"
+	                "disconnected",
+	                "error"
 	              ]
 	            }
 	          },
@@ -1075,6 +1076,10 @@
 	            "disconnected": {
 	              "type": "AppDisconnectedEvent",
 	              "id": 2
+	            },
+	            "error": {
+	              "type": "AppConnectionErrorEvent",
+	              "id": 3
 	            }
 	          }
 	        },
@@ -1115,6 +1120,17 @@
 	        "AppDisconnectedEvent": {
 	          "options": {
 	            "(.interop.message_id)": "interop.AppDisconnectedEvent"
+	          },
+	          "fields": {
+	            "connectionDescriptor": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "AppConnectionErrorEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppConnectionErrorEvent"
 	          },
 	          "fields": {
 	            "connectionDescriptor": {

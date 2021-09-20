@@ -94,13 +94,14 @@ namespace Plexus.Interop.Apps.Internal.Services
             var contextsOfApp = _contextsSet.GetContextsOf(connection.ApplicationInstanceId);
             foreach (var context in contextsOfApp)
             {
-                if (connectionEvent.Type == ConnectionEventType.AppConnected)
+                switch (connectionEvent.Type)
                 {
-                    context.AppConnected(connection);
-                }
-                else
-                {
-                    context.AppDisconnected(connection);
+                    case ConnectionEventType.AppConnected:
+                        context.AppConnected(connection);
+                        break;
+                    case ConnectionEventType.AppDisconnected:
+                        context.AppDisconnected(connection);
+                        break;
                 }
             }
         }
