@@ -20,5 +20,6 @@ namespace Plexus.Interop.Apps
     {
         AppConnected = 0,
         AppDisconnected = 1,
+        AppConnectionError = 2,
     }
 }

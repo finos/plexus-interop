@@ -172,6 +172,9 @@ namespace Plexus.Interop.Apps.Internal
             return true;
         }
 
+        public void ReportConnectionError(AppConnectionDescriptor connectionInfo)
+            => _connectionSubject.OnNext(new AppConnectionEvent(connectionInfo, ConnectionEventType.AppConnectionError));
+
         public bool TryGetConnectionInProgress(UniqueId appInstanceId, string appId, out Task<IAppConnection> appConnection)
         {
             lock (_sync)

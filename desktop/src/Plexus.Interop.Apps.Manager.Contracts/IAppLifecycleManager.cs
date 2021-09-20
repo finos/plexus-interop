@@ -26,6 +26,8 @@ namespace Plexus.Interop.Apps
 
         bool TryRemoveConnection(IAppConnection connection);
 
+        void ReportConnectionError(AppConnectionDescriptor connectionInfo);
+
         bool TryGetOnlineConnection(UniqueId connectionId, out IAppConnection connection);
 
         bool TryGetOnlineConnection(UniqueId appInstanceId, string app, out IAppConnection connection);
