@@ -48,10 +48,7 @@ export class InteropClientFactory {
         const details = await discoveryService.getConnectionDetails();
         this.log.info(`Instance ID provided by launcher: ${details.appInstanceId}`);
 
-        let appInstanceId = UrlParamsProvider.getParam('plexusInstanceId');
-        if (!appInstanceId) {
-            appInstanceId = details.appInstanceId;
-        }
+        let appInstanceId = UrlParamsProvider.getParam('plexusInstanceId') || details.appInstanceId;
         if (appInstanceId) {
             this.log.info(`Connecting with ${appInstanceId} instance ID`);
         }
