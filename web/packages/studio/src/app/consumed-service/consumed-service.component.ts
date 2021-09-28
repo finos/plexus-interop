@@ -77,7 +77,6 @@ export class ConsumedServiceComponent implements OnInit, OnDestroy {
           this.selectedDiscoveredMethod = undefined;
           this.interopClient = state.services.interopClient;
           this.discoveredMethods = state.consumedMethod.discoveredMethods.methods;
-          this.interopClient = state.services.interopClient;
           this.consumedMethod = state.consumedMethod.method;
           this.title = this.getTitle(this.consumedMethod);
           this.createDefaultMessage();

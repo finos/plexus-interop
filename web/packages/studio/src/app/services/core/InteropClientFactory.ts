@@ -27,6 +27,9 @@ import { DynamicProtoMarshallerFactory } from '@plexus-interop/io/dist/main/src/
 import { DefaultMessageGenerator } from './DefaultMessageGenerator';
 import { Marshaller } from '@plexus-interop/io';
 import { UnaryStringHandler, BidiStreamingStringHandler, ServerStreamingStringHandler, wrapGenericHostClient } from './StringHandlers';
+import { DefaultConnectionDetailsService } from '@plexus-interop/client';
+
+const discoveryService: DefaultConnectionDetailsService = new DefaultConnectionDetailsService();
 
 @Injectable()
 export class InteropClientFactory {
@@ -41,8 +44,11 @@ export class InteropClientFactory {
         this.log.info(`Connecting as ${appId}`);
 
         let genericClientBuilder = new GenericClientApiBuilder();
-        let appInstanceId = UrlParamsProvider.getParam('plexusInstanceId');
+        
+        const details = await discoveryService.getConnectionDetails();
+        this.log.info(`Instance ID provided by launcher: ${details.appInstanceId}`);
 
+        let appInstanceId = UrlParamsProvider.getParam('plexusInstanceId') || details.appInstanceId;
         if (appInstanceId) {
             this.log.info(`Connecting with ${appInstanceId} instance ID`);
         }
