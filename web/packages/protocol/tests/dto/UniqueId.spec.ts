@@ -27,4 +27,10 @@ describe('UniqueId', () => {
         const strId = id.toString();
         expect(id.toString().length).toBe(32);
     });
+    it('fromString and toString compatible for small numbers', () => {
+        const s = "00000000000000000000000000000001";
+        const id = UniqueId.fromString(s);
+        const strId = id.toString();
+        expect(strId).toBe(s);
+    });
 });
