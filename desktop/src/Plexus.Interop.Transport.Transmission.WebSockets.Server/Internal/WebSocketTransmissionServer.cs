@@ -31,6 +31,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using System.Net;
     using System.Net.Sockets;
     using System.Net.WebSockets;
+    using System.Security.Cryptography.X509Certificates;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -40,6 +41,10 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     {        
         private const int AcceptedConnectionsBufferSize = 20;
         private const string ServerName = "ws-v1";
+
+        private readonly string _protocol = "http";
+        private readonly string _webSocketsProtocol = "ws";
+        private readonly X509Certificate2 _certificate = null;
 
         private IWebHost _host;
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
@@ -51,6 +56,14 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             _options = options;
             _stateWriter = new ServerStateWriter(ServerName, _options.WorkingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
+        }
+
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
+            : this(options)
+        {
+            _protocol = "https";
+            _webSocketsProtocol = "wss";
+            _certificate = certificate;
         }
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
@@ -84,7 +97,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         {
             var feature = _host.ServerFeatures.Get<IServerAddressesFeature>();
             var url = feature.Addresses.First();
-            _stateWriter.Write("address", url.Replace("http://", "ws://"));
+            _stateWriter.Write("address", url.Replace($"{_protocol}://", $"{_webSocketsProtocol}://"));
             Log.Info("Websocket server started: {0}", url);
             _stateWriter.SignalInitialized();
             SetStartCompleted();
@@ -95,9 +108,13 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             Log.Trace("Resolving localhost url");
             var hostEntry = Dns.GetHostEntryAsync("localhost").GetResult();
             var localhostIp = hostEntry.AddressList.First(addr => addr.AddressFamily == AddressFamily.InterNetwork);
-            var url = $"http://{localhostIp}:{_options.Port}";
+            var url = $"{_protocol}://{localhostIp}:{_options.Port}";
             _host = new WebHostBuilder()
-                .UseKestrel()
+                .UseKestrel(serverOptions =>
+                {
+                    if (_certificate != null)
+                        serverOptions.ConfigureHttpsDefaults(o => o.ServerCertificate = _certificate);
+                })
                 .SuppressStatusMessages(true)
                 .UseUrls(url)
                 .UseContentRoot(Directory.GetCurrentDirectory())

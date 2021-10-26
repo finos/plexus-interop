@@ -22,12 +22,17 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using System;
     using System.IO;
     using System.Net;
+    using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
 
     internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer
     {
         private const int AcceptedConnectionsBufferSize = 20;
         private const string ServerName = "ws-v1";
+
+        private readonly string _protocol = "ws";
+        private readonly X509Certificate2 _certificate = null;
+
         private readonly WebSocketTransmissionServerOptions _options;
         private WebSocketServer _server;
 
@@ -39,6 +44,13 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             _options = options;
             _stateWriter = new ServerStateWriter(ServerName, _options.WorkingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
+        }
+
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
+            : this(options)
+        {
+            _protocol = "wss";
+            _certificate = certificate;
         }
 
         public IReadableChannel<ITransmissionConnection> In => _buffer.In;
@@ -53,7 +65,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             using (_stateWriter)
             using (_server = CreateWebSocketServerWithRetry(_options.Port))
             {
-                var address = "ws://" + _server.ListenerSocket.LocalEndPoint;                
+                var address = $"{_protocol}://{_server.ListenerSocket.LocalEndPoint}";
                 _stateWriter.Write("address", address);
                 _stateWriter.SignalInitialized();
                 SetStartCompleted();
@@ -64,19 +76,13 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         }
 
         private WebSocketServer CreateWebSocketServerWithRetry(uint port)
-        {
-            var server = StartWebSocketServer($"ws://127.0.0.1:{port}", true);
-            server = server ?? StartWebSocketServer($"ws://127.0.0.1:{port}", false);
-            server = server ?? StartWebSocketServer($"ws://localhost:{port}", true);
-            server = server ?? StartWebSocketServer($"ws://localhost:{port}", false);
-            server = server ?? StartWebSocketServer($"ws://[::1]:{port}", true);
-            server = server ?? StartWebSocketServer($"ws://[::1]:{port}", false);
-            if (server == null)
-            {
-                throw new InvalidOperationException("Failed to start websocket server");
-            }
-            return server;
-        }
+            => StartWebSocketServer($"{_protocol}://127.0.0.1:{port}", true)
+            ?? StartWebSocketServer($"{_protocol}://127.0.0.1:{port}", false)
+            ?? StartWebSocketServer($"{_protocol}://localhost:{port}", true)
+            ?? StartWebSocketServer($"{_protocol}://localhost:{port}", false)
+            ?? StartWebSocketServer($"{_protocol}://[::1]:{port}", true)
+            ?? StartWebSocketServer($"{_protocol}://[::1]:{port}", false)
+            ?? throw new InvalidOperationException("Failed to start websocket server");
 
         private WebSocketServer StartWebSocketServer(string url, bool supportDualStack)
         {
@@ -85,6 +91,9 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             {
                 server.RestartAfterListenError = true;
                 server.ListenerSocket.NoDelay = true;
+                if (_certificate != null)
+                    server.Certificate = _certificate;
+
                 server.Start(OnSocketConnection);
             }
             catch (Exception ex)
