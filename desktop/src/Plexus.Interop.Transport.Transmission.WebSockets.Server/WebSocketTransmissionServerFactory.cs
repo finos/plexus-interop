@@ -28,9 +28,8 @@
             return new WebSocketTransmissionServer(options);
         }
 
-        public ITransmissionServer CreateSecure(WebSocketTransmissionServerOptions options, string certificateFileName, string certificatePassword)
+        public ITransmissionServer CreateSecure(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
         {
-            var certificate = new X509Certificate2(certificateFileName, certificatePassword);
             return new WebSocketTransmissionServer(options, certificate);
         }
     }

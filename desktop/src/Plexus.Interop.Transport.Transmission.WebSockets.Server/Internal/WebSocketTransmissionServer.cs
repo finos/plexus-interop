@@ -42,8 +42,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private const int AcceptedConnectionsBufferSize = 20;
         private const string ServerName = "ws-v1";
 
-        private readonly string _protocol = "http";
-        private readonly string _webSocketsProtocol = "ws";
         private readonly X509Certificate2 _certificate = null;
 
         private IWebHost _host;
@@ -61,8 +59,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
             : this(options)
         {
-            _protocol = "https";
-            _webSocketsProtocol = "wss";
             _certificate = certificate;
         }
 
@@ -97,7 +93,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         {
             var feature = _host.ServerFeatures.Get<IServerAddressesFeature>();
             var url = feature.Addresses.First();
-            _stateWriter.Write("address", url.Replace($"{_protocol}://", $"{_webSocketsProtocol}://"));
+            _stateWriter.Write("address", url.Replace("http://", "ws://").Replace("https://", "wss://"));
             Log.Info("Websocket server started: {0}", url);
             _stateWriter.SignalInitialized();
             SetStartCompleted();
@@ -108,19 +104,21 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             Log.Trace("Resolving localhost url");
             var hostEntry = Dns.GetHostEntryAsync("localhost").GetResult();
             var localhostIp = hostEntry.AddressList.First(addr => addr.AddressFamily == AddressFamily.InterNetwork);
-            var url = $"{_protocol}://{localhostIp}:{_options.Port}";
+            var port = (int)_options.Port;
             _host = new WebHostBuilder()
                 .UseKestrel(serverOptions =>
                 {
                     if (_certificate != null)
-                        serverOptions.ConfigureHttpsDefaults(o => o.ServerCertificate = _certificate);
+                        serverOptions.Listen(localhostIp, port, o => o.UseHttps(_certificate));
+                    else
+                        serverOptions.Listen(localhostIp, port);
                 })
                 .SuppressStatusMessages(true)
-                .UseUrls(url)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .Configure(Configure)
                 .Build();
-            Log.Trace("Starting server host: {0}", url);
+
+            Log.Trace("Starting server host: {0}:{1}", localhostIp, port);
             await _host.RunAsync(CancellationToken).ConfigureAwait(false);
         }
 
