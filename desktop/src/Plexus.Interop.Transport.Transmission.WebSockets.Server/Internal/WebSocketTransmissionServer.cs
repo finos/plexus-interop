@@ -40,7 +40,6 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer
     {        
         private const int AcceptedConnectionsBufferSize = 20;
-        private const string ServerName = "ws-v1";
 
         private readonly X509Certificate2 _certificate = null;
 
@@ -49,15 +48,21 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private readonly IServerStateWriter _stateWriter;
         private readonly WebSocketTransmissionServerOptions _options;
 
-        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options)
+        private WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, string protocol)
         {
             _options = options;
-            _stateWriter = new ServerStateWriter(ServerName, _options.WorkingDir);
+            var serverName = $"{protocol}-v1";
+            _stateWriter = new ServerStateWriter(serverName, _options.WorkingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options)
+            : this(options, "ws")
+        {
+        }
+
         public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
-            : this(options)
+            : this(options, "wss")
         {
             _certificate = certificate;
         }

@@ -19,20 +19,21 @@ namespace Plexus.Interop
     public sealed class BrokerOptions
     {
         public string MetadataDir { get; }
-
         public uint Port { get; }
-
+        public uint WssPort { get; }
         public string CertificateFilePath { get; }
         public string CertificatePassword { get; }
 
         public BrokerOptions(
             string metadataDir,
             uint port,
+            uint wssPort,
             string certificateFilePath,
             string certificatePassword)
         {
             MetadataDir = metadataDir;
             Port = port;
+            WssPort = wssPort;
             CertificateFilePath = certificateFilePath;
             CertificatePassword = certificatePassword;
         }
@@ -40,6 +41,7 @@ namespace Plexus.Interop
         public override string ToString() => string.Join(", ",
             $"{nameof(MetadataDir)}: {MetadataDir}",
             $"{nameof(Port)}: {Port}",
+            $"{nameof(WssPort)}: {WssPort}",
             $"{nameof(CertificateFilePath)}: {CertificateFilePath}",
             $"{nameof(CertificatePassword)}.Length: {CertificatePassword?.Length}");
     }

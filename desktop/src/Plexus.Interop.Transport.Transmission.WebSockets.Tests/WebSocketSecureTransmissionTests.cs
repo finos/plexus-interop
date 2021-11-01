@@ -35,7 +35,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
 
         protected override ITransmissionClient CreateClient()
         {
-            return new WebSocketTransmissionClient();
+            return new WebSocketTransmissionClient("wss");
         }
     }
 }

@@ -16,19 +16,17 @@
  */
 namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 {
-    using global::Fleck;
+    using Fleck;
     using Plexus.Channels;
     using Plexus.Processes;
     using System;
     using System.IO;
-    using System.Net;
     using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
 
     internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer
     {
         private const int AcceptedConnectionsBufferSize = 20;
-        private const string ServerName = "ws-v1";
 
         private readonly string _protocol = "ws";
         private readonly X509Certificate2 _certificate = null;
@@ -39,17 +37,23 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
         private readonly IServerStateWriter _stateWriter;
 
-        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options)
+        private WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, string protocol)
         {
             _options = options;
-            _stateWriter = new ServerStateWriter(ServerName, _options.WorkingDir);
+            _protocol = protocol;
+            var serverName = $"{protocol}-v1";
+            _stateWriter = new ServerStateWriter(serverName, _options.WorkingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
         }
 
-        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
-            : this(options)
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options)
+            : this(options, "ws")
         {
-            _protocol = "wss";
+        }
+
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
+            : this(options, "wss")
+        {
             _certificate = certificate;
         }
 
