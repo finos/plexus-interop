@@ -22,13 +22,25 @@ namespace Plexus.Interop
 
         public uint Port { get; }
 
-        public BrokerOptions(string metadataDir, uint port)
+        public string CertificateFilePath { get; }
+        public string CertificatePassword { get; }
+
+        public BrokerOptions(
+            string metadataDir,
+            uint port,
+            string certificateFilePath,
+            string certificatePassword)
         {
             MetadataDir = metadataDir;
             Port = port;
+            CertificateFilePath = certificateFilePath;
+            CertificatePassword = certificatePassword;
         }
 
-        public override string ToString()
-            => $"{nameof(MetadataDir)}: {MetadataDir}, {nameof(Port)}: {Port}";
+        public override string ToString() => string.Join(", ",
+            $"{nameof(MetadataDir)}: {MetadataDir}",
+            $"{nameof(Port)}: {Port}",
+            $"{nameof(CertificateFilePath)}: {CertificateFilePath}",
+            $"{nameof(CertificatePassword)}.Length: {CertificatePassword?.Length}");
     }
 }

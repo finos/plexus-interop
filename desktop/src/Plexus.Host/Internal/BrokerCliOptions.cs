@@ -29,6 +29,12 @@
 
         [Option('p', "port", Required = false, HelpText = "Port number to listen. If omitted, free port is selected automatically.")]
         public uint Port { get; set; }
+
+        [Option("certfile", Required = false, HelpText = "Path to .pfx certificate file. If omitted, only ws transport used.")]
+        public string CertificateFilePath { get; set; }
+
+        [Option("certpass", Required = false, HelpText = "Password to certificate file.")]
+        public string CertificatePassword { get; set; }
     }
 
 #if !NET45
