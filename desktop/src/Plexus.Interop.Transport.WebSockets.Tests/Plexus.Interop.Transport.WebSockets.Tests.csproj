@@ -32,9 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="mycert.pfx">
+    <Content Include="..\..\mycert.pfx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
