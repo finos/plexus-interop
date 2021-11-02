@@ -47,10 +47,12 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
         private readonly IServerStateWriter _stateWriter;
         private readonly WebSocketTransmissionServerOptions _options;
+        private readonly string _protocol;
 
         private WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, string protocol)
         {
             _options = options;
+            _protocol = protocol;
             var serverName = $"{protocol}-v1";
             _stateWriter = new ServerStateWriter(serverName, _options.WorkingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
@@ -123,7 +125,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 .Configure(Configure)
                 .Build();
 
-            Log.Trace("Starting server host: {0}:{1}", localhostIp, port);
+            Log.Trace($"Starting server host: {_protocol}://{localhostIp}:{port}");
             await _host.RunAsync(CancellationToken).ConfigureAwait(false);
         }
 
