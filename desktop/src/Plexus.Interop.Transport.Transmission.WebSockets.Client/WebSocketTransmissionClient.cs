@@ -26,16 +26,26 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
         private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
         private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout1Min;
 
+        private readonly bool _useWSS;
         private readonly string _serverName;
 
         public WebSocketTransmissionClient(string protocol)
         {
+            _useWSS = protocol switch
+            {
+                "ws" => false,
+                "wss" => true,
+                _ => throw new ArgumentException($"Unknown {nameof(protocol)} value {protocol}", nameof(protocol))
+            };
             _serverName = $"{protocol}-v1";
         }
 
         public async ValueTask<ITransmissionConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken = default)
         {
-            var webSocketAddress = EnvironmentHelper.GetWebSocketAddress();
+            var webSocketAddress = _useWSS
+                ? EnvironmentHelper.GetWebSocketSecureAddress()
+                : EnvironmentHelper.GetWebSocketAddress();
+
             if (string.IsNullOrEmpty(webSocketAddress))
             {
                 Log.Trace("Waiting initialization of server {0}", _serverName);
