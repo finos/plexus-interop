@@ -31,7 +31,7 @@ namespace Plexus.Interop.Transport.WebSockets
                 WebSocketTransmissionServerFactory.Instance.CreateSecure(new WebSocketTransmissionServerOptions(BrokerWorkingDir), cert),
                 new ProtobufTransportProtocolSerializationProvider()));
             Client = TransportClientFactory.Instance.Create(
-                new WebSocketTransmissionClient("wss"),
+                WebSocketTransmissionClient.CreateSecure(),
                 new ProtobufTransportProtocolSerializationProvider());
         }
 

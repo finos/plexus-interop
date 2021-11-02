@@ -33,7 +33,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
 
         protected override ITransmissionClient CreateClient()
         {
-            return new WebSocketTransmissionClient("ws");
+            return WebSocketTransmissionClient.Create();
         }
     }
 }
