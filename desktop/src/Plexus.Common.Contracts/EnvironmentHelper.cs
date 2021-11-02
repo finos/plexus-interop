@@ -29,6 +29,8 @@ namespace Plexus
         public const string PlexusBrokerPipeAddress = "PLEXUS_BROKER_PIPE_ADDRESS";
         public const string BrokerFeatures = "PLEXUS_BROKER_FEATURES";
         public const string LauncherId = "PLEXUS_TRUSTED_LAUNCHER_ID";
+        public const string CertificatePath = "PLEXUS_CERTIFICATE_PATH";
+        public const string CertificatePassword = "PLEXUS_CERTIFICATE_PASSWORD";
 
         public static string GetBrokerWorkingDir()
         {
@@ -89,6 +91,16 @@ namespace Plexus
                 return null;
 
             return UniqueId.FromString(rawValue);
+        }
+
+        public static string GetCertificatePath()
+        {
+            return Environment.GetEnvironmentVariable(CertificatePath);
+        }
+
+        public static string GetCertificatePassword()
+        {
+            return Environment.GetEnvironmentVariable(CertificatePassword);
         }
     }
 }

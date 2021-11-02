@@ -84,12 +84,17 @@ namespace Plexus.Interop.Internal
                     WebSocketTransmissionServerFactory.Instance.Create(webSocketTransmissionServerOptions),
                     DefaultTransportSerializationProvider),
             };
-            if (_features.HasFlag(BrokerFeatures.UseWSS) && !string.IsNullOrEmpty(options.CertificateFilePath))
+            if (_features.HasFlag(BrokerFeatures.UseWSS))
             {
+                var certificatePath = EnvironmentHelper.GetCertificatePath();
+                if (string.IsNullOrEmpty(certificatePath))
+                    throw new BrokerException($"{EnvironmentHelper.CertificatePath} must be defined if {BrokerFeatures.UseWSS} set.");
+
+                var certificatePassword = EnvironmentHelper.GetCertificatePassword();
+                var certificate = string.IsNullOrEmpty(certificatePassword)
+                    ? new X509Certificate2(certificatePath)
+                    : new X509Certificate2(certificatePath, certificatePassword);
                 var wssTransmissionServerOptions = new WebSocketTransmissionServerOptions(_workingDir, options.WssPort, staticFileMapping);
-                var certificate = string.IsNullOrEmpty(options.CertificatePassword)
-                    ? new X509Certificate2(options.CertificateFilePath)
-                    : new X509Certificate2(options.CertificateFilePath, options.CertificatePassword);
                 transportServers.Add(TransportServerFactory.Instance.Create(
                     WebSocketTransmissionServerFactory.Instance.CreateSecure(wssTransmissionServerOptions, certificate),
                     DefaultTransportSerializationProvider));

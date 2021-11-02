@@ -100,7 +100,7 @@ namespace Plexus.Host
 
         private static async Task<int> StartBrokerAsync(StartCliOptions opts)
         {
-            var brokerOptions = new BrokerOptions(opts.Metadata, opts.Port, opts.WssPort, opts.CertificateFilePath, opts.CertificatePassword);
+            var brokerOptions = new BrokerOptions(opts.Metadata, opts.Port, opts.WssPort);
             var program = new BrokerProgram(brokerOptions);
             return await LoadAndRunProgramAsync(program).ConfigureAwait(false);
         }
