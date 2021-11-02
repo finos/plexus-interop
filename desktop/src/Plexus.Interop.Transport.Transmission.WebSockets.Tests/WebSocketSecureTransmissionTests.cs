@@ -29,7 +29,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
 
         protected override ITransmissionServer CreateServer()
         {
-            var cert = new X509Certificate2("mycert.pfx", "god");
+            var cert = new X509Certificate2("test-cert.pfx", "god");
             return WebSocketTransmissionServerFactory.Instance.CreateSecure(new WebSocketTransmissionServerOptions(BrokerWorkingDir), cert);
         }
 

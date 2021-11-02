@@ -26,7 +26,7 @@ namespace Plexus.Interop.Transport.WebSockets
     {
         public WebSocketSecureTransportTests(ITestOutputHelper output) : base(output)
         {
-            var cert = new X509Certificate2("mycert.pfx", "god");
+            var cert = new X509Certificate2("test-cert.pfx", "god");
             Server = RegisterDisposable(TransportServerFactory.Instance.Create(
                 WebSocketTransmissionServerFactory.Instance.CreateSecure(new WebSocketTransmissionServerOptions(BrokerWorkingDir), cert),
                 new ProtobufTransportProtocolSerializationProvider()));
