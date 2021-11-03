@@ -49,6 +49,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
             _webSocket.AutoSendPingInterval = 5000;
             _webSocket.ReceiveBufferSize = PooledBuffer.MaxSize;
             _webSocket.Security.AllowNameMismatchCertificate = true;
+            _webSocket.Security.AllowCertificateChainErrors = true;
+            _webSocket.Security.AllowUnstrustedCertificate = true;
 
             _reader = new WebSocketClientTransmissionReader(Id, _webSocket, CancellationToken);
             _writer = new WebSocketClientTransmissionWriter(Id, _webSocket, CancellationToken);
