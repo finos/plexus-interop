@@ -38,7 +38,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
     internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer
-    {        
+    {
         private const int AcceptedConnectionsBufferSize = 20;
 
         private readonly X509Certificate2 _certificate = null;
@@ -81,7 +81,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             await _buffer.Out.WriteAsync(connection, CancellationToken).ConfigureAwait(false);
             Log.Trace("Websocket connection accepted");
             return connection.Completion;
-        }        
+        }
 
         protected override async Task<Task> StartCoreAsync()
         {
@@ -93,7 +93,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                     .Unwrap()
                     .ConfigureAwait(false);
             }
-            return Task.CompletedTask;
+            return StartCompletion;
         }
 
         public void OnListeningStarted()
@@ -195,7 +195,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                             }
 
                             return;
-                        }                        
+                        }
                     }
 
                     if (string.IsNullOrEmpty(urlPath))
@@ -233,7 +233,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             try
             {
                 Log.Trace("Accepting websocket connection");
-                var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);                
+                var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
                 connectionTask = await AcceptConnectionAsync(webSocket).ConfigureAwait(false);
                 Log.Trace("Websocket connection accepted");
             }
