@@ -89,11 +89,11 @@ namespace Plexus.Interop.Internal
                 var certificatePath = EnvironmentHelper.GetCertificatePath();
                 if (string.IsNullOrEmpty(certificatePath))
                     throw new BrokerException($"{EnvironmentHelper.CertificatePath} must be defined if {BrokerFeatures.UseWSS} set.");
-
                 var certificatePassword = EnvironmentHelper.GetCertificatePassword();
-                var certificate = string.IsNullOrEmpty(certificatePassword)
-                    ? new X509Certificate2(certificatePath)
-                    : new X509Certificate2(certificatePath, certificatePassword);
+                if (string.IsNullOrEmpty(certificatePassword))
+                    throw new BrokerException($"{EnvironmentHelper.CertificatePassword} must be defined if {BrokerFeatures.UseWSS} set.");
+
+                var certificate = new X509Certificate2(certificatePath, certificatePassword);
                 var wssTransmissionServerOptions = new WebSocketTransmissionServerOptions(_workingDir, options.WssPort, staticFileMapping);
                 transportServers.Add(TransportServerFactory.Instance.Create(
                     WebSocketTransmissionServerFactory.Instance.CreateSecure(wssTransmissionServerOptions, certificate),
