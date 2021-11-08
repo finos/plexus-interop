@@ -17,6 +17,6 @@
 import { WsConnectionProtocol } from './WsConnectionProtocol';
 
 export interface WsConnectionDetails {
-    protocol: WsConnectionProtocol;
+    protocol?: WsConnectionProtocol;
     port: number;
 }
