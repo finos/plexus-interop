@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 export enum WsConnectionProtocol {
-    Ws = "ws",
-    Wss = "wss"
+    Ws = 'ws',
+    Wss = 'wss'
 }
