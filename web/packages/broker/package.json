@@ -15,7 +15,7 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "protobufjs": "6.8.6",
+    "protobufjs": "6.11.2",
     "@plexus-interop/client": "0.1.0",
     "@plexus-interop/transport-common": "0.1.0",
     "@plexus-interop/common": "0.1.0",
@@ -45,7 +45,7 @@
     "yarn": "^1.17.3"
   },
   "peerDependencies": {
-    "protobufjs": "6.8.6",
+    "protobufjs": "6.11.2",
     "rxjs": "^5.5.2"
   },
   "jest": {
