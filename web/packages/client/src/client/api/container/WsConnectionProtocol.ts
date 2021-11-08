@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WsConnectionProtocol } from './WsConnectionProtocol';
-
-export interface WsConnectionDetails {
-    protocol: WsConnectionProtocol;
-    port: number;
+export enum WsConnectionProtocol {
+    Ws = "ws",
+    Wss = "wss"
 }
