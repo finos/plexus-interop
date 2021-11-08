@@ -17,7 +17,7 @@
   "dependencies": {
     "long": "^4.0.0",
     "rxjs": "^5.5.2",
-    "protobufjs": "6.8.6",
+    "protobufjs": "6.11.2",
     "@plexus-interop/transport-common": "0.1.0",
     "@plexus-interop/common": "0.1.0",
     "@plexus-interop/protocol": "0.1.0",
@@ -25,7 +25,7 @@
     "tslib": "^1.10.0"
   },
   "peerDependencies": {
-    "protobufjs": "6.8.6",
+    "protobufjs": "6.11.2",
     "rxjs": "^5.5.2"
   },
   "main": "dist/main/src/index.js",
