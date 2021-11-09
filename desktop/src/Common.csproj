@@ -7,7 +7,7 @@
     <Product>Plexus Interop</Product>
     <Copyright>Copyright © Plexus Interop Deutsche Bank AG 2017-2018</Copyright>
     <PackageLicenseUrl>https://github.com/finos-plexus/plexus-interop/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>http://finos-plexus.github.io/plexus-interop</PackageProjectUrl>
+    <PackageProjectUrl>http://plexus.finos.org</PackageProjectUrl>
     <RepositoryUrl>https://github.com/finos-plexus/plexus-interop</RepositoryUrl>
     <PackageTags>plexus interop finos</PackageTags>
     <Description>Plexus Interop is metadata-centric language-agnostic desktop app-to-app interoperability framework with extensible model for launching new instances of desktop Apps on demand.</Description>
