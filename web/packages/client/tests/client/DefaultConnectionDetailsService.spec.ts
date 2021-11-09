@@ -20,18 +20,28 @@ import { DefaultConnectionDetailsService } from '../../src/client/api/container/
 
 describe('DefaultConnectionDetailsService', () => {
 
-    it('Returns correct protocol', async (done) => {
+    it('getConnectionDetails returns correct result', async (done) => {
         const service = new DefaultConnectionDetailsService(getConnectionDetailsFactory(WsConnectionProtocol.Wss));
-        service.getConnectionDetails().then(details => {
-            expect(details.ws.protocol).toBe('wss');
+        service.getConnectionDetails().then(r => {
+            expect(r.ws.protocol).toBe('wss');
+            expect(r.ws.port).toBe(42);
+            expect(r.appInstanceId).toBe('007');
             done();
         });
     });
 
-    it('Returns ws protocol if not defined', async (done) => {
+    it('getConnectionDetails returns default ws protocol if not defined', async (done) => {
         const service = new DefaultConnectionDetailsService(getConnectionDetailsFactory());
-        service.getConnectionDetails().then(details => {
-            expect(details.ws.protocol).toBe('ws');
+        service.getConnectionDetails().then(r => {
+            expect(r.ws.protocol).toBe('ws');
+            done();
+        });
+    });
+
+    it('getMetadataUrl returns correct result', async (done) => {
+        const service = new DefaultConnectionDetailsService(getConnectionDetailsFactory(WsConnectionProtocol.Wss));
+        service.getMetadataUrl().then(r => {
+            expect(r).toBe('wss://127.0.0.1:42/metadata/interop');
             done();
         });
     });
@@ -41,7 +51,8 @@ describe('DefaultConnectionDetailsService', () => {
             ws: {
                 protocol: protocol,
                 port: 42
-            }
+            },
+            appInstanceId: '007'
         });
     }
 });
