@@ -23,5 +23,6 @@ namespace Plexus
     {
         None = 0,
         CheckAppInstanceId = 1,
+        UseWSS = 2,
     }
 }

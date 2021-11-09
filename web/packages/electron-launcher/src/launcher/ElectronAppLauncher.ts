@@ -43,7 +43,9 @@ export class ElectronAppLauncher {
 
     private readonly instanceIdEnvProperty: string = 'PLEXUS_APP_INSTANCE_ID';
     private readonly brokerDirEnvProperty: string = 'PLEXUS_BROKER_WORKING_DIR';
+    private readonly brokerServerNameEnvProperty: string = 'PLEXUS_BROKER_SERVER_NAME';
 
+    private readonly defaultBrokerServerName = "ws-v1";
     private webSocketAddress: string;
     
     public constructor(
@@ -58,7 +60,8 @@ export class ElectronAppLauncher {
         }
 
         const brokerWorkingDir = this.readBrokerWorkingDir();
-        this.webSocketAddress = await this.readWebSocketUrl(brokerWorkingDir);
+        const brokerServerName = this.getBrokerServerName();
+        this.webSocketAddress = await this.readWebSocketUrl(brokerWorkingDir, brokerServerName);
         const launcherAppInstanceId = this.getAppInstanceId();
 
         this.log.info(`App Instance ID ${launcherAppInstanceId}`);
@@ -169,6 +172,16 @@ export class ElectronAppLauncher {
         return brokerDir as string;
     }
 
+    private getBrokerServerName(): string {
+        const serverName = process.env[this.brokerServerNameEnvProperty];
+        this.log.debug(`Received broker server name ${serverName}`);
+        if (!serverName) {
+            this.log.debug(`${this.brokerServerNameEnvProperty} env property is empty, resolving to default ${this.defaultBrokerServerName}`);
+            return this.defaultBrokerServerName;
+        }
+        return serverName as string;
+    }
+
     private getAppInstanceId(): UniqueId {
         const instanceId = process.env[this.instanceIdEnvProperty];
         this.log.debug(`Received instance ID ${instanceId}`);
@@ -179,8 +192,8 @@ export class ElectronAppLauncher {
         return UniqueId.fromString(instanceId);
     }
 
-    private readWebSocketUrl(workingDir: string): Promise<string> {
-        const path = `${workingDir}/servers/ws-v1/address`;
+    private readWebSocketUrl(workingDir: string, serverName: string): Promise<string> {
+        const path = `${workingDir}/servers/${serverName}/address`;
         this.log.info(`Reading WS URL from ${path}`);
         return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf8', (err, data) => {

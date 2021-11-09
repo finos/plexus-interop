@@ -14,27 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.WebSockets
+namespace Plexus.Interop.Transport.Transmission.WebSockets
 {
-    using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.WebSockets.Client;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
+    using System.Security.Cryptography.X509Certificates;
     using Xunit.Abstractions;
 
-    public sealed class WebSocketTransportTests : TransportTestsSuite
+    public sealed class WebSocketSecureTransmissionTests : TransmissionTestsSuite
     {
-        public WebSocketTransportTests(ITestOutputHelper output) : base(output)
+        public WebSocketSecureTransmissionTests(ITestOutputHelper output) : base(output)
         {
-            Server = RegisterDisposable(TransportServerFactory.Instance.Create(
-                WebSocketTransmissionServerFactory.Instance.Create(new WebSocketTransmissionServerOptions(BrokerWorkingDir)),
-                new ProtobufTransportProtocolSerializationProvider()));
-            Client = TransportClientFactory.Instance.Create(
-                WebSocketTransmissionClient.Create(),
-                new ProtobufTransportProtocolSerializationProvider());
         }
 
-        protected override ITransportServer Server { get; }
+        protected override ITransmissionServer CreateServer()
+        {
+            var cert = new X509Certificate2("test-cert.pfx", "god");
+            return WebSocketTransmissionServerFactory.Instance.CreateSecure(new WebSocketTransmissionServerOptions(BrokerWorkingDir), cert);
+        }
 
-        protected override ITransportClient Client { get; }
+        protected override ITransmissionClient CreateClient()
+        {
+            return WebSocketTransmissionClient.CreateSecure();
+        }
     }
 }

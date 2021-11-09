@@ -31,6 +31,7 @@ namespace Plexus.Interop.Internal
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal;
     using ILogger = Plexus.ILogger;
@@ -68,23 +69,37 @@ namespace Plexus.Interop.Internal
             var metadataDir = Path.GetFullPath(options.MetadataDir ?? Path.Combine(_workingDir, "metadata"));
             Log.Info("Metadata dir: {0}", metadataDir);
             var metadataFile = Path.Combine(metadataDir, "interop.json");
-            var webSocketTransmissionServerOptions = new WebSocketTransmissionServerOptions(
-                _workingDir,
-                options.Port,
-                new Dictionary<string, string>
-                {
-                    {"/metadata/interop", metadataFile},
-                    {"/studio", studioDir}
-                });
-            _transportServers = new[]
+            IReadOnlyDictionary<string, string> staticFileMapping = new Dictionary<string, string>
+            {
+                {"/metadata/interop", metadataFile},
+                {"/studio", studioDir}
+            };
+            var webSocketTransmissionServerOptions = new WebSocketTransmissionServerOptions(_workingDir, options.Port, staticFileMapping);
+            var transportServers = new List<ITransportServer>
             {
                 TransportServerFactory.Instance.Create(
-                    PipeTransmissionServerFactory.Instance.Create(_workingDir), 
+                    PipeTransmissionServerFactory.Instance.Create(_workingDir),
                     DefaultTransportSerializationProvider),
                 TransportServerFactory.Instance.Create(
                     WebSocketTransmissionServerFactory.Instance.Create(webSocketTransmissionServerOptions),
-                    DefaultTransportSerializationProvider)
+                    DefaultTransportSerializationProvider),
             };
+            if (_features.HasFlag(BrokerFeatures.UseWSS))
+            {
+                var certificatePath = EnvironmentHelper.GetCertificatePath();
+                if (string.IsNullOrEmpty(certificatePath))
+                    throw new BrokerException($"{EnvironmentHelper.CertificatePath} must be defined if {BrokerFeatures.UseWSS} set.");
+                var certificatePassword = EnvironmentHelper.GetCertificatePassword();
+                if (string.IsNullOrEmpty(certificatePassword))
+                    throw new BrokerException($"{EnvironmentHelper.CertificatePassword} must be defined if {BrokerFeatures.UseWSS} set.");
+
+                var certificate = new X509Certificate2(certificatePath, certificatePassword);
+                var wssTransmissionServerOptions = new WebSocketTransmissionServerOptions(_workingDir, options.WssPort, staticFileMapping);
+                transportServers.Add(TransportServerFactory.Instance.Create(
+                    WebSocketTransmissionServerFactory.Instance.CreateSecure(wssTransmissionServerOptions, certificate),
+                    DefaultTransportSerializationProvider));
+            }
+            _transportServers = transportServers;
             _connectionListener = new ServerConnectionListener(_transportServers);
             registryProvider = registryProvider ?? new JsonRegistryProvider(Path.Combine(metadataDir, "interop.json"));
             _interopContext = InteropContextFactory.Instance.Create(trustedLauncherId ?? default, metadataDir, registryProvider);

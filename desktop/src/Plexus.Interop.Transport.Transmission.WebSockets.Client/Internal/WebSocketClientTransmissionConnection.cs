@@ -40,7 +40,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
         {
             _log = LogManager.GetLogger<WebSocketClientTransmissionConnection>(Id.ToString());
             _disconnectCompletion.Task.PropagateCompletionToPromise(_connectCompletion);
-            _webSocket = new WebSocket(url.Replace("http://", "ws://"));
+            _webSocket = new WebSocket(url.Replace("http://", "ws://").Replace("https://", "wss://"));
             _webSocket.Opened += OnOpened;
             _webSocket.Closed += OnClosed;
             _webSocket.Error += OnError;
@@ -48,6 +48,9 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client.Internal
             _webSocket.EnableAutoSendPing = true;
             _webSocket.AutoSendPingInterval = 5000;
             _webSocket.ReceiveBufferSize = PooledBuffer.MaxSize;
+            _webSocket.Security.AllowNameMismatchCertificate = true;
+            _webSocket.Security.AllowCertificateChainErrors = true;
+            _webSocket.Security.AllowUnstrustedCertificate = true;
 
             _reader = new WebSocketClientTransmissionReader(Id, _webSocket, CancellationToken);
             _writer = new WebSocketClientTransmissionWriter(Id, _webSocket, CancellationToken);

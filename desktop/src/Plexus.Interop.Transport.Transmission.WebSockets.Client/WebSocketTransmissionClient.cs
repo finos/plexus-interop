@@ -23,25 +23,38 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Client
 
     public sealed class WebSocketTransmissionClient : ITransmissionClient
     {
-        private const string ServerName = "ws-v1";
-
+        private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
         private static readonly TimeSpan MaxServerInitializationTime = TimeoutConstants.Timeout1Min;
 
-        private static readonly ILogger Log = LogManager.GetLogger<WebSocketTransmissionClient>();
+        private readonly bool _secure;
+        private readonly string _serverName;
+
+        private WebSocketTransmissionClient(bool secure)
+        {
+            _secure = secure;
+            var protocol = secure ? "wss" : "ws";
+            _serverName = $"{protocol}-v1";
+        }
+
+        public static WebSocketTransmissionClient Create() => new WebSocketTransmissionClient(false);
+        public static WebSocketTransmissionClient CreateSecure() => new WebSocketTransmissionClient(true);
 
         public async ValueTask<ITransmissionConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken = default)
         {
-            var webSocketAddress = EnvironmentHelper.GetWebSocketAddress();
+            var webSocketAddress = _secure
+                ? EnvironmentHelper.GetWebSocketSecureAddress()
+                : EnvironmentHelper.GetWebSocketAddress();
+
             if (string.IsNullOrEmpty(webSocketAddress))
             {
-                Log.Trace("Waiting initialization of server {0}", ServerName);
-                var serverStateReader = new ServerStateReader(ServerName, brokerWorkingDir);
+                Log.Trace("Waiting initialization of server {0}", _serverName);
+                var serverStateReader = new ServerStateReader(_serverName, brokerWorkingDir);
                 if (!await serverStateReader
                     .WaitInitializationAsync(MaxServerInitializationTime, cancellationToken)
                     .ConfigureAwait(false))
                 {
                     throw new TimeoutException(
-                        $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{ServerName}\" availability");
+                        $"Timeout ({MaxServerInitializationTime.TotalSeconds}sec) while waiting for server \"{_serverName}\" availability");
                 }
 
                 webSocketAddress = serverStateReader.ReadSetting("address");
