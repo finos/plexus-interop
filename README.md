@@ -138,7 +138,7 @@ After successful build documentation is available via:
 
 ## Contributing
 
-1. Fork it (<https://github.com/finos-plexus/plexus-interop/fork>)
+1. Fork it (<https://github.com/finos/plexus-interop/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Read our [contribution guidelines](.github/CONTRIBUTING.md) and [Community Code of Conduct](https://www.finos.org/code-of-conduct)
 4. Commit your changes (`git commit -am 'Add some fooBar'`)
