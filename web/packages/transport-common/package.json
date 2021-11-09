@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "rxjs": "^5.5.2",
-    "protobufjs": "6.8.6",
+    "protobufjs": "6.11.2",
     "@types/loglevel": "^1.4.29",
     "@types/long": "^4.0.0",
     "@plexus-interop/common": "0.1.0",
@@ -28,7 +28,7 @@
     "typescript-collections": "1.2.3"
   },
   "peerDependencies": {
-    "protobufjs": "6.8.6",
+    "protobufjs": "6.11.2",
     "rxjs": "^5.5.2"
   },
   "devDependencies": {

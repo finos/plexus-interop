@@ -3,5 +3,6 @@
   "parallelizeAssembly": false,
   "parallelizeTestCollections": false,
   "preEnumerateTheories": true,
-  "diagnosticMessages": true
+  "diagnosticMessages": true,
+  "shadowCopy": false
 }

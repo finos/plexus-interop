@@ -19,16 +19,22 @@ namespace Plexus.Interop
     public sealed class BrokerOptions
     {
         public string MetadataDir { get; }
-
         public uint Port { get; }
+        public uint WssPort { get; }
 
-        public BrokerOptions(string metadataDir, uint port)
+        public BrokerOptions(
+            string metadataDir,
+            uint port,
+            uint wssPort)
         {
             MetadataDir = metadataDir;
             Port = port;
+            WssPort = wssPort;
         }
 
-        public override string ToString()
-            => $"{nameof(MetadataDir)}: {MetadataDir}, {nameof(Port)}: {Port}";
+        public override string ToString() => string.Join(", ",
+            $"{nameof(MetadataDir)}: {MetadataDir}",
+            $"{nameof(Port)}: {Port}",
+            $"{nameof(WssPort)}: {WssPort}");
     }
 }

@@ -31,26 +31,42 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using System.Net;
     using System.Net.Sockets;
     using System.Net.WebSockets;
+    using System.Security.Cryptography.X509Certificates;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using IMsLoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
     internal sealed class WebSocketTransmissionServer : ProcessBase, ITransmissionServer
-    {        
+    {
         private const int AcceptedConnectionsBufferSize = 20;
-        private const string ServerName = "ws-v1";
+
+        private readonly X509Certificate2 _certificate = null;
 
         private IWebHost _host;
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
         private readonly IServerStateWriter _stateWriter;
         private readonly WebSocketTransmissionServerOptions _options;
+        private readonly string _protocol;
 
-        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options)
+        private WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, string protocol)
         {
             _options = options;
-            _stateWriter = new ServerStateWriter(ServerName, _options.WorkingDir);
+            _protocol = protocol;
+            var serverName = $"{protocol}-v1";
+            _stateWriter = new ServerStateWriter(serverName, _options.WorkingDir);
             _buffer.Out.PropagateCompletionFrom(Completion);
+        }
+
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options)
+            : this(options, "ws")
+        {
+        }
+
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
+            : this(options, "wss")
+        {
+            _certificate = certificate;
         }
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
@@ -65,7 +81,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             await _buffer.Out.WriteAsync(connection, CancellationToken).ConfigureAwait(false);
             Log.Trace("Websocket connection accepted");
             return connection.Completion;
-        }        
+        }
 
         protected override async Task<Task> StartCoreAsync()
         {
@@ -77,14 +93,14 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                     .Unwrap()
                     .ConfigureAwait(false);
             }
-            return Task.CompletedTask;
+            return StartCompletion;
         }
 
         public void OnListeningStarted()
         {
             var feature = _host.ServerFeatures.Get<IServerAddressesFeature>();
             var url = feature.Addresses.First();
-            _stateWriter.Write("address", url.Replace("http://", "ws://"));
+            _stateWriter.Write("address", url.Replace("http://", "ws://").Replace("https://", "wss://"));
             Log.Info("Websocket server started: {0}", url);
             _stateWriter.SignalInitialized();
             SetStartCompleted();
@@ -95,15 +111,21 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             Log.Trace("Resolving localhost url");
             var hostEntry = Dns.GetHostEntryAsync("localhost").GetResult();
             var localhostIp = hostEntry.AddressList.First(addr => addr.AddressFamily == AddressFamily.InterNetwork);
-            var url = $"http://{localhostIp}:{_options.Port}";
+            var port = (int)_options.Port;
             _host = new WebHostBuilder()
-                .UseKestrel()
+                .UseKestrel(serverOptions =>
+                {
+                    if (_certificate != null)
+                        serverOptions.Listen(localhostIp, port, o => o.UseHttps(_certificate));
+                    else
+                        serverOptions.Listen(localhostIp, port);
+                })
                 .SuppressStatusMessages(true)
-                .UseUrls(url)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .Configure(Configure)
                 .Build();
-            Log.Trace("Starting server host: {0}", url);
+
+            Log.Trace($"Starting server host: {_protocol}://{localhostIp}:{port}");
             await _host.RunAsync(CancellationToken).ConfigureAwait(false);
         }
 
@@ -173,7 +195,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                             }
 
                             return;
-                        }                        
+                        }
                     }
 
                     if (string.IsNullOrEmpty(urlPath))
@@ -211,7 +233,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
             try
             {
                 Log.Trace("Accepting websocket connection");
-                var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);                
+                var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
                 connectionTask = await AcceptConnectionAsync(webSocket).ConfigureAwait(false);
                 Log.Trace("Websocket connection accepted");
             }

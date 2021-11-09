@@ -25,9 +25,12 @@ namespace Plexus
         public const string ParentProcessIdVarName = "PLEXUS_PARENT_PROCESS_ID";
         public const string PlexusTimeoutMultiplier = "PLEXUS_TIMEOUT_MULTIPLIER";
         public const string PlexusBrokerWebSocketAddress = "PLEXUS_BROKER_WEBSOCKET_ADDRESS";
+        public const string PlexusBrokerWebSocketSecureAddress = "PLEXUS_BROKER_WEBSOCKETSECURE_ADDRESS";
         public const string PlexusBrokerPipeAddress = "PLEXUS_BROKER_PIPE_ADDRESS";
         public const string BrokerFeatures = "PLEXUS_BROKER_FEATURES";
         public const string LauncherId = "PLEXUS_TRUSTED_LAUNCHER_ID";
+        public const string CertificatePath = "PLEXUS_CERTIFICATE_PATH";
+        public const string CertificatePassword = "PLEXUS_CERTIFICATE_PASSWORD";
 
         public static string GetBrokerWorkingDir()
         {
@@ -62,6 +65,11 @@ namespace Plexus
             return Environment.GetEnvironmentVariable(PlexusBrokerWebSocketAddress);
         }
 
+        public static string GetWebSocketSecureAddress()
+        {
+            return Environment.GetEnvironmentVariable(PlexusBrokerWebSocketSecureAddress);
+        }
+
         public static string GetPipeAddress()
         {
             return Environment.GetEnvironmentVariable(PlexusBrokerPipeAddress);
@@ -83,6 +91,16 @@ namespace Plexus
                 return null;
 
             return UniqueId.FromString(rawValue);
+        }
+
+        public static string GetCertificatePath()
+        {
+            return Environment.GetEnvironmentVariable(CertificatePath);
+        }
+
+        public static string GetCertificatePassword()
+        {
+            return Environment.GetEnvironmentVariable(CertificatePassword);
         }
     }
 }

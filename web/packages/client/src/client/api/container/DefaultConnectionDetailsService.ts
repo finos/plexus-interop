@@ -16,29 +16,42 @@
  */
 import { ConnectionDetailsService } from './ConnectionDetailsService';
 import { ConnectionDetails } from './ConnectionDetails';
+import { WsConnectionProtocol } from './WsConnectionProtocol';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 
 export class DefaultConnectionDetailsService implements ConnectionDetailsService {
 
     private readonly log: Logger = LoggerFactory.getLogger('DefaultConnectionDetailsService');
 
-    public getConnectionDetails(): Promise<ConnectionDetails> {
-        const globalObj = self as any;
-        if (globalObj.plexus && globalObj.plexus.getConnectionDetails) {
-            this.log.info('Detected connection details service, provided by container');
-            return globalObj.plexus.getConnectionDetails() as Promise<ConnectionDetails>;
-        } else {
-            return Promise.reject('Container is not providing \'self.plexus.getConnectionDetails(): Promise<ConnectionDetails>\' API');
+    public constructor(private readonly connectionDetailsFactory?: () => Promise<ConnectionDetails>) {
+    }
+
+    public async getConnectionDetails(): Promise<ConnectionDetails> {
+        const connDetails = await this.getConnectionDetailsFactory()();
+        if (!connDetails.ws.protocol) {
+            connDetails.ws.protocol = WsConnectionProtocol.Ws;
         }
+        return connDetails;
     }
 
     public getMetadataUrl(): Promise<string> {
         return this.getConnectionDetails()
-            .then(details => this.getDefaultUrl(`ws://127.0.0.1:${details.ws.port}`));
+            .then(details => this.getDefaultUrl(`${details.ws.protocol}://127.0.0.1:${details.ws.port}`));
     }
 
     public getDefaultUrl(baseUrl: string): string {
         return `${baseUrl}/metadata/interop`;
     }
 
+    private getConnectionDetailsFactory(): () => Promise<ConnectionDetails> {
+        if (this.connectionDetailsFactory) {
+            return this.connectionDetailsFactory;
+        }
+        const globalObj = self as any;
+        if (globalObj.plexus && globalObj.plexus.getConnectionDetails) {
+            this.log.info('Detected connection details service, provided by container');
+            return globalObj.plexus.getConnectionDetails;
+        }
+        throw new Error('Container is not providing \'self.plexus.getConnectionDetails(): Promise<ConnectionDetails>\' API');
+    }
 }
