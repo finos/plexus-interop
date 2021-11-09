@@ -122,7 +122,7 @@ Run .Net to Web interop example on Windows:
 
 ## Documentation
 
-To check out docs, visit [plexus.finos.org](https://plexus.finos.org).
+To check out docs, visit [https://plexus.finos.org](https://plexus.finos.org).
 
 Documentation project is located in folder 'docs'. We build documentation using [AsciiDoc](http://asciidoc.org/).
 

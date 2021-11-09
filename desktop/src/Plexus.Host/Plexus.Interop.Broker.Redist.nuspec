@@ -6,7 +6,7 @@
     <title>$id$</title>
     <authors>Plexus Interop Deutsche Bank AG</authors>
     <licenseUrl>https://github.com/finos-plexus/plexus-interop/blob/master/LICENSE</licenseUrl>
-    <projectUrl>http://finos-plexus.github.io/plexus-interop</projectUrl>
+    <projectUrl>http://plexus.finos.org</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Plexus Interop Broker Binaries</description>
     <copyright>Copyright 2017</copyright>
