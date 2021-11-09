@@ -1,7 +1,7 @@
 
 # Greeting Sample Internal Detals
 
-This page provides detailed view on Greeting sample - two apps communicating via Plexus Interop with simple greeting messages. Fully runnable examples are available at **./bin/win-x86/samples/greeting** folder after you run the full build of the repo. Steps to run the demo from your workstation and links to code of demo apps are described at [Public Documentation](https://finos-plexus.github.io/plexus-interop/#sample-apps)
+This page provides detailed view on Greeting sample - two apps communicating via Plexus Interop with simple greeting messages. Fully runnable examples are available at **./bin/win-x86/samples/greeting** folder after you run the full build of the repo. Steps to run the demo from your workstation and links to code of demo apps are described at [Public Documentation](https://plexus.finos.org/#sample-apps)
 
 Following diagram defines high level structure of running components, *blue* boxes define Plexus Interop artifacts available for Open Source Community.
 
