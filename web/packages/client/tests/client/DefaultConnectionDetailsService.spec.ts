@@ -15,42 +15,33 @@
  * limitations under the License.
  */
 import { ConnectionDetails } from '../../src/client/api/container/ConnectionDetails';
-import { WsConnectionProtocol } from '../../src/client/api/container/WsConnectionProtocol';
 import { DefaultConnectionDetailsService } from '../../src/client/api/container/DefaultConnectionDetailsService';
 
 describe('DefaultConnectionDetailsService', () => {
 
     it('getConnectionDetails returns correct result', async (done) => {
-        const service = new DefaultConnectionDetailsService(getConnectionDetailsFactory(WsConnectionProtocol.Wss));
+        const service = new DefaultConnectionDetailsService(getConnectionDetails);
         service.getConnectionDetails().then(r => {
-            expect(r.ws.protocol).toBe('wss');
             expect(r.ws.port).toBe(42);
+            expect(r.ws.wssPort).toBe(24);
             expect(r.appInstanceId).toBe('007');
             done();
         });
     });
 
-    it('getConnectionDetails returns default ws protocol if not defined', async (done) => {
-        const service = new DefaultConnectionDetailsService(getConnectionDetailsFactory());
-        service.getConnectionDetails().then(r => {
-            expect(r.ws.protocol).toBe('ws');
-            done();
-        });
-    });
-
     it('getMetadataUrl returns correct result', async (done) => {
-        const service = new DefaultConnectionDetailsService(getConnectionDetailsFactory(WsConnectionProtocol.Wss));
+        const service = new DefaultConnectionDetailsService(getConnectionDetails);
         service.getMetadataUrl().then(r => {
-            expect(r).toBe('wss://127.0.0.1:42/metadata/interop');
+            expect(r).toBe('wss://127.0.0.1:24/metadata/interop');
             done();
         });
     });
 
-    function getConnectionDetailsFactory(protocol?: WsConnectionProtocol): () => Promise<ConnectionDetails> {
-        return () => Promise.resolve<ConnectionDetails>({
+    function getConnectionDetails(): Promise<ConnectionDetails> {
+        return Promise.resolve<ConnectionDetails>({
             ws: {
-                protocol: protocol,
-                port: 42
+                port: 42,
+                wssPort: 24
             },
             appInstanceId: '007'
         });

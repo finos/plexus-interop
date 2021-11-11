@@ -14,9 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { WsConnectionProtocol } from './WsConnectionProtocol';
 
 export interface WsConnectionDetails {
-    protocol?: WsConnectionProtocol;
     port: number;
+    wssPort?: number;
+}
+
+export function getBaseWsUrl(details: WsConnectionDetails): string {
+    return details.wssPort
+        ? `wss://127.0.0.1:${details.wssPort}`
+        : `ws://127.0.0.1:${details.port}`;
 }
