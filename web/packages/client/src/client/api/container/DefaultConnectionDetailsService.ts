@@ -16,7 +16,7 @@
  */
 import { ConnectionDetailsService } from './ConnectionDetailsService';
 import { ConnectionDetails } from './ConnectionDetails';
-import { WsConnectionProtocol } from './WsConnectionProtocol';
+import { getBaseWsUrl } from './WsConnectionDetails';
 import { Logger, LoggerFactory } from '@plexus-interop/common';
 
 export class DefaultConnectionDetailsService implements ConnectionDetailsService {
@@ -26,17 +26,13 @@ export class DefaultConnectionDetailsService implements ConnectionDetailsService
     public constructor(private readonly connectionDetailsFactory?: () => Promise<ConnectionDetails>) {
     }
 
-    public async getConnectionDetails(): Promise<ConnectionDetails> {
-        const connDetails = await this.getConnectionDetailsFactory()();
-        if (!connDetails.ws.protocol) {
-            connDetails.ws.protocol = WsConnectionProtocol.Ws;
-        }
-        return connDetails;
+    public getConnectionDetails(): Promise<ConnectionDetails> {
+        return this.getConnectionDetailsFactory()();
     }
 
     public getMetadataUrl(): Promise<string> {
         return this.getConnectionDetails()
-            .then(details => this.getDefaultUrl(`${details.ws.protocol}://127.0.0.1:${details.ws.port}`));
+            .then(details => this.getDefaultUrl(getBaseWsUrl(details.ws)));
     }
 
     public getDefaultUrl(baseUrl: string): string {
