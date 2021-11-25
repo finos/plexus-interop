@@ -50,6 +50,7 @@ coverage
 *.iws
 .idea/
 out/
+.DS_Store
 
 ### Local configuration file (sdk path, etc)
 local.properties

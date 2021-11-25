@@ -27,7 +27,6 @@ import { SubscribeRequest } from './model/SubscribeRequest';
 import { ResponseType } from './model/ResponseType';
 import { MessageType } from './model/MessageType';
 import { PartialObserver } from 'rxjs/Observer';
-import { Defaults } from '@plexus-interop/transport-common';
 
 enum State {
     CREATED = 'CREATED',
@@ -39,7 +38,7 @@ export class CrossDomainEventBus implements EventBus {
 
     private readonly log: Logger = LoggerFactory.getLogger('CrossDomainEventBus');
 
-    private readonly singleOperationTimeOut: number = Defaults.OPERATION_TIMEOUT;
+    private readonly singleOperationTimeOut: number = 60000;
     private readonly pingTimeoutInMillis: number = 1000;
 
     private readonly emitters: Map<string, Observer<any>> = new Map<string, Observer<any>>();
