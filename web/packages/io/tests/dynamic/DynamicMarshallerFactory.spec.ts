@@ -102,6 +102,6 @@ describe('DynamicMarshallerFactory', () => {
         const marshaller = sut.getMarshaller(messageId);
         const encoded = marshaller.encode(undefinedEnumValueMessage);
         const decoded = marshaller.decode(encoded);
-        expect(decoded.enumField).toBeDefined();
+        expect(decoded.enumField).toBe(0);
     });
 });

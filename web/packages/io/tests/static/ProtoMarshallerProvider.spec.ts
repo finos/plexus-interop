@@ -41,6 +41,6 @@ describe('Proto Marshaller Provider', () => {
 
         const encoded = marshaller.encode({});
         const decoded = marshaller.decode(encoded);
-        expect(decoded.applicationId).toBeDefined();
+        expect(decoded.applicationId).toBe("");
     });
 });
