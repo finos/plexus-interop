@@ -33,10 +33,9 @@ export class ProtoMarshallerProvider implements BinaryMarshallerProvider {
                     return messageObj.encode(obj).finish() as Uint8Array;
                 },
                 decode: (payload: Uint8Array): any => {
-                    return messageObj.toObject(messageObj.decode(payload));
+                    return messageObj.toObject(messageObj.decode(payload), { defaults: true });
                 }
             };
         }
     }
-
 }

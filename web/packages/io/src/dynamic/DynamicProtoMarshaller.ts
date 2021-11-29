@@ -31,7 +31,7 @@ export class DynamicProtoMarshaller implements ExtendedMarshaller<any, ArrayBuff
 
     public decode(messagePayload: ArrayBuffer): any {
         const decoded = this.protoType.decode(new Uint8Array(messagePayload));
-        return this.protoType.toObject(decoded);
+        return this.protoType.toObject(decoded, { defaults: true });
     }
 
     public encode(messageObj: any): ArrayBuffer {
