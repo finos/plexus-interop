@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { getPlexusFeatures } from '@plexus-interop/common';
 import { BinaryMarshallerProvider } from '../api/BinaryMarshallerProvider';
 import { BinaryMarshaller } from '../api/BinaryMarshaller';
 
@@ -33,7 +34,8 @@ export class ProtoMarshallerProvider implements BinaryMarshallerProvider {
                     return messageObj.encode(obj).finish() as Uint8Array;
                 },
                 decode: (payload: Uint8Array): any => {
-                    return messageObj.toObject(messageObj.decode(payload), { defaults: true });
+                    const features = getPlexusFeatures();
+                    return messageObj.toObject(messageObj.decode(payload), { defaults: features.decodeUndefinedToDefault });
                 }
             };
         }
