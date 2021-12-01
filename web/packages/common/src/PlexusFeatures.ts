@@ -14,9 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './util';
-export * from './logger';
-export * from './rx';
-export * from './cache';
-export * from './PlexusFeatures';
-export * from './RetryConfig';
+export interface PlexusFeatures {
+    readonly decodeUndefinedToDefault: boolean;
+}
+
+const plexusFeatures = {
+    decodeUndefinedToDefault: true
+};
+
+export function setDecodeUndefinedToDefault(value: boolean): void {
+    plexusFeatures.decodeUndefinedToDefault = value;
+}
+
+export function getPlexusFeatures(): PlexusFeatures {
+    return plexusFeatures;
+}
