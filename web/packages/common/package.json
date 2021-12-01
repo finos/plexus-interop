@@ -1,6 +1,7 @@
 {
   "name": "@plexus-interop/common",
   "version": "0.1.0",
+  "sideEffects": true,
   "types": "dist/main/src/index.d.ts",
   "main": "dist/main/src/index.js",
   "description": "Common functionality for Plexus Interop Web",
