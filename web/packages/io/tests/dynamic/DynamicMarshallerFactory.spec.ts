@@ -25,7 +25,7 @@ import { JsonInteropRegistryProvider } from '@plexus-interop/metadata';
 
 describe('DynamicMarshallerFactory', () => {
 
-    const metadataJson = fs.readFileSync('../metadata/tests/json/test-interop.json', 'utf8');    
+    const metadataJson = fs.readFileSync('../metadata/tests/json/test-interop.json', 'utf8');
     const registry = new JsonInteropRegistryProvider(metadataJson).getCurrent();
 
     const messages = ExtendedMap.create<string, Message>();
@@ -39,17 +39,21 @@ describe('DynamicMarshallerFactory', () => {
         subMessageField: {
             stringField: 'stringData'
         }
-    };  
+    };
 
     const invalidTypeMessage = {
         stringField: 'stringData',
         boolField: 'true'
-    };    
+    };
 
     const invalidEnumValueMessage = {
         stringField: 'stringData',
         enumField: 10
-    };    
+    };
+
+    const undefinedEnumValueMessage = {
+        stringField: 'stringData'
+    };
 
     const sut = new DynamicProtoMarshallerFactory(registry);
 
@@ -65,14 +69,14 @@ describe('DynamicMarshallerFactory', () => {
 
     it('It creates Marshaller with validation support', () => {
         const marshaller = sut.getMarshaller(messageId);
-        marshaller.validate(validMessage);        
+        marshaller.validate(validMessage);
     });
 
     it('Raises an Error for Marshaller request on not existing Message', () => {
         try {
             sut.getMarshaller('Do not exist');
             fail('Should fail');
-        } catch (error) {  
+        } catch (error) {
         }
     });
 
@@ -87,11 +91,17 @@ describe('DynamicMarshallerFactory', () => {
     });
 
     it('Creates Marshaller encoding/decoding support', () => {
-        const marshaller = sut.getMarshaller(messageId);  
+        const marshaller = sut.getMarshaller(messageId);
         const encoded = marshaller.encode(validMessage);
         expect(encoded).toBeDefined();
         const decoded = marshaller.decode(encoded);
-        expect(decoded).toEqual(validMessage);
+        expect(decoded).toMatchObject(validMessage);
     });
 
+    it('Decodes undefined enum value to default', () => {
+        const marshaller = sut.getMarshaller(messageId);
+        const encoded = marshaller.encode(undefinedEnumValueMessage);
+        const decoded = marshaller.decode(encoded);
+        expect(decoded.enumField).toBe(0);
+    });
 });

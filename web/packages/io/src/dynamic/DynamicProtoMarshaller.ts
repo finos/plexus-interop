@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import * as protobuf from 'protobufjs/light';
-import { Arrays } from '@plexus-interop/common';
+import { Arrays, getPlexusFeatures } from '@plexus-interop/common';
 import { ExtendedMarshaller } from '../api/ExtendedMarshaller';
 
 export class DynamicProtoMarshaller implements ExtendedMarshaller<any, ArrayBuffer> {
@@ -30,8 +30,9 @@ export class DynamicProtoMarshaller implements ExtendedMarshaller<any, ArrayBuff
     }
 
     public decode(messagePayload: ArrayBuffer): any {
+        const features = getPlexusFeatures();
         const decoded = this.protoType.decode(new Uint8Array(messagePayload));
-        return this.protoType.toObject(decoded);
+        return this.protoType.toObject(decoded, { defaults: features.decodeUndefinedToDefault });
     }
 
     public encode(messageObj: any): ArrayBuffer {
