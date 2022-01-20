@@ -21,6 +21,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using Plexus.Processes;
     using System;
     using System.IO;
+    using System.Security.Authentication;
     using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
 
@@ -30,6 +31,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
 
         private readonly string _protocol = "ws";
         private readonly X509Certificate2 _certificate = null;
+        private readonly SslProtocols _sslProtocols;
 
         private readonly WebSocketTransmissionServerOptions _options;
         private WebSocketServer _server;
@@ -51,10 +53,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         {
         }
 
-        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate, SslProtocols sslProtocols)
             : this(options, "wss")
         {
             _certificate = certificate;
+            _sslProtocols = sslProtocols;
         }
 
         public IReadableChannel<ITransmissionConnection> In => _buffer.In;
@@ -96,8 +99,10 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 server.RestartAfterListenError = true;
                 server.ListenerSocket.NoDelay = true;
                 if (_certificate != null)
+                {
                     server.Certificate = _certificate;
-
+                    server.EnabledSslProtocols = _sslProtocols;
+                }
                 server.Start(OnSocketConnection);
             }
             catch (Exception ex)

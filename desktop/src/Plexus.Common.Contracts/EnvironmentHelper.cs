@@ -17,6 +17,7 @@
 namespace Plexus
 {
     using System;
+    using System.Security.Authentication;
 
     public static class EnvironmentHelper
     {
@@ -31,6 +32,7 @@ namespace Plexus
         public const string LauncherId = "PLEXUS_TRUSTED_LAUNCHER_ID";
         public const string CertificatePath = "PLEXUS_CERTIFICATE_PATH";
         public const string CertificatePassword = "PLEXUS_CERTIFICATE_PASSWORD";
+        public const string SslProtocols = "PLEXUS_SSL_PROTOCOLS";
 
         public static string GetBrokerWorkingDir()
         {
@@ -101,6 +103,15 @@ namespace Plexus
         public static string GetCertificatePassword()
         {
             return Environment.GetEnvironmentVariable(CertificatePassword);
+        }
+
+        public static SslProtocols GetSslProtocols()
+        {
+            var rawValue = Environment.GetEnvironmentVariable(SslProtocols);
+            if (string.IsNullOrEmpty(rawValue))
+                return System.Security.Authentication.SslProtocols.None;
+
+            return (SslProtocols)Enum.Parse(typeof(SslProtocols), rawValue);
         }
     }
 }

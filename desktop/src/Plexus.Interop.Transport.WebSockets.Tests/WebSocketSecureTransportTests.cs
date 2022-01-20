@@ -19,6 +19,7 @@ namespace Plexus.Interop.Transport.WebSockets
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.WebSockets.Client;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
+    using System.Security.Authentication;
     using System.Security.Cryptography.X509Certificates;
     using Xunit.Abstractions;
 
@@ -28,7 +29,7 @@ namespace Plexus.Interop.Transport.WebSockets
         {
             var cert = new X509Certificate2("test-cert.pfx", "god");
             Server = RegisterDisposable(TransportServerFactory.Instance.Create(
-                WebSocketTransmissionServerFactory.Instance.CreateSecure(new WebSocketTransmissionServerOptions(BrokerWorkingDir), cert),
+                WebSocketTransmissionServerFactory.Instance.CreateSecure(new WebSocketTransmissionServerOptions(BrokerWorkingDir), cert, SslProtocols.None),
                 new ProtobufTransportProtocolSerializationProvider()));
             Client = TransportClientFactory.Instance.Create(
                 WebSocketTransmissionClient.CreateSecure(),

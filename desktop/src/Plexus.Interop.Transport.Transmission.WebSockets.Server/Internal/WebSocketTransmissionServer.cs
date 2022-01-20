@@ -20,6 +20,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Hosting.Server.Features;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Server.Kestrel.Https;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Plexus.Channels;
@@ -31,6 +32,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
     using System.Net;
     using System.Net.Sockets;
     using System.Net.WebSockets;
+    using System.Security.Authentication;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
     using System.Threading;
@@ -42,6 +44,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private const int AcceptedConnectionsBufferSize = 20;
 
         private readonly X509Certificate2 _certificate = null;
+        private readonly SslProtocols _sslProtocols;
 
         private IWebHost _host;
         private readonly IChannel<ITransmissionConnection> _buffer = new BufferedChannel<ITransmissionConnection>(AcceptedConnectionsBufferSize);
@@ -63,10 +66,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         {
         }
 
-        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
+        public WebSocketTransmissionServer(WebSocketTransmissionServerOptions options, X509Certificate2 certificate, SslProtocols sslProtocols)
             : this(options, "wss")
         {
             _certificate = certificate;
+            _sslProtocols = sslProtocols;
         }
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
@@ -116,7 +120,11 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
                 .UseKestrel(serverOptions =>
                 {
                     if (_certificate != null)
-                        serverOptions.Listen(localhostIp, port, o => o.UseHttps(_certificate));
+                        serverOptions.Listen(localhostIp, port, o => o.UseHttps(new HttpsConnectionAdapterOptions
+                        {
+                            ServerCertificate = _certificate,
+                            SslProtocols = _sslProtocols
+                        }));
                     else
                         serverOptions.Listen(localhostIp, port);
                 })
