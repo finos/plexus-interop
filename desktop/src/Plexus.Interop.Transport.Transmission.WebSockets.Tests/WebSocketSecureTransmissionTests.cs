@@ -18,6 +18,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
 {
     using Plexus.Interop.Transport.Transmission.WebSockets.Client;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
+    using System.Security.Authentication;
     using System.Security.Cryptography.X509Certificates;
     using Xunit.Abstractions;
 
@@ -30,7 +31,7 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
         protected override ITransmissionServer CreateServer()
         {
             var cert = new X509Certificate2("test-cert.pfx", "god");
-            return WebSocketTransmissionServerFactory.Instance.CreateSecure(new WebSocketTransmissionServerOptions(BrokerWorkingDir), cert);
+            return WebSocketTransmissionServerFactory.Instance.CreateSecure(new WebSocketTransmissionServerOptions(BrokerWorkingDir), cert, SslProtocols.None);
         }
 
         protected override ITransmissionClient CreateClient()

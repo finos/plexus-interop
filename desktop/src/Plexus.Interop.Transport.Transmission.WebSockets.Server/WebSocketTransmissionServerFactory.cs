@@ -17,6 +17,7 @@
 ﻿namespace Plexus.Interop.Transport.Transmission.WebSockets.Server
 {
     using Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal;
+    using System.Security.Authentication;
     using System.Security.Cryptography.X509Certificates;
 
     public sealed class WebSocketTransmissionServerFactory
@@ -28,9 +29,9 @@
             return new WebSocketTransmissionServer(options);
         }
 
-        public ITransmissionServer CreateSecure(WebSocketTransmissionServerOptions options, X509Certificate2 certificate)
+        public ITransmissionServer CreateSecure(WebSocketTransmissionServerOptions options, X509Certificate2 certificate, SslProtocols sslProtocols)
         {
-            return new WebSocketTransmissionServer(options, certificate);
+            return new WebSocketTransmissionServer(options, certificate, sslProtocols);
         }
     }
 }
