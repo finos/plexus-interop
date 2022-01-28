@@ -89,6 +89,7 @@ namespace Plexus.Interop.Internal
                 var certificate = GetCertificate();
                 var wssTransmissionServerOptions = new WebSocketTransmissionServerOptions(_workingDir, options.WssPort, staticFileMapping);
                 var sslProtocols = EnvironmentHelper.GetSslProtocols();
+                Log.Info($"{EnvironmentHelper.SslProtocols}={sslProtocols}");
                 transportServers.Add(TransportServerFactory.Instance.Create(
                     WebSocketTransmissionServerFactory.Instance.CreateSecure(wssTransmissionServerOptions, certificate, sslProtocols),
                     DefaultTransportSerializationProvider));
