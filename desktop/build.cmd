@@ -5,4 +5,4 @@ if not defined PLEXUS_BUILD_DOTNET_PARAMS (
   set PLEXUS_BUILD_DOTNET_PARAMS=/p:CORE_ONLY=true
 )
 CD %~dp0
-dotnet build -c release src\Plexus.Interop.sln %PLEXUS_BUILD_DOTNET_PARAMS% && dotnet pack -c release -o ..\..\..\bin\nuget src\Plexus.Interop.sln %PLEXUS_BUILD_DOTNET_PARAMS%
+dotnet.cmd build -c release src\Plexus.Interop.sln %PLEXUS_BUILD_DOTNET_PARAMS% && dotnet.cmd pack -c release -o ..\..\..\bin\nuget src\Plexus.Interop.sln %PLEXUS_BUILD_DOTNET_PARAMS%

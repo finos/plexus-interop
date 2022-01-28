@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export interface WsConnectionDetails {
-    port: number;
-    wssPort?: number;
+export interface PlexusFeatures {
+    readonly decodeUndefinedToDefault: boolean;
 }
 
-export function getBaseWsUrl(details: WsConnectionDetails): string {
-    return details.wssPort
-        ? `wss://127.0.0.1:${details.wssPort}`
-        : `ws://127.0.0.1:${details.port}`;
+const plexusFeatures = {
+    decodeUndefinedToDefault: true
+};
+
+export function setDecodeUndefinedToDefault(value: boolean): void {
+    plexusFeatures.decodeUndefinedToDefault = value;
+}
+
+export function getPlexusFeatures(): PlexusFeatures {
+    return plexusFeatures;
 }

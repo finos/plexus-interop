@@ -1,6 +1,10 @@
 {
-  "projects": [ "src" ],
+  "projects": [
+    "src"
+  ],
   "sdk": {
-    "version": "2.1.301"
+    "version": "5.0.100",
+    "allowPrerelease": false,
+    "rollForward": "minor"
   }
 }
