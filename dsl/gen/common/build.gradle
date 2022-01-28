@@ -1,4 +1,4 @@
 dependencies {
-    compile group: 'com.beust', name: 'jcommander', version: '1.72'
+    compile group: 'com.beust', name: 'jcommander', version: '1.75'
     compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '3.0'
 }
