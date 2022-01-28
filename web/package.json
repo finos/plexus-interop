@@ -32,7 +32,7 @@
 	],
 	"devDependencies": {
 		"cross-var": "1.1.0",
-		"lerna": "^3.18.4",
+		"lerna": "^4.0.0",
 		"minimist": "^1.2.0",
 		"electron": "1.8.8",
 		"nyc": "^11.2.1",
