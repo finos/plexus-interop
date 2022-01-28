@@ -74,7 +74,7 @@
     },
     "devDependencies": {
         "typescript": "^2.1.5",
-        "vscode": "1.1.14",
+        "vscode": "1.1.35",
         "vsce": "1.40.0",
         "cross-var": "1.1.0",
         "@types/node": "^6.0.40"
