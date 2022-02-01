@@ -36,6 +36,7 @@ namespace Plexus.Interop.Internal
     using Plexus.Interop.Apps.Internal;
     using ILogger = Plexus.ILogger;
     using LogManager = Plexus.LogManager;
+    using System;
 
     internal sealed class Broker : ProcessBase, IBroker
     {
@@ -87,12 +88,15 @@ namespace Plexus.Interop.Internal
             if (_features.HasFlag(BrokerFeatures.UseWSS))
             {
                 var certificate = GetCertificate();
-                var wssTransmissionServerOptions = new WebSocketTransmissionServerOptions(_workingDir, options.WssPort, staticFileMapping);
-                var sslProtocols = EnvironmentHelper.GetSslProtocols();
-                Log.Info($"{EnvironmentHelper.SslProtocols}={sslProtocols}");
-                transportServers.Add(TransportServerFactory.Instance.Create(
-                    WebSocketTransmissionServerFactory.Instance.CreateSecure(wssTransmissionServerOptions, certificate, sslProtocols),
-                    DefaultTransportSerializationProvider));
+                if (certificate != null)
+                {
+                    var wssTransmissionServerOptions = new WebSocketTransmissionServerOptions(_workingDir, options.WssPort, staticFileMapping);
+                    var sslProtocols = EnvironmentHelper.GetSslProtocols();
+                    Log.Info($"{EnvironmentHelper.SslProtocols}={sslProtocols}");
+                    transportServers.Add(TransportServerFactory.Instance.Create(
+                        WebSocketTransmissionServerFactory.Instance.CreateSecure(wssTransmissionServerOptions, certificate, sslProtocols),
+                        DefaultTransportSerializationProvider));
+                }
             }
             _transportServers = transportServers;
             _connectionListener = new ServerConnectionListener(_transportServers);
@@ -108,16 +112,24 @@ namespace Plexus.Interop.Internal
 
         private X509Certificate2 GetCertificate()
         {
-            var certificatePath = EnvironmentHelper.GetCertificatePath();
-            if (string.IsNullOrEmpty(certificatePath))
-                throw new BrokerException($"{EnvironmentHelper.CertificatePath} must be defined if {BrokerFeatures.UseWSS} set.");
-            var certificatePassword = EnvironmentHelper.GetCertificatePassword();
-            if (string.IsNullOrEmpty(certificatePassword))
+            try
             {
-                Log.Info($"{EnvironmentHelper.CertificatePassword} is empty, try open certificate without password.");
-                return new X509Certificate2(certificatePath);
+                var certificatePath = EnvironmentHelper.GetCertificatePath();
+                if (string.IsNullOrEmpty(certificatePath))
+                    throw new BrokerException($"{EnvironmentHelper.CertificatePath} must be defined if {BrokerFeatures.UseWSS} set.");
+                var certificatePassword = EnvironmentHelper.GetCertificatePassword();
+                if (string.IsNullOrEmpty(certificatePassword))
+                {
+                    Log.Info($"{EnvironmentHelper.CertificatePassword} is empty, try open certificate without password.");
+                    return new X509Certificate2(certificatePath);
+                }
+                return new X509Certificate2(certificatePath, certificatePassword);
             }
-            return new X509Certificate2(certificatePath, certificatePassword);
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occured while creating certificate");
+                return null;
+            }
         }
 
         protected override async Task<Task> StartCoreAsync()
