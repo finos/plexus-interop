@@ -117,13 +117,15 @@ namespace Plexus.Interop.Internal
                 var certificatePath = EnvironmentHelper.GetCertificatePath();
                 if (string.IsNullOrEmpty(certificatePath))
                     throw new BrokerException($"{EnvironmentHelper.CertificatePath} must be defined if {BrokerFeatures.UseWSS} set.");
+
                 var certificatePassword = EnvironmentHelper.GetCertificatePassword();
                 if (string.IsNullOrEmpty(certificatePassword))
                 {
                     Log.Info($"{EnvironmentHelper.CertificatePassword} is empty, try open certificate without password.");
                     return new X509Certificate2(certificatePath);
                 }
-                return new X509Certificate2(certificatePath, certificatePassword);
+                var flags = EnvironmentHelper.GetCertificateKeyStorageFlags();
+                return new X509Certificate2(certificatePath, certificatePassword, flags);
             }
             catch (Exception ex)
             {
