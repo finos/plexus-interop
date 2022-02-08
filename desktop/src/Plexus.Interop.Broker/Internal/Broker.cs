@@ -40,10 +40,10 @@ namespace Plexus.Interop.Internal
 
     internal sealed class Broker : ProcessBase, IBroker
     {
-        private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider 
+        private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider
             = new ProtobufTransportProtocolSerializationProvider();
 
-        private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider 
+        private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider
             = new ProtobufProtocolSerializerFactory();
 
         private readonly BrokerFeatures _features;
@@ -117,13 +117,16 @@ namespace Plexus.Interop.Internal
                 var certificatePath = EnvironmentHelper.GetCertificatePath();
                 if (string.IsNullOrEmpty(certificatePath))
                     throw new BrokerException($"{EnvironmentHelper.CertificatePath} must be defined if {BrokerFeatures.UseWSS} set.");
+
                 var certificatePassword = EnvironmentHelper.GetCertificatePassword();
                 if (string.IsNullOrEmpty(certificatePassword))
                 {
                     Log.Info($"{EnvironmentHelper.CertificatePassword} is empty, try open certificate without password.");
                     return new X509Certificate2(certificatePath);
                 }
-                return new X509Certificate2(certificatePath, certificatePassword);
+                var flags = EnvironmentHelper.GetCertificateKeyStorageFlags();
+                Log.Info($"{EnvironmentHelper.CertificateKeyStorageFlags}={flags}");
+                return new X509Certificate2(certificatePath, certificatePassword, flags);
             }
             catch (Exception ex)
             {
