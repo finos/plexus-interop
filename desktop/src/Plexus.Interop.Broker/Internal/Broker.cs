@@ -125,6 +125,7 @@ namespace Plexus.Interop.Internal
                     return new X509Certificate2(certificatePath);
                 }
                 var flags = EnvironmentHelper.GetCertificateKeyStorageFlags();
+                Log.Info($"{EnvironmentHelper.CertificateKeyStorageFlags}={flags}");
                 return new X509Certificate2(certificatePath, certificatePassword, flags);
             }
             catch (Exception ex)
