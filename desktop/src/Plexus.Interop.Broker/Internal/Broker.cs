@@ -40,10 +40,10 @@ namespace Plexus.Interop.Internal
 
     internal sealed class Broker : ProcessBase, IBroker
     {
-        private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider 
+        private static readonly ProtobufTransportProtocolSerializationProvider DefaultTransportSerializationProvider
             = new ProtobufTransportProtocolSerializationProvider();
 
-        private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider 
+        private static readonly ProtobufProtocolSerializerFactory DefaultProtocolSerializationProvider
             = new ProtobufProtocolSerializerFactory();
 
         private readonly BrokerFeatures _features;
