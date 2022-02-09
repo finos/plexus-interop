@@ -3,7 +3,7 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.1;net45;net46</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.1;net452;net46</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.1</TargetFrameworks>
 
     <RootNamespace>Plexus.Interop</RootNamespace>
