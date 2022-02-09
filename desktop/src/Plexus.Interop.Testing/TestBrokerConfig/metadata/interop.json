@@ -5,12 +5,14 @@
 	      "nested": {
 	        "protobuf": {
 	          "options": {
-	            "go_package": "github.com/golang/protobuf/protoc-gen-go/descriptor;descriptor",
+	            "go_package": "github.com/golang/protobuf/ptypes/empty",
 	            "java_package": "com.google.protobuf",
-	            "java_outer_classname": "DescriptorProtos",
-	            "csharp_namespace": "Google.Protobuf.Reflection",
+	            "java_outer_classname": "EmptyProto",
+	            "csharp_namespace": "Google.Protobuf.WellKnownTypes",
 	            "objc_class_prefix": "GPB",
-	            "optimize_for": "SPEED"
+	            "optimize_for": "SPEED",
+	            "java_multiple_files": true,
+	            "cc_enable_arenas": true
 	          },
 	          "nested": {
 	            "FileDescriptorSet": {
@@ -1063,7 +1065,8 @@
 	            "event": {
 	              "oneof": [
 	                "connected",
-	                "disconnected"
+	                "disconnected",
+	                "error"
 	              ]
 	            }
 	          },
@@ -1075,6 +1078,10 @@
 	            "disconnected": {
 	              "type": "AppDisconnectedEvent",
 	              "id": 2
+	            },
+	            "error": {
+	              "type": "AppConnectionErrorEvent",
+	              "id": 3
 	            }
 	          }
 	        },
@@ -1115,6 +1122,17 @@
 	        "AppDisconnectedEvent": {
 	          "options": {
 	            "(.interop.message_id)": "interop.AppDisconnectedEvent"
+	          },
+	          "fields": {
+	            "connectionDescriptor": {
+	              "type": "AppConnectionDescriptor",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "AppConnectionErrorEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppConnectionErrorEvent"
 	          },
 	          "fields": {
 	            "connectionDescriptor": {
@@ -1971,25 +1989,54 @@
 	,
 	"services": [
 		{
-			"id": "interop.AppLauncherService",
+			"id": "plexus.interop.testing.EchoService",
 			"methods": [
 				{
-					"name": "Launch",
-					"request": "interop.AppLaunchRequest",
-					"response": "interop.AppLaunchResponse",
+					"name": "Unary",
+					"request": "plexus.interop.testing.EchoRequest",
+					"response": "plexus.interop.testing.EchoRequest",
 					"type": "Unary"
 				},
 				{
-					"name": "AppLaunchedEventStream",
-					"request": "google.protobuf.Empty",
-					"response": "interop.AppLaunchedEvent",
+					"name": "ServerStreaming",
+					"request": "plexus.interop.testing.EchoRequest",
+					"response": "plexus.interop.testing.EchoRequest",
 					"type": "ServerStreaming"
+				},
+				{
+					"name": "ClientStreaming",
+					"request": "plexus.interop.testing.EchoRequest",
+					"response": "plexus.interop.testing.EchoRequest",
+					"type": "ClientStreaming"
+				},
+				{
+					"name": "DuplexStreaming",
+					"request": "plexus.interop.testing.EchoRequest",
+					"response": "plexus.interop.testing.EchoRequest",
+					"type": "DuplexStreaming"
 				}
 			],
 			"options": [
 				{
 					"id": "interop.service_id",
-					"value": "interop.AppLauncherService"
+					"value": "plexus.interop.testing.EchoService"
+				}
+			]
+		},
+		{
+			"id": "plexus.interop.testing.GreetingService",
+			"methods": [
+				{
+					"name": "Hello",
+					"request": "plexus.interop.testing.GreetingRequest",
+					"response": "plexus.interop.testing.GreetingResponse",
+					"type": "Unary"
+				}
+			],
+			"options": [
+				{
+					"id": "interop.service_id",
+					"value": "plexus.interop.testing.GreetingService"
 				}
 			]
 		},
@@ -2031,29 +2078,6 @@
 				{
 					"id": "interop.service_id",
 					"value": "interop.AppLifecycleService"
-				}
-			]
-		},
-		{
-			"id": "interop.AppMetadataService",
-			"methods": [
-				{
-					"name": "GetAppMetadataChangedEventStream",
-					"request": "google.protobuf.Empty",
-					"response": "interop.AppMetadataChangedEvent",
-					"type": "ServerStreaming"
-				},
-				{
-					"name": "GetMetamodelChangedEventStream",
-					"request": "google.protobuf.Empty",
-					"response": "interop.MetamodelChangedEvent",
-					"type": "ServerStreaming"
-				}
-			],
-			"options": [
-				{
-					"id": "interop.service_id",
-					"value": "interop.AppMetadataService"
 				}
 			]
 		},
@@ -2117,172 +2141,53 @@
 			]
 		},
 		{
-			"id": "plexus.interop.testing.EchoService",
+			"id": "interop.AppLauncherService",
 			"methods": [
 				{
-					"name": "Unary",
-					"request": "plexus.interop.testing.EchoRequest",
-					"response": "plexus.interop.testing.EchoRequest",
+					"name": "Launch",
+					"request": "interop.AppLaunchRequest",
+					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
 				},
 				{
-					"name": "ServerStreaming",
-					"request": "plexus.interop.testing.EchoRequest",
-					"response": "plexus.interop.testing.EchoRequest",
+					"name": "AppLaunchedEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.AppLaunchedEvent",
 					"type": "ServerStreaming"
-				},
-				{
-					"name": "ClientStreaming",
-					"request": "plexus.interop.testing.EchoRequest",
-					"response": "plexus.interop.testing.EchoRequest",
-					"type": "ClientStreaming"
-				},
-				{
-					"name": "DuplexStreaming",
-					"request": "plexus.interop.testing.EchoRequest",
-					"response": "plexus.interop.testing.EchoRequest",
-					"type": "DuplexStreaming"
 				}
 			],
 			"options": [
 				{
 					"id": "interop.service_id",
-					"value": "plexus.interop.testing.EchoService"
+					"value": "interop.AppLauncherService"
 				}
 			]
 		},
 		{
-			"id": "plexus.interop.testing.GreetingService",
+			"id": "interop.AppMetadataService",
 			"methods": [
 				{
-					"name": "Hello",
-					"request": "plexus.interop.testing.GreetingRequest",
-					"response": "plexus.interop.testing.GreetingResponse",
-					"type": "Unary"
+					"name": "GetAppMetadataChangedEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.AppMetadataChangedEvent",
+					"type": "ServerStreaming"
+				},
+				{
+					"name": "GetMetamodelChangedEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.MetamodelChangedEvent",
+					"type": "ServerStreaming"
 				}
 			],
 			"options": [
 				{
 					"id": "interop.service_id",
-					"value": "plexus.interop.testing.GreetingService"
+					"value": "interop.AppMetadataService"
 				}
 			]
 		}
 	],
 	"applications": [
-		{
-			"id": "interop.AppLifecycleManager",
-			"consumes": [
-				{
-					"service": "interop.AppLauncherService",
-					"methods": [
-						{
-							"name": "Launch"
-						},
-						{
-							"name": "AppLaunchedEventStream"
-						}
-					]
-				}
-			],
-			"provides": [
-				{
-					"service": "interop.AppLifecycleService",
-					"methods": [
-						{
-							"name": "ResolveApp"
-						},
-						{
-							"name": "GetLifecycleEventStream"
-						},
-						{
-							"name": "GetInvocationEventStream"
-						},
-						{
-							"name": "GetConnections"
-						},
-						{
-							"name": "GetConnectionsStream"
-						}
-					]
-				},
-				{
-					"service": "interop.AppMetadataService",
-					"methods": [
-						{
-							"name": "GetAppMetadataChangedEventStream"
-						},
-						{
-							"name": "GetMetamodelChangedEventStream"
-						}
-					]
-				},
-				{
-					"service": "interop.ContextLinkageService",
-					"methods": [
-						{
-							"name": "ContextLoadedStream"
-						},
-						{
-							"name": "CreateContext"
-						},
-						{
-							"name": "JoinContext"
-						},
-						{
-							"name": "GetContexts"
-						},
-						{
-							"name": "GetLinkedInvocations"
-						},
-						{
-							"name": "GetAllLinkedInvocations"
-						},
-						{
-							"name": "AppJoinedContextStream"
-						},
-						{
-							"name": "RestoreContextsLinkage"
-						}
-					]
-				}
-			]
-		},
-		{
-			"id": "interop.CommandLineTool",
-			"consumes": [
-				{
-					"service": "interop.AppLifecycleService",
-					"methods": [
-						{
-							"name": "ResolveApp"
-						}
-					],
-					"from": [
-						"interop.AppLifecycleManager"
-					]
-				}
-			]
-		},
-		{
-			"id": "interop.NativeAppLauncher",
-			"provides": [
-				{
-					"service": "interop.AppLauncherService",
-					"methods": [
-						{
-							"name": "Launch"
-						},
-						{
-							"name": "AppLaunchedEventStream"
-						}
-					],
-					"to": [
-						"plexus.interop.AppLifecycleManager"
-					]
-				}
-			]
-		},
 		{
 			"id": "plexus.interop.testing.EchoClient",
 			"consumes": [
