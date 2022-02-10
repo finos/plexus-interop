@@ -1485,6 +1485,44 @@
 	            }
 	          }
 	        },
+	        "AppRegistrationService": {
+	          "options": {
+	            "(.interop.service_id)": "interop.AppRegistrationService"
+	          },
+	          "methods": {
+	            "RequestInstanceId": {
+	              "requestType": "RequestInstanceIdRequest",
+	              "responseType": "UniqueId"
+	            },
+	            "RegisterInstanceId": {
+	              "requestType": "RegisterInstanceIdRequest",
+	              "responseType": "RegisterInstanceIdResponse"
+	            }
+	          }
+	        },
+	        "RequestInstanceIdRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RequestInstanceIdRequest"
+	          },
+	          "fields": {}
+	        },
+	        "RegisterInstanceIdRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RegisterInstanceIdRequest"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "RegisterInstanceIdResponse": {
+	          "options": {
+	            "(.interop.message_id)": "interop.RegisterInstanceIdResponse"
+	          },
+	          "fields": {}
+	        },
 	        "Context": {
 	          "options": {
 	            "(.interop.message_id)": "interop.Context"
@@ -2164,6 +2202,29 @@
 			]
 		},
 		{
+			"id": "interop.AppRegistrationService",
+			"methods": [
+				{
+					"name": "RequestInstanceId",
+					"request": "interop.RequestInstanceIdRequest",
+					"response": "interop.UniqueId",
+					"type": "Unary"
+				},
+				{
+					"name": "RegisterInstanceId",
+					"request": "interop.RegisterInstanceIdRequest",
+					"response": "interop.RegisterInstanceIdResponse",
+					"type": "Unary"
+				}
+			],
+			"options": [
+				{
+					"id": "interop.service_id",
+					"value": "interop.AppRegistrationService"
+				}
+			]
+		},
+		{
 			"id": "interop.AppMetadataService",
 			"methods": [
 				{
@@ -2442,6 +2503,17 @@
 					],
 					"from": [
 						"interop.AppLifecycleManager"
+					]
+				},
+				{
+					"service": "interop.AppRegistrationService",
+					"methods": [
+						{
+							"name": "RequestInstanceId"
+						},
+						{
+							"name": "RegisterInstanceId"
+						}
 					]
 				}
 			],
