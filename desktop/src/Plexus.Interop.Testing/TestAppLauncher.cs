@@ -29,6 +29,9 @@ namespace Plexus.Interop.Testing
 
     internal sealed class TestAppLauncher : ProcessBase, TestAppLauncherClient.IAppLauncherServiceImpl
     {
+        public static readonly UniqueId LauncherAppInstanceId = UniqueId.FromString("C1EC24C635D744E48AC27740360D235E");
+        public static readonly UniqueId EchoServiceAppInstanceId = UniqueId.FromString("1D9CBA35139E4126950839DBF0FEC928");
+
         private readonly ITestBroker _broker;
         private readonly Dictionary<string, TestClientFactory> _clientFactories;
         private readonly bool _connectClients;
@@ -49,13 +52,16 @@ namespace Plexus.Interop.Testing
             _broker = broker;
             _clientFactories = clientFactories;
             _connectClients = connectClients;
-            _client = new TestAppLauncherClient(this, s => s.WithBrokerWorkingDir(broker.WorkingDir));
+            _client = new TestAppLauncherClient(this, s => s
+               .WithBrokerWorkingDir(broker.WorkingDir)
+               .WithAppInstanceId(LauncherAppInstanceId));
             OnStop(_client.Disconnect);
         }
 
         protected override async Task<Task> StartCoreAsync()
         {
             await _client.ConnectAsync().ConfigureAwait(false);
+            await _client.AppRegistrationService.RegisterInstanceId(new RegisterInstanceIdRequest { AppInstanceId = EchoServiceAppInstanceId });
             return _client.Completion;
         }
 
