@@ -33,6 +33,8 @@ namespace Plexus.Interop.Testing.Generated {
 		TestAppLauncherClient.IContextLinkageServiceProxy ContextLinkageService { get; }
 		
 		TestAppLauncherClient.IAppLifecycleServiceProxy AppLifecycleService { get; }
+		
+		TestAppLauncherClient.IAppRegistrationServiceProxy AppRegistrationService { get; }
 	}
 	
 	public sealed partial class TestAppLauncherClient: ClientBase, ITestAppLauncherClient {
@@ -60,6 +62,7 @@ namespace Plexus.Interop.Testing.Generated {
 		{
 			ContextLinkageService = new TestAppLauncherClient.ContextLinkageServiceProxy(this.CallInvoker);
 			AppLifecycleService = new TestAppLauncherClient.AppLifecycleServiceProxy(this.CallInvoker);
+			AppRegistrationService = new TestAppLauncherClient.AppRegistrationServiceProxy(this.CallInvoker);
 		}
 	
 		public sealed partial class ServiceBinder {
@@ -216,6 +219,32 @@ namespace Plexus.Interop.Testing.Generated {
 		}
 		
 		public IAppLifecycleServiceProxy AppLifecycleService { get; private set; }
+		
+		public partial interface IAppRegistrationServiceProxy:
+			global::Plexus.Interop.Testing.Generated.AppRegistrationService.IRequestInstanceIdProxy,
+			global::Plexus.Interop.Testing.Generated.AppRegistrationService.IRegisterInstanceIdProxy
+		{ }
+		
+		public sealed partial class AppRegistrationServiceProxy: IAppRegistrationServiceProxy {
+			
+			public static global::Plexus.Interop.Testing.Generated.AppRegistrationService.Descriptor Descriptor = global::Plexus.Interop.Testing.Generated.AppRegistrationService.DefaultDescriptor;
+			
+			private readonly IClientCallInvoker _callInvoker;
+									
+			public AppRegistrationServiceProxy(IClientCallInvoker callInvoker) {
+				_callInvoker = callInvoker;
+			}						
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.UniqueId> RequestInstanceId(global::Plexus.Interop.Testing.Generated.RequestInstanceIdRequest request) {
+				return _callInvoker.Call(Descriptor.RequestInstanceIdMethod, request);
+			}
+			
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.RegisterInstanceIdResponse> RegisterInstanceId(global::Plexus.Interop.Testing.Generated.RegisterInstanceIdRequest request) {
+				return _callInvoker.Call(Descriptor.RegisterInstanceIdMethod, request);
+			}
+		}
+		
+		public IAppRegistrationServiceProxy AppRegistrationService { get; private set; }
 	}
 }
 #endregion Designer generated code

@@ -50,13 +50,12 @@ namespace Plexus.Interop.Apps.Internal
         {
             _appRegistryProvider = appRegistryProvider;
             _appLifecycleManagerClientClientRepo = appLifecycleManagerClientClientRepo;
-            ConnectionEventsStream = _connectionSubject.ObserveOn(TaskPoolScheduler.Default);
             appLaunchedEventProvider.AppLaunchedStream.Subscribe(OnApplicationLaunchedEvent);
         }
 
         private ILogger Log { get; } = LogManager.GetLogger<AppLifecycleManager>();
 
-        public IObservable<AppConnectionEvent> ConnectionEventsStream { get; }
+        public IObservable<AppConnectionEvent> ConnectionEventsStream => _connectionSubject;
 
         public IReadOnlyCollection<IAppConnection> GetAppInstanceConnections(UniqueId appInstanceId)
         {

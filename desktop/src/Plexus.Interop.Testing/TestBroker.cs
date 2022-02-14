@@ -64,11 +64,14 @@ namespace Plexus.Interop.Testing
                 },
                 EnableRaisingEvents = true,
             };
+
 #if NET45
-            _process.StartInfo.EnvironmentVariables[EnvironmentHelper.ParentProcessIdVarName] = Process.GetCurrentProcess().Id.ToString();            
-#else            
-            _process.StartInfo.Environment[EnvironmentHelper.ParentProcessIdVarName] = Process.GetCurrentProcess().Id.ToString();
+            var processEnv = _process.StartInfo.EnvironmentVariables;
+#else
+            var processEnv = _process.StartInfo.Environment;
 #endif
+            processEnv[EnvironmentHelper.ParentProcessIdVarName] = Process.GetCurrentProcess().Id.ToString();
+            processEnv[EnvironmentHelper.LauncherId] = TestAppLauncher.LauncherAppInstanceId.ToString();
             _process.Exited += (x, y) =>
             {
                 if (_process.ExitCode != 0)

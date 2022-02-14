@@ -59,9 +59,8 @@ namespace Plexus.Interop.Apps.Internal
         private bool IsLauncher(AppConnectionDescriptor appConnectionDescriptor, out string applicationId)
         {
             applicationId = appConnectionDescriptor.ApplicationId;
-            var isLauncherApplication = _registryProvider.Current.Applications[applicationId].ProvidedServices
-                .Any(service => service.Service.Id == AppLauncherService.Id);
-            return isLauncherApplication;
+            return _registryProvider.Current.Applications.TryGetValue(applicationId, out var application)
+                && application.ProvidedServices.Any(service => service.Service.Id == AppLauncherService.Id);
         }
 
         private void SubscribeToApplicationLaunchedEventStream(string applicationId, UniqueId connectionId)
