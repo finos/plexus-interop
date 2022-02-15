@@ -1259,6 +1259,7 @@ namespace Plexus.Interop
                 .WithBrokerWorkingDir(testBroker.WorkingDir)
                 .WithDefaultConfiguration()
                 .WithApplicationId("plexus.interop.testing.EchoClient")
+                .WithAppInstanceId(TestAppLauncher.EchoServiceAppInstanceId)
                 .Build();
             return RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
         }
@@ -1289,7 +1290,8 @@ namespace Plexus.Interop
             var clientOptionsBuilder = new ClientOptionsBuilder()
                 .WithBrokerWorkingDir(testBroker.WorkingDir)
                 .WithDefaultConfiguration()
-                .WithApplicationId("plexus.interop.testing.EchoServer");
+                .WithApplicationId("plexus.interop.testing.EchoServer")
+                .WithAppInstanceId(TestAppLauncher.EchoServiceAppInstanceId);
             setup?.Invoke(clientOptionsBuilder);
             var clientOptions = clientOptionsBuilder.Build();
             var client = RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
