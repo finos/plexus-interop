@@ -322,9 +322,14 @@ namespace Plexus.Interop.Apps.Internal
 
         public void RegisterAppInstance(UniqueId appInstanceId)
         {
+            bool added;
             lock (_sync)
             {
-                _appInstanceIds.Add(appInstanceId);
+                added = _appInstanceIds.Add(appInstanceId);
+            }
+            if (added)
+            {
+                Log.Debug($"{nameof(RegisterAppInstance)}: {appInstanceId}");
             }
         }
 
