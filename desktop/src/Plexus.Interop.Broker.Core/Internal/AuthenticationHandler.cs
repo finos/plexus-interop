@@ -60,12 +60,16 @@
                 }
                 if (!_connectionTracker.IsAppInstanceRegistered(connectRequest.ApplicationInstanceId))
                 {
+                    Log.Debug("Connection with unknown application instance id: "
+                        + $"ApplicationInstanceId={connectRequest.ApplicationInstanceId}, ApplicationId={connectRequest.ApplicationId}");
                     _connectionTracker.ReportConnectionError(new AppConnectionDescriptor(
                         UniqueId.Empty, connectRequest.ApplicationId, connectRequest.ApplicationInstanceId));
 
                     if (_features.HasFlag(BrokerFeatures.CheckAppInstanceId))
+                    {
                         throw new BrokerException("Connection rejected because application instance id is unknown to broker: "
                             + $"ApplicationInstanceId={connectRequest.ApplicationInstanceId}, ApplicationId={connectRequest.ApplicationId}");
+                    }
                 }
                 using (var connectResponse = _messageFactory.CreateConnectResponse(connection.Id))
                 {
