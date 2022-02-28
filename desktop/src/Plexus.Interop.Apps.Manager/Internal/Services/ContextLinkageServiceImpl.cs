@@ -54,6 +54,9 @@ namespace Plexus.Interop.Apps.Internal.Services
         }
 
         public Task<ContextDto> CreateContext(Empty request, MethodCallContext callContext)
+            => CreateContext2(new CreateContextRequest(), callContext);
+
+        public Task<ContextDto> CreateContext2(CreateContextRequest request, MethodCallContext callContext)
         {
             return Task.Factory.StartNew(() =>
             {
