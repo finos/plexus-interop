@@ -5,12 +5,14 @@
 	      "nested": {
 	        "protobuf": {
 	          "options": {
-	            "go_package": "github.com/golang/protobuf/protoc-gen-go/descriptor;descriptor",
+	            "go_package": "github.com/golang/protobuf/ptypes/empty",
 	            "java_package": "com.google.protobuf",
-	            "java_outer_classname": "DescriptorProtos",
-	            "csharp_namespace": "Google.Protobuf.Reflection",
+	            "java_outer_classname": "EmptyProto",
+	            "csharp_namespace": "Google.Protobuf.WellKnownTypes",
 	            "objc_class_prefix": "GPB",
-	            "optimize_for": "SPEED"
+	            "optimize_for": "SPEED",
+	            "java_multiple_files": true,
+	            "cc_enable_arenas": true
 	          },
 	          "nested": {
 	            "FileDescriptorSet": {
@@ -1529,6 +1531,14 @@
 	            "id": {
 	              "type": "string",
 	              "id": 1
+	            },
+	            "own": {
+	              "type": "bool",
+	              "id": 2
+	            },
+	            "kind": {
+	              "type": "string",
+	              "id": 3
 	            }
 	          }
 	        },
@@ -1540,6 +1550,17 @@
 	            "contexts": {
 	              "rule": "repeated",
 	              "type": "Context",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "CreateContextRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.CreateContextRequest"
+	          },
+	          "fields": {
+	            "kind": {
+	              "type": "string",
 	              "id": 1
 	            }
 	          }
@@ -1698,6 +1719,10 @@
 	            },
 	            "CreateContext": {
 	              "requestType": "google.protobuf.Empty",
+	              "responseType": "Context"
+	            },
+	            "CreateContext2": {
+	              "requestType": "CreateContextRequest",
 	              "responseType": "Context"
 	            },
 	            "JoinContext": {
@@ -1893,6 +1918,12 @@
 					"type": "Unary"
 				},
 				{
+					"name": "CreateContext2",
+					"request": "interop.CreateContextRequest",
+					"response": "interop.Context",
+					"type": "Unary"
+				},
+				{
 					"name": "JoinContext",
 					"request": "interop.Context",
 					"response": "google.protobuf.Empty",
@@ -2016,6 +2047,9 @@
 						},
 						{
 							"name": "CreateContext"
+						},
+						{
+							"name": "CreateContext2"
 						},
 						{
 							"name": "JoinContext"
