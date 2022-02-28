@@ -26,10 +26,16 @@ import "interop/app_metadata_service.proto";
 
 message Context {
 	string id = 1;
+	bool own = 2;
+	string kind = 3;
 }
 
 message ContextsList {
 	repeated Context contexts = 1;
+}
+
+message CreateContextRequest {
+	string kind = 1;
 }
 
 enum ContextLoadingStatus {
@@ -93,9 +99,14 @@ service ContextLinkageService {
 	rpc ContextLoadedStream(Context) returns (stream ContextLoadingUpdate);
 
 	/**
-	* Creates new context and associates running instance to it 
+	* Creates new context and associates running instance to it
 	*/
 	rpc CreateContext(google.protobuf.Empty) returns (Context);
+
+	/**
+	* Creates new context and associates running instance to it
+	*/
+	rpc CreateContext2(CreateContextRequest) returns (Context);
 
 	/**
 	* Associates running instance with provided context, useful if we want to link already running instance

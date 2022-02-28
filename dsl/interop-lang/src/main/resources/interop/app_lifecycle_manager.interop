@@ -34,6 +34,7 @@ application AppLifecycleManager {
 	provides ContextLinkageService {
 		ContextLoadedStream;
 		CreateContext;
+		CreateContext2;
 		JoinContext;
 		GetContexts;
 		GetLinkedInvocations;
