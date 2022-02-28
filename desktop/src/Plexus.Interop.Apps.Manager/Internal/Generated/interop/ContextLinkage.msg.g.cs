@@ -44,62 +44,67 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "Z2xlL3Byb3RvYnVmL2VtcHR5LnByb3RvGhdpbnRlcm9wL3VuaXF1ZV9pZC5w",
             "cm90bxonaW50ZXJvcC9hcHBfY29ubmVjdGlvbl9kZXNjcmlwdG9yLnByb3Rv",
             "GiJpbnRlcm9wL2FwcF9tZXRhZGF0YV9zZXJ2aWNlLnByb3RvGhVpbnRlcm9w",
-            "L29wdGlvbnMucHJvdG8iKgoHQ29udGV4dBIKCgJpZBgBIAEoCToTktsED2lu",
-            "dGVyb3AuQ29udGV4dCJMCgxDb250ZXh0c0xpc3QSIgoIY29udGV4dHMYASAD",
-            "KAsyEC5pbnRlcm9wLkNvbnRleHQ6GJLbBBRpbnRlcm9wLkNvbnRleHRzTGlz",
-            "dCLrAQoUQ29udGV4dExvYWRpbmdVcGRhdGUSLQoGc3RhdHVzGAEgASgOMh0u",
-            "aW50ZXJvcC5Db250ZXh0TG9hZGluZ1N0YXR1cxJAChZsb2FkZWRfYXBwX2Rl",
-            "c2NyaXB0b3JzGAIgAygLMiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3Jp",
-            "cHRvchJAChZmYWlsZWRfYXBwX2Rlc2NyaXB0b3JzGAMgAygLMiAuaW50ZXJv",
-            "cC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvcjogktsEHGludGVyb3AuQ29udGV4",
-            "dExvYWRpbmdVcGRhdGUiiQEKDUludm9jYXRpb25SZWYSKwoIYXBwX2luZm8Y",
-            "ASABKAsyGS5pbnRlcm9wLkFwcE1ldGFtb2RlbEluZm8SMAoGdGFyZ2V0GAIg",
-            "ASgLMiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvcjoZktsEFWlu",
-            "dGVyb3AuSW52b2NhdGlvblJlZiJbCg9JbnZvY2F0aW9uc0xpc3QSKwoLaW52",
-            "b2NhdGlvbnMYASADKAsyFi5pbnRlcm9wLkludm9jYXRpb25SZWY6G5LbBBdp",
-            "bnRlcm9wLkludm9jYXRpb25zTGlzdCKKAQoUQ29udGV4dFRvSW52b2NhdGlv",
-            "bnMSIQoHY29udGV4dBgBIAEoCzIQLmludGVyb3AuQ29udGV4dBItCgtpbnZv",
-            "Y2F0aW9ucxgCIAEoCzIYLmludGVyb3AuSW52b2NhdGlvbnNMaXN0OiCS2wQc",
-            "aW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0aW9ucyJxChhDb250ZXh0VG9JbnZv",
-            "Y2F0aW9uc0xpc3QSLwoIY29udGV4dHMYASADKAsyHS5pbnRlcm9wLkNvbnRl",
-            "eHRUb0ludm9jYXRpb25zOiSS2wQgaW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0",
-            "aW9uc0xpc3QiiQEKFUFwcEpvaW5lZENvbnRleHRFdmVudBIhCgdjb250ZXh0",
-            "GAEgASgLMhAuaW50ZXJvcC5Db250ZXh0EioKD2FwcF9pbnN0YW5jZV9pZBgC",
-            "IAEoCzIRLmludGVyb3AuVW5pcXVlSWQ6IZLbBB1pbnRlcm9wLkFwcEpvaW5l",
-            "ZENvbnRleHRFdmVudCJ3Ch1SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVxdWVz",
-            "dBIrCgRhcHBzGAEgAygLMh0uaW50ZXJvcC5SZXN0b3JpbmdBcHBJbnN0YW5j",
-            "ZTopktsEJWludGVyb3AuUmVzdG9yZUNvbnRleHRzTGlua2FnZVJlcXVlc3Qi",
-            "igEKFFJlc3RvcmluZ0FwcEluc3RhbmNlEioKD2FwcF9pbnN0YW5jZV9pZBgB",
-            "IAEoCzIRLmludGVyb3AuVW5pcXVlSWQSDwoHYXBwX2lkcxgCIAMoCRITCgtj",
-            "b250ZXh0X2lkcxgDIAMoCTogktsEHGludGVyb3AuUmVzdG9yaW5nQXBwSW5z",
-            "dGFuY2Ui+AEKHlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZRJdChRj",
-            "cmVhdGVkX2NvbnRleHRzX21hcBgBIAMoCzI/LmludGVyb3AuUmVzdG9yZUNv",
-            "bnRleHRzTGlua2FnZVJlc3BvbnNlLkNyZWF0ZWRDb250ZXh0c01hcEVudHJ5",
-            "GksKF0NyZWF0ZWRDb250ZXh0c01hcEVudHJ5EgsKA2tleRgBIAEoCRIfCgV2",
-            "YWx1ZRgCIAEoCzIQLmludGVyb3AuQ29udGV4dDoCOAE6KpLbBCZpbnRlcm9w",
-            "LlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZSpBChRDb250ZXh0TG9h",
-            "ZGluZ1N0YXR1cxIPCgtJTl9QUk9HUkVTUxAAEgoKBkZBSUxFRBABEgwKCEZJ",
-            "TklTSEVEEAIyjwUKFUNvbnRleHRMaW5rYWdlU2VydmljZRJIChNDb250ZXh0",
-            "TG9hZGVkU3RyZWFtEhAuaW50ZXJvcC5Db250ZXh0Gh0uaW50ZXJvcC5Db250",
-            "ZXh0TG9hZGluZ1VwZGF0ZTABEjkKDUNyZWF0ZUNvbnRleHQSFi5nb29nbGUu",
-            "cHJvdG9idWYuRW1wdHkaEC5pbnRlcm9wLkNvbnRleHQSNwoLSm9pbkNvbnRl",
-            "eHQSEC5pbnRlcm9wLkNvbnRleHQaFi5nb29nbGUucHJvdG9idWYuRW1wdHkS",
-            "PAoLR2V0Q29udGV4dHMSFi5nb29nbGUucHJvdG9idWYuRW1wdHkaFS5pbnRl",
-            "cm9wLkNvbnRleHRzTGlzdBJCChRHZXRMaW5rZWRJbnZvY2F0aW9ucxIQLmlu",
-            "dGVyb3AuQ29udGV4dBoYLmludGVyb3AuSW52b2NhdGlvbnNMaXN0ElQKF0dl",
-            "dEFsbExpbmtlZEludm9jYXRpb25zEhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5",
-            "GiEuaW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0aW9uc0xpc3QSUgoWQXBwSm9p",
-            "bmVkQ29udGV4dFN0cmVhbRIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRoeLmlu",
-            "dGVyb3AuQXBwSm9pbmVkQ29udGV4dEV2ZW50MAESaQoWUmVzdG9yZUNvbnRl",
-            "eHRzTGlua2FnZRImLmludGVyb3AuUmVzdG9yZUNvbnRleHRzTGlua2FnZVJl",
-            "cXVlc3QaJy5pbnRlcm9wLlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25z",
-            "ZRohktsEHWludGVyb3AuQ29udGV4dExpbmthZ2VTZXJ2aWNlQimqAiZQbGV4",
-            "dXMuSW50ZXJvcC5BcHBzLkludGVybmFsLkdlbmVyYXRlZGIGcHJvdG8z"));
+            "L29wdGlvbnMucHJvdG8iRQoHQ29udGV4dBIKCgJpZBgBIAEoCRILCgNvd24Y",
+            "AiABKAgSDAoEa2luZBgDIAEoCToTktsED2ludGVyb3AuQ29udGV4dCJMCgxD",
+            "b250ZXh0c0xpc3QSIgoIY29udGV4dHMYASADKAsyEC5pbnRlcm9wLkNvbnRl",
+            "eHQ6GJLbBBRpbnRlcm9wLkNvbnRleHRzTGlzdCJGChRDcmVhdGVDb250ZXh0",
+            "UmVxdWVzdBIMCgRraW5kGAEgASgJOiCS2wQcaW50ZXJvcC5DcmVhdGVDb250",
+            "ZXh0UmVxdWVzdCLrAQoUQ29udGV4dExvYWRpbmdVcGRhdGUSLQoGc3RhdHVz",
+            "GAEgASgOMh0uaW50ZXJvcC5Db250ZXh0TG9hZGluZ1N0YXR1cxJAChZsb2Fk",
+            "ZWRfYXBwX2Rlc2NyaXB0b3JzGAIgAygLMiAuaW50ZXJvcC5BcHBDb25uZWN0",
+            "aW9uRGVzY3JpcHRvchJAChZmYWlsZWRfYXBwX2Rlc2NyaXB0b3JzGAMgAygL",
+            "MiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvcjogktsEHGludGVy",
+            "b3AuQ29udGV4dExvYWRpbmdVcGRhdGUiiQEKDUludm9jYXRpb25SZWYSKwoI",
+            "YXBwX2luZm8YASABKAsyGS5pbnRlcm9wLkFwcE1ldGFtb2RlbEluZm8SMAoG",
+            "dGFyZ2V0GAIgASgLMiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRv",
+            "cjoZktsEFWludGVyb3AuSW52b2NhdGlvblJlZiJbCg9JbnZvY2F0aW9uc0xp",
+            "c3QSKwoLaW52b2NhdGlvbnMYASADKAsyFi5pbnRlcm9wLkludm9jYXRpb25S",
+            "ZWY6G5LbBBdpbnRlcm9wLkludm9jYXRpb25zTGlzdCKKAQoUQ29udGV4dFRv",
+            "SW52b2NhdGlvbnMSIQoHY29udGV4dBgBIAEoCzIQLmludGVyb3AuQ29udGV4",
+            "dBItCgtpbnZvY2F0aW9ucxgCIAEoCzIYLmludGVyb3AuSW52b2NhdGlvbnNM",
+            "aXN0OiCS2wQcaW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0aW9ucyJxChhDb250",
+            "ZXh0VG9JbnZvY2F0aW9uc0xpc3QSLwoIY29udGV4dHMYASADKAsyHS5pbnRl",
+            "cm9wLkNvbnRleHRUb0ludm9jYXRpb25zOiSS2wQgaW50ZXJvcC5Db250ZXh0",
+            "VG9JbnZvY2F0aW9uc0xpc3QiiQEKFUFwcEpvaW5lZENvbnRleHRFdmVudBIh",
+            "Cgdjb250ZXh0GAEgASgLMhAuaW50ZXJvcC5Db250ZXh0EioKD2FwcF9pbnN0",
+            "YW5jZV9pZBgCIAEoCzIRLmludGVyb3AuVW5pcXVlSWQ6IZLbBB1pbnRlcm9w",
+            "LkFwcEpvaW5lZENvbnRleHRFdmVudCJ3Ch1SZXN0b3JlQ29udGV4dHNMaW5r",
+            "YWdlUmVxdWVzdBIrCgRhcHBzGAEgAygLMh0uaW50ZXJvcC5SZXN0b3JpbmdB",
+            "cHBJbnN0YW5jZTopktsEJWludGVyb3AuUmVzdG9yZUNvbnRleHRzTGlua2Fn",
+            "ZVJlcXVlc3QiigEKFFJlc3RvcmluZ0FwcEluc3RhbmNlEioKD2FwcF9pbnN0",
+            "YW5jZV9pZBgBIAEoCzIRLmludGVyb3AuVW5pcXVlSWQSDwoHYXBwX2lkcxgC",
+            "IAMoCRITCgtjb250ZXh0X2lkcxgDIAMoCTogktsEHGludGVyb3AuUmVzdG9y",
+            "aW5nQXBwSW5zdGFuY2Ui+AEKHlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNw",
+            "b25zZRJdChRjcmVhdGVkX2NvbnRleHRzX21hcBgBIAMoCzI/LmludGVyb3Au",
+            "UmVzdG9yZUNvbnRleHRzTGlua2FnZVJlc3BvbnNlLkNyZWF0ZWRDb250ZXh0",
+            "c01hcEVudHJ5GksKF0NyZWF0ZWRDb250ZXh0c01hcEVudHJ5EgsKA2tleRgB",
+            "IAEoCRIfCgV2YWx1ZRgCIAEoCzIQLmludGVyb3AuQ29udGV4dDoCOAE6KpLb",
+            "BCZpbnRlcm9wLlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZSpBChRD",
+            "b250ZXh0TG9hZGluZ1N0YXR1cxIPCgtJTl9QUk9HUkVTUxAAEgoKBkZBSUxF",
+            "RBABEgwKCEZJTklTSEVEEAIy0gUKFUNvbnRleHRMaW5rYWdlU2VydmljZRJI",
+            "ChNDb250ZXh0TG9hZGVkU3RyZWFtEhAuaW50ZXJvcC5Db250ZXh0Gh0uaW50",
+            "ZXJvcC5Db250ZXh0TG9hZGluZ1VwZGF0ZTABEjkKDUNyZWF0ZUNvbnRleHQS",
+            "Fi5nb29nbGUucHJvdG9idWYuRW1wdHkaEC5pbnRlcm9wLkNvbnRleHQSQQoO",
+            "Q3JlYXRlQ29udGV4dDISHS5pbnRlcm9wLkNyZWF0ZUNvbnRleHRSZXF1ZXN0",
+            "GhAuaW50ZXJvcC5Db250ZXh0EjcKC0pvaW5Db250ZXh0EhAuaW50ZXJvcC5D",
+            "b250ZXh0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5EjwKC0dldENvbnRleHRz",
+            "EhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5GhUuaW50ZXJvcC5Db250ZXh0c0xp",
+            "c3QSQgoUR2V0TGlua2VkSW52b2NhdGlvbnMSEC5pbnRlcm9wLkNvbnRleHQa",
+            "GC5pbnRlcm9wLkludm9jYXRpb25zTGlzdBJUChdHZXRBbGxMaW5rZWRJbnZv",
+            "Y2F0aW9ucxIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRohLmludGVyb3AuQ29u",
+            "dGV4dFRvSW52b2NhdGlvbnNMaXN0ElIKFkFwcEpvaW5lZENvbnRleHRTdHJl",
+            "YW0SFi5nb29nbGUucHJvdG9idWYuRW1wdHkaHi5pbnRlcm9wLkFwcEpvaW5l",
+            "ZENvbnRleHRFdmVudDABEmkKFlJlc3RvcmVDb250ZXh0c0xpbmthZ2USJi5p",
+            "bnRlcm9wLlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXF1ZXN0GicuaW50ZXJv",
+            "cC5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVzcG9uc2UaIZLbBB1pbnRlcm9w",
+            "LkNvbnRleHRMaW5rYWdlU2VydmljZUIpqgImUGxleHVzLkludGVyb3AuQXBw",
+            "cy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingStatus), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.Context), global::Plexus.Interop.Apps.Internal.Generated.Context.Parser, new[]{ "Id" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.Context), global::Plexus.Interop.Apps.Internal.Generated.Context.Parser, new[]{ "Id", "Own", "Kind" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextsList), global::Plexus.Interop.Apps.Internal.Generated.ContextsList.Parser, new[]{ "Contexts" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest), global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest.Parser, new[]{ "Kind" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate), global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate.Parser, new[]{ "Status", "LoadedAppDescriptors", "FailedAppDescriptors" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationRef), global::Plexus.Interop.Apps.Internal.Generated.InvocationRef.Parser, new[]{ "AppInfo", "Target" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.InvocationsList), global::Plexus.Interop.Apps.Internal.Generated.InvocationsList.Parser, new[]{ "Invocations" }, null, null, null, null),
@@ -168,6 +173,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Context(Context other) : this() {
       id_ = other.id_;
+      own_ = other.own_;
+      kind_ = other.kind_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -189,6 +196,30 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
+    /// <summary>Field number for the "own" field.</summary>
+    public const int OwnFieldNumber = 2;
+    private bool own_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Own {
+      get { return own_; }
+      set {
+        own_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "kind" field.</summary>
+    public const int KindFieldNumber = 3;
+    private string kind_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Kind {
+      get { return kind_; }
+      set {
+        kind_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -205,6 +236,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         return true;
       }
       if (Id != other.Id) return false;
+      if (Own != other.Own) return false;
+      if (Kind != other.Kind) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -213,6 +246,8 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     public override int GetHashCode() {
       int hash = 1;
       if (Id.Length != 0) hash ^= Id.GetHashCode();
+      if (Own != false) hash ^= Own.GetHashCode();
+      if (Kind.Length != 0) hash ^= Kind.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -235,6 +270,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(10);
         output.WriteString(Id);
       }
+      if (Own != false) {
+        output.WriteRawTag(16);
+        output.WriteBool(Own);
+      }
+      if (Kind.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Kind);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -249,6 +292,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(10);
         output.WriteString(Id);
       }
+      if (Own != false) {
+        output.WriteRawTag(16);
+        output.WriteBool(Own);
+      }
+      if (Kind.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Kind);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -261,6 +312,12 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       int size = 0;
       if (Id.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
+      }
+      if (Own != false) {
+        size += 1 + 1;
+      }
+      if (Kind.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Kind);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -276,6 +333,12 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.Id.Length != 0) {
         Id = other.Id;
+      }
+      if (other.Own != false) {
+        Own = other.Own;
+      }
+      if (other.Kind.Length != 0) {
+        Kind = other.Kind;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -296,6 +359,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             Id = input.ReadString();
             break;
           }
+          case 16: {
+            Own = input.ReadBool();
+            break;
+          }
+          case 26: {
+            Kind = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -313,6 +384,14 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             break;
           case 10: {
             Id = input.ReadString();
+            break;
+          }
+          case 16: {
+            Own = input.ReadBool();
+            break;
+          }
+          case 26: {
+            Kind = input.ReadString();
             break;
           }
         }
@@ -500,6 +579,195 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 
   }
 
+  internal sealed partial class CreateContextRequest : pb::IMessage<CreateContextRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CreateContextRequest> _parser = new pb::MessageParser<CreateContextRequest>(() => new CreateContextRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CreateContextRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CreateContextRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CreateContextRequest(CreateContextRequest other) : this() {
+      kind_ = other.kind_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CreateContextRequest Clone() {
+      return new CreateContextRequest(this);
+    }
+
+    /// <summary>Field number for the "kind" field.</summary>
+    public const int KindFieldNumber = 1;
+    private string kind_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Kind {
+      get { return kind_; }
+      set {
+        kind_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CreateContextRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CreateContextRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Kind != other.Kind) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Kind.Length != 0) hash ^= Kind.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Kind.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Kind);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Kind.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Kind);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Kind.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Kind);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CreateContextRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Kind.Length != 0) {
+        Kind = other.Kind;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Kind = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Kind = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
   internal sealed partial class ContextLoadingUpdate : pb::IMessage<ContextLoadingUpdate>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -514,7 +782,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -761,7 +1029,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1005,7 +1273,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1183,7 +1451,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1427,7 +1695,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1605,7 +1873,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1849,7 +2117,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2027,7 +2295,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2277,7 +2545,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[10]; }
+      get { return global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
