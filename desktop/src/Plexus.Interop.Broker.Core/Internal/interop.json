@@ -1691,7 +1691,15 @@
 	            "contextIds": {
 	              "rule": "repeated",
 	              "type": "string",
-	              "id": 3
+	              "id": 3,
+	              "options": {
+	                "deprecated": true
+	              }
+	            },
+	            "contexts": {
+	              "rule": "repeated",
+	              "type": "Context",
+	              "id": 4
 	            }
 	          }
 	        },

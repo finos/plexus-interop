@@ -85,7 +85,8 @@ message RestoreContextsLinkageRequest {
 message RestoringAppInstance {
 	UniqueId app_instance_id = 1;
 	repeated string app_ids = 2;
-	repeated string context_ids = 3;
+	repeated string context_ids = 3 [deprecated=true];
+	repeated Context contexts = 4;
 }
 
 message RestoreContextsLinkageResponse {

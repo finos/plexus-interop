@@ -71,34 +71,35 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "LkFwcEpvaW5lZENvbnRleHRFdmVudCJ3Ch1SZXN0b3JlQ29udGV4dHNMaW5r",
             "YWdlUmVxdWVzdBIrCgRhcHBzGAEgAygLMh0uaW50ZXJvcC5SZXN0b3JpbmdB",
             "cHBJbnN0YW5jZTopktsEJWludGVyb3AuUmVzdG9yZUNvbnRleHRzTGlua2Fn",
-            "ZVJlcXVlc3QiigEKFFJlc3RvcmluZ0FwcEluc3RhbmNlEioKD2FwcF9pbnN0",
+            "ZVJlcXVlc3QisgEKFFJlc3RvcmluZ0FwcEluc3RhbmNlEioKD2FwcF9pbnN0",
             "YW5jZV9pZBgBIAEoCzIRLmludGVyb3AuVW5pcXVlSWQSDwoHYXBwX2lkcxgC",
-            "IAMoCRITCgtjb250ZXh0X2lkcxgDIAMoCTogktsEHGludGVyb3AuUmVzdG9y",
-            "aW5nQXBwSW5zdGFuY2Ui+AEKHlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNw",
-            "b25zZRJdChRjcmVhdGVkX2NvbnRleHRzX21hcBgBIAMoCzI/LmludGVyb3Au",
-            "UmVzdG9yZUNvbnRleHRzTGlua2FnZVJlc3BvbnNlLkNyZWF0ZWRDb250ZXh0",
-            "c01hcEVudHJ5GksKF0NyZWF0ZWRDb250ZXh0c01hcEVudHJ5EgsKA2tleRgB",
-            "IAEoCRIfCgV2YWx1ZRgCIAEoCzIQLmludGVyb3AuQ29udGV4dDoCOAE6KpLb",
-            "BCZpbnRlcm9wLlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZSpBChRD",
-            "b250ZXh0TG9hZGluZ1N0YXR1cxIPCgtJTl9QUk9HUkVTUxAAEgoKBkZBSUxF",
-            "RBABEgwKCEZJTklTSEVEEAIy0gUKFUNvbnRleHRMaW5rYWdlU2VydmljZRJI",
-            "ChNDb250ZXh0TG9hZGVkU3RyZWFtEhAuaW50ZXJvcC5Db250ZXh0Gh0uaW50",
-            "ZXJvcC5Db250ZXh0TG9hZGluZ1VwZGF0ZTABEjkKDUNyZWF0ZUNvbnRleHQS",
-            "Fi5nb29nbGUucHJvdG9idWYuRW1wdHkaEC5pbnRlcm9wLkNvbnRleHQSQQoO",
-            "Q3JlYXRlQ29udGV4dDISHS5pbnRlcm9wLkNyZWF0ZUNvbnRleHRSZXF1ZXN0",
-            "GhAuaW50ZXJvcC5Db250ZXh0EjcKC0pvaW5Db250ZXh0EhAuaW50ZXJvcC5D",
-            "b250ZXh0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5EjwKC0dldENvbnRleHRz",
-            "EhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5GhUuaW50ZXJvcC5Db250ZXh0c0xp",
-            "c3QSQgoUR2V0TGlua2VkSW52b2NhdGlvbnMSEC5pbnRlcm9wLkNvbnRleHQa",
-            "GC5pbnRlcm9wLkludm9jYXRpb25zTGlzdBJUChdHZXRBbGxMaW5rZWRJbnZv",
-            "Y2F0aW9ucxIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRohLmludGVyb3AuQ29u",
-            "dGV4dFRvSW52b2NhdGlvbnNMaXN0ElIKFkFwcEpvaW5lZENvbnRleHRTdHJl",
-            "YW0SFi5nb29nbGUucHJvdG9idWYuRW1wdHkaHi5pbnRlcm9wLkFwcEpvaW5l",
-            "ZENvbnRleHRFdmVudDABEmkKFlJlc3RvcmVDb250ZXh0c0xpbmthZ2USJi5p",
-            "bnRlcm9wLlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXF1ZXN0GicuaW50ZXJv",
-            "cC5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVzcG9uc2UaIZLbBB1pbnRlcm9w",
-            "LkNvbnRleHRMaW5rYWdlU2VydmljZUIpqgImUGxleHVzLkludGVyb3AuQXBw",
-            "cy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3RvMw=="));
+            "IAMoCRIXCgtjb250ZXh0X2lkcxgDIAMoCUICGAESIgoIY29udGV4dHMYBCAD",
+            "KAsyEC5pbnRlcm9wLkNvbnRleHQ6IJLbBBxpbnRlcm9wLlJlc3RvcmluZ0Fw",
+            "cEluc3RhbmNlIvgBCh5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVzcG9uc2US",
+            "XQoUY3JlYXRlZF9jb250ZXh0c19tYXAYASADKAsyPy5pbnRlcm9wLlJlc3Rv",
+            "cmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZS5DcmVhdGVkQ29udGV4dHNNYXBF",
+            "bnRyeRpLChdDcmVhdGVkQ29udGV4dHNNYXBFbnRyeRILCgNrZXkYASABKAkS",
+            "HwoFdmFsdWUYAiABKAsyEC5pbnRlcm9wLkNvbnRleHQ6AjgBOiqS2wQmaW50",
+            "ZXJvcC5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVzcG9uc2UqQQoUQ29udGV4",
+            "dExvYWRpbmdTdGF0dXMSDwoLSU5fUFJPR1JFU1MQABIKCgZGQUlMRUQQARIM",
+            "CghGSU5JU0hFRBACMtIFChVDb250ZXh0TGlua2FnZVNlcnZpY2USSAoTQ29u",
+            "dGV4dExvYWRlZFN0cmVhbRIQLmludGVyb3AuQ29udGV4dBodLmludGVyb3Au",
+            "Q29udGV4dExvYWRpbmdVcGRhdGUwARI5Cg1DcmVhdGVDb250ZXh0EhYuZ29v",
+            "Z2xlLnByb3RvYnVmLkVtcHR5GhAuaW50ZXJvcC5Db250ZXh0EkEKDkNyZWF0",
+            "ZUNvbnRleHQyEh0uaW50ZXJvcC5DcmVhdGVDb250ZXh0UmVxdWVzdBoQLmlu",
+            "dGVyb3AuQ29udGV4dBI3CgtKb2luQ29udGV4dBIQLmludGVyb3AuQ29udGV4",
+            "dBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRI8CgtHZXRDb250ZXh0cxIWLmdv",
+            "b2dsZS5wcm90b2J1Zi5FbXB0eRoVLmludGVyb3AuQ29udGV4dHNMaXN0EkIK",
+            "FEdldExpbmtlZEludm9jYXRpb25zEhAuaW50ZXJvcC5Db250ZXh0GhguaW50",
+            "ZXJvcC5JbnZvY2F0aW9uc0xpc3QSVAoXR2V0QWxsTGlua2VkSW52b2NhdGlv",
+            "bnMSFi5nb29nbGUucHJvdG9idWYuRW1wdHkaIS5pbnRlcm9wLkNvbnRleHRU",
+            "b0ludm9jYXRpb25zTGlzdBJSChZBcHBKb2luZWRDb250ZXh0U3RyZWFtEhYu",
+            "Z29vZ2xlLnByb3RvYnVmLkVtcHR5Gh4uaW50ZXJvcC5BcHBKb2luZWRDb250",
+            "ZXh0RXZlbnQwARJpChZSZXN0b3JlQ29udGV4dHNMaW5rYWdlEiYuaW50ZXJv",
+            "cC5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVxdWVzdBonLmludGVyb3AuUmVz",
+            "dG9yZUNvbnRleHRzTGlua2FnZVJlc3BvbnNlGiGS2wQdaW50ZXJvcC5Db250",
+            "ZXh0TGlua2FnZVNlcnZpY2VCKaoCJlBsZXh1cy5JbnRlcm9wLkFwcHMuSW50",
+            "ZXJuYWwuR2VuZXJhdGVkYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingStatus), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -112,7 +113,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList), global::Plexus.Interop.Apps.Internal.Generated.ContextToInvocationsList.Parser, new[]{ "Contexts" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent), global::Plexus.Interop.Apps.Internal.Generated.AppJoinedContextEvent.Parser, new[]{ "Context", "AppInstanceId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest), global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageRequest.Parser, new[]{ "Apps" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance), global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance.Parser, new[]{ "AppInstanceId", "AppIds", "ContextIds" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance), global::Plexus.Interop.Apps.Internal.Generated.RestoringAppInstance.Parser, new[]{ "AppInstanceId", "AppIds", "ContextIds", "Contexts" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse), global::Plexus.Interop.Apps.Internal.Generated.RestoreContextsLinkageResponse.Parser, new[]{ "CreatedContextsMap" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, })
           }));
     }
@@ -2318,6 +2319,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       appInstanceId_ = other.appInstanceId_ != null ? other.appInstanceId_.Clone() : null;
       appIds_ = other.appIds_.Clone();
       contextIds_ = other.contextIds_.Clone();
+      contexts_ = other.contexts_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2355,10 +2357,22 @@ namespace Plexus.Interop.Apps.Internal.Generated {
     private static readonly pb::FieldCodec<string> _repeated_contextIds_codec
         = pb::FieldCodec.ForString(26);
     private readonly pbc::RepeatedField<string> contextIds_ = new pbc::RepeatedField<string>();
+    [global::System.ObsoleteAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<string> ContextIds {
       get { return contextIds_; }
+    }
+
+    /// <summary>Field number for the "contexts" field.</summary>
+    public const int ContextsFieldNumber = 4;
+    private static readonly pb::FieldCodec<global::Plexus.Interop.Apps.Internal.Generated.Context> _repeated_contexts_codec
+        = pb::FieldCodec.ForMessage(34, global::Plexus.Interop.Apps.Internal.Generated.Context.Parser);
+    private readonly pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.Context> contexts_ = new pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.Context>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::Plexus.Interop.Apps.Internal.Generated.Context> Contexts {
+      get { return contexts_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2379,6 +2393,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (!object.Equals(AppInstanceId, other.AppInstanceId)) return false;
       if(!appIds_.Equals(other.appIds_)) return false;
       if(!contextIds_.Equals(other.contextIds_)) return false;
+      if(!contexts_.Equals(other.contexts_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2389,6 +2404,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (appInstanceId_ != null) hash ^= AppInstanceId.GetHashCode();
       hash ^= appIds_.GetHashCode();
       hash ^= contextIds_.GetHashCode();
+      hash ^= contexts_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2413,6 +2429,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       appIds_.WriteTo(output, _repeated_appIds_codec);
       contextIds_.WriteTo(output, _repeated_contextIds_codec);
+      contexts_.WriteTo(output, _repeated_contexts_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2429,6 +2446,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       appIds_.WriteTo(ref output, _repeated_appIds_codec);
       contextIds_.WriteTo(ref output, _repeated_contextIds_codec);
+      contexts_.WriteTo(ref output, _repeated_contexts_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2444,6 +2462,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       size += appIds_.CalculateSize(_repeated_appIds_codec);
       size += contextIds_.CalculateSize(_repeated_contextIds_codec);
+      size += contexts_.CalculateSize(_repeated_contexts_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -2464,6 +2483,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       appIds_.Add(other.appIds_);
       contextIds_.Add(other.contextIds_);
+      contexts_.Add(other.contexts_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -2494,6 +2514,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             contextIds_.AddEntriesFrom(input, _repeated_contextIds_codec);
             break;
           }
+          case 34: {
+            contexts_.AddEntriesFrom(input, _repeated_contexts_codec);
+            break;
+          }
         }
       }
     #endif
@@ -2522,6 +2546,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
           case 26: {
             contextIds_.AddEntriesFrom(ref input, _repeated_contextIds_codec);
+            break;
+          }
+          case 34: {
+            contexts_.AddEntriesFrom(ref input, _repeated_contexts_codec);
             break;
           }
         }
