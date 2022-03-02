@@ -60,12 +60,12 @@ namespace Plexus.Interop.Apps.Internal.Services
         {
             return Task.Factory.StartNew(() =>
             {
-                var newContext = _contextsSet.CreateContext();
+                var newContext = _contextsSet.CreateContext(request.Kind, callContext.ConsumerApplicationInstanceId);
                 foreach (var appConnection in _appLifecycleManager.GetAppInstanceConnections(callContext.ConsumerApplicationInstanceId))
                 {
                     newContext.AppConnected(appConnection.Info);
                 }
-                return new ContextDto { Id = newContext.Id };
+                return ConvertContextToProto(newContext, callContext);
             });
         }
 
@@ -133,7 +133,7 @@ namespace Plexus.Interop.Apps.Internal.Services
                 var allContexts = _contextsSet.GetContextsOf(callContext.ConsumerApplicationInstanceId);
                 return new ContextsList
                 {
-                    Contexts = { allContexts.Select(context => new ContextDto { Id = context.Id }) }
+                    Contexts = { allContexts.Select(context => ConvertContextToProto(context, callContext)) }
                 };
             });
         }
@@ -161,7 +161,7 @@ namespace Plexus.Interop.Apps.Internal.Services
                 {
                     Contexts = { allContexts.Select(context => new ContextToInvocations
                     {
-                        Context = new ContextDto {Id = context.Id},
+                        Context = ConvertContextToProto(context, callContext),
                         Invocations = CreateInvocationsList(context),
                     })}
                 };
@@ -258,15 +258,15 @@ namespace Plexus.Interop.Apps.Internal.Services
             }
         }
 
-        public Task AppJoinedContextStream(Empty request, IWritableChannel<AppJoinedContextEvent> responseStream, MethodCallContext context)
+        public Task AppJoinedContextStream(Empty request, IWritableChannel<AppJoinedContextEvent> responseStream, MethodCallContext callContext)
         {
             return _contextsSet.AppContextBindingEvents
                 .Select(ev => new AppJoinedContextEvent
                 {
                     AppInstanceId = ev.AppInstanceId.ToProto(),
-                    Context = new ContextDto { Id = ev.Context.Id }
+                    Context = ConvertContextToProto(ev.Context, callContext)
                 })
-                .PipeAsync(responseStream, context.CancellationToken);
+                .PipeAsync(responseStream, callContext.CancellationToken);
         }
 
         public Task<RestoreContextsLinkageResponse> RestoreContextsLinkage(RestoreContextsLinkageRequest request, MethodCallContext callContext)
@@ -276,26 +276,36 @@ namespace Plexus.Interop.Apps.Internal.Services
                 var newCreatedContexts = new Dictionary<string, Context>();
                 foreach (var restoringAppInstance in request.Apps)
                 {
-                    foreach (var contextId in restoringAppInstance.ContextIds)
-                    {
-                        if (!newCreatedContexts.TryGetValue(contextId, out var context))
-                        {
-                            context = _contextsSet.CreateContext();
-                            newCreatedContexts[contextId] = context;
-                        }
+                    var contexts = restoringAppInstance.Contexts.Count > 0
+                        ? restoringAppInstance.Contexts
+                        : restoringAppInstance.ContextIds.Select(id => new ContextDto { Id = id });
 
-                        context.AppLaunched(restoringAppInstance.AppInstanceId.ToUniqueId(),
-                            restoringAppInstance.AppIds);
+                    foreach (var context in contexts)
+                    {
+                        if (!newCreatedContexts.TryGetValue(context.Id, out var newContext))
+                        {
+                            newContext = _contextsSet.CreateContext(context.Kind, context.OwnerAppInstanceId.ToUniqueId());
+                            newCreatedContexts[context.Id] = newContext;
+                        }
+                        newContext.AppLaunched(restoringAppInstance.AppInstanceId.ToUniqueId(), restoringAppInstance.AppIds);
                     }
                 }
 
                 var response = new RestoreContextsLinkageResponse();
                 foreach (var pair in newCreatedContexts)
                 {
-                    response.CreatedContextsMap[pair.Key] = new ContextDto { Id = pair.Value.Id };
+                    response.CreatedContextsMap[pair.Key] = ConvertContextToProto(pair.Value, callContext);
                 }
                 return response;
             });
         }
+
+        private static ContextDto ConvertContextToProto(Context context, MethodCallContext callContext) => new ContextDto
+        {
+            Id = context.Id,
+            Own = context.OwnerAppInstanceId == callContext.ConsumerApplicationInstanceId,
+            Kind = context.Kind,
+            OwnerAppInstanceId = context.OwnerAppInstanceId.ToProto()
+        };
     }
 }
