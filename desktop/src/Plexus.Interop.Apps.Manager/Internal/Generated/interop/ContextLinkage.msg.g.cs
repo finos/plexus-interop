@@ -44,66 +44,67 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             "Z2xlL3Byb3RvYnVmL2VtcHR5LnByb3RvGhdpbnRlcm9wL3VuaXF1ZV9pZC5w",
             "cm90bxonaW50ZXJvcC9hcHBfY29ubmVjdGlvbl9kZXNjcmlwdG9yLnByb3Rv",
             "GiJpbnRlcm9wL2FwcF9tZXRhZGF0YV9zZXJ2aWNlLnByb3RvGhVpbnRlcm9w",
-            "L29wdGlvbnMucHJvdG8iRQoHQ29udGV4dBIKCgJpZBgBIAEoCRILCgNvd24Y",
-            "AiABKAgSDAoEa2luZBgDIAEoCToTktsED2ludGVyb3AuQ29udGV4dCJMCgxD",
-            "b250ZXh0c0xpc3QSIgoIY29udGV4dHMYASADKAsyEC5pbnRlcm9wLkNvbnRl",
-            "eHQ6GJLbBBRpbnRlcm9wLkNvbnRleHRzTGlzdCJGChRDcmVhdGVDb250ZXh0",
-            "UmVxdWVzdBIMCgRraW5kGAEgASgJOiCS2wQcaW50ZXJvcC5DcmVhdGVDb250",
-            "ZXh0UmVxdWVzdCLrAQoUQ29udGV4dExvYWRpbmdVcGRhdGUSLQoGc3RhdHVz",
-            "GAEgASgOMh0uaW50ZXJvcC5Db250ZXh0TG9hZGluZ1N0YXR1cxJAChZsb2Fk",
-            "ZWRfYXBwX2Rlc2NyaXB0b3JzGAIgAygLMiAuaW50ZXJvcC5BcHBDb25uZWN0",
-            "aW9uRGVzY3JpcHRvchJAChZmYWlsZWRfYXBwX2Rlc2NyaXB0b3JzGAMgAygL",
-            "MiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvcjogktsEHGludGVy",
-            "b3AuQ29udGV4dExvYWRpbmdVcGRhdGUiiQEKDUludm9jYXRpb25SZWYSKwoI",
-            "YXBwX2luZm8YASABKAsyGS5pbnRlcm9wLkFwcE1ldGFtb2RlbEluZm8SMAoG",
-            "dGFyZ2V0GAIgASgLMiAuaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRv",
-            "cjoZktsEFWludGVyb3AuSW52b2NhdGlvblJlZiJbCg9JbnZvY2F0aW9uc0xp",
-            "c3QSKwoLaW52b2NhdGlvbnMYASADKAsyFi5pbnRlcm9wLkludm9jYXRpb25S",
-            "ZWY6G5LbBBdpbnRlcm9wLkludm9jYXRpb25zTGlzdCKKAQoUQ29udGV4dFRv",
-            "SW52b2NhdGlvbnMSIQoHY29udGV4dBgBIAEoCzIQLmludGVyb3AuQ29udGV4",
-            "dBItCgtpbnZvY2F0aW9ucxgCIAEoCzIYLmludGVyb3AuSW52b2NhdGlvbnNM",
-            "aXN0OiCS2wQcaW50ZXJvcC5Db250ZXh0VG9JbnZvY2F0aW9ucyJxChhDb250",
-            "ZXh0VG9JbnZvY2F0aW9uc0xpc3QSLwoIY29udGV4dHMYASADKAsyHS5pbnRl",
-            "cm9wLkNvbnRleHRUb0ludm9jYXRpb25zOiSS2wQgaW50ZXJvcC5Db250ZXh0",
-            "VG9JbnZvY2F0aW9uc0xpc3QiiQEKFUFwcEpvaW5lZENvbnRleHRFdmVudBIh",
-            "Cgdjb250ZXh0GAEgASgLMhAuaW50ZXJvcC5Db250ZXh0EioKD2FwcF9pbnN0",
-            "YW5jZV9pZBgCIAEoCzIRLmludGVyb3AuVW5pcXVlSWQ6IZLbBB1pbnRlcm9w",
-            "LkFwcEpvaW5lZENvbnRleHRFdmVudCJ3Ch1SZXN0b3JlQ29udGV4dHNMaW5r",
-            "YWdlUmVxdWVzdBIrCgRhcHBzGAEgAygLMh0uaW50ZXJvcC5SZXN0b3JpbmdB",
-            "cHBJbnN0YW5jZTopktsEJWludGVyb3AuUmVzdG9yZUNvbnRleHRzTGlua2Fn",
-            "ZVJlcXVlc3QisgEKFFJlc3RvcmluZ0FwcEluc3RhbmNlEioKD2FwcF9pbnN0",
-            "YW5jZV9pZBgBIAEoCzIRLmludGVyb3AuVW5pcXVlSWQSDwoHYXBwX2lkcxgC",
-            "IAMoCRIXCgtjb250ZXh0X2lkcxgDIAMoCUICGAESIgoIY29udGV4dHMYBCAD",
-            "KAsyEC5pbnRlcm9wLkNvbnRleHQ6IJLbBBxpbnRlcm9wLlJlc3RvcmluZ0Fw",
-            "cEluc3RhbmNlIvgBCh5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVzcG9uc2US",
-            "XQoUY3JlYXRlZF9jb250ZXh0c19tYXAYASADKAsyPy5pbnRlcm9wLlJlc3Rv",
-            "cmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZS5DcmVhdGVkQ29udGV4dHNNYXBF",
-            "bnRyeRpLChdDcmVhdGVkQ29udGV4dHNNYXBFbnRyeRILCgNrZXkYASABKAkS",
-            "HwoFdmFsdWUYAiABKAsyEC5pbnRlcm9wLkNvbnRleHQ6AjgBOiqS2wQmaW50",
-            "ZXJvcC5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVzcG9uc2UqQQoUQ29udGV4",
-            "dExvYWRpbmdTdGF0dXMSDwoLSU5fUFJPR1JFU1MQABIKCgZGQUlMRUQQARIM",
-            "CghGSU5JU0hFRBACMtIFChVDb250ZXh0TGlua2FnZVNlcnZpY2USSAoTQ29u",
-            "dGV4dExvYWRlZFN0cmVhbRIQLmludGVyb3AuQ29udGV4dBodLmludGVyb3Au",
-            "Q29udGV4dExvYWRpbmdVcGRhdGUwARI5Cg1DcmVhdGVDb250ZXh0EhYuZ29v",
-            "Z2xlLnByb3RvYnVmLkVtcHR5GhAuaW50ZXJvcC5Db250ZXh0EkEKDkNyZWF0",
-            "ZUNvbnRleHQyEh0uaW50ZXJvcC5DcmVhdGVDb250ZXh0UmVxdWVzdBoQLmlu",
-            "dGVyb3AuQ29udGV4dBI3CgtKb2luQ29udGV4dBIQLmludGVyb3AuQ29udGV4",
-            "dBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRI8CgtHZXRDb250ZXh0cxIWLmdv",
-            "b2dsZS5wcm90b2J1Zi5FbXB0eRoVLmludGVyb3AuQ29udGV4dHNMaXN0EkIK",
-            "FEdldExpbmtlZEludm9jYXRpb25zEhAuaW50ZXJvcC5Db250ZXh0GhguaW50",
-            "ZXJvcC5JbnZvY2F0aW9uc0xpc3QSVAoXR2V0QWxsTGlua2VkSW52b2NhdGlv",
-            "bnMSFi5nb29nbGUucHJvdG9idWYuRW1wdHkaIS5pbnRlcm9wLkNvbnRleHRU",
-            "b0ludm9jYXRpb25zTGlzdBJSChZBcHBKb2luZWRDb250ZXh0U3RyZWFtEhYu",
-            "Z29vZ2xlLnByb3RvYnVmLkVtcHR5Gh4uaW50ZXJvcC5BcHBKb2luZWRDb250",
-            "ZXh0RXZlbnQwARJpChZSZXN0b3JlQ29udGV4dHNMaW5rYWdlEiYuaW50ZXJv",
-            "cC5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVxdWVzdBonLmludGVyb3AuUmVz",
-            "dG9yZUNvbnRleHRzTGlua2FnZVJlc3BvbnNlGiGS2wQdaW50ZXJvcC5Db250",
-            "ZXh0TGlua2FnZVNlcnZpY2VCKaoCJlBsZXh1cy5JbnRlcm9wLkFwcHMuSW50",
-            "ZXJuYWwuR2VuZXJhdGVkYgZwcm90bzM="));
+            "L29wdGlvbnMucHJvdG8idwoHQ29udGV4dBIKCgJpZBgBIAEoCRILCgNvd24Y",
+            "AiABKAgSDAoEa2luZBgDIAEoCRIwChVvd25lcl9hcHBfaW5zdGFuY2VfaWQY",
+            "BCABKAsyES5pbnRlcm9wLlVuaXF1ZUlkOhOS2wQPaW50ZXJvcC5Db250ZXh0",
+            "IkwKDENvbnRleHRzTGlzdBIiCghjb250ZXh0cxgBIAMoCzIQLmludGVyb3Au",
+            "Q29udGV4dDoYktsEFGludGVyb3AuQ29udGV4dHNMaXN0IkYKFENyZWF0ZUNv",
+            "bnRleHRSZXF1ZXN0EgwKBGtpbmQYASABKAk6IJLbBBxpbnRlcm9wLkNyZWF0",
+            "ZUNvbnRleHRSZXF1ZXN0IusBChRDb250ZXh0TG9hZGluZ1VwZGF0ZRItCgZz",
+            "dGF0dXMYASABKA4yHS5pbnRlcm9wLkNvbnRleHRMb2FkaW5nU3RhdHVzEkAK",
+            "FmxvYWRlZF9hcHBfZGVzY3JpcHRvcnMYAiADKAsyIC5pbnRlcm9wLkFwcENv",
+            "bm5lY3Rpb25EZXNjcmlwdG9yEkAKFmZhaWxlZF9hcHBfZGVzY3JpcHRvcnMY",
+            "AyADKAsyIC5pbnRlcm9wLkFwcENvbm5lY3Rpb25EZXNjcmlwdG9yOiCS2wQc",
+            "aW50ZXJvcC5Db250ZXh0TG9hZGluZ1VwZGF0ZSKJAQoNSW52b2NhdGlvblJl",
+            "ZhIrCghhcHBfaW5mbxgBIAEoCzIZLmludGVyb3AuQXBwTWV0YW1vZGVsSW5m",
+            "bxIwCgZ0YXJnZXQYAiABKAsyIC5pbnRlcm9wLkFwcENvbm5lY3Rpb25EZXNj",
+            "cmlwdG9yOhmS2wQVaW50ZXJvcC5JbnZvY2F0aW9uUmVmIlsKD0ludm9jYXRp",
+            "b25zTGlzdBIrCgtpbnZvY2F0aW9ucxgBIAMoCzIWLmludGVyb3AuSW52b2Nh",
+            "dGlvblJlZjobktsEF2ludGVyb3AuSW52b2NhdGlvbnNMaXN0IooBChRDb250",
+            "ZXh0VG9JbnZvY2F0aW9ucxIhCgdjb250ZXh0GAEgASgLMhAuaW50ZXJvcC5D",
+            "b250ZXh0Ei0KC2ludm9jYXRpb25zGAIgASgLMhguaW50ZXJvcC5JbnZvY2F0",
+            "aW9uc0xpc3Q6IJLbBBxpbnRlcm9wLkNvbnRleHRUb0ludm9jYXRpb25zInEK",
+            "GENvbnRleHRUb0ludm9jYXRpb25zTGlzdBIvCghjb250ZXh0cxgBIAMoCzId",
+            "LmludGVyb3AuQ29udGV4dFRvSW52b2NhdGlvbnM6JJLbBCBpbnRlcm9wLkNv",
+            "bnRleHRUb0ludm9jYXRpb25zTGlzdCKJAQoVQXBwSm9pbmVkQ29udGV4dEV2",
+            "ZW50EiEKB2NvbnRleHQYASABKAsyEC5pbnRlcm9wLkNvbnRleHQSKgoPYXBw",
+            "X2luc3RhbmNlX2lkGAIgASgLMhEuaW50ZXJvcC5VbmlxdWVJZDohktsEHWlu",
+            "dGVyb3AuQXBwSm9pbmVkQ29udGV4dEV2ZW50IncKHVJlc3RvcmVDb250ZXh0",
+            "c0xpbmthZ2VSZXF1ZXN0EisKBGFwcHMYASADKAsyHS5pbnRlcm9wLlJlc3Rv",
+            "cmluZ0FwcEluc3RhbmNlOimS2wQlaW50ZXJvcC5SZXN0b3JlQ29udGV4dHNM",
+            "aW5rYWdlUmVxdWVzdCKyAQoUUmVzdG9yaW5nQXBwSW5zdGFuY2USKgoPYXBw",
+            "X2luc3RhbmNlX2lkGAEgASgLMhEuaW50ZXJvcC5VbmlxdWVJZBIPCgdhcHBf",
+            "aWRzGAIgAygJEhcKC2NvbnRleHRfaWRzGAMgAygJQgIYARIiCghjb250ZXh0",
+            "cxgEIAMoCzIQLmludGVyb3AuQ29udGV4dDogktsEHGludGVyb3AuUmVzdG9y",
+            "aW5nQXBwSW5zdGFuY2Ui+AEKHlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNw",
+            "b25zZRJdChRjcmVhdGVkX2NvbnRleHRzX21hcBgBIAMoCzI/LmludGVyb3Au",
+            "UmVzdG9yZUNvbnRleHRzTGlua2FnZVJlc3BvbnNlLkNyZWF0ZWRDb250ZXh0",
+            "c01hcEVudHJ5GksKF0NyZWF0ZWRDb250ZXh0c01hcEVudHJ5EgsKA2tleRgB",
+            "IAEoCRIfCgV2YWx1ZRgCIAEoCzIQLmludGVyb3AuQ29udGV4dDoCOAE6KpLb",
+            "BCZpbnRlcm9wLlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXNwb25zZSpBChRD",
+            "b250ZXh0TG9hZGluZ1N0YXR1cxIPCgtJTl9QUk9HUkVTUxAAEgoKBkZBSUxF",
+            "RBABEgwKCEZJTklTSEVEEAIy0gUKFUNvbnRleHRMaW5rYWdlU2VydmljZRJI",
+            "ChNDb250ZXh0TG9hZGVkU3RyZWFtEhAuaW50ZXJvcC5Db250ZXh0Gh0uaW50",
+            "ZXJvcC5Db250ZXh0TG9hZGluZ1VwZGF0ZTABEjkKDUNyZWF0ZUNvbnRleHQS",
+            "Fi5nb29nbGUucHJvdG9idWYuRW1wdHkaEC5pbnRlcm9wLkNvbnRleHQSQQoO",
+            "Q3JlYXRlQ29udGV4dDISHS5pbnRlcm9wLkNyZWF0ZUNvbnRleHRSZXF1ZXN0",
+            "GhAuaW50ZXJvcC5Db250ZXh0EjcKC0pvaW5Db250ZXh0EhAuaW50ZXJvcC5D",
+            "b250ZXh0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5EjwKC0dldENvbnRleHRz",
+            "EhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5GhUuaW50ZXJvcC5Db250ZXh0c0xp",
+            "c3QSQgoUR2V0TGlua2VkSW52b2NhdGlvbnMSEC5pbnRlcm9wLkNvbnRleHQa",
+            "GC5pbnRlcm9wLkludm9jYXRpb25zTGlzdBJUChdHZXRBbGxMaW5rZWRJbnZv",
+            "Y2F0aW9ucxIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRohLmludGVyb3AuQ29u",
+            "dGV4dFRvSW52b2NhdGlvbnNMaXN0ElIKFkFwcEpvaW5lZENvbnRleHRTdHJl",
+            "YW0SFi5nb29nbGUucHJvdG9idWYuRW1wdHkaHi5pbnRlcm9wLkFwcEpvaW5l",
+            "ZENvbnRleHRFdmVudDABEmkKFlJlc3RvcmVDb250ZXh0c0xpbmthZ2USJi5p",
+            "bnRlcm9wLlJlc3RvcmVDb250ZXh0c0xpbmthZ2VSZXF1ZXN0GicuaW50ZXJv",
+            "cC5SZXN0b3JlQ29udGV4dHNMaW5rYWdlUmVzcG9uc2UaIZLbBB1pbnRlcm9w",
+            "LkNvbnRleHRMaW5rYWdlU2VydmljZUIpqgImUGxleHVzLkludGVyb3AuQXBw",
+            "cy5JbnRlcm5hbC5HZW5lcmF0ZWRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppConnectionDescriptorReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.AppMetadataServiceReflection.Descriptor, global::Plexus.Interop.Apps.Internal.Generated.OptionsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingStatus), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.Context), global::Plexus.Interop.Apps.Internal.Generated.Context.Parser, new[]{ "Id", "Own", "Kind" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.Context), global::Plexus.Interop.Apps.Internal.Generated.Context.Parser, new[]{ "Id", "Own", "Kind", "OwnerAppInstanceId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextsList), global::Plexus.Interop.Apps.Internal.Generated.ContextsList.Parser, new[]{ "Contexts" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest), global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest.Parser, new[]{ "Kind" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate), global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate.Parser, new[]{ "Status", "LoadedAppDescriptors", "FailedAppDescriptors" }, null, null, null, null),
@@ -176,6 +177,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       id_ = other.id_;
       own_ = other.own_;
       kind_ = other.kind_;
+      ownerAppInstanceId_ = other.ownerAppInstanceId_ != null ? other.ownerAppInstanceId_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -221,6 +223,18 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
     }
 
+    /// <summary>Field number for the "owner_app_instance_id" field.</summary>
+    public const int OwnerAppInstanceIdFieldNumber = 4;
+    private global::Plexus.Interop.Apps.Internal.Generated.UniqueId ownerAppInstanceId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Plexus.Interop.Apps.Internal.Generated.UniqueId OwnerAppInstanceId {
+      get { return ownerAppInstanceId_; }
+      set {
+        ownerAppInstanceId_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -239,6 +253,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Id != other.Id) return false;
       if (Own != other.Own) return false;
       if (Kind != other.Kind) return false;
+      if (!object.Equals(OwnerAppInstanceId, other.OwnerAppInstanceId)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -249,6 +264,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       if (Id.Length != 0) hash ^= Id.GetHashCode();
       if (Own != false) hash ^= Own.GetHashCode();
       if (Kind.Length != 0) hash ^= Kind.GetHashCode();
+      if (ownerAppInstanceId_ != null) hash ^= OwnerAppInstanceId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -279,6 +295,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(26);
         output.WriteString(Kind);
       }
+      if (ownerAppInstanceId_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(OwnerAppInstanceId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -301,6 +321,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
         output.WriteRawTag(26);
         output.WriteString(Kind);
       }
+      if (ownerAppInstanceId_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(OwnerAppInstanceId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -319,6 +343,9 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (Kind.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Kind);
+      }
+      if (ownerAppInstanceId_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(OwnerAppInstanceId);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -340,6 +367,12 @@ namespace Plexus.Interop.Apps.Internal.Generated {
       }
       if (other.Kind.Length != 0) {
         Kind = other.Kind;
+      }
+      if (other.ownerAppInstanceId_ != null) {
+        if (ownerAppInstanceId_ == null) {
+          OwnerAppInstanceId = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+        }
+        OwnerAppInstanceId.MergeFrom(other.OwnerAppInstanceId);
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -368,6 +401,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
             Kind = input.ReadString();
             break;
           }
+          case 34: {
+            if (ownerAppInstanceId_ == null) {
+              OwnerAppInstanceId = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+            }
+            input.ReadMessage(OwnerAppInstanceId);
+            break;
+          }
         }
       }
     #endif
@@ -393,6 +433,13 @@ namespace Plexus.Interop.Apps.Internal.Generated {
           }
           case 26: {
             Kind = input.ReadString();
+            break;
+          }
+          case 34: {
+            if (ownerAppInstanceId_ == null) {
+              OwnerAppInstanceId = new global::Plexus.Interop.Apps.Internal.Generated.UniqueId();
+            }
+            input.ReadMessage(OwnerAppInstanceId);
             break;
           }
         }
