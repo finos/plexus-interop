@@ -144,7 +144,7 @@ namespace Plexus.Interop.Testing.Generated {
 		
 		public partial interface IContextLinkageServiceProxy:
 			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IContextLoadedStreamProxy,
-			global::Plexus.Interop.Testing.Generated.ContextLinkageService.ICreateContextProxy,
+			global::Plexus.Interop.Testing.Generated.ContextLinkageService.ICreateContext2Proxy,
 			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IJoinContextProxy,
 			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IGetContextsProxy,
 			global::Plexus.Interop.Testing.Generated.ContextLinkageService.IGetLinkedInvocationsProxy,
@@ -165,8 +165,8 @@ namespace Plexus.Interop.Testing.Generated {
 				return _callInvoker.Call(Descriptor.ContextLoadedStreamMethod, request);
 			}
 			
-			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.Context> CreateContext(global::Google.Protobuf.WellKnownTypes.Empty request) {
-				return _callInvoker.Call(Descriptor.CreateContextMethod, request);
+			public IUnaryMethodCall<global::Plexus.Interop.Testing.Generated.Context> CreateContext2(global::Plexus.Interop.Testing.Generated.CreateContextRequest request) {
+				return _callInvoker.Call(Descriptor.CreateContext2Method, request);
 			}
 			
 			public IUnaryMethodCall<global::Google.Protobuf.WellKnownTypes.Empty> JoinContext(global::Plexus.Interop.Testing.Generated.Context request) {

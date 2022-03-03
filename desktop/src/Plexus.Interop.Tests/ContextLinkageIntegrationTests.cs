@@ -83,7 +83,7 @@ namespace Plexus.Interop
 
                 serverCreatedCount.ShouldBe(1);
 
-                var newContext = await client.ContextLinkageService.CreateContext(new Empty());
+                var newContext = await client.ContextLinkageService.CreateContext2(new CreateContextRequest());
                 var allContexts = await client.ContextLinkageService.GetContexts(new Empty());
 
                 allContexts.Contexts.Count.ShouldBe(1);
@@ -121,7 +121,7 @@ namespace Plexus.Interop
                 var client1 = CreateClient<EchoClient>();
                 await client1.ConnectAsync();
 
-                var newContext = await client1.ContextLinkageService.CreateContext(new Empty());
+                var newContext = await client1.ContextLinkageService.CreateContext2(new CreateContextRequest());
 
                 var contextStatusUpdateStream = client1.ContextLinkageService.ContextLoadedStream(newContext).ResponseStream;
 

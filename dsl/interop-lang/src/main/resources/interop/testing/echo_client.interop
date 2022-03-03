@@ -28,7 +28,7 @@ application EchoClient {
 
 	consumes interop.testing.GreetingService from interop.testing.* { Hello; } 
 
-	consumes .interop.AppLifecycleService from interop.AppLifecycleManager { GetConnections; GetConnectionsStream; }
+	consumes interop.AppLifecycleService from interop.AppLifecycleManager { GetConnections; GetConnectionsStream; }
 		
-	consumes .interop.ContextLinkageService { ContextLoadedStream; CreateContext; JoinContext; GetContexts; GetLinkedInvocations; GetAllLinkedInvocations; }
+	consumes interop.ContextLinkageService { ContextLoadedStream; CreateContext2; JoinContext; GetContexts; GetLinkedInvocations; GetAllLinkedInvocations; }
 }
