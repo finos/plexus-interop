@@ -17,7 +17,7 @@
 
 syntax = "proto3";
 
-package plexus.interop.testing;
+package interop.testing;
 
 service EchoService {
 	rpc Unary (EchoRequest) returns (EchoRequest);

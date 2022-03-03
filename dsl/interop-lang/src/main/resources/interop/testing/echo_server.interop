@@ -15,27 +15,27 @@
 // limitations under the License.
 //
 
-package plexus.interop.testing;
+package interop.testing;
 
-import "plexus/interop/testing/echo_service.proto";
-import "plexus/interop/testing/echo_service_options.proto";
-import "plexus/interop/testing/greeting_service.proto";
+import "interop/testing/echo_service.proto";
+import "interop/testing/echo_service_options.proto";
+import "interop/testing/greeting_service.proto";
 
 application EchoServer {
 
-    consumes plexus.interop.testing.EchoService from plexus.interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
+    consumes interop.testing.EchoService from interop.testing.* { Unary; ServerStreaming; ClientStreaming; DuplexStreaming; }
 
-	consumes plexus.interop.testing.GreetingService from plexus.interop.testing.* { Hello; } 
+	consumes interop.testing.GreetingService from interop.testing.* { Hello; } 
 
-	provides plexus.interop.testing.EchoService to plexus.interop.testing.* {
+	provides interop.testing.EchoService to interop.testing.* {
 		option title = "Sample Echo Service";
-		Unary [title = "Sample Unary Method", (plexus.interop.testing.string_option)="some string", (plexus.interop.testing.enum_option)=VALUE_TWO];
+		Unary [title = "Sample Unary Method", (interop.testing.string_option)="some string", (interop.testing.enum_option)=VALUE_TWO];
 		ServerStreaming [title = "Sample Server Streaming Method"];
 		ClientStreaming [title = "Sample Client Streaming Method"]; 
 		DuplexStreaming [title = "Sample Duplex Streaming Method"]; 
 	}
 
-	provides plexus.interop.testing.GreetingService to plexus.interop.testing.* { Hello; }
-	provides plexus.interop.testing.GreetingService as AlwaysLaunchGreetingService to plexus.interop.testing.* { Hello [ launch_on_call=ALWAYS ]; }
-	provides plexus.interop.testing.GreetingService as NeverLaunchGreetingService to plexus.interop.testing.* { Hello [ launch_on_call=NEVER ]; }
+	provides interop.testing.GreetingService to interop.testing.* { Hello; }
+	provides interop.testing.GreetingService as AlwaysLaunchGreetingService to interop.testing.* { Hello [ launch_on_call=ALWAYS ]; }
+	provides interop.testing.GreetingService as NeverLaunchGreetingService to interop.testing.* { Hello [ launch_on_call=NEVER ]; }
 }

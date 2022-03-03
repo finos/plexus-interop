@@ -17,10 +17,10 @@
 
 syntax = "proto2";
 
-package plexus.interop.testing;
+package interop.testing;
 
 import "interop/descriptor.proto";
-import "plexus/interop/testing/echo_service.proto";
+import "interop/testing/echo_service.proto";
 
 extend .interop.ProvidedMethodOptions {
 	optional string string_option = 1500;
