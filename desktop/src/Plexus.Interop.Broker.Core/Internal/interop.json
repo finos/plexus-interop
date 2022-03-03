@@ -1731,7 +1731,15 @@
 	            },
 	            "CreateContext": {
 	              "requestType": "google.protobuf.Empty",
-	              "responseType": "Context"
+	              "responseType": "Context",
+	              "options": {
+	                "deprecated": true
+	              },
+	              "parsedOptions": [
+	                {
+	                  "deprecated": true
+	                }
+	              ]
 	            },
 	            "CreateContext2": {
 	              "requestType": "CreateContextRequest",
@@ -1927,7 +1935,13 @@
 					"name": "CreateContext",
 					"request": "google.protobuf.Empty",
 					"response": "interop.Context",
-					"type": "Unary"
+					"type": "Unary",
+					"options": [
+						{
+							"id": "google.protobuf.MethodOptions.deprecated",
+							"value": "true"
+						}
+					]
 				},
 				{
 					"name": "CreateContext2",

@@ -96,22 +96,24 @@ message RestoreContextsLinkageResponse {
 
 service ContextLinkageService {
 	/**
-	* Stream, provides status of context loading, order and loading status of linked applications
+	* Stream, provides status of context loading, order and loading status of linked applications. Only context id required.
 	*/
 	rpc ContextLoadedStream(Context) returns (stream ContextLoadingUpdate);
 
 	/**
-	* Creates new context and associates running instance to it
+	* Deprecated, use CreateContext2 instead. Creates new context and associates running instance to it.
 	*/
-	rpc CreateContext(google.protobuf.Empty) returns (Context);
+	rpc CreateContext(google.protobuf.Empty) returns (Context) {
+		option deprecated = true;
+	};
 
 	/**
-	* Creates new context and associates running instance to it
+	* Creates new context and associates running instance to it.
 	*/
 	rpc CreateContext2(CreateContextRequest) returns (Context);
 
 	/**
-	* Associates running instance with provided context, useful if we want to link already running instance
+	* Associates running instance with provided context, useful if we want to link already running instance. Only context id required.
 	*/
 	rpc JoinContext(Context) returns (google.protobuf.Empty);
 
@@ -121,7 +123,7 @@ service ContextLinkageService {
 	rpc GetContexts(google.protobuf.Empty) returns (ContextsList);
 
 	/**
-	* Discover list of linked invocations for specified context
+	* Discover list of linked invocations for specified context. Only context id required.
 	*/
 	rpc GetLinkedInvocations(Context) returns (InvocationsList);
 
