@@ -264,7 +264,7 @@ namespace Plexus.Interop.Apps.Internal.Services
                 .Select(ev => new AppJoinedContextEvent
                 {
                     AppInstanceId = ev.AppInstanceId.ToProto(),
-                    Context = ConvertContextToProto(ev.Context, callContext.ConsumerApplicationInstanceId)
+                    Context = ConvertContextToProto(ev.Context, ev.AppInstanceId)
                 })
                 .PipeAsync(responseStream, callContext.CancellationToken);
         }
