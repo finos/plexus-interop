@@ -59,7 +59,9 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
         public Context(IAppLifecycleManager appLifecycleManager, string kind, UniqueId ownerAppInstanceId)
         {
             _appLifecycleManager = appLifecycleManager;
-            Kind = kind ?? Guid.NewGuid().ToString();
+            Kind = string.IsNullOrEmpty(kind)
+                ? Guid.NewGuid().ToString()
+                : kind;
             OwnerAppInstanceId = ownerAppInstanceId;
         }
 
