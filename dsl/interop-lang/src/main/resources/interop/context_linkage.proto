@@ -26,10 +26,16 @@ import "interop/app_metadata_service.proto";
 
 message Context {
 	string id = 1;
+	bool own = 2;
+	string kind = 3;
 }
 
 message ContextsList {
 	repeated Context contexts = 1;
+}
+
+message CreateContextRequest {
+	string kind = 1;
 }
 
 enum ContextLoadingStatus {
@@ -79,7 +85,8 @@ message RestoreContextsLinkageRequest {
 message RestoringAppInstance {
 	UniqueId app_instance_id = 1;
 	repeated string app_ids = 2;
-	repeated string context_ids = 3;
+	repeated string context_ids = 3 [deprecated=true];
+	repeated Context contexts = 4;
 }
 
 message RestoreContextsLinkageResponse {
@@ -88,17 +95,24 @@ message RestoreContextsLinkageResponse {
 
 service ContextLinkageService {
 	/**
-	* Stream, provides status of context loading, order and loading status of linked applications
+	* Stream, provides status of context loading, order and loading status of linked applications. Only context id required.
 	*/
 	rpc ContextLoadedStream(Context) returns (stream ContextLoadingUpdate);
 
 	/**
-	* Creates new context and associates running instance to it 
+	* Deprecated, use CreateContext2 instead. Creates new context and associates running instance to it.
 	*/
-	rpc CreateContext(google.protobuf.Empty) returns (Context);
+	rpc CreateContext(google.protobuf.Empty) returns (Context) {
+		option deprecated = true;
+	};
 
 	/**
-	* Associates running instance with provided context, useful if we want to link already running instance
+	* Creates new context and associates running instance to it.
+	*/
+	rpc CreateContext2(CreateContextRequest) returns (Context);
+
+	/**
+	* Associates running instance with provided context, useful if we want to link already running instance. Only context id required.
 	*/
 	rpc JoinContext(Context) returns (google.protobuf.Empty);
 
@@ -108,7 +122,7 @@ service ContextLinkageService {
 	rpc GetContexts(google.protobuf.Empty) returns (ContextsList);
 
 	/**
-	* Discover list of linked invocations for specified context
+	* Discover list of linked invocations for specified context. Only context id required.
 	*/
 	rpc GetLinkedInvocations(Context) returns (InvocationsList);
 

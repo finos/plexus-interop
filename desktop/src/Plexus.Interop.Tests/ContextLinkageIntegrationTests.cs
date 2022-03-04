@@ -29,7 +29,7 @@ namespace Plexus.Interop
 
     public class ContextLinkageIntegrationTests : BaseClientBrokerTestsSuite
     {
-        public ContextLinkageIntegrationTests(ITestOutputHelper output, TestBrokerFixture testBrokerFixture) 
+        public ContextLinkageIntegrationTests(ITestOutputHelper output, TestBrokerFixture testBrokerFixture)
             : base(output, testBrokerFixture)
         { }
 
@@ -83,7 +83,7 @@ namespace Plexus.Interop
 
                 serverCreatedCount.ShouldBe(1);
 
-                var newContext = await client.ContextLinkageService.CreateContext(new Empty());
+                var newContext = await client.ContextLinkageService.CreateContext2(new CreateContextRequest());
                 var allContexts = await client.ContextLinkageService.GetContexts(new Empty());
 
                 allContexts.Contexts.Count.ShouldBe(1);
@@ -121,7 +121,7 @@ namespace Plexus.Interop
                 var client1 = CreateClient<EchoClient>();
                 await client1.ConnectAsync();
 
-                var newContext = await client1.ContextLinkageService.CreateContext(new Empty());
+                var newContext = await client1.ContextLinkageService.CreateContext2(new CreateContextRequest());
 
                 var contextStatusUpdateStream = client1.ContextLinkageService.ContextLoadedStream(newContext).ResponseStream;
 
@@ -139,6 +139,26 @@ namespace Plexus.Interop
 
                 contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => descriptor.AppInstanceId.Equals(client1.ApplicationInstanceId));
                 contextLoadingUpdate.LoadedAppDescriptors.ShouldContain(descriptor => descriptor.AppInstanceId.Equals(client2.ApplicationInstanceId));
+            });
+        }
+
+        [Fact]
+        public void AtMostOneContextWithSpecifiedKind()
+        {
+            RunWith10SecTimeout(async () =>
+            {
+                var client = CreateClient<EchoClient>();
+                await client.ConnectAsync();
+
+                var ctx1 = await client.ContextLinkageService.CreateContext2(new CreateContextRequest());
+                ctx1.Kind.ShouldNotBeNullOrEmpty();
+
+                var ctx2 = await client.ContextLinkageService.CreateContext2(new CreateContextRequest());
+                var ctx3 = await client.ContextLinkageService.CreateContext2(new CreateContextRequest { Kind = ctx1.Kind });
+                ctx3.Kind.ShouldBe(ctx1.Kind);
+
+                var contexts = (await client.ContextLinkageService.GetContexts(new Empty())).Contexts;
+                contexts.OrderBy(x => x.Id).ShouldBe(new[] { ctx2, ctx3 }.OrderBy(x => x.Id));
             });
         }
     }

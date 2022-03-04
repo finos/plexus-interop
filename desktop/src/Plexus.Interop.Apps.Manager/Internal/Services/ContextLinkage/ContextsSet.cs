@@ -44,17 +44,22 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
         private readonly IAppLifecycleManager _appLifecycleManager;
         private readonly Subject<AppContextBindingEvent> _appContextBindingSubject = new Subject<AppContextBindingEvent>();
 
+        private readonly object _lock = new object();
+
+        private readonly Dictionary<UniqueId, HashSet<Context>> _contextsOfAppInstance = new Dictionary<UniqueId, HashSet<Context>>();
+        private readonly Dictionary<string, Context> _contexts = new Dictionary<string, Context>();
+
+        public IObservable<AppContextBindingEvent> AppContextBindingEvents { get; }
+
         public ContextsSet(IAppLifecycleManager appLifecycleManager)
         {
             _appLifecycleManager = appLifecycleManager;
             AppContextBindingEvents = _appContextBindingSubject.ObserveOn(TaskPoolScheduler.Default);
         }
 
-        public IObservable<AppContextBindingEvent> AppContextBindingEvents { get; }
-
-        public Context CreateContext()
+        public Context CreateContext(string kind, UniqueId ownerAppInstanceId)
         {
-            var context = new Context(_appLifecycleManager);
+            var context = new Context(_appLifecycleManager, kind, ownerAppInstanceId);
             _contexts[context.Id] = context;
             context.AppContextBindings.Subscribe(BindContext);
             return context;
@@ -71,11 +76,6 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
             }
             return new Context[0];
         }
-
-        private readonly object _lock = new object();
-
-        private readonly Dictionary<UniqueId, HashSet<Context>> _contextsOfAppInstance = new Dictionary<UniqueId, HashSet<Context>>();
-        private readonly Dictionary<string, Context> _contexts = new Dictionary<string, Context>();
 
         public Context GetContext(string contextId)
         {
@@ -98,6 +98,7 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
                     _contextsOfAppInstance[appInstanceId] = contexts;
                 }
 
+                contexts.RemoveWhere(x => x.Kind == context.Kind);
                 if (contexts.Add(context))
                 {
                     _appContextBindingSubject.OnNext(bindingEvent);

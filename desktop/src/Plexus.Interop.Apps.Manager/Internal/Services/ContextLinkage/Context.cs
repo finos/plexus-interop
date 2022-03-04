@@ -36,7 +36,6 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
-    using System.Reactive.Linq;
     using System.Reactive.Subjects;
 
     internal class Context
@@ -44,6 +43,8 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
         private readonly IAppLifecycleManager _appLifecycleManager;
 
         public string Id { get; } = Guid.NewGuid().ToString();
+        public string Kind { get; }
+        public UniqueId OwnerAppInstanceId { get; }
 
         private readonly object _lock = new object();
 
@@ -52,15 +53,17 @@ namespace Plexus.Interop.Apps.Internal.Services.ContextLinkage
         private readonly Subject<AppContextBindingEvent> _bindingSubject = new Subject<AppContextBindingEvent>();
         private readonly BehaviorSubject<Unit> _contextUpdatedSubject = new BehaviorSubject<Unit>(Unit.Default);
 
-        public Context(IAppLifecycleManager appLifecycleManager)
+        public IObservable<AppContextBindingEvent> AppContextBindings => _bindingSubject;
+        public IObservable<Unit> ContextUpdatedEventStream => _contextUpdatedSubject;
+
+        public Context(IAppLifecycleManager appLifecycleManager, string kind, UniqueId ownerAppInstanceId)
         {
             _appLifecycleManager = appLifecycleManager;
-            AppContextBindings = _bindingSubject;
-            ContextUpdatedEventStream = _contextUpdatedSubject;
+            Kind = string.IsNullOrEmpty(kind)
+                ? Guid.NewGuid().ToString()
+                : kind;
+            OwnerAppInstanceId = ownerAppInstanceId;
         }
-        
-        public IObservable<AppContextBindingEvent> AppContextBindings { get; }
-        public IObservable<Unit> ContextUpdatedEventStream { get; }
 
         public void AppLaunched(UniqueId appInstanceId, IEnumerable<string> appIds)
         {

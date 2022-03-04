@@ -20,7 +20,7 @@ import "interop/app_lifecycle_service.proto";
 import "interop/app_registration_service.proto";
 import "interop/context_linkage.proto";
 
-package plexus.interop.testing;
+package interop.testing;
 
 application TestAppLauncher {
 

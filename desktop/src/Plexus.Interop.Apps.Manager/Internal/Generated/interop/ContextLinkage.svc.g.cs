@@ -33,6 +33,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		public const string Id = "interop.ContextLinkageService";			
 		public const string ContextLoadedStreamMethodId = "ContextLoadedStream";
 		public const string CreateContextMethodId = "CreateContext";
+		public const string CreateContext2MethodId = "CreateContext2";
 		public const string JoinContextMethodId = "JoinContext";
 		public const string GetContextsMethodId = "GetContexts";
 		public const string GetLinkedInvocationsMethodId = "GetLinkedInvocations";
@@ -56,6 +57,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		
 		public partial interface ICreateContextProxy {
 			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext(global::Google.Protobuf.WellKnownTypes.Empty request);
+		}
+		
+		public partial interface ICreateContext2Proxy {
+			IUnaryMethodCall<global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext2(global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest request);
 		}
 		
 		public partial interface IJoinContextProxy {
@@ -90,6 +95,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			Task<global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context);
 		}
 		
+		public partial interface ICreateContext2Impl {
+			Task<global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext2(global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest request, MethodCallContext context);
+		}
+		
 		public partial interface IJoinContextImpl {
 			Task<global::Google.Protobuf.WellKnownTypes.Empty> JoinContext(global::Plexus.Interop.Apps.Internal.Generated.Context request, MethodCallContext context);
 		}
@@ -118,6 +127,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		
 			public ServerStreamingMethod<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate> ContextLoadedStreamMethod {get; private set; }
 			public UnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContextMethod {get; private set; }
+			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest, global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext2Method {get; private set; }
 			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Google.Protobuf.WellKnownTypes.Empty> JoinContextMethod {get; private set; }
 			public UnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList> GetContextsMethod {get; private set; }
 			public UnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList> GetLinkedInvocationsMethod {get; private set; }
@@ -128,6 +138,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			public Descriptor() {				
 				ContextLoadedStreamMethod = Method.ServerStreaming<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate>(Id, ContextLoadedStreamMethodId);
 				CreateContextMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.Context>(Id, CreateContextMethodId);
+				CreateContext2Method = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest, global::Plexus.Interop.Apps.Internal.Generated.Context>(Id, CreateContext2MethodId);
 				JoinContextMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Google.Protobuf.WellKnownTypes.Empty>(Id, JoinContextMethodId);
 				GetContextsMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList>(Id, GetContextsMethodId);
 				GetLinkedInvocationsMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList>(Id, GetLinkedInvocationsMethodId);
@@ -139,6 +150,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			public Descriptor(string alias) {
 				ContextLoadedStreamMethod = Method.ServerStreaming<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate>(Id, alias, ContextLoadedStreamMethodId);
 				CreateContextMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.Context>(Id, alias, CreateContextMethodId);
+				CreateContext2Method = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest, global::Plexus.Interop.Apps.Internal.Generated.Context>(Id, alias, CreateContext2MethodId);
 				JoinContextMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Google.Protobuf.WellKnownTypes.Empty>(Id, alias, JoinContextMethodId);
 				GetContextsMethod = Method.Unary<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList>(Id, alias, GetContextsMethodId);
 				GetLinkedInvocationsMethod = Method.Unary<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList>(Id, alias, GetLinkedInvocationsMethodId);
