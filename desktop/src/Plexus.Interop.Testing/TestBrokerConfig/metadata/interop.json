@@ -1539,10 +1539,6 @@
 	            "kind": {
 	              "type": "string",
 	              "id": 3
-	            },
-	            "ownerAppInstanceId": {
-	              "type": "UniqueId",
-	              "id": 4
 	            }
 	          }
 	        },

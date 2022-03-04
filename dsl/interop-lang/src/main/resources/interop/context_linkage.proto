@@ -28,7 +28,6 @@ message Context {
 	string id = 1;
 	bool own = 2;
 	string kind = 3;
-	UniqueId owner_app_instance_id = 4;
 }
 
 message ContextsList {
