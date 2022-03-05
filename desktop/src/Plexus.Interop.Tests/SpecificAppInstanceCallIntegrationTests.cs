@@ -305,7 +305,7 @@ namespace Plexus.Interop
             var clientOptionsBuilder = new ClientOptionsBuilder()
                 .WithBrokerWorkingDir(testBroker.WorkingDir)
                 .WithDefaultConfiguration()
-                .WithApplicationId("plexus.interop.testing.EchoServer");
+                .WithApplicationId("interop.testing.EchoServer");
             setup?.Invoke(clientOptionsBuilder);
             var clientOptions = clientOptionsBuilder.Build();
             var client = RegisterDisposable(ClientFactory.Instance.Create(clientOptions));

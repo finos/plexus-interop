@@ -1,19 +1,19 @@
 ﻿{
   "apps": [
     {
-      "id": "plexus.interop.testing.TestAppLauncher",
+      "id": "interop.testing.TestAppLauncher",
       "displayName": "Test App Launcher"
     },
     {
-      "id": "plexus.interop.testing.EchoServer",
+      "id": "interop.testing.EchoServer",
       "displayName": "Test Echo Server",
-      "launcherId": "plexus.interop.testing.TestAppLauncher",
+      "launcherId": "interop.testing.TestAppLauncher",
       "launcherParams": {}
     },
     {
-      "id": "plexus.interop.testing.EchoClient",
+      "id": "interop.testing.EchoClient",
       "displayName": "Test Echo Client",
-      "launcherId": "plexus.interop.testing.TestAppLauncher",
+      "launcherId": "interop.testing.TestAppLauncher",
       "launcherParams": {}
     }
   ]

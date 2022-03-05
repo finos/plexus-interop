@@ -42,16 +42,16 @@ namespace Plexus.Interop
     public sealed class ClientBrokerIntegrationTests : BaseClientBrokerTestsSuite
     {
         private static readonly UnaryMethod<EchoRequest, EchoRequest> EchoUnaryMethod =
-            Method.Unary<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "Unary");
+            Method.Unary<EchoRequest, EchoRequest>("interop.testing.EchoService", "Unary");
 
         private static readonly ServerStreamingMethod<EchoRequest, EchoRequest> EchoServerStreamingMethod =
-            Method.ServerStreaming<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "ServerStreaming");
+            Method.ServerStreaming<EchoRequest, EchoRequest>("interop.testing.EchoService", "ServerStreaming");
 
         private static readonly ClientStreamingMethod<EchoRequest, EchoRequest> EchoClientStreamingMethod =
-            Method.ClientStreaming<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "ClientStreaming");
+            Method.ClientStreaming<EchoRequest, EchoRequest>("interop.testing.EchoService", "ClientStreaming");
 
         private static readonly DuplexStreamingMethod<EchoRequest, EchoRequest> EchoDuplexStreamingMethod =
-            Method.DuplexStreaming<EchoRequest, EchoRequest>("plexus.interop.testing.EchoService", "DuplexStreaming");
+            Method.DuplexStreaming<EchoRequest, EchoRequest>("interop.testing.EchoService", "DuplexStreaming");
 
         public ClientBrokerIntegrationTests(ITestOutputHelper output, TestBrokerFixture testBrokerFixture)
             : base(output, testBrokerFixture)
@@ -87,9 +87,9 @@ namespace Plexus.Interop
                 var evt2 = await stream.ReadAsync();
 
                 evt1.EventCase.ShouldBe(AppLifecycleEvent.EventOneofCase.Connected);
-                evt1.Connected.ConnectionDescriptor.AppId.ShouldBe("plexus.interop.testing.EchoClient");
+                evt1.Connected.ConnectionDescriptor.AppId.ShouldBe("interop.testing.EchoClient");
                 evt2.EventCase.ShouldBe(AppLifecycleEvent.EventOneofCase.Disconnected);
-                evt2.Disconnected.ConnectionDescriptor.AppId.ShouldBe("plexus.interop.testing.EchoClient");
+                evt2.Disconnected.ConnectionDescriptor.AppId.ShouldBe("interop.testing.EchoClient");
             });
         }
 
@@ -110,7 +110,7 @@ namespace Plexus.Interop
         [Fact]
         public void ExceptionWhenConnectingWithUnexistingAppId()
         {
-            Should.Throw<Exception>(() => ConnectClient("plexus.interop.testing.UnexistingApp"));
+            Should.Throw<Exception>(() => ConnectClient("interop.testing.UnexistingApp"));
         }
 
         [Fact]
@@ -150,7 +150,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
                     )
                 );
@@ -161,7 +161,7 @@ namespace Plexus.Interop
                 receivedRequest.ShouldBe(sentRequest);
                 response.ShouldBe(sentRequest);
                 receivedCallContext.ShouldNotBeNull();
-                receivedCallContext.ConsumerApplicationId.ShouldBe("plexus.interop.testing.EchoClient");
+                receivedCallContext.ConsumerApplicationId.ShouldBe("interop.testing.EchoClient");
                 receivedCallContext.ConsumerConnectionId.ShouldBe(client.ConnectionId);
             });
         }
@@ -206,7 +206,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
                     )
                 );
@@ -222,10 +222,10 @@ namespace Plexus.Interop
                 var evt1 = await stream.ReadAsync();
                 var evt2 = await stream.ReadAsync();
                 evt1.EventCase.ShouldBe(InvocationEvent.EventOneofCase.InvocationStarted);
-                evt1.InvocationStarted.InvocationDescriptor.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                evt1.InvocationStarted.InvocationDescriptor.ServiceId.ShouldBe("interop.testing.EchoService");
                 evt1.InvocationStarted.InvocationDescriptor.MethodId.ShouldBe("Unary");
                 evt2.EventCase.ShouldBe(InvocationEvent.EventOneofCase.InvocationFinished);
-                evt2.InvocationFinished.InvocationDescriptor.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                evt2.InvocationFinished.InvocationDescriptor.ServiceId.ShouldBe("interop.testing.EchoService");
                 evt2.InvocationFinished.InvocationDescriptor.MethodId.ShouldBe("Unary");
                 evt2.InvocationFinished.Result.ShouldBe(result);
                 evt2.InvocationFinished.DurationMs.ShouldBeGreaterThan(0);
@@ -350,7 +350,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.UnexistingService",
+                        "interop.testing.UnexistingService",
                         s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
                     )
                 );
@@ -375,7 +375,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
                     )
                 );
@@ -394,7 +394,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s
                     )
                 );
@@ -428,7 +428,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithServerStreamingMethod<EchoRequest, EchoRequest>("ServerStreaming", HandleAsync)
                     )
                 );
@@ -477,7 +477,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithServerStreamingMethod<EchoRequest, EchoRequest>("ServerStreaming", HandleAsync)
                     )
                 );
@@ -518,7 +518,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithClientStreamingMethod<EchoRequest, EchoRequest>("ClientStreaming", HandleAsync)
                     )
                 );
@@ -568,7 +568,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithDuplexStreamingMethod<EchoRequest, EchoRequest>("DuplexStreaming", HandleAsync)
                     )
                 );
@@ -614,18 +614,18 @@ namespace Plexus.Interop
                 discoveryResults.Count.ShouldBe(1);
                 var discoveryResult = discoveryResults.Single();
                 discoveryResult.Title.ShouldBe("Sample Unary Method");
-                discoveryResult.ProvidedMethod.ProvidedService.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                discoveryResult.ProvidedMethod.ProvidedService.ServiceId.ShouldBe("interop.testing.EchoService");
                 discoveryResult.ProvidedMethod.ProvidedService.ServiceAlias.HasValue.ShouldBeFalse();
                 discoveryResult.ProvidedMethod.ProvidedService.ApplicationId.ShouldBe(
-                    "plexus.interop.testing.EchoServer");
+                    "interop.testing.EchoServer");
                 discoveryResult.ProvidedMethod.Name.ShouldBe("Unary");
-                discoveryResult.InputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
-                discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
+                discoveryResult.InputMessageId.ShouldBe("interop.testing.EchoRequest");
+                discoveryResult.OutputMessageId.ShouldBe("interop.testing.EchoRequest");
                 discoveryResult.Type.ShouldBe(MethodType.Unary);
                 discoveryResult.Options.Count.ShouldBe(3);
                 discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
-                discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
-                discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
+                discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.testing.string_option") && o.Value.Equals("some string"));
+                discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
             });
         }
 
@@ -639,13 +639,13 @@ namespace Plexus.Interop
                 discoveryResults.Count.ShouldBe(1);
                 var discoveryResult = discoveryResults.Single();
                 discoveryResult.Title.ShouldBe("Sample Unary Method");
-                discoveryResult.ProvidedMethod.ProvidedService.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                discoveryResult.ProvidedMethod.ProvidedService.ServiceId.ShouldBe("interop.testing.EchoService");
                 discoveryResult.ProvidedMethod.ProvidedService.ServiceAlias.HasValue.ShouldBeFalse();
                 discoveryResult.ProvidedMethod.ProvidedService.ApplicationId.ShouldBe(
-                    "plexus.interop.testing.EchoServer");
+                    "interop.testing.EchoServer");
                 discoveryResult.ProvidedMethod.Name.ShouldBe("Unary");
-                discoveryResult.InputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
-                discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
+                discoveryResult.InputMessageId.ShouldBe("interop.testing.EchoRequest");
+                discoveryResult.OutputMessageId.ShouldBe("interop.testing.EchoRequest");
                 discoveryResult.Type.ShouldBe(MethodType.Unary);
             });
         }
@@ -665,7 +665,7 @@ namespace Plexus.Interop
                 foreach (var discoveryResult in discoveryResults)
                 {
                     discoveryResult.Title.ShouldBe("Sample Echo Service");
-                    discoveryResult.ProvidedService.ApplicationId.ShouldBe("plexus.interop.testing.EchoServer");
+                    discoveryResult.ProvidedService.ApplicationId.ShouldBe("interop.testing.EchoServer");
                     discoveryResult.ProvidedService.ConnectionId.HasValue.ShouldBeFalse();
                     discoveryResult.Methods.Count.ShouldBe(4);
                     var serverStreamingMethod = discoveryResult.Methods.FirstOrDefault(x =>
@@ -678,8 +678,8 @@ namespace Plexus.Interop
                         discoveryResult.Methods.FirstOrDefault(x => string.Equals(x.ProvidedMethod.Name, "Unary"));
                     unaryMethod.ShouldNotBeNull();
                     unaryMethod.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
-                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
-                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("interop.testing.string_option") && o.Value.Equals("some string"));
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
                 }
             });
         }
@@ -698,20 +698,20 @@ namespace Plexus.Interop
                 {
                     discoveryResult.Title.ShouldBe("Sample Unary Method");
                     discoveryResult.ProvidedMethod.ProvidedService.ServiceId.ShouldBe(
-                        "plexus.interop.testing.EchoService");
+                        "interop.testing.EchoService");
                     discoveryResult.ProvidedMethod.ProvidedService.ServiceAlias.HasValue.ShouldBeFalse();
                     discoveryResult.ProvidedMethod.ProvidedService.ApplicationId.ShouldBe(
-                        "plexus.interop.testing.EchoServer");
+                        "interop.testing.EchoServer");
                     discoveryResult.ProvidedMethod.ProvidedService.ServiceAlias.ShouldBe(Maybe<string>.Nothing);
                     discoveryResult.ProvidedMethod.Name.ShouldBe("Unary");
-                    discoveryResult.InputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
-                    discoveryResult.OutputMessageId.ShouldBe("plexus.interop.testing.EchoRequest");
+                    discoveryResult.InputMessageId.ShouldBe("interop.testing.EchoRequest");
+                    discoveryResult.OutputMessageId.ShouldBe("interop.testing.EchoRequest");
                     discoveryResult.Type.ShouldBe(MethodType.Unary);
                     discoveryResult.ProviderConnectionId.ShouldBeOneOf(server1.ConnectionId, server2.ConnectionId);
                     discoveryResult.Options.Count.ShouldBe(3);
                     discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
-                    discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
-                    discoveryResult.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
+                    discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.testing.string_option") && o.Value.Equals("some string"));
+                    discoveryResult.Options.ShouldContain(o => o.Id.Equals("interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
                 }
             });
         }
@@ -731,7 +731,7 @@ namespace Plexus.Interop
                 foreach (var discoveryResult in discoveryResults)
                 {
                     discoveryResult.Title.ShouldBe("Sample Echo Service");
-                    discoveryResult.ProvidedService.ApplicationId.ShouldBe("plexus.interop.testing.EchoServer");
+                    discoveryResult.ProvidedService.ApplicationId.ShouldBe("interop.testing.EchoServer");
                     discoveryResult.ProviderConnectionId.ShouldBeOneOf(server1.ConnectionId, server2.ConnectionId);
                     discoveryResult.Methods.Count.ShouldBe(4);
                     var serverStreamingMethod = discoveryResult.Methods.FirstOrDefault(x =>
@@ -744,8 +744,8 @@ namespace Plexus.Interop
                         discoveryResult.Methods.FirstOrDefault(x => string.Equals(x.ProvidedMethod.Name, "Unary"));
                     unaryMethod.ShouldNotBeNull();
                     unaryMethod.Options.ShouldContain(o => o.Id.Equals("interop.ProvidedMethodOptions.title") && o.Value.Equals("Sample Unary Method"));
-                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.string_option") && o.Value.Equals("some string"));
-                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("plexus.interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("interop.testing.string_option") && o.Value.Equals("some string"));
+                    unaryMethod.Options.ShouldContain(o => o.Id.Equals("interop.testing.enum_option") && o.Value.Equals("VALUE_TWO"));
                 }
             });
         }
@@ -763,7 +763,7 @@ namespace Plexus.Interop
                 var client = ConnectEchoClient();
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithUnaryMethod<EchoRequest, EchoRequest>("Unary", HandleAsync)
                     )
                 );
@@ -1080,7 +1080,7 @@ namespace Plexus.Interop
             {
                 ConnectEchoServer(x => x
                     .WithProvidedService(
-                        "plexus.interop.testing.EchoService",
+                        "interop.testing.EchoService",
                         s => s.WithDuplexStreamingMethod<EchoRequest, EchoRequest>("DuplexStreaming", HandleAsync)
                     )
                 );
@@ -1258,7 +1258,7 @@ namespace Plexus.Interop
             var clientOptions = new ClientOptionsBuilder()
                 .WithBrokerWorkingDir(testBroker.WorkingDir)
                 .WithDefaultConfiguration()
-                .WithApplicationId("plexus.interop.testing.EchoClient")
+                .WithApplicationId("interop.testing.EchoClient")
                 .WithAppInstanceId(TestAppLauncher.EchoServiceAppInstanceId)
                 .Build();
             return RegisterDisposable(ClientFactory.Instance.Create(clientOptions));
@@ -1290,7 +1290,7 @@ namespace Plexus.Interop
             var clientOptionsBuilder = new ClientOptionsBuilder()
                 .WithBrokerWorkingDir(testBroker.WorkingDir)
                 .WithDefaultConfiguration()
-                .WithApplicationId("plexus.interop.testing.EchoServer")
+                .WithApplicationId("interop.testing.EchoServer")
                 .WithAppInstanceId(TestAppLauncher.EchoServiceAppInstanceId);
             setup?.Invoke(clientOptionsBuilder);
             var clientOptions = clientOptionsBuilder.Build();

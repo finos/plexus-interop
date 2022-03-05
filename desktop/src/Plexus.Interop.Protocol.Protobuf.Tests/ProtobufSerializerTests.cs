@@ -32,7 +32,7 @@
         public void InvocationStartRequestSerialization()
         {
             var serializer = SerializerFactory.Create(MessageFactory);
-            using (var request = MessageFactory.CreateInvocationStartRequest("plexus.interop.testing.EchoService", "Unary"))
+            using (var request = MessageFactory.CreateInvocationStartRequest("interop.testing.EchoService", "Unary"))
             using (var serialized = serializer.Serialize(request))
             using (var deserialized = serializer.DeserializeClientToBrokerRequest(serialized))
             {
@@ -43,7 +43,7 @@
                                 (target, __) =>
                                 {
                                     target.MethodId.ShouldBe("Unary");
-                                    target.ConsumedService.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                                    target.ConsumedService.ServiceId.ShouldBe("interop.testing.EchoService");
                                     target.ConsumedService.ServiceAlias.ShouldBe(Maybe<string>.Nothing);
                                     return Nothing.Instance;
                                 },
@@ -60,7 +60,7 @@
         public void ContextLinkageInfoIsSerializedCorrectly(ContextLinkageDiscoveryMode mode)
         {
             var serializer = SerializerFactory.Create(MessageFactory);
-            var serviceReference = MessageFactory.CreateConsumedServiceReference("plexus.interop.testing.EchoService", Maybe<string>.Nothing);
+            var serviceReference = MessageFactory.CreateConsumedServiceReference("interop.testing.EchoService", Maybe<string>.Nothing);
             var methodReference = MessageFactory.CreateConsumedMethodReference(serviceReference, "Unary");
             var contextLinkageOptions = MessageFactory.CreateContextLinkageOptions(mode, Maybe<string>.Nothing);
             using (var request = MessageFactory.CreateInvocationStartRequest(methodReference, contextLinkageOptions))
@@ -75,7 +75,7 @@
                             (target, __) =>
                             {
                                 target.MethodId.ShouldBe("Unary");
-                                target.ConsumedService.ServiceId.ShouldBe("plexus.interop.testing.EchoService");
+                                target.ConsumedService.ServiceId.ShouldBe("interop.testing.EchoService");
                                 target.ConsumedService.ServiceAlias.ShouldBe(Maybe<string>.Nothing);
                                 return Nothing.Instance;
                             },

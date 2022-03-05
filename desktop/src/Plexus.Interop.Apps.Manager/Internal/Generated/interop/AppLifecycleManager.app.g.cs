@@ -272,6 +272,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		public partial interface IContextLinkageServiceImpl:
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.IContextLoadedStreamImpl,
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.ICreateContextImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.ICreateContext2Impl,
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.IJoinContextImpl,
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.IGetContextsImpl,
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.IGetLinkedInvocationsImpl,
@@ -296,6 +297,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
 				builder = builder.WithServerStreamingMethod<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate>(global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.ContextLoadedStreamMethodId, _impl.ContextLoadedStream);
 				builder = builder.WithUnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.Context>(global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.CreateContextMethodId, _impl.CreateContext);
+				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest, global::Plexus.Interop.Apps.Internal.Generated.Context>(global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.CreateContext2MethodId, _impl.CreateContext2);
 				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Google.Protobuf.WellKnownTypes.Empty>(global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.JoinContextMethodId, _impl.JoinContext);
 				builder = builder.WithUnaryMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList>(global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.GetContextsMethodId, _impl.GetContexts);
 				builder = builder.WithUnaryMethod<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList>(global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.GetLinkedInvocationsMethodId, _impl.GetLinkedInvocations);
@@ -310,6 +312,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 		{
 			private readonly ServerStreamingMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate> _contextLoadedStreamHandler;
 			private readonly UnaryMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.Context> _createContextHandler;
+			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest, global::Plexus.Interop.Apps.Internal.Generated.Context> _createContext2Handler;
 			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Google.Protobuf.WellKnownTypes.Empty> _joinContextHandler;
 			private readonly UnaryMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList> _getContextsHandler;
 			private readonly UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList> _getLinkedInvocationsHandler;
@@ -320,6 +323,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			public ContextLinkageServiceImpl(
 				ServerStreamingMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.ContextLoadingUpdate> contextLoadedStreamHandler,
 				UnaryMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.Context> createContextHandler,
+				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest, global::Plexus.Interop.Apps.Internal.Generated.Context> createContext2Handler,
 				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Google.Protobuf.WellKnownTypes.Empty> joinContextHandler,
 				UnaryMethodHandler<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Interop.Apps.Internal.Generated.ContextsList> getContextsHandler,
 				UnaryMethodHandler<global::Plexus.Interop.Apps.Internal.Generated.Context, global::Plexus.Interop.Apps.Internal.Generated.InvocationsList> getLinkedInvocationsHandler,
@@ -329,6 +333,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			) {
 				_contextLoadedStreamHandler = contextLoadedStreamHandler;
 				_createContextHandler = createContextHandler;
+				_createContext2Handler = createContext2Handler;
 				_joinContextHandler = joinContextHandler;
 				_getContextsHandler = getContextsHandler;
 				_getLinkedInvocationsHandler = getLinkedInvocationsHandler;
@@ -343,6 +348,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context) {
 				return _createContextHandler(request, context);
+			}
+			
+			public Task<global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext2(global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest request, MethodCallContext context) {
+				return _createContext2Handler(request, context);
 			}
 			
 			public Task<global::Google.Protobuf.WellKnownTypes.Empty> JoinContext(global::Plexus.Interop.Apps.Internal.Generated.Context request, MethodCallContext context) {
@@ -374,6 +383,7 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			where T:
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.IContextLoadedStreamImpl,
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.ICreateContextImpl,
+			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.ICreateContext2Impl,
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.IJoinContextImpl,
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.IGetContextsImpl,
 			global::Plexus.Interop.Apps.Internal.Generated.ContextLinkageService.IGetLinkedInvocationsImpl,
@@ -393,6 +403,10 @@ namespace Plexus.Interop.Apps.Internal.Generated {
 			
 			public Task<global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext(global::Google.Protobuf.WellKnownTypes.Empty request, MethodCallContext context) {
 				return _impl.CreateContext(request, context);
+			}
+			
+			public Task<global::Plexus.Interop.Apps.Internal.Generated.Context> CreateContext2(global::Plexus.Interop.Apps.Internal.Generated.CreateContextRequest request, MethodCallContext context) {
+				return _impl.CreateContext2(request, context);
 			}
 			
 			public Task<global::Google.Protobuf.WellKnownTypes.Empty> JoinContext(global::Plexus.Interop.Apps.Internal.Generated.Context request, MethodCallContext context) {

@@ -15,18 +15,14 @@
 // limitations under the License.
 //
 
-syntax = "proto3";
+syntax = "proto2";
 
-package plexus.interop.testing;
+package interop.testing;
 
-service GreetingService {
-	rpc Hello (GreetingRequest) returns (GreetingResponse);
-}
+import "interop/descriptor.proto";
+import "interop/testing/echo_service.proto";
 
-message GreetingRequest {
-	string name = 1;
-}
-
-message GreetingResponse {
-	string greeting = 1;
+extend .interop.ProvidedMethodOptions {
+	optional string string_option = 1500;
+	optional EchoRequest.SubEnum enum_option = 1501;
 }
