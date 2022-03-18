@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{21157EE9-F291-48DA-B411-731A21AAF6AD}"
 	ProjectSection(SolutionItems) = preProject
@@ -140,7 +140,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plexus.Interop.Transport.Tr
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{16653188-657e-4a2b-a967-7516f87ff516}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{215b0f69-fab6-402f-aee7-7a68076605e6}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{2692d84d-b028-496d-a417-d08489c02e4d}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{413fdf9e-d3b8-4060-b047-adf5df7674d3}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{431a3352-9191-40f3-bdc6-9b36aefe8bce}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{8c1cf325-b2e8-44eb-930d-210abcfe505f}*SharedItemsImports = 5
 		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{ada01827-8218-4182-ad83-a25fc36ddd95}*SharedItemsImports = 13
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{b1301ba6-9693-41b7-98e4-d879299ca781}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{b9ade812-6919-4b86-bd1c-0123dbb95fcb}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{bcecde18-e331-445c-a501-19b9b7d1bb3b}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{cb185812-dead-4e84-8f69-c2570e3da38a}*SharedItemsImports = 5
+		Plexus.Utils.Testing.Shared\Plexus.Utils.Testing.Shared.projitems*{fde6bdbb-b755-43a8-9528-4729826fd375}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
