@@ -25,9 +25,11 @@ namespace Plexus.Interop.Transport.Pipes
         public PipeTransportTests(ITestOutputHelper output) : base(output)
         {
             Server = RegisterDisposable(TransportServerFactory.Instance.Create(
+                TransportType.Pipe,
                 PipeTransmissionServerFactory.Instance.Create(BrokerWorkingDir),
                 new ProtobufTransportProtocolSerializationProvider()));
             Client = TransportClientFactory.Instance.Create(
+                TransportType.Pipe,
                 PipeTransmissionClientFactory.Instance.Create(),
                 new ProtobufTransportProtocolSerializationProvider());
         }

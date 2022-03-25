@@ -35,6 +35,7 @@ namespace Plexus.Interop
                         new ProtobufProtocolSerializerFactory()))
                 .WithTransport(
                     TransportClientFactory.Instance.Create(
+                        TransportType.Pipe,
                         PipeTransmissionClientFactory.Instance.Create(),
                         new ProtobufTransportProtocolSerializationProvider()));
         }

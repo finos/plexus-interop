@@ -28,6 +28,8 @@
 
         IReadableChannel<ITransportChannel> IncomingChannels { get; }
 
+        TransportType TransportType { get; }
+
         bool TryComplete();
 
         bool TryTerminate(Exception ex = null);

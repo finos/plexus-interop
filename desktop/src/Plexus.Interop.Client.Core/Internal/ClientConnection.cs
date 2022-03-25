@@ -37,6 +37,8 @@
 
         public IReadableChannel<ITransportChannel> IncomingChannels => _transportConnection.IncomingChannels;
 
+        public TransportType TransportType => _transportConnection.TransportType;
+
         public bool TryComplete()
         {
             return _transportConnection.TryComplete();

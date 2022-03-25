@@ -25,11 +25,13 @@
     {
         private static readonly ILogger Log = LogManager.GetLogger<TransportConnectionFactory>();
 
+        private readonly TransportType _transportType;
         private readonly ITransportProtocolSerializer _serializer;
         private readonly ITransportProtocolDeserializer _deserializer;
 
-        public TransportConnectionFactory(ITransportProtocolSerializationProvider serializationProvider)
+        public TransportConnectionFactory(TransportType transportType, ITransportProtocolSerializationProvider serializationProvider)
         {
+            _transportType = transportType;
             _serializer = serializationProvider.GetSerializer();
             _deserializer = serializationProvider.GetDeserializer(TransportHeaderPool.Instance);
         }
@@ -40,7 +42,7 @@
             {
                 var sender = new TransportSendProcessor(transmissionConnection, TransportHeaderPool.Instance, _serializer);
                 var receiver = new TransportReceiveProcessor(transmissionConnection, _deserializer);
-                var connection = new TransportConnection(sender, receiver, TransportHeaderPool.Instance);
+                var connection = new TransportConnection(_transportType, sender, receiver, TransportHeaderPool.Instance);
                 Log.Trace("New connection created: {0}", connection.Id);
                 return connection;
             }

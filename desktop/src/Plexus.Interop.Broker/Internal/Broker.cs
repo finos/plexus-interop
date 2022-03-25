@@ -79,9 +79,11 @@ namespace Plexus.Interop.Internal
             var transportServers = new List<ITransportServer>
             {
                 TransportServerFactory.Instance.Create(
+                    TransportType.Pipe,
                     PipeTransmissionServerFactory.Instance.Create(_workingDir),
                     DefaultTransportSerializationProvider),
                 TransportServerFactory.Instance.Create(
+                    TransportType.Ws,
                     WebSocketTransmissionServerFactory.Instance.Create(webSocketTransmissionServerOptions),
                     DefaultTransportSerializationProvider),
             };
@@ -94,6 +96,7 @@ namespace Plexus.Interop.Internal
                     var sslProtocols = EnvironmentHelper.GetSslProtocols();
                     Log.Info($"{EnvironmentHelper.SslProtocols}={sslProtocols}");
                     transportServers.Add(TransportServerFactory.Instance.Create(
+                        TransportType.Wss,
                         WebSocketTransmissionServerFactory.Instance.CreateSecure(wssTransmissionServerOptions, certificate, sslProtocols),
                         DefaultTransportSerializationProvider));
                 }

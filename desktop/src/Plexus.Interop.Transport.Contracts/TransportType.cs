@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2021 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,19 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Transport
+namespace Plexus.Interop.Transport
 {
-    using Plexus.Interop.Transport.Internal;
-    using Plexus.Interop.Transport.Protocol.Serialization;
-    using Plexus.Interop.Transport.Transmission;
-
-    public sealed class TransportClientFactory
+    public enum TransportType
     {
-        public static TransportClientFactory Instance = new TransportClientFactory();
-
-        public ITransportClient Create(TransportType transportType, ITransmissionClient transmissionClient, ITransportProtocolSerializationProvider serializationProvider)
-        {
-            return new TransportClient(transportType, transmissionClient, serializationProvider);
-        }
+        Pipe,
+        Ws,
+        Wss
     }
 }

@@ -24,9 +24,9 @@ namespace Plexus.Interop.Transport
     {
         public static TransportServerFactory Instance = new TransportServerFactory();
 
-        public ITransportServer Create(ITransmissionServer transmissionServer, ITransportProtocolSerializationProvider serializationProvider)
+        public ITransportServer Create(TransportType transportType, ITransmissionServer transmissionServer, ITransportProtocolSerializationProvider serializationProvider)
         {
-            return new TransportServer(transmissionServer, serializationProvider);
+            return new TransportServer(transportType, transmissionServer, serializationProvider);
         }
     }
 }
