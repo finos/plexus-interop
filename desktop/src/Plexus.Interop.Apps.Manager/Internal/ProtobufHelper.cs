@@ -39,13 +39,25 @@
             };
         }
 
+        public static Generated.TransportType ToProto(this Transport.TransportType transportType)
+        {
+            switch (transportType)
+            {
+                case Transport.TransportType.Pipe: return Generated.TransportType.Pipe;
+                case Transport.TransportType.Ws: return Generated.TransportType.Ws;
+                case Transport.TransportType.Wss: return Generated.TransportType.Wss;
+                default: return Generated.TransportType.Unknown;
+            }
+        }
+
         public static Generated.AppConnectionDescriptor ToProto(this AppConnectionDescriptor info)
         {
             return new Generated.AppConnectionDescriptor
             {
                 AppId = info.ApplicationId,
                 AppInstanceId = info.ApplicationInstanceId.ToProto(),
-                ConnectionId = info.ConnectionId.ToProto()
+                ConnectionId = info.ConnectionId.ToProto(),
+                TransportType = info.TransportType.ToProto()
             };
         }
 

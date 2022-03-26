@@ -14,18 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal.ClientProtocol.Invocations
+namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
+    using Plexus.Interop.Transport;
+
     internal sealed class InvocationSourceDescriptor
     {
         public InvocationSourceDescriptor(
             string applicationId,
             UniqueId applicationInstanceId,
-            UniqueId connectionId)
+            UniqueId connectionId,
+            TransportType transportType)
         {
             ApplicationId = applicationId;
             ConnectionId = connectionId;
             ApplicationInstanceId = applicationInstanceId;
+            TransportType = transportType;
         }
 
         public string ApplicationId { get; }
@@ -34,16 +38,19 @@
 
         public UniqueId ApplicationInstanceId { get; }
 
+        public TransportType TransportType { get; }
+
         private bool Equals(InvocationSourceDescriptor other)
-        {
-            return string.Equals(ApplicationId, other.ApplicationId) && ConnectionId.Equals(other.ConnectionId) && string.Equals(ApplicationInstanceId, other.ApplicationInstanceId);
-        }
+            => ApplicationId == other.ApplicationId
+            && ConnectionId == other.ConnectionId
+            && ApplicationInstanceId == other.ApplicationInstanceId
+            && TransportType == other.TransportType;
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is InvocationSourceDescriptor && Equals((InvocationSourceDescriptor) obj);
+            return obj is InvocationSourceDescriptor && Equals((InvocationSourceDescriptor)obj);
         }
 
         public override int GetHashCode()

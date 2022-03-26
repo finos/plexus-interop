@@ -107,7 +107,8 @@ namespace Plexus.Interop.Apps.Internal.Services
             var referrerConnectionInfo = new AppConnectionDescriptor(
                 context.ConsumerConnectionId,
                 context.ConsumerApplicationId,
-                context.ConsumerApplicationInstanceId);
+                context.ConsumerApplicationInstanceId,
+                context.ConsumerTransportType);
             var resolveMode = Convert(request.AppResolveMode);
             if (resolveMode == ResolveMode.SingleInstance)
             {

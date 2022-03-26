@@ -14,17 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Apps
+namespace Plexus.Interop.Apps
 {
     using System.Collections.Generic;
+    using Plexus.Interop.Transport;
 
     public sealed class AppConnectionDescriptor
     {
-        public AppConnectionDescriptor(UniqueId connectionId, string applicationId, UniqueId applicationInstanceId)
+        public AppConnectionDescriptor(
+            UniqueId connectionId,
+            string applicationId,
+            UniqueId applicationInstanceId,
+            TransportType transportType)
         {
             ConnectionId = connectionId;
             ApplicationId = applicationId;
             ApplicationInstanceId = applicationInstanceId;
+            TransportType = transportType;
         }
 
         public UniqueId ConnectionId { get; }
@@ -33,13 +39,14 @@
 
         public UniqueId ApplicationInstanceId { get; }
 
+        public TransportType TransportType { get; }
+
         public override bool Equals(object obj)
-        {
-            return obj is AppConnectionDescriptor info &&
-                   ConnectionId.Equals(info.ConnectionId) &&
-                   ApplicationId == info.ApplicationId &&
-                   ApplicationInstanceId.Equals(info.ApplicationInstanceId);
-        }
+            => obj is AppConnectionDescriptor info
+            && ConnectionId == info.ConnectionId
+            && ApplicationId == info.ApplicationId
+            && ApplicationInstanceId == info.ApplicationInstanceId
+            && TransportType == info.TransportType;
 
         public override int GetHashCode()
         {
@@ -47,12 +54,14 @@
             hashCode = hashCode * -1521134295 + EqualityComparer<UniqueId>.Default.GetHashCode(ConnectionId);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ApplicationId);
             hashCode = hashCode * -1521134295 + EqualityComparer<UniqueId>.Default.GetHashCode(ApplicationInstanceId);
+            hashCode = hashCode * -1521134295 + TransportType.GetHashCode();
             return hashCode;
         }
 
         public override string ToString()
-        {
-            return $"{ApplicationId}, {nameof(ConnectionId)}: {ConnectionId}, {nameof(ApplicationInstanceId)}: {ApplicationInstanceId}";
-        }
+            => $"{ApplicationId}, " +
+               $"{nameof(ConnectionId)}: {ConnectionId}, " +
+               $"{nameof(ApplicationInstanceId)}: {ApplicationInstanceId}, " +
+               $"{nameof(TransportType)}: {TransportType}";
     }
 }

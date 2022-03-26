@@ -14,23 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop
+namespace Plexus.Interop
 {
     using System.Threading;
+    using Plexus.Interop.Transport;
 
     public sealed class MethodCallContext
     {
-        internal MethodCallContext(            
+        internal MethodCallContext(
             string consumerApplicationId,
             UniqueId consumerApplicationInstanceId,
-            UniqueId consumerConnectionId, 
+            UniqueId consumerConnectionId,
+            TransportType consumerTransportType,
             CancellationToken cancellationToken)
-        {            
+        {
             ConsumerApplicationId = consumerApplicationId;
             ConsumerApplicationInstanceId = consumerApplicationInstanceId;
             ConsumerConnectionId = consumerConnectionId;
-            CancellationToken = cancellationToken;            
-        }        
+            CancellationToken = cancellationToken;
+            ConsumerTransportType = consumerTransportType;
+        }
 
         public string ConsumerApplicationId { get; }
 
@@ -38,11 +41,14 @@
 
         public UniqueId ConsumerConnectionId { get; }
 
+        public TransportType ConsumerTransportType { get; }
+
         public CancellationToken CancellationToken { get; }
 
         public override string ToString()
-        {
-            return $"{nameof(ConsumerApplicationId)}: {ConsumerApplicationId}, {nameof(ConsumerConnectionId)}: {ConsumerConnectionId}, {nameof(ConsumerApplicationInstanceId)}: {ConsumerApplicationInstanceId}";
-        }
+            => $"{nameof(ConsumerApplicationId)}: {ConsumerApplicationId}, " +
+               $"{nameof(ConsumerConnectionId)}: {ConsumerConnectionId}, " +
+               $"{nameof(ConsumerApplicationInstanceId)}: {ConsumerApplicationInstanceId}, " +
+               $"{nameof(ConsumerTransportType)}: {ConsumerTransportType}";
     }
 }
