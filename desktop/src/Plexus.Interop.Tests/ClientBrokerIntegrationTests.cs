@@ -224,9 +224,13 @@ namespace Plexus.Interop
                 evt1.EventCase.ShouldBe(InvocationEvent.EventOneofCase.InvocationStarted);
                 evt1.InvocationStarted.InvocationDescriptor.ServiceId.ShouldBe("interop.testing.EchoService");
                 evt1.InvocationStarted.InvocationDescriptor.MethodId.ShouldBe("Unary");
+                evt1.InvocationStarted.InvocationDescriptor.Source.TransportType.ShouldBe(TransportType.Pipe);
+                evt1.InvocationStarted.InvocationDescriptor.Target.TransportType.ShouldBe(TransportType.Pipe);
                 evt2.EventCase.ShouldBe(InvocationEvent.EventOneofCase.InvocationFinished);
                 evt2.InvocationFinished.InvocationDescriptor.ServiceId.ShouldBe("interop.testing.EchoService");
                 evt2.InvocationFinished.InvocationDescriptor.MethodId.ShouldBe("Unary");
+                evt2.InvocationFinished.InvocationDescriptor.Source.TransportType.ShouldBe(TransportType.Pipe);
+                evt2.InvocationFinished.InvocationDescriptor.Target.TransportType.ShouldBe(TransportType.Pipe);
                 evt2.InvocationFinished.Result.ShouldBe(result);
                 evt2.InvocationFinished.DurationMs.ShouldBeGreaterThan(0);
             });
