@@ -42,38 +42,59 @@ namespace Plexus.Host.Internal.Generated {
           string.Concat(
             "CidpbnRlcm9wL2FwcF9jb25uZWN0aW9uX2Rlc2NyaXB0b3IucHJvdG8SB2lu",
             "dGVyb3AaF2ludGVyb3AvdW5pcXVlX2lkLnByb3RvGhVpbnRlcm9wL29wdGlv",
-            "bnMucHJvdG8ipAEKF0FwcENvbm5lY3Rpb25EZXNjcmlwdG9yEigKDWNvbm5l",
+            "bnMucHJvdG8i1AEKF0FwcENvbm5lY3Rpb25EZXNjcmlwdG9yEigKDWNvbm5l",
             "Y3Rpb25faWQYASABKAsyES5pbnRlcm9wLlVuaXF1ZUlkEg4KBmFwcF9pZBgC",
             "IAEoCRIqCg9hcHBfaW5zdGFuY2VfaWQYAyABKAsyES5pbnRlcm9wLlVuaXF1",
-            "ZUlkOiOS2wQfaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvckIhqgIe",
-            "UGxleHVzLkhvc3QuSW50ZXJuYWwuR2VuZXJhdGVkYgZwcm90bzM="));
+            "ZUlkEi4KDnRyYW5zcG9ydF90eXBlGAQgASgOMhYuaW50ZXJvcC5UcmFuc3Bv",
+            "cnRUeXBlOiOS2wQfaW50ZXJvcC5BcHBDb25uZWN0aW9uRGVzY3JpcHRvcio3",
+            "Cg1UcmFuc3BvcnRUeXBlEgsKB1Vua25vd24QABIICgRQaXBlEAESBgoCV3MQ",
+            "AhIHCgNXc3MQA0IhqgIeUGxleHVzLkhvc3QuSW50ZXJuYWwuR2VuZXJhdGVk",
+            "YgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Host.Internal.Generated.UniqueIdReflection.Descriptor, global::Plexus.Host.Internal.Generated.OptionsReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Host.Internal.Generated.AppConnectionDescriptor), global::Plexus.Host.Internal.Generated.AppConnectionDescriptor.Parser, new[]{ "ConnectionId", "AppId", "AppInstanceId" }, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Host.Internal.Generated.TransportType), }, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Plexus.Host.Internal.Generated.AppConnectionDescriptor), global::Plexus.Host.Internal.Generated.AppConnectionDescriptor.Parser, new[]{ "ConnectionId", "AppId", "AppInstanceId", "TransportType" }, null, null, null, null)
           }));
     }
     #endregion
 
   }
+  #region Enums
+  internal enum TransportType {
+    [pbr::OriginalName("Unknown")] Unknown = 0,
+    [pbr::OriginalName("Pipe")] Pipe = 1,
+    [pbr::OriginalName("Ws")] Ws = 2,
+    [pbr::OriginalName("Wss")] Wss = 3,
+  }
+
+  #endregion
+
   #region Messages
-  internal sealed partial class AppConnectionDescriptor : pb::IMessage<AppConnectionDescriptor> {
+  internal sealed partial class AppConnectionDescriptor : pb::IMessage<AppConnectionDescriptor>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
     private static readonly pb::MessageParser<AppConnectionDescriptor> _parser = new pb::MessageParser<AppConnectionDescriptor>(() => new AppConnectionDescriptor());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<AppConnectionDescriptor> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Plexus.Host.Internal.Generated.AppConnectionDescriptorReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppConnectionDescriptor() {
       OnConstruction();
     }
@@ -81,14 +102,17 @@ namespace Plexus.Host.Internal.Generated {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppConnectionDescriptor(AppConnectionDescriptor other) : this() {
-      ConnectionId = other.connectionId_ != null ? other.ConnectionId.Clone() : null;
+      connectionId_ = other.connectionId_ != null ? other.connectionId_.Clone() : null;
       appId_ = other.appId_;
-      AppInstanceId = other.appInstanceId_ != null ? other.AppInstanceId.Clone() : null;
+      appInstanceId_ = other.appInstanceId_ != null ? other.appInstanceId_.Clone() : null;
+      transportType_ = other.transportType_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public AppConnectionDescriptor Clone() {
       return new AppConnectionDescriptor(this);
     }
@@ -97,6 +121,7 @@ namespace Plexus.Host.Internal.Generated {
     public const int ConnectionIdFieldNumber = 1;
     private global::Plexus.Host.Internal.Generated.UniqueId connectionId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Plexus.Host.Internal.Generated.UniqueId ConnectionId {
       get { return connectionId_; }
       set {
@@ -108,6 +133,7 @@ namespace Plexus.Host.Internal.Generated {
     public const int AppIdFieldNumber = 2;
     private string appId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string AppId {
       get { return appId_; }
       set {
@@ -119,6 +145,7 @@ namespace Plexus.Host.Internal.Generated {
     public const int AppInstanceIdFieldNumber = 3;
     private global::Plexus.Host.Internal.Generated.UniqueId appInstanceId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Plexus.Host.Internal.Generated.UniqueId AppInstanceId {
       get { return appInstanceId_; }
       set {
@@ -126,12 +153,26 @@ namespace Plexus.Host.Internal.Generated {
       }
     }
 
+    /// <summary>Field number for the "transport_type" field.</summary>
+    public const int TransportTypeFieldNumber = 4;
+    private global::Plexus.Host.Internal.Generated.TransportType transportType_ = global::Plexus.Host.Internal.Generated.TransportType.Unknown;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Plexus.Host.Internal.Generated.TransportType TransportType {
+      get { return transportType_; }
+      set {
+        transportType_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as AppConnectionDescriptor);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(AppConnectionDescriptor other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -142,15 +183,18 @@ namespace Plexus.Host.Internal.Generated {
       if (!object.Equals(ConnectionId, other.ConnectionId)) return false;
       if (AppId != other.AppId) return false;
       if (!object.Equals(AppInstanceId, other.AppInstanceId)) return false;
+      if (TransportType != other.TransportType) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (connectionId_ != null) hash ^= ConnectionId.GetHashCode();
       if (AppId.Length != 0) hash ^= AppId.GetHashCode();
       if (appInstanceId_ != null) hash ^= AppInstanceId.GetHashCode();
+      if (TransportType != global::Plexus.Host.Internal.Generated.TransportType.Unknown) hash ^= TransportType.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -158,12 +202,17 @@ namespace Plexus.Host.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
       if (connectionId_ != null) {
         output.WriteRawTag(10);
         output.WriteMessage(ConnectionId);
@@ -176,12 +225,44 @@ namespace Plexus.Host.Internal.Generated {
         output.WriteRawTag(26);
         output.WriteMessage(AppInstanceId);
       }
+      if (TransportType != global::Plexus.Host.Internal.Generated.TransportType.Unknown) {
+        output.WriteRawTag(32);
+        output.WriteEnum((int) TransportType);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
+    #endif
     }
 
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (connectionId_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(ConnectionId);
+      }
+      if (AppId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(AppId);
+      }
+      if (appInstanceId_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(AppInstanceId);
+      }
+      if (TransportType != global::Plexus.Host.Internal.Generated.TransportType.Unknown) {
+        output.WriteRawTag(32);
+        output.WriteEnum((int) TransportType);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (connectionId_ != null) {
@@ -193,6 +274,9 @@ namespace Plexus.Host.Internal.Generated {
       if (appInstanceId_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(AppInstanceId);
       }
+      if (TransportType != global::Plexus.Host.Internal.Generated.TransportType.Unknown) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) TransportType);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -200,13 +284,14 @@ namespace Plexus.Host.Internal.Generated {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(AppConnectionDescriptor other) {
       if (other == null) {
         return;
       }
       if (other.connectionId_ != null) {
         if (connectionId_ == null) {
-          connectionId_ = new global::Plexus.Host.Internal.Generated.UniqueId();
+          ConnectionId = new global::Plexus.Host.Internal.Generated.UniqueId();
         }
         ConnectionId.MergeFrom(other.ConnectionId);
       }
@@ -215,15 +300,22 @@ namespace Plexus.Host.Internal.Generated {
       }
       if (other.appInstanceId_ != null) {
         if (appInstanceId_ == null) {
-          appInstanceId_ = new global::Plexus.Host.Internal.Generated.UniqueId();
+          AppInstanceId = new global::Plexus.Host.Internal.Generated.UniqueId();
         }
         AppInstanceId.MergeFrom(other.AppInstanceId);
+      }
+      if (other.TransportType != global::Plexus.Host.Internal.Generated.TransportType.Unknown) {
+        TransportType = other.TransportType;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
@@ -232,9 +324,9 @@ namespace Plexus.Host.Internal.Generated {
             break;
           case 10: {
             if (connectionId_ == null) {
-              connectionId_ = new global::Plexus.Host.Internal.Generated.UniqueId();
+              ConnectionId = new global::Plexus.Host.Internal.Generated.UniqueId();
             }
-            input.ReadMessage(connectionId_);
+            input.ReadMessage(ConnectionId);
             break;
           }
           case 18: {
@@ -243,14 +335,56 @@ namespace Plexus.Host.Internal.Generated {
           }
           case 26: {
             if (appInstanceId_ == null) {
-              appInstanceId_ = new global::Plexus.Host.Internal.Generated.UniqueId();
+              AppInstanceId = new global::Plexus.Host.Internal.Generated.UniqueId();
             }
-            input.ReadMessage(appInstanceId_);
+            input.ReadMessage(AppInstanceId);
+            break;
+          }
+          case 32: {
+            TransportType = (global::Plexus.Host.Internal.Generated.TransportType) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            if (connectionId_ == null) {
+              ConnectionId = new global::Plexus.Host.Internal.Generated.UniqueId();
+            }
+            input.ReadMessage(ConnectionId);
+            break;
+          }
+          case 18: {
+            AppId = input.ReadString();
+            break;
+          }
+          case 26: {
+            if (appInstanceId_ == null) {
+              AppInstanceId = new global::Plexus.Host.Internal.Generated.UniqueId();
+            }
+            input.ReadMessage(AppInstanceId);
+            break;
+          }
+          case 32: {
+            TransportType = (global::Plexus.Host.Internal.Generated.TransportType) input.ReadEnum();
             break;
           }
         }
       }
     }
+    #endif
 
   }
 

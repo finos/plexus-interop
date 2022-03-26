@@ -46,7 +46,7 @@ namespace Plexus.Host.Internal.Generated {
             "c3QuSW50ZXJuYWwuR2VuZXJhdGVkYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Plexus.Host.Internal.Generated.OptionsReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Host.Internal.Generated.AppLaunchMode), }, null));
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Plexus.Host.Internal.Generated.AppLaunchMode), }, null, null));
     }
     #endregion
 
