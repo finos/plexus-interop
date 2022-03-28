@@ -30,7 +30,7 @@ namespace Plexus.Interop.Apps.Internal.Services
     using Plexus.Interop.Apps.Internal.Services.ContextLinkage;
     using Plexus.Interop.Metamodel;
     using Plexus.Interop.Protocol;
-    using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
+    using AppConnectionDescriptor = Plexus.AppConnectionDescriptor;
     using Context = Plexus.Interop.Apps.Internal.Services.ContextLinkage.Context;
     using ContextDto = Generated.Context;
     using UniqueId = Plexus.UniqueId;

@@ -39,13 +39,13 @@
             };
         }
 
-        public static Generated.TransportType ToProto(this Transport.TransportType transportType)
+        public static Generated.TransportType ToProto(this TransportType transportType)
         {
             switch (transportType)
             {
-                case Transport.TransportType.Pipe: return Generated.TransportType.Pipe;
-                case Transport.TransportType.Ws: return Generated.TransportType.Ws;
-                case Transport.TransportType.Wss: return Generated.TransportType.Wss;
+                case TransportType.Pipe: return Generated.TransportType.Pipe;
+                case TransportType.Ws: return Generated.TransportType.Ws;
+                case TransportType.Wss: return Generated.TransportType.Wss;
                 default: return Generated.TransportType.Unknown;
             }
         }

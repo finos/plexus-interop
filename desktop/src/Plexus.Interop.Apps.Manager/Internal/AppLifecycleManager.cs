@@ -25,7 +25,7 @@ namespace Plexus.Interop.Apps.Internal
     using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Plexus.Interop.Apps.Internal.Generated;
-    using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
+    using AppConnectionDescriptor = Plexus.AppConnectionDescriptor;
     using UniqueId = Plexus.UniqueId;
 
     internal sealed class AppLifecycleManager : IAppLifecycleManager

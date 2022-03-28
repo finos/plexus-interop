@@ -17,7 +17,6 @@
 namespace Plexus.Interop
 {
     using System.Threading;
-    using Plexus.Interop.Transport;
 
     public sealed class MethodCallContext
     {
