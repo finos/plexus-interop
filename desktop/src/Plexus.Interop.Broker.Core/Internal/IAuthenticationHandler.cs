@@ -17,7 +17,6 @@
  namespace Plexus.Interop.Broker.Internal
 {
     using System.Threading.Tasks;
-    using Plexus.Interop.Apps;
     using Plexus.Interop.Transport;
 
     internal interface IAuthenticationHandler

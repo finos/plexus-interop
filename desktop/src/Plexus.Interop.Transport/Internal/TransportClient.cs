@@ -30,11 +30,12 @@ namespace Plexus.Interop.Transport.Internal
         private readonly TransportConnectionFactory _connectionFactory;
 
         public TransportClient(
+            TransportType transportType,
             ITransmissionClient transmissionClient,
             ITransportProtocolSerializationProvider serializationProvider)
         {
             _transmissionClient = transmissionClient;
-            _connectionFactory = new TransportConnectionFactory(serializationProvider);
+            _connectionFactory = new TransportConnectionFactory(transportType, serializationProvider);
         }
 
         public async ValueTask<ITransportConnection> ConnectAsync(string brokerWorkingDir, CancellationToken cancellationToken)

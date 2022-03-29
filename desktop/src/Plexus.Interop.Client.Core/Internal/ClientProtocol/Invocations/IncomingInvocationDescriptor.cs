@@ -14,43 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿namespace Plexus.Interop.Internal.ClientProtocol.Invocations
+namespace Plexus.Interop.Internal.ClientProtocol.Invocations
 {
-    using System.Collections.Generic;
-
     internal sealed class IncomingInvocationDescriptor
     {
+        public InvocationMethodDescriptor Method { get; }
+
+        public AppConnectionDescriptor Source { get; }
+
         public IncomingInvocationDescriptor(
             InvocationMethodDescriptor method,
-            InvocationSourceDescriptor source)
+            AppConnectionDescriptor source)
         {
             Method = method;
             Source = source;
         }
 
-        public InvocationSourceDescriptor Source { get; }
-
-        public InvocationMethodDescriptor Method { get; }
-
         public override bool Equals(object obj)
-        {
-            return obj is IncomingInvocationDescriptor descriptor &&
-                   EqualityComparer<InvocationSourceDescriptor>.Default.Equals(Source, descriptor.Source) &&
-                   EqualityComparer<InvocationMethodDescriptor>.Default.Equals(Method, descriptor.Method);
-        }
+            => obj is IncomingInvocationDescriptor other
+            && Method.Equals(other.Method)
+            && Source.Equals(other.Source);
 
         public override int GetHashCode()
-        {
-            var hashCode = -809999864;
-            hashCode = hashCode * -1521134295 + EqualityComparer<InvocationSourceDescriptor>.Default.GetHashCode(Source);
-            hashCode = hashCode * -1521134295 + EqualityComparer<InvocationMethodDescriptor>.Default.GetHashCode(Method);
-            return hashCode;
-        }
+            => Method.GetHashCode()
+            ^ Source.GetHashCode();
 
         public override string ToString()
-        {
-            return $"{{Type: {nameof(IncomingInvocationDescriptor)}, {nameof(Method)}: {Method}, {nameof(Source)}: {Source}}}";
-        }
+            => $"{{Type: {nameof(IncomingInvocationDescriptor)}, " +
+               $"{nameof(Method)}: {Method}, " +
+               $"{nameof(Source)}: {Source}}}";
 
 
     }

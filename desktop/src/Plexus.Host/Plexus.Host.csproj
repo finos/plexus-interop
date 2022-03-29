@@ -33,17 +33,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <None Remove="GenBrokerMetadata.cmd" />
-    <None Remove="LaunchBroker.cmd" />
-    <None Remove="LaunchBroker.sh" />
     <None Remove="plexus.cmd" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="GenBrokerMetadata.cmd" />
-    <Content Include="LaunchBroker.cmd" />
-    <Content Include="LaunchBroker.sh" />
-    <Content Include="plexus.cmd" />
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
@@ -73,18 +63,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish">
-    <Copy SourceFiles="plexus.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(ArtifactsSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
-
-    <Copy SourceFiles="plexus.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="GenBrokerMetadata.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="LaunchBroker.cmd" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="LaunchBroker.sh" DestinationFolder="$(QuickStartSamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
-  </Target>
 
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>

@@ -26,9 +26,11 @@ namespace Plexus.Interop.Transport.WebSockets
         public WebSocketTransportTests(ITestOutputHelper output) : base(output)
         {
             Server = RegisterDisposable(TransportServerFactory.Instance.Create(
+                TransportType.Ws,
                 WebSocketTransmissionServerFactory.Instance.Create(new WebSocketTransmissionServerOptions(BrokerWorkingDir)),
                 new ProtobufTransportProtocolSerializationProvider()));
             Client = TransportClientFactory.Instance.Create(
+                TransportType.Ws,
                 WebSocketTransmissionClient.Create(),
                 new ProtobufTransportProtocolSerializationProvider());
         }

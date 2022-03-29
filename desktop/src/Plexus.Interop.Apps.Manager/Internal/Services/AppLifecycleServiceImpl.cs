@@ -26,7 +26,7 @@ namespace Plexus.Interop.Apps.Internal.Services
     using Google.Protobuf.WellKnownTypes;
     using Plexus.Channels;
     using Plexus.Interop.Apps.Internal.Generated;
-    using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
+    using AppConnectionDescriptor = Plexus.AppConnectionDescriptor;
     using UniqueId = Plexus.UniqueId;
 
     internal class AppLifecycleServiceImpl : IAppLifecycleService
@@ -107,7 +107,8 @@ namespace Plexus.Interop.Apps.Internal.Services
             var referrerConnectionInfo = new AppConnectionDescriptor(
                 context.ConsumerConnectionId,
                 context.ConsumerApplicationId,
-                context.ConsumerApplicationInstanceId);
+                context.ConsumerApplicationInstanceId,
+                context.ConsumerTransportType);
             var resolveMode = Convert(request.AppResolveMode);
             if (resolveMode == ResolveMode.SingleInstance)
             {

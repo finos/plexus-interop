@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- namespace Plexus.Interop.Internal.Calls
+namespace Plexus.Interop.Internal.Calls
 {
     using Plexus.Channels;
     using Plexus.Interop.Internal.ClientProtocol.Invocations;
@@ -43,9 +43,10 @@
             {
                 await invocation.StartCompletion.ConfigureAwait(false);
                 var context = new MethodCallContext(
-                    info.Source.ApplicationId, 
-                    info.Source.ApplicationInstanceId, 
-                    info.Source.ConnectionId, 
+                    info.Source.ApplicationId,
+                    info.Source.ApplicationInstanceId,
+                    info.Source.ConnectionId,
+                    info.Source.TransportType,
                     cancellation.Token);
                 await HandleCoreAsync(invocation, context).ConfigureAwait(false);
                 invocation.Out.TryComplete();
@@ -57,7 +58,7 @@
                 throw;
             }
             finally
-            {                
+            {
                 await invocation.Completion.ConfigureAwait(false);
             }
         }

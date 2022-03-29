@@ -23,7 +23,7 @@ namespace Plexus.Interop.Apps.Internal
     using Google.Protobuf.WellKnownTypes;
     using Plexus.Interop.Apps.Internal.Generated;
     using Plexus.Interop.Metamodel;
-    using AppConnectionDescriptor = Plexus.Interop.Apps.AppConnectionDescriptor;
+    using AppConnectionDescriptor = Plexus.AppConnectionDescriptor;
     using UniqueId = Plexus.UniqueId;
 
     internal class AppLaunchedEventSubscriber
