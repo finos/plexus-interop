@@ -64,6 +64,10 @@
     </None>
   </ItemGroup>
 
+  <Target Name="MakePublishDir" AfterTargets="Build">
+    <MakeDir Directories="$(PublishDir)" />
+  </Target>
+
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
       <NuspecProperties>$(NuspecProperties);id=Plexus.Interop.Broker.Redist-$(RuntimeIdentifier)</NuspecProperties>
