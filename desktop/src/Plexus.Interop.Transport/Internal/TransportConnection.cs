@@ -36,6 +36,7 @@ namespace Plexus.Interop.Transport.Internal
         private readonly Latch _sendCompletion = new Latch();
 
         public TransportConnection(
+            TransportType transportType,
             ITransportSendProcessor transportSendProcessor,
             ITransportReceiveProcessor transportReceiveProcessor,
             ITransportHeaderFactory headerFactory)
@@ -46,6 +47,7 @@ namespace Plexus.Interop.Transport.Internal
             _transportReceiveProcessor = transportReceiveProcessor;
             _headerFactory = headerFactory;
             _incomingMessageHandler = new TransportChannelHeaderHandler<Task, ChannelMessage>(HandleIncomingAsync, HandleIncomingAsync, HandleIncomingAsync);
+            TransportType = transportType;
             Completion = ProcessAsync().LogCompletion(_log);
         }
 
@@ -54,6 +56,8 @@ namespace Plexus.Interop.Transport.Internal
         public Task Completion { get; }
 
         public IReadableChannel<ITransportChannel> IncomingChannels => _incomingChannelQueue.In;
+
+        public TransportType TransportType { get; }
 
         public bool TryComplete()
         {

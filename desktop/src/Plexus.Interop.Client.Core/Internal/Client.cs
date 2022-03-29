@@ -345,10 +345,11 @@ namespace Plexus.Interop.Internal
                         request.ServiceId,
                         request.MethodId,
                         request.ServiceAlias),
-                    new InvocationSourceDescriptor(
+                    new AppConnectionDescriptor(
+                        request.ConsumerConnectionId,
                         request.ConsumerApplicationId,
                         request.ConsumerApplicationInstanceId,
-                        request.ConsumerConnectionId));
+                        _connection.TransportType));
             return callHandler.HandleAsync(invocationInfo, channel);
         }
 

@@ -63,7 +63,10 @@
                     Log.Debug("Connection with unknown application instance id: "
                         + $"ApplicationInstanceId={connectRequest.ApplicationInstanceId}, ApplicationId={connectRequest.ApplicationId}");
                     _connectionTracker.ReportConnectionError(new AppConnectionDescriptor(
-                        UniqueId.Empty, connectRequest.ApplicationId, connectRequest.ApplicationInstanceId));
+                        UniqueId.Empty,
+                        connectRequest.ApplicationId,
+                        connectRequest.ApplicationInstanceId,
+                        connection.TransportType));
 
                     if (_features.HasFlag(BrokerFeatures.CheckAppInstanceId))
                     {
@@ -89,7 +92,8 @@
                     return new AppConnectionDescriptor(
                         connectResponse.ConnectionId,
                         connectRequest.ApplicationId,
-                        connectRequest.ApplicationInstanceId);
+                        connectRequest.ApplicationInstanceId,
+                        connection.TransportType);
                 }
             }
         }

@@ -33,6 +33,9 @@ namespace Plexus.Host.Internal.Generated {
 		public const string Id = "interop.AppLifecycleService";			
 		public const string ResolveAppMethodId = "ResolveApp";
 		public const string GetLifecycleEventStreamMethodId = "GetLifecycleEventStream";
+		public const string GetInvocationEventStreamMethodId = "GetInvocationEventStream";
+		public const string GetConnectionsMethodId = "GetConnections";
+		public const string GetConnectionsStreamMethodId = "GetConnectionsStream";
 		
 		public static readonly AppLifecycleService.Descriptor DefaultDescriptor = CreateDescriptor();
 		
@@ -52,6 +55,18 @@ namespace Plexus.Host.Internal.Generated {
 			IServerStreamingMethodCall<global::Plexus.Host.Internal.Generated.AppLifecycleEvent> GetLifecycleEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
 		}
 		
+		public partial interface IGetInvocationEventStreamProxy {
+			IServerStreamingMethodCall<global::Plexus.Host.Internal.Generated.InvocationEvent> GetInvocationEventStream(global::Google.Protobuf.WellKnownTypes.Empty request);
+		}
+		
+		public partial interface IGetConnectionsProxy {
+			IUnaryMethodCall<global::Plexus.Host.Internal.Generated.GetConnectionsResponse> GetConnections(global::Plexus.Host.Internal.Generated.GetConnectionsRequest request);
+		}
+		
+		public partial interface IGetConnectionsStreamProxy {
+			IServerStreamingMethodCall<global::Plexus.Host.Internal.Generated.GetConnectionsEvent> GetConnectionsStream(global::Plexus.Host.Internal.Generated.GetConnectionsRequest request);
+		}
+		
 		public partial interface IResolveAppImpl {
 			Task<global::Plexus.Host.Internal.Generated.ResolveAppResponse> ResolveApp(global::Plexus.Host.Internal.Generated.ResolveAppRequest request, MethodCallContext context);
 		}
@@ -60,19 +75,40 @@ namespace Plexus.Host.Internal.Generated {
 			Task GetLifecycleEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Host.Internal.Generated.AppLifecycleEvent> responseStream, MethodCallContext context);
 		}
 		
+		public partial interface IGetInvocationEventStreamImpl {
+			Task GetInvocationEventStream(global::Google.Protobuf.WellKnownTypes.Empty request, IWritableChannel<global::Plexus.Host.Internal.Generated.InvocationEvent> responseStream, MethodCallContext context);
+		}
+		
+		public partial interface IGetConnectionsImpl {
+			Task<global::Plexus.Host.Internal.Generated.GetConnectionsResponse> GetConnections(global::Plexus.Host.Internal.Generated.GetConnectionsRequest request, MethodCallContext context);
+		}
+		
+		public partial interface IGetConnectionsStreamImpl {
+			Task GetConnectionsStream(global::Plexus.Host.Internal.Generated.GetConnectionsRequest request, IWritableChannel<global::Plexus.Host.Internal.Generated.GetConnectionsEvent> responseStream, MethodCallContext context);
+		}
+		
 		public sealed partial class Descriptor {
 		
 			public UnaryMethod<global::Plexus.Host.Internal.Generated.ResolveAppRequest, global::Plexus.Host.Internal.Generated.ResolveAppResponse> ResolveAppMethod {get; private set; }
 			public ServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Host.Internal.Generated.AppLifecycleEvent> GetLifecycleEventStreamMethod {get; private set; }
+			public ServerStreamingMethod<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Host.Internal.Generated.InvocationEvent> GetInvocationEventStreamMethod {get; private set; }
+			public UnaryMethod<global::Plexus.Host.Internal.Generated.GetConnectionsRequest, global::Plexus.Host.Internal.Generated.GetConnectionsResponse> GetConnectionsMethod {get; private set; }
+			public ServerStreamingMethod<global::Plexus.Host.Internal.Generated.GetConnectionsRequest, global::Plexus.Host.Internal.Generated.GetConnectionsEvent> GetConnectionsStreamMethod {get; private set; }
 			
 			public Descriptor() {				
 				ResolveAppMethod = Method.Unary<global::Plexus.Host.Internal.Generated.ResolveAppRequest, global::Plexus.Host.Internal.Generated.ResolveAppResponse>(Id, ResolveAppMethodId);
 				GetLifecycleEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Host.Internal.Generated.AppLifecycleEvent>(Id, GetLifecycleEventStreamMethodId);
+				GetInvocationEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Host.Internal.Generated.InvocationEvent>(Id, GetInvocationEventStreamMethodId);
+				GetConnectionsMethod = Method.Unary<global::Plexus.Host.Internal.Generated.GetConnectionsRequest, global::Plexus.Host.Internal.Generated.GetConnectionsResponse>(Id, GetConnectionsMethodId);
+				GetConnectionsStreamMethod = Method.ServerStreaming<global::Plexus.Host.Internal.Generated.GetConnectionsRequest, global::Plexus.Host.Internal.Generated.GetConnectionsEvent>(Id, GetConnectionsStreamMethodId);
 			}
 		
 			public Descriptor(string alias) {
 				ResolveAppMethod = Method.Unary<global::Plexus.Host.Internal.Generated.ResolveAppRequest, global::Plexus.Host.Internal.Generated.ResolveAppResponse>(Id, alias, ResolveAppMethodId);
 				GetLifecycleEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Host.Internal.Generated.AppLifecycleEvent>(Id, alias, GetLifecycleEventStreamMethodId);
+				GetInvocationEventStreamMethod = Method.ServerStreaming<global::Google.Protobuf.WellKnownTypes.Empty, global::Plexus.Host.Internal.Generated.InvocationEvent>(Id, alias, GetInvocationEventStreamMethodId);
+				GetConnectionsMethod = Method.Unary<global::Plexus.Host.Internal.Generated.GetConnectionsRequest, global::Plexus.Host.Internal.Generated.GetConnectionsResponse>(Id, alias, GetConnectionsMethodId);
+				GetConnectionsStreamMethod = Method.ServerStreaming<global::Plexus.Host.Internal.Generated.GetConnectionsRequest, global::Plexus.Host.Internal.Generated.GetConnectionsEvent>(Id, alias, GetConnectionsStreamMethodId);
 			}
 		}
 	}

@@ -891,7 +891,19 @@
 	            "appInstanceId": {
 	              "type": "UniqueId",
 	              "id": 3
+	            },
+	            "transportType": {
+	              "type": "TransportType",
+	              "id": 4
 	            }
+	          }
+	        },
+	        "TransportType": {
+	          "values": {
+	            "Unknown": 0,
+	            "Pipe": 1,
+	            "Ws": 2,
+	            "Wss": 3
 	          }
 	        },
 	        "AppLaunchMode": {

@@ -47,12 +47,22 @@ namespace Plexus.Host.Internal.Generated {
             "dGhvZF9pZBIeLmdvb2dsZS5wcm90b2J1Zi5NZXRob2RPcHRpb25zGLJLIAEo",
             "CUIhqgIeUGxleHVzLkhvc3QuSW50ZXJuYWwuR2VuZXJhdGVkYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { pbr::FileDescriptor.DescriptorProtoFileDescriptor, },
-          new pbr::GeneratedClrTypeInfo(null, null));
+          new pbr::FileDescriptor[] { global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor, },
+          new pbr::GeneratedClrTypeInfo(null, new pb::Extension[] { OptionsExtensions.MessageId, OptionsExtensions.ServiceId, OptionsExtensions.MethodId }, null));
     }
     #endregion
 
   }
+  /// <summary>Holder for extension identifiers generated from the top level of interop/options.proto</summary>
+  internal static partial class OptionsExtensions {
+    public static readonly pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, string> MessageId =
+      new pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, string>(9650, pb::FieldCodec.ForString(77202, ""));
+    public static readonly pb::Extension<global::Google.Protobuf.Reflection.ServiceOptions, string> ServiceId =
+      new pb::Extension<global::Google.Protobuf.Reflection.ServiceOptions, string>(9650, pb::FieldCodec.ForString(77202, ""));
+    public static readonly pb::Extension<global::Google.Protobuf.Reflection.MethodOptions, string> MethodId =
+      new pb::Extension<global::Google.Protobuf.Reflection.MethodOptions, string>(9650, pb::FieldCodec.ForString(77202, ""));
+  }
+
 }
 
 #endregion Designer generated code

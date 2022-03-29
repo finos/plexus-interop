@@ -29,10 +29,11 @@ namespace Plexus.Interop.Transport.Internal
         private readonly BufferedChannel<ITransportConnection> _buffer = new BufferedChannel<ITransportConnection>(1);
 
         public TransportServer(
+            TransportType transportType,
             ITransmissionServer transmissionServer,
             ITransportProtocolSerializationProvider serializationProvider)
         {
-            _connectionFactory = new TransportConnectionFactory(serializationProvider);
+            _connectionFactory = new TransportConnectionFactory(transportType, serializationProvider);
             _transmissionServer = transmissionServer;
             _buffer.Out.PropagateCompletionFrom(Completion);
             OnStop(_transmissionServer.Stop);
