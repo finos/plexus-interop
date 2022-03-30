@@ -64,9 +64,7 @@
     </None>
   </ItemGroup>
 
-  <Target Name="MakePublishDir" AfterTargets="Build">
-    <MakeDir Directories="$(PublishDir)" />
-  </Target>
+  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish" />
 
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
