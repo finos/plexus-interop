@@ -3,13 +3,13 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' And '$(CORE_ONLY)' == ''">
-    <TargetFramework>net45</TargetFramework>    
+    <TargetFramework>net45</TargetFramework>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">
-    <TargetFramework>netcoreapp2.1</TargetFramework>    
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,13 +29,9 @@
     <QuickStartSamplesDir>$(ArtifactsDir)samples/quick-start/</QuickStartSamplesDir>
 
     <IsPackable>true</IsPackable>
-    <NuspecFile>$(MSBuildThisFileDirectory)Plexus.Interop.Broker.Redist.nuspec</NuspecFile>    
+    <NuspecFile>$(MSBuildThisFileDirectory)Plexus.Interop.Broker.Redist.nuspec</NuspecFile>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <None Remove="plexus.cmd" />
-  </ItemGroup>
-  
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <PackageReference Include="CommandLineParser" Version="2.4.3" />
     <PackageReference Include="System.Console" Version="4.3.1" />
@@ -47,9 +43,9 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
     <PackageReference Include="CommandLineParser" Version="1.9.71" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />    
+    <ProjectReference Include="..\Plexus.Interop.Broker\Plexus.Interop.Broker.csproj" />
     <ProjectReference Include="..\Plexus.Logging.NLog\Plexus.Logging.NLog.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Samples.Metadata\Plexus.Interop.Samples.Metadata.csproj">
@@ -57,7 +53,7 @@
       <IncludeAssets>Build</IncludeAssets>
     </ProjectReference>
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
