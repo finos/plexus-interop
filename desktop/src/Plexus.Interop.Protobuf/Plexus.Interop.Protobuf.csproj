@@ -9,17 +9,17 @@
 
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <NUGET_PACKAGES Condition=" '$(NUGET_PACKAGES)' == '' ">$(USERPROFILE)\.nuget\packages</NUGET_PACKAGES>
-    <ProtoCompilerPath>$(NUGET_PACKAGES)\google.protobuf.tools\3.14.0\tools\windows_x86\protoc</ProtoCompilerPath>
+    <ProtoCompilerPath>$(NUGET_PACKAGES)\google.protobuf.tools\3.20.1\tools\windows_x86\protoc</ProtoCompilerPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
     <NUGET_PACKAGES Condition=" '$(NUGET_PACKAGES)' == '' ">~/.nuget/packages</NUGET_PACKAGES>
-    <ProtoCompilerPath>$(NUGET_PACKAGES)/google.protobuf.tools/3.14.0/tools/macosx_x64/protoc</ProtoCompilerPath>
+    <ProtoCompilerPath>$(NUGET_PACKAGES)/google.protobuf.tools/3.20.1/tools/macosx_x64/protoc</ProtoCompilerPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
-    <PackageReference Include="Google.Protobuf.Tools" Version="3.14.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.20.1" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.20.1" />
   </ItemGroup>
 
   <ItemGroup>
