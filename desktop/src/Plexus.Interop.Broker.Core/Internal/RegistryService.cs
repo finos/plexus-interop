@@ -160,7 +160,7 @@ namespace Plexus.Interop.Broker.Internal
             _registryLock.EnterReadLock();
             try
             {
-                return GetMatchingProvidedMethods(consumedMethod.ConsumedService.Application)
+                return GetMethodMatchesByConsumedService(consumedMethod.ConsumedService)
                     .Where(x => Equals(x.Method, consumedMethod.Method))
                     .ToList();
             }
@@ -266,7 +266,7 @@ namespace Plexus.Interop.Broker.Internal
             try
             {
                 var consumedService = GetConsumedService(appId, consumedServiceReference);
-                return GetMatchingProvidedMethods(consumedService.Application)
+                return GetMethodMatchesByConsumedService(consumedService)
                     .Join(consumedService.Methods.Values, x => x.Method, y => y.Method, (x, y) => (y, x))
                     .Distinct()
                     .ToList();
@@ -276,6 +276,10 @@ namespace Plexus.Interop.Broker.Internal
                 _registryLock.ExitReadLock();
             }
         }
+
+        private IEnumerable<IProvidedMethod> GetMethodMatchesByConsumedService(IConsumedService consumedService)
+            => GetMatchingProvidedMethods(consumedService.Application)
+                .Where(providedMethod => consumedService.From.IsMatch(providedMethod.ProvidedService.Application.Id));
 
         public IReadOnlyCollection<(IConsumedMethod Consumed, IProvidedMethod Provided)> GetMethodMatches(string appId)
         {
