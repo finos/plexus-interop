@@ -83,8 +83,7 @@ export class InvocationHandlersRegistry {
     }
 
     private actionHash(actionRef: ActionReference): string {
-        const alias = actionRef.serviceAlias || 'default';
-        return `${actionRef.serviceId}.${alias}.${actionRef.methodId}`;
+        return `${actionRef.serviceId}.${actionRef.methodId}`;
     }
 
     private toActionRef(handlerRef: HandlerActionRef): ActionReference {
