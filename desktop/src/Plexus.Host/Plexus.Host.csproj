@@ -60,8 +60,7 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish"
-          Condition="'$(CORE_ONLY)' != '' Or '$(TargetFramework)' == 'net45'" />
+  <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish" />
 
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
