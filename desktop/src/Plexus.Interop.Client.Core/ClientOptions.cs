@@ -39,7 +39,7 @@
             Marshaller = marshaller;
             Protocol = protocol;
             Services = new List<ProvidedServiceDefinition>(services);
-            ServicesDictionary = Services.ToDictionary(x => (x.Id, x.Alias), x => x);
+            ServicesDictionary = Services.ToDictionary(x => x.Id, x => x);
         }
 
         public string BrokerWorkingDir { get; }
@@ -56,7 +56,7 @@
 
         public IReadOnlyCollection<ProvidedServiceDefinition> Services { get; }
 
-        internal IReadOnlyDictionary<(string Id, Maybe<string> Alias), ProvidedServiceDefinition> ServicesDictionary { get; }
+        internal IReadOnlyDictionary<string, ProvidedServiceDefinition> ServicesDictionary { get; }
 
         public override string ToString()
         {
