@@ -331,13 +331,13 @@ namespace Plexus.Interop.Internal
         private Task HandleInvocationStartRequestAsync(IInvocationStartRequested request, ITransportChannel channel)
         {
             _log.Debug($"Handling invocation start request {request} on channel {channel.Id}");
-            if (!_options.ServicesDictionary.TryGetValue((request.ServiceId, request.ServiceAlias), out var providedService))
+            if (!_options.ServicesDictionary.TryGetValue(request.ServiceId, out var providedService))
             {
-                throw new InvalidOperationException($"Service implementation with alias {request.ServiceAlias} not provided: {request.ServiceId}");
+                throw new InvalidOperationException($"Service implementation not provided: {request.ServiceId}");
             }
             if (!providedService.CallHandlers.TryGetValue(request.MethodId, out var callHandler))
             {
-                throw new InvalidOperationException($"Method implementation with alias {request.ServiceAlias} not provided: {request.ServiceId}.{request.MethodId}");
+                throw new InvalidOperationException($"Method implementation not provided: {request.ServiceId}.{request.MethodId}");
             }
             var invocationInfo =
                 new IncomingInvocationDescriptor(
