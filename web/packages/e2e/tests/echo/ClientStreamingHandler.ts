@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { NopServiceHandler } from './NopServiceHandler';
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { Observer } from '@plexus-interop/common';
 import { StreamingInvocationClient, MethodInvocationContext, InvocationObserver } from '@plexus-interop/client';
 

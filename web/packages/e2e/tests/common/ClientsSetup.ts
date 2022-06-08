@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 import { EchoClientClient, EchoClientClientBuilder } from '../../src/echo/client/EchoClientGeneratedClient';
-import { EchoServerClient, EchoServerClientBuilder, EchoServiceInvocationHandler, ServiceAliasInvocationHandler } from '../../src/echo/server/EchoServerGeneratedClient';
+import { EchoServerClient, EchoServerClientBuilder, EchoServiceInvocationHandler } from '../../src/echo/server/EchoServerGeneratedClient';
 import { ConnectionProvider } from './ConnectionProvider';
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { TimeUtils } from '@plexus-interop/common';
 import * as Long from 'long';
 import { ConnectionSetup } from './ConnectionSetup';
-import { NopServiceAliasHandler } from '../echo/NopServiceAliasHandler';
 import { GenericClientApi, ContainerAwareClientAPIBuilder, GenericClientApiBuilder } from '@plexus-interop/client';
 import { BinaryMarshallerProvider } from '@plexus-interop/io';
 
@@ -34,9 +33,8 @@ export class ClientsSetup {
 
     public async createEchoClients(
         transportConnectionProvider: ConnectionProvider,
-        serviceHandler: EchoServiceInvocationHandler,
-        aliasServiceHandler: ServiceAliasInvocationHandler = new NopServiceAliasHandler()): Promise<[EchoClientClient, EchoServerClient]> {
-        const server = await this.createEchoServer(transportConnectionProvider, serviceHandler, aliasServiceHandler);
+        serviceHandler: EchoServiceInvocationHandler): Promise<[EchoClientClient, EchoServerClient]> {
+        const server = await this.createEchoServer(transportConnectionProvider, serviceHandler);
         const client = await this.createEchoClient(transportConnectionProvider);
         await TimeUtils.timeout(this.clientConnectionDelay);
         return [client, server];
@@ -54,9 +52,8 @@ export class ClientsSetup {
     public async createGenericClientAndStaticServer(
         clientMarshaller: BinaryMarshallerProvider,
         transportConnectionProvider: ConnectionProvider,
-        serviceHandler: EchoServiceInvocationHandler,
-        aliasServiceHandler: ServiceAliasInvocationHandler = new NopServiceAliasHandler()): Promise<[GenericClientApi, EchoServerClient]> {
-        const server = await this.createEchoServer(transportConnectionProvider, serviceHandler, aliasServiceHandler);
+        serviceHandler: EchoServiceInvocationHandler): Promise<[GenericClientApi, EchoServerClient]> {
+        const server = await this.createEchoServer(transportConnectionProvider, serviceHandler);
         const client = await this.createGenericEchoClient(transportConnectionProvider, clientMarshaller);
         await TimeUtils.timeout(this.clientConnectionDelay);
         return [client, server];
@@ -74,11 +71,9 @@ export class ClientsSetup {
 
     public createEchoServer(
         transportConnectionProvider: ConnectionProvider,
-        serviceHandler: EchoServiceInvocationHandler,
-        aliasServiceHandler: ServiceAliasInvocationHandler = new NopServiceAliasHandler()): Promise<EchoServerClient> {
+        serviceHandler: EchoServiceInvocationHandler): Promise<EchoServerClient> {
         return new EchoServerClientBuilder()
             .withEchoServiceInvocationsHandler(serviceHandler)
-            .withServiceAliasInvocationsHandler(aliasServiceHandler)
             .withTransportConnectionProvider(async () => {
                 this.serverConnectionSetup = await transportConnectionProvider();
                 return this.serverConnectionSetup.getConnection();
@@ -100,7 +95,7 @@ export class ClientsSetup {
             int64Field: Long.fromInt(1234),
             uint32Field: 4321,
             repeatedDoubleField: [1, 2, 3],
-            enumField: plexus.plexus.interop.testing.EchoRequest.SubEnum.value_one,
+            enumField: plexus.plexus.interop.testing.EchoRequest.SubEnum.VALUE_ONE,
             subMessageField: {
                 stringField: 'subString',
                 bytesField: new Uint8Array([5, 6, 7])

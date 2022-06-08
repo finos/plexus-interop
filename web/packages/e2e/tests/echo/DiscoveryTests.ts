@@ -17,7 +17,7 @@
 import { ClientsSetup } from '../common/ClientsSetup';
 import { ConnectionProvider } from '../common/ConnectionProvider';
 import { BaseEchoTest } from './BaseEchoTest';
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { NopServiceHandler } from './NopServiceHandler';
 import { expect } from 'chai';
 import { DiscoveredMethod, ProvidedMethodReference, DiscoveredServiceMethod, DiscoveredService } from '@plexus-interop/client-api';

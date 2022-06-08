@@ -17,7 +17,7 @@
 import { ConnectionProvider } from '../common/ConnectionProvider';
 import { ClientsSetup } from '../common/ClientsSetup';
 import { BaseEchoTest } from './BaseEchoTest';
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { ClientStreamingHandler } from './ClientStreamingHandler';
 import { StreamingInvocationClient, MethodInvocationContext } from '@plexus-interop/client';
 
