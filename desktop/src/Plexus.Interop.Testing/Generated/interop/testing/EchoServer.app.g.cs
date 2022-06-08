@@ -51,15 +51,11 @@ namespace Plexus.Interop.Testing.Generated {
 		public EchoServerClient(
 			EchoServerClient.IEchoServiceImpl echoService,
 			EchoServerClient.IGreetingServiceImpl greetingService,
-			EchoServerClient.IAlwaysLaunchGreetingServiceImpl alwaysLaunchGreetingService,
-			EchoServerClient.INeverLaunchGreetingServiceImpl neverLaunchGreetingService,
 			Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null
 		)
 		:this(new EchoServerClient.ServiceBinder(
 			echoService,
-			greetingService,
-			alwaysLaunchGreetingService,
-			neverLaunchGreetingService
+			greetingService
 		), setup) { }
 		
 		public EchoServerClient(EchoServerClient.ServiceBinder serviceBinder, Func<ClientOptionsBuilder, ClientOptionsBuilder> setup = null): base(CreateClientOptions(serviceBinder, setup)) 
@@ -72,26 +68,18 @@ namespace Plexus.Interop.Testing.Generated {
 			
 			public ServiceBinder(
 				EchoServerClient.IEchoServiceImpl echoService,
-				EchoServerClient.IGreetingServiceImpl greetingService,
-				EchoServerClient.IAlwaysLaunchGreetingServiceImpl alwaysLaunchGreetingService,
-				EchoServerClient.INeverLaunchGreetingServiceImpl neverLaunchGreetingService
+				EchoServerClient.IGreetingServiceImpl greetingService
 			) {
 				_echoServiceBinder = new EchoServerClient.EchoServiceBinder(echoService);
 				_greetingServiceBinder = new EchoServerClient.GreetingServiceBinder(greetingService);
-				_alwaysLaunchGreetingServiceBinder = new EchoServerClient.AlwaysLaunchGreetingServiceBinder(alwaysLaunchGreetingService);
-				_neverLaunchGreetingServiceBinder = new EchoServerClient.NeverLaunchGreetingServiceBinder(neverLaunchGreetingService);
 			}
 			
 			private EchoServiceBinder _echoServiceBinder;
 			private GreetingServiceBinder _greetingServiceBinder;
-			private AlwaysLaunchGreetingServiceBinder _alwaysLaunchGreetingServiceBinder;
-			private NeverLaunchGreetingServiceBinder _neverLaunchGreetingServiceBinder;
 			
 			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
 				builder = _echoServiceBinder.Bind(builder);
 				builder = _greetingServiceBinder.Bind(builder);
-				builder = _alwaysLaunchGreetingServiceBinder.Bind(builder);
-				builder = _neverLaunchGreetingServiceBinder.Bind(builder);
 				return builder;
 			}
 		}
@@ -236,114 +224,6 @@ namespace Plexus.Interop.Testing.Generated {
 			private readonly T _impl;
 			
 			public GreetingServiceImpl(T impl) {
-				_impl = impl;
-			}
-			
-			public Task<global::Plexus.Interop.Testing.Generated.GreetingResponse> Hello(global::Plexus.Interop.Testing.Generated.GreetingRequest request, MethodCallContext context) {
-				return _impl.Hello(request, context);
-			}
-		}
-		
-		public partial interface IAlwaysLaunchGreetingServiceImpl:
-			global::Plexus.Interop.Testing.Generated.GreetingService.IHelloImpl
-		{ }
-		
-		private sealed partial class AlwaysLaunchGreetingServiceBinder {
-			
-			public const string Alias = "AlwaysLaunchGreetingService";
-			
-			private readonly IAlwaysLaunchGreetingServiceImpl _impl;
-			
-			public AlwaysLaunchGreetingServiceBinder(IAlwaysLaunchGreetingServiceImpl impl) {
-				_impl = impl;
-			}
-			
-			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
-				return builder.WithProvidedService(global::Plexus.Interop.Testing.Generated.GreetingService.Id, Alias, Bind);
-			}
-			
-			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
-				builder = builder.WithUnaryMethod<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse>(global::Plexus.Interop.Testing.Generated.GreetingService.HelloMethodId, _impl.Hello);
-				return builder; 							
-			}
-		}
-		
-		public sealed partial class AlwaysLaunchGreetingServiceImpl: IAlwaysLaunchGreetingServiceImpl
-		{
-			private readonly UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse> _helloHandler;
-			
-			public AlwaysLaunchGreetingServiceImpl(
-				UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse> helloHandler
-			) {
-				_helloHandler = helloHandler;
-			}
-			
-			public Task<global::Plexus.Interop.Testing.Generated.GreetingResponse> Hello(global::Plexus.Interop.Testing.Generated.GreetingRequest request, MethodCallContext context) {
-				return _helloHandler(request, context);
-			}
-		}					
-		
-		public sealed partial class AlwaysLaunchGreetingServiceImpl<T>: IAlwaysLaunchGreetingServiceImpl
-			where T:
-			global::Plexus.Interop.Testing.Generated.GreetingService.IHelloImpl
-		{
-			private readonly T _impl;
-			
-			public AlwaysLaunchGreetingServiceImpl(T impl) {
-				_impl = impl;
-			}
-			
-			public Task<global::Plexus.Interop.Testing.Generated.GreetingResponse> Hello(global::Plexus.Interop.Testing.Generated.GreetingRequest request, MethodCallContext context) {
-				return _impl.Hello(request, context);
-			}
-		}
-		
-		public partial interface INeverLaunchGreetingServiceImpl:
-			global::Plexus.Interop.Testing.Generated.GreetingService.IHelloImpl
-		{ }
-		
-		private sealed partial class NeverLaunchGreetingServiceBinder {
-			
-			public const string Alias = "NeverLaunchGreetingService";
-			
-			private readonly INeverLaunchGreetingServiceImpl _impl;
-			
-			public NeverLaunchGreetingServiceBinder(INeverLaunchGreetingServiceImpl impl) {
-				_impl = impl;
-			}
-			
-			public ClientOptionsBuilder Bind(ClientOptionsBuilder builder) {
-				return builder.WithProvidedService(global::Plexus.Interop.Testing.Generated.GreetingService.Id, Alias, Bind);
-			}
-			
-			private ProvidedServiceDefinition.Builder Bind(ProvidedServiceDefinition.Builder builder) {
-				builder = builder.WithUnaryMethod<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse>(global::Plexus.Interop.Testing.Generated.GreetingService.HelloMethodId, _impl.Hello);
-				return builder; 							
-			}
-		}
-		
-		public sealed partial class NeverLaunchGreetingServiceImpl: INeverLaunchGreetingServiceImpl
-		{
-			private readonly UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse> _helloHandler;
-			
-			public NeverLaunchGreetingServiceImpl(
-				UnaryMethodHandler<global::Plexus.Interop.Testing.Generated.GreetingRequest, global::Plexus.Interop.Testing.Generated.GreetingResponse> helloHandler
-			) {
-				_helloHandler = helloHandler;
-			}
-			
-			public Task<global::Plexus.Interop.Testing.Generated.GreetingResponse> Hello(global::Plexus.Interop.Testing.Generated.GreetingRequest request, MethodCallContext context) {
-				return _helloHandler(request, context);
-			}
-		}					
-		
-		public sealed partial class NeverLaunchGreetingServiceImpl<T>: INeverLaunchGreetingServiceImpl
-			where T:
-			global::Plexus.Interop.Testing.Generated.GreetingService.IHelloImpl
-		{
-			private readonly T _impl;
-			
-			public NeverLaunchGreetingServiceImpl(T impl) {
 				_impl = impl;
 			}
 			

@@ -2608,42 +2608,6 @@
 					"to": [
 						"interop.testing.*"
 					]
-				},
-				{
-					"service": "interop.testing.GreetingService",
-					"methods": [
-						{
-							"name": "Hello",
-							"options": [
-								{
-									"id": "interop.ProvidedMethodOptions.launch_on_call",
-									"value": "ALWAYS"
-								}
-							]
-						}
-					],
-					"alias": "AlwaysLaunchGreetingService",
-					"to": [
-						"interop.testing.*"
-					]
-				},
-				{
-					"service": "interop.testing.GreetingService",
-					"methods": [
-						{
-							"name": "Hello",
-							"options": [
-								{
-									"id": "interop.ProvidedMethodOptions.launch_on_call",
-									"value": "NEVER"
-								}
-							]
-						}
-					],
-					"alias": "NeverLaunchGreetingService",
-					"to": [
-						"interop.testing.*"
-					]
 				}
 			]
 		},
