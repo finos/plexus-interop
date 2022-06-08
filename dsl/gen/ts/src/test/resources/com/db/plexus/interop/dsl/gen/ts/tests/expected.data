@@ -183,14 +183,6 @@ class ComponentAClientImpl extends GenericClientApiBase implements ComponentACli
 }
 
 /**
- * Client invocation handler for NoLaunchExampleService, to be implemented by Client
- */
-export abstract class NoLaunchExampleServiceInvocationHandler {
-
-    public abstract onPointToPoint(invocationContext: MethodInvocationContext, request: plexus.com.db.plexus.interop.dsl.gen.test.model.IRequest): Promise<plexus.com.db.plexus.interop.dsl.gen.test.model.IResponse>;
-}
-
-/**
  * Client invocation handler for ExampleService, to be implemented by Client
  */
 export abstract class ExampleServiceInvocationHandler {
@@ -213,15 +205,8 @@ export class ComponentAClientBuilder implements ClientApiBuilder<ComponentAClien
         new ContainerAwareClientAPIBuilder()
             .withApplicationId('com.db.plexus.interop.dsl.gen.test.components.ComponentA');
 
-    private noLaunchExampleServiceHandler: NoLaunchExampleServiceInvocationHandler;
-    
     private exampleServiceHandler: ExampleServiceInvocationHandler;
 
-    public withNoLaunchExampleServiceInvocationsHandler(invocationsHandler: NoLaunchExampleServiceInvocationHandler): ComponentAClientBuilder {
-        this.noLaunchExampleServiceHandler = invocationsHandler;
-        return this;
-    }
-    
     public withExampleServiceInvocationsHandler(invocationsHandler: ExampleServiceInvocationHandler): ComponentAClientBuilder {
         this.exampleServiceHandler = invocationsHandler;
         return this;
@@ -253,21 +238,10 @@ export class ComponentAClientBuilder implements ClientApiBuilder<ComponentAClien
     }
 
     public connect(): Promise<ComponentAClient> {
-        if (!this.noLaunchExampleServiceHandler) {
-            return Promise.reject('Invocation handler for NoLaunchExampleService is not provided');
-        }
         if (!this.exampleServiceHandler) {
             return Promise.reject('Invocation handler for ExampleService is not provided');
         }
         return this.genericBuilder
-            .withTypeAwareUnaryHandler({
-                serviceInfo: {
-                    serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService',
-                    serviceAlias: 'NoLaunchExampleService'
-                },
-                methodId: 'PointToPoint',
-                handle: this.noLaunchExampleServiceHandler.onPointToPoint.bind(this.noLaunchExampleServiceHandler)
-            }, plexus.com.db.plexus.interop.dsl.gen.test.model.Request, plexus.com.db.plexus.interop.dsl.gen.test.model.Response)
             .withTypeAwareUnaryHandler({
                 serviceInfo: {
                     serviceId: 'com.db.plexus.interop.dsl.gen.test.services.ExampleService'

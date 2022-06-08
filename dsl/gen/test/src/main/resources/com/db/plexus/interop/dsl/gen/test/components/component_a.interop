@@ -22,20 +22,16 @@ package com.db.plexus.interop.dsl.gen.test.components;
 
 application ComponentA {
 
-        consumes com.db.plexus.interop.dsl.gen.test.services.ExampleService { PointToPoint; ServerStreaming [(model.consumed_method_option_enum)=VALUE2]; ClientToServer; BidiStreaming; }
+    consumes com.db.plexus.interop.dsl.gen.test.services.ExampleService { PointToPoint; ServerStreaming [(model.consumed_method_option_enum)=VALUE2]; ClientToServer; BidiStreaming; }
 
-        consumes com.db.plexus.interop.dsl.gen.test.services.ExampleService as NoLaunchExampleService {
-            PointToPoint;
-        } from com.db.plexus.*
+    consumes com.db.plexus.interop.dsl.gen.test.services.ExampleService as NoLaunchExampleService from com.db.plexus.* {
+        PointToPoint;
+    }
 
-        provides com.db.plexus.interop.dsl.gen.test.services.ExampleService as NoLaunchExampleService to com.db.plexus.* {
-            PointToPoint;
-        }
-
-        provides services.ExampleService to com.db.plexus.* {
-        	PointToPoint [launch_on_call=ALWAYS, title="Point-to-point"]; 
-        	ServerStreaming; 
-        	ClientToServer; 
-        	BidiStreaming [launch_on_call=DISABLED]; 
-        }
+    provides services.ExampleService to com.db.plexus.* {
+        PointToPoint [launch_on_call=ALWAYS, title="Point-to-point"]; 
+        ServerStreaming; 
+        ClientToServer; 
+        BidiStreaming [launch_on_call=DISABLED]; 
+    }
 }

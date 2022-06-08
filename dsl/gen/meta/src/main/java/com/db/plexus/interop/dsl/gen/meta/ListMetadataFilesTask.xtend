@@ -34,7 +34,7 @@ class ListMetadataFilesTask extends BaseGenTask {
             .sort
             .join(System.lineSeparator)
 
-        if (config.outFile != null && !config.outFile.isEmpty()) {
+        if (config.outFile !== null && !config.outFile.isEmpty()) {
             val file = new File(config.outFile)
             println("Saving metadata files list to: " + file.absolutePath)
             FileUtils.writeStringToFile(file, loadedResourcesString)
