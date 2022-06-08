@@ -22,6 +22,7 @@ package com.db.plexus.interop.dsl.validation
 import com.db.plexus.interop.dsl.ConsumedMethod
 import com.db.plexus.interop.dsl.DslPackage
 import com.db.plexus.interop.dsl.ProvidedMethod
+import com.db.plexus.interop.dsl.ProvidedService
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.validation.Check
 
@@ -31,26 +32,33 @@ import org.eclipse.xtext.validation.Check
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 class InteropLangValidator extends AbstractInteropLangValidator {
-	
+
 	override def isLanguageSpecific() {
 		false
 	}
-		
+
 	@Check
-	def checkUniqueConsumedMethod(ConsumedMethod consumedMethod) {		
+	def checkUniqueConsumedMethod(ConsumedMethod consumedMethod) {
 		for (otherConsumedMethod : EcoreUtil2.getSiblingsOfType(consumedMethod, typeof(ConsumedMethod))) {
 			if (otherConsumedMethod.method.equals(consumedMethod.method)) {
-				error("Duplicated consumed method definition: " + consumedMethod.method.name, DslPackage.Literals.CONSUMED_METHOD__METHOD);								
-			}			
-		}						
+				error("Duplicated consumed method definition: " + consumedMethod.method.name, DslPackage.Literals.CONSUMED_METHOD__METHOD);
+			}
+		}
 	}
-	
+
 	@Check
-	def checkUniqueProvidedMethod(ProvidedMethod providedMethod) {		
+	def checkUniqueProvidedMethod(ProvidedMethod providedMethod) {
 		for (otherProvidedMethod : EcoreUtil2.getSiblingsOfType(providedMethod, typeof(ProvidedMethod))) {
 			if (otherProvidedMethod.method.equals(providedMethod.method)) {
-				error("Duplicated provided method definition: " + providedMethod.method.name, DslPackage.Literals.PROVIDED_METHOD__METHOD);								
-			}			
-		}						
+				error("Duplicated provided method definition: " + providedMethod.method.name, DslPackage.Literals.PROVIDED_METHOD__METHOD);
+			}
+		}
+	}
+
+	@Check
+	def checkProvidedServiceHasNoAlias(ProvidedService providedService) {
+		if (providedService.alias !== null && !providedService.alias.isEmpty()) {
+			error("Provided service alias not empty: " + providedService.alias, DslPackage.Literals.PROVIDED_SERVICE__ALIAS);
+		}
 	}
 }

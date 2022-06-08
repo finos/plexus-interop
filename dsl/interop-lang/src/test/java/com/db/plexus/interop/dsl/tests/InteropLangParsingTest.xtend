@@ -69,14 +69,27 @@ class InteropLangParsingTest {
 		Assert.assertTrue(allResources.length > 0)	
 	}
 	
-	def validateResource(Resource r) {		
+	@Test
+	def void provideServiceAsAlias() {
+		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource("com/db/plexus/interop/dsl/tests/provide_as_alias.interop").toURI().toString())
+		val r = rs.getResource(uri, true)
+		val issues = getValidationIssues(r)
+		Assert.assertEquals(1, issues.length)
+	}
+
+	def validateResource(Resource r) {
+		val issues = getValidationIssues(r)
+		Assert.assertEquals(0, issues.length)
+	}
+
+	def getValidationIssues(Resource r) {
 		System.out.println("Validating " + r.URI)
-		val issues = validator.validate(r, CheckMode.ALL, CancelIndicator.NullImpl)		
-		for (issue : issues) {			
-			System.err.println(issue)			
+		val issues = validator.validate(r, CheckMode.ALL, CancelIndicator.NullImpl)
+		for (issue : issues) {
+			System.err.println(issue)
 		}
 		System.out.flush()
-		System.err.flush()		
-		Assert.assertEquals(0, issues.length)		
-	}	
+		System.err.flush()
+		return issues;
+	}
 }
