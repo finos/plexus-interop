@@ -74,7 +74,15 @@ class InteropLangParsingTest {
 		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource("com/db/plexus/interop/dsl/tests/provide_as_alias.interop").toURI().toString())
 		val r = rs.getResource(uri, true)
 		val issues = getValidationIssues(r)
-		Assert.assertEquals(1, issues.length)
+		Assert.assertTrue("Validation did not reveal any problems with incorrect metadata", issues.length > 0)
+	}
+	
+	@Test
+	def void provideDuplicateService() {
+		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource("com/db/plexus/interop/dsl/tests/provide_duplicate.interop").toURI().toString())
+		val r = rs.getResource(uri, true)
+		val issues = getValidationIssues(r)
+		Assert.assertTrue("Validation did not reveal any problems with incorrect metadata", issues.length > 0)
 	}
 
 	def validateResource(Resource r) {

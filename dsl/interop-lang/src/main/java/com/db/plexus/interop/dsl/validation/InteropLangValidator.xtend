@@ -61,4 +61,13 @@ class InteropLangValidator extends AbstractInteropLangValidator {
 			error("Provided service alias not empty: " + providedService.alias, DslPackage.Literals.PROVIDED_SERVICE__ALIAS);
 		}
 	}
+
+	@Check
+	def checkUniqueProvidedService(ProvidedService providedService) {
+		for (otherProvidedService : EcoreUtil2.getSiblingsOfType(providedService, typeof(ProvidedService))) {
+			if (otherProvidedService.service.name.equals(providedService.service.name)) {
+				error("Duplicated provided service definition: " + providedService.service.name, DslPackage.Literals.PROVIDED_SERVICE__SERVICE);
+			}
+		}
+	}
 }
