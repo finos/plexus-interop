@@ -20,9 +20,9 @@ package com.db.plexus.interop.dsl.tests;
 import "com/db/plexus/interop/dsl/tests/example1.proto";
 
 application App1 {
-	consumes Service1 {
-        option launch_on_call = ALWAYS;
-        option launch_on_call = ALWAYS;
+	provides Service1 {
+		option title = "Test Service";
+		option title = "Test Service";
 		Do;
 	}
 }

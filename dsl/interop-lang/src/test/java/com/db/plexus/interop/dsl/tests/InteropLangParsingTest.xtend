@@ -80,13 +80,8 @@ class InteropLangParsingTest {
 	}
 
 	@Test
-	def provideDuplicateOption() {
-		checkIncorrectMetadataValidation("provide_duplicate_option.interop")
-	}
-
-	@Test
-	def consumeDuplicateOption() {
-		checkIncorrectMetadataValidation("consume_duplicate_option.interop")
+	def duplicateOption() {
+		checkIncorrectMetadataValidation("duplicate_option.interop")
 	}
 
 	def checkIncorrectMetadataValidation(String fileName) {
