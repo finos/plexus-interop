@@ -23,6 +23,7 @@ import com.db.plexus.interop.dsl.ConsumedMethod
 import com.db.plexus.interop.dsl.DslPackage
 import com.db.plexus.interop.dsl.ProvidedMethod
 import com.db.plexus.interop.dsl.ProvidedService
+import com.db.plexus.interop.dsl.InteropOption
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.validation.Check
 
@@ -67,6 +68,19 @@ class InteropLangValidator extends AbstractInteropLangValidator {
 		for (otherProvidedService : EcoreUtil2.getSiblingsOfType(providedService, typeof(ProvidedService))) {
 			if (otherProvidedService.service.name.equals(providedService.service.name)) {
 				error("Duplicated provided service definition: " + providedService.service.name, DslPackage.Literals.PROVIDED_SERVICE__SERVICE);
+			}
+		}
+	}
+
+	@Check
+	def checkUniqueProvidedServiceOption(ProvidedService providedService) {
+		var options = EcoreUtil2.typeSelect(providedService.elements, typeof(InteropOption))
+		for (var i = 1; i < options.size(); i++) {
+			for (var j = 0; j < i; j++) {
+				var name = options.get(i).descriptor.name
+				if (name.equals(options.get(j).descriptor.name)) {
+					error("Duplicated option definition: " + name, DslPackage.Literals.PROVIDED_SERVICE__ELEMENTS);
+				}
 			}
 		}
 	}
