@@ -1,5 +1,5 @@
 //
-// Copyright 2017-2020 Plexus Interop Deutsche Bank AG
+// Copyright 2017-2021 Plexus Interop Deutsche Bank AG
 // SPDX-License-Identifier: Apache-2.0
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +15,10 @@
 // limitations under the License.
 //
 
-syntax="proto3";
+package com.db.plexus.interop.dsl.tests;
 
-package plexus.interop.testing;
+import "com/db/plexus/interop/dsl/tests/example1.proto";
 
-option csharp_namespace="Plexus.Interop.Testing.Generated";
-
-message EchoRequest {
-	string string_field = 1;
-	int64 int64_field = 2;
-	uint32 uint32_field = 3;
-	repeated double repeated_double_field = 4;
-	SubEnum enum_field = 5;
-	SubMessage sub_message_field = 6;
-	repeated SubMessage repeated_sub_message_field = 7;
-
-	message SubMessage {
-		bytes bytes_field = 1;
-		string string_field = 2;
-	}
-
-	enum SubEnum {
-		value_one = 0;
-		value_two = 1;
-	}
+application App1 {
+	provides Service1 as ServiceAlias { Do; }
 }
- 

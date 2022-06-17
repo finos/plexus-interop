@@ -18,7 +18,7 @@ import { BaseEchoTest } from './BaseEchoTest';
 import { ConnectionProvider } from '../common/ConnectionProvider';
 import { ClientsSetup } from '../common/ClientsSetup';
 import { UnaryServiceHandler } from './UnaryServiceHandler';
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { ClientStreamingHandler } from './ClientStreamingHandler';
 import { expect } from 'chai';
 

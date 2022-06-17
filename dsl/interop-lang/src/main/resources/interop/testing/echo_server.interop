@@ -36,6 +36,4 @@ application EchoServer {
 	}
 
 	provides interop.testing.GreetingService to interop.testing.* { Hello; }
-	provides interop.testing.GreetingService as AlwaysLaunchGreetingService to interop.testing.* { Hello [ launch_on_call=ALWAYS ]; }
-	provides interop.testing.GreetingService as NeverLaunchGreetingService to interop.testing.* { Hello [ launch_on_call=NEVER ]; }
 }

@@ -68,6 +68,9 @@ configurations.all {
             if (details.requested.group == 'org.eclipse.platform' && details.requested.name == 'org.eclipse.core.contenttype') {
                 details.useVersion "3.7.0"
             }
+            if (details.requested.group == 'org.eclipse.platform' && details.requested.name == 'org.eclipse.equinox.preferences') {
+                details.useVersion "3.9.0"
+            }
         }
     }
 }

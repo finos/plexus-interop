@@ -19,7 +19,7 @@ import { InteropPlatformFactory, MethodImplementation, InteropPeerDescriptor, St
 import { expect } from 'chai';
 import { BaseEchoTest } from '../echo/BaseEchoTest';
 import { ClientsSetup } from '../common/ClientsSetup';
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { AsyncHelper } from '@plexus-interop/common';
 
 // tslint:disable:no-unused-expression

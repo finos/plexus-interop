@@ -1,5 +1,5 @@
 /**
- * Copyright 2017-2020 Plexus Interop Deutsche Bank AG
+ * Copyright 2017-2021 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,12 @@ import { TransportConnection, UniqueId } from '@plexus-interop/transport-common'
 import { Arrays, Observer } from '@plexus-interop/common';
 import { InvocationObserver, InvocationObserverConverter, ContainerAwareClientAPIBuilder } from '@plexus-interop/client';
 
-import * as plexus from '../gen/plexus-messages';
+import * as plexus from './plexus-messages';
+
+export interface CancellableUnaryResponse<T> {
+    invocation: InvocationClient;
+    response: Promise<T>;
+}
 
 
 
@@ -61,14 +66,6 @@ export abstract class EchoServiceInvocationHandler {
 }
 
 /**
- * Client invocation handler for ServiceAlias, to be implemented by Client
- */
-export abstract class ServiceAliasInvocationHandler {
-
-    public abstract onUnary(invocationContext: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest>;
-}
-
-/**
  * Client API builder
  */
 export class EchoServerClientBuilder implements ClientApiBuilder<EchoServerClient, EchoServerClientBuilder> {
@@ -78,16 +75,9 @@ export class EchoServerClientBuilder implements ClientApiBuilder<EchoServerClien
             .withApplicationId('plexus.interop.testing.EchoServer');
 
     private echoServiceHandler: EchoServiceInvocationHandler;
-    
-    private serviceAliasHandler: ServiceAliasInvocationHandler;
 
     public withEchoServiceInvocationsHandler(invocationsHandler: EchoServiceInvocationHandler): EchoServerClientBuilder {
         this.echoServiceHandler = invocationsHandler;
-        return this;
-    }
-    
-    public withServiceAliasInvocationsHandler(invocationsHandler: ServiceAliasInvocationHandler): EchoServerClientBuilder {
-        this.serviceAliasHandler = invocationsHandler;
         return this;
     }
 
@@ -120,9 +110,6 @@ export class EchoServerClientBuilder implements ClientApiBuilder<EchoServerClien
         if (!this.echoServiceHandler) {
             return Promise.reject('Invocation handler for EchoService is not provided');
         }
-        if (!this.serviceAliasHandler) {
-            return Promise.reject('Invocation handler for ServiceAlias is not provided');
-        }
         return this.genericBuilder
             .withTypeAwareUnaryHandler({
                 serviceInfo: {
@@ -151,14 +138,6 @@ export class EchoServerClientBuilder implements ClientApiBuilder<EchoServerClien
                 },
                 methodId: 'DuplexStreaming',
                 handle: this.echoServiceHandler.onDuplexStreaming.bind(this.echoServiceHandler)
-            }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
-            .withTypeAwareUnaryHandler({
-                serviceInfo: {
-                    serviceId: 'plexus.interop.testing.EchoService',
-                    serviceAlias: 'ServiceAlias'
-                },
-                methodId: 'Unary',
-                handle: this.serviceAliasHandler.onUnary.bind(this.serviceAliasHandler)
             }, plexus.plexus.interop.testing.EchoRequest, plexus.plexus.interop.testing.EchoRequest)
             .connect()
             .then(genericClient => new EchoServerClientImpl(

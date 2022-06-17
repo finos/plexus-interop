@@ -5,12 +5,14 @@
 	      "nested": {
 	        "protobuf": {
 	          "options": {
-	            "go_package": "github.com/golang/protobuf/protoc-gen-go/descriptor;descriptor",
+	            "go_package": "github.com/golang/protobuf/ptypes/empty",
 	            "java_package": "com.google.protobuf",
-	            "java_outer_classname": "DescriptorProtos",
-	            "csharp_namespace": "Google.Protobuf.Reflection",
+	            "java_outer_classname": "EmptyProto",
+	            "csharp_namespace": "Google.Protobuf.WellKnownTypes",
 	            "objc_class_prefix": "GPB",
-	            "optimize_for": "SPEED"
+	            "optimize_for": "SPEED",
+	            "java_multiple_files": true,
+	            "cc_enable_arenas": true
 	          },
 	          "nested": {
 	            "FileDescriptorSet": {
@@ -860,6 +862,9 @@
 	                  }
 	                }
 	              }
+	            },
+	            "Empty": {
+	              "fields": {}
 	            }
 	          }
 	        }
@@ -870,6 +875,105 @@
 	        "csharp_namespace": "plexus"
 	      },
 	      "nested": {
+	        "AppLaunchMode": {
+	          "values": {
+	            "SINGLE_INSTANCE": 0,
+	            "MULTI_INSTANCE": 1
+	          }
+	        },
+	        "AppLauncherService": {
+	          "options": {
+	            "(.interop.service_id)": "interop.AppLauncherService"
+	          },
+	          "methods": {
+	            "Launch": {
+	              "requestType": "AppLaunchRequest",
+	              "responseType": "AppLaunchResponse"
+	            },
+	            "AppLaunchedEventStream": {
+	              "requestType": ".google.protobuf.Empty",
+	              "responseType": "AppLaunchedEvent",
+	              "responseStream": true
+	            }
+	          }
+	        },
+	        "AppLaunchRequest": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchRequest"
+	          },
+	          "fields": {
+	            "appId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "launchParamsJson": {
+	              "type": "string",
+	              "id": 2
+	            },
+	            "launchMode": {
+	              "type": "AppLaunchMode",
+	              "id": 3
+	            },
+	            "suggestedAppInstanceId": {
+	              "type": "UniqueId",
+	              "id": 4
+	            },
+	            "referrer": {
+	              "type": "AppLaunchReferrer",
+	              "id": 5
+	            }
+	          }
+	        },
+	        "AppLaunchReferrer": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchReferrer"
+	          },
+	          "fields": {
+	            "appId": {
+	              "type": "string",
+	              "id": 1
+	            },
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 2
+	            },
+	            "connectionId": {
+	              "type": "UniqueId",
+	              "id": 3
+	            }
+	          }
+	        },
+	        "AppLaunchResponse": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchResponse"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            }
+	          }
+	        },
+	        "AppLaunchedEvent": {
+	          "options": {
+	            "(.interop.message_id)": "interop.AppLaunchedEvent"
+	          },
+	          "fields": {
+	            "appInstanceId": {
+	              "type": "UniqueId",
+	              "id": 1
+	            },
+	            "appIds": {
+	              "rule": "repeated",
+	              "type": "string",
+	              "id": 2
+	            },
+	            "referrer": {
+	              "type": "AppLaunchReferrer",
+	              "id": 3
+	            }
+	          }
+	        },
 	        "ApplicationOptions": {
 	          "fields": {
 	            "title": {
@@ -959,73 +1063,20 @@
 	            "DISABLED": 2
 	          }
 	        },
-	        "AppLauncherService": {
-	          "options": {
-	            "(.interop.service_id)": "interop.AppLauncherService"
-	          },
-	          "methods": {
-	            "Launch": {
-	              "requestType": "AppLaunchRequest",
-	              "responseType": "AppLaunchResponse"
-	            }
-	          }
+	        "messageId": {
+	          "type": "string",
+	          "id": 9650,
+	          "extend": "google.protobuf.MessageOptions"
 	        },
-	        "AppLaunchRequest": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLaunchRequest"
-	          },
-	          "fields": {
-	            "appId": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "launchParamsJson": {
-	              "type": "string",
-	              "id": 2
-	            },
-	            "launchMode": {
-	              "type": "AppLaunchMode",
-	              "id": 3
-	            },
-	            "suggestedAppInstanceId": {
-	              "type": "UniqueId",
-	              "id": 4
-	            },
-	            "referrer": {
-	              "type": "AppLaunchReferrer",
-	              "id": 5
-	            }
-	          }
+	        "serviceId": {
+	          "type": "string",
+	          "id": 9650,
+	          "extend": "google.protobuf.ServiceOptions"
 	        },
-	        "AppLaunchReferrer": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLaunchReferrer"
-	          },
-	          "fields": {
-	            "appId": {
-	              "type": "string",
-	              "id": 1
-	            },
-	            "appInstanceId": {
-	              "type": "UniqueId",
-	              "id": 2
-	            },
-	            "connectionId": {
-	              "type": "UniqueId",
-	              "id": 3
-	            }
-	          }
-	        },
-	        "AppLaunchResponse": {
-	          "options": {
-	            "(.interop.message_id)": "interop.AppLaunchResponse"
-	          },
-	          "fields": {
-	            "appInstanceId": {
-	              "type": "UniqueId",
-	              "id": 1
-	            }
-	          }
+	        "methodId": {
+	          "type": "string",
+	          "id": 9650,
+	          "extend": "google.protobuf.MethodOptions"
 	        },
 	        "UniqueId": {
 	          "options": {
@@ -1040,12 +1091,6 @@
 	              "type": "fixed64",
 	              "id": 2
 	            }
-	          }
-	        },
-	        "AppLaunchMode": {
-	          "values": {
-	            "SINGLE_INSTANCE": 0,
-	            "MULTI_INSTANCE": 1
 	          }
 	        }
 	      }
@@ -1199,6 +1244,12 @@
 					"request": "interop.AppLaunchRequest",
 					"response": "interop.AppLaunchResponse",
 					"type": "Unary"
+				},
+				{
+					"name": "AppLaunchedEventStream",
+					"request": "google.protobuf.Empty",
+					"response": "interop.AppLaunchedEvent",
+					"type": "ServerStreaming"
 				}
 			],
 			"options": [
@@ -1212,13 +1263,6 @@
 	"applications": [
 		{
 			"id": "plexus.interop.testing.EchoClient",
-			"options": [
-				{
-					"id": "plexus.interop.testing.app_alias",
-					"value": "echo-client"
-				}
-			]
-			,
 			"consumes": [
 				{
 					"service": "plexus.interop.testing.EchoService",
@@ -1256,13 +1300,6 @@
 		},
 		{
 			"id": "plexus.interop.testing.EchoServer",
-			"options": [
-				{
-					"id": "plexus.interop.testing.app_alias",
-					"value": "echo-server"
-				}
-			]
-			,
 			"provides": [
 				{
 					"service": "plexus.interop.testing.EchoService",
@@ -1273,10 +1310,6 @@
 								{
 									"id": "interop.ProvidedMethodOptions.title",
 									"value": "Sample Unary Method"
-								},
-								{
-									"id": "plexus.interop.testing.provided_method_alias",
-									"value": "unary-method"
 								}
 							]
 						},
@@ -1286,10 +1319,6 @@
 								{
 									"id": "interop.ProvidedMethodOptions.title",
 									"value": "Sample Server Streaming Method"
-								},
-								{
-									"id": "plexus.interop.testing.provided_method_alias",
-									"value": "server-stream"
 								}
 							]
 						},
@@ -1319,30 +1348,6 @@
 						{
 							"id": "interop.ProvidedServiceOptions.title",
 							"value": "Sample Echo Service"
-						}
-					]
-				},
-				{
-					"service": "plexus.interop.testing.EchoService",
-					"methods": [
-						{
-							"name": "Unary",
-							"options": [
-								{
-									"id": "interop.ProvidedMethodOptions.title",
-									"value": "Sample Unary Method with Alias"
-								}
-							]
-						}
-					],
-					"alias": "ServiceAlias",
-					"to": [
-						"plexus.interop.testing.*"
-					],
-					"options": [
-						{
-							"id": "interop.ProvidedServiceOptions.title",
-							"value": "Sample Echo Service with Alias"
 						}
 					]
 				}

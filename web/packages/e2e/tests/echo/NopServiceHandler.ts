@@ -18,7 +18,7 @@ import { EchoServiceInvocationHandler } from '../../src/echo/server/EchoServerGe
 import { StreamingInvocationClient, MethodInvocationContext, InvocationObserver } from '@plexus-interop/client';
 import { Observer } from '@plexus-interop/common';
 
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 
 export class NopServiceHandler implements EchoServiceInvocationHandler {
 

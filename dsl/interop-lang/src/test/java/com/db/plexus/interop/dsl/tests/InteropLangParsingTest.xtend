@@ -36,47 +36,74 @@ import org.eclipse.xtext.util.CancelIndicator
 @RunWith(XtextRunner)
 @InjectWith(InteropLangInjectionProvider)
 class InteropLangParsingTest {
-	
+
 	@Inject
 	ResourceSet rs
-	
+
 	@Inject
 	IResourceValidator validator
-		
+
 	@Test
-	def void loadModel() {
+	def loadModel() {
 		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource("com/db/plexus/interop/dsl/tests/example1.interop").toURI().toString())
 		Assert.assertEquals(0, rs.resources.length)
 		rs.getResource(uri, true)
 		EcoreUtil2.resolveAll(rs);
-		val allResources = rs.resources		
+		val allResources = rs.resources
 		for (r : allResources) {
 			validateResource(r)
-		}								
+		}
 		Assert.assertEquals(5, allResources.length)	
 	}
-	
+
 	@Test
-	def void parseFilesWithPredefinedResources() {
+	def parseFilesWithPredefinedResources() {
 		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource("com/db/plexus/interop/dsl/tests/example3.interop").toURI().toString())
 		Assert.assertEquals(0, rs.resources.length)
 		rs.getResource(uri, true)
 		EcoreUtil2.resolveAll(rs);
-		val allResources = rs.resources		
+		val allResources = rs.resources
 		for (r : allResources) {
 			validateResource(r)
-		}								
+		}
 		Assert.assertTrue(allResources.length > 0)	
 	}
-	
-	def validateResource(Resource r) {		
+
+	@Test
+	def provideServiceAsAlias() {
+		checkIncorrectMetadataValidation("provide_as_alias.interop")
+	}
+
+	@Test
+	def provideDuplicateService() {
+		checkIncorrectMetadataValidation("provide_duplicate.interop")
+	}
+
+	@Test
+	def duplicateOption() {
+		checkIncorrectMetadataValidation("provide_duplicate_option.interop")
+	}
+
+	def checkIncorrectMetadataValidation(String fileName) {
+		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource("com/db/plexus/interop/dsl/tests/" + fileName).toURI().toString())
+		val r = rs.getResource(uri, true)
+		val issues = getValidationIssues(r)
+		Assert.assertTrue("Validation did not reveal any problems with incorrect metadata " + fileName, issues.length > 0)
+	}
+
+	def validateResource(Resource r) {
+		val issues = getValidationIssues(r)
+		Assert.assertEquals(0, issues.length)
+	}
+
+	def getValidationIssues(Resource r) {
 		System.out.println("Validating " + r.URI)
-		val issues = validator.validate(r, CheckMode.ALL, CancelIndicator.NullImpl)		
-		for (issue : issues) {			
-			System.err.println(issue)			
+		val issues = validator.validate(r, CheckMode.ALL, CancelIndicator.NullImpl)
+		for (issue : issues) {
+			System.err.println(issue)
 		}
 		System.out.flush()
-		System.err.flush()		
-		Assert.assertEquals(0, issues.length)		
-	}	
+		System.err.flush()
+		return issues;
+	}
 }
