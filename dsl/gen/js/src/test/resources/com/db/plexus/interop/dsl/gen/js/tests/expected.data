@@ -36,7 +36,7 @@ export class ExampleServiceProxy {
             });
         });
     }
-
+    
     serverStreaming(request, responseObserver) {
         const requestToBinaryConverter = from => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.test.model.Request.encode(from).finish());
         const responseFromBinaryConverter = from => {
@@ -52,7 +52,7 @@ export class ExampleServiceProxy {
             requestToBinaryConverter(request),
             new InvocationObserverConverter(responseObserver, responseFromBinaryConverter));
     }
-
+    
     clientToServer(responseObserver) {
         const requestToBinaryConverter = from => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.test.model.Request.encode(from).finish());
         const responseFromBinaryConverter = from => {
@@ -75,7 +75,7 @@ export class ExampleServiceProxy {
                 };
             });
     }
-
+    
     bidiStreaming(responseObserver) {
         const requestToBinaryConverter = from => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.test.model.Request.encode(from).finish());
         const responseFromBinaryConverter = from => {
@@ -154,22 +154,11 @@ class ComponentAClient extends GenericClientApiBase {
     getExampleServiceProxy() {
         return this.exampleServiceProxy;
     }
-
+    
     getNoLaunchExampleServiceProxy() {
         return this.noLaunchExampleServiceProxy;
     }
 
-}
-
-/**
- * Client invocation handler for NoLaunchExampleService, to be implemented by Client
- *
- */
-export class NoLaunchExampleServiceInvocationHandler {
-
-    onPointToPoint(invocationContext, request) {
-        // TODO implement handler
-    }
 }
 
 /**
@@ -193,28 +182,6 @@ export class ExampleServiceInvocationHandler {
 }
 
 /**
- * Internal invocation handler delegate for NoLaunchExampleService
- *
- */
-class NoLaunchExampleServiceInvocationHandlerInternal {
-
-    constructor(clientHandler) {
-        this.clientHandler = clientHandler;
-    }
-
-    onPointToPoint(invocationContext, request) {
-        const responseToBinaryConverter = from => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.test.model.Response.encode(from).finish());
-        const requestFromBinaryConverter = from => {
-            const decoded = plexus.com.db.plexus.interop.dsl.gen.test.model.Request.decode(new Uint8Array(from));
-            return plexus.com.db.plexus.interop.dsl.gen.test.model.Request.toObject(decoded);
-        };
-        return this.clientHandler
-            .onPointToPoint(invocationContext, requestFromBinaryConverter(request))
-            .then(response => responseToBinaryConverter(response));
-    }
-}
-
-/**
  * Internal invocation handler delegate for ExampleService
  *
  */
@@ -234,7 +201,7 @@ class ExampleServiceInvocationHandlerInternal {
             .onPointToPoint(invocationContext, requestFromBinaryConverter(request))
             .then(response => responseToBinaryConverter(response));
     }
-
+    
     onServerStreaming(invocationContext, request, hostClient) {
         const responseToBinaryConverter = from => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.test.model.Response.encode(from).finish());
         const requestFromBinaryConverter = from => {
@@ -249,7 +216,7 @@ class ExampleServiceInvocationHandlerInternal {
                 cancel: hostClient.cancel.bind(hostClient)
             });
     }
-
+    
     onClientToServer(invocationContext, hostClient) {
         const responseToBinaryConverter = from => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.test.model.Response.encode(from).finish());
         const requestFromBinaryConverter = from => {
@@ -270,7 +237,7 @@ class ExampleServiceInvocationHandlerInternal {
             streamCompleted: baseObserver.streamCompleted.bind(baseObserver)
         };
     }
-
+    
     onBidiStreaming(invocationContext, hostClient) {
         const responseToBinaryConverter = from => Arrays.toArrayBuffer(plexus.com.db.plexus.interop.dsl.gen.test.model.Response.encode(from).finish());
         const requestFromBinaryConverter = from => {
@@ -316,11 +283,6 @@ export class ComponentAClientBuilder {
         return this;
     }
 
-    withNoLaunchExampleServiceInvocationsHandler(invocationsHandler) {
-        this.noLaunchExampleServiceHandler = new NoLaunchExampleServiceInvocationHandlerInternal(invocationsHandler);
-        return this;
-    }
-
     withExampleServiceInvocationsHandler(invocationsHandler) {
         this.exampleServiceHandler = new ExampleServiceInvocationHandlerInternal(invocationsHandler);
         return this;
@@ -335,16 +297,6 @@ export class ComponentAClientBuilder {
         return new ContainerAwareClientAPIBuilder()
             .withTransportConnectionProvider(this.transportConnectionProvider)
             .withClientDetails(this.clientDetails)
-            .withUnaryInvocationHandler({
-                serviceInfo: {
-                    serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService",
-                    serviceAlias: "NoLaunchExampleService"
-                },
-                handler: {
-                    methodId: "PointToPoint",
-                    handle: this.noLaunchExampleServiceHandler.onPointToPoint.bind(this.noLaunchExampleServiceHandler)
-                }
-            })
             .withUnaryInvocationHandler({
                 serviceInfo: {
                     serviceId: "com.db.plexus.interop.dsl.gen.test.services.ExampleService"

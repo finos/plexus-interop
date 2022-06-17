@@ -18,7 +18,7 @@ import { ClientsSetup } from '../common/ClientsSetup';
 import { ConnectionProvider } from '../common/ConnectionProvider';
 import { UnaryServiceHandler } from './UnaryServiceHandler';
 import { BaseEchoTest } from './BaseEchoTest';
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { ClientError } from '@plexus-interop/protocol';
 import { expect } from 'chai';
 import { MethodInvocationContext } from '@plexus-interop/client';
@@ -40,14 +40,9 @@ export class PointToPointInvocationTests extends BaseEchoTest {
 
     public testAliasedServiceInvoked(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            const aliasServiceHandler = {
-                onUnary: async (context: MethodInvocationContext, request: plexus.plexus.interop.testing.IEchoRequest): Promise<plexus.plexus.interop.testing.IEchoRequest> => {
-                    return request;
-                }
-            };
             const echoRequest = this.clientsSetup.createRequestDto();
             return this.clientsSetup
-                .createEchoClients(this.connectionProvider, new NopServiceHandler(), aliasServiceHandler)
+                .createEchoClients(this.connectionProvider, new NopServiceHandler())
                 .then(clients => {
                     return clients[0].getServiceAliasProxy()
                         .unary(echoRequest)

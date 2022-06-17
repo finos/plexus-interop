@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { NopServiceHandler } from './NopServiceHandler';
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { MethodInvocationContext } from '@plexus-interop/client';
 
 export class UnaryServiceHandler extends NopServiceHandler {

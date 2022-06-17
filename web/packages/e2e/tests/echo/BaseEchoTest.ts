@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as plexus from '../../src/echo/gen/plexus-messages';
+import * as plexus from '../../src/echo/server/plexus-messages';
 import { expect } from 'chai';
 import { MethodInvocationContext } from '@plexus-interop/client';
 import { BinaryMarshallerProvider } from '@plexus-interop/io';

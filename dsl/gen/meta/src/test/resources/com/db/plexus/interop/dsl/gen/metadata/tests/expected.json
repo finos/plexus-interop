@@ -86,18 +86,6 @@
 					"service": "com.db.plexus.interop.dsl.gen.test.services.ExampleService",
 					"methods": [
 						{
-							"name": "PointToPoint"
-						}
-					],
-					"alias": "NoLaunchExampleService",
-					"to": [
-						"com.db.plexus.*"
-					]
-				},
-				{
-					"service": "com.db.plexus.interop.dsl.gen.test.services.ExampleService",
-					"methods": [
-						{
 							"name": "PointToPoint",
 							"options": [
 								{
@@ -158,28 +146,6 @@
 						{
 							"id": "interop.ProvidedServiceOptions.title",
 							"value": "Example Service"
-						}
-					]
-				},
-				{
-					"service": "com.db.plexus.interop.dsl.gen.test.services.ExampleService",
-					"methods": [
-						{
-							"name": "PointToPoint"
-						}
-					],
-					"alias": "NoLaunchExampleService",
-					"to": [
-						"com.db.plexus.*"
-					],
-					"options": [
-						{
-							"id": "interop.ProvidedServiceOptions.title",
-							"value": "No Launch Example Service"
-						},
-						{
-							"id": "interop.ProvidedServiceOptions.launch_on_call",
-							"value": "NEVER"
 						}
 					]
 				}
