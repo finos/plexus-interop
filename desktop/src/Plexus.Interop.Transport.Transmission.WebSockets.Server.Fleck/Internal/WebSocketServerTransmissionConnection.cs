@@ -37,6 +37,8 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets.Server.Internal
         private readonly Promise _connectCompletion = new Promise();
         private readonly Promise _disconnectCompletion = new Promise();
 
+        protected override ILogger Log => _log;
+
         public WebSocketServerTransmissionConnection(IWebSocketConnection websocket)
         {            
             _log = LogManager.GetLogger<WebSocketServerTransmissionConnection>(Id.ToString());
