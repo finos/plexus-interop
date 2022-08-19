@@ -19,7 +19,7 @@
     "@plexus-interop/common": "0.1.0",
     "@plexus-interop/metadata": "0.1.0",
     "@plexus-interop/protocol": "0.1.0",
-    "protobufjs": "6.11.2"
+    "protobufjs": "6.11.3"
   },
   "main": "dist/main/src/index.js",
   "devDependencies": {
