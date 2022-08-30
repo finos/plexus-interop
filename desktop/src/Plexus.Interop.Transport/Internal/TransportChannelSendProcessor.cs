@@ -109,14 +109,8 @@
                     ? CompletionHeader.Completed
                     : error is OperationCanceledException
                         ? CompletionHeader.Canceled
-                        : CompletionHeader.Failed(GetErrorHeader(error)));
+                        : CompletionHeader.Failed(TransportUtils.GetErrorHeader(error)));
             await SendAsync(closeHeader).ConfigureAwait(false);
-        }
-
-        private static ErrorHeader GetErrorHeader(Exception error)
-        {
-            var message = error is RemoteErrorException remoteError ? remoteError.RemoteMessage : error.Message;
-            return new ErrorHeader(message, error.FormatToString());
         }
 
         private async Task SendAsync(TransportMessageFrame frame)

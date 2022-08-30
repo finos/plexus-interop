@@ -1036,7 +1036,8 @@ namespace Plexus.Interop
                 client.CallInvoker
                     .CallUnary(callDescriptor, new GreetingRequest { Name = "Test" })
                     .AsTask()
-                    .ShouldThrow<RemoteErrorException>();
+                    .ShouldThrow<RemoteErrorException>()
+                    .RemoteExceptionName.ShouldBe("InvalidOperationException");
                 serverCreatedCount.ShouldBe(0);
             });
         }

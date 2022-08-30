@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2017-2021 Plexus Interop Deutsche Bank AG
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -14,25 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Plexus.Interop.Transport.Protocol
+namespace Plexus.Interop.Transport.Internal
 {
     using Plexus.Interop.Protocol.Common;
+    using Plexus.Interop.Transport.Protocol;
+    using System;
 
-    public sealed class RemoteErrorException : ProtocolException
+    internal static class TransportUtils
     {
-        public string RemoteMessage { get; }
-        public string RemoteExceptionName { get; }
-
-        public RemoteErrorException(ErrorHeader errorHeader)
-            : this(errorHeader.Message, errorHeader.Details, errorHeader.ExceptionName)
+        public static ErrorHeader GetErrorHeader(Exception ex)
         {
-        }
-
-        public RemoteErrorException(string remoteMessage, string details, string remoteExceptionName)
-            : base("Error message received: " + remoteMessage, new RemoteException(details))
-        {
-            RemoteMessage = remoteMessage;
-            RemoteExceptionName = remoteExceptionName;
+            var message = ex is RemoteErrorException remoteError ? remoteError.RemoteMessage : ex.Message;
+            return new ErrorHeader(message, ex.FormatToString(), ex.GetBaseException().GetType().Name);
         }
     }
 }

@@ -14,21 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Plexus.Interop.Protocol.Common
 {
-    public struct ErrorHeader
-    {
-        public ErrorHeader(string message, string details)
-        {
-            Message = message;
-            Details = details;
-        }
+    using System;
 
+    public readonly struct ErrorHeader
+    {
         public string Message { get; }
 
         public string Details { get; }
+
+        public string ExceptionName { get; }
+
+        public ErrorHeader(string message, string details, string exceptionName)
+        {
+            Message = message;
+            Details = details;
+            ExceptionName = exceptionName;
+        }
 
         public override bool Equals(object obj)
         {
@@ -48,6 +53,7 @@ namespace Plexus.Interop.Protocol.Common
             hashCode = hashCode * -1521134295 + base.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Message);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Details);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ExceptionName);
             return hashCode;
         }
 
