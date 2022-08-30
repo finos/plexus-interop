@@ -20,7 +20,8 @@ namespace Plexus.Interop.Transport.Protocol
 
     public sealed class RemoteException : Exception
     {
-        public RemoteException(string details) : base(details)
+        public RemoteException(string message)
+            : base(message)
         {
         }
     }

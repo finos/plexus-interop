@@ -29,6 +29,7 @@ message UniqueId {
 message Error {
 	string message = 1;
 	string details = 2;
+	string exception_name = 3;
 }
 
 message Completion {

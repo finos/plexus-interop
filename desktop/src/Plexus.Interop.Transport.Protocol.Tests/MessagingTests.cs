@@ -63,7 +63,7 @@ namespace Plexus.Interop.Transport.Protocol
                 TransportHeaderPool.Instance.CreateConnectionCloseHeader(
                     new CompletionHeader(
                         CompletionStatusHeader.Failed,
-                        new ErrorHeader("Error message", "Error details"))));
+                        new ErrorHeader("Error message", "Error details", nameof(Exception)))));
         }
 
         [Fact]
