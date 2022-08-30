@@ -82,7 +82,7 @@ namespace Plexus.Interop.Protobuf
         {
             return proto == null
                 ? Maybe<ErrorHeader>.Nothing
-                : new Maybe<ErrorHeader>(new ErrorHeader(proto.Message, proto.Details));
+                : new Maybe<ErrorHeader>(new ErrorHeader(proto.Message, proto.Details, proto.ExceptionName));
         }
 
         public static Completion MergeFrom(this Completion proto, CompletionHeader message)
@@ -98,6 +98,7 @@ namespace Plexus.Interop.Protobuf
             proto = proto ?? new Error();
             proto.Message = message.Message;
             proto.Details = message.Details;
+            proto.ExceptionName = message.ExceptionName;
             return proto;
         }
 

@@ -86,15 +86,9 @@ namespace Plexus.Interop.Transport.Internal
             }
             else
             {
-                closeHeader = _transportHeaderFactory.CreateConnectionCloseHeader(CompletionHeader.Failed(GetErrorHeader(error)));
+                closeHeader = _transportHeaderFactory.CreateConnectionCloseHeader(CompletionHeader.Failed(TransportUtils.GetErrorHeader(error)));
             }
             await SendAsync(new TransportMessage(closeHeader)).ConfigureAwait(false);
-        }
-
-        private static ErrorHeader GetErrorHeader(Exception error)
-        {
-            var message = error is RemoteErrorException remoteError ? remoteError.RemoteMessage : error.Message;
-            return new ErrorHeader(message, error.FormatToString());
         }
 
         private Task SendAsync(ChannelMessage message)
