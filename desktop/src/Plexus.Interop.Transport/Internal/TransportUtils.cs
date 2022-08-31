@@ -23,9 +23,8 @@ namespace Plexus.Interop.Transport.Internal
     internal static class TransportUtils
     {
         public static ErrorHeader GetErrorHeader(Exception ex)
-        {
-            var message = ex is RemoteErrorException remoteError ? remoteError.RemoteMessage : ex.Message;
-            return new ErrorHeader(message, ex.FormatToString(), ex.GetBaseException().GetType().Name);
-        }
+            => ex is RemoteErrorException remoteEx
+            ? new ErrorHeader(remoteEx.RemoteMessage, remoteEx.Details, remoteEx.RemoteExceptionName)
+            : new ErrorHeader(ex.Message, ex.FormatToString(), ex.GetBaseException().GetType().Name);
     }
 }
