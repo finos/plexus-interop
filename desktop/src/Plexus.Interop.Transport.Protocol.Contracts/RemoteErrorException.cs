@@ -21,6 +21,7 @@ namespace Plexus.Interop.Transport.Protocol
     public sealed class RemoteErrorException : ProtocolException
     {
         public string RemoteMessage { get; }
+        public string Details { get; }
         public string RemoteExceptionName { get; }
 
         public RemoteErrorException(ErrorHeader errorHeader)
@@ -32,6 +33,7 @@ namespace Plexus.Interop.Transport.Protocol
             : base("Error message received: " + remoteMessage, new RemoteException(details))
         {
             RemoteMessage = remoteMessage;
+            Details = details;
             RemoteExceptionName = remoteExceptionName;
         }
     }
