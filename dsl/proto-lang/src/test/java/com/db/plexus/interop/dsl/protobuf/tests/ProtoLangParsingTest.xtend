@@ -113,4 +113,24 @@ class ProtoLangParsingTest {
 		System.out.println("Validating " + r.URI)
 		issues.addAll(validator.validate(r, CheckMode.ALL, CancelIndicator.NullImpl))								
 	}	
+
+	@Test
+	def void validateProto3FieldLabel() {
+		val resourceUri = "com/db/plexus/interop/dsl/protobuf/tests/field_label.proto"
+		val uri = URI.createURI(ClassLoader.getSystemClassLoader().getResource(resourceUri).toURI().toString())
+		System.out.println("Parsing " + uri)
+		Assert.assertEquals(0, rs.resources.length)
+		rs.getResource(uri, true)
+		EcoreUtil2.resolveAll(rs);
+		val allResources = rs.resources
+		val issues = new LinkedList<Issue>()
+		for (r : allResources) {
+			validateResource(r, issues)
+		}
+		Assert.assertEquals(2, issues.length)
+		System.out.println(issues.length + " expected issues found: ")
+		for (issue : issues) {
+			System.out.println(issue);
+		}
+	}
 }

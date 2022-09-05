@@ -31,11 +31,14 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider
 import com.db.plexus.interop.dsl.protobuf.Import
 import com.db.plexus.interop.dsl.protobuf.ProtoLangImportResolver
 import com.db.plexus.interop.dsl.protobuf.Field
+import com.db.plexus.interop.dsl.protobuf.FieldLabel
 import com.db.plexus.interop.dsl.protobuf.Proto
+import com.db.plexus.interop.dsl.protobuf.ProtoSyntax
 import com.db.plexus.interop.dsl.protobuf.ProtoLangConfig
 import com.db.plexus.interop.dsl.protobuf.Method
 import com.db.plexus.interop.dsl.protobuf.EnumValue
 import com.db.plexus.interop.dsl.protobuf.Enum
+import org.eclipse.xtext.EcoreUtil2
 
 /**
  * This class contains custom validation rules. 
@@ -61,7 +64,7 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 	
 	@Inject
 	ProtoLangConfig protoLangConfig
-		
+
 	@Check
 	def checkSinglePackageDeclaration(Package ele) {		
 		if (ele.eContainer.eContents.filter(typeof(Package)).length > 1) {					
@@ -116,6 +119,19 @@ class ProtoLangValidator extends AbstractProtoLangValidator {
 		}
 	}
 	
+	@Check
+	def checkFieldLabel(Field field) {
+		var proto = EcoreUtil2.getContainerOfType(field, typeof(Proto))
+		if (proto.syntax === ProtoSyntax.PROTO3) {
+			if (field.label === FieldLabel.REQUIRED) {
+				error('Required field label forbidden in plexus proto3', ProtobufPackage.Literals.FIELD__NUMBER)
+			}
+			if (field.label === FieldLabel.OPTIONAL) {
+				error('Optional field label forbidden in plexus proto3', ProtobufPackage.Literals.FIELD__NUMBER)
+			}
+		}
+	}
+
 	@Check
 	def checkProtoResourceName(Proto proto) {
 		if (!protoLangConfig.strictMode) {
