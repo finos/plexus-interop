@@ -47,7 +47,8 @@ task prepareDotnet {
     doLast {
 
         println "Full dotnet: $fullDotNetBuild"
-	    println "Tests enabled: $testsEnabled"
+        println "Only net4: $net4Only"
+        println "Tests enabled: $testsEnabled"
 
         def dotnetVersion = new ByteArrayOutputStream()
         exec {
