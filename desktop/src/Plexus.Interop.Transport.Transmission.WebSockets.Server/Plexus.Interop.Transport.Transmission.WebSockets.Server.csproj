@@ -2,21 +2,30 @@
 
   <Import Project="../Common.csproj" />
 
+  <!--
+    HACK: When build only for net4 we don't need this project.
+    Excluded all files from this project when build only for net4 to avoid problems with netstandard dependencies.
+  -->
+
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks Condition="'$(NET4_ONLY)' == ''">netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(NET4_ONLY)' != ''">net45</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(NET4_ONLY)' == ''">
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.2.1" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(NET4_ONLY)' == ''">
     <ProjectReference Include="..\Plexus.Interop.Transport.Transmission.Contracts\Plexus.Interop.Transport.Transmission.Contracts.csproj" />
     <ProjectReference Include="..\Plexus.Interop.Transport.Utils\Plexus.Interop.Transport.Utils.csproj" />
     <ProjectReference Include="..\Plexus.Utils\Plexus.Utils.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(NET4_ONLY)' != ''">
+    <Compile Remove="**/*cs" />
+  </ItemGroup>
 </Project>
