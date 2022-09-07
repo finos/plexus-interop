@@ -3,12 +3,11 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.0;net45</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.0</TargetFrameworks>
-
+    <TargetFrameworks Condition="'$(CORE_ONLY)' == '' And '$(NET4_ONLY)' == ''">netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition="'$(NET4_ONLY)' != ''">net45</TargetFrameworks>
+    <TargetFrameworks Condition="'$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
     <RootNamespace>Plexus.Interop.Transport</RootNamespace>
     <IsPackable>false</IsPackable>
-
   </PropertyGroup>
 
   <ItemGroup>

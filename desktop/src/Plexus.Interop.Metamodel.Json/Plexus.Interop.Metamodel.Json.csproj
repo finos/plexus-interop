@@ -3,8 +3,9 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netstandard2.0;net45</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(CORE_ONLY)' == '' And '$(NET4_ONLY)' == ''">netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition="'$(NET4_ONLY)' != ''">net45</TargetFrameworks>
+    <TargetFrameworks Condition="'$(CORE_ONLY)' != ''">netstandard2.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
