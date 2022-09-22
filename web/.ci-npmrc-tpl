@@ -1,4 +1,3 @@
 # Placeholders to be replaced with env variables
 registry=${NPM_REGISTRY}
 _auth=${NPM_AUTH_TOKEN}
-email=${NPM_AUTH_USER}

@@ -1,4 +1,4 @@
 # Placeholders to be replaced with env variables
 @plexus-interop:registry=https:${NPM_REGISTRY}
-${NPM_REGISTRY}:_authToken=${NPM_AUTH_TOKEN}
+${NPM_REGISTRY}:_auth=${NPM_AUTH_TOKEN}
 ${NPM_REGISTRY}:always-auth=true
