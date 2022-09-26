@@ -3,12 +3,11 @@
   <Import Project="../Common.csproj" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">netcoreapp2.1;net452;net46</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">netcoreapp2.1</TargetFrameworks>
-
+    <TargetFrameworks Condition="'$(CORE_ONLY)' == '' And '$(NET4_ONLY)' == ''">netcoreapp2.1;net452</TargetFrameworks>
+    <TargetFrameworks Condition="'$(NET4_ONLY)' != ''">net452</TargetFrameworks>
+    <TargetFrameworks Condition="'$(CORE_ONLY)' != ''">netcoreapp2.1</TargetFrameworks>
     <RootNamespace>Plexus</RootNamespace>
     <IsPackable>false</IsPackable>
-
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.0" />

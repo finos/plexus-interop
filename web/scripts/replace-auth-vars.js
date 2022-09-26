@@ -37,26 +37,20 @@ if (!!buildRunner) {
 
     const registryVar = 'NPM_REGISTRY';
     const authTokenVar = 'NPM_AUTH_TOKEN';
-    const authUserVar = 'NPM_AUTH_USER';
 
     const authToken = process.env[`${authTokenVar}${postfix}`] || process.env[authTokenVar];
     let registry = process.env[`${registryVar}${postfix}`] || process.env[registryVar];
-    const user = process.env[`${authUserVar}${postfix}`] || process.env[authUserVar];
     const templateFile = install ? '.ci-npmrc-tpl' : '.ci-publish-npmrc-tpl';
 
     if (!!authToken) {
         console.log(`Auth Token length ${authToken.length}`);
     }
 
-    if (!!user) {
-        console.log(`Auth User length ${user.length}`);
-    }
-
     if (!!registry) {
         console.log(`Registry value ${registry}`);
     }
 
-    if (!authToken || !registry || !user) {
+    if (!authToken || !registry) {
 
         console.log("Not all auth variables provided");
         
@@ -79,9 +73,8 @@ if (!!buildRunner) {
             if (err) {
                 return console.log(err);
             }
-            data = data.replace(new RegExp(`\\\${${registryVar}}`, 'g'), registry);
+            data = data.replace(`\${${registryVar}}`, registry);
             data = data.replace(`\${${authTokenVar}}`, authToken);
-            data = data.replace(`\${${authUserVar}}`, user);
 
             if (disableStrictSsl) {
                 console.log('Updating strict ssl setting');
