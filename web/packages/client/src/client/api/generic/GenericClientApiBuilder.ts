@@ -41,6 +41,8 @@ export class GenericClientApiBuilder {
     protected transportConnectionProvider: () => Promise<TransportConnection>;
     protected clientApiDecorator: (client: InternalGenericClientApi) => Promise<GenericClientApi> = async client => client;
 
+    private onDisconnect?: () => Promise<void>;
+
     constructor(protected marshallerProvider: BinaryMarshallerProvider = new ProtoMarshallerProvider()) {
         this.handlersRegistry = new InvocationHandlersRegistry(this.marshallerProvider);
     }
@@ -101,6 +103,10 @@ export class GenericClientApiBuilder {
         return this;
     }
 
+    public withDisconnectCallback(onDisconnect: () => Promise<void>): void {
+        this.onDisconnect = onDisconnect;
+    }
+
     public connect(): Promise<GenericClientApi> {
         if (!this.applicationInstanceId) {
             this.applicationInstanceId = UniqueId.generateNew();
@@ -120,7 +126,7 @@ export class GenericClientApiBuilder {
             .then(connectionProviderWithRetries)
             .then(connection => {
                 this.log.info('Connection established');
-                return new GenericClientFactory(connection).createClient(appInfo);
+                return new GenericClientFactory(connection, this.onDisconnect).createClient(appInfo);
             })
             .then(genericClient => {
                 const actionsHost = new GenericInvocationsHost(genericClient, this.handlersRegistry);

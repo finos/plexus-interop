@@ -26,7 +26,9 @@ export class GenericClientFactory {
 
     private log: Logger = LoggerFactory.getLogger('GenericClientFactory');
 
-    constructor(private readonly transportConnection: TransportConnection) { }
+    constructor(
+        private readonly transportConnection: TransportConnection,
+        private readonly onDisconnect?: () => Promise<void>) { }
 
     public async createClient(request: ClientConnectRequest): Promise<GenericClient> {
         const requestPayload = ClientProtocolHelper.connectRequestPayload(request);
@@ -38,7 +40,8 @@ export class GenericClientFactory {
                 return new GenericClientImpl(
                     request,
                     UniqueId.fromProperties(response.connectionId as plexus.IUniqueId),
-                    this.transportConnection);
+                    this.transportConnection,
+                    this.onDisconnect);
             });
     }
 }

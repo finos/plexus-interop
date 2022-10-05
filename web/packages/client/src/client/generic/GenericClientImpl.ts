@@ -48,17 +48,25 @@ export class GenericClientImpl implements GenericClient {
     constructor(
         private readonly clientInfo: ClientConnectRequest,
         private readonly connectionId: UniqueId,
-        private readonly transportConnection: TransportConnection) {
+        private readonly transportConnection: TransportConnection,
+        onDisconnect?: () => Promise<void>) {
         this.log = LoggerFactory.getLogger('GenericClient');
         this.state = new StateMaschineBase(ClientState.CREATED, [
             {
-                from: ClientState.CREATED, to: ClientState.LISTEN
+                from: ClientState.CREATED,
+                to: ClientState.LISTEN
             },
             {
-                from: ClientState.CREATED, to: ClientState.CLOSED, preHandler: async () => this.cancellationToken.cancel('Closed')
+                from: ClientState.CREATED,
+                to: ClientState.CLOSED,
+                preHandler: async () => this.cancellationToken.cancel('Closed'),
+                postHandler: onDisconnect
             },
             {
-                from: ClientState.LISTEN, to: ClientState.CLOSED, preHandler: async () => this.cancellationToken.cancel('Closed')
+                from: ClientState.LISTEN,
+                to: ClientState.CLOSED,
+                preHandler: async () => this.cancellationToken.cancel('Closed'),
+                postHandler: onDisconnect
             }
         ], this.log);
         this.log.trace('Created');
@@ -145,10 +153,14 @@ export class GenericClientImpl implements GenericClient {
             },
             complete: () => {
                 this.log.debug('Channels subscription completed');
+                if (!this.transportConnection.isConnected()) {
+                    this.log.info('Transport connection closed, move client to closed');
+                    this.state.go(ClientState.CLOSED);
+                }
                 observer.complete();
             },
             error: e => {
-                this.log.error('Error while receceivign channel', e);
+                this.log.error('Error while receiving channel', e);
                 this.state.go(ClientState.CLOSED);
             }
         });
