@@ -185,6 +185,11 @@ export class «app.name»ClientBuilder implements ClientApiBuilder<«app.name»C
         return this;
     }
 
+    public withDisconnectCallback(onDisconnect: () => Promise<void>): «app.name»ClientBuilder {
+        this.genericBuilder.withDisconnectCallback(onDisconnect);
+        return this;
+    }
+
     public connect(): Promise<«app.name»Client> {
         «FOR providedService : providedServices »
         if (!this.«providedService.aliasOrName.toFirstLower»Handler) {
