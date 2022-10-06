@@ -153,7 +153,7 @@ export class GenericClientImpl implements GenericClient {
             },
             complete: () => {
                 this.log.debug('Channels subscription completed');
-                if (!this.transportConnection.isConnected()) {
+                if (!this.transportConnection.isConnected() && !this.state.is(ClientState.CLOSED)) {
                     this.log.info('Transport connection closed, move client to closed');
                     this.state.go(ClientState.CLOSED);
                 }
@@ -161,7 +161,9 @@ export class GenericClientImpl implements GenericClient {
             },
             error: e => {
                 this.log.error('Error while receiving channel', e);
-                this.state.go(ClientState.CLOSED);
+                if (!this.state.is(ClientState.CLOSED)) {
+                    this.state.go(ClientState.CLOSED);
+                }
             }
         });
     }
