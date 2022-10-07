@@ -333,10 +333,12 @@ export class FramedTransportConnection implements TransportConnection, Transport
             error: (transportError) => {
                 this.log.error('Error from source transport', transportError);
                 this.reportErrorToChannels(transportError);
+                this.channelObserver.complete();
                 this.closeAndCleanUp();
             },
             complete: () => {
                 this.log.debug('Source connection completed');
+                this.channelObserver.complete();
                 this.closeAndCleanUp();
             }
         });

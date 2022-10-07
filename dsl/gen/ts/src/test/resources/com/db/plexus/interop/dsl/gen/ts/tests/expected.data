@@ -237,6 +237,11 @@ export class ComponentAClientBuilder implements ClientApiBuilder<ComponentAClien
         return this;
     }
 
+    public withDisconnectCallback(onDisconnect: () => Promise<void>): ComponentAClientBuilder {
+        this.genericBuilder.withDisconnectCallback(onDisconnect);
+        return this;
+    }
+
     public connect(): Promise<ComponentAClient> {
         if (!this.exampleServiceHandler) {
             return Promise.reject('Invocation handler for ExampleService is not provided');
