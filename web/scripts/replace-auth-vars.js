@@ -73,7 +73,8 @@ if (!!buildRunner) {
             if (err) {
                 return console.log(err);
             }
-            data = data.replace(`\${${registryVar}}`, registry);
+            // Replace with RegExp to replace all instances
+            data = data.replace(new RegExp(`\\\${${registryVar}}`, 'g'), registry);
             data = data.replace(`\${${authTokenVar}}`, authToken);
 
             if (disableStrictSsl) {
