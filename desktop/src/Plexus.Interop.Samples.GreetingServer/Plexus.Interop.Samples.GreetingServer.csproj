@@ -44,9 +44,7 @@
   </ItemGroup>
 
   <Target Name="PublishAfterBuild" AfterTargets="Build" DependsOnTargets="Publish">
-    <Copy SourceFiles="LaunchGreetingServer.cmd" DestinationFolder="$(SamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'win-x86'" />
-    <Copy SourceFiles="LaunchGreetingServer.sh" DestinationFolder="$(SamplesDir)" Condition=" '$(RuntimeIdentifier)' == 'osx-x64'" />
-
+    <Copy SourceFiles="LaunchGreetingServer.cmd" DestinationFolder="$(SamplesDir)" />
   </Target>
   
 </Project>
