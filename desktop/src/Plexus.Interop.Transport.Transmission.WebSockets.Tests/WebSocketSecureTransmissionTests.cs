@@ -20,8 +20,10 @@ namespace Plexus.Interop.Transport.Transmission.WebSockets
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
     using System.Security.Authentication;
     using System.Security.Cryptography.X509Certificates;
+    using Xunit;
     using Xunit.Abstractions;
 
+    [Collection("WebSockets")]
     public sealed class WebSocketSecureTransmissionTests : TransmissionTestsSuite
     {
         public WebSocketSecureTransmissionTests(ITestOutputHelper output) : base(output)
