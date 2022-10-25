@@ -2,13 +2,13 @@
 
   <Import Project="../Common.csproj" />
 
-  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' And '$(CORE_ONLY)' == ''">
+  <PropertyGroup Condition=" '$(CORE_ONLY)' == ''">
     <TargetFramework>net45</TargetFramework>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' Or '$(CORE_ONLY)' != ''">
+  <PropertyGroup Condition=" '$(CORE_ONLY)' != ''">
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
@@ -16,12 +16,10 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>plexus</AssemblyName>
 
-    <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT' And '$(BUILD_X64)' == ''">win-x86</RuntimeIdentifier>
-    <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT' And '$(BUILD_X64)' != ''">win-x64</RuntimeIdentifier>
-    <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>
-
+    <RuntimeIdentifier Condition=" '$(BUILD_X64)' == ''">win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition=" '$(BUILD_X64)' != ''">win-x64</RuntimeIdentifier>
     <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'win-x86'">x86</PlatformTarget>
-    <PlatformTarget Condition=" '$(RuntimeIdentifier)' != 'win-x86'">x64</PlatformTarget>
+    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'win-x64'">x64</PlatformTarget>
 
     <RepoRootDir>../../../</RepoRootDir>
     <ArtifactsDir>$(RepoRootDir)bin/$(RuntimeIdentifier)/</ArtifactsDir>
