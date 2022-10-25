@@ -19,8 +19,10 @@ namespace Plexus.Interop.Transport.WebSockets
     using Plexus.Interop.Transport.Protocol.Protobuf;
     using Plexus.Interop.Transport.Transmission.WebSockets.Client;
     using Plexus.Interop.Transport.Transmission.WebSockets.Server;
+    using Xunit;
     using Xunit.Abstractions;
 
+    [Collection("WebSockets")]
     public sealed class WebSocketTransportTests : TransportTestsSuite
     {
         public WebSocketTransportTests(ITestOutputHelper output) : base(output)

@@ -13,7 +13,7 @@
     <tags>plexus interop broker ipc rpc messaging interoperability</tags>
   </metadata>
   <files>
-    <file src="..\..\..\bin\win-x86\broker\" target="\redist\$id$" />
+    <file src="..\..\..\bin\$rid$\broker\" target="\redist\$id$" />
     <file src="Plexus.Interop.Broker.Redist.targets" target="\build\$id$.targets" />
   </files>
 </package>

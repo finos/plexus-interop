@@ -13,6 +13,7 @@ def dotnetSdkVersion = "5.0"
 def buildCache = System.getenv("PLEXUS_BUILD_CACHE_DIR") ?: new File("${rootDir}/build").absolutePath
 def fullDotNetBuild = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['PLEXUS_BUILD_FULL_DOTNET'] != 'false'
 def net4Only = System.env['PLEXUS_BUILD_NET4_ONLY'] == 'true'
+def buildX64 = System.env['PLEXUS_BUILD_X64'] == 'true'
 def skipNugetPublish = System.env['PLEXUS_BUILD_SKIP_DOTNET_PUBLISH'] == 'true'
 def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] != 'true'
 def nugetVersion = System.getenv("PLEXUS_BUILD_NUGET_VERSION") ?: System.getenv("APPVEYOR_REPO_TAG_NAME")
@@ -22,6 +23,9 @@ if (net4Only) {
     dotnetParams += " /p:NET4_ONLY=true"
 } else if (!fullDotNetBuild) {
     dotnetParams += " /p:CORE_ONLY=true"
+}
+if (buildX64) {
+    dotnetParams += " /p:BUILD_X64=true"
 }
 
 license {
@@ -48,6 +52,7 @@ task prepareDotnet {
 
         println "Full dotnet: $fullDotNetBuild"
         println "Only net4: $net4Only"
+        println "Build x64: $buildX64"
         println "Tests enabled: $testsEnabled"
 
         def dotnetVersion = new ByteArrayOutputStream()
@@ -70,8 +75,8 @@ task prepareDotnet {
             download {
                 onlyIfNewer true
                 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    src 'https://download.visualstudio.microsoft.com/download/pr/b34b6944-78df-4004-852c-94433e48a5d5/df50f29231c47e0e2898bf85f0ff31f3/dotnet-sdk-5.0.404-win-x86.zip'
-                    dest "$buildCache/win32/sdk/dotnet.zip"
+                    src 'https://download.visualstudio.microsoft.com/download/pr/14ccbee3-e812-4068-af47-1631444310d1/3b8da657b99d28f1ae754294c9a8f426/dotnet-sdk-5.0.408-win-x64.exe'
+                    dest "$buildCache/win/sdk/dotnet.zip"
                 } else if (Os.isFamily(Os.FAMILY_MAC)){
                     src 'https://download.visualstudio.microsoft.com/download/pr/90588609-df30-4cb7-b4aa-a2e71ec42c9a/9bc894713f459ebe73493552fd231807/dotnet-sdk-5.0.404-osx-x64.tar.gz'
                     dest "$buildCache/unix/sdk/dotnet.tar.gz"
@@ -83,8 +88,8 @@ task prepareDotnet {
 
             copy {
                 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    from zipTree("$buildCache/win32/sdk/dotnet.zip")
-                    into "$buildCache/win32/sdk/dotnet"
+                    from zipTree("$buildCache/win/sdk/dotnet.zip")
+                    into "$buildCache/win/sdk/dotnet"
                 } else {
                     from tarTree(resources.gzip("$buildCache/unix/sdk/dotnet.tar.gz"))
                     into "$buildCache/unix/sdk/dotnet"
@@ -93,8 +98,8 @@ task prepareDotnet {
 
             tasks.withType(Exec) {
                 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    environment "PATH", "$buildCache/win32/sdk/dotnet/"
-                    environment "PLEXUS_BUILD_DOTNET_DIR", "$buildCache/win32/sdk/dotnet/"
+                    environment "PATH", "$buildCache/win/sdk/dotnet/"
+                    environment "PLEXUS_BUILD_DOTNET_DIR", "$buildCache/win/sdk/dotnet/"
                 } else {
                     environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildCache/unix/sdk/dotnet/"
                     environment "PLEXUS_BUILD_DOTNET_DIR", "$buildCache/unix/sdk/dotnet/"
