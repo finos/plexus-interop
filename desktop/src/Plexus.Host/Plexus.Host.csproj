@@ -6,23 +6,21 @@
     <TargetFramework>net45</TargetFramework>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(CORE_ONLY)' != ''">
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>plexus</AssemblyName>
 
-    <RuntimeIdentifier Condition=" '$(BUILD_X64)' == ''">win-x86</RuntimeIdentifier>
-    <RuntimeIdentifier Condition=" '$(BUILD_X64)' != ''">win-x64</RuntimeIdentifier>
-    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'win-x86'">x86</PlatformTarget>
-    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'win-x64'">x64</PlatformTarget>
-
     <RepoRootDir>../../../</RepoRootDir>
-    <ArtifactsDir>$(RepoRootDir)bin/$(RuntimeIdentifier)/</ArtifactsDir>
+    <ArtifactsDir>$(RepoRootDir)bin/$(PlatformTarget)/</ArtifactsDir>
     <PublishDir>$(ArtifactsDir)broker/</PublishDir>
     <ArtifactsSamplesDir>$(ArtifactsDir)samples/greeting/</ArtifactsSamplesDir>
     <QuickStartSamplesDir>$(ArtifactsDir)samples/quick-start/</QuickStartSamplesDir>
@@ -63,9 +61,10 @@
 
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);id=Plexus.Interop.Broker.Redist-$(RuntimeIdentifier)</NuspecProperties>
+      <NuspecProperties Condition="'$(TargetFramework)' == 'net45'">$(NuspecProperties);id=Plexus.Interop.Broker.Redist</NuspecProperties>
+      <NuspecProperties Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(NuspecProperties);id=Plexus.Interop.Broker.Redist-$(RuntimeIdentifier)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);rid=$(RuntimeIdentifier)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);platform=$(PlatformTarget)</NuspecProperties>
     </PropertyGroup>
     <Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />
   </Target>
