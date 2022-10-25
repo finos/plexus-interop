@@ -75,7 +75,7 @@ task prepareDotnet {
             download {
                 onlyIfNewer true
                 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    src 'https://download.visualstudio.microsoft.com/download/pr/14ccbee3-e812-4068-af47-1631444310d1/3b8da657b99d28f1ae754294c9a8f426/dotnet-sdk-5.0.408-win-x64.exe'
+                    src 'https://download.visualstudio.microsoft.com/download/pr/57776397-c87d-4eb8-9080-d58d180ccbe6/920afd9e178bdcd10fcfe696c1fdb88c/dotnet-sdk-5.0.408-win-x64.zip'
                     dest "$buildCache/win/sdk/dotnet.zip"
                 } else if (Os.isFamily(Os.FAMILY_MAC)){
                     src 'https://download.visualstudio.microsoft.com/download/pr/90588609-df30-4cb7-b4aa-a2e71ec42c9a/9bc894713f459ebe73493552fd231807/dotnet-sdk-5.0.404-osx-x64.tar.gz'
