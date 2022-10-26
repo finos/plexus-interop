@@ -14,11 +14,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     
-    <RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
-    <RuntimeIdentifier Condition=" '$(OS)' != 'Windows_NT'">osx-x64</RuntimeIdentifier>
-
-    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'win-x86'">x86</PlatformTarget>
-    <PlatformTarget Condition=" '$(RuntimeIdentifier)' == 'osx-x64'">x64</PlatformTarget>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <PlatformTarget>x86</PlatformTarget>
 
     <ArtifactsDir>../../../bin/$(RuntimeIdentifier)/</ArtifactsDir>
     <SamplesDir>$(ArtifactsDir)samples/quick-start/</SamplesDir>

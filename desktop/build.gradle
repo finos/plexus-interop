@@ -13,7 +13,6 @@ def dotnetSdkVersion = "5.0"
 def buildCache = System.getenv("PLEXUS_BUILD_CACHE_DIR") ?: new File("${rootDir}/build").absolutePath
 def fullDotNetBuild = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['PLEXUS_BUILD_FULL_DOTNET'] != 'false'
 def net4Only = System.env['PLEXUS_BUILD_NET4_ONLY'] == 'true'
-def buildX64 = System.env['PLEXUS_BUILD_X64'] == 'true'
 def skipNugetPublish = System.env['PLEXUS_BUILD_SKIP_DOTNET_PUBLISH'] == 'true'
 def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] != 'true'
 def nugetVersion = System.getenv("PLEXUS_BUILD_NUGET_VERSION") ?: System.getenv("APPVEYOR_REPO_TAG_NAME")
@@ -23,9 +22,6 @@ if (net4Only) {
     dotnetParams += " /p:NET4_ONLY=true"
 } else if (!fullDotNetBuild) {
     dotnetParams += " /p:CORE_ONLY=true"
-}
-if (buildX64) {
-    dotnetParams += " /p:BUILD_X64=true"
 }
 
 license {
@@ -52,17 +48,12 @@ task prepareDotnet {
 
         println "Full dotnet: $fullDotNetBuild"
         println "Only net4: $net4Only"
-        println "Build x64: $buildX64"
         println "Tests enabled: $testsEnabled"
 
         def dotnetVersion = new ByteArrayOutputStream()
         exec {
             ignoreExitValue true
-            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$projectDir/dotnet.cmd", "--version"
-            } else {
-                commandLine "$projectDir/dotnet.sh", "--version"
-            }
+            commandLine 'cmd', '/c', "$projectDir/dotnet.cmd", "--version"
             standardOutput = dotnetVersion;
         }
         dotnetVersion = "$dotnetVersion".trim()
@@ -74,36 +65,18 @@ task prepareDotnet {
 
             download {
                 onlyIfNewer true
-                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    src 'https://download.visualstudio.microsoft.com/download/pr/57776397-c87d-4eb8-9080-d58d180ccbe6/920afd9e178bdcd10fcfe696c1fdb88c/dotnet-sdk-5.0.408-win-x64.zip'
-                    dest "$buildCache/win/sdk/dotnet.zip"
-                } else if (Os.isFamily(Os.FAMILY_MAC)){
-                    src 'https://download.visualstudio.microsoft.com/download/pr/90588609-df30-4cb7-b4aa-a2e71ec42c9a/9bc894713f459ebe73493552fd231807/dotnet-sdk-5.0.404-osx-x64.tar.gz'
-                    dest "$buildCache/unix/sdk/dotnet.tar.gz"
-                } else {
-                    src 'https://download.visualstudio.microsoft.com/download/pr/2c1eb8c8-ac05-4dc7-9bef-307b3e450e9d/75e85b3d1662f60afd69572fd5df6884/dotnet-sdk-5.0.404-linux-x64.tar.gz'
-                    dest "$buildCache/unix/sdk/dotnet.tar.gz"
-                }
+                src 'https://download.visualstudio.microsoft.com/download/pr/57776397-c87d-4eb8-9080-d58d180ccbe6/920afd9e178bdcd10fcfe696c1fdb88c/dotnet-sdk-5.0.408-win-x64.zip'
+                dest "$buildCache/win/sdk/dotnet.zip"
             }
 
             copy {
-                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    from zipTree("$buildCache/win/sdk/dotnet.zip")
-                    into "$buildCache/win/sdk/dotnet"
-                } else {
-                    from tarTree(resources.gzip("$buildCache/unix/sdk/dotnet.tar.gz"))
-                    into "$buildCache/unix/sdk/dotnet"
-                }
+                from zipTree("$buildCache/win/sdk/dotnet.zip")
+                into "$buildCache/win/sdk/dotnet"
             }
 
             tasks.withType(Exec) {
-                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    environment "PATH", "$buildCache/win/sdk/dotnet/"
-                    environment "PLEXUS_BUILD_DOTNET_DIR", "$buildCache/win/sdk/dotnet/"
-                } else {
-                    environment "PATH", "/usr/local/bin:/bin:/usr/bin:$buildCache/unix/sdk/dotnet/"
-                    environment "PLEXUS_BUILD_DOTNET_DIR", "$buildCache/unix/sdk/dotnet/"
-                }
+                environment "PATH", "$buildCache/win/sdk/dotnet/"
+                environment "PLEXUS_BUILD_DOTNET_DIR", "$buildCache/win/sdk/dotnet/"
 	        }
         }
     }
@@ -115,11 +88,7 @@ task compile(type:Exec) {
     
     workingDir projectDir
     environment "PLEXUS_BUILD_DOTNET_PARAMS", dotnetParams
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        commandLine "$projectDir/build.cmd"
-    } else {
-        commandLine "$projectDir/build.sh"
-    }
+    commandLine "$projectDir/build.cmd"
 }
 
 if (testsEnabled) {
@@ -128,12 +97,7 @@ if (testsEnabled) {
         workingDir projectDir
     	ignoreExitValue false
         environment "PLEXUS_BUILD_DOTNET_PARAMS", dotnetParams
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-           commandLine "$projectDir/tests.cmd"
-        } else {
-           // For now tests can only run on Windows
-           // commandLine "$projectDir/tests.sh"
-        }
+        commandLine "$projectDir/tests.cmd"
     }
 } else {
     task test(dependsOn: compile) {
@@ -147,11 +111,7 @@ if (nugetVersion != null && !skipNugetPublish) {
     task push(dependsOn: test, type:Exec) {
         dependsOn prepareDotnet
         workingDir projectDir
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            commandLine "$projectDir/push.cmd"
-        } else {
-            commandLine "$projectDir/push.sh"
-        }
+        commandLine "$projectDir/push.cmd"
     }    
 } else {
    task push(dependsOn: test) {
