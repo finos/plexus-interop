@@ -21,10 +21,8 @@
     <AssemblyName>plexus</AssemblyName>
 
     <RepoRootDir>../../../</RepoRootDir>
-    <ArtifactsDir>$(RepoRootDir)bin/$(PlatformTarget)/</ArtifactsDir>
+    <ArtifactsDir>$(RepoRootDir)bin/$(TargetFramework)-$(PlatformTarget)/</ArtifactsDir>
     <PublishDir>$(ArtifactsDir)broker/</PublishDir>
-    <ArtifactsSamplesDir>$(ArtifactsDir)samples/greeting/</ArtifactsSamplesDir>
-    <QuickStartSamplesDir>$(ArtifactsDir)samples/quick-start/</QuickStartSamplesDir>
 
     <IsPackable>true</IsPackable>
     <NuspecFile>$(MSBuildThisFileDirectory)Plexus.Interop.Broker.Redist.nuspec</NuspecFile>
@@ -65,7 +63,7 @@
       <NuspecProperties Condition="'$(TargetFramework)' == 'net45'">$(NuspecProperties);id=Plexus.Interop.Broker.Redist</NuspecProperties>
       <NuspecProperties Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(NuspecProperties);id=Plexus.Interop.Broker.Redist-$(RuntimeIdentifier)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);platform=$(PlatformTarget)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);artifacts=$(TargetFramework)-$(PlatformTarget)</NuspecProperties>
     </PropertyGroup>
     <Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />
   </Target>
