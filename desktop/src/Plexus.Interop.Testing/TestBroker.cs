@@ -29,9 +29,15 @@ namespace Plexus.Interop.Testing
     {
         private static readonly TimeSpan StopTimeout = TimeoutConstants.Timeout3Sec;
 
+        private const string ArtifactsDir =
+#if CORE_ONLY
+"netcoreapp2.1-x64";
+#else
+"net45-AnyCPU";
+#endif
         private readonly string _exePath =
             Path.GetFullPath(Path.Combine(
-                Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "..", "bin", "AnyCPU", "broker",
+                Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "..", "bin", ArtifactsDir, "broker",
                 "plexus"));
         
         private readonly Promise _processExited = new Promise();

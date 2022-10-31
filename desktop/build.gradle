@@ -11,16 +11,16 @@ repositories {
 
 def dotnetSdkVersion = "5.0"
 def buildCache = System.getenv("PLEXUS_BUILD_CACHE_DIR") ?: new File("${rootDir}/build").absolutePath
-def fullDotNetBuild = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['PLEXUS_BUILD_FULL_DOTNET'] != 'false'
+def coreOnly = System.env['PLEXUS_BUILD_CORE_ONLY'] == 'true'
 def net4Only = System.env['PLEXUS_BUILD_NET4_ONLY'] == 'true'
-def skipNugetPublish = System.env['PLEXUS_BUILD_SKIP_DOTNET_PUBLISH'] == 'true'
+def nugetPublish = System.env['PLEXUS_BUILD_NUGET_PUBLISH'] == 'true'
 def testsEnabled = Os.isFamily(Os.FAMILY_WINDOWS) && System.env['BuildRunner'] != "MyGet" && System.env['PLEXUS_BUILD_SKIP_DOTNET_TESTS'] != 'true'
 def nugetVersion = System.getenv("PLEXUS_BUILD_NUGET_VERSION") ?: System.getenv("APPVEYOR_REPO_TAG_NAME")
 def dotnetParams = nugetVersion == null ? " " : "/p:Version=$nugetVersion"
 
 if (net4Only) {
     dotnetParams += " /p:NET4_ONLY=true"
-} else if (!fullDotNetBuild) {
+} else if (coreOnly) {
     dotnetParams += " /p:CORE_ONLY=true"
 }
 
@@ -46,7 +46,7 @@ licenseFormat.dependsOn licenseFormatCS
 task prepareDotnet {
     doLast {
 
-        println "Full dotnet: $fullDotNetBuild"
+        println "Only netcore: $coreOnly"
         println "Only net4: $net4Only"
         println "Tests enabled: $testsEnabled"
 
@@ -107,7 +107,7 @@ if (testsEnabled) {
     }
 }
 
-if (nugetVersion != null && !skipNugetPublish) {
+if (nugetVersion != null && nugetPublish) {
     task push(dependsOn: test, type:Exec) {
         dependsOn prepareDotnet
         workingDir projectDir
