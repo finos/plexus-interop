@@ -1,4 +1,8 @@
-# Plexus Interop [![FINOS - Incubating](https://cdn.rawgit.com/finos/contrib-toolbox/master/images/badge-incubating.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Incubating) [![AppVeyor Plexus Interop CI status](https://ci.appveyor.com/api/projects/status/sfjvccbssn9hwbkh/branch/master?svg=true)](https://ci.appveyor.com/project/finos/plexus-interop/branch/master) [![Plexus Interop MyGet Build Status](https://www.myget.org/BuildSource/Badge/plexus?identifier=bd2cfabe-2a11-4584-9a39-80251218fd94)](https://www.myget.org/)
+[![FINOS - Archived](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-archived.svg)](https://community.finos.org/docs/governance/Software-Projects/stages/archived)
+
+_This project is archived, which means that it's in read-only state; you can download and use this code, but please be aware that it may be buggy and may also contain security vulnerabilities. If you're interested in restoring development activities on this project, please email help@finos.org_
+
+# Plexus Interop 
 
 ## Overview
 
